@@ -65,40 +65,11 @@ class Mapper extends BaseMapper
         // * due work
         // * quiz
         // * project
-        // These are defined without a related field, because they don't have a matching key in this mapper
-        // (that isn't this mapper's PK)
-        $this->hasJoin(
-            'task',
-            [
-                'mapper'    => TaskMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'assessment_id'
-            ]
-        );
-        $this->hasJoin(
-            'duework',
-            [
-                'mapper'    => SubmissionBoxMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'assessment_id'
-            ]
-        );
-        $this->hasJoin(
-            'quiz',
-            [
-                'mapper'    => QuizMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'assessment_id'
-            ]
-        );
-        $this->hasJoin(
-            'project',
-            [
-                'mapper'    => ProjectMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'assessment_id'
-            ]
-        );
+        $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
+        $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
+        $this->joinsReverseSingle('assessment_id', QuizMapper::class, 'quiz', 'quiz');
+        $this->joinsReverseSingle('assessment_id', ProjectMapper::class, 'project', 'project');
+
         // Context joins (where does this assessment live?)
         // * folder (via assessment_folder)
         // * unit specification (via assessment_course_unit_specification)
