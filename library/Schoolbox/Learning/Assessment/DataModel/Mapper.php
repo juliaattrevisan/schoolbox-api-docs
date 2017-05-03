@@ -15,7 +15,9 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
@@ -186,7 +188,7 @@ class Mapper extends BaseMapper
      *
      * @param Builder $pb
      * @param array $options
-     * @return Collection
+     * @return GenericCollection|IAssessable[]
      */
     public function findByPredicates(Builder $pb, array $options = [])
     {
@@ -704,7 +706,7 @@ class Mapper extends BaseMapper
                     d.id as duework_id,
                     {$this->getJoinColumnString('duework.submission_box_file', 's')},
                     {$this->getJoinColumnString('duework.submission_box_file.allowedFileExtension', 'm')}
-                FROM {$this->getJoinMapper('duework', 'd')->getTable()} d
+                FROM {$this->getJoinMapper('duework')->getTable()} d
                 INNER JOIN {$this->getJoinSql('duework.submission_box_file', 'd', 's')}
                 LEFT JOIN {$this->getJoinSql('duework.submission_box_file.allowedFileExtension', 's', 'm')}
                 WHERE d.id IN {$this->getArrayPlaceholders($dueWorkIds, 'id')}
