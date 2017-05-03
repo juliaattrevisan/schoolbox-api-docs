@@ -149,7 +149,6 @@ class EventRecurrenceMapper
 
             if ($efficacy == self::EFFICACY_SERIES) {
                 $this->persistSeries($event, $eventRelations, $access, $startDate, $endDate);
-
             } elseif ($efficacy == self::EFFICACY_SELF) {
                 $this->persistSingle($event, $eventRelations, $access, $eventRecurrence);
             }
@@ -183,11 +182,20 @@ class EventRecurrenceMapper
      */
     protected function persistSeries(Event $event, EventRelations $eventRelations, $access, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate)
     {
+        // Clone metadata IMMEDIATELY otherwise it will be clobbered by refetch
+        // of $event in getAllInSeries below. (╯°□°）╯︵ ┻━┻
+        $seriesEventMetadata = $event->getMetadata();
+        if (is_object($seriesEventMetadata)) {
+            $metadata = clone $seriesEventMetadata;
+        } else {
+            $metadata = $seriesEventMetadata;
+        }
 
         /* Update details of an already-existing set of recurring event incidents
          * (Change details of each instance of a recurring event, for example)
          */
         $series = $this->getEventMapper()->getAllInSeries($event);
+
 
         if ($series->count() == 0) {
             // there's no point continuing if there's nothing to work with
@@ -210,10 +218,18 @@ class EventRecurrenceMapper
         foreach ($series as $seriesEvent) {
             $this->setSeriesEventData($seriesEvent, $event);
 
+            // clone AGAIN
+            if (is_object($metadata)) {
+                $seriesMetadata = clone $metadata;
+            } else {
+                $seriesMetadata = $metadata;
+            }
+
             // Adjust each event's start and end individually
             $seriesEvent->getStartDateTime()->getDateTimeObject()->add($startDelta);
             $seriesEvent->getEndDateTime()->getDateTimeObject()->add($endDelta);
             $this->getEventMapper()->save($seriesEvent);
+            $this->getEventMapper()->updateMetadata($seriesMetadata, $seriesEvent);
 
             /* Assign relations
              */
@@ -237,12 +253,31 @@ class EventRecurrenceMapper
         // rest from scratch.
         $first_date_set = $eventRecurrence->getDateCollection()->first();
 
+        /* Tried to set a recurrence date in the past
+         * You can't repeat events into the past
+         */
+        if ($first_date_set == null) {
+            return;
+        }
+
         $event->setSeriesId($eventRecurrence->getSeriesId());
         $event->setStartDate($first_date_set['start']);
         $event->setEndDate($first_date_set['end']);
         $event->setAccess($access);
 
+        $eventMetadata = $event->getMetadata();
+        if (is_object($eventMetadata)) {
+            $metadata = clone $eventMetadata;
+        } else {
+            $metadata = $eventMetadata;
+        }
+
         $this->getEventMapper()->save($event);
+
+        /* Some weird caching problems occur if you don't do this separately
+         * The staff attendees list doesn't get updated, for example
+         */
+        $this->getEventMapper()->updateMetadata($metadata, $event);
 
         /* Assign relations
          */
@@ -330,6 +365,7 @@ class EventRecurrenceMapper
                   ->setEndDate($currentDate['end']);
 
             $this->getEventMapper()->create($event);
+            $this->getEventMapper()->updateMetadata($event->getMetadata(), $event);
 
             /* Remember first event id in a series
              */

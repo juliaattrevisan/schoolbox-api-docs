@@ -588,4 +588,18 @@ class EventMapper extends Schoolbox\Mapper
 
         return $series->first();
     }
+
+    /**
+     * This method needs to be defined in this base mapper, because
+     * `\Schoolbox\Calendar\EventRecurrenceMapper` uses it.
+     *
+     * TODO extricate EOTC events from regular events, and remove this
+     *
+     * @param mixed $metadata
+     * @param mixed $event
+     */
+    public function updateMetadata($metadata, $event)
+    {
+        // noop
+    }
 }

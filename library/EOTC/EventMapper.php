@@ -18,7 +18,10 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
-
+/**
+ * Class EventMapper
+ * @method Event hydrate(array $row, $alias = '', $callback = null)
+ */
 class EventMapper extends Calendar\EventMapper {
 
 	/**
@@ -59,109 +62,119 @@ class EventMapper extends Calendar\EventMapper {
 		));
 	}
 
-	/**
-	 * Custom findById
-	 *
-	 * @param int $identifier
-	 * @return Event
-	 * @throws Exception
-	 */
-	public function findById($identifier) {
-		$authorMapper = $this->getJoinMapper('author');
-		$eventTypeMapper = $this->getJoinMapper('eventType');
-		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+    protected function getSelectString()
+    {
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
-		$query = "
-			SELECT
-				{$this->getColumnString('e')},
-				{$authorMapper->getColumnString('a')},
-				{$teacherInChargeMapper->getColumnString('c')},
-				{$eventTypeMapper->getColumnString('t')}
-			FROM `{$this->table}` e
-			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			WHERE e.id = :eventId
-		";
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$authorMapper->getColumnString('a')},
+                {$teacherInChargeMapper->getColumnString('c')},
+                {$eventTypeMapper->getColumnString('t')}
+        ";
+    }
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([
-			'eventId' => $identifier
-		]);
+    protected function getFromString()
+    {
+        return "
+            FROM `{$this->table}`
+            LEFT JOIN {$this->getJoinSql('author', '', 'a')}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', '', 'c')}
+            LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
+        ";
+    }
 
-		;
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
-		/* Hydrate or die
-		 */
-		if ($row = $statement->fetch()) {
-			/** @var Event $eventItem */
-			$eventItem = $this->hydrate($row, 'e');
+        /* Hydrate or die
+         */
+        /** @var Event[] $allEvents */
+        $allEvents = [];
 
-			/** @var User $authorItem */
-			$authorItem = $authorMapper->hydrate($row, 'a');
-			$eventItem->setAuthor($authorItem);
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
-			/** @var User $teacherInChargeItem */
-			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
-			$eventItem->setTeacherInCharge($teacherInChargeItem);
+            /* Assemble event pieces
+             */
+            $eventItem = $this->hydrate($row);
 
-			/** @var EventType $eventTypeItem */
-			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setType($eventTypeItem);
+            /* Author
+             */
+            /** @var User $authorItem */
+            $authorItem = $authorMapper->hydrate($row, 'a');
+            $eventItem->setAuthor($authorItem);
 
-			/* Accumulate the metadata for this event
-			 * Only use the first record
-			 */
-			$eventItem->setMetadata($this->findMetadata($identifier)->first());
+            /* Event Type
+             */
+            /** @var EventType $eventTypeItem */
+            $eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+            $eventItem->setType($eventTypeItem);
 
-			/* Accumulate campuses for this event
-			 */
-			$eventItem->setCampusCollection($this->findCampuses($identifier));
+            /* Teacher in charge
+             */
+            /** @var User $teacherInChargeItem */
+            $teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
+            $eventItem->setTeacherInCharge($teacherInChargeItem);
 
-			/* Determine current status
-			 */
-			if ($eventItem->getMetadata()) {
-				$metadataMapper = EventMetadataMapper::getInstance();
-				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+            /* Accumulate the metadata for this event
+             * Only use the first record
+             */
+            $identifier = $eventItem->getId();
+            $eventItem->setMetadata($this->findMetadata($identifier)->first());
 
-				/* Accumulate staff attendees for this event
-				 */
-				$allStaff = $metadataMapper->findStaffAttendees($eventItem->getMetadata()->getId());
-				$eventItem->getMetadata()->setStaffAttendees($allStaff);
+            /* Accumulate campuses for this event
+             */
+            $eventItem->setCampusCollection($this->findCampuses($identifier));
 
-				/* Accumulate student attendees for this event
-				 */
-				$allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
-				$eventItem->getMetadata()->setStudentAttendees($allStudents);
+            /* Determine current status
+             */
+            if ($eventItem->getMetadata()) {
+                $metadataMapper = EventMetadataMapper::getInstance();
+                $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
-				/* Accumulate RAMS files for this event
-				 */
-				$allFiles = $metadataMapper->findFiles($eventItem->getMetadata()->getId());
-				$eventItem->getMetadata()->setRamsFiles($allFiles);
+                /* Accumulate staff attendees for this event
+                 */
+                $allStaff = $metadataMapper->findStaffAttendees($eventItem->getMetadata()->getId());
+                $eventItem->getMetadata()->setStaffAttendees($allStaff);
 
-				/* Accumulate resource bookings for this event
-				 */
-				$allResourceBookings = $metadataMapper->findResourceBookings($eventItem->getMetadata()->getId());
-				$eventItem->getMetadata()->setResourceBookings($allResourceBookings);
+                /* Accumulate student attendees for this event
+                 */
+                $allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
+                $eventItem->getMetadata()->setStudentAttendees($allStudents);
 
-				/* Activity logs
-				 */
-				$activityLogMapper = ActivityLog\Mapper::getInstance();
+                /* Accumulate RAMS files for this event
+                 */
+                $allFiles = $metadataMapper->findFiles($eventItem->getMetadata()->getId());
+                $eventItem->getMetadata()->setRamsFiles($allFiles);
 
-				$allActivityLogs = $activityLogMapper->findByColumn('metadata_id', $eventItem->getMetadata()->getId(), array(
-					'order' => array(
-						'created_at' => 'DESC'
-					)
-				));
+                /* Accumulate resource bookings for this event
+                 */
+                $allResourceBookings = $metadataMapper->findResourceBookings($eventItem->getMetadata()->getId());
+                $eventItem->getMetadata()->setResourceBookings($allResourceBookings);
 
-				$eventItem->getMetadata()->setActivityLog($allActivityLogs);
-			}
+                /* Activity logs
+                 */
+                $activityLogMapper = ActivityLog\Mapper::getInstance();
 
-			return $eventItem;
-		}
+                $allActivityLogs = $activityLogMapper->findByColumn('metadata_id', $eventItem->getMetadata()->getId(), array(
+                    'order' => array(
+                        'created_at' => 'DESC'
+                    )
+                ));
 
-		throw new Exception('Instance of object not found');
-	}
+                $eventItem->getMetadata()->setActivityLog($allActivityLogs);
+            }
+            $allEvents[] = $eventItem;
+        }
+
+        return $this->createCollection($allEvents);
+    }
 
 	/**
 	 * Custom findAllByListGroups
@@ -375,31 +388,56 @@ class EventMapper extends Calendar\EventMapper {
 		return $allEvents;
 	}
 
-	/**
-	 * Postsave hook
-	 *
-	 * @param Event $event
-	 */
-	protected function postSave($event) {
-		$metadataMapper = EventMetadataMapper::getInstance();
-		$metadataMapper->save($event->getMetadata());
-		$metadataMapper->saveRelation($event);
+    /**
+     * Postsave hook
+     *
+     * Override to prevent base postSave from occurring
+     *
+     * @param Calendar\Event $event
+     */
+    protected function postSave($event)
+    {
+        /* Noop
+         */
+    }
 
-		$this->deleteCampusRelations($event);
-		$this->createCampus($event);
+    /**
+     * Some caching issue prevents metadata being correctly formed.
+     *
+     * It contains data from its previous incarnation (something in core mapper's save method
+     * prevents joined objects from containing the correct data)
+     *
+     * Therefore can't rely on postSave correctly assigning people/relations
+     *
+     * @param EventMetadata $metadata
+     * @param Event $event
+     */
+    public function updateMetadata($metadata, $event)
+    {
+        if (!($metadata instanceof EventMetadata && $event instanceof Event)) {
+            return;
+        }
+        $event->setMetadata($metadata);
 
-		$metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
-		$metadataMapper->createStaffAttendees($event->getMetadata());
+        $metadataMapper = EventMetadataMapper::getInstance();
+        $metadataMapper->save($event->getMetadata());
+        $metadataMapper->saveRelation($event);
 
-		$metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
-		$metadataMapper->createStudentAttendees($event->getMetadata());
+        $this->deleteCampusRelations($event);
+        $this->createCampus($event);
 
-		$metadataMapper->deleteFilesRelations($event->getMetadata());
-		$metadataMapper->createFiles($event->getMetadata());
+        $metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
+        $metadataMapper->createStaffAttendees($event->getMetadata());
 
-		$metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
-		$metadataMapper->createResourceBookings($event->getMetadata());
-	}
+        $metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
+        $metadataMapper->createStudentAttendees($event->getMetadata());
+
+        $metadataMapper->deleteFilesRelations($event->getMetadata());
+        $metadataMapper->createFiles($event->getMetadata());
+
+        $metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
+        $metadataMapper->createResourceBookings($event->getMetadata());
+    }
 
 	/**
 	 * Find metadata for a particular event
