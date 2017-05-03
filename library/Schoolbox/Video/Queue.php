@@ -33,6 +33,11 @@ class Queue extends ResourceVideo
     private $videoBitrate;
 
     /**
+     * @var string
+     */
+    private $processTimeout = '3600';
+
+    /**
      * Primary binary program used for conversion
      * @var string
      */
@@ -67,6 +72,13 @@ class Queue extends ResourceVideo
 
         $this->audioBitrate = $this->getConfig()->get('audio_bitrate');
         $this->videoBitrate = $this->getConfig()->get('video_bitrate');
+        $timeout = $this->getConfig()->get('video_processing_timeout');
+        if ($timeout > 0 && $timeout < 2147483647) {
+            $this->processTimeout = $timeout;
+        } else {
+            // If timeout not within processor limits, default to sane max of 1 day
+            $this->processTimeout = '86400';
+        }
     }
 
     /**
@@ -99,7 +111,7 @@ class Queue extends ResourceVideo
         $executable = $this->getConverterExecutable();
 
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) . " -map 0:a -c:a libmp3lame -b {$this->audioBitrate}k -ar:a 44100"
-            . ' -timelimit ' . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' '
+            . ' -timelimit ' . escapeshellarg($this->processTimeout) . ' '
             . escapeshellarg($this->getAudioLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
@@ -215,7 +227,7 @@ class Queue extends ResourceVideo
         /* Process video to 512kb in libx264 format for mobile and html5 streaming */
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             " -c:v libx264 $scale -preset slow -b:v {$this->videoBitrate}k -pix_fmt yuv420p -b:a {$this->audioBitrate}k -r 24 -ar:a 44100" .
-            " -timelimit " . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' ' .
+            " -timelimit " . escapeshellarg($this->processTimeout) . ' ' .
             ($strict ? '-strict -2 ' : '') .
             '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
 
