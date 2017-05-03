@@ -948,7 +948,7 @@ class Mapper extends BaseMapper
             $pb->notEquals("a.id", $assessment->getId());
         }
         $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());
-        $pb->isNull("a.deleted_at");
+        $pb->isNull('a.deleted_at');
         $query .= 'WHERE ' . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
