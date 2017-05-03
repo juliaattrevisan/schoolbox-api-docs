@@ -4,13 +4,12 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\Folder;
+namespace Schoolbox\Filter\Filters\Assessment\FolderIndirect;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder;
 
 /**
  * No conversion. A int is converted to the same int (representing a folder.id)
