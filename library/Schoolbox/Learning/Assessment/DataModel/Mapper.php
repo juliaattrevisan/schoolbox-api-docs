@@ -12,20 +12,15 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
-use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\DataModel\Project;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Quiz;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
@@ -41,6 +36,7 @@ class Mapper extends BaseMapper
 {
     /**
      * @inheritdoc
+     * @throws BaseMapper\Exception If unable to derive an ID for mapped joins
      */
     protected function mapping()
     {
@@ -67,8 +63,8 @@ class Mapper extends BaseMapper
         // * project
         $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
-        $this->joinsReverseSingle('assessment_id', QuizMapper::class, 'quiz', 'quiz');
-        $this->joinsReverseSingle('assessment_id', ProjectMapper::class, 'project', 'project');
+        $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
+        $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
 
         // Context joins (where does this assessment live?)
         // * folder (via assessment_folder)
@@ -77,7 +73,7 @@ class Mapper extends BaseMapper
         // * project (via project_assessment)
         $this->joinsVia(
             'assessment_folder',
-            FolderMapper::class,
+            Folder\Mapper::class,
             'id',
             'folder_id',
             'assessment_id',
@@ -88,7 +84,7 @@ class Mapper extends BaseMapper
         );
         $this->joinsVia(
             'assessment_course_unit_specification',
-            UnitSpecificationMapper::class,
+            UnitSpec\Mapper::class,
             'id',
             'course_unit_specification_id',
             'assessment_id',
@@ -99,7 +95,7 @@ class Mapper extends BaseMapper
         );
         $this->joinsVia(
             'assessment_course_unit_implementation',
-            UnitImplementationMapper::class,
+            UnitImpl\Mapper::class,
             'id',
             'course_unit_implementation_id',
             'assessment_id',
@@ -110,7 +106,7 @@ class Mapper extends BaseMapper
         );
         $this->joinsVia(
             'project_assessment',
-            ProjectMapper::class,
+            Project\Mapper::class,
             'id',
             'project_id',
             'assessment_id',
@@ -217,7 +213,7 @@ class Mapper extends BaseMapper
      */
     public function softDeleteQuiz(Model $assessment)
     {
-        if($assessment->getQuiz() instanceof Quiz){
+        if($assessment->getQuiz() instanceof Quiz\Model){
             $quizMapper = $this->getJoinMapper('quiz');
             $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $quizMapper->delete($quiz);
@@ -230,7 +226,7 @@ class Mapper extends BaseMapper
      */
     public function restoreQuiz(Model $assessment)
     {
-        if($assessment->getQuiz() instanceof Quiz){
+        if($assessment->getQuiz() instanceof Quiz\Model){
             $quizMapper = $this->getJoinMapper('quiz');
             $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $quizMapper->restoreSoftDeleted($quiz);
@@ -295,7 +291,7 @@ class Mapper extends BaseMapper
      */
     public function softDeleteProject(Model $assessment)
     {
-        if($assessment->getProject() instanceof ProjectModel){
+        if($assessment->getProject() instanceof Project\Model){
             $projectMapper = $this->getJoinMapper('project');
             $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $projectMapper->delete($project);
@@ -307,7 +303,7 @@ class Mapper extends BaseMapper
      */
     public function restoreProject(Model $assessment)
     {
-        if($assessment->getProject() instanceof ProjectModel){
+        if($assessment->getProject() instanceof Project\Model){
             $projectMapper = $this->getJoinMapper('project');
             $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $projectMapper->restoreSoftDeleted($project);
@@ -317,11 +313,11 @@ class Mapper extends BaseMapper
     /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
-     * @param User $student
-     * @param Term $term
+     * @param User       $student
+     * @param Term\Model $term
      * @return array|int[]
      */
-    public function findUniqueAssessmentIdsForStudent(User $student, Term $term)
+    public function findUniqueAssessmentIdsForStudent(User $student, Term\Model $term)
     {
         return $this->findUniqueAssessmentIdsForStudentBetweenDates($student, $term->getStart(), $term->getActualFinish());
     }
@@ -739,7 +735,7 @@ class Mapper extends BaseMapper
             foreach ($modelList as $model) {
                 // This has to be a project
                 $context = $model->getAssessmentContext();
-                if ($context instanceof ProjectModel) {
+                if ($context instanceof Project\Model) {
                     $contextId = $context->getAssessmentModel()->getId();
                     if (isset($contextProjects[$contextId])) {
                         $model->getAssessmentContext()->setAssessmentModel($contextProjects[$contextId]);
@@ -766,7 +762,7 @@ class Mapper extends BaseMapper
         // (Project context: folder was loaded in augmentListWithProjectContexts.)
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-            if (isset($context) && !$context instanceof ProjectModel) {
+            if (isset($context) && !$context instanceof Project\Model) {
                 $folderIds[] = $context->getFolder()->getId();
             }
         }
@@ -775,7 +771,7 @@ class Mapper extends BaseMapper
         // Pass 2: assign folders to all non-project contexts
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-            if (isset($context) && !$context instanceof ProjectModel) {
+            if (isset($context) && !$context instanceof Project\Model) {
                 $folderId = $context->getFolder()->getId();
                 if (isset($folders[$folderId])) {
                     // Add the folder into the context
@@ -837,7 +833,7 @@ class Mapper extends BaseMapper
                 // Broken assessment - not much I can do besides ignore
                 continue;
             }
-            if ($submodel instanceof SubmissionBox || $submodel instanceof ProjectModel) {
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model) {
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
@@ -896,16 +892,16 @@ class Mapper extends BaseMapper
 
         $contextClass = get_class($assessment->getAssessmentContext());
         switch($contextClass){
-            case FolderModel::class:
+            case Folder\Model::class:
                 $joinName = 'contextFolder';
                 break;
-            case ProjectModel::class:
+            case Project\Model::class:
                 $joinName = 'contextProject';
                 break;
-            case UnitImplementationModel::class:
+            case UnitImpl\Model::class:
                 $joinName = 'contextUnitImplementation';
                 break;
-            case UnitSpecificationModel::class:
+            case UnitSpec\Model::class:
                 $joinName = 'contextUnitSpecification';
                 break;
             default:
