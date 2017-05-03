@@ -4,7 +4,7 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\FolderIndirect;
+namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -19,8 +19,10 @@ class KeyConverter extends AbstractKeyConverter
 {
 
     /**
-     * All Folders IDs known to the system (regardless of whether they are available)
-     * (using IDs instead of Models as too slow for no value)
+     * All Folder IDs known to the system (regardless of whether they are
+     * available for selection for current user)
+     *
+     * We use IDs instead of Models as models are too slow to build and add no extra value
      *
      * @var Collection|int[]
      */
@@ -28,8 +30,8 @@ class KeyConverter extends AbstractKeyConverter
 
 
     /**
-     * @param Filter\Model $filter
-     * @param Collection   $folderIds
+     * @param Filter\Model     $filter
+     * @param Collection|int[] $folderIds
      */
     public function __construct(Filter\Model $filter, Collection $folderIds)
     {
@@ -42,11 +44,14 @@ class KeyConverter extends AbstractKeyConverter
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *
      * @param string $key
-     * @return int
+     * @return null|int
      * @throws \InvalidArgumentException
      */
     public function getItem($key)
     {
+        if(Definition::KEY_NONE === $key){
+            return null;
+        }
         $this->assertValidKey($key);
         return $this->folderIds[$key];
     }
@@ -68,6 +73,9 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function sanitiseKey($key)
     {
+        if(Definition::KEY_NONE === $key){
+            return $key;
+        }
         $this->assertValidKey($key);
         return (string)(int)$key;
     }
@@ -78,6 +86,9 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
+        if(Definition::KEY_NONE === $key){
+            return;
+        }
         if (!$this->folderIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No Folder ID found for key: $key");
         }

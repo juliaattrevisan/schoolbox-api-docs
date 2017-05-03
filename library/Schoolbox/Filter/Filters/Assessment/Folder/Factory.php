@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\FolderDirect;
+namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -15,12 +15,11 @@ use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 use Schoolbox\User;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Resource\Folder;
 
 
 /**
- * A factory for building 'FolderDirect' filter objects
+ * A factory for building 'Folder' filter objects
  */
 class Factory extends AbstractFilterFactory
 {

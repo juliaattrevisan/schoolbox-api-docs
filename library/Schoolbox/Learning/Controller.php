@@ -46,7 +46,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
-use Schoolbox\Filter\Filters\Assessment\FolderIndirect as FolderIndirectFilter;
+use Schoolbox\Filter\Filters\Assessment\FolderUltimate as FolderUltimateFilter;
 use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitImportSpecFilter;
 use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType as AssessmentTypeFilter;
@@ -298,7 +298,7 @@ class Controller extends Base
         $selectedTerms           = $selectionTransformer->getSelectedItems(TermFilter\Definition::class);
         $selectedWorkTypes       = $selectionTransformer->getSelectedItems(WorkTypeFilter\Definition::class);
         $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentTypeFilter\Definition::class);
-        $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderIndirectFilter\Definition::class);
+        $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderUltimateFilter\Definition::class);
         $selectedWeightings      = $selectionTransformer->getSelectedItems(WeightingFilter\Definition::class);
         $selectedUnitIds         = $selectionTransformer->getSelectedItems(UnitImportSpecFilter\Definition::class);
 
