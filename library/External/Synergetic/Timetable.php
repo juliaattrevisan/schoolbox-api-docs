@@ -603,6 +603,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return [];
         }
 
+        $lastPeriodIndex = $timetabledef['periodCount'] - 1;
+        $lastPeriodNumber = $this->database->quote($timetabledef['number'][$lastPeriodIndex]);
+
         $campusString = $campus->getExtTimetableCode();
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
@@ -634,7 +637,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						Timetable.TimetableGroup = '$campusString' AND
 						(StudentClasses.ID='$externalUserId'))
 						AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-						AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND PeriodNumber <= " . $timetabledef['periodCount'] . "
+						AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND PeriodNumber <= " . $lastPeriodNumber . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
         } else {
             // if user has no timetable, $timetabledef['dayCount'] is NULL, not 0, which breaks SQL query
@@ -659,7 +662,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 						Timetable.TimetableGroup = '$campusString' AND
 						Timetable.StaffID='$externalUserId' AND
 						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND
-						PeriodNumber <= " . $timetabledef['periodCount'] . "
+						PeriodNumber <= " . $lastPeriodNumber . "
 					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
         }
 
