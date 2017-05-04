@@ -66,7 +66,11 @@
                 {% for attachment in record.attachments %}
                     <div class="card small-12">
                         <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
-                            <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}" />
+		            {% if attachment.storage.mimetype.isImage %}
+		                <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
+		                {% else %}
+		                <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
+		            {% endif %}
                             {{ attachment.storage.filename }}
                         </a>
                         <p class="meta">{{ attachment.storage.size | bytes}}</p>
