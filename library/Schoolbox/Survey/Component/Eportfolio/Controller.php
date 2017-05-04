@@ -105,7 +105,9 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
                     // The number of questions is restricted by the components configuration
 
-                    if (count($answersRenderArray[$sectionTitle]) < $this->config['size']) {
+                    if ($this->config['size'] >= 0
+                        && count($answersRenderArray[$sectionTitle]) < $this->config['size'])
+                    {
 
                         // Unserialize the persons selected answer(s) and store them with the question for rendering
 
