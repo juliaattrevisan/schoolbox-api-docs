@@ -1,0 +1,108 @@
+{% if showStudentHeading %}
+    <div class="row">
+        <div class="small-12 columns">
+            <ul class="component-titlebar">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 card ui-sortable-handle" data-component-handle>
+                            <h2 title="{{ config.componentname }}">
+                                <a href="#">{{ config.componentname }}</a>
+                            </h2>
+                        </div>
+                    </div>
+                    <nav>
+                    </nav>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
+{# Make sure a survey has been selected in the components configuration #}
+
+{% if config.survey is empty %}
+
+    {# No survey selected #}
+
+    <div class="empty-state">
+        <i class="icon-surveys"></i>
+        <p>No survey has been selected, and the component has been hidden from student ePortfolios.</p>
+        <p>Please select a survey to enable this component.</p>
+    </div>
+
+{% else %}
+
+    {% if survey.anonymousResult and eportfolioUser.id != USER.id %}
+
+        {# Only the owner of the ePortfolio may view results if they are anonymous #}
+
+        <div class="empty-state">
+            <i class="icon-surveys"></i>
+            <p>This survey's results are anonymous.</p>
+        </div>
+
+    {% elseif answers is empty %}
+
+        {# The owner of the ePortfolio has not completed the survey #}
+
+        <div class="empty-state">
+            <i class="icon-surveys"></i>
+            {% if eportfolioUser.id == USER.id %}
+                <p>You have not yet completed the survey.</p>
+                <p>Click here to complete the '<a href="/survey/intro/{{ survey.id }}">{{ survey.title }}</a>' survey.</p>
+            {% else %}
+                <p>{{ eportfolioUser.firstName }} has not yet completed the survey.</p>
+            {% endif %}
+        </div>
+
+    {% else %}
+
+        <table class="no-margin">
+            <tbody>
+                {% for section, questions in answers %}
+                    <tr>
+                        <td width="10%"><b>{{ section }}</b></td>
+                        {% set count = 0 %}
+
+                        {% for question, answers in questions %}
+                            <td width="{{ columnWidth }}">
+                                <p><b>{{ question }}</b></p>
+                                {% if answers | length %}
+                                    <ul>
+                                    {% for answer in answers %}
+                                        <li>{{ answer }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="meta">No Response Given</p>
+                                {% endif %}
+                            </td>
+                            {% set count = count + 1 %}
+                        {% endfor %}
+
+                        {# Add blank cells for missing questions #}
+
+                        {% if count < questionCount %}
+                            {% for count in count .. (questionCount - 1) %}
+                                <td width="{{ columnWidth }}"></td>
+                            {% endfor %}
+                        {% endif %}
+
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if (survey.attempts | length < survey.maxAttempts) and (eportfolioUser.id == USER.id) %}
+            <div class="component-action">
+                <section>
+                    <a href="/survey/intro/{{ survey.id }}" class="button">
+                        Reattempt Survey
+                    </a>
+                </section>
+            </div>
+        {% endif %}
+
+    {% endif %}
+
+{% endif %}

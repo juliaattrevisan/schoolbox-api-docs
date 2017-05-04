@@ -275,13 +275,13 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
 
         /* Enforce array format for radio answers
            */
-        if ($data['answer'] == null) {
+        if (!isset($data['answer'])) {
             $processedResponse = 'NULL';
         } else {
             $processedResponse = serialize(array($data['answer']));
         }
 
-        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
+        return parent::saveResponseInternal($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
     }
 
     /**

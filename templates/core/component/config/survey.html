@@ -1,0 +1,15 @@
+<input id="component-survey-{COMPONENT_CONFIG_ID}" name="survey" value="{COMPONENT_CONFIG_VALUE}">
+
+<script>
+    $(function() {
+        $('#component-survey-{COMPONENT_CONFIG_ID}').selectizeSelector({
+            ajax: {
+                url: '/survey/ajax',
+                type: 'GET',
+                dataType: 'json'
+            },
+            multiple: false,
+            value: {COMPONENT_CONFIG_VALUE}
+        });
+    });
+</script>

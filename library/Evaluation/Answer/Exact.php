@@ -167,10 +167,9 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * @param array $data
      * @return array
      */
-    public function saveResponse($data) {
-        $processedResponse = $data['answer'];
-
-        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
+    public function saveResponse($data)
+    {
+        return parent::saveResponseInternal($data['attempt_id'], $data['section_id'], $data['question_id'], $data['answer']);
     }
 
     /**

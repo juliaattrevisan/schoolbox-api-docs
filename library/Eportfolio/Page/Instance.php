@@ -159,10 +159,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
          */
         $this->getComponentFactory()->setModule('eportfolio_template');
 
-        $instanceCollection = $this->getComponentFactory()->getDefinitionList();
+        $instanceCollection = $this->getComponentFactory()->getModuleInstanceList('eportfolio_template');
 
+        /** @var Component_Instance $instance */
         foreach ($instanceCollection as $instance) {
-            /** @var Component_Instance $instance */
             foreach ($this->getComponentCollection() as $inst) {
                 /** @var Component_Eportfolio_ControllerAbstract $inst */
                 if ($inst->getInstance()->getDefinitionId() == $instance->getDefinitionId()) {
