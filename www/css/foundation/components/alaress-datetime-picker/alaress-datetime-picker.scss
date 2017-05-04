@@ -56,6 +56,10 @@ $pickr-month-padding: 5px;
         .numInputWrapper {
             width: 70px;
         }
+
+        span.cur-month:hover {
+            background: transparent;
+        }
     }
 
     .flatpickr-day {
