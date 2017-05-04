@@ -522,7 +522,7 @@ class QueryBuilder
         if(null === $uImpSpcIds || !count($uImpSpcIds)){
             return false;
         }
-        if(is_array($projectIds) && !count($projectIds)){
+        if(is_array($projectIds) && count($projectIds)){
             return false;
         }
         return true;
@@ -586,7 +586,7 @@ class QueryBuilder
      */
     private function getClauseProject(array $projectIds = null)
     {
-        if(null === $projectIds){
+        if(null === $projectIds || !count($projectIds)){
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
@@ -617,7 +617,7 @@ class QueryBuilder
      */
     private function getClauseUnitImpl(array $unitImplIds = null)
     {
-        if(null === $unitImplIds){
+        if(null === $unitImplIds || !count($unitImplIds)){
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
@@ -637,7 +637,7 @@ class QueryBuilder
      */
     private function getClauseUnitImplSpec(array $unitImpSpcIds = null)
     {
-        if(null === $unitImpSpcIds){
+        if(null === $unitImpSpcIds || !count($unitImpSpcIds)){
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
@@ -657,7 +657,7 @@ class QueryBuilder
      */
     private function getClauseUnitSpec(array $unitSpecIds = null)
     {
-        if(null === $unitSpecIds){
+        if(null === $unitSpecIds || !count($unitSpecIds)){
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
