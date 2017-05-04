@@ -35,6 +35,7 @@ class Mapper extends BaseMapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('max_attempts', self::TYPE_INTEGER);
         $this->joins('category_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
+        $this->uses('anonymous_result', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('deleted_at');

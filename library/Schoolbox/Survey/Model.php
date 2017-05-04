@@ -37,9 +37,12 @@ class Model
 
     /** @var Collection $attempts */
     protected $attempts;
-    
+
     /** @var int $maxAttempts */
     protected $maxAttempts;
+
+    /** @var bool */
+    protected $anonymousResult;
 
     /**
      * @param string $availability
@@ -147,5 +150,23 @@ class Model
     public function getAttempts()
     {
         return $this->attempts;
-    }    
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAnonymousResult()
+    {
+        return $this->anonymousResult;
+    }
+
+    /**
+     * @param bool $anonymousResult
+     * @return static
+     */
+    public function setAnonymousResult($anonymousResult)
+    {
+        $this->anonymousResult = $anonymousResult;
+        return $this;
+    }
 }
