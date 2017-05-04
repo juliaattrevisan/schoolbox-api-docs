@@ -212,6 +212,10 @@ class Mapper extends BaseMapper
 
         $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
 
+	if (!empty($bindings['placeholders'])) {
+    	    $groupSql = "group_id` IN ({$bindings['placeholders']}) AND";
+        }
+
         $sql = "
 
             SELECT      {$this->getColumnString()},
@@ -224,7 +228,7 @@ class Mapper extends BaseMapper
                             `pastoral_report`.`id` IN (
                                 SELECT    `report_id` 
                                 FROM      `pastoral_report_groups` 
-                                WHERE     `group_id` IN ({$bindings['placeholders']}) AND
+                                WHERE     {$groupSql}
                                           `deleted_at` IS NULL
                             )
                         ) AND
