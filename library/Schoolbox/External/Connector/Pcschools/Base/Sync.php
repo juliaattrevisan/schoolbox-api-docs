@@ -15,6 +15,11 @@ use Schoolbox\Sync\Iterator;
 
 class Sync extends Base implements ISync
 {
+    const CONTACT_TYPE_FATHER    = 'F';
+    const CONTACT_TYPE_MOTHER    = 'M';
+    const CONTACT_TYPE_GUARDIAN  = 'G';
+    const CONTACT_TYPE_CAREGIVER = 'C';
+
     /**
      * {@inheritdoc}
      */
@@ -66,7 +71,8 @@ class Sync extends Base implements ISync
         $query = "
             SELECT
                 ''                    AS student_contact_network_login,
-                F.IDENTITY_ID# + '-F' AS student_contact_id,
+                F.IDENTITY_ID# + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_FATHER)}
+                                      AS student_contact_id,
                 ''                    AS student_contact_title,
                 F.DAD_FIRSTNAME       AS student_contact_given_name,
                 F.DAD_FIRSTNAME       AS student_contact_preferred,
@@ -84,7 +90,8 @@ class Sync extends Base implements ISync
 
             SELECT
                 ''                    AS student_contact_network_login,
-                F.IDENTITY_ID# + '-M' AS student_contact_id,
+                F.IDENTITY_ID# + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_MOTHER)}
+                                      AS student_contact_id,
                 ''                    AS student_contact_title,
                 F.MUM_FIRSTNAME       AS student_contact_given_name,
                 F.MUM_FIRSTNAME       AS student_contact_preferred,
@@ -102,7 +109,8 @@ class Sync extends Base implements ISync
 
             SELECT
                 ''                    AS student_contact_network_login,
-                F.IDENTITY_ID# + '-C' AS student_contact_id,
+                F.IDENTITY_ID# + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_CAREGIVER)}
+                                      AS student_contact_id,
                 ''                    AS student_contact_title,
                 F.CGIVE_FIRSTNAME     AS student_contact_given_name,
                 F.CGIVE_FIRSTNAME     AS student_contact_preferred,
@@ -120,7 +128,8 @@ class Sync extends Base implements ISync
 
             SELECT
                 ''                    AS student_contact_network_login,
-                F.IDENTITY_ID# + '-G' AS student_contact_id,
+                F.IDENTITY_ID# + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_GUARDIAN)}
+                                      AS student_contact_id,
                 ''                    AS student_contact_title,
                 F.GUARD_FIRSTNAME     AS student_contact_given_name,
                 F.GUARD_FIRSTNAME     AS student_contact_preferred,
