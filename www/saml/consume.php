@@ -69,7 +69,7 @@ if(isset($_POST['SAMLResponse'])) {
             SAMLDebugLog($msg);
         }
     }
-    error(ErrorMapper::ERROR_PROCESSING, implode("\n" . $errorTracker));
+    error(ErrorMapper::ERROR_PROCESSING, implode("\n", $errorTracker));
 }
 else {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);
