@@ -120,6 +120,7 @@ class Mapper extends BaseMapper
               JOIN assess_attempt attempt ON
                                             attempt.deleted_at IS NULL AND
                                             attempt.assess_id = survey.assess_id AND
+                                            attempt.finish IS NOT NULL AND
                                             attempt.attempt_id = (
                                               SELECT attempt_id
                                               FROM assess_attempt last_attempt
