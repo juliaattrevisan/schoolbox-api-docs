@@ -84,7 +84,7 @@ class Definition extends AbstractFilterDefinition
      */
     public static function getQueryKey()
     {
-        return 'fi';
+        return 'f';
     }
 
     /**
