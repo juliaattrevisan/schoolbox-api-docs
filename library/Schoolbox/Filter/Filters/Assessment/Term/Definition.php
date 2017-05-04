@@ -17,10 +17,11 @@ use Schoolbox\Assessment\Term;
 
 /**
  * Available Term options:
- * * all
- * * current
- * * previous, and
- * * all terms
+ * □ all
+ * □ future
+ * □ current
+ * □ previous, and
+ * □ all terms existing in DB
  *
  * Term options are keyed by 'current', 'previous' and the term IDs
  *

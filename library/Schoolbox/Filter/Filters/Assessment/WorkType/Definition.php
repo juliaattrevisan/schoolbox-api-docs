@@ -18,8 +18,8 @@ use Schoolbox\Learning\Assessment\WorkType;
 
 /**
  * Available options:
- * * None
- * * One per configured workType
+ * □ None
+ * □ One per workType that exists in system
  */
 class Definition extends AbstractFilterDefinition
 {

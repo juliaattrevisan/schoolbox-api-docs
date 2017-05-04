@@ -15,11 +15,11 @@ use Schoolbox\GenericCollection;
  * Displays a list of projects.
  *
  * Admin can configure whether to only show projects:
- * * class folders,
- * * group folders,
- * * imported to classes,
- * * imported to groups,
- * * in unit-specs
+ * □ class folders,
+ * □ group folders,
+ * □ imported to classes,
+ * □ imported to groups,
+ * □ in unit-specs
  */
 class Definition extends AbstractFilterDefinition
 {

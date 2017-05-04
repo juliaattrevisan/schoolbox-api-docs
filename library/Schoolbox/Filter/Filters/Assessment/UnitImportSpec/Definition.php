@@ -12,7 +12,9 @@ use Schoolbox\Filter\Option;
 use Schoolbox\GenericCollection;
 
 /**
- * From which unit spec was an assessment imported?
+ * The unit-spec that an an assessment-impl's unit-impl was imported from.
+ *
+ * 'Give me assessments who reside in a [project inside a] unit-impl, that was imported from unit-spec X'
  *
  * An assessment created in a UnitImpl, but not imported from a UnitSpec is still considered to be 'imported' from that unitSpec.
  *
@@ -22,10 +24,10 @@ use Schoolbox\GenericCollection;
  *
  * In this scenario, both AssessmentImpl_X1 and AssessmentImpl_Y1 are considered as 'imported from UnitSpec_A'
  *
- * We still need to retain 'On Folder' to enable a full set of options for this filter
+ * We still need to retain '(none)' to enable a full set of options for this filter
  * Eg:
  *
- * * □ On Folder (ie not imported at all)
+ * * □ (none) (lives on folder, project on folder, unit-spec, or project in unit-spec)
  *
  * * CourseSpec A
  * * □ UnitSpec 111 (will match any assessments that reside in UnitImpls imported from UnitSpec 111)

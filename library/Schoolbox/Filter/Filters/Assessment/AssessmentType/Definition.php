@@ -18,10 +18,10 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 
 /**
  * Available options:
- * * Project
- * * Quiz
- * * DueWork
- * * Task
+ * □ Project
+ * □ Quiz
+ * □ DueWork
+ * □ Task
  *
  * Defaults to full set, but run-time options will enable controller to exclude individual items
  *

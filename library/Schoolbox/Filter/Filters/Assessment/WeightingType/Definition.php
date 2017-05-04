@@ -17,8 +17,8 @@ use Schoolbox\GenericCollection;
 
 /**
  * Available options:
- * * Weighted
- * * Unweighted
+ * □ Weighted
+ * □ Unweighted
  *
  */
 class Definition extends AbstractFilterDefinition
