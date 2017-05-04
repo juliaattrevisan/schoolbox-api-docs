@@ -12,6 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
@@ -50,7 +51,6 @@ class Module extends BaseModule
         $preloadParticipant     = function (array $params) { return $this->preloadParticipant($params); };
         $preloadResponse        = function (array $params) { return $this->preloadResponseWithFeedback($params); };
         $preloadPlagscanWithAss = function (array $params) { return $this->preloadPlagscanWithAssessment($params); };
-        $preloadPlagscan        = function (array $params) { return $this->preloadPlagscan($params); };
 
         /**
          * @param $params['response'] IResponse
@@ -82,6 +82,14 @@ class Module extends BaseModule
             new IsParticipant()
         );
 
+        $hasPlagscanAccess = new Rule\Any(
+            $hasWriteAccess,
+            new Rule\All(
+                new IsParticipant(),
+                new Rule\IsConfigOn('plagscan_allow_students_report_access', $this->getConfigLoader())
+            )
+        );
+
         $plagscanPattern    = '/plagscans/{assessmentId:\d+}/{responseId:\d+}/{plagscanId:\d+}';
         $assessmentPattern  = '/assessments/{assessmentId:\d+}';
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
@@ -96,8 +104,8 @@ class Module extends BaseModule
         $this->register('GET', $crocodocPattern . '/download',  'getCrocodocDownload', $hasWriteOrIsParticipant, $preloadResponse); // a || r
         $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $hasWriteOrIsParticipant, $preloadResponse); // a || r
 
-        $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasWriteAccess, $preloadPlagscanWithAss); // a || r
-        $this->register('GET', $plagscanPattern . '/{contextId:\d+}/iframe', 'getPlagscanReportContents', $hasWriteAccess, $preloadPlagscanWithAss); // a || r
+        $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
+        $this->register('GET', $plagscanPattern . '/{contextId:\d+}/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
     }
 
 
@@ -246,7 +254,7 @@ class Module extends BaseModule
         /* Die early when requested Assessment doesn't exist
          */
         try {
-            $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
@@ -259,32 +267,21 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        return [
-            'assessment' => $assessment,
-            'response' => $response,
-            'plagscan' => $plagscanDocument,
-        ];
-    }
-
-    /**
-     * @param array $params
-     * @return array [ plagscan ]
-     */
-    private function preloadPlagscan(array $params)
-    {
-        /* @var Plagscan $plagscanDocument */
+        /* Die early when participant isn't found
+         */
         try {
-            $plagscanDocument = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
-        }
-        catch (MapperException $e) {
+            $participant = $assessment->getParticipant($response->getSubmittedOnBehalfOf());
+        } catch (OutOfBoundsException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
+            'assessment' => $assessment,
+            'response' => $response,
             'plagscan' => $plagscanDocument,
+            'participant' => $participant
         ];
     }
-
 
     /**
      * @inheritdoc
@@ -314,6 +311,14 @@ class Module extends BaseModule
 
     /* Getters / Setters
      */
+
+    /**
+     * @return object|IConfigLoader
+     */
+    protected function getConfigLoader()
+    {
+        return $this->injector->get('config');
+    }
 
     /**
      * @return Mapper|UserMapper
