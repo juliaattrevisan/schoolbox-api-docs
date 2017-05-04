@@ -26,15 +26,19 @@ class Component_Config_Survey extends Component_Config_Abstract
             /** @var Survey $survey */
             $survey = $surveyMapper->findById($configValue);
 
+            $selectedValues   = [];
+            $selectedValues[] = [
+                'id'   => $survey->getId(),
+                'name' => $survey->getFolder()->getName() . " - " . $survey->getTitle(),
+            ];
             $page->setVar('COMPONENT_CONFIG_ID', $survey->getId());
-            $page->setVar('COMPONENT_CONFIG_VALUE', $survey->getTitle());
-            $page->setVar('COMPONENT_CONFIG_NAME', $survey->getFolder()->getName() . " - " . $survey->getTitle());
+            $page->setVar('COMPONENT_CONFIG_VALUE', json_encode($selectedValues));
 
         } catch (\Schoolbox\Mapper\Exception $e) {
 
             $page->setVar('COMPONENT_CONFIG_NAME', 'Survey');
             $page->setVar('COMPONENT_CONFIG_ID', '');
-            $page->setVar('COMPONENT_CONFIG_VALUE', '');
+            $page->setVar('COMPONENT_CONFIG_VALUE', '[]');
         }
     }
 }
