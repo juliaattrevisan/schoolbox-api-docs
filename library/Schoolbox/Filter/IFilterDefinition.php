@@ -99,6 +99,7 @@ interface IFilterDefinition
      * The value must be short and unique to enable lots of data in a GET url
      *
      * @return string
+     * @todo consider making these constants
      */
     public static function getQueryKey();
 
