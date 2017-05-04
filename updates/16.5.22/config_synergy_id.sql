@@ -1,0 +1,2 @@
+ALTER TABLE `user` 
+CHANGE COLUMN `synergy_id` `synergy_id` VARCHAR(64) NULL DEFAULT NULL;
