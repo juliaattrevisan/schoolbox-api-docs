@@ -44,34 +44,46 @@ foreach ($allDocuments as $currentDocument) {
     $prefix = "Plagscan Record {$currentDocument->getId()}";
 
     try {
+        $plagscanId = null;
+
         /** @var StudentSubmissionFile $studentSubmissionFile */
         $studentSubmissionFile = StudentSubmissionFileMapper::getInstance()->findById($currentDocument->getStudentSubmissionFileId());
 
         /* Convert to new format
          */
         $submissionFile = new SubmissionFile();
+        $submissionFile->setId($studentSubmissionFile->getId());
         $submissionFile->setStorage($studentSubmissionFile->getStorage());
 
         /* This returns a plagscan id upon transmission
          */
         $log->info("{$prefix}: transmitting student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
-        $plagscanId = $mapper->getConnector()->transmit($submissionFile);
-
-        /* Update the db with this new plagscan id
+        /* Figure out what the filename will be
          */
-        if ($plagscanId) {
-            $log->info("{$prefix}: queueing student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
+        $filename = $mapper->plagscanFilename($submissionFile);
 
-            $currentDocument->setPlagscanId($plagscanId);
-            $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
-            $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
-            $mapper->save($currentDocument);
+        if ($filename !== null) {
+            $plagscanId = $mapper->getConnector()->transmit($submissionFile, $filename);
 
-            $log->info("{$prefix}: set to pending status");
-            $numUpdated++;
-        } else {
-            $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
+            /* Update the db with this new plagscan id
+             */
+            if ($plagscanId) {
+                $log->info("{$prefix}: queueing student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
+
+                $currentDocument->setPlagscanId($plagscanId);
+                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
+                $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+                $mapper->save($currentDocument);
+
+                $log->info("{$prefix}: set to pending status");
+                $numUpdated++;
+            } else {
+                $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
+            }
+        }
+        else {
+            $log->warning("{$prefix}: unknown join criteria for file/assessment/user");
         }
     }
     catch (Schoolbox\Mapper\Exception $e) {
@@ -86,13 +98,13 @@ foreach ($allDocuments as $currentDocument) {
 
         /* Could not transmit this file to plagscan for some reason
          */
-        $log->warning("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
+        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
     }
     catch (\RuntimeException $e) {
 
         /* Could not transmit this file to plagscan for some reason
          */
-        $log->warning("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
+        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
     }
 }
 

@@ -11,9 +11,11 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -162,9 +164,10 @@ class Mapper extends \Schoolbox\Mapper
      * Save a Plagscan payload into db
      *
      * @param SubmissionFile $file
+     * @param $filename
      * @return array
      */
-    public function saveNewPlagscan(SubmissionFile $file)
+    public function saveNewPlagscan(SubmissionFile $file, $filename)
     {
         /* If gateway never spawned, plagscan not configured
          */
@@ -180,7 +183,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Send it to plag
          */
-        $plagscanId = $this->getConnector()->transmit($file);
+        $plagscanId = $this->getConnector()->transmit($file, $filename);
 
         /* Plagscan death
          */
@@ -213,6 +216,41 @@ class Mapper extends \Schoolbox\Mapper
         $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
 
         return parent::save($plagscan);
+    }
+
+    /**
+     * Derive a plagscan filename that's used in Plagscan's systems
+     * to identify files that people upload
+     *
+     * Current scheme is to use
+     * <schoolbox user id>_<firstname>_<lastname>_<assessment id>
+     *
+     * @param SubmissionFile $submissionFile
+     * @return null|string
+     */
+    public function plagscanFilename(SubmissionFile $submissionFile)
+    {
+        $query = "
+            SELECT u.id, u.firstname, u.lastname, sb.assessment_id
+            FROM student_submission_file sf
+            INNER JOIN student_submission ss ON sf.student_submission_id = ss.id
+            INNER JOIN submission_box sb on ss.box_id = sb.id
+            INNER JOIN user u ON ss.owner = u.id
+            WHERE sf.id = :submissionFileId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'submissionFileId' => $submissionFile->getId()
+        ]);
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        if ($row) {
+            return implode('_', array_values($row));
+        }
+
+        return null;
     }
 
     /* Getters/Setters
