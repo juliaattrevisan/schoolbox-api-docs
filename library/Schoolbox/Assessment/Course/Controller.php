@@ -569,7 +569,7 @@ class Controller extends Base\Base
         $post = $this->getRequest()->post;
         $courseSpec->getFolder()->setName(trim($post['name']));
         $parentFolderId = trim($post['parent']);
-        $curriculumCodes = explode(',', $post['curriculumCodes'][0]);
+        $curriculumCodes = $post['curriculumCodes'];
 
         try{
             $this->validateCourseData($courseSpec->getFolder()->getId(), $courseSpec->getFolder()->getName(), $parentFolderId);
