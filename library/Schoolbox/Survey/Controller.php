@@ -174,7 +174,10 @@ class Controller extends Base
                         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
                         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setIndent(1);
                         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-                        $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, "{$user->getLastname()}, {$user->getFirstname()}");
+                        $name = $survey->getAnonymousResult()
+                            ? ''
+                            : "{$user->getLastname()}, {$user->getFirstname()}";
+                        $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, $name);
 
                         // Concatenate all the answers together into one cell
 
