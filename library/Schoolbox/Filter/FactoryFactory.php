@@ -70,10 +70,6 @@ class FactoryFactory
                 return $this->buildFactory(Filters\Assessment\Folder\Factory::class, [
                     'folderMapper' => $this->mapperFactory->get(Folder\Mapper::class),
                 ]);
-            case Filters\Assessment\FolderUltimate\Definition::class:
-                return $this->buildFactory(Filters\Assessment\FolderUltimate\Factory::class, [
-                    'folderMapper' => $this->mapperFactory->get(Folder\Mapper::class),
-                ]);
             case Filters\Assessment\Term\Definition::class:
                 return $this->buildFactory(Filters\Assessment\Term\Factory::class, [
                     'termMapper' => $this->mapperFactory->get(Term\Mapper::class),

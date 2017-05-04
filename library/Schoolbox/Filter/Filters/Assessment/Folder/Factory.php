@@ -14,6 +14,7 @@ use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 
@@ -23,7 +24,10 @@ use Schoolbox\Resource\Folder;
  */
 class Factory extends AbstractFilterFactory
 {
-    /** @var Folder\Mapper */
+
+    /**
+     * @var Folder\Mapper
+     */
     private $folderMapper;
 
 
@@ -51,7 +55,34 @@ class Factory extends AbstractFilterFactory
      */
     protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
     {
-        return [];
+        // Should this role type see classes for this page?
+        /** @var Option\Model[][] $options */
+        $options = $definition->getOptions($page);
+
+        $getSubjects = $options[Definition::KEY_CLASSES][$page]->getAvailable();
+
+        $groupAccessLevel = $options[Definition::KEY_GROUPS][$page]->getAvailable()
+            ? UserAccess::ACCESS_WRITE
+            : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
+
+        $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
+
+        // Divide folders into Classes and Groups (not mutually exclusive!)
+
+        // Does the folder have class codes ?
+        $classes = $folders->filter(function (Folder\Model $folder) {
+            return $folder->getCodes()->count();
+        })->indexBy('id');
+
+        // Does the folder have a group ?
+        $groups = $folders->filter(function (Folder\Model $folder) {
+            return $folder->getGroup();
+        })->indexBy('id');
+
+        return [
+            'classes' => $classes,
+            'groups'  => $groups,
+        ];
     }
 
 
@@ -68,5 +99,4 @@ class Factory extends AbstractFilterFactory
             'folderIds' => $folderIds,
         ]);
     }
-
 }

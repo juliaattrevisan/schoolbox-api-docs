@@ -8,30 +8,23 @@
 namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\Option;
 use Schoolbox\GenericCollection;
 
 /**
- * List of folders. Not currently exposed in UI.
+ * Display a list of folders (either classes, groups or both)
+ * Whether classes, groups or both are available for selection is configured by the admin
+ * The list of folders is generated at run-time for the current user and page
  *
- * An assessment will only match a checked folder only if it resides directly in that folder (not indirectly
- * via a project, unit-impl, or unit-spec)
+ * Assessments will match this filter if their ultimate/indirect folder matches that selected.
  *
- * □ None (not directly in a folder)
- * □ English 3 4 (EN344)
- * □ Archery
- * □ ...
+ * eg, Assessment_A lives in project_B which lives in folder_C, if folder_C is selected, Assessment_A will be fetched.
  */
 class Definition extends AbstractFilterDefinition
 {
-    const KEY_NONE = 'none';        // Assessment is not directly inside a folder
 
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 'fd';
-    }
+    const KEY_CLASSES = 'classes';
+    const KEY_GROUPS = 'groups';
 
 
     /**
@@ -59,7 +52,7 @@ class Definition extends AbstractFilterDefinition
      */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
-        // Nothing is selected, meaning filter is not applied
+        // No options checked
         return false;
     }
 
@@ -70,10 +63,10 @@ class Definition extends AbstractFilterDefinition
     protected function getCustomKeys()
     {
         return [
-            self::KEY_NONE,
+            self::KEY_CLASSES,
+            self::KEY_GROUPS,
         ];
     }
-
 
 
     /**
@@ -81,6 +74,7 @@ class Definition extends AbstractFilterDefinition
      */
     public function getInitialAvailability($customAbstractKey, $page)
     {
+        // Initial config is both classes and groups are available for all pages
         return true;
     }
 
@@ -88,12 +82,21 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getQueryKey()
     {
-        // Does not appear on any pages yet - exists for now just to enable query building
-        return [];
+        return 'fi';
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function getPages()
+    {
+        return [
+            Option\Model::PAGE_PENDING_ASSESSMENTS,
+            Option\Model::PAGE_MARK_BOOK,
+        ];
+    }
 
 
     /**
@@ -101,9 +104,12 @@ class Definition extends AbstractFilterDefinition
      */
     public function getLabel($key)
     {
-        if(self::KEY_NONE === $key){
-            return 'None (assessment does reside directly on a folder)';
+        switch ($key) {
+            case self::KEY_CLASSES:
+                return 'Classes';
+            case self::KEY_GROUPS:
+                return 'Groups';
         }
-        throw new \InvalidArgumentException("Unknown 'Folder' filter key: $key");
+        throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
     }
 }
