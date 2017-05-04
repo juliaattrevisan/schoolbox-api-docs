@@ -32,7 +32,16 @@
 
 {% else %}
 
-    {% if answers is empty %}
+    {% if survey.anonymousResult and eportfolioUser.id != USER.id %}
+
+        {# Only the owner of the ePortfolio may view results if they are anonymous #}
+
+        <div class="empty-state">
+            <i class="icon-surveys"></i>
+            <p>This survey's results are anonymous.</p>
+        </div>
+
+    {% elseif answers is empty %}
 
         {# The owner of the ePortfolio has not completed the survey #}
 
@@ -84,7 +93,7 @@
             </tbody>
         </table>
 
-        {% if survey.attempts | length < survey.maxAttempts %}
+        {% if (survey.attempts | length < survey.maxAttempts) and (eportfolioUser.id == USER.id) %}
             <div class="component-action">
                 <section>
                     <a href="/survey/intro/{{ survey.id }}" class="button">
