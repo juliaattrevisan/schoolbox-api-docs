@@ -170,8 +170,8 @@ class Builder implements IBuilder
     }
 
     /**
-     * @param string     $columnName
-     * @param string|int $columnValue
+     * @param string                    $columnName
+     * @param string|int|string[]|int[] $columnValue
      * @return Builder
      */
     public function equals($columnName, $columnValue)
