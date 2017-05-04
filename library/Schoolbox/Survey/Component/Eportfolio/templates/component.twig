@@ -38,8 +38,12 @@
 
         <div class="empty-state">
             <i class="icon-surveys"></i>
-            <p>You have not yet completed the survey.</p>
-            <p>Click here to complete the '<a href="/survey/intro/{{ survey.id }}">{{ survey.title }}</a>' survey.</p>
+            {% if eportfolioUser.id == USER.id %}
+                <p>You have not yet completed the survey.</p>
+                <p>Click here to complete the '<a href="/survey/intro/{{ survey.id }}">{{ survey.title }}</a>' survey.</p>
+            {% else %}
+                <p>{{ eportfolioUser.firstName }} has not yet completed the survey.</p>
+            {% endif %}
         </div>
 
     {% else %}

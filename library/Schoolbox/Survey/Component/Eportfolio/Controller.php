@@ -149,6 +149,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             $templateHandle,
             '@surveyEportfolio/component.twig',
             [
+                'eportfolioUser'        => $this->getContext()->getUser(),
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
                 'config'                => $this->config,

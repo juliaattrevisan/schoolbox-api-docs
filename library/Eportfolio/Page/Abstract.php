@@ -355,7 +355,7 @@ abstract class Eportfolio_Page_Abstract {
 	 *
 	 * @return \Schoolbox\User
 	 */
-	protected function getUser() {
+	public function getUser() {
 		return $this->user;
 	}
 
