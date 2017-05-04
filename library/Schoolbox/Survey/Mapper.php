@@ -192,7 +192,8 @@ class Mapper extends BaseMapper
             JOIN        assess_answer answer ON answer.question_id = question.question_id                            
             WHERE       survey.deleted_at IS NULL AND
                         survey.assess_id = :survey_id AND
-                        survey.availability = 'survey' 
+                        survey.availability = 'survey' AND
+                        attempt.finish IS NOT NULL
             ORDER BY    section.sequence, 
                         question.sequence
         ";
