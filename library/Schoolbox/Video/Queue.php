@@ -115,7 +115,7 @@ class Queue extends ResourceVideo
             . escapeshellarg($this->getAudioLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
-        $this->setMessage(implode("\n", $message));
+        $this->setMessage($processString . "\n" . implode("\n", $message));
 
         preg_match('/Duration: ([0-9\:]+)/', $this->getMessage(), $match);
 
@@ -129,7 +129,7 @@ class Queue extends ResourceVideo
         if ($return == 0) {
             return true;
         } else {
-            throw new \RuntimeException(implode(' ',$message));
+            throw new \RuntimeException($processString . "\n" . implode("\n",$message));
         }
 
     }
@@ -232,7 +232,7 @@ class Queue extends ResourceVideo
             '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
-        $this->setMessage(implode("\n", $message));
+        $this->setMessage($processString . "\n" . implode("\n", $message));
 
         preg_match('/Duration: ([0-9\:]+)/', $this->getMessage(), $match);
 
@@ -277,7 +277,7 @@ class Queue extends ResourceVideo
                 throw new \RuntimeException($output);
             }
         }
-        throw new \RuntimeException(implode(' ',$message));
+        throw new \RuntimeException($processString . "\n" . implode("\n",$message));
 
 
     }
