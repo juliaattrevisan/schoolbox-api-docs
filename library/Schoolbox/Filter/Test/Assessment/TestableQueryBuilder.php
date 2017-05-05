@@ -19,9 +19,27 @@ class TestableQueryBuilder extends QueryBuilder
      * @param array $completeFilters
      * @return bool
      */
+    public function getFiltersGuaranteeEmptySet(array $completeFilters)
+    {
+        return $this->doFiltersGuaranteeEmptySet($completeFilters);
+    }
+
+    /**
+     * @param array $completeFilters
+     * @return bool
+     */
     public function getDoContextFiltersGuaranteeEmptySet(array $completeFilters)
     {
         return $this->doContextFiltersGuaranteeEmptySet($completeFilters);
+    }
+
+    /**
+     * @param array $completeFilters
+     * @return bool
+     */
+    public function getDoNonContextFiltersGuaranteeEmptySet(array $completeFilters)
+    {
+        return $this->doNonContextFiltersGuaranteeEmptySet($completeFilters);
     }
 
     /**
@@ -30,7 +48,7 @@ class TestableQueryBuilder extends QueryBuilder
      */
     public function getSqlStringForFilters(array $completeFilters)
     {
-        return $this->buildQuery($completeFilters);
+        return $this->buildQuery($completeFilters, false);
     }
 
 

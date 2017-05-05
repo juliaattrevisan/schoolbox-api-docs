@@ -41,6 +41,33 @@ class AssessmentTests extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider provider_doNonContextGuaranteeEmptySet
+     * @param null|int[] $a        AssessmentType
+     * @param null|int[] $tc       Term Close
+     * @param null|int[] $td       Term Due
+     * @param null|int[] $wt       Weighting
+     * @param null|int[] $wk       WorkType
+     * @param bool       $expected Are results possible? (ie not guaranteed empty set)
+     */
+    public function test_areResultsPossible_nonContextFilters($a, $tc, $td, $wt, $wk, $expected)
+    {
+        $qbt             = $this->getTester();
+        $filters         = $this->buildNonContextFilterArray($a, $tc, $td, $wt, $wk);
+        $completeFilters = $qbt->insertMissingFilters($filters);
+        $actual          = $qbt->getDoNonContextFiltersGuaranteeEmptySet($completeFilters);
+
+        $message =
+            AssessmentFilters\AssessmentType\Definition::SLUG . ':  '. $this->toStr($a).
+            AssessmentFilters\TermClose\Definition::SLUG      . ': ' . $this->toStr($tc).
+            AssessmentFilters\TermDue\Definition::SLUG        . ': ' . $this->toStr($td).
+            AssessmentFilters\WeightingType\Definition::SLUG  . ': ' . $this->toStr($wt).
+            AssessmentFilters\WorkType\Definition::SLUG       . ': ' . $this->toStr($wk).
+            $this->toStr($completeFilters)."\n";
+
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
      * @dataProvider provider_subQueriesRequired
      * @param null|int[] $uis              UnitImplSpec
      * @param null|int[] $f                Folder
@@ -75,7 +102,9 @@ class AssessmentTests extends \PHPUnit_Framework_TestCase
 
     /**
      * Return a compact string representation of NULL or an int[] for debugging
+     *
      * @param Collection|mixed[]|int[] $var
+     * @param int                      $level
      * @return string
      */
     private function toStr($var, $level = 0)
@@ -132,6 +161,27 @@ class AssessmentTests extends \PHPUnit_Framework_TestCase
             AssessmentFilters\Project\Definition::SLUG        => null === $p   ? null : new Collection($p),
             AssessmentFilters\UnitImpl\Definition::SLUG       => null === $ui  ? null : new Collection($ui),
             AssessmentFilters\UnitSpec\Definition::SLUG       => null === $us  ? null : new Collection($us),
+        ];
+    }
+
+    /**
+     * Build a filter array where null filters are included but their value is null
+     *
+     * @param null|int[] $a  AssessmentType
+     * @param null|int[] $tc TermClose
+     * @param null|int[] $td TermDue
+     * @param null|int[] $wt Weighting
+     * @param null|int[] $wk WorkType
+     * @return mixed[]
+     */
+    private function buildNonContextFilterArray($a, $tc, $td, $wt, $wk)
+    {
+        return [
+            AssessmentFilters\AssessmentType\Definition::SLUG => null === $a  ? null : new Collection($a),
+            AssessmentFilters\TermClose\Definition::SLUG      => null === $tc ? null : new Collection($tc),
+            AssessmentFilters\TermDue\Definition::SLUG        => null === $td ? null : new Collection($td),
+            AssessmentFilters\WeightingType\Definition::SLUG  => null === $wt ? null : new Collection($wt),
+            AssessmentFilters\WorkType\Definition::SLUG       => null === $wk ? null : new Collection($wk),
         ];
     }
 
@@ -401,6 +451,265 @@ class AssessmentTests extends \PHPUnit_Framework_TestCase
             [$ntE,  $ntE,  $ntE,  $ntE,  $nll, false],
             [$ntE,  $ntE,  $ntE,  $ntE,  $emt, false],
             [$ntE,  $ntE,  $ntE,  $ntE,  $ntE, true],
+        ];
+    }
+
+
+    /**
+     * Truth table for whether some combination of non-context filters guarantees an empty set
+     * (and hence we can short-circuit without hitting the DB)
+     * @return array
+     */
+    public function provider_doNonContextGuaranteeEmptySet(){
+
+        $nll = null;
+        $emt = [];
+        $ntE = [1];
+
+        return [
+            [$nll, $nll, $nll, $nll, $nll, false],
+            [$nll, $nll, $nll, $nll, $emt, false],
+            [$nll, $nll, $nll, $nll, $ntE, false],
+            [$nll, $nll, $nll, $emt, $nll, true],
+            [$nll, $nll, $nll, $emt, $emt, true],
+            [$nll, $nll, $nll, $emt, $ntE, true],
+            [$nll, $nll, $nll, $ntE, $nll, false],
+            [$nll, $nll, $nll, $ntE, $emt, false],
+            [$nll, $nll, $nll, $ntE, $ntE, false],
+            [$nll, $nll, $emt, $nll, $nll, true],
+            [$nll, $nll, $emt, $nll, $emt, true],
+            [$nll, $nll, $emt, $nll, $ntE, true],
+            [$nll, $nll, $emt, $emt, $nll, true],
+            [$nll, $nll, $emt, $emt, $emt, true],
+            [$nll, $nll, $emt, $emt, $ntE, true],
+            [$nll, $nll, $emt, $ntE, $nll, true],
+            [$nll, $nll, $emt, $ntE, $emt, true],
+            [$nll, $nll, $emt, $ntE, $ntE, true],
+            [$nll, $nll, $ntE, $nll, $nll, false],
+            [$nll, $nll, $ntE, $nll, $emt, false],
+            [$nll, $nll, $ntE, $nll, $ntE, false],
+            [$nll, $nll, $ntE, $emt, $nll, true],
+            [$nll, $nll, $ntE, $emt, $emt, true],
+            [$nll, $nll, $ntE, $emt, $ntE, true],
+            [$nll, $nll, $ntE, $ntE, $nll, false],
+            [$nll, $nll, $ntE, $ntE, $emt, false],
+            [$nll, $nll, $ntE, $ntE, $ntE, false],
+            [$nll, $emt, $nll, $nll, $nll, true],
+            [$nll, $emt, $nll, $nll, $emt, true],
+            [$nll, $emt, $nll, $nll, $ntE, true],
+            [$nll, $emt, $nll, $emt, $nll, true],
+            [$nll, $emt, $nll, $emt, $emt, true],
+            [$nll, $emt, $nll, $emt, $ntE, true],
+            [$nll, $emt, $nll, $ntE, $nll, true],
+            [$nll, $emt, $nll, $ntE, $emt, true],
+            [$nll, $emt, $nll, $ntE, $ntE, true],
+            [$nll, $emt, $emt, $nll, $nll, true],
+            [$nll, $emt, $emt, $nll, $emt, true],
+            [$nll, $emt, $emt, $nll, $ntE, true],
+            [$nll, $emt, $emt, $emt, $nll, true],
+            [$nll, $emt, $emt, $emt, $emt, true],
+            [$nll, $emt, $emt, $emt, $ntE, true],
+            [$nll, $emt, $emt, $ntE, $nll, true],
+            [$nll, $emt, $emt, $ntE, $emt, true],
+            [$nll, $emt, $emt, $ntE, $ntE, true],
+            [$nll, $emt, $ntE, $nll, $nll, true],
+            [$nll, $emt, $ntE, $nll, $emt, true],
+            [$nll, $emt, $ntE, $nll, $ntE, true],
+            [$nll, $emt, $ntE, $emt, $nll, true],
+            [$nll, $emt, $ntE, $emt, $emt, true],
+            [$nll, $emt, $ntE, $emt, $ntE, true],
+            [$nll, $emt, $ntE, $ntE, $nll, true],
+            [$nll, $emt, $ntE, $ntE, $emt, true],
+            [$nll, $emt, $ntE, $ntE, $ntE, true],
+            [$nll, $ntE, $nll, $nll, $nll, false],
+            [$nll, $ntE, $nll, $nll, $emt, false],
+            [$nll, $ntE, $nll, $nll, $ntE, false],
+            [$nll, $ntE, $nll, $emt, $nll, true],
+            [$nll, $ntE, $nll, $emt, $emt, true],
+            [$nll, $ntE, $nll, $emt, $ntE, true],
+            [$nll, $ntE, $nll, $ntE, $nll, false],
+            [$nll, $ntE, $nll, $ntE, $emt, false],
+            [$nll, $ntE, $nll, $ntE, $ntE, false],
+            [$nll, $ntE, $emt, $nll, $nll, true],
+            [$nll, $ntE, $emt, $nll, $emt, true],
+            [$nll, $ntE, $emt, $nll, $ntE, true],
+            [$nll, $ntE, $emt, $emt, $nll, true],
+            [$nll, $ntE, $emt, $emt, $emt, true],
+            [$nll, $ntE, $emt, $emt, $ntE, true],
+            [$nll, $ntE, $emt, $ntE, $nll, true],
+            [$nll, $ntE, $emt, $ntE, $emt, true],
+            [$nll, $ntE, $emt, $ntE, $ntE, true],
+            [$nll, $ntE, $ntE, $nll, $nll, false],
+            [$nll, $ntE, $ntE, $nll, $emt, false],
+            [$nll, $ntE, $ntE, $nll, $ntE, false],
+            [$nll, $ntE, $ntE, $emt, $nll, true],
+            [$nll, $ntE, $ntE, $emt, $emt, true],
+            [$nll, $ntE, $ntE, $emt, $ntE, true],
+            [$nll, $ntE, $ntE, $ntE, $nll, false],
+            [$nll, $ntE, $ntE, $ntE, $emt, false],
+            [$nll, $ntE, $ntE, $ntE, $ntE, false],
+            [$emt, $nll, $nll, $nll, $nll, true],
+            [$emt, $nll, $nll, $nll, $emt, true],
+            [$emt, $nll, $nll, $nll, $ntE, true],
+            [$emt, $nll, $nll, $emt, $nll, true],
+            [$emt, $nll, $nll, $emt, $emt, true],
+            [$emt, $nll, $nll, $emt, $ntE, true],
+            [$emt, $nll, $nll, $ntE, $nll, true],
+            [$emt, $nll, $nll, $ntE, $emt, true],
+            [$emt, $nll, $nll, $ntE, $ntE, true],
+            [$emt, $nll, $emt, $nll, $nll, true],
+            [$emt, $nll, $emt, $nll, $emt, true],
+            [$emt, $nll, $emt, $nll, $ntE, true],
+            [$emt, $nll, $emt, $emt, $nll, true],
+            [$emt, $nll, $emt, $emt, $emt, true],
+            [$emt, $nll, $emt, $emt, $ntE, true],
+            [$emt, $nll, $emt, $ntE, $nll, true],
+            [$emt, $nll, $emt, $ntE, $emt, true],
+            [$emt, $nll, $emt, $ntE, $ntE, true],
+            [$emt, $nll, $ntE, $nll, $nll, true],
+            [$emt, $nll, $ntE, $nll, $emt, true],
+            [$emt, $nll, $ntE, $nll, $ntE, true],
+            [$emt, $nll, $ntE, $emt, $nll, true],
+            [$emt, $nll, $ntE, $emt, $emt, true],
+            [$emt, $nll, $ntE, $emt, $ntE, true],
+            [$emt, $nll, $ntE, $ntE, $nll, true],
+            [$emt, $nll, $ntE, $ntE, $emt, true],
+            [$emt, $nll, $ntE, $ntE, $ntE, true],
+            [$emt, $emt, $nll, $nll, $nll, true],
+            [$emt, $emt, $nll, $nll, $emt, true],
+            [$emt, $emt, $nll, $nll, $ntE, true],
+            [$emt, $emt, $nll, $emt, $nll, true],
+            [$emt, $emt, $nll, $emt, $emt, true],
+            [$emt, $emt, $nll, $emt, $ntE, true],
+            [$emt, $emt, $nll, $ntE, $nll, true],
+            [$emt, $emt, $nll, $ntE, $emt, true],
+            [$emt, $emt, $nll, $ntE, $ntE, true],
+            [$emt, $emt, $emt, $nll, $nll, true],
+            [$emt, $emt, $emt, $nll, $emt, true],
+            [$emt, $emt, $emt, $nll, $ntE, true],
+            [$emt, $emt, $emt, $emt, $nll, true],
+            [$emt, $emt, $emt, $emt, $emt, true],
+            [$emt, $emt, $emt, $emt, $ntE, true],
+            [$emt, $emt, $emt, $ntE, $nll, true],
+            [$emt, $emt, $emt, $ntE, $emt, true],
+            [$emt, $emt, $emt, $ntE, $ntE, true],
+            [$emt, $emt, $ntE, $nll, $nll, true],
+            [$emt, $emt, $ntE, $nll, $emt, true],
+            [$emt, $emt, $ntE, $nll, $ntE, true],
+            [$emt, $emt, $ntE, $emt, $nll, true],
+            [$emt, $emt, $ntE, $emt, $emt, true],
+            [$emt, $emt, $ntE, $emt, $ntE, true],
+            [$emt, $emt, $ntE, $ntE, $nll, true],
+            [$emt, $emt, $ntE, $ntE, $emt, true],
+            [$emt, $emt, $ntE, $ntE, $ntE, true],
+            [$ntE, $ntE, $nll, $nll, $nll, false],
+            [$ntE, $ntE, $nll, $nll, $emt, false],
+            [$ntE, $ntE, $nll, $nll, $ntE, false],
+            [$ntE, $ntE, $nll, $emt, $nll, true],
+            [$ntE, $ntE, $nll, $emt, $emt, true],
+            [$ntE, $ntE, $nll, $emt, $ntE, true],
+            [$ntE, $ntE, $nll, $ntE, $nll, false],
+            [$ntE, $ntE, $nll, $ntE, $emt, false],
+            [$ntE, $ntE, $nll, $ntE, $ntE, false],
+            [$ntE, $ntE, $emt, $nll, $nll, true],
+            [$ntE, $ntE, $emt, $nll, $emt, true],
+            [$ntE, $ntE, $emt, $nll, $ntE, true],
+            [$ntE, $ntE, $emt, $emt, $nll, true],
+            [$ntE, $ntE, $emt, $emt, $emt, true],
+            [$ntE, $ntE, $emt, $emt, $ntE, true],
+            [$ntE, $ntE, $emt, $ntE, $nll, true],
+            [$ntE, $ntE, $emt, $ntE, $emt, true],
+            [$ntE, $ntE, $emt, $ntE, $ntE, true],
+            [$ntE, $ntE, $ntE, $nll, $nll, false],
+            [$ntE, $ntE, $ntE, $nll, $emt, false],
+            [$ntE, $ntE, $ntE, $nll, $ntE, false],
+            [$ntE, $ntE, $ntE, $emt, $nll, true],
+            [$ntE, $ntE, $ntE, $emt, $emt, true],
+            [$ntE, $ntE, $ntE, $emt, $ntE, true],
+            [$ntE, $ntE, $ntE, $ntE, $nll, false],
+            [$ntE, $ntE, $ntE, $ntE, $emt, false],
+            [$ntE, $ntE, $ntE, $ntE, $ntE, false],
+            [$ntE, $nll, $nll, $nll, $nll, false],
+            [$ntE, $nll, $nll, $nll, $emt, false],
+            [$ntE, $nll, $nll, $nll, $ntE, false],
+            [$ntE, $nll, $nll, $emt, $nll, true],
+            [$ntE, $nll, $nll, $emt, $emt, true],
+            [$ntE, $nll, $nll, $emt, $ntE, true],
+            [$ntE, $nll, $nll, $ntE, $nll, false],
+            [$ntE, $nll, $nll, $ntE, $emt, false],
+            [$ntE, $nll, $nll, $ntE, $ntE, false],
+            [$ntE, $nll, $emt, $nll, $nll, true],
+            [$ntE, $nll, $emt, $nll, $emt, true],
+            [$ntE, $nll, $emt, $nll, $ntE, true],
+            [$ntE, $nll, $emt, $emt, $nll, true],
+            [$ntE, $nll, $emt, $emt, $emt, true],
+            [$ntE, $nll, $emt, $emt, $ntE, true],
+            [$ntE, $nll, $emt, $ntE, $nll, true],
+            [$ntE, $nll, $emt, $ntE, $emt, true],
+            [$ntE, $nll, $emt, $ntE, $ntE, true],
+            [$ntE, $nll, $ntE, $nll, $nll, false],
+            [$ntE, $nll, $ntE, $nll, $emt, false],
+            [$ntE, $nll, $ntE, $nll, $ntE, false],
+            [$ntE, $nll, $ntE, $emt, $nll, true],
+            [$ntE, $nll, $ntE, $emt, $emt, true],
+            [$ntE, $nll, $ntE, $emt, $ntE, true],
+            [$ntE, $nll, $ntE, $ntE, $nll, false],
+            [$ntE, $nll, $ntE, $ntE, $emt, false],
+            [$ntE, $nll, $ntE, $ntE, $ntE, false],
+            [$ntE, $emt, $nll, $nll, $nll, true],
+            [$ntE, $emt, $nll, $nll, $emt, true],
+            [$ntE, $emt, $nll, $nll, $ntE, true],
+            [$ntE, $emt, $nll, $emt, $nll, true],
+            [$ntE, $emt, $nll, $emt, $emt, true],
+            [$ntE, $emt, $nll, $emt, $ntE, true],
+            [$ntE, $emt, $nll, $ntE, $nll, true],
+            [$ntE, $emt, $nll, $ntE, $emt, true],
+            [$ntE, $emt, $nll, $ntE, $ntE, true],
+            [$ntE, $emt, $emt, $nll, $nll, true],
+            [$ntE, $emt, $emt, $nll, $emt, true],
+            [$ntE, $emt, $emt, $nll, $ntE, true],
+            [$ntE, $emt, $emt, $emt, $nll, true],
+            [$ntE, $emt, $emt, $emt, $emt, true],
+            [$ntE, $emt, $emt, $emt, $ntE, true],
+            [$ntE, $emt, $emt, $ntE, $nll, true],
+            [$ntE, $emt, $emt, $ntE, $emt, true],
+            [$ntE, $emt, $emt, $ntE, $ntE, true],
+            [$ntE, $emt, $ntE, $nll, $nll, true],
+            [$ntE, $emt, $ntE, $nll, $emt, true],
+            [$ntE, $emt, $ntE, $nll, $ntE, true],
+            [$ntE, $emt, $ntE, $emt, $nll, true],
+            [$ntE, $emt, $ntE, $emt, $emt, true],
+            [$ntE, $emt, $ntE, $emt, $ntE, true],
+            [$ntE, $emt, $ntE, $ntE, $nll, true],
+            [$ntE, $emt, $ntE, $ntE, $emt, true],
+            [$ntE, $emt, $ntE, $ntE, $ntE, true],
+            [$ntE, $ntE, $nll, $nll, $nll, false],
+            [$ntE, $ntE, $nll, $nll, $emt, false],
+            [$ntE, $ntE, $nll, $nll, $ntE, false],
+            [$ntE, $ntE, $nll, $emt, $nll, true],
+            [$ntE, $ntE, $nll, $emt, $emt, true],
+            [$ntE, $ntE, $nll, $emt, $ntE, true],
+            [$ntE, $ntE, $nll, $ntE, $nll, false],
+            [$ntE, $ntE, $nll, $ntE, $emt, false],
+            [$ntE, $ntE, $nll, $ntE, $ntE, false],
+            [$ntE, $ntE, $emt, $nll, $nll, true],
+            [$ntE, $ntE, $emt, $nll, $emt, true],
+            [$ntE, $ntE, $emt, $nll, $ntE, true],
+            [$ntE, $ntE, $emt, $emt, $nll, true],
+            [$ntE, $ntE, $emt, $emt, $emt, true],
+            [$ntE, $ntE, $emt, $emt, $ntE, true],
+            [$ntE, $ntE, $emt, $ntE, $nll, true],
+            [$ntE, $ntE, $emt, $ntE, $emt, true],
+            [$ntE, $ntE, $emt, $ntE, $ntE, true],
+            [$ntE, $ntE, $ntE, $nll, $nll, false],
+            [$ntE, $ntE, $ntE, $nll, $emt, false],
+            [$ntE, $ntE, $ntE, $nll, $ntE, false],
+            [$ntE, $ntE, $ntE, $emt, $nll, true],
+            [$ntE, $ntE, $ntE, $emt, $emt, true],
+            [$ntE, $ntE, $ntE, $emt, $ntE, true],
+            [$ntE, $ntE, $ntE, $ntE, $nll, false],
+            [$ntE, $ntE, $ntE, $ntE, $emt, false],
+            [$ntE, $ntE, $ntE, $ntE, $ntE, false],
         ];
     }
 
