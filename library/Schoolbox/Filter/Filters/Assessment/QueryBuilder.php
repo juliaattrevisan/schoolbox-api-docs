@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Filter\IFilterDefinition;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Learning\Assessment\WorkType as AWorkType;
 
 
 /**
@@ -36,6 +37,11 @@ use Schoolbox\Assessment\Term;
  *      $assessmentModels  = $assessmentMapper->findByColumn('id', $ids, $options);
  *      $assessableObjects = $assessmentMapperProxy->findByColumn('id', $ids, $options);
  *
+ * It is *NOT* the responsibility of this class to determine if a filter represents a full set, and therefore should not be applied.
+ * That is the responsibility of IKeyConverter::getSelectedItems().
+ * eg, if Weighting filter is specified as both weighted and unweighted, logically we
+ * don't need to apply that filter, but that optimisation is NOT done here.
+ *
  * @todo, once other analogous versions are required, abstract common logic into abstract and place behind interface IFilterer
  */
 class QueryBuilder
@@ -46,7 +52,7 @@ class QueryBuilder
     /**
      * A list of filter definitions this class knows how to apply
      *
-     * Indexed by IFilterDefinition->getQueryKey()
+     * Indexed by IFilterDefinition->getSlug()
      * @var string[]
      */
     private $knownFilterDefinitionRegistry = [];
@@ -95,8 +101,8 @@ class QueryBuilder
      * * []    => LEFT JOIN must match NULL. eg if project filter is [] then assessment does not live in project
      * * [X..] => INNER JOIN must be in X.   eg if project filter is [1] then assessments must reside directly in project_1
      *
-     * @param array $filters Indexed by filter definition key
-     * @param array $options Conventional mapper query modifiers
+     * @param Collection[]|null[]|mixed[][] $filters Indexed by filter definition key
+     * @param array                         $options Conventional mapper query modifiers
      * @see IFilterDefinition::getSlug()
      * @return int[]
      * @throws \InvalidArgumentException If any filter keys not recognised
@@ -105,6 +111,7 @@ class QueryBuilder
     {
         // No filters ?
         if (0 === count($filters)) {
+            // TODO consider removing $options and always return deleted (unless we add a filter for that)
             return $this->assessmentMapper->findAllIds($options);
         }
 
@@ -131,7 +138,7 @@ class QueryBuilder
      * Different sub-queries are required depending on which assessment-contexts filters are specified
      * Each sub-queries are modified depending on which non-assessment-context filters are specified
      *
-     * @param array $completeFilters
+     * @param Collection[]|null[]|mixed[][] $completeFilters
      * @return mixed[]
      */
     protected function buildQuery(array $completeFilters)
@@ -149,17 +156,21 @@ class QueryBuilder
         list($unitSpecWhere, $unitSpecParams)  = $this->getClauseUnitSpec($unitSpecIds);
         list($uImpSpcWhere,  $uImpSpcParams)   = $this->getClauseUnitImplSpec($unitImpSpcIds);
 
-
-        $params = array_merge($folderParams, $projectParams, $unitImplParams, $unitSpecParams, $uImpSpcParams);
-
         // Sub-query modifiers
-        $aTypes = $completeFilters[AssessmentType\Definition::SLUG];
-        $termIds = $completeFilters[TermDue\Definition::SLUG];
-        list($aTypeJoin, $aTypeWhere) = $this->getClauseAType($aTypes);
-        list($termWhere) = $this->getClauseTerm($termIds);
-//        list($weightingJoin, $weightingWhere, $weightingParams) = $this->getClauseWeighting($filters);
-//        list($workTypeJoin,  $workTypeWhere,  $workTypeParams)  = $this->getClauseWorkType($filters);
+        $aTypes     = $completeFilters[AssessmentType\Definition::SLUG];
+        $termsDue   = $completeFilters[TermDue\Definition::SLUG];
+        $termsClose = $completeFilters[TermClose\Definition::SLUG];
+        $weightings = $completeFilters[WeightingType\Definition::SLUG];
+        $workTypes  = $completeFilters[WorkType\Definition::SLUG];
 
+        list($aTypeJoin, $aTypeWhere) = $this->getClauseAType($aTypes);
+        list($termDueWhere) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
+        list($termCloseWhere) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
+        list($weightingWhere, $weightingParams) = $this->getClauseWeighting($weightings);
+        list($workTypeWhere,  $workTypeParams)  = $this->getClauseWorkType($workTypes);
+
+        // Merge all the params
+        $params = array_merge($folderParams, $projectParams, $unitImplParams, $unitSpecParams, $uImpSpcParams, $weightingParams, $workTypeParams);
 
         $subQueries = [];
         if($this->subQueryBase($unitImpSpcIds, $folderIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -167,7 +178,7 @@ class QueryBuilder
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$aTypeJoin}
                 WHERE TRUE
-                AND {$termWhere}
+                AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                 ";
         } else {
             if($this->subQueryFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -178,7 +189,7 @@ class QueryBuilder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$folderWhere}
-                    AND {$aTypeWhere} AND {$termWhere}
+                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryProjectFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -191,7 +202,7 @@ class QueryBuilder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$folderWhere} AND {$projectWhere}
-                    AND {$aTypeWhere} AND {$termWhere}
+                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -206,7 +217,7 @@ class QueryBuilder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$folderWhere} AND {$unitImplWhere}
-                    AND {$aTypeWhere} AND {$termWhere}
+                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     
                     ";
             }
@@ -224,7 +235,7 @@ class QueryBuilder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
-                    AND {$aTypeWhere} AND {$termWhere}
+                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -236,7 +247,7 @@ class QueryBuilder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$folderWhere} AND {$unitSpecWhere}
-                    AND {$aTypeWhere} AND {$termWhere}
+                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryProjectUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -250,7 +261,7 @@ class QueryBuilder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere}
-                    AND {$aTypeWhere} AND {$termWhere}
+                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryUnitImplUnitSpec($unitImpSpcIds, $projectIds)){
@@ -263,7 +274,7 @@ class QueryBuilder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$folderWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
-                    AND {$aTypeWhere} AND {$termWhere}
+                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryProjectUnitImplUnitSpec($unitImpSpcIds, $projectIds)){
@@ -278,7 +289,7 @@ class QueryBuilder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$folderWhere} AND {$projectWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
-                    AND {$aTypeWhere} AND {$termWhere}
+                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
         }
@@ -294,14 +305,17 @@ class QueryBuilder
     {
         // Manually register instead of auto-glob, as we have to manually implement anyway.
         $this->knownFilterDefinitionRegistry = [
-            AssessmentType\Definition::SLUG => AssessmentType\Definition::class,
+            // Context-filters
+            UnitImportSpec\Definition::SLUG => UnitImportSpec\Definition::class,
             Folder\Definition::SLUG         => Folder\Definition::class,
             Project\Definition::SLUG        => Project\Definition::class,
+            UnitImpl\Definition::SLUG       => UnitImpl\Definition::class,
+            UnitSpec\Definition::SLUG       => UnitSpec\Definition::class,
+
+            // Non-context filters
+            AssessmentType\Definition::SLUG => AssessmentType\Definition::class,
             TermDue\Definition::SLUG        => TermDue\Definition::class,
             TermClose\Definition::SLUG      => TermClose\Definition::class,
-            UnitImpl\Definition::SLUG       => UnitImpl\Definition::class,
-            UnitImportSpec\Definition::SLUG => UnitImportSpec\Definition::class,
-            UnitSpec\Definition::SLUG       => UnitSpec\Definition::class,
             WeightingType\Definition::SLUG  => WeightingType\Definition::class,
             WorkType\Definition::SLUG       => WorkType\Definition::class,
         ];
@@ -311,11 +325,11 @@ class QueryBuilder
     /**
      * Ensures that any filters passed in are known to this class
      *
-     * @param array $filters
+     * @param Collection[]|null[]|mixed[][] $filters
      * @throws \InvalidArgumentException If filter key not recognised
      * @todo move to abstract
      */
-    protected function checkValidFilterKeys(array $filters = [])
+    protected function checkValidFilterKeys(array $filters)
     {
         foreach($filters as $key => $val){
             if(!array_key_exists($key, $this->knownFilterDefinitionRegistry)){
@@ -326,12 +340,12 @@ class QueryBuilder
 
 
     /**
-     * Inserts null values for missing filters and ensures any scalars are wrapped in arrays
+     * Inserts null values for missing filters and ensures any scalars are wrapped in Collections
      *
      * This enables us to rely on filters being present, even if set explicitly to NULL
      *
      * @param array $sparseFilters
-     * @return mixed[]
+     * @return Collection[]|null[]|mixed[][]
      * @todo move to abstract
      */
     protected function normaliseFilters(array $sparseFilters)
@@ -343,10 +357,13 @@ class QueryBuilder
                 $completeFilters[$filterKey] = null;
                 continue;
             }
-            // Ensure it is either null, or an array (ok if empty)
-            $completeFilters[$filterKey] = null === $sparseFilters[$filterKey]
-                ? null
-                : (array)$sparseFilters[$filterKey];
+            // Ensure it is either null, or a (potentially empty) Collection
+            if(null === $sparseFilters[$filterKey] || $sparseFilters[$filterKey] instanceof Collection){
+                $completeFilters[$filterKey] = $sparseFilters[$filterKey];
+            } else {
+                // Enables caller to specify a inject a single entity, or an array, and have it normalised here.
+                $completeFilters[$filterKey] = new Collection((array)$sparseFilters[$filterKey]);
+            }
         }
         return $completeFilters;
     }
@@ -357,19 +374,19 @@ class QueryBuilder
      *
      * This will only be true if no context filters are specified
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $folderIds
-     * @param int[]|null $projectIds
-     * @param int[]|null $unitImplIds
-     * @param int[]|null $unitSpecIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $folderIds
+     * @param null|Collection|int[] $projectIds
+     * @param null|Collection|int[] $unitImplIds
+     * @param null|Collection|int[] $unitSpecIds
      * @return bool
      */
     private function subQueryBase(
-        array $uImpSpcIds = null,
-        array $folderIds = null,
-        array $projectIds = null,
-        array $unitImplIds = null,
-        array $unitSpecIds = null)
+        Collection $uImpSpcIds = null,
+        Collection $folderIds = null,
+        Collection $projectIds = null,
+        Collection $unitImplIds = null,
+        Collection $unitSpecIds = null)
     {
         return
             null === $uImpSpcIds &&
@@ -382,24 +399,28 @@ class QueryBuilder
     /**
      * Include (#1) 'folder' sub-query?
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $projectIds
-     * @param int[]|null $unitImplIds
-     * @param int[]|null $unitSpecIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $projectIds
+     * @param null|Collection|int[] $unitImplIds
+     * @param null|Collection|int[] $unitSpecIds
      * @return bool
      */
-    private function subQueryFolder(array $uImpSpcIds = null, array $projectIds = null, array $unitImplIds = null, array $unitSpecIds = null)
-    {
-        if(is_array($projectIds) && count($projectIds)){
+    private function subQueryFolder(
+        Collection $uImpSpcIds = null,
+        Collection $projectIds = null,
+        Collection $unitImplIds = null,
+        Collection $unitSpecIds = null
+    ){
+        if($projectIds instanceOf Collection && count($projectIds)){
             return false;
         }
-        if(is_array($unitSpecIds) && count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && count($unitSpecIds)){
             return false;
         }
-        if(is_array($unitImplIds) && count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && count($unitImplIds)){
             return false;
         }
-        if(is_array($uImpSpcIds) && count($uImpSpcIds)){
+        if($uImpSpcIds instanceOf Collection && count($uImpSpcIds)){
             return false;
         }
         return true;
@@ -408,24 +429,28 @@ class QueryBuilder
     /**
      * Include (#2) 'in project' sub-query?
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $projectIds
-     * @param int[]|null $unitImplIds
-     * @param int[]|null $unitSpecIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $projectIds
+     * @param null|Collection|int[] $unitImplIds
+     * @param null|Collection|int[] $unitSpecIds
      * @return bool
      */
-    private function subQueryProjectFolder(array $uImpSpcIds = null, array $projectIds = null, array $unitImplIds = null, array $unitSpecIds = null)
+    private function subQueryProjectFolder(
+        Collection $uImpSpcIds = null,
+        Collection $projectIds = null,
+        Collection $unitImplIds = null,
+        Collection $unitSpecIds = null)
     {
-        if(is_array($projectIds) && !count($projectIds)){
+        if($projectIds instanceOf Collection && !count($projectIds)){
             return false;
         }
-        if(is_array($unitImplIds) && count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && count($unitImplIds)){
             return false;
         }
-        if(is_array($unitSpecIds) && count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && count($unitSpecIds)){
             return false;
         }
-        if(is_array($uImpSpcIds) && count($uImpSpcIds)){
+        if($uImpSpcIds instanceOf Collection && count($uImpSpcIds)){
             return false;
         }
         return true;
@@ -434,24 +459,28 @@ class QueryBuilder
     /**
      * Include (#3) 'in unit-impl' sub-query?
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $projectIds
-     * @param int[]|null $unitImplIds
-     * @param int[]|null $unitSpecIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $projectIds
+     * @param null|Collection|int[] $unitImplIds
+     * @param null|Collection|int[] $unitSpecIds
      * @return bool
      */
-    private function subQueryUnitImpl(array $uImpSpcIds = null, array $projectIds = null, array $unitImplIds = null, array $unitSpecIds = null)
-    {
-        if(is_array($uImpSpcIds)){
+    private function subQueryUnitImpl(
+        Collection $uImpSpcIds = null,
+        Collection $projectIds = null,
+        Collection $unitImplIds = null,
+        Collection $unitSpecIds = null
+    ) {
+        if($uImpSpcIds instanceOf Collection){
             return false;
         }
-        if(is_array($unitImplIds) && !count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && !count($unitImplIds)){
             return false;
         }
-        if(is_array($projectIds) && count($projectIds)){
+        if($projectIds instanceOf Collection && count($projectIds)){
             return false;
         }
-        if(is_array($unitSpecIds) && count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && count($unitSpecIds)){
             return false;
         }
         return true;
@@ -460,24 +489,28 @@ class QueryBuilder
     /**
      * Include (#4) 'in project in unit-impl' sub-query?
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $projectIds
-     * @param int[]|null $unitImplIds
-     * @param int[]|null $unitSpecIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $projectIds
+     * @param null|Collection|int[] $unitImplIds
+     * @param null|Collection|int[] $unitSpecIds
      * @return bool
      */
-    private function subQueryProjectUnitImpl(array $uImpSpcIds = null, array $projectIds = null, array $unitImplIds = null, array $unitSpecIds = null)
-    {
-        if(is_array($uImpSpcIds)){
+    private function subQueryProjectUnitImpl(
+        Collection $uImpSpcIds = null,
+        Collection $projectIds = null,
+        Collection $unitImplIds = null,
+        Collection $unitSpecIds = null
+    ) {
+        if($uImpSpcIds instanceOf Collection){
             return false;
         }
-        if(is_array($projectIds) && !count($projectIds)){
+        if($projectIds instanceOf Collection && !count($projectIds)){
             return false;
         }
-        if(is_array($unitImplIds) && !count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && !count($unitImplIds)){
             return false;
         }
-        if(is_array($unitSpecIds) && count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && count($unitSpecIds)){
             return false;
         }
         return true;
@@ -486,24 +519,28 @@ class QueryBuilder
     /**
      * Include (#5) 'in unit-spec' sub-query?
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $projectIds
-     * @param int[]|null $unitImplIds
-     * @param int[]|null $unitSpecIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $projectIds
+     * @param null|Collection|int[] $unitImplIds
+     * @param null|Collection|int[] $unitSpecIds
      * @return bool
      */
-    private function subQueryUnitSpec(array $uImpSpcIds = null, array $projectIds = null, array $unitImplIds = null, array $unitSpecIds = null)
+    private function subQueryUnitSpec(
+        Collection $uImpSpcIds = null,
+        Collection $projectIds = null,
+        Collection $unitImplIds = null,
+        Collection $unitSpecIds = null)
     {
-        if(is_array($unitSpecIds) && !count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && !count($unitSpecIds)){
             return false;
         }
-        if(is_array($unitImplIds) && count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && count($unitImplIds)){
             return false;
         }
-        if(is_array($uImpSpcIds) && count($uImpSpcIds)){
+        if($uImpSpcIds instanceOf Collection && count($uImpSpcIds)){
             return false;
         }
-        if(is_array($projectIds) && count($projectIds)){
+        if($projectIds instanceOf Collection && count($projectIds)){
             return false;
         }
         return true;
@@ -512,24 +549,28 @@ class QueryBuilder
     /**
      * Include (#6) 'in project in unit-spec' sub-query?
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $projectIds
-     * @param int[]|null $unitImplIds
-     * @param int[]|null $unitSpecIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $projectIds
+     * @param null|Collection|int[] $unitImplIds
+     * @param null|Collection|int[] $unitSpecIds
      * @return bool
      */
-    private function subQueryProjectUnitSpec(array $uImpSpcIds = null, array $projectIds = null, array $unitImplIds = null, array $unitSpecIds = null)
+    private function subQueryProjectUnitSpec(
+        Collection $uImpSpcIds = null,
+        Collection $projectIds = null,
+        Collection $unitImplIds = null,
+        Collection $unitSpecIds = null)
     {
-        if(is_array($projectIds) && !count($projectIds)){
+        if($projectIds instanceOf Collection && !count($projectIds)){
             return false;
         }
-        if(is_array($unitSpecIds) && !count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && !count($unitSpecIds)){
             return false;
         }
-        if(is_array($unitImplIds) && count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && count($unitImplIds)){
             return false;
         }
-        if(is_array($uImpSpcIds) && count($uImpSpcIds)){
+        if($uImpSpcIds instanceOf Collection && count($uImpSpcIds)){
             return false;
         }
         return true;
@@ -538,16 +579,16 @@ class QueryBuilder
     /**
      * Include (#7) 'in unit-impl in unit-spec' sub-query?
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $projectIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $projectIds
      * @return bool
      */
-    private function subQueryUnitImplUnitSpec(array $uImpSpcIds = null, array $projectIds = null)
+    private function subQueryUnitImplUnitSpec(Collection $uImpSpcIds = null, Collection $projectIds = null)
     {
         if(null === $uImpSpcIds || !count($uImpSpcIds)){
             return false;
         }
-        if(is_array($projectIds) && count($projectIds)){
+        if($projectIds instanceOf Collection && count($projectIds)){
             return false;
         }
         return true;
@@ -556,16 +597,16 @@ class QueryBuilder
     /**
      * Include (#8) 'in project in unit-impl in unit-spec' sub-query?
      *
-     * @param int[]|null $uImpSpcIds
-     * @param int[]|null $projectIds
+     * @param null|Collection|int[] $uImpSpcIds
+     * @param null|Collection|int[] $projectIds
      * @return bool
      */
-    private function subQueryProjectUnitImplUnitSpec(array $uImpSpcIds = null, array $projectIds = null)
+    private function subQueryProjectUnitImplUnitSpec(Collection $uImpSpcIds = null, Collection $projectIds = null)
     {
         if(null === $uImpSpcIds || !count($uImpSpcIds)){
             return false;
         }
-        if(is_array($projectIds) && !count($projectIds)){
+        if($projectIds instanceOf Collection && !count($projectIds)){
             return false;
         }
         return true;
@@ -575,10 +616,10 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'AssessmentType' filter
      *
-     * @param null|int[] $aTypes
+     * @param null|Collection|int[] $aTypes
      * @return mixed[]
      */
-    private function getClauseAType(array $aTypes = null)
+    private function getClauseAType(Collection $aTypes = null)
     {
         // Not filtering by assessment type?
         if(null === $aTypes) {
@@ -626,10 +667,10 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'Folder' filter
      *
-     * @param null|int[] $folderIds
+     * @param null|Collection|int[] $folderIds
      * @return mixed[]
      */
-    private function getClauseFolder(array $folderIds = null)
+    private function getClauseFolder(Collection $folderIds = null)
     {
         if(null === $folderIds){
             $whereClause = 'TRUE';
@@ -646,10 +687,10 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'Project' filter
      *
-     * @param null|int[] $projectIds
+     * @param null|Collection|int[] $projectIds
      * @return mixed[]
      */
-    private function getClauseProject(array $projectIds = null)
+    private function getClauseProject(Collection $projectIds = null)
     {
         if(null === $projectIds || !count($projectIds)){
             $whereClause = 'TRUE';
@@ -664,27 +705,33 @@ class QueryBuilder
     }
 
     /**
-     * Get query fragments dependent on 'Term' filter
+     * Get query fragments dependent on 'TermClose' filter
      *
-     * @param null|Collection|Term\Model[] $terms
+     * @param Collection|Term\Model[] $termClose (can also be NULL, but storm doesn't like that type-hint)
+     * @param string $dateColumn ['due_date'|'close_date']
      * @return string
-     * @todo rename this to dueDate and add 'closeDate' (can pass term models for both)
      */
-    private function getClauseTerm(Collection $terms = null)
+    const DATE_COL_DUE = 'due_date';
+    const DATE_COL_CLS = 'close_date';
+    private function getClauseTerm(Collection $terms = null, $dateColumn)
     {
         // Is this filter being applied ?
         if(NULL === $terms){
             return ' TRUE ';
         }
 
+        if(!in_array($dateColumn, [self::DATE_COL_DUE, self::DATE_COL_CLS], true)){
+            throw new \InvalidArgumentException("Unrecognised dataColumn: $dateColumn");
+        }
+
         // Generate the dueDate filtering
         $anyBuilder = $this->assessmentMapper->getPredicateBuilder();
         foreach($terms as $term){
             $allBuilder = $this->assessmentMapper->getPredicateBuilder();
-            $allBuilder->greaterOrEqualTo('a.due_date', $term->getStart()->getDatabaseDate());
+            $allBuilder->greaterOrEqualTo("a.$dateColumn", $term->getStart()->getDatabaseDate());
 
             if(!$term->getActualFinish()->isNull()){
-                $allBuilder->lesserOrEqualTo('a.due_date', $term->getActualFinish()->getDatabaseDate());
+                $allBuilder->lesserOrEqualTo("a.$dateColumn", $term->getActualFinish()->getDatabaseDate());
             }
             $anyBuilder->all($allBuilder);
         }
@@ -694,10 +741,10 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'UnitImpl' filter
      *
-     * @param null|int[] $unitImplIds
+     * @param null|Collection|int[] $unitImplIds
      * @return mixed[]
      */
-    private function getClauseUnitImpl(array $unitImplIds = null)
+    private function getClauseUnitImpl(Collection $unitImplIds = null)
     {
         if(null === $unitImplIds || !count($unitImplIds)){
             $whereClause = 'TRUE';
@@ -714,10 +761,10 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'UnitImportSpec' filter
      *
-     * @param null|int[] $unitImpSpcIds
+     * @param null|Collection|int[] $unitImpSpcIds
      * @return mixed[]
      */
-    private function getClauseUnitImplSpec(array $unitImpSpcIds = null)
+    private function getClauseUnitImplSpec(Collection $unitImpSpcIds = null)
     {
         if(null === $unitImpSpcIds || !count($unitImpSpcIds)){
             $whereClause = 'TRUE';
@@ -734,10 +781,10 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'UnitSpec' filter
      *
-     * @param null|int[] $unitSpecIds
+     * @param null|Collection|int[] $unitSpecIds
      * @return mixed[]
      */
-    private function getClauseUnitSpec(array $unitSpecIds = null)
+    private function getClauseUnitSpec(Collection $unitSpecIds = null)
     {
         if(null === $unitSpecIds || !count($unitSpecIds)){
             $whereClause = 'TRUE';
@@ -754,23 +801,51 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'Weighting' filter
      *
-     * @param array $filters
+     * @param Collection|string[] $weightings (can also be NULL but storm doesn't like iterating that type-hint)
      * @return mixed[]
      */
-    private function getClauseWeighting(array $filters)
+    private function getClauseWeighting(Collection $weightings = null)
     {
-        return [];
+        // If no weighting types are selected, don't filter
+        if(NULL === $weightings){
+            return ['TRUE', []];
+        }
+
+        $builder = $this->assessmentMapper->getPredicateBuilder();
+
+        foreach($weightings as $weightingType){
+            if(WeightingType\Definition::KEY_WEIGHTED === $weightingType){
+                $builder->notEquals('a.weight', 0);
+            } else {
+                $builder->equals('a.weight', 0);
+            }
+        }
+        return ['(' . implode(' OR ', $builder->getWhere()) . ')', $builder->getParams()];
     }
 
     /**
      * Get query fragments dependent on 'WorkType' filter
      *
-     * @param array $filters
+     * @param Collection|AWorkType\Model[] $workTypes
      * @return mixed[]
      */
-    private function getClauseWorkType(array $filters)
+    private function getClauseWorkType(Collection $workTypes = null)
     {
-        return [];
+        // If no workTypes selected, don't filter
+        if(NULL === $workTypes){
+            return ['TRUE', []];
+        }
+
+        $builder = $this->assessmentMapper->getPredicateBuilder();
+
+        foreach($workTypes as $workType){
+            if(null === $workType){
+                $builder->isNull('a.work_type_id');
+            } else {
+                $builder->equals('a.work_type_id', $workType->getId());
+            }
+        }
+        return ['(' . implode(' OR ', $builder->getWhere()) . ')', $builder->getParams()];
     }
 
 
@@ -804,19 +879,26 @@ class QueryBuilder
      * @param int[][]|null[] $completeFilters
      * @return bool
      */
-    private function doNonContextFiltersGuaranteeEmptySet(array $completeFilters)
+    protected function doNonContextFiltersGuaranteeEmptySet(array $completeFilters)
     {
         // Did call explicitly request assessments that do not have an assessment type?
         $assessmentTypes = $completeFilters[AssessmentType\Definition::SLUG];
-        if (is_array($assessmentTypes) && !count($assessmentTypes)) {
+        if ($assessmentTypes instanceOf Collection && !count($assessmentTypes)) {
             // All assessments have a type
             return true;
         }
 
         // Did call explicitly request assessments due in some term, but no terms supplied?
-        $termIds = $completeFilters[TermDue\Definition::SLUG];
-        if (is_array($termIds) && !count($termIds)) {
+        $termsDue = $completeFilters[TermDue\Definition::SLUG];
+        if ($termsDue instanceOf Collection && !$termsDue->count()) {
             // All assessments have due dates
+            return true;
+        }
+
+        // Did call explicitly request assessments close in some term, but no terms supplied?
+        $termsClose = $completeFilters[TermClose\Definition::SLUG];
+        if ($termsClose instanceOf Collection && !$termsClose->count()) {
+            // All assessments have have a close date
             return true;
         }
 
@@ -825,7 +907,7 @@ class QueryBuilder
 
         // Did call explicitly request assessments with a weightingType, but no weightingTypes supplied?
         $weightingType = $completeFilters[WeightingType\Definition::SLUG];
-        if (is_array($weightingType) && !count($weightingType)) {
+        if ($weightingType instanceOf Collection && !count($weightingType)) {
             // All assessments have a weighting type
             return true;
         }
@@ -842,13 +924,13 @@ class QueryBuilder
      * @param int[][]|null[] $completeFilters
      * @return bool
      */
-    private function doContextFiltersGuaranteeEmptySet(array  $completeFilters){
+    protected function doContextFiltersGuaranteeEmptySet(array $completeFilters){
 
         // Ultimate folder (ie either direct or indirectly associated)
         $folderIds = $completeFilters[Folder\Definition::SLUG];
 
         // Did call explicitly request assessments that do not have an ultimate folder?
-        if(is_array($folderIds) && !count($folderIds)){
+        if($folderIds instanceOf Collection && !$folderIds->count()){
             // All assessments have an ultimate folder
             return true;
         }
@@ -857,7 +939,7 @@ class QueryBuilder
         $unitSpecIds = $completeFilters[UnitSpec\Definition::SLUG];
 
         // Did caller request assessments that live in unit-impls and unit-specs simultaneously?
-        if(is_array($unitImplIds) && is_array($unitSpecIds) && count($unitImplIds) && count($unitSpecIds)){
+        if($unitImplIds instanceOf Collection && $unitSpecIds instanceOf Collection && count($unitImplIds) && count($unitSpecIds)){
             // Assessments cannot live in both a unitImpl and unitSpec at the same time.
             return true;
         }
@@ -865,14 +947,14 @@ class QueryBuilder
         // Did caller specify assessment must reside directly in some unit-spec, and also be
         // directly in a unit-impl (that was imported from some spec)?
         $unitImportSpecIds = $completeFilters[UnitImportSpec\Definition::SLUG];
-        if(is_array($unitImportSpecIds) && is_array($unitSpecIds) && count($unitImportSpecIds) && count($unitSpecIds)){
+        if($unitImportSpecIds instanceOf Collection && $unitSpecIds instanceOf Collection && count($unitImportSpecIds) && count($unitSpecIds)){
             return true;
         }
 
 
         // Did caller request assessment that live inside unit-impls that were not imported, or were imported from unit-specs
         // but don't live in a unit-spec?
-        if(is_array($unitImplIds) && is_array($unitImportSpecIds) && (bool)count($unitImplIds) !== (bool)count($unitImportSpecIds)){
+        if($unitImplIds instanceOf Collection && $unitImportSpecIds instanceOf Collection && (bool)count($unitImplIds) !== (bool)count($unitImportSpecIds)){
             return true;
         }
 
