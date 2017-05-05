@@ -234,6 +234,16 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
     }
 
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue  if string, must be datetime
+     * @return Builder
+     */
+    public function lesserOrEqualTo($columnName, $columnValue)
+    {
+        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
+    }
+
 
     /**
      * @param string     $columnName
@@ -245,12 +255,13 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
     }
 
+
     /**
      * @param string     $columnName
-     * @param int|string $columnValue  if string, must be datetime
+     * @param int|string $columnValue If string, must be datetime
      * @return Builder
      */
-    public function notLessThan($columnName, $columnValue)
+    public function greaterOrEqualTo($columnName, $columnValue)
     {
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
     }
@@ -260,9 +271,19 @@ class Builder implements IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return Builder
      */
+    public function notLessThan($columnName, $columnValue)
+    {
+        return $this->greaterOrEqualTo($columnName, $columnValue);
+    }
+
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue  if string, must be datetime
+     * @return Builder
+     */
     public function notGreaterThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
+        return $this->lesserOrEqualTo($columnName, $columnValue);
     }
 
     /**
