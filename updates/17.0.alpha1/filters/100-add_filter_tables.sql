@@ -68,12 +68,12 @@ DELETE FROM config WHERE `name` = 'pending_assessment_types';
 INSERT INTO filter (`class`) VALUES
   ('Schoolbox\\Filter\\Filters\\Assessment\\AssessmentType\\Definition'),
   ('Schoolbox\\Filter\\Filters\\Assessment\\Folder\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\Project\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\Project\\Definition'),
   ('Schoolbox\\Filter\\Filters\\Assessment\\TermDue\\Definition'),
   ('Schoolbox\\Filter\\Filters\\Assessment\\TermClose\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\UnitImpl\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\UnitImportSpec\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\UnitSpec\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImpl\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImportSpec\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitSpec\\Definition'),
   ('Schoolbox\\Filter\\Filters\\Assessment\\WeightingType\\Definition'),
   ('Schoolbox\\Filter\\Filters\\Assessment\\WorkType\\Definition')
 ;

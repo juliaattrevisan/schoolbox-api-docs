@@ -5,11 +5,10 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\UnitImportSpec;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\Filter\Option;
-use Schoolbox\GenericCollection;
 
 /**
  * The unit-spec that an an assessment-impl's unit-impl was imported from.
@@ -36,8 +35,9 @@ use Schoolbox\GenericCollection;
  * * CourseSpec B
  * * □ UnitSpec 333
  */
-class Definition extends AbstractFilterDefinition
+class Definition extends NullableContext\Definition
 {
+
     const SLUG = 'uis';
 
     /* Show units imported to the following folder types:
@@ -52,7 +52,6 @@ class Definition extends AbstractFilterDefinition
      *
      * 'NONE' => assessment is not in a unit-impl imported from a unit-spec
      */
-    const KEY_NONE              = 'none';
     const KEY_IMPORTED_TO_CLASS = 'to_classes';
     const KEY_IMPORTED_TO_GROUP = 'to_groups';
 
@@ -60,53 +59,12 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
-    {
-        // noop - abstract options are hard-coded, concrete options are run-time
-        return $pageOptions;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
-    {
-        // noop - abstract options are hard-coded, concrete options are run-time
-        return $pageOptions;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getInitialSelectedState($key, $page, $roleType)
-    {
-        // Nothing is selected, meaning filter is not applied
-        return false;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     protected function getCustomKeys()
     {
-        return [
-            self::KEY_NONE,
+        return array_merge(parent::getCustomKeys(), [
             self::KEY_IMPORTED_TO_CLASS,
             self::KEY_IMPORTED_TO_GROUP,
-        ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getInitialAvailability($customAbstractKey, $page)
-    {
-        // Initial config is both classes and groups are available for all pages
-        return true;
+        ]);
     }
 
 
@@ -117,8 +75,7 @@ class Definition extends AbstractFilterDefinition
     {
         return [
             Option\Model::PAGE_MARK_BOOK,
-
-            Option\Model::PAGE_PENDING_ASSESSMENTS
+            Option\Model::PAGE_PENDING_ASSESSMENTS,
         ];
     }
 

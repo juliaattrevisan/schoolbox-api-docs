@@ -4,18 +4,18 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\UnitSpec;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractKeyConverter;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\GenericCollection;
 
 /**
  * No conversion. A int is converted to the same int (representing a unitSpec.id)
  * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
-class KeyConverter extends AbstractKeyConverter
+class KeyConverter extends NullableContext\KeyConverter
 {
 
     /**

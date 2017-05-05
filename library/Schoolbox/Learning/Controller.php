@@ -47,7 +47,7 @@ use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
-use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitImportSpecFilter;
+use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec as UnitImportSpecFilter;
 use Schoolbox\Filter\Filters\Assessment\TermDue as TermFilter;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType as AssessmentTypeFilter;
 use Schoolbox\Filter\Filters\Assessment\WeightingType as WeightingFilter;

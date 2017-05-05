@@ -59,10 +59,10 @@ class IdFinder extends Filter\AbstractIdFinder
     {
         // Filters which effect which sub-queries are required
         $folderIds     = $completeFilters[Folder\Definition::SLUG];
-        $projectIds    = $completeFilters[Project\Definition::SLUG];
-        $unitImplIds   = $completeFilters[UnitImpl\Definition::SLUG];
-        $unitSpecIds   = $completeFilters[UnitSpec\Definition::SLUG];
-        $unitImpSpcIds = $completeFilters[UnitImportSpec\Definition::SLUG];
+        $projectIds    = $completeFilters[NullableContext\Project\Definition::SLUG];
+        $unitImplIds   = $completeFilters[NullableContext\UnitImpl\Definition::SLUG];
+        $unitSpecIds   = $completeFilters[NullableContext\UnitSpec\Definition::SLUG];
+        $unitImpSpcIds = $completeFilters[NullableContext\UnitImportSpec\Definition::SLUG];
 
         list($folderWhere,   $folderParams)    = $this->getClauseFolder($folderIds);
         list($projectWhere,  $projectParams)   = $this->getClauseProject($projectIds);
@@ -221,18 +221,18 @@ class IdFinder extends Filter\AbstractIdFinder
         // Manually register instead of auto-glob, as we have to manually implement anyway.
         return [
             // Context-filters
-            UnitImportSpec\Definition::SLUG => UnitImportSpec\Definition::class,
-            Folder\Definition::SLUG         => Folder\Definition::class,
-            Project\Definition::SLUG        => Project\Definition::class,
-            UnitImpl\Definition::SLUG       => UnitImpl\Definition::class,
-            UnitSpec\Definition::SLUG       => UnitSpec\Definition::class,
+            NullableContext\UnitImportSpec\Definition::SLUG => NullableContext\UnitImportSpec\Definition::class,
+            Folder\Definition::SLUG                         => Folder\Definition::class,
+            NullableContext\Project\Definition::SLUG        => NullableContext\Project\Definition::class,
+            NullableContext\UnitImpl\Definition::SLUG       => NullableContext\UnitImpl\Definition::class,
+            NullableContext\UnitSpec\Definition::SLUG       => NullableContext\UnitSpec\Definition::class,
 
             // Non-context filters
-            AssessmentType\Definition::SLUG => AssessmentType\Definition::class,
-            TermDue\Definition::SLUG        => TermDue\Definition::class,
-            TermClose\Definition::SLUG      => TermClose\Definition::class,
-            WeightingType\Definition::SLUG  => WeightingType\Definition::class,
-            WorkType\Definition::SLUG       => WorkType\Definition::class,
+            AssessmentType\Definition::SLUG                 => AssessmentType\Definition::class,
+            TermDue\Definition::SLUG                        => TermDue\Definition::class,
+            TermClose\Definition::SLUG                      => TermClose\Definition::class,
+            WeightingType\Definition::SLUG                  => WeightingType\Definition::class,
+            WorkType\Definition::SLUG                       => WorkType\Definition::class,
         ];
     }
 
@@ -576,7 +576,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param Collection|Term\Model[] $terms (can also be NULL, but storm doesn't like that type-hint)
      * @param string $dateColumn ['due_date'|'close_date']
-     * @return string
+     * @return string[]
      * @throws Filter\BrokenFilterException If filter cannot be constructed
      * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
      */
@@ -584,7 +584,7 @@ class IdFinder extends Filter\AbstractIdFinder
     {
         // Is this filter being applied ?
         if(NULL === $terms){
-            return ' TRUE ';
+            return [' TRUE '];
         }
 
         if(!in_array($dateColumn, [self::DATE_COL_DUE, self::DATE_COL_CLS], true)){
@@ -602,7 +602,7 @@ class IdFinder extends Filter\AbstractIdFinder
             }
             $anyBuilder->all($allBuilder);
         }
-        return '(' . implode(' OR ', $anyBuilder->getWhere()) . ')';
+        return ['(' . implode(' OR ', $anyBuilder->getWhere()) . ')'];
     }
 
     /**
@@ -728,17 +728,17 @@ class IdFinder extends Filter\AbstractIdFinder
      * Return a SQL clause fragment that determines whether soft-deleted assessments are filtered off
      *
      * @param bool $deleted
-     * @return string
+     * @return string[]
      */
     private function getClauseDeleted($deleted)
     {
         if(false !== $deleted){
-            return 'TRUE';
+            return ['TRUE'];
         }
         // Exclude deleted assessments
         $builder = $this->getMapper()->getPredicateBuilder();
         $builder->isNull('a.deleted_at');
-        return $builder->getWhere()[0];
+        return [$builder->getWhere()[0]];
     }
 
 
@@ -782,8 +782,8 @@ class IdFinder extends Filter\AbstractIdFinder
             return true;
         }
 
-        $unitImplIds = $completeFilters[UnitImpl\Definition::SLUG];
-        $unitSpecIds = $completeFilters[UnitSpec\Definition::SLUG];
+        $unitImplIds = $completeFilters[NullableContext\UnitImpl\Definition::SLUG];
+        $unitSpecIds = $completeFilters[NullableContext\UnitSpec\Definition::SLUG];
 
         // Did caller request assessments that live in unit-impls and unit-specs simultaneously?
         if($unitImplIds instanceOf Collection && $unitSpecIds instanceOf Collection && $unitImplIds->count() && $unitSpecIds->count()){
@@ -793,7 +793,7 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // Did caller specify assessment must reside directly in some unit-spec, and also be
         // directly in a unit-impl (that was imported from some spec)?
-        $unitImportSpecIds = $completeFilters[UnitImportSpec\Definition::SLUG];
+        $unitImportSpecIds = $completeFilters[NullableContext\UnitImportSpec\Definition::SLUG];
         if($unitImportSpecIds instanceOf Collection && $unitSpecIds instanceOf Collection && $unitImportSpecIds->count() && $unitSpecIds->count()){
             return true;
         }

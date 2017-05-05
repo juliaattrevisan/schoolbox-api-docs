@@ -4,39 +4,39 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\UnitImportSpec;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImpl;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractKeyConverter;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\GenericCollection;
 
 /**
  * No conversion. A int is converted to the same int (representing a unitSpec.id)
  * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
-class KeyConverter extends AbstractKeyConverter
+class KeyConverter extends NullableContext\KeyConverter
 {
 
     /**
-     * All UnitSpecs IDs known to the system (regardless of whether they are
+     * All UnitImpls IDs known to the system (regardless of whether they are
      * available for selection for current user)
      *
-     * We use IDs instead of Models as too slow for no value
+     * We use IDs instead of Models as models are too slow to build and add no extra value
      *
      * @var Collection|int[]
      */
-    private $unitSpecIds;
+    private $unitImplIds;
 
 
     /**
      * @param Filter\Model     $filter
-     * @param Collection|int[] $unitSpecIds
+     * @param Collection|int[] $unitImplIds
      */
-    public function __construct(Filter\Model $filter, Collection $unitSpecIds)
+    public function __construct(Filter\Model $filter, Collection $unitImplIds)
     {
         parent::__construct($filter);
-        $this->unitSpecIds = $unitSpecIds->shallowClone();
+        $this->unitImplIds = $unitImplIds->shallowClone();
     }
 
 
@@ -53,7 +53,7 @@ class KeyConverter extends AbstractKeyConverter
             return null;
         }
         $this->assertValidKey($key);
-        return $this->unitSpecIds[$key];
+        return $this->unitImplIds[$key];
     }
 
 
@@ -64,7 +64,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getAllPossibleItems()
     {
-        return $this->unitSpecIds->shallowClone();
+        return $this->unitImplIds->shallowClone();
     }
 
 
@@ -89,8 +89,8 @@ class KeyConverter extends AbstractKeyConverter
         if(Definition::KEY_NONE === $key){
             return;
         }
-        if (!$this->unitSpecIds->offsetExists($key)) {
-            throw new \InvalidArgumentException("No UnitSpec ID found for key: $key");
+        if (!$this->unitImplIds->offsetExists($key)) {
+            throw new \InvalidArgumentException("No UnitImpl ID found for key: $key");
         }
     }
 }

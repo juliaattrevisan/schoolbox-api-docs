@@ -84,24 +84,24 @@ class FactoryFactory
                 ]);
             case Filters\Assessment\WeightingType\Definition::class:
                 return $this->buildFactory(Filters\Assessment\WeightingType\Factory::class);
-            case Filters\Assessment\UnitImportSpec\Definition::class:
-                return $this->buildFactory(Filters\Assessment\UnitImportSpec\Factory::class, [
+            case Filters\Assessment\NullableContext\UnitImportSpec\Definition::class:
+                return $this->buildFactory(Filters\Assessment\NullableContext\UnitImportSpec\Factory::class, [
                     'folderMapper'     => $this->mapperFactory->get(Folder\Mapper::class),
                     'courseImplMapper' => $this->mapperFactory->get(CourseImpl\Mapper::class),
                     'unitSpecMapper'   => $this->mapperFactory->get(UnitSpec\Mapper::class),
                 ]);
-            case Filters\Assessment\Project\Definition::class:
-                return $this->buildFactory(Filters\Assessment\Project\Factory::class, [
+            case Filters\Assessment\NullableContext\Project\Definition::class:
+                return $this->buildFactory(Filters\Assessment\NullableContext\Project\Factory::class, [
                     'folderMapper'   => $this->mapperFactory->get(Folder\Mapper::class),
                     'unitImplMapper' => $this->mapperFactory->get(UnitImpl\Mapper::class),
                     'projectMapper'  => $this->mapperFactory->get(Project\Mapper::class),
                 ]);
-            case Filters\Assessment\UnitSpec\Definition::class:
-                return $this->buildFactory(Filters\Assessment\UnitSpec\Factory::class, [
+            case Filters\Assessment\NullableContext\UnitSpec\Definition::class:
+                return $this->buildFactory(Filters\Assessment\NullableContext\UnitSpec\Factory::class, [
                     'unitSpecMapper' => $this->mapperFactory->get(UnitSpec\Mapper::class),
                 ]);
-            case Filters\Assessment\UnitImpl\Definition::class:
-                return $this->buildFactory(Filters\Assessment\UnitImpl\Factory::class, [
+            case Filters\Assessment\NullableContext\UnitImpl\Definition::class:
+                return $this->buildFactory(Filters\Assessment\NullableContext\UnitImpl\Factory::class, [
                     'unitImplMapper' => $this->mapperFactory->get(UnitImpl\Mapper::class),
                 ]);
         }

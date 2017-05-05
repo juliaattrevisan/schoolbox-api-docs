@@ -5,11 +5,12 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\Project;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFilterFactory;
+use Schoolbox\Filter\Filters\Assessment\NullableContext\Project\Definition;
 use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
@@ -27,8 +28,6 @@ use Schoolbox\Mapper;
 
 /**
  * A factory for building 'Project' filter objects
- *
- * @see Filter\Filters\Assessment\Project\Definition for more detailed description
  */
 class Factory extends AbstractFilterFactory
 {

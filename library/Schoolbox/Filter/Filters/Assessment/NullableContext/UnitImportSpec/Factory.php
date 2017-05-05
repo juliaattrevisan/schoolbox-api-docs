@@ -5,11 +5,12 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\UnitImportSpec;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFilterFactory;
+use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
 use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
