@@ -59,7 +59,7 @@
             <article>{{= it.description }}</article>
 
             {{? !it.readonly }}
-            <ul class="flex-list buttons">
+            <ul class="flex-list flex-wrap buttons">
                 <li><a data-interaction="edit" class="icon-modify">Edit</a></li>
                 <li><a data-interaction="add-subsection" class="icon-add" data-nodeid="{{! it.id }}">Add Subsection</a></li>
                 <li><a data-interaction="delete" class="icon-delete" data-nodeid="{{! it.id }}" data-action="{{! it.actions.delete }}">Delete</a></li>
@@ -97,7 +97,7 @@
                 <label for="curriculumDescription">Description</label>
                 <textarea id="curriculumDescription" name="description">{{! it.description }}</textarea>
 
-                <ul class="flex-list buttons small-1 medium-2 large-2 xlarge-4 xxlarge-2">
+                <ul class="flex-list flex-wrap buttons">
                     <li>
                         {{? it.id }}
                             <input type="submit" value="Save Changes" />
