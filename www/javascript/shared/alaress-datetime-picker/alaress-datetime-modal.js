@@ -116,6 +116,18 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     Flatpickr.localize(Flatpickr.l10ns.default);
     Flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
 
+    // Come up with a shit load of random numbers for heatmap dummy percentages
+    var randPercent = [];
+    for (var y=1900; y <= 2100; y++) {
+        randPercent[y] = [];
+        for (var m = 1; m <= 12; m++) {
+            randPercent[y][m] = [];
+            for (var d = 1; d <= 31; d++) {
+                randPercent[y][m][d] = Math.floor((Math.random() * 100) + 1);
+            }
+        }
+    }
+
     window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, {
         defaultDate: twigVars.date,
         inline: true,
@@ -159,6 +171,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
+
+            addHeatmap(instance);
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -177,6 +191,15 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
                 latestDate = newDate;
             }
+        },
+        onMonthChange: function(selectedDates, dateStr, instance) {
+            addHeatmap(instance);
+        },
+        onYearChange: function(selectedDates, dateStr, instance) {
+            addHeatmap(instance);
+        },
+        onValueUpdate: function(selectedDates, dateStr, instance) {
+            addHeatmap(instance);
         }
 
     });
@@ -579,15 +602,39 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             var dayNumber = $(this).attr('data-tt-day');
 
-           if (dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]) {
+            if (dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]) {
                 var dayDate = moment(twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]).format('YYYY-MM-DD');
                 $(this).attr('data-date', dayDate).removeClass('disabled');
             } else {
-               $(this).removeAttr('data-date').addClass('disabled');
+                $(this).removeAttr('data-date').addClass('disabled');
             }
 
         });
 
+    }
+
+
+    /**
+     * Adds heatmap to a month view of flatpickr
+     *
+     * @param instance
+     */
+    function addHeatmap(instance) {
+        // loop through all days and set a heatmap height
+        var i = 0;
+        $(instance.days.childNodes).each(function() {
+            var year = $(this)[0].dateObj.getFullYear(),
+                month = $(this)[0].dateObj.getMonth() + 1,
+                day = $(this)[0].dateObj.getDate();
+
+            // empty out weekends to make more realistic
+            if ($(this)[0].dateObj.getDay() == 0 || $(this)[0].dateObj.getDay() == 6) {
+                randPercent[year][month][day] = 0;
+            }
+
+            $(this).append('<span class="flatpickr-day-heat" style="height:' + randPercent[year][month][day] + '%;"></span>');
+            i++;
+        });
     }
 
 };

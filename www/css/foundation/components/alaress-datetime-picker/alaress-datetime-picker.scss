@@ -63,6 +63,12 @@ $pickr-month-padding: 5px;
     }
 
     .flatpickr-day {
+
+        z-index: 50;
+        border-radius: 0;
+        max-width: none;
+
+
         &.inRange,
         &.prevMonthDay.inRange,
         &.nextMonthDay.inRange,
@@ -86,6 +92,16 @@ $pickr-month-padding: 5px;
         &.selected.nextMonthDay {
             background: #0066b0;
             border-color: #0066b0;
+        }
+
+        .flatpickr-day-heat {
+            display: block;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: rgba(209, 236, 255, 0.3);
+            z-index: -50;
+            pointer-events: none;
         }
     }
 
