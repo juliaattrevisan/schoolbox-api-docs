@@ -118,7 +118,7 @@ class Component extends AbstractFilterComponent
             $selected = $option->getDefaults()[$roleType]->getSelected();
 
             // Is this the 'On Folder' abstract option?
-            if (Definition::KEY_ON_FOLDER === $option->getKey()) {
+            if (Definition::KEY_NONE === $option->getKey()) {
                 $key                       = $option->getKey();
                 $availableSelections[$key] = $this->createSelection($key, $selected);
             } elseif (Definition::KEY_IMPORTED_TO_CLASS === $option->getKey()) {
@@ -153,7 +153,7 @@ class Component extends AbstractFilterComponent
     {
         return array_merge(parent::toContext(), [
             'courseSpecs' => $this->courseSpecs,
-            'keyOnFolder' => Definition::KEY_ON_FOLDER,
+            'keyOnFolder' => Definition::KEY_NONE,
         ]);
     }
 

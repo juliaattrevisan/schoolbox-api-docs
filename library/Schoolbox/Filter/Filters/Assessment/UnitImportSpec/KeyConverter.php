@@ -49,7 +49,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getItem($key)
     {
-        if(Definition::KEY_ON_FOLDER === $key){
+        if(Definition::KEY_NONE === $key){
             return null;
         }
         $this->assertValidKey($key);
@@ -73,7 +73,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function sanitiseKey($key)
     {
-        if(Definition::KEY_ON_FOLDER === $key){
+        if(Definition::KEY_NONE === $key){
             return $key;
         }
         $this->assertValidKey($key);
@@ -86,7 +86,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
-        if(Definition::KEY_ON_FOLDER === $key){
+        if(Definition::KEY_NONE === $key){
             return;
         }
         if (!$this->unitSpecIds->offsetExists($key)) {

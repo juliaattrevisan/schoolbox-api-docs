@@ -50,9 +50,9 @@ class Definition extends AbstractFilterDefinition
      *
      * Items created in UnitImpls on a class will be included in 'CLASS_UNITS
      *
-     * 'ON_FOLDER' => assessment is on folder (or in project on folder)
+     * 'NONE' => assessment is not in a unit-impl imported from a unit-spec
      */
-    const KEY_ON_FOLDER         = 'on_folder';
+    const KEY_NONE              = 'none';
     const KEY_IMPORTED_TO_CLASS = 'to_classes';
     const KEY_IMPORTED_TO_GROUP = 'to_groups';
 
@@ -93,7 +93,7 @@ class Definition extends AbstractFilterDefinition
     protected function getCustomKeys()
     {
         return [
-            self::KEY_ON_FOLDER,
+            self::KEY_NONE,
             self::KEY_IMPORTED_TO_CLASS,
             self::KEY_IMPORTED_TO_GROUP,
         ];
@@ -129,7 +129,7 @@ class Definition extends AbstractFilterDefinition
     public function getLabel($key)
     {
         switch ($key) {
-            case self::KEY_ON_FOLDER:
+            case self::KEY_NONE:
                 return 'No Unit';
             case self::KEY_IMPORTED_TO_CLASS:
                 return 'Units imported to classes';
