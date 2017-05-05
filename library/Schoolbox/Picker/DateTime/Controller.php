@@ -14,6 +14,7 @@ use Calendar_Api_Factory;
 use External_Timetable;
 use Alaress_Date_Format;
 use InvalidArgumentException;
+use Calendar\Event\Type\EventBase;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
@@ -352,9 +353,13 @@ class Controller extends Base
         $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
         foreach ($events as $event) {
+            /** @var $event EventBase */
             $appointments[] = [
                 'displayDateTime' => $event->getEventSpan(),
-                'title' => $event->getTitle()
+                'title'           => $event->getTitle(),
+                'start'           => $event->getStartTime()->toIso8601String(),
+                'end'             => $event->getEndTime()->toIso8601String(),
+                'allDay'          => $event->getAllday()
             ];
         }
 

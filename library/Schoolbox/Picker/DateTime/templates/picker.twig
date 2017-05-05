@@ -29,7 +29,11 @@
                 <div class="small-12 medium-{{ width }} columns">
 
                     {# Placeholder for appointments to be rendered in #}
-                    <div id="calendarResponse{{ id }}" class="adtp-response"></div>
+                    <div id="calendarResponse{{ id }}" class="adtp-response">
+                        <div class="loader hide"></div>
+                        <div id="calendarResponse{{ id }}-duework" class="adtp-response-duework"></div>
+                        <div id="calendarResponse{{ id }}-events"></div>
+                    </div>
 
                 </div>
             {% endif %}
@@ -140,7 +144,11 @@
                         <div class="small-12 medium-{{ width }} columns">
 
                             {# Placeholder for appointments to be rendered in #}
-                            <div id="timetableResponse{{ id }}" class="adtp-response"></div>
+                            <div id="timetableResponse{{ id }}" class="adtp-response">
+                                <div class="loader hide"></div>
+                                <div id="timetableResponse{{ id }}-duework" class="adtp-response-duework"></div>
+                                <div id="timetableResponse{{ id }}-events"></div>
+                            </div>
 
                         </div>
                     {% endif %}
@@ -152,6 +160,16 @@
         {% endif %}
     </div>
 </div>
+
+<style>
+    h2.mini {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #aaa !important;
+        margin-bottom: .25rem;
+    }
+</style>
 
 <script>
     $.fn.alaressDateTimeModal({

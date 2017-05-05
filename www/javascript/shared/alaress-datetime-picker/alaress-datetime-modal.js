@@ -396,6 +396,17 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
                 });
+
+            // Pull in events as well
+            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
+                .done(function (data) {
+
+                    appendResponse(data, 'events', target);
+
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified date');
+                });
         }
         else if (twigVars.type == 'event') { // Fetch events
 
@@ -464,9 +475,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param target
      */
     function loadingResponse(target) {
-        var $pickerResponse = $('#' + target + 'Response' + twigVars.id);
-        $pickerResponse.html('');
-        $pickerResponse.append('<div class="loader"></div>');
+        $('#' + target + 'Response' + twigVars.id + '-duework').html('');
+        $('#' + target + 'Response' + twigVars.id + '-events').html('');
+        $('#' + target + 'Response' + twigVars.id + ' .loader').removeClass('hide');
     }
 
 
@@ -480,37 +491,59 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function appendResponse(data, template, target) {
 
         var $pickerResponse = $('#' + target + 'Response' + twigVars.id); // The event container
+        var $pickerResponseDueWork = $('#' + target + 'Response' + twigVars.id + '-duework');
+        var $pickerResponseEvents = $('#' + target + 'Response' + twigVars.id + '-events');
         var displayDate = moment(data.date).format('MMMM DD, YYYY'); // The selected date in a nice format
         var html = '';
 
         // Clear out any old response display
-        $pickerResponse.html('');
+        if (template == 'duework') {
+            $pickerResponseDueWork.html('');
+        } else {
+            $pickerResponseEvents.html('');
+        }
+
+        // Hide the loader
+        $('#' + target + 'Response' + twigVars.id + ' .loader').addClass('hide');
 
         if (template == 'duework') {
+
+            html = '<h2 class="mini">Due Work (<span data-due-work-title>Most Loaded Student</span>)</h2>';
 
             if (data.students === undefined) {
                 html = 'Error loading data';
             }
             else if (data.students.length == 0) {
-                html += 'Nothing due on ' + displayDate + '';
-                $pickerResponse.addClass('meta');
+                html += '<span style="font-size:13px;">Your students have nothing due this day</span>';
+                $pickerResponseDueWork.addClass('meta');
             }
             else {
                 $pickerResponse.removeClass('meta');
 
-                // Populate with results for the selected date
+                // Show most loaded student
+                html += '<div class="top-due-work" style="display:flex; margin-bottom:.5rem;">';
+                html += '<div class="compact card small-12">';
+                html += '<img src="/portrait.php?userId=' + data.students[0].externalId + '&amp;size=square80">';
+                html += '<h3>' + data.students[0].firstname + ' ' + data.students[0].lastname + '</h3>';
+                html += '<p class="meta">' + data.students[0].assessmentsDue + ' due' + '</p>';
+                html += '</div>';
+                html += '<div class="icon-next" data-show-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '" title="Show all students and work due" style="cursor:pointer; line-height:44px;"></div>';
+                html += '</div>';
 
-                html += '<div class="row">';
+                // Create a full list of students, hidden by default
+                html += '<div id="due-work-list-' + moment(data.date).format('Y-m-d') + '" class="row hide">';
                 html += '<div class="small-12 medium-12 columns">';
-                html += '<h2>Work due on ' + displayDate + '</h2>';
+                //html += '<h2>Work due on ' + displayDate + '</h2>';
                 html += '<ul class="small-12 information-list expandable-card">';
 
-                for (var i = 0; i < data.students.length; i++) {
-                    html += '<li>';
+                html += '<li><a data-hide-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '"><div class="compact card small-12 icon-previous" style="color:#0066b0;">Back</div></a></li>';
 
+                for (var i = 0; i < data.students.length; i++) {
+
+                    html += '<li>';
                     html += '<div>';
                     html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
-                    html += '<div class="compact card small-12">';
+                    html += '<div class="card compact small-12">';
                     html += '<img src="/portrait.php?userId=' + data.students[i].externalId + '&amp;size=square80">';
                     html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
                     html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
@@ -528,8 +561,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                             '</tr>';
                     }
                     html += '</table>';
-                    html += '</div>';
 
+                    html += '</div>';
                     html += '</li>';
                 }
 
@@ -538,40 +571,79 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 html += '</div>';
 
             }
+
+            $pickerResponseDueWork.append(html);
+
+            $('[data-show-full-due]').click(function() {
+                var listDiv = $(this).data('show-full-due');
+                $(this).parents('.top-due-work').addClass('hide');
+                $('#' + listDiv).removeClass('hide');
+                $pickerResponseEvents.addClass('hide');
+                $('[data-due-work-title]').text('Top 5 Students');
+            });
+
+            $('[data-hide-full-due]').click(function() {
+                var listDiv = $(this).data('hide-full-due');
+                $pickerResponseDueWork.find('.top-due-work').removeClass('hide');
+                $('#' + listDiv).addClass('hide');
+                $pickerResponseEvents.removeClass('hide');
+                $('[data-due-work-title]').text('Most Loaded Student');
+            });
         }
         else if (template == 'events') {
+
+            var events = [];
+
+            html = '<h2 class="mini">Your Calendar</h2>';
+
             if (data.appointments === undefined) {
-                html = 'Error loading data';
+                //html = 'Error loading data';
             }
             else if (data.appointments.length == 0) {
-                html += 'No events found for ' + displayDate;
-                $pickerResponse.addClass('meta');
+                //html += 'No events found for ' + displayDate;
+                //$pickerResponse.addClass('meta');
             }
             else {
-                $pickerResponse.removeClass('meta');
+                //$pickerResponse.removeClass('meta');
 
-                html += '<div class="row">';
-                html += '<div class="small-12 medium-12 columns">';
-                html += '<h2>Events on ' + displayDate + '</h2>';
-                html += '<ul class="small-12 information-list card">';
+                // html += '<div class="row">';
+                // html += '<div class="small-12 medium-12 columns">';
+                // html += '<h2>Events on ' + displayDate + '</h2>';
+                // html += '<ul class="small-12 information-list card">';
 
                 // Populate with appointments for the selected date
                 for (var i = 0; i < data.appointments.length; i++) {
-                    html += '<li>';
-                    html += '<h3>' + data.appointments[i].title + '</h3>';
-                    html += '<p class="meta">' + data.appointments[i].displayDateTime + '</p>';
-                    html += '</li>';
+                    // html += '<li>';
+                    // html += '<h3>' + data.appointments[i].title + '</h3>';
+                    // html += '<p class="meta">' + data.appointments[i].displayDateTime + '</p>';
+                    // html += '</li>';
+                    events.push({
+                        id: i,
+                        start: data.appointments[i].start,
+                        end: data.appointments[i].end,
+                        title: data.appointments[i].title,
+                        allDay: data.appointments[i].allDay
+                    });
                 }
 
-                html += '</ul>';
-                html += '</div>';
-                html += '</div>';
+                // html += '</ul>';
+                // html += '</div>';
+                // html += '</div>';
             }
+
+            html += '<div id="calendar-response-fc"></div>';
+            $pickerResponseEvents.append(html);
+            var $calendarDiv = $pickerResponseEvents.find('#calendar-response-fc');
+
+            $calendarDiv.fullCalendar({
+                header: false,
+                defaultView: 'agendaDay',
+                events: events,
+                height: 270,
+                defaultDate: moment(data.date)
+            });
         }
-        else {
-            // nope
-            html = '';
-        }
+
 
         $pickerResponse.append(html);
         if (template == 'duework' && data.students.length > 0) {
@@ -813,7 +885,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             startMonth = startMoment.month() + 1,
             endYear    = endMoment.year(),
             endMonth   = endMoment.month() + 1
-        ;
+            ;
 
         // these are likely the same, but not a guarantee
         monthsToFetch[startYear] = [];
