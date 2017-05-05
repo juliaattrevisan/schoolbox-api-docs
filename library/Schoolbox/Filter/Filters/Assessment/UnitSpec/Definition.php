@@ -26,15 +26,9 @@ use Schoolbox\GenericCollection;
  */
 class Definition extends AbstractFilterDefinition
 {
-    const KEY_NONE = 'none';        // Assessment is not inside a unitSpec
+    const SLUG = 'us';
 
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 'us';
-    }
+    const KEY_NONE = 'none';        // Assessment is not inside a unitSpec
 
 
     /**

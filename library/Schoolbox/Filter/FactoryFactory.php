@@ -155,15 +155,15 @@ class FactoryFactory
         $filterComponents = $this->createFilterComponentCollection();
         unset($query['page']);
 
-        foreach ($this->getDefinitions($page) as $className) {
-            $filterFactory = $this->buildFilterFactoryForFilter($className);
-            $queryKey      = $className::getQueryKey();
+        foreach ($this->getDefinitions($page) as $definitionClassName) {
+            $filterFactory = $this->buildFilterFactoryForFilter($definitionClassName);
+            $queryKey      = $definitionClassName::getSlug();
             $overrides     = array_key_exists($queryKey, $query) ? explode(',', $query[$queryKey]) : null;
-            $component     = $filterFactory->buildComponent($className, $user, $page, $viewee, $overrides);
+            $component     = $filterFactory->buildComponent($definitionClassName, $user, $page, $viewee, $overrides);
 
             // Don't bother inserting component if it wasn't build (because no options would be available anyway)
             if($component){
-                $filterComponents->setOffset($className, $component);
+                $filterComponents->setOffset($definitionClassName, $component);
             }
 
         }

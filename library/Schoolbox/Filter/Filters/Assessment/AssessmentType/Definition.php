@@ -28,6 +28,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'a';
 
     const KEY_PROJECT  = AssessmentType::TYPE_PROJECT;
     const KEY_QUIZ     = AssessmentType::TYPE_QUIZ;
@@ -52,15 +53,6 @@ class Definition extends AbstractFilterDefinition
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->assessmentTypes = $assessmentTypes->shallowClone();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 'a';
     }
 
 

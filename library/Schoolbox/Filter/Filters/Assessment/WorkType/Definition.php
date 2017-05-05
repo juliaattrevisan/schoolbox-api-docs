@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\WorkType;
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'wk';
 
     // If assessment does not have a WorkType at all
     const KEY_NONE = ' none';
@@ -60,15 +61,6 @@ class Definition extends AbstractFilterDefinition
         return [
             self::KEY_NONE,
         ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 'wk';
     }
 
     /**

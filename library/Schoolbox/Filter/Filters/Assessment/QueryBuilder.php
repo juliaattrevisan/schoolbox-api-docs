@@ -7,8 +7,10 @@
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter\IFilterDefinition;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Assessment\Term;
 
 
 /**
@@ -95,7 +97,7 @@ class QueryBuilder
      *
      * @param array $filters Indexed by filter definition key
      * @param array $options Conventional mapper query modifiers
-     * @see IFilterDefinition::getQueryKey()
+     * @see IFilterDefinition::getSlug()
      * @return int[]
      * @throws \InvalidArgumentException If any filter keys not recognised
      */
@@ -110,10 +112,10 @@ class QueryBuilder
         $this->checkValidFilterKeys($filters);
 
         // Ensure all filter keys so we don't need to perform repeated isset() checks
-        $completeFilters = $this->insertNullFilters($filters);
+        $completeFilters = $this->normaliseFilters($filters);
 
         // Can we conclude filters will never permit any assessments to match? ie always an empty set?
-        if (!$this->areResultsPossible($completeFilters)) {
+        if ($this->doFiltersGuaranteeEmptySet($completeFilters)) {
             return [];
         }
 
@@ -135,11 +137,11 @@ class QueryBuilder
     protected function buildQuery(array $completeFilters)
     {
         // Filters which effect which sub-queries are required
-        $folderIds     = $completeFilters[Folder\Definition::getQueryKey()];
-        $projectIds    = $completeFilters[Project\Definition::getQueryKey()];
-        $unitImplIds   = $completeFilters[UnitImpl\Definition::getQueryKey()];
-        $unitSpecIds   = $completeFilters[UnitSpec\Definition::getQueryKey()];
-        $unitImpSpcIds = $completeFilters[UnitImportSpec\Definition::getQueryKey()];
+        $folderIds     = $completeFilters[Folder\Definition::SLUG];
+        $projectIds    = $completeFilters[Project\Definition::SLUG];
+        $unitImplIds   = $completeFilters[UnitImpl\Definition::SLUG];
+        $unitSpecIds   = $completeFilters[UnitSpec\Definition::SLUG];
+        $unitImpSpcIds = $completeFilters[UnitImportSpec\Definition::SLUG];
 
         list($folderWhere,   $folderParams)    = $this->getClauseFolder($folderIds);
         list($projectWhere,  $projectParams)   = $this->getClauseProject($projectIds);
@@ -147,22 +149,25 @@ class QueryBuilder
         list($unitSpecWhere, $unitSpecParams)  = $this->getClauseUnitSpec($unitSpecIds);
         list($uImpSpcWhere,  $uImpSpcParams)   = $this->getClauseUnitImplSpec($unitImpSpcIds);
 
+
         $params = array_merge($folderParams, $projectParams, $unitImplParams, $unitSpecParams, $uImpSpcParams);
 
         // Sub-query modifiers
-
-//        list($aTypeSelect,     $aTypeJoin,     $aTypeWhere,     $aTypeParams)     = $this->getClauseAType($filters);
-//        list($termSelect,      $termJoin,      $termWhere,      $termParams)      = $this->getClauseTerm($filters);
-//        list($weightingSelect, $weightingJoin, $weightingWhere, $weightingParams) = $this->getClauseWeighting($filters);
-//        list($workTypeSelect,  $workTypeJoin,  $workTypeWhere,  $workTypeParams)  = $this->getClauseWorkType($filters);
-//
+        $aTypes = $completeFilters[AssessmentType\Definition::SLUG];
+        $termIds = $completeFilters[TermDue\Definition::SLUG];
+        list($aTypeJoin, $aTypeWhere) = $this->getClauseAType($aTypes);
+        list($termWhere) = $this->getClauseTerm($termIds);
+//        list($weightingJoin, $weightingWhere, $weightingParams) = $this->getClauseWeighting($filters);
+//        list($workTypeJoin,  $workTypeWhere,  $workTypeParams)  = $this->getClauseWorkType($filters);
 
 
         $subQueries = [];
         if($this->subQueryBase($unitImpSpcIds, $folderIds, $projectIds, $unitImplIds, $unitSpecIds)){
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
+                {$aTypeJoin}
                 WHERE TRUE
+                AND {$termWhere}
                 ";
         } else {
             if($this->subQueryFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -171,7 +176,9 @@ class QueryBuilder
                     SELECT a.id, 1 AS 'case' FROM `assessment` a
                     JOIN assessment_folder af ON af.assessment_id = a.id
                     {$folderJoin}
+                    {$aTypeJoin}
                     WHERE {$folderWhere}
+                    AND {$aTypeWhere} AND {$termWhere}
                     ";
             }
             if($this->subQueryProjectFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -182,7 +189,9 @@ class QueryBuilder
                     JOIN project p             ON ap.project_id     = p.id
                     JOIN assessment_folder paf ON paf.assessment_id = p.assessment_id
                     {$folderJoin}
+                    {$aTypeJoin}
                     WHERE {$folderWhere} AND {$projectWhere}
+                    AND {$aTypeWhere} AND {$termWhere}
                     ";
             }
             if($this->subQueryUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -195,7 +204,10 @@ class QueryBuilder
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$folderJoin}
+                    {$aTypeJoin}
                     WHERE {$folderWhere} AND {$unitImplWhere}
+                    AND {$aTypeWhere} AND {$termWhere}
+                    
                     ";
             }
             if($this->subQueryProjectUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -210,7 +222,9 @@ class QueryBuilder
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$folderJoin}
+                    {$aTypeJoin}
                     WHERE {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
+                    AND {$aTypeWhere} AND {$termWhere}
                     ";
             }
             if($this->subQueryUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -220,7 +234,9 @@ class QueryBuilder
                     JOIN assessment_course_unit_specification aus ON aus.assessment_id = a.id
                     JOIN course_unit_specification us ON aus.course_unit_specification_id = us.id
                     {$folderJoin}
+                    {$aTypeJoin}
                     WHERE {$folderWhere} AND {$unitSpecWhere}
+                    AND {$aTypeWhere} AND {$termWhere}
                     ";
             }
             if($this->subQueryProjectUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -232,7 +248,9 @@ class QueryBuilder
                     JOIN assessment_course_unit_specification aus  ON aus.assessment_id = p.assessment_id
                     JOIN course_unit_specification us              ON aus.course_unit_specification_id = us.id
                     {$folderJoin}
+                    {$aTypeJoin}
                     WHERE {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere}
+                    AND {$aTypeWhere} AND {$termWhere}
                     ";
             }
             if($this->subQueryUnitImplUnitSpec($unitImpSpcIds, $projectIds)){
@@ -243,7 +261,9 @@ class QueryBuilder
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id 
                     JOIN course_unit_specification uis             ON ui.course_unit_specification_id   = uis.id
                     {$folderJoin}
+                    {$aTypeJoin}
                     WHERE {$folderWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
+                    AND {$aTypeWhere} AND {$termWhere}
                     ";
             }
             if($this->subQueryProjectUnitImplUnitSpec($unitImpSpcIds, $projectIds)){
@@ -256,7 +276,9 @@ class QueryBuilder
                     JOIN course_unit_implementation ui              ON aui.course_unit_implementation_id = ui.id 
                     JOIN course_unit_specification uis ON ui.course_unit_specification_id = uis.id
                     {$folderJoin}
+                    {$aTypeJoin}
                     WHERE {$folderWhere} AND {$projectWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
+                    AND {$aTypeWhere} AND {$termWhere}
                     ";
             }
         }
@@ -272,15 +294,16 @@ class QueryBuilder
     {
         // Manually register instead of auto-glob, as we have to manually implement anyway.
         $this->knownFilterDefinitionRegistry = [
-            AssessmentType\Definition::getQueryKey() => AssessmentType\Definition::class,
-            Folder\Definition::getQueryKey()         => Folder\Definition::class,
-            Project\Definition::getQueryKey()        => Project\Definition::class,
-            Term\Definition::getQueryKey()           => Term\Definition::class,
-            UnitImpl\Definition::getQueryKey()       => UnitImpl\Definition::class,
-            UnitImportSpec\Definition::getQueryKey() => UnitImportSpec\Definition::class,
-            UnitSpec\Definition::getQueryKey()       => UnitSpec\Definition::class,
-            WeightingType\Definition::getQueryKey()  => WeightingType\Definition::class,
-            WorkType\Definition::getQueryKey()       => WorkType\Definition::class,
+            AssessmentType\Definition::SLUG => AssessmentType\Definition::class,
+            Folder\Definition::SLUG         => Folder\Definition::class,
+            Project\Definition::SLUG        => Project\Definition::class,
+            TermDue\Definition::SLUG        => TermDue\Definition::class,
+            TermClose\Definition::SLUG      => TermClose\Definition::class,
+            UnitImpl\Definition::SLUG       => UnitImpl\Definition::class,
+            UnitImportSpec\Definition::SLUG => UnitImportSpec\Definition::class,
+            UnitSpec\Definition::SLUG       => UnitSpec\Definition::class,
+            WeightingType\Definition::SLUG  => WeightingType\Definition::class,
+            WorkType\Definition::SLUG       => WorkType\Definition::class,
         ];
     }
 
@@ -305,11 +328,13 @@ class QueryBuilder
     /**
      * Inserts null values for missing filters and ensures any scalars are wrapped in arrays
      *
+     * This enables us to rely on filters being present, even if set explicitly to NULL
+     *
      * @param array $sparseFilters
      * @return mixed[]
      * @todo move to abstract
      */
-    private function insertNullFilters(array $sparseFilters)
+    protected function normaliseFilters(array $sparseFilters)
     {
         $completeFilters = [];
         foreach($this->knownFilterDefinitionRegistry as $filterKey => $filterClass){
@@ -550,12 +575,52 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'AssessmentType' filter
      *
-     * @param array $filters
+     * @param null|int[] $aTypes
      * @return mixed[]
      */
-    private function getClauseAType(array $filters)
+    private function getClauseAType(array $aTypes = null)
     {
-        return [];
+        // Not filtering by assessment type?
+        if(null === $aTypes) {
+            return ['', 'TRUE'];
+        }
+
+        $joinClause = '';
+        $builder    = $this->assessmentMapper->getPredicateBuilder();
+
+        // Task
+        if (array_key_exists(AssessmentType\Definition::KEY_TASK, $aTypes)) {
+            $joinClause .= '
+                LEFT JOIN task tk           ON tk.assessment_id = a.id
+            ';
+            $builder->notNull('tk.id');
+        }
+
+        // Quiz
+        if (array_key_exists(AssessmentType\Definition::KEY_QUIZ, $aTypes)) {
+            $joinClause .= '
+                LEFT JOIN assess qz         ON qz.assessment_id = a.id
+            ';
+            $builder->notNull('qz.assess_id');
+        }
+
+        // DueWork
+        if (array_key_exists(AssessmentType\Definition::KEY_DUE_WORK, $aTypes)) {
+            $joinClause .= '
+                LEFT JOIN submission_box dw ON dw.assessment_id = a.id
+            ';
+            $builder->notNull('dw.id');
+        }
+
+        // DueWork
+        if (array_key_exists(AssessmentType\Definition::KEY_PROJECT, $aTypes)) {
+            $joinClause .= '
+                LEFT JOIN project pr ON pr.assessment_id = a.id
+            ';
+            $builder->notNull('pr.id');
+        }
+        return [$joinClause, '('. implode(' OR ', $builder->getWhere()) .')'];
+
     }
 
     /**
@@ -601,12 +666,29 @@ class QueryBuilder
     /**
      * Get query fragments dependent on 'Term' filter
      *
-     * @param array $filters
-     * @return mixed[]
+     * @param null|Collection|Term\Model[] $terms
+     * @return string
+     * @todo rename this to dueDate and add 'closeDate' (can pass term models for both)
      */
-    private function getClauseTerm(array $filters)
+    private function getClauseTerm(Collection $terms = null)
     {
-        return [];
+        // Is this filter being applied ?
+        if(NULL === $terms){
+            return ' TRUE ';
+        }
+
+        // Generate the dueDate filtering
+        $anyBuilder = $this->assessmentMapper->getPredicateBuilder();
+        foreach($terms as $term){
+            $allBuilder = $this->assessmentMapper->getPredicateBuilder();
+            $allBuilder->greaterOrEqualTo('a.due_date', $term->getStart()->getDatabaseDate());
+
+            if(!$term->getActualFinish()->isNull()){
+                $allBuilder->lesserOrEqualTo('a.due_date', $term->getActualFinish()->getDatabaseDate());
+            }
+            $anyBuilder->all($allBuilder);
+        }
+        return '(' . implode(' OR ', $anyBuilder->getWhere()) . ')';
     }
 
     /**
@@ -700,41 +782,101 @@ class QueryBuilder
      * @param int[][]|null[] $completeFilters
      * @return bool
      */
-    protected function areResultsPossible(array $completeFilters)
+    protected function doFiltersGuaranteeEmptySet(array $completeFilters)
     {
+        // Examine the context-filters
+        if ($this->doContextFiltersGuaranteeEmptySet($completeFilters)) {
+            return true;
+        }
+
+        // Examine the non-context-filters
+        if ($this->doNonContextFiltersGuaranteeEmptySet($completeFilters)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Can examination of the non-context filters using set-theory enable us to conclude that no results will ever be returned?
+     *
+     * @param int[][]|null[] $completeFilters
+     * @return bool
+     */
+    private function doNonContextFiltersGuaranteeEmptySet(array $completeFilters)
+    {
+        // Did call explicitly request assessments that do not have an assessment type?
+        $assessmentTypes = $completeFilters[AssessmentType\Definition::SLUG];
+        if (is_array($assessmentTypes) && !count($assessmentTypes)) {
+            // All assessments have a type
+            return true;
+        }
+
+        // Did call explicitly request assessments due in some term, but no terms supplied?
+        $termIds = $completeFilters[TermDue\Definition::SLUG];
+        if (is_array($termIds) && !count($termIds)) {
+            // All assessments have due dates
+            return true;
+        }
+
+        // Note. It is valid to request assessments without a workType (it is nullable)
+
+
+        // Did call explicitly request assessments with a weightingType, but no weightingTypes supplied?
+        $weightingType = $completeFilters[WeightingType\Definition::SLUG];
+        if (is_array($weightingType) && !count($weightingType)) {
+            // All assessments have a weighting type
+            return true;
+        }
+
+        // Unable to conclude that result set is guaranteed to be empty
+        return false;
+    }
+
+    /**
+     * Can examination of the filters using set-theory enable us to conclude that no assessments could ever match?
+     *
+     * eg, an assessment can not live directly in a unit-impl and unit-spec at the same time.
+     *
+     * @param int[][]|null[] $completeFilters
+     * @return bool
+     */
+    private function doContextFiltersGuaranteeEmptySet(array  $completeFilters){
+
         // Ultimate folder (ie either direct or indirectly associated)
-        $folderIds = $completeFilters[Folder\Definition::getQueryKey()];
+        $folderIds = $completeFilters[Folder\Definition::SLUG];
 
         // Did call explicitly request assessments that do not have an ultimate folder?
         if(is_array($folderIds) && !count($folderIds)){
             // All assessments have an ultimate folder
-            return false;
+            return true;
         }
 
-        $unitImplIds = $completeFilters[UnitImpl\Definition::getQueryKey()];
-        $unitSpecIds = $completeFilters[UnitSpec\Definition::getQueryKey()];
+        $unitImplIds = $completeFilters[UnitImpl\Definition::SLUG];
+        $unitSpecIds = $completeFilters[UnitSpec\Definition::SLUG];
 
         // Did caller request assessments that live in unit-impls and unit-specs simultaneously?
         if(is_array($unitImplIds) && is_array($unitSpecIds) && count($unitImplIds) && count($unitSpecIds)){
             // Assessments cannot live in both a unitImpl and unitSpec at the same time.
-            return false;
+            return true;
         }
 
         // Did caller specify assessment must reside directly in some unit-spec, and also be
         // directly in a unit-impl (that was imported from some spec)?
-        $unitImportSpecIds = $completeFilters[UnitImportSpec\Definition::getQueryKey()];
+        $unitImportSpecIds = $completeFilters[UnitImportSpec\Definition::SLUG];
         if(is_array($unitImportSpecIds) && is_array($unitSpecIds) && count($unitImportSpecIds) && count($unitSpecIds)){
-            return false;
+            return true;
         }
 
 
         // Did caller request assessment that live inside unit-impls that were not imported, or were imported from unit-specs
         // but don't live in a unit-spec?
         if(is_array($unitImplIds) && is_array($unitImportSpecIds) && (bool)count($unitImplIds) !== (bool)count($unitImportSpecIds)){
-            return false;
+            return true;
         }
 
         // Unable to conclude that result set is guaranteed to be empty
-        return true;
+        return false;
     }
 }

@@ -22,6 +22,7 @@ use Schoolbox\GenericCollection;
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'f';
 
     const KEY_CLASSES = 'classes';
     const KEY_GROUPS = 'groups';
@@ -78,14 +79,6 @@ class Definition extends AbstractFilterDefinition
         return true;
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 'f';
-    }
 
     /**
      * @inheritdoc

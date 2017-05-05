@@ -23,6 +23,8 @@ use Schoolbox\GenericCollection;
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'p';
+
     // Where does the project reside?
     const KEY_NONE               = 'none';                // assessment is not inside a project
     const KEY_ON_CLASS_FOLDER    = 'on_class_folder';     // created directly on a class folder
@@ -90,10 +92,6 @@ class Definition extends AbstractFilterDefinition
         return false;
     }
 
-    public static function getQueryKey()
-    {
-        return 'p';
-    }
 
     /**
      * @inheritdoc

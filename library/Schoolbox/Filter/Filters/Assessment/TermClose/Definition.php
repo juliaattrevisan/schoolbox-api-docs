@@ -32,6 +32,7 @@ use Schoolbox\Assessment\Term;
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'tc';
 
     const KEY_ALL      = 'all';        // All terms
     const KEY_FUTURE   = 'future';     // All terms in future
@@ -73,13 +74,6 @@ class Definition extends AbstractFilterDefinition
         $this->previousTerm = $previousTerm;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 'tc';
-    }
 
     /**
      * @inheritdoc

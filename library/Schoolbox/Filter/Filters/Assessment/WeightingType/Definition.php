@@ -23,6 +23,8 @@ use Schoolbox\GenericCollection;
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'wt';
+
     const KEY_WEIGHTED    = 'weighted';
     const KEY_UNWEIGHTED  = 'unweighted';
 
@@ -45,14 +47,6 @@ class Definition extends AbstractFilterDefinition
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->weightingTypes = $weightingTypes->shallowClone();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 'wt';
     }
 
     /**
