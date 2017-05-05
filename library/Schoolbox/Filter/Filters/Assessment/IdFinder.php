@@ -8,16 +8,15 @@
 namespace Schoolbox\Filter\Filters\Assessment;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter\IFilterDefinition;
-use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\WorkType as AWorkType;
+use Schoolbox\Filter;
 
 
 /**
  * Helper for building the query clauses.
  *
- * The overall query will be made up of 0-8 sub-queries that are UNIONed together.
+ * The overall query will be made up of 0-8 sub-queries that are combined using UNION.
  * If 0, then caller should short-circuit to return an empty set
  * Sub-query for each extra assessment context.
  *
@@ -32,8 +31,8 @@ use Schoolbox\Learning\Assessment\WorkType as AWorkType;
  * * 8. In Project  in UnitImpl in UnitSpec on Folder
  *
  * Callers (eg Controllers) should call this like:
- *  1. $ids                = $this->assessmentFilterer->findIdsByFilters($filters);
- *  2. Either of:
+ *  1. $ids                = $this->assessmentIdFinder->findIdsByFilters($filters, $deleted);
+ *  2. Then either of:
  *      $assessmentModels  = $assessmentMapper->findByColumn('id', $ids, $options);
  *      $assessableObjects = $assessmentMapperProxy->findByColumn('id', $ids, $options);
  *
@@ -41,104 +40,14 @@ use Schoolbox\Learning\Assessment\WorkType as AWorkType;
  * That is the responsibility of IKeyConverter::getSelectedItems().
  * eg, if Weighting filter is specified as both weighted and unweighted, logically we
  * don't need to apply that filter, but that optimisation is NOT done here.
- *
- * @todo, once other analogous versions are required, abstract common logic into abstract and place behind interface IFilterer
  */
-class QueryBuilder
+class IdFinder extends Filter\AbstractIdFinder
 {
-    /** @var static[] $instance */
-    protected static $instance = [];
-
     /**
-     * A list of filter definitions this class knows how to apply
-     *
-     * Indexed by IFilterDefinition->getSlug()
-     * @var string[]
-     */
-    private $knownFilterDefinitionRegistry = [];
-
-    /**
-     * @var Assessment\Mapper
-     */
-    private $assessmentMapper;
-
-
-    /**
-     * @param Assessment\Mapper $assessmentMapper
-     */
-    private function __construct(Assessment\Mapper $assessmentMapper)
-    {
-        $this->assessmentMapper = $assessmentMapper;
-    }
-
-
-    /**
-     * Fetch the singleton instance of this class
-     *
-     * @param Assessment\Mapper $assessmentMapper
-     * @return QueryBuilder
-     * @throws \DomainException If any matched filter definition files are not IFilterDefinitions
-     */
-    public static function getInstance(Assessment\Mapper $assessmentMapper)
-    {
-        $className = get_called_class();
-        if (!isset(self::$instance[$className])) {
-            self::$instance[$className] = new static($assessmentMapper);
-            self::$instance[$className]->buildRegistry();
-        }
-        return self::$instance[$className];
-    }
-
-
-    /**
-     * Fetch an array of assessment IDs that match the specified filters
-     *
-     * Filters are applied using ∩ (intersection).
-     *
-     * For each filter:
-     * * null  => don't apply filter
-     * * []    => LEFT JOIN must match NULL. eg if project filter is [] then assessment does not live in project
-     * * [X..] => INNER JOIN must be in X.   eg if project filter is [1] then assessments must reside directly in project_1
-     *
-     * @param Collection[]|null[]|mixed[][] $filters Indexed by filter definition key
-     * @param bool                          $deleted Whether to include soft-deleted assessments
-     * @see IFilterDefinition::getSlug()
-     * @return int[]
-     * @throws \InvalidArgumentException If any filter keys not recognised
-     */
-    public function findIdsByFilters(array $filters = [], $deleted = false)
-    {
-        // No filters ?
-        if (0 === count($filters)) {
-            return $this->assessmentMapper->findAllIds(['deleted' => $deleted]);
-        }
-
-        // Filters supplied. Ensure they are recognisable.
-        $this->checkValidFilterKeys($filters);
-
-        // Ensure all filter keys so we don't need to perform repeated isset() checks
-        $completeFilters = $this->normaliseFilters($filters);
-
-        // Can we conclude filters will never permit any assessments to match? ie always an empty set?
-        if ($this->doFiltersGuaranteeEmptySet($completeFilters)) {
-            return [];
-        }
-
-        list($query, $params) = $this->buildQuery($completeFilters, $deleted);
-        $idStatement = $this->assessmentMapper->getDatabase()->query($query, $params);
-        return array_column($idStatement->fetchAll(), $this->assessmentMapper->getIdentifierColumn());
-    }
-
-
-    /**
-     * Protected so we can call from child unit-testing class
-     *
      * Different sub-queries are required depending on which assessment-contexts filters are specified
      * Each sub-queries are modified depending on which non-assessment-context filters are specified
      *
-     * @param Collection[]|null[]|mixed[][] $completeFilters
-     * @param bool $deleted Whether to include deleted assessments
-     * @return mixed[]
+     * @inheritdoc
      */
     protected function buildQuery(array $completeFilters, $deleted)
     {
@@ -299,12 +208,12 @@ class QueryBuilder
 
 
     /**
-     * Build a registry of filters known to this class
+     * @inheritdoc
      */
-    private function buildRegistry()
+    protected function buildRegistry()
     {
         // Manually register instead of auto-glob, as we have to manually implement anyway.
-        $this->knownFilterDefinitionRegistry = [
+        return [
             // Context-filters
             UnitImportSpec\Definition::SLUG => UnitImportSpec\Definition::class,
             Folder\Definition::SLUG         => Folder\Definition::class,
@@ -320,54 +229,6 @@ class QueryBuilder
             WorkType\Definition::SLUG       => WorkType\Definition::class,
         ];
     }
-
-
-    /**
-     * Ensures that any filters passed in are known to this class
-     *
-     * @param Collection[]|null[]|mixed[][] $filters
-     * @throws \InvalidArgumentException If filter key not recognised
-     * @todo move to abstract
-     */
-    protected function checkValidFilterKeys(array $filters)
-    {
-        foreach($filters as $key => $val){
-            if(!array_key_exists($key, $this->knownFilterDefinitionRegistry)){
-                throw new \InvalidArgumentException("Unknown filter: $key");
-            }
-        }
-    }
-
-
-    /**
-     * Inserts null values for missing filters and ensures any scalars are wrapped in Collections
-     *
-     * This enables us to rely on filters being present, even if set explicitly to NULL
-     *
-     * @param array $sparseFilters
-     * @return Collection[]|null[]|mixed[][]
-     * @todo move to abstract
-     */
-    protected function normaliseFilters(array $sparseFilters)
-    {
-        $completeFilters = [];
-        foreach($this->knownFilterDefinitionRegistry as $filterKey => $filterClass){
-            // Not in the passed filters? Set it explicitly to null.
-            if(!array_key_exists($filterKey, $sparseFilters)){
-                $completeFilters[$filterKey] = null;
-                continue;
-            }
-            // Ensure it is either null, or a (potentially empty) Collection
-            if(null === $sparseFilters[$filterKey] || $sparseFilters[$filterKey] instanceof Collection){
-                $completeFilters[$filterKey] = $sparseFilters[$filterKey];
-            } else {
-                // Enables caller to specify a inject a single entity, or an array, and have it normalised here.
-                $completeFilters[$filterKey] = new Collection((array)$sparseFilters[$filterKey]);
-            }
-        }
-        return $completeFilters;
-    }
-
 
     /**
      * Include (#0) 'base' sub-query? (and just the base query)
@@ -627,7 +488,7 @@ class QueryBuilder
         }
 
         $joinClause = '';
-        $builder    = $this->assessmentMapper->getPredicateBuilder();
+        $builder    = $this->getMapper()->getPredicateBuilder();
 
         // Task
         if (array_key_exists(AssessmentType\Definition::KEY_TASK, $aTypes)) {
@@ -676,7 +537,7 @@ class QueryBuilder
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
-            $builder = $this->assessmentMapper->getPredicateBuilder();
+            $builder = $this->getMapper()->getPredicateBuilder();
             $builder->equals('f.id', $folderIds);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
@@ -696,7 +557,7 @@ class QueryBuilder
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
-            $builder = $this->assessmentMapper->getPredicateBuilder();
+            $builder = $this->getMapper()->getPredicateBuilder();
             $builder->equals('p.id', $projectIds);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
@@ -725,9 +586,9 @@ class QueryBuilder
         }
 
         // Generate the dueDate filtering
-        $anyBuilder = $this->assessmentMapper->getPredicateBuilder();
+        $anyBuilder = $this->getMapper()->getPredicateBuilder();
         foreach($terms as $term){
-            $allBuilder = $this->assessmentMapper->getPredicateBuilder();
+            $allBuilder = $this->getMapper()->getPredicateBuilder();
             $allBuilder->greaterOrEqualTo("a.$dateColumn", $term->getStart()->getDatabaseDate());
 
             if(!$term->getActualFinish()->isNull()){
@@ -750,7 +611,7 @@ class QueryBuilder
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
-            $builder = $this->assessmentMapper->getPredicateBuilder();
+            $builder = $this->getMapper()->getPredicateBuilder();
             $builder->equals('ui.id', $unitImplIds);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
@@ -770,7 +631,7 @@ class QueryBuilder
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
-            $builder = $this->assessmentMapper->getPredicateBuilder();
+            $builder = $this->getMapper()->getPredicateBuilder();
             $builder->equals('uis.id', $unitImpSpcIds);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
@@ -790,7 +651,7 @@ class QueryBuilder
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
-            $builder = $this->assessmentMapper->getPredicateBuilder();
+            $builder = $this->getMapper()->getPredicateBuilder();
             $builder->equals('us.id', $unitSpecIds);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
@@ -811,7 +672,7 @@ class QueryBuilder
             return ['TRUE', []];
         }
 
-        $builder = $this->assessmentMapper->getPredicateBuilder();
+        $builder = $this->getMapper()->getPredicateBuilder();
 
         foreach($weightings as $weightingType){
             if(WeightingType\Definition::KEY_WEIGHTED === $weightingType){
@@ -836,7 +697,7 @@ class QueryBuilder
             return ['TRUE', []];
         }
 
-        $builder = $this->assessmentMapper->getPredicateBuilder();
+        $builder = $this->getMapper()->getPredicateBuilder();
 
         // There are two ways to specify that you want assessments without a workType.
         // The first is by passing an empty Collection, the latter is by inserting NULL in that collection.
@@ -869,19 +730,16 @@ class QueryBuilder
             return 'TRUE';
         }
         // Exclude deleted assessments
-        $builder = $this->assessmentMapper->getPredicateBuilder();
+        $builder = $this->getMapper()->getPredicateBuilder();
         $builder->isNull('a.deleted_at');
         return $builder->getWhere()[0];
     }
 
 
     /**
-     * Can examination of the filters using set-theory indicate that no assessments could ever match?
-     *
      * eg, an assessment can not live directly in a unit-impl and unit-spec at the same time.
      *
-     * @param int[][]|null[] $completeFilters
-     * @return bool
+     * @inheritdoc
      */
     protected function doFiltersGuaranteeEmptySet(array $completeFilters)
     {

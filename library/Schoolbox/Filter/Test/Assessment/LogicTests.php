@@ -11,7 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
-class AssessmentTests extends \PHPUnit_Framework_TestCase
+class LogicTests extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider provider_doContextFiltersGuaranteeEmptySet
@@ -187,12 +187,12 @@ class AssessmentTests extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @return AssessmentFilters\TestableQueryBuilder|AssessmentFilters\QueryBuilder
+     * @return AssessmentFilters\TestableIdFinder|AssessmentFilters\IdFinder
      */
     private function getTester()
     {
-        require_once __DIR__ . '/TestableQueryBuilder.php';
-        return AssessmentFilters\TestableQueryBuilder::getInstance(Assessment\Mapper::getInstance());
+        require_once __DIR__ . '/TestableIdFinder.php';
+        return AssessmentFilters\TestableIdFinder::getInstance(Assessment\Mapper::getInstance());
     }
 
     // ---------------- data providers --------------

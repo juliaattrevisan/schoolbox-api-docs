@@ -1903,9 +1903,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * Create a PredicateBuilder for this Mapper's table.
-     *
-     * @return Builder
+     * @inheritdoc
      */
     public function getPredicateBuilder()
     {

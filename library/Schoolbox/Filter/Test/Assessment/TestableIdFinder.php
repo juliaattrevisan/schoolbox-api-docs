@@ -10,9 +10,9 @@ namespace Schoolbox\Filter\Filters\Assessment;
 use Schoolbox\Collection;
 
 /**
- * Enables unit testing of the QueryBuilder's logic by exposing internal methods.
+ * Enables unit testing of the parent's logic by exposing internal methods.
  */
-class TestableQueryBuilder extends QueryBuilder
+class TestableIdFinder extends IdFinder
 {
 
     /**
