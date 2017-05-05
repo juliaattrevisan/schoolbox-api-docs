@@ -297,12 +297,12 @@ class Controller extends Base
         $selectionTransformer = new Filter\Transformer($keyConverters, $selectionsPerFilter);
 
         // Get selections, defaulting to full possible set if filter not present in panel (ie if disabled by admin)
-        $selectedTerms           = $selectionTransformer->getSelectedItems(TermFilter\Definition::class);
-        $selectedWorkTypes       = $selectionTransformer->getSelectedItems(WorkTypeFilter\Definition::class);
-        $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentTypeFilter\Definition::class);
-        $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderFilter\Definition::class);
-        $selectedWeightings      = $selectionTransformer->getSelectedItems(WeightingFilter\Definition::class);
-        $selectedUnitIds         = $selectionTransformer->getSelectedItems(UnitImportSpecFilter\Definition::class);
+        $selectedTerms           = $selectionTransformer->getSelectedItems(TermFilter\Definition::SLUG);
+        $selectedWorkTypes       = $selectionTransformer->getSelectedItems(WorkTypeFilter\Definition::SLUG);
+        $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentTypeFilter\Definition::SLUG);
+        $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderFilter\Definition::SLUG);
+        $selectedWeightings      = $selectionTransformer->getSelectedItems(WeightingFilter\Definition::SLUG);
+        $selectedUnitIds         = $selectionTransformer->getSelectedItems(UnitImportSpecFilter\Definition::SLUG);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.

@@ -14,20 +14,20 @@ use Schoolbox\GenericCollection;
  * Encapsulates the transform of filter selections into collection
  * of entities, eg Term Models, WorkType Models, AssessmentType strings etc
  *
- * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter.class) should return a set of 3 Term models.
+ * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter::SLUG) should return a set of 3 Term models.
  */
 class Transformer
 {
 
     /**
-     * Indexed by filter.class, then selection.key
+     * Indexed by IFilterDefinition::SLUG, then selection.key
      *
      * @var Collection|GenericCollection[]|Selection\Model[][] $selectionsPerFilter
      */
     private $selectionsPerFilter;
 
     /**
-     * Indexed by filter.class
+     * Indexed by IFilterDefinition::SLUG
      *
      * @var GenericCollection|IKeyConverter[]
      */
@@ -41,15 +41,18 @@ class Transformer
      */
     public function __construct(GenericCollection $keyConverters, Collection $selectionsPerFilter)
     {
-        // Convert indexing by filter.id to filter.class
+        // Convert indexing by filter.id to IFilterDefinition::KEY
         $this->selectionsPerFilter = $selectionsPerFilter->emptyClone();
         $this->keyConverters       = $keyConverters->emptyClone();
 
         foreach ($keyConverters as $filterId => $keyConverter) {
             $filter = $keyConverter->getFilter();
-            $this->keyConverters->offsetSet($filter->getClass(), $keyConverter);
+            /** @var IFilterDefinition $filterDefinitionClass */
+            $filterDefinitionClass = $filter->getClass();
+            $filterSlug            = $filterDefinitionClass::getSlug();
+            $this->keyConverters->offsetSet($filterSlug, $keyConverter);
             if ($selectionsPerFilter->offsetExists($filter->getId())) {
-                $this->selectionsPerFilter->offsetSet($filter->getClass(), $selectionsPerFilter[$filter->getId()]);
+                $this->selectionsPerFilter->offsetSet($filterSlug, $selectionsPerFilter[$filter->getId()]);
             }
         }
     }
@@ -58,17 +61,17 @@ class Transformer
     /**
      * Get a set of entities represented by a filter component's selections
      *
-     * @param string $filterClass
+     * @param string $filterSlug
      * @return Collection|mixed[]
      * @throws \InvalidArgumentException
      */
-    public function getSelectedItems($filterClass)
+    public function getSelectedItems($filterSlug)
     {
-        if (!$this->keyConverters->offsetExists($filterClass)) {
-            throw new \InvalidArgumentException("No KeyConverter found for class: $filterClass");
+        if (!$this->keyConverters->offsetExists($filterSlug)) {
+            throw new \InvalidArgumentException("No KeyConverter found for filter slug: $filterSlug");
         }
-        $keyConverter = $this->keyConverters[$filterClass];
+        $keyConverter = $this->keyConverters[$filterSlug];
 
-        return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterClass]);
+        return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterSlug]);
     }
 }
