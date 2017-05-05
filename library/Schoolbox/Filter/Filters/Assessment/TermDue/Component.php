@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\Term;
+namespace Schoolbox\Filter\Filters\Assessment\TermDue;
 
 use Schoolbox\Filter\AbstractFilterComponent;
 use Schoolbox\GenericCollection;

@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\Term;
+namespace Schoolbox\Filter\Filters\Assessment\TermDue;
 
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter;
@@ -24,7 +24,6 @@ use Schoolbox\Assessment\Term;
  * □ all terms existing in DB
  *
  * Term options are keyed by 'current', 'previous' and the term IDs
- *
  */
 class Definition extends AbstractFilterDefinition
 {
@@ -74,7 +73,7 @@ class Definition extends AbstractFilterDefinition
      */
     public static function getQueryKey()
     {
-        return 't';
+        return 'td';
     }
 
     /**
