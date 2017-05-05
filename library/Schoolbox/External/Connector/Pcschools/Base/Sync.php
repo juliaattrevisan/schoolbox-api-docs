@@ -71,7 +71,7 @@ class Sync extends Base implements ISync
         $query = "
             SELECT
                 ''                    AS student_contact_network_login,
-                F.IDENTITY_ID# + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_FATHER)}
+                CAST(F.IDENTITY_ID# AS VARCHAR(16)) + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_FATHER)}
                                       AS student_contact_id,
                 ''                    AS student_contact_title,
                 F.DAD_FIRSTNAME       AS student_contact_given_name,
@@ -90,7 +90,7 @@ class Sync extends Base implements ISync
 
             SELECT
                 ''                    AS student_contact_network_login,
-                F.IDENTITY_ID# + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_MOTHER)}
+                CAST(F.IDENTITY_ID# AS VARCHAR(16)) + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_MOTHER)}
                                       AS student_contact_id,
                 ''                    AS student_contact_title,
                 F.MUM_FIRSTNAME       AS student_contact_given_name,
@@ -109,7 +109,7 @@ class Sync extends Base implements ISync
 
             SELECT
                 ''                    AS student_contact_network_login,
-                F.IDENTITY_ID# + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_CAREGIVER)}
+                CAST(F.IDENTITY_ID# AS VARCHAR(16)) + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_CAREGIVER)}
                                       AS student_contact_id,
                 ''                    AS student_contact_title,
                 F.CGIVE_FIRSTNAME     AS student_contact_given_name,
@@ -128,7 +128,7 @@ class Sync extends Base implements ISync
 
             SELECT
                 ''                    AS student_contact_network_login,
-                F.IDENTITY_ID# + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_GUARDIAN)}
+                CAST(F.IDENTITY_ID# AS VARCHAR(16)) + '-' + {$this->database->smartQuote(self::CONTACT_TYPE_GUARDIAN)}
                                       AS student_contact_id,
                 ''                    AS student_contact_title,
                 F.GUARD_FIRSTNAME     AS student_contact_given_name,
