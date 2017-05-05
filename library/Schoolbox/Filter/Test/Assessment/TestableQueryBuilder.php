@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
+use Schoolbox\Collection;
+
 /**
  * Enables unit testing of the QueryBuilder's logic by exposing internal methods.
  */
@@ -14,12 +16,12 @@ class TestableQueryBuilder extends QueryBuilder
 {
 
     /**
-     * @param array $filters
+     * @param array $completeFilters
      * @return bool
      */
-    public function getAreResultsPossible(array $filters)
+    public function getDoContextFiltersGuaranteeEmptySet(array $completeFilters)
     {
-        return $this->areResultsPossible($filters);
+        return $this->doContextFiltersGuaranteeEmptySet($completeFilters);
     }
 
     /**
@@ -29,5 +31,17 @@ class TestableQueryBuilder extends QueryBuilder
     public function getSqlStringForFilters(array $completeFilters)
     {
         return $this->buildQuery($completeFilters);
+    }
+
+
+    /**
+     * Inserts null values for missing filters and ensures any scalars are wrapped in Collections
+     *
+     * @param $filters
+     * @return Collection[]|null[]|mixed[][]
+     */
+    public function insertMissingFilters($filters)
+    {
+        return $this->normaliseFilters($filters);
     }
 }

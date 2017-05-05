@@ -163,9 +163,9 @@ class QueryBuilder
         $weightings = $completeFilters[WeightingType\Definition::SLUG];
         $workTypes  = $completeFilters[WorkType\Definition::SLUG];
 
-        list($aTypeJoin, $aTypeWhere) = $this->getClauseAType($aTypes);
-        list($termDueWhere) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
-        list($termCloseWhere) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
+        list($aTypeJoin, $aTypeWhere)           = $this->getClauseAType($aTypes);
+        list($termDueWhere)                     = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
+        list($termCloseWhere)                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams) = $this->getClauseWeighting($weightings);
         list($workTypeWhere,  $workTypeParams)  = $this->getClauseWorkType($workTypes);
 
@@ -838,6 +838,14 @@ class QueryBuilder
 
         $builder = $this->assessmentMapper->getPredicateBuilder();
 
+        // There are two ways to specify that you want assessments without a workType.
+        // The first is by passing an empty Collection, the latter is by inserting NULL in that collection.
+        // Need to support both.
+        if(!$workTypes->count()){
+            $builder->isNull('a.work_type_id');
+        }
+
+        // If Collection is empty, this will never execute - so no need to wrap
         foreach($workTypes as $workType){
             if(null === $workType){
                 $builder->isNull('a.work_type_id');
@@ -872,49 +880,6 @@ class QueryBuilder
         return false;
     }
 
-
-    /**
-     * Can examination of the non-context filters using set-theory enable us to conclude that no results will ever be returned?
-     *
-     * @param int[][]|null[] $completeFilters
-     * @return bool
-     */
-    protected function doNonContextFiltersGuaranteeEmptySet(array $completeFilters)
-    {
-        // Did call explicitly request assessments that do not have an assessment type?
-        $assessmentTypes = $completeFilters[AssessmentType\Definition::SLUG];
-        if ($assessmentTypes instanceOf Collection && !count($assessmentTypes)) {
-            // All assessments have a type
-            return true;
-        }
-
-        // Did call explicitly request assessments due in some term, but no terms supplied?
-        $termsDue = $completeFilters[TermDue\Definition::SLUG];
-        if ($termsDue instanceOf Collection && !$termsDue->count()) {
-            // All assessments have due dates
-            return true;
-        }
-
-        // Did call explicitly request assessments close in some term, but no terms supplied?
-        $termsClose = $completeFilters[TermClose\Definition::SLUG];
-        if ($termsClose instanceOf Collection && !$termsClose->count()) {
-            // All assessments have have a close date
-            return true;
-        }
-
-        // Note. It is valid to request assessments without a workType (it is nullable)
-
-
-        // Did call explicitly request assessments with a weightingType, but no weightingTypes supplied?
-        $weightingType = $completeFilters[WeightingType\Definition::SLUG];
-        if ($weightingType instanceOf Collection && !count($weightingType)) {
-            // All assessments have a weighting type
-            return true;
-        }
-
-        // Unable to conclude that result set is guaranteed to be empty
-        return false;
-    }
 
     /**
      * Can examination of the filters using set-theory enable us to conclude that no assessments could ever match?
@@ -961,4 +926,49 @@ class QueryBuilder
         // Unable to conclude that result set is guaranteed to be empty
         return false;
     }
+
+
+    /**
+     * Can examination of the non-context filters using set-theory enable us to conclude that no results will ever be returned?
+     *
+     * @param int[][]|null[] $completeFilters
+     * @return bool
+     */
+    protected function doNonContextFiltersGuaranteeEmptySet(array $completeFilters)
+    {
+        // Did call explicitly request assessments that do not have an assessment type?
+        $assessmentTypes = $completeFilters[AssessmentType\Definition::SLUG];
+        if ($assessmentTypes instanceOf Collection && !count($assessmentTypes)) {
+            // All assessments have a type
+            return true;
+        }
+
+        // Did call explicitly request assessments due in some term, but no terms supplied?
+        $termsDue = $completeFilters[TermDue\Definition::SLUG];
+        if ($termsDue instanceOf Collection && !$termsDue->count()) {
+            // All assessments have due dates
+            return true;
+        }
+
+        // Did call explicitly request assessments close in some term, but no terms supplied?
+        $termsClose = $completeFilters[TermClose\Definition::SLUG];
+        if ($termsClose instanceOf Collection && !$termsClose->count()) {
+            // All assessments have have a close date
+            return true;
+        }
+
+        // Note: It is valid to request assessments without a workType (it is nullable)
+
+
+        // Did call explicitly request assessments with a weightingType, but no weightingTypes supplied?
+        $weightingType = $completeFilters[WeightingType\Definition::SLUG];
+        if ($weightingType instanceOf Collection && !count($weightingType)) {
+            // All assessments have a weighting type
+            return true;
+        }
+
+        // Unable to conclude that result set is guaranteed to be empty
+        return false;
+    }
+
 }
