@@ -137,14 +137,46 @@ class Controller extends Base
                 $termLastDay = ($term->getDuration() - ($timetableDay + 1 - $termStartDay)) % $timetableDay;
                 $selectedDay = $this->getTimetableHandler()->getDayNumber($campus, $date->getUnixTimeStamp());
                 $timetableCycles = ceil(($term->getDuration() + $termStartDay - 1) / $timetableDay);
-                $selectedCycle = ceil(($term->getDuration($date) + $termStartDay - 1) / $timetableDay);
 
                 $timetableVars['byCampus'][$campus->getId()]['id'] = $campus->getId();
                 $timetableVars['byCampus'][$campus->getId()]['termStartDay'] = $termStartDay;
                 $timetableVars['byCampus'][$campus->getId()]['termLastDay'] = $termLastDay;
                 $timetableVars['byCampus'][$campus->getId()]['selectedDay'] = $selectedDay;
                 $timetableVars['byCampus'][$campus->getId()]['timetableCycles'] = $timetableCycles;
-                $timetableVars['byCampus'][$campus->getId()]['selectedCycle'] = $selectedCycle;
+
+                // Loop through terms and set cycle start and end dates
+                $cycles = [];
+
+                foreach ($terms as $cycleTerm) {
+
+                    $termStartDate = $cycleTerm->getStart();
+                    $termEndDate = $cycleTerm->getDisplayFinish();
+                    $tempDate = clone $termStartDate;
+                    $tempDay = $termStartDay;
+                    $cycleDays = $timetableDay;
+                    $currentCycle = 1;
+
+                    //$cycles[$cycleTerm->getId()][1]['startDate'] = $tempDate->toIso8601String();
+
+                    while ($tempDate->compareDateOnly($termEndDate) <= 0) {
+
+                        $cycles[$cycleTerm->getId()][$currentCycle][$tempDay] = $tempDate->toIso8601String();
+
+                        if ($tempDay == $cycleDays) {
+                            $currentCycle++;
+                            $tempDay = 1;
+                        } else {
+                            $tempDay++;
+                        }
+
+                        do {
+                            $tempDate->addDays(1);
+                        } while ($tempDate->isWeekend());
+
+                    }
+                }
+
+                $timetableVars['byCampus'][$campus->getId()]['cycles'] = json_encode($cycles);
             }
         }
 
@@ -587,7 +619,7 @@ class Controller extends Base
     {
         return $this->assessmentMapperProxy;
     }
-    
+
     /**
      * @return External_Timetable
      */
@@ -595,7 +627,7 @@ class Controller extends Base
     {
         return $this->timetableHandler;
     }
-    
+
     /**
      * @param External_Timetable $timetableHandler
      * @return $this

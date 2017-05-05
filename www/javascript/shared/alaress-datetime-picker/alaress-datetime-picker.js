@@ -194,12 +194,12 @@ function checkAllDaySwitch (state, pickerId) {
 
     // All Day is on
     if (state === true) {
-        $timeDiv.css('display', 'none');
+        $timeDiv.addClass('hide');
         $('#hideTime' + pickerId).prop('checked', true);
 
     }
     else {
-        $timeDiv.css('display', 'block');
+        $timeDiv.removeClass('hide');
         $('#hideTime' + pickerId).prop('checked', false);
     }
 
@@ -228,7 +228,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     element.attr('data-datepicker-id', pickerId);
 
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
-    element.after('<div data-reveal id="picker' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '"></div>');
+    element.after('<div data-reveal id="picker' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
 
     // Create click event to open the modal for the element
 
@@ -323,15 +323,29 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                 });
 
-                $timetablePicker.find('.timetable-submit').click(function () {
+                $timetablePicker.find('[data-adtp-tt-submit]').click(function () {
+
                     var newDate = moment($(this).attr('data-timetable-value'));
 
-                    if(options.enableTime === true) {
-                        var periodSelected = $timetablePicker.find('table').find('[data-selected=1]').attr('data-period'),
-                            periodTime = $timetablePicker.find('[name*="periodTime' + pickerId + '"]:checked').val(),
-                            newTime = moment($('[data-period-number=' + periodSelected + ']').attr('data-period-' + periodTime), 'h:mma');
+                    if (options.enableTime === true) {
 
-                        newDate = newDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+                        var selectedPeriod = $timetablePicker.find('[data-tt-period] option:selected').val();
+
+                        if (selectedPeriod == 'allday') {
+
+                            if (options.endDay) {
+                                newDate = newDate.endOf('day');
+                            } else {
+                                newDate = newDate.startOf('day');
+                            }
+
+                        } else {
+
+                            var periodTime = $timetablePicker.find('[name*="periodTime' + pickerId + '"]:checked').val();
+                            var newTime = moment($timetablePicker.find('[data-tt-period] option:selected').attr('data-' + periodTime + '-time'), 'h:mma');
+
+                            newDate = newDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
+                        }
                     }
 
                     setValue(element, options, false, true, newDate);
