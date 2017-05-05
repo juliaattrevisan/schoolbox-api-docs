@@ -63,7 +63,6 @@ class QueryBuilder
     private $assessmentMapper;
 
 
-
     /**
      * @param Assessment\Mapper $assessmentMapper
      */
@@ -92,7 +91,7 @@ class QueryBuilder
 
 
     /**
-     * Fetch an array of assessment IDs that match the specified filters and options
+     * Fetch an array of assessment IDs that match the specified filters
      *
      * Filters are applied using ∩ (intersection).
      *
@@ -102,17 +101,16 @@ class QueryBuilder
      * * [X..] => INNER JOIN must be in X.   eg if project filter is [1] then assessments must reside directly in project_1
      *
      * @param Collection[]|null[]|mixed[][] $filters Indexed by filter definition key
-     * @param array                         $options Conventional mapper query modifiers
+     * @param bool                          $deleted Whether to include soft-deleted assessments
      * @see IFilterDefinition::getSlug()
      * @return int[]
      * @throws \InvalidArgumentException If any filter keys not recognised
      */
-    public function findIdsByFilters(array $filters = [], array $options = [])
+    public function findIdsByFilters(array $filters = [], $deleted = false)
     {
         // No filters ?
         if (0 === count($filters)) {
-            // TODO consider removing $options and always return deleted (unless we add a filter for that)
-            return $this->assessmentMapper->findAllIds($options);
+            return $this->assessmentMapper->findAllIds(['deleted' => $deleted]);
         }
 
         // Filters supplied. Ensure they are recognisable.
@@ -126,7 +124,7 @@ class QueryBuilder
             return [];
         }
 
-        list($query, $params) = $this->buildQuery($completeFilters);
+        list($query, $params) = $this->buildQuery($completeFilters, $deleted);
         $idStatement = $this->assessmentMapper->getDatabase()->query($query, $params);
         return array_column($idStatement->fetchAll(), $this->assessmentMapper->getIdentifierColumn());
     }
@@ -139,9 +137,10 @@ class QueryBuilder
      * Each sub-queries are modified depending on which non-assessment-context filters are specified
      *
      * @param Collection[]|null[]|mixed[][] $completeFilters
+     * @param bool $deleted Whether to include deleted assessments
      * @return mixed[]
      */
-    protected function buildQuery(array $completeFilters)
+    protected function buildQuery(array $completeFilters, $deleted)
     {
         // Filters which effect which sub-queries are required
         $folderIds     = $completeFilters[Folder\Definition::SLUG];
@@ -168,6 +167,7 @@ class QueryBuilder
         list($termCloseWhere)                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams) = $this->getClauseWeighting($weightings);
         list($workTypeWhere,  $workTypeParams)  = $this->getClauseWorkType($workTypes);
+        list($deletedWhere)                     = $this->getClauseDeleted($deleted);
 
         // Merge all the params
         $params = array_merge($folderParams, $projectParams, $unitImplParams, $unitSpecParams, $uImpSpcParams, $weightingParams, $workTypeParams);
@@ -177,7 +177,7 @@ class QueryBuilder
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$aTypeJoin}
-                WHERE TRUE
+                WHERE {$deletedWhere}
                 AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                 ";
         } else {
@@ -188,7 +188,7 @@ class QueryBuilder
                     JOIN assessment_folder af ON af.assessment_id = a.id
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$folderWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
@@ -201,7 +201,7 @@ class QueryBuilder
                     JOIN assessment_folder paf ON paf.assessment_id = p.assessment_id
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$folderWhere} AND {$projectWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
@@ -216,7 +216,7 @@ class QueryBuilder
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$folderWhere} AND {$unitImplWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$unitImplWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     
                     ";
@@ -234,7 +234,7 @@ class QueryBuilder
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
@@ -246,7 +246,7 @@ class QueryBuilder
                     JOIN course_unit_specification us ON aus.course_unit_specification_id = us.id
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$folderWhere} AND {$unitSpecWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$unitSpecWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
@@ -260,7 +260,7 @@ class QueryBuilder
                     JOIN course_unit_specification us              ON aus.course_unit_specification_id = us.id
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
@@ -273,7 +273,7 @@ class QueryBuilder
                     JOIN course_unit_specification uis             ON ui.course_unit_specification_id   = uis.id
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$folderWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
@@ -288,7 +288,7 @@ class QueryBuilder
                     JOIN course_unit_specification uis ON ui.course_unit_specification_id = uis.id
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$folderWhere} AND {$projectWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
+                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
@@ -411,16 +411,16 @@ class QueryBuilder
         Collection $unitImplIds = null,
         Collection $unitSpecIds = null
     ){
-        if($projectIds instanceOf Collection && count($projectIds)){
+        if($projectIds instanceOf Collection && $projectIds->count()){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && $unitSpecIds->count()){
             return false;
         }
-        if($unitImplIds instanceOf Collection && count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && $unitImplIds->count()){
             return false;
         }
-        if($uImpSpcIds instanceOf Collection && count($uImpSpcIds)){
+        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count()){
             return false;
         }
         return true;
@@ -441,16 +441,16 @@ class QueryBuilder
         Collection $unitImplIds = null,
         Collection $unitSpecIds = null)
     {
-        if($projectIds instanceOf Collection && !count($projectIds)){
+        if($projectIds instanceOf Collection && !$projectIds->count()){
             return false;
         }
-        if($unitImplIds instanceOf Collection && count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && $unitImplIds->count()){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && $unitSpecIds->count()){
             return false;
         }
-        if($uImpSpcIds instanceOf Collection && count($uImpSpcIds)){
+        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count()){
             return false;
         }
         return true;
@@ -474,13 +474,13 @@ class QueryBuilder
         if($uImpSpcIds instanceOf Collection){
             return false;
         }
-        if($unitImplIds instanceOf Collection && !count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && !$unitImplIds->count()){
             return false;
         }
-        if($projectIds instanceOf Collection && count($projectIds)){
+        if($projectIds instanceOf Collection && $projectIds->count()){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && $unitSpecIds->count()){
             return false;
         }
         return true;
@@ -504,13 +504,13 @@ class QueryBuilder
         if($uImpSpcIds instanceOf Collection){
             return false;
         }
-        if($projectIds instanceOf Collection && !count($projectIds)){
+        if($projectIds instanceOf Collection && !$projectIds->count()){
             return false;
         }
-        if($unitImplIds instanceOf Collection && !count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && !$unitImplIds->count()){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && $unitSpecIds->count()){
             return false;
         }
         return true;
@@ -531,16 +531,16 @@ class QueryBuilder
         Collection $unitImplIds = null,
         Collection $unitSpecIds = null)
     {
-        if($unitSpecIds instanceOf Collection && !count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && !$unitSpecIds->count()){
             return false;
         }
-        if($unitImplIds instanceOf Collection && count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && $unitImplIds->count()){
             return false;
         }
-        if($uImpSpcIds instanceOf Collection && count($uImpSpcIds)){
+        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count()){
             return false;
         }
-        if($projectIds instanceOf Collection && count($projectIds)){
+        if($projectIds instanceOf Collection && $projectIds->count()){
             return false;
         }
         return true;
@@ -561,16 +561,16 @@ class QueryBuilder
         Collection $unitImplIds = null,
         Collection $unitSpecIds = null)
     {
-        if($projectIds instanceOf Collection && !count($projectIds)){
+        if($projectIds instanceOf Collection && !$projectIds->count()){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && !count($unitSpecIds)){
+        if($unitSpecIds instanceOf Collection && !$unitSpecIds->count()){
             return false;
         }
-        if($unitImplIds instanceOf Collection && count($unitImplIds)){
+        if($unitImplIds instanceOf Collection && $unitImplIds->count()){
             return false;
         }
-        if($uImpSpcIds instanceOf Collection && count($uImpSpcIds)){
+        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count()){
             return false;
         }
         return true;
@@ -585,10 +585,10 @@ class QueryBuilder
      */
     private function subQueryUnitImplUnitSpec(Collection $uImpSpcIds = null, Collection $projectIds = null)
     {
-        if(null === $uImpSpcIds || !count($uImpSpcIds)){
+        if(null === $uImpSpcIds || !$uImpSpcIds->count()){
             return false;
         }
-        if($projectIds instanceOf Collection && count($projectIds)){
+        if($projectIds instanceOf Collection && $projectIds->count()){
             return false;
         }
         return true;
@@ -603,10 +603,10 @@ class QueryBuilder
      */
     private function subQueryProjectUnitImplUnitSpec(Collection $uImpSpcIds = null, Collection $projectIds = null)
     {
-        if(null === $uImpSpcIds || !count($uImpSpcIds)){
+        if(null === $uImpSpcIds || !$uImpSpcIds->count()){
             return false;
         }
-        if($projectIds instanceOf Collection && !count($projectIds)){
+        if($projectIds instanceOf Collection && !$projectIds->count()){
             return false;
         }
         return true;
@@ -692,7 +692,7 @@ class QueryBuilder
      */
     private function getClauseProject(Collection $projectIds = null)
     {
-        if(null === $projectIds || !count($projectIds)){
+        if(null === $projectIds || !$projectIds->count()){
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
@@ -746,7 +746,7 @@ class QueryBuilder
      */
     private function getClauseUnitImpl(Collection $unitImplIds = null)
     {
-        if(null === $unitImplIds || !count($unitImplIds)){
+        if(null === $unitImplIds || !$unitImplIds->count()){
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
@@ -766,7 +766,7 @@ class QueryBuilder
      */
     private function getClauseUnitImplSpec(Collection $unitImpSpcIds = null)
     {
-        if(null === $unitImpSpcIds || !count($unitImpSpcIds)){
+        if(null === $unitImpSpcIds || !$unitImpSpcIds->count()){
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
@@ -786,7 +786,7 @@ class QueryBuilder
      */
     private function getClauseUnitSpec(Collection $unitSpecIds = null)
     {
-        if(null === $unitSpecIds || !count($unitSpecIds)){
+        if(null === $unitSpecIds || !$unitSpecIds->count()){
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
@@ -858,6 +858,24 @@ class QueryBuilder
 
 
     /**
+     * Return a SQL clause fragment that determines whether soft-deleted assessments are filtered off
+     *
+     * @param bool $deleted
+     * @return string
+     */
+    private function getClauseDeleted($deleted)
+    {
+        if(false !== $deleted){
+            return 'TRUE';
+        }
+        // Exclude deleted assessments
+        $builder = $this->assessmentMapper->getPredicateBuilder();
+        $builder->isNull('a.deleted_at');
+        return $builder->getWhere()[0];
+    }
+
+
+    /**
      * Can examination of the filters using set-theory indicate that no assessments could ever match?
      *
      * eg, an assessment can not live directly in a unit-impl and unit-spec at the same time.
@@ -904,7 +922,7 @@ class QueryBuilder
         $unitSpecIds = $completeFilters[UnitSpec\Definition::SLUG];
 
         // Did caller request assessments that live in unit-impls and unit-specs simultaneously?
-        if($unitImplIds instanceOf Collection && $unitSpecIds instanceOf Collection && count($unitImplIds) && count($unitSpecIds)){
+        if($unitImplIds instanceOf Collection && $unitSpecIds instanceOf Collection && $unitImplIds->count() && $unitSpecIds->count()){
             // Assessments cannot live in both a unitImpl and unitSpec at the same time.
             return true;
         }
@@ -912,14 +930,14 @@ class QueryBuilder
         // Did caller specify assessment must reside directly in some unit-spec, and also be
         // directly in a unit-impl (that was imported from some spec)?
         $unitImportSpecIds = $completeFilters[UnitImportSpec\Definition::SLUG];
-        if($unitImportSpecIds instanceOf Collection && $unitSpecIds instanceOf Collection && count($unitImportSpecIds) && count($unitSpecIds)){
+        if($unitImportSpecIds instanceOf Collection && $unitSpecIds instanceOf Collection && $unitImportSpecIds->count() && $unitSpecIds->count()){
             return true;
         }
 
 
         // Did caller request assessment that live inside unit-impls that were not imported, or were imported from unit-specs
         // but don't live in a unit-spec?
-        if($unitImplIds instanceOf Collection && $unitImportSpecIds instanceOf Collection && (bool)count($unitImplIds) !== (bool)count($unitImportSpecIds)){
+        if($unitImplIds instanceOf Collection && $unitImportSpecIds instanceOf Collection && (bool)$unitImplIds->count() !== (bool)$unitImportSpecIds->count()){
             return true;
         }
 
@@ -938,7 +956,7 @@ class QueryBuilder
     {
         // Did call explicitly request assessments that do not have an assessment type?
         $assessmentTypes = $completeFilters[AssessmentType\Definition::SLUG];
-        if ($assessmentTypes instanceOf Collection && !count($assessmentTypes)) {
+        if ($assessmentTypes instanceOf Collection && !$assessmentTypes->count()) {
             // All assessments have a type
             return true;
         }
@@ -962,7 +980,7 @@ class QueryBuilder
 
         // Did call explicitly request assessments with a weightingType, but no weightingTypes supplied?
         $weightingType = $completeFilters[WeightingType\Definition::SLUG];
-        if ($weightingType instanceOf Collection && !count($weightingType)) {
+        if ($weightingType instanceOf Collection && !$weightingType->count()) {
             // All assessments have a weighting type
             return true;
         }
