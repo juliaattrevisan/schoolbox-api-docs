@@ -875,14 +875,16 @@ class External_Pcschools_User implements External_UserInterface
             list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
 
             // Add classes for each day into it
-            foreach ($dayClasses as $dayClass) {
-                $code = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
-                $classes[$code] = [
-                    'code'       => $code,
-                    'name'       => $dayClass['DESC'],
-                    'classType'  => '',
-                    'campusCode' => $timePeriod,
-                ];
+            if (!empty($dayClasses)) {
+                foreach ($dayClasses as $dayClass) {
+                    $code = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
+                    $classes[$code] = [
+                        'code'       => $code,
+                        'name'       => $dayClass['DESC'],
+                        'classType'  => '',
+                        'campusCode' => $timePeriod,
+                    ];
+                }
             }
         }
         return array_values($classes);
