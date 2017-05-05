@@ -74,6 +74,10 @@ class FactoryFactory
                 return $this->buildFactory(Filters\Assessment\TermDue\Factory::class, [
                     'termMapper' => $this->mapperFactory->get(Term\Mapper::class),
                 ]);
+            case Filters\Assessment\TermClose\Definition::class:
+                return $this->buildFactory(Filters\Assessment\TermClose\Factory::class, [
+                    'termMapper' => $this->mapperFactory->get(Term\Mapper::class),
+                ]);
             case Filters\Assessment\WorkType\Definition::class:
                 return $this->buildFactory(Filters\Assessment\WorkType\Factory::class, [
                     'workTypeMapper' => $this->mapperFactory->get(WorkType\Mapper::class),
