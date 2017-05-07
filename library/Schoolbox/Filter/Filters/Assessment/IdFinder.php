@@ -103,8 +103,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 $subQueries[] = "
                     SELECT a.id, 1 AS 'case' FROM `assessment` a
                     JOIN assessment_folder af ON af.assessment_id = a.id
-                    {$folderJoin}
-                    {$aTypeJoin}
+                    {$folderJoin} {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$folderWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
@@ -116,8 +115,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project_assessment ap ON ap.assessment_id  = a.id
                     JOIN project p             ON ap.project_id     = p.id
                     JOIN assessment_folder paf ON paf.assessment_id = p.assessment_id
-                    {$folderJoin}
-                    {$aTypeJoin}
+                    {$folderJoin} {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
@@ -131,9 +129,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     SELECT a.id, 3 AS 'case' FROM `assessment` a
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
-                    {$uImpSpcJoin}
-                    {$folderJoin}
-                    {$aTypeJoin}
+                    {$uImpSpcJoin} {$folderJoin} {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$unitImplWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     
@@ -150,9 +146,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project p                                 ON ap.project_id                     = p.id 
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
-                    {$uImpSpcJoin}
-                    {$folderJoin}
-                    {$aTypeJoin}
+                    {$uImpSpcJoin} {$folderJoin} {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
@@ -184,7 +178,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     ";
             }
         }
-        return [implode(' UNION ', $subQueries), $params];
+        return [implode("\n\n\tUNION\n\n", $subQueries), $params];
     }
 
 

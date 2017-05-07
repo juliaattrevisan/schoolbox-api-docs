@@ -41,7 +41,7 @@ class Transformer
      */
     public function __construct(GenericCollection $keyConverters, Collection $selectionsPerFilter)
     {
-        // Convert indexing by filter.id to IFilterDefinition::KEY
+        // Convert indexing by filter.id to IFilterDefinition::SLUG
         $this->selectionsPerFilter = $selectionsPerFilter->emptyClone();
         $this->keyConverters       = $keyConverters->emptyClone();
 
@@ -52,18 +52,17 @@ class Transformer
             $filterSlug            = $filterDefinitionClass::getSlug();
             $this->keyConverters->offsetSet($filterSlug, $keyConverter);
             if ($selectionsPerFilter->offsetExists($filter->getId())) {
-                $this->selectionsPerFilter->offsetSet($filterSlug, $selectionsPerFilter[$filter->getId()]);
+                $this->selectionsPerFilter[$filterSlug] = $selectionsPerFilter[$filter->getId()];
             }
         }
     }
-
 
     /**
      * Get a set of entities represented by a filter component's selections
      *
      * @param string $filterSlug
      * @return null|Collection|mixed[]
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If no KeyConverter registered for specified slug
      */
     public function getSelectedItems($filterSlug)
     {
@@ -74,6 +73,32 @@ class Transformer
 
         return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterSlug]);
     }
+
+
+    /**
+     * Get all filter selections in the form accepted by an IdFindere
+     * @todo pass an interface/object instead of array
+     * @return array
+     */
+    public function getFilters()
+    {
+        $filters = [];
+        foreach($this->getSelectionsPerFilter() as $slug => $selections){
+            try{
+                $filters[$slug] = $this->getSelectedItems($slug);
+            } catch (\InvalidArgumentException $e){
+                // This is logically impossible to throw when called from here.
+                // But just in case...
+                if(function_exists('newrelic_notice_error')){
+                    newrelic_notice_error(null, $e);
+                }
+            }
+        }
+        return $filters;
+    }
+
+    /* Getters
+     */
 
     /**
      * @return Collection|Selection\Model[][]|GenericCollection[]
