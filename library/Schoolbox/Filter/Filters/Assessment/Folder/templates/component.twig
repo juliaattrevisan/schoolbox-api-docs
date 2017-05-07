@@ -49,10 +49,11 @@
             {% for classFolder in classes %}
                 {% set selection = userSelections[classFolder.id] %}
 
-                {% include '@filters/_selectionCheckbox.twig' with {
+                {% include '@filters/_selectionCheckboxWithDuplicates.twig' with {
                     userSelection: selection,
                     roleSelection: defaultClassSelections[selection.key],
                     label:         classFolder.nameWithCodes,
+                    idSuffix:      '_class'
                 } only %}
 
             {% endfor %}
@@ -66,10 +67,11 @@
             <h4>Groups</h4>
             {% for groupFolder in groups %}
                 {% set selection = userSelections[groupFolder.id] %}
-                {% include '@filters/_selectionCheckbox.twig' with {
+                {% include '@filters/_selectionCheckboxWithDuplicates.twig' with {
                     userSelection: selection,
                     roleSelection: defaultGroupSelections[selection.key],
                     label:         groupFolder.name,
+                    idSuffix:      '_group'
                 } only %}
             {% endfor %}
         {% endif %}
