@@ -40,4 +40,15 @@ interface IdFinder
      * @throws \InvalidArgumentException If any filter keys not recognised
      */
     public function findIdsByFilters(array $filters = [], $deleted = false);
+
+
+    /**
+     * Find all entities using a Filter Transformer produced from user filter selections
+     *
+     * @param Transformer $transformer
+     * @param bool        $deleted
+     * @return mixed
+     * @throws \InvalidArgumentException If any filter keys not recognised
+     */
+    public function findIdsByTransformer(Transformer $transformer, $deleted = false);
 }
