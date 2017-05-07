@@ -64,11 +64,13 @@ class IdFinder extends Filter\AbstractIdFinder
         $unitSpecIds   = $completeFilters[NullableContext\UnitSpec\Definition::SLUG];
         $unitImpSpcIds = $completeFilters[NullableContext\UnitImportSpec\Definition::SLUG];
 
-        list($folderWhere,   $folderParams)    = $this->getClauseFolder($folderIds);
-        list($projectWhere,  $projectParams)   = $this->getClauseProject($projectIds);
-        list($unitImplWhere, $unitImplParams)  = $this->getClauseUnitImpl($unitImplIds);
-        list($unitSpecWhere, $unitSpecParams)  = $this->getClauseUnitSpec($unitSpecIds);
-        list($uImpSpcWhere,  $uImpSpcParams)   = $this->getClauseUnitImplSpec($unitImpSpcIds);
+        list($folderWhere,   $folderParams)               = $this->getClauseFolder($folderIds);
+        list($projectWhere,  $projectParams)              = $this->getClauseProject($projectIds);
+        list($unitImplWhere, $unitImplParams)             = $this->getClauseUnitImpl($unitImplIds);
+        list($unitSpecWhere, $unitSpecParams)             = $this->getClauseUnitSpec($unitSpecIds);
+
+        // This filter affects which sub-queries are used, and also potentially modifies the unit-impl-context sub-queries
+        list($uImpSpcJoin, $uImpSpcWhere, $uImpSpcParams) = $this->getClauseUnitImplSpec($unitImpSpcIds);
 
         // Sub-query modifiers
         $aTypes     = $completeFilters[AssessmentType\Definition::SLUG];
@@ -129,9 +131,10 @@ class IdFinder extends Filter\AbstractIdFinder
                     SELECT a.id, 3 AS 'case' FROM `assessment` a
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
+                    {$uImpSpcJoin}
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$unitImplWhere}
+                    WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$unitImplWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     
                     ";
@@ -147,9 +150,10 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project p                                 ON ap.project_id                     = p.id 
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
+                    {$uImpSpcJoin}
                     {$folderJoin}
                     {$aTypeJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
+                    WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
@@ -179,36 +183,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
-            if($this->subQueryUnitImplUnitSpec($unitImpSpcIds, $projectIds)){
-                $folderJoin = count($folderParams) ? 'JOIN folder f ON uis.folder_id = f.id' : '';
-                $subQueries[] = "
-                    SELECT a.id, 7 AS 'case' FROM `assessment` a
-                    JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 =  a.id 
-                    JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id 
-                    JOIN course_unit_specification uis             ON ui.course_unit_specification_id   = uis.id
-                    {$folderJoin}
-                    {$aTypeJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
-                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
-                    ";
-            }
-            if($this->subQueryProjectUnitImplUnitSpec($unitImpSpcIds, $projectIds)){
-                $folderJoin = count($folderParams) ? 'JOIN folder f ON uis.folder_id = f.id' : '';
-                $subQueries[] = "
-                    SELECT a.id, 8 AS 'case' FROM `assessment` a
-                    JOIN project_assessment ap                      ON ap.assessment_id                  = a.id
-                    JOIN project p                                  ON ap.project_id                     = p.id
-                    JOIN assessment_course_unit_implementation aui  ON aui.assessment_id                 = p.assessment_id
-                    JOIN course_unit_implementation ui              ON aui.course_unit_implementation_id = ui.id 
-                    JOIN course_unit_specification uis ON ui.course_unit_specification_id = uis.id
-                    {$folderJoin}
-                    {$aTypeJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere} AND {$uImpSpcWhere}
-                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
-                    ";
-            }
         }
-
         return [implode(' UNION ', $subQueries), $params];
     }
 
@@ -256,9 +231,9 @@ class IdFinder extends Filter\AbstractIdFinder
         Collection $unitSpecIds = null)
     {
         return
-            null === $uImpSpcIds &&
-            null === $folderIds &&
-            null === $projectIds &&
+            null === $uImpSpcIds  &&
+            null === $folderIds   &&
+            null === $projectIds  &&
             null === $unitImplIds &&
             null === $unitSpecIds;
     }
@@ -278,16 +253,16 @@ class IdFinder extends Filter\AbstractIdFinder
         Collection $unitImplIds = null,
         Collection $unitSpecIds = null
     ){
-        if($projectIds instanceOf Collection && $projectIds->count()){
+        if($projectIds instanceOf Collection && $projectIds->count() && !$projectIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && $unitSpecIds->count()){
+        if($unitSpecIds instanceOf Collection && $unitSpecIds->count() && !$unitSpecIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
-        if($unitImplIds instanceOf Collection && $unitImplIds->count()){
+        if($unitImplIds instanceOf Collection && $unitImplIds->count() && !$unitImplIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
-        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count()){
+        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count() && !$uImpSpcIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
         return true;
@@ -311,13 +286,13 @@ class IdFinder extends Filter\AbstractIdFinder
         if($projectIds instanceOf Collection && !$projectIds->count()){
             return false;
         }
-        if($unitImplIds instanceOf Collection && $unitImplIds->count()){
+        if($unitImplIds instanceOf Collection && $unitImplIds->count() && !$unitImplIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && $unitSpecIds->count()){
+        if($unitSpecIds instanceOf Collection && $unitSpecIds->count() && !$unitSpecIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
-        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count()){
+        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count() && !$uImpSpcIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
         return true;
@@ -338,16 +313,17 @@ class IdFinder extends Filter\AbstractIdFinder
         Collection $unitImplIds = null,
         Collection $unitSpecIds = null
     ) {
-        if($uImpSpcIds instanceOf Collection){
-            return false;
-        }
         if($unitImplIds instanceOf Collection && !$unitImplIds->count()){
             return false;
         }
-        if($projectIds instanceOf Collection && $projectIds->count()){
+
+        if($uImpSpcIds instanceOf Collection  && !$uImpSpcIds->count()){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && $unitSpecIds->count()){
+        if($projectIds instanceOf Collection && $projectIds->count() && !$projectIds->keyExists(NullableContext\Definition::KEY_NONE)){
+            return false;
+        }
+        if($unitSpecIds instanceOf Collection && $unitSpecIds->count() && !$unitSpecIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
         return true;
@@ -368,16 +344,16 @@ class IdFinder extends Filter\AbstractIdFinder
         Collection $unitImplIds = null,
         Collection $unitSpecIds = null
     ) {
-        if($uImpSpcIds instanceOf Collection){
-            return false;
-        }
         if($projectIds instanceOf Collection && !$projectIds->count()){
             return false;
         }
         if($unitImplIds instanceOf Collection && !$unitImplIds->count()){
             return false;
         }
-        if($unitSpecIds instanceOf Collection && $unitSpecIds->count()){
+        if($uImpSpcIds instanceOf Collection && !$uImpSpcIds->count()){
+            return false;
+        }
+        if($unitSpecIds instanceOf Collection && $unitSpecIds->count() && !$unitSpecIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
         return true;
@@ -401,13 +377,13 @@ class IdFinder extends Filter\AbstractIdFinder
         if($unitSpecIds instanceOf Collection && !$unitSpecIds->count()){
             return false;
         }
-        if($unitImplIds instanceOf Collection && $unitImplIds->count()){
+        if($unitImplIds instanceOf Collection && $unitImplIds->count() && !$unitImplIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
-        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count()){
+        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count() && !$uImpSpcIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
-        if($projectIds instanceOf Collection && $projectIds->count()){
+        if($projectIds instanceOf Collection && $projectIds->count() && !$projectIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
         return true;
@@ -434,46 +410,10 @@ class IdFinder extends Filter\AbstractIdFinder
         if($unitSpecIds instanceOf Collection && !$unitSpecIds->count()){
             return false;
         }
-        if($unitImplIds instanceOf Collection && $unitImplIds->count()){
+        if($unitImplIds instanceOf Collection && $unitImplIds->count() && !$unitImplIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
-        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count()){
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Include (#7) 'in unit-impl in unit-spec' sub-query?
-     *
-     * @param null|Collection|int[] $uImpSpcIds
-     * @param null|Collection|int[] $projectIds
-     * @return bool
-     */
-    private function subQueryUnitImplUnitSpec(Collection $uImpSpcIds = null, Collection $projectIds = null)
-    {
-        if(null === $uImpSpcIds || !$uImpSpcIds->count()){
-            return false;
-        }
-        if($projectIds instanceOf Collection && $projectIds->count()){
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Include (#8) 'in project in unit-impl in unit-spec' sub-query?
-     *
-     * @param null|Collection|int[] $uImpSpcIds
-     * @param null|Collection|int[] $projectIds
-     * @return bool
-     */
-    private function subQueryProjectUnitImplUnitSpec(Collection $uImpSpcIds = null, Collection $projectIds = null)
-    {
-        if(null === $uImpSpcIds || !$uImpSpcIds->count()){
-            return false;
-        }
-        if($projectIds instanceOf Collection && !$projectIds->count()){
+        if($uImpSpcIds instanceOf Collection && $uImpSpcIds->count() && !$uImpSpcIds->keyExists(NullableContext\Definition::KEY_NONE)){
             return false;
         }
         return true;
@@ -563,8 +503,12 @@ class IdFinder extends Filter\AbstractIdFinder
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
+            $ids = $projectIds->getAll();
+            if(array_key_exists(NullableContext\Definition::KEY_NONE, $ids)){
+                unset($ids[NullableContext\Definition::KEY_NONE]);
+            }
             $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('p.id', $projectIds);
+            $builder->equals('p.id', $ids);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
         }
@@ -617,8 +561,12 @@ class IdFinder extends Filter\AbstractIdFinder
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
+            $ids = $unitImplIds->getAll();
+            if(array_key_exists(NullableContext\Definition::KEY_NONE, $ids)){
+                unset($ids[NullableContext\Definition::KEY_NONE]);
+            }
             $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('ui.id', $unitImplIds);
+            $builder->equals('ui.id', $ids);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
         }
@@ -633,16 +581,23 @@ class IdFinder extends Filter\AbstractIdFinder
      */
     private function getClauseUnitImplSpec(Collection $unitImpSpcIds = null)
     {
+
         if(null === $unitImpSpcIds || !$unitImpSpcIds->count()){
+            $joinClause  = '';
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
+            $ids = $unitImpSpcIds->getAll();
+            if(array_key_exists(NullableContext\Definition::KEY_NONE, $ids)){
+                unset($ids[NullableContext\Definition::KEY_NONE]);
+            }
             $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('uis.id', $unitImpSpcIds);
+            $builder->equals('uis.id', $ids);
+            $joinClause = 'JOIN course_unit_specification uis ON ui.course_unit_specification_id = uis.id';
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
         }
-        return [$whereClause, $whereParams];
+        return [$joinClause, $whereClause, $whereParams];
     }
 
     /**
@@ -657,8 +612,12 @@ class IdFinder extends Filter\AbstractIdFinder
             $whereClause = 'TRUE';
             $whereParams = [];
         } else {
+            $ids = $unitSpecIds->getAll();
+            if(array_key_exists(NullableContext\Definition::KEY_NONE, $ids)){
+                unset($ids[NullableContext\Definition::KEY_NONE]);
+            }
             $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('us.id', $unitSpecIds);
+            $builder->equals('us.id', $ids);
             $whereClause = $builder->getWhere()[0];
             $whereParams = $builder->getParams();
         }

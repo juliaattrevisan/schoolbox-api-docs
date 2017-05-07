@@ -84,7 +84,32 @@ abstract class AbstractIdFinder implements IdFinder
 
         list($query, $params) = $this->buildQuery($completeFilters, $deleted);
         $idStatement = $this->getMapper()->getDatabase()->query($query, $params);
-        return array_column($idStatement->fetchAll(), $this->getMapper()->getIdentifierColumn());
+        $ids = array_column($idStatement->fetchAll(), $this->getMapper()->getIdentifierColumn());
+
+        // Need to deduplicate some forms of sub-query combination
+        // (eg, if nullable assessment context filter has both (none) + 1 or more concrete items checked)
+        $uniqueIds = array_unique($ids);
+        sort($uniqueIds);
+        return $uniqueIds;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function findIdsByTransformer(Transformer $transformer, $deleted = false)
+    {
+        $filters = [];
+        foreach($this->registry as $slug => $class){
+            try{
+                $filters[$slug] = $transformer->getSelectedItems($slug);
+            } catch (\InvalidArgumentException $e){
+                // Silently discard it. It just means this component is not in use in the UI.
+                // This can happen when the admin has configured it not to appear, or because it never appears
+                // and is used for manual-filter-building only
+            }
+        }
+        return $this->findIdsByFilters($filters, $deleted);
     }
 
     /**
