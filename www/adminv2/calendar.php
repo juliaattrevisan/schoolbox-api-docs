@@ -235,13 +235,13 @@ foreach ($typeList as $type) {
             $allUsers = array();
 
             foreach ($currentEvent->getUserCollection() as $currentUser) {
-                $allUsers[] = $currentUser->getFullname();
+                $allUsers[] = \Schoolbox\UserMapper::getInstance()->findById($currentUser->getUserId())->getFullName();
             }
 
             $allCategories = array();
 
             foreach ($currentEvent->getCategoryCollection() as $currentCategory) {
-                $allCategories[] = $currentCategory->getName();
+                $allCategories[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($currentCategory->getCategoryId())->getTitle();
             }
 
             $allCampuses = array();
