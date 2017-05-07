@@ -116,7 +116,7 @@ class Module extends BaseModule
             '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
             function () {
                 return [
-                    'filterFactoryFactory' => new Filter\FactoryFactory($this->getMapperFactory()),
+                    'filterFactoryFactory' => new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory()),
                 ];
             }
         );

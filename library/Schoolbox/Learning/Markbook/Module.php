@@ -10,6 +10,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Filter\IdFinder;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
@@ -21,31 +22,37 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use DueWork_ErrorMapper;
+use Schoolbox\Filter;
+use \Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
+
 
 class Module extends BaseModule
 {
-    /**
-     * @inheritdoc
-     */
     protected $basename = 'learningMarkbook';
 
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException
+     * @throws NotFound If a class was specified but it does not exist
      */
     public function registerRoutes()
     {
         $preload = function ($params) {
-            $extraParams = [];
-            try {
-                $extraParams['class'] = $this->getFolderMapper()->findById($params['classId']);
-            } catch (MapperException $e) {
-                throw new NotFound("Class does not exist");
+            $assessmentMapper = $this->getMapperFactory()->get(Assessment\Mapper::class);
+            $args = [
+                'filterFactoryFactory' => new AssessmentFilter\FactoryFactory($this->getMapperFactory()),
+                'assessmentIdFinder'   => AssessmentFilter\IdFinder::getInstance($assessmentMapper),
+            ];
+
+            if(null !== $params['userId']){
+                try{
+                    $args['viewee'] = $this->getUserMapper()->findById($params['userId']);
+                } catch (Mapper\Exception $e){
+                    throw new NotFound("No user found for id: {$params['userId']}");
+                }
             }
-            if ($params['termCode']) {
-                $extraParams['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
-            }
-            return $extraParams;
+            return $args;
         };
 
         $isStaffOrSuper = new Rule\Any(
@@ -53,9 +60,12 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '/{classId}', 'getMarkbook', $isStaffOrSuper, $preload);
-        $this->register('GET', '/{classId}/term/{termCode}', 'getMarkbookForTerm', $isStaffOrSuper, $preload);
-        $this->register('GET', '/{classId}/term/{termCode}/export', 'getMarkbookExport', $isStaffOrSuper, $preload);
+        // TODO 'getMarkbookForTerm' is now redundant. The 'markbookSelector.twig' can likely be removed
+//        $this->register('GET', '/{classId}/term/{termCode}', 'getMarkbookForTerm', $isStaffOrSuper, $preload);
+
+        $this->register('GET',  '{/userId}',       'getMarkbook',       $isStaffOrSuper, $preload);
+        $this->register('POST', '{/userId}',       'postMarkbook',       $isStaffOrSuper, $preload);  //AJAX in the report
+        $this->register('GET', '/export', 'getMarkbookExport', $isStaffOrSuper, $preload);
     }
 
     /**
