@@ -14,6 +14,7 @@ use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\MappingCollection;
+use Schoolbox\Mapper\Performance\LiveMonitor;
 
 class ConfigMapper extends Mapper implements IConfigLoader
 {
@@ -31,8 +32,16 @@ class ConfigMapper extends Mapper implements IConfigLoader
     {
         // Load database only on request, so this can be tested
         $this->map = new MappingCollection();
-        $this->setup();
+
         $this->initCaches();
+        // Switch on the cache if this is a web request: otherwise switch off
+        if (self::isWithinWebRequest()) {
+            $this->enableCache();
+        } else {
+            $this->disableCache();
+        }
+
+        $this->setMonitor( new LiveMonitor());
         $this->setConfigLoader($this); // this line will possibly blow up in my face
         $this->setColumnFactory(new ColumnFactory());
 
