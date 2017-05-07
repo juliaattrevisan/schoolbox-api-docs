@@ -178,9 +178,11 @@ class TreeBuilder extends AbstractTreeBuilder
 
 
     /**
-     * @inheritdoc
+     * @param Resource\AbstractFile|Resource\Link $file
+     * @throws Resource\Exception
+     * @return array
      */
-    protected function buildFileNode(Resource\AbstractFile $file)
+    protected function buildFileNode($file)
     {
         $permission = $this->getFilePermission($file);
         if (empty($permission)) {
