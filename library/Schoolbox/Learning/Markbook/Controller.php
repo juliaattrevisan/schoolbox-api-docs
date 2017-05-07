@@ -135,12 +135,11 @@ class Controller extends Base
 
 
     /**
-     * @param User                                                $viewee
-     * @param AssessmentFilter\IdFinder                           $assessmentIdFinder
-     * @param \Schoolbox\Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
+     * @param AssessmentFilter\IdFinder       $assessmentIdFinder
+     * @param AssessmentFilter\FactoryFactory $filterFactoryFactory
      * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
-    public function postMarkbook(User $viewee, AssessmentFilter\IdFinder $assessmentIdFinder, AssessmentFilter\FactoryFactory $filterFactoryFactory)
+    public function postMarkbook(AssessmentFilter\IdFinder $assessmentIdFinder, AssessmentFilter\FactoryFactory $filterFactoryFactory)
     {
 
         try {
@@ -167,14 +166,28 @@ class Controller extends Base
             ]));
 
         } catch (\Exception $e) {
-            throw $e;
-            die('bbb');
+            $this->returnJsonError($e);
             // TODO - can remove this block when we abandon PHP 5 support
-//            $this->returnJsonError($e);
         } catch (\Throwable $e) {
-            die('ccc');
-//            $this->returnJsonError($e);
+            $this->returnJsonError($e);
         }
+    }
+
+
+    /**
+     * Returns a JSON representation of an exception suitable for AJAX HTML alert divs
+     *
+     * @param \Throwable $e
+     */
+    protected function returnJsonError($e)
+    {
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'status'  => 500,
+            'code'    => $e->getCode(),
+            'message' => $e->getMessage(),
+            'line'    => $e->getLine(),
+            'file'    => $e->getFile(),
+        ]));
     }
 
 

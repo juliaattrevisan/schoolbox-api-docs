@@ -431,7 +431,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $builder    = $this->getMapper()->getPredicateBuilder();
 
         // Task
-        if (array_key_exists(AssessmentType\Definition::KEY_TASK, $aTypes)) {
+        if ($aTypes->keyExists(AssessmentType\Definition::KEY_TASK)) {
             $joinClause .= '
                 LEFT JOIN task tk           ON tk.assessment_id = a.id
             ';
@@ -439,7 +439,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Quiz
-        if (array_key_exists(AssessmentType\Definition::KEY_QUIZ, $aTypes)) {
+        if ($aTypes->keyExists(AssessmentType\Definition::KEY_QUIZ)) {
             $joinClause .= '
                 LEFT JOIN assess qz         ON qz.assessment_id = a.id
             ';
@@ -447,15 +447,15 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // DueWork
-        if (array_key_exists(AssessmentType\Definition::KEY_DUE_WORK, $aTypes)) {
+        if ($aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK)) {
             $joinClause .= '
                 LEFT JOIN submission_box dw ON dw.assessment_id = a.id
             ';
             $builder->notNull('dw.id');
         }
 
-        // DueWork
-        if (array_key_exists(AssessmentType\Definition::KEY_PROJECT, $aTypes)) {
+        // Project
+        if ($aTypes->keyExists(AssessmentType\Definition::KEY_PROJECT)) {
             $joinClause .= '
                 LEFT JOIN project pr ON pr.assessment_id = a.id
             ';
@@ -530,17 +530,16 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Generate the dueDate filtering
-        $anyBuilder = $this->getMapper()->getPredicateBuilder();
+        $orParts = [];
         foreach($terms as $term){
-            $allBuilder = $this->getMapper()->getPredicateBuilder();
-            $allBuilder->greaterThanOrEqualTo("a.$dateColumn", $term->getStart()->getDatabaseDate());
-
+            $andPart = " (a.$dateColumn >= '{$term->getStart()->getDatabaseDate()}' ";
             if(!$term->getActualFinish()->isNull()){
-                $allBuilder->lessThanOrEqualTo("a.$dateColumn", $term->getActualFinish()->getDatabaseDate());
+                $andPart .= " AND a.$dateColumn <= '{$term->getActualFinish()->getDatabaseDate()}' ";
             }
-            $anyBuilder->all($allBuilder);
+            $andPart .= ')';
+            $orParts[] = $andPart;
         }
-        return ['(' . implode(' OR ', $anyBuilder->getWhere()) . ')'];
+        return ['(' . implode(' OR ', $orParts) . ')'];
     }
 
     /**
