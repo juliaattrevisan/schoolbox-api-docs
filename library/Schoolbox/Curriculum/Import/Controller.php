@@ -124,7 +124,8 @@ class Controller extends Base
             $this->getNodeMapper()->saveTree($rootNode);
             $outcomes = new Collection();
             $outcomes->add($rootNode);
-            $data['outcomes'] = $outcomes;
+            // All the handling code cares about is the root node's ID
+            $data['outcomes'][0] = ['id' => $rootNode->getId()];
 
         } else {
             $code = 400;
@@ -133,12 +134,7 @@ class Controller extends Base
 
         // JSON something back to me
         $this->getResponse()->status->setCode($code);
-        $this->getResponse()->content->set(
-            array(
-                'format' => 'json',
-                'data'   => $data,
-            )
-        );
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**
