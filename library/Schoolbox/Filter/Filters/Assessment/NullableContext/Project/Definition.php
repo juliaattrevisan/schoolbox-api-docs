@@ -9,7 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
-use Schoolbox\Filter\Option;
 
 /**
  * Displays a list of projects.
@@ -40,6 +39,9 @@ class Definition extends NullableContext\Definition
     {
         foreach ($pageOptions as $idx => $option) {
             // For now, no pages can have projects that reside in unitSpecs
+            // This is because the list of projects is set to:
+            // 1. Projects in folders taught by user, plus
+            // 2. Projects in unit-impls on folders taught by user
             if (self::KEY_ON_UNIT_SPEC === $option->getKey()) {
                 $pageOptions->offsetUnset($idx);
             }
@@ -72,7 +74,7 @@ class Definition extends NullableContext\Definition
     {
         // For now, not available on any pages - purely used for internal query building
         return [
-//            Option\Model::PAGE_PENDING_ASSESSMENTS,
+//            \Schoolbox\Filter\Option\Model::PAGE_MARK_BOOK,
         ];
     }
 

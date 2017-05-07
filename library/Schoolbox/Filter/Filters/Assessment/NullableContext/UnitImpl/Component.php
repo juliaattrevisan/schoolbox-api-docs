@@ -8,7 +8,6 @@
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImpl;
 
 use Schoolbox\Filter\AbstractFilterComponent;
-use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImpl\Definition;
 
 /**
  * @method Definition getDefinition()

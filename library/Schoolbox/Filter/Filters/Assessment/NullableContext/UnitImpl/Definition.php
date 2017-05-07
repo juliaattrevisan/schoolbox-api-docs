@@ -35,7 +35,9 @@ class Definition extends NullableContext\Definition
     public static function getPages()
     {
         // Does not appear on any pages yet - exists for now just to enable query building
-        return [];
+        return [
+//            \Schoolbox\Filter\Option\Model::PAGE_MARK_BOOK,
+        ];
     }
 
 

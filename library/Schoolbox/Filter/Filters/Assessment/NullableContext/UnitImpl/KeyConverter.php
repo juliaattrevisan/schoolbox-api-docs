@@ -9,11 +9,9 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImpl;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
-use Schoolbox\GenericCollection;
 
 /**
  * No conversion. A int is converted to the same int (representing a unitSpec.id)
- * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends NullableContext\KeyConverter
 {
@@ -65,19 +63,6 @@ class KeyConverter extends NullableContext\KeyConverter
     public function getAllPossibleItems()
     {
         return $this->unitImplIds->shallowClone();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function sanitiseKey($key)
-    {
-        if(Definition::KEY_NONE === $key){
-            return $key;
-        }
-        $this->assertValidKey($key);
-        return (string)(int)$key;
     }
 
 

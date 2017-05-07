@@ -10,11 +10,9 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
-use Schoolbox\GenericCollection;
 
 /**
  * No conversion. A int is converted to the same int (representing a project.id)
- * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends NullableContext\KeyConverter
 {
@@ -63,15 +61,6 @@ class KeyConverter extends NullableContext\KeyConverter
         return $this->projectIds->shallowClone();
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function sanitiseKey($key)
-    {
-        $this->assertValidKey($key);
-        return (string)(int)$key;
-    }
 
 
     /**
