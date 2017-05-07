@@ -14,11 +14,6 @@ class SitePage extends Page
      */
     public $site;
 
-    /**
-     * Is this a responsive skin? Calculated in $this->setSite().
-     * @var bool
-     */
-    private $responsive;
 
     /**
      * The following template paths render the skin's chrome
@@ -237,14 +232,6 @@ class SitePage extends Page
      */
     public function setSite()
     {
-        if ($this->config->get('skin_builder')) {
-            // If config.skin_builder is on - set $site to core
-            $this->responsive = true;
-        } else {
-            // detect responsiveness: if there's no override for body.html, that school has gone responsive
-            $this->responsive = !file_exists(SITE_root . '/templates/' . $this->config->get('site_location') . '/include/body.html');
-        }
-
         if ($this->config->get('site_detect') == 'domain') {
             //Get site templates via domain name
             if (preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
@@ -368,7 +355,6 @@ class SitePage extends Page
             'SITE_USERNAME' => $this->user->getUsername(),
             'SITE_LOCATION' => $this->site,
             'SITE_ANALYTICS' => $this->config->get('site_analytics'),
-            'SITE_CHROME_LOCATION' => ($this->config->get('skin_builder') ? 'demo' : $this->site),
             'USER_ID' => $this->user->getId(),
             'EXTERNAL_ID' => $this->user->getExternalId(),
             'USER_ROLE' => $this->user->getRole()->getName(),
@@ -444,7 +430,7 @@ class SitePage extends Page
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
-        $this->setBlock($this->responsive ? TEMPLATE_body : 'bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
+        $this->setBlock(TEMPLATE_body, 'banner_logged_in', 'banner_logged_in_block');
 
         if ($_SESSION['user'] instanceof User) {
 
@@ -467,10 +453,7 @@ class SitePage extends Page
 
             /* Output switch user options */
             $this->setBlock('banner_logged_in', 'switch_user', 'switch_user_block');
-
-            if ($this->responsive) {
-                $this->setBlock('banner_logged_in', 'can_switch', 'can_switch_block');
-            }
+            $this->setBlock('banner_logged_in', 'can_switch', 'can_switch_block');
 
             $this->setVar([
                 'switch_user_block' => '',
@@ -528,7 +511,7 @@ class SitePage extends Page
                 $canSwitch = true;
             }
 
-            if ($canSwitch && $this->responsive) {
+            if ($canSwitch) {
                 $this->parse('can_switch_block', 'can_switch');
             }
 
@@ -804,14 +787,12 @@ class SitePage extends Page
             ]);
         }
 
-        if ($this->responsive) {
-            $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
+        $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
 
-            if ($this->config->get('messaging_enabled')) {
-                $this->parse('instantmessage_toggle_block', 'instantmessage_toggle');
-            } else {
-                $this->setVar('instantmessage_toggle_block', '');
-            }
+        if ($this->config->get('messaging_enabled')) {
+            $this->parse('instantmessage_toggle_block', 'instantmessage_toggle');
+        } else {
+            $this->setVar('instantmessage_toggle_block', '');
         }
 
         if ($this->config->get('messaging_enabled')) {
@@ -903,13 +884,11 @@ class SitePage extends Page
     {
         // Chrome/skin templates are always core if skin builder is on,
         // except if the version in the skin is newer than 15.5 release date (this is determined if instant.html is included)
-        if ($this->config->get('skin_builder')) {
-            foreach ($this->chromePaths as $chromePath) {
-                if (fnmatch($chromePath, $template) &&
-                    is_file($this->templateRoot . '/' . $this->site . '/include/instant.html')
-                ) {
-                    return 'core/' . $template;
-                }
+        foreach ($this->chromePaths as $chromePath) {
+            if (fnmatch($chromePath, $template) &&
+                is_file($this->templateRoot . '/' . $this->site . '/include/instant.html')
+            ) {
+                return 'core/' . $template;
             }
         }
 

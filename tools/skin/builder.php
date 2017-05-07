@@ -21,35 +21,32 @@ $force = isset($opts['f']) || isset($opts['force']);
 
 // Skin builder is off? don't set any vars
 $vars = [];
-if (Config::get('skin_builder')) {
-    $logger->info('Skin builder is on - building using color settings from skin builder');
-    $vars = [
-        'navigation-foreground' => Config::get('skin_colour_navigation_foreground'),
-        'navigation-background' => Config::get('skin_colour_navigation_background'),
-        'navigation-hover' => Config::get('skin_colour_navigation_hover'),
-        'off-canvas-foreground' => Config::get('skin_colour_offcanvas_foreground'),
-        'off-canvas-background' => Config::get('skin_colour_offcanvas_background'),
-        'off-canvas-hover' => Config::get('skin_colour_offcanvas_hover'),
-        'off-canvas' => Config::get('skin_colour_off_canvas'),
-        'content-ui-foreground' => Config::get('skin_colour_content_ui_foreground'),
-        'content-ui-background' => Config::get('skin_colour_content_ui_background'),
-        'content-ui-hover' => Config::get('skin_colour_content_ui_hover'),
-        'content-ui-selected' => Config::get('skin_colour_content_ui_selected'),
-        'content-ui-submit-foreground' => Config::get('skin_colour_content_ui_submit_foreground'),
-        'content-ui-submit-background' => Config::get('skin_colour_content_ui_submit_background'),
-        'accent-foreground' => Config::get('skin_colour_accent_foreground'),
-        'accent-background' => Config::get('skin_colour_accent_background'),
-        'accent-hover' => Config::get('skin_colour_accent_hover'),
-        'logo-background' => Config::get('skin_colour_logo_background'),
-        'body-bg'         => Config::get('skin_colour_body_bg'),
-        'button-input-scale' => Config::get('skin_button_input_scale'),
-        'login-form-background-color' => Config::get('skin_colour_login_background'),
-        'form-border-color' => Config::get('skin_colour_form_input_border_color'),
-        'form-bg-hover-color' => Config::get('skin_colour_form_background_hover_color'),
-    ];
-} else {
-    $logger->info('Skin builder is off - building using default color settings');
-}
+$logger->info('Skin builder is on - building using color settings from skin builder');
+$vars = [
+    'navigation-foreground' => Config::get('skin_colour_navigation_foreground'),
+    'navigation-background' => Config::get('skin_colour_navigation_background'),
+    'navigation-hover' => Config::get('skin_colour_navigation_hover'),
+    'off-canvas-foreground' => Config::get('skin_colour_offcanvas_foreground'),
+    'off-canvas-background' => Config::get('skin_colour_offcanvas_background'),
+    'off-canvas-hover' => Config::get('skin_colour_offcanvas_hover'),
+    'off-canvas' => Config::get('skin_colour_off_canvas'),
+    'content-ui-foreground' => Config::get('skin_colour_content_ui_foreground'),
+    'content-ui-background' => Config::get('skin_colour_content_ui_background'),
+    'content-ui-hover' => Config::get('skin_colour_content_ui_hover'),
+    'content-ui-selected' => Config::get('skin_colour_content_ui_selected'),
+    'content-ui-submit-foreground' => Config::get('skin_colour_content_ui_submit_foreground'),
+    'content-ui-submit-background' => Config::get('skin_colour_content_ui_submit_background'),
+    'accent-foreground' => Config::get('skin_colour_accent_foreground'),
+    'accent-background' => Config::get('skin_colour_accent_background'),
+    'accent-hover' => Config::get('skin_colour_accent_hover'),
+    'logo-background' => Config::get('skin_colour_logo_background'),
+    'body-bg'         => Config::get('skin_colour_body_bg'),
+    'button-input-scale' => Config::get('skin_button_input_scale'),
+    'login-form-background-color' => Config::get('skin_colour_login_background'),
+    'form-border-color' => Config::get('skin_colour_form_input_border_color'),
+    'form-bg-hover-color' => Config::get('skin_colour_form_background_hover_color'),
+];
+
 
 if(is_readable(SKIN_FILE) && is_readable(CUSTOM_CSS_FILE)) {
     $origSha = sha1_file(SKIN_FILE);

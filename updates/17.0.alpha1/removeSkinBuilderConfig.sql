@@ -1,0 +1,1 @@
+DELETE FROM config WHERE name like 'skin_builder';
