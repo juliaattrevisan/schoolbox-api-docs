@@ -11,8 +11,8 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
 /**
- * Encapsulates the transform of filter selections into collection
- * of entities, eg Term Models, WorkType Models, AssessmentType strings etc
+ * Encapsulates the transform of filter selections into filters (collections of entities)
+ * eg Term Models, WorkType Models, AssessmentType strings etc
  *
  * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter::SLUG) should return a set of 3 Term models.
  */
@@ -62,7 +62,7 @@ class Transformer
      * Get a set of entities represented by a filter component's selections
      *
      * @param string $filterSlug
-     * @return Collection|mixed[]
+     * @return null|Collection|mixed[]
      * @throws \InvalidArgumentException
      */
     public function getSelectedItems($filterSlug)
@@ -73,5 +73,21 @@ class Transformer
         $keyConverter = $this->keyConverters[$filterSlug];
 
         return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterSlug]);
+    }
+
+    /**
+     * @return Collection|Selection\Model[][]|GenericCollection[]
+     */
+    protected function getSelectionsPerFilter()
+    {
+        return $this->selectionsPerFilter;
+    }
+
+    /**
+     * @return IKeyConverter[]|GenericCollection
+     */
+    protected function getKeyConverters()
+    {
+        return $this->keyConverters;
     }
 }
