@@ -55,7 +55,7 @@ if (strlen($userKey)) {
 
     $page->setVar(
         array(
-            'TITLE' => Scrub::xml(Cfg::get('school_name') . '  - '.$category->getTitle().' News'),
+            'TITLE' => Scrub::xml(Cfg::get('school_name') . ' - '.$category->getTitle().' News'),
             'DESCRIPTION' => Scrub::xml('Recent news items from Schoolbox'),
             'DATE' => Scrub::xml(date('r')),
             'LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']),
