@@ -260,7 +260,7 @@ abstract class AbstractTreeBuilder
      * @throws Resource\Exception
      * @return array
      */
-    protected function buildFileNode(Resource\AbstractFile $file)
+    protected function buildFileNode($file)
     {
         $permission = $this->getFilePermission($file);
         if (empty($permission)) {
