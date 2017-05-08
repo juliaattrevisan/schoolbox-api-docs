@@ -12,7 +12,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 $page = new SitePage(false);
 
 $user = null;
-$category = null;
+$folder = null;
 
 /* Param explosion
  */
@@ -21,7 +21,7 @@ $params = parse_url($_SERVER['QUERY_STRING']);
 preg_match('/user=([a-zA-Z0-9]+)(&category=)?(\d*)/', $params['path'], $matches);
 
 $userKey = $matches[1];
-$categoryId = $matches[3];
+$folderId = $matches[3];
 
 /* Find all the bits
  */
@@ -33,12 +33,12 @@ if (strlen($userKey)) {
         error(31);
     }
 
-    /* Optional category filter
+    /* Optional folder filter
      */
-    if (is_numeric($categoryId)) {
+    if (is_numeric($folderId)) {
         try {
-            $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-            $category = $categoryMapper->findById($categoryId);
+            $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
+            $folder = $folderMapper->findById($folderId);
         } catch (\Exception $e) {
         }
     }
@@ -46,7 +46,7 @@ if (strlen($userKey)) {
     /* Find the articles
      */
     $articleMapper = new \Schoolbox\News\ArticleMapper();
-    $allNews = $articleMapper->findAllForUserAndCategory($user, $category);
+    $allNews = $articleMapper->findAllForUserAndCategory($user, $folder);
 
     /* Render all this stuff
      */
@@ -55,7 +55,7 @@ if (strlen($userKey)) {
 
     $page->setVar(
         array(
-            'TITLE' => Scrub::xml(Cfg::get('school_name') . ' - '.$category->getTitle().' News'),
+            'TITLE' => Scrub::xml(Cfg::get('school_name') . ' - '.$folder->getTitle().' News'),
             'DESCRIPTION' => Scrub::xml('Recent news items from Schoolbox'),
             'DATE' => Scrub::xml(date('r')),
             'LINK' => Scrub::xml($page->conType() . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']),
@@ -80,7 +80,7 @@ if (strlen($userKey)) {
             $page->setVar(
                 array(
                     'ITEM_TITLE' => Scrub::xml($currentNews->getHeading()),
-                    'ITEM_TOPIC' => Scrub::xml($category->getTitle()),
+                    'ITEM_TOPIC' => Scrub::xml($folder->getTitle()),
                     'ITEM_DESCRIPTION' => "<![CDATA[" . Scrub::html($imageStr . $currentNews->getBody()) . "]]>",
                     'ITEM_DATE' => Scrub::xml($currentNews->getPostDate()->getUsingFormat(datetime::RFC2822)),
                     'ITEM_LINK' => Scrub::xml(
