@@ -12,8 +12,8 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
-use Calendar\Event\Type\ResourceBooking\Renderer\Base;
 use Schoolbox\ResourceBooking\Booking;
+use Schoolbox\User;
 use \Scrub;
 
 class Javascript extends Base
@@ -112,6 +112,20 @@ class Javascript extends Base
             ];
         }
 
+        // Event may or may not have a reviewer.
+        $reviewer = $this->getEvent()->getBooking()->getReviewer();
+        if (!$reviewer instanceof User) {
+            $reviewerRender = [
+                'id'   => -1,
+                'name' => '',
+            ];
+        } else {
+            $reviewerRender = [
+                'id'   => $reviewer->getId(),
+                'name' => $reviewer->formatName(),
+            ];
+        }
+
         // Set title from resource name, and code and booking name
         // if either are there.
 
@@ -173,10 +187,7 @@ class Javascript extends Base
                     ),
                     'status'  => $this->getEvent()->getBooking()->getStatus()->jsonSerialize(),
                     'buttons' => $bookingButtons,
-                    'reviewer' => array(
-                        'id'   => $this->getEvent()->getBooking()->getReviewer()->getId() ?: -1,
-                        'name' => $this->getEvent()->getBooking()->getReviewer()->formatName(),
-                    ),
+                    'reviewer' => $reviewerRender,
                     'related' => $relatedBookings,
                 ),
             )
