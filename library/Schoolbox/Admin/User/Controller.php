@@ -410,8 +410,8 @@ class Controller extends Base
         $user->setPositionTitle($post['position_title']);
         $user->setAltEmail($post['alt_email']);
         $user->setYear($post['year'] == '' ? null : $post['year']);
-        $user->getSchoolHouse()->setId($post['house']);
-        $user->getResidentialHouse()->setId($post['residential_house']);
+        $user->getSchoolHouse()->setId($post['house'] == '' ? null : $post['house']);
+        $user->getResidentialHouse()->setId($post['residential_house'] == '' ? null : $post['residential_house']);
         $user->setEportfolioEnable(!empty($post['eportfolio']));
         $user->setHideContacts(!empty($post['hide_contacts']));
         $user->setHideTimetable(!empty($post['hide_timetable']));
