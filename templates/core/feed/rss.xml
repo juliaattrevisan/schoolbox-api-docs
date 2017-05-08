@@ -11,6 +11,7 @@
 	<!-- BEGIN rss_item -->
     <item>
       <title>{ITEM_TITLE}</title>
+      <category>{ITEM_TOPIC}</category>
       <description>{ITEM_DESCRIPTION}</description>
 	  <link>{ITEM_LINK}</link>
       <pubDate>{ITEM_DATE}</pubDate>

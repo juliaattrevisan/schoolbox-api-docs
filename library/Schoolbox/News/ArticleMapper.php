@@ -630,6 +630,7 @@ class ArticleMapper extends Mapper implements Searchable
         /* Find all the news relevant to roles and campuses
          */
         $imageMapper  = $this->getJoinMapper('image');
+        $topicMapper  = $this->getJoinMapper('topic');
 
         /* Find all the news relevant to you specifically by id,
          * or by role type in your campus
@@ -653,7 +654,8 @@ class ArticleMapper extends Mapper implements Searchable
         $query = "
             SELECT DISTINCT
                 {$this->getColumnString('a')},
-                {$imageMapper->getColumnString('i')}
+                {$imageMapper->getColumnString('i')},
+                {$topicMapper->getColumnString('t')}
             FROM `{$this->getTable()}` a
             LEFT JOIN {$this->getJoinSql('image', 'a', 'i')}
             LEFT JOIN {$this->getJoinSql('users', 'a', 'u')}
@@ -684,6 +686,7 @@ class ArticleMapper extends Mapper implements Searchable
 
             /** @var Article $article */
             $article = $this->hydrate($currentRecord, 'a');
+            $article->setTopic($topicMapper->hydrate($currentRecord,'t'));
 
             /* Only ram in a hydrated image if there's an actual image there to use
              * Otherwise set to null (Article sets an empty IStorage object by default)
