@@ -29,7 +29,6 @@ class CoreContext {
             'site_hostname',
             'site_location',
             'site_domain',
-            'skin_builder',
             'forgotten_password',
             'feedback_url',
             'feedback_text'
