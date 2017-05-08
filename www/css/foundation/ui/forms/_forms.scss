@@ -191,13 +191,16 @@ th, td{
 .input-group{
 	@include flex;
 	align-items: flex-start;
-	label{
-		flex: 3 auto;
+	input{
+		flex: 0 auto;
 		& + .button{
-			flex: 1 auto;
+			flex: 1 0 auto;
 		}
 	}
 	@media #{$small-only} {
+		input{
+			margin: 0;
+		}
 		flex-wrap: wrap;
 	}
 }

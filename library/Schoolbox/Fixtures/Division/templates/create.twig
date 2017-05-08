@@ -107,12 +107,10 @@
                             <input id="season" name="seasonId" type="text" value="{{ division.season.name }}" placeholder="Search Seasons" />
                         </label>
 
+                        <label for="url">Homepage URL</label>
                         <div class="input-group">
-                            <label>
-                                Homepage URL
-                                <input type="text" name="url" value="{{ division.url }}" placeholder="http://" />
-                            </label>
-                            <a href="#" class="button" data-role="openResourceBrowser">Browse {{ locale.translate('resource',true,true) }}</a>
+                            <input type="text" name="url" value="{{ division.url }}" placeholder="http://" />
+                            <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ locale.translate('resource',true,true) }}</a>
                             <div data-role="resourceBrowser" class="hide"></div>
                         </div>
                     </div>

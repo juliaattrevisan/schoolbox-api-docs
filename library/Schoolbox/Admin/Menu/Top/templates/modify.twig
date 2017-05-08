@@ -81,13 +81,15 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <div class="small-12 columns input-group">
-                        <label>
+                    <div class="small-12 columns">
+                        <label for="url">
                             Destination URL
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can use [id], [externalId], [username] in your URLs, these will be replaced for the user">?</span>
-                                <input name="url" required type="text" value="{{ item.url }}">
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can use [id], [externalId], [username] in your URLs, these will be replaced for the user">?</span>
                         </label>
-                        <a href="#" class="button" data-role="openResourceBrowser">Browse {{ resource }}</a>
+                        <div class="input-group">
+                            <input name="url" required type="text" value="{{ item.url }}">
+                            <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ resource }}</a>
+                        </div>
                     </div>
                     <div class="small-6 columns">
                         <label>

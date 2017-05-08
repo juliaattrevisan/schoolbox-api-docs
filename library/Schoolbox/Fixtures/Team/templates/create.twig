@@ -114,13 +114,13 @@
                             <input type="text" name="name" value="{{ team.name }}"/>
                         </label>
                     </div>
-                    <div class="small-12 columns input-group">
-                        <label>
-                            Homepage URL
+                    <div class="small-12 columns">
+                        <label for="url">Homepage URL</label>
+                        <div class="input-group">
                             <input type="text" name="url" value="{{ team.url }}" placeholder="http://" />
-                        </label>
-                        <a href="#" class="button" data-role="openResourceBrowser">Browse {{ locale.translate('resource',true,true) }}</a>
-                        <div data-role="resourceBrowser" class="hide"></div>
+                            <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ locale.translate('resource',true,true) }}</a>
+                            <div data-role="resourceBrowser" class="hide"></div>
+                        </div>
                     </div>
                     <div class="small-12 columns">
                         <label>
