@@ -762,6 +762,7 @@ class MapperProxy
      *
      * @param Collection|Model[] $collection
      * @return Collection|IAssessable[]
+     * @throws \UnexpectedValueException If assessment's data is broken in database
      */
     public function translateToDomainModelCollection(Collection $collection)
     {
@@ -772,6 +773,9 @@ class MapperProxy
                     $newCollection->add($this->translateToDomainModel($model));
                 } catch (\UnexpectedValueException $e) {
                     // Broken object from database - not much I can do but...
+                    if(function_exists('newrelic_notice_error')){
+                        newrelic_notice_error(null, $e);
+                    }
                     continue;
                 }
             }
