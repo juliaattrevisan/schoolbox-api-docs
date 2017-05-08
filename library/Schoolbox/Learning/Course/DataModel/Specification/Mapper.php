@@ -89,11 +89,12 @@ class Mapper extends AbstractCourseMapper
      *
      * @param Model $courseSpec
      * @return bool
+     * @throws BaseMapper\DefinitionException If join $name isn't on this mapper
      */
     public function restoreFolder(Model $courseSpec)
     {
         /** @var FolderMapper $folderMapper */
-        $folderMapper = $this->getJoinMapper('folder_id');
+        $folderMapper = $this->getJoinMapper('folder');
         $folder = $folderMapper->findByColumn('id', $courseSpec->getFolder()->getId(), ['deleted' => true]);
         $folderMapper->restoreSoftDeleted($folder);
         return true;
