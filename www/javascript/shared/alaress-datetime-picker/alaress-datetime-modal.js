@@ -194,35 +194,40 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 // Populate with results for the selected date
 
                 html += '<div class="row">';
-                html += '<div class="small-12 medium-12 columns">';
-                html += '<h2>Work due on ' + displayDate + '</h2>';
-                html += '<ul class="small-12 information-list expandable-card">';
-                for (var i = 0; i < data.students.length; i++) {
-                    html += '<li>';
-                    html += '<div>';
-                    html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
-                    html += '<div class="card small-12">';
-                    html += '<img src="/portrait.php?userId=' + data.students[i].externalId + '&amp;size=square80">';
-                    html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
-                    html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
+                    html += '<div class="small-12 medium-12 columns">';
+                        html += '<h2>Work due on ' + displayDate + '</h2>';
+                        html += '<ul class="small-12 information-list expandable-card">';
+
+                            for (var i = 0; i < data.students.length; i++) {
+                                html += '<li>';
+
+                                    html += '<div>';
+                                        html += '<div class="expander icon-down-arrow" data-collapser="collap-' + i + '"></div>';
+                                        html += '<div class="compact card small-12">';
+                                            html += '<img src="/portrait.php?userId=' + data.students[i].externalId + '&amp;size=square80">';
+                                            html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
+                                            html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
+                                        html += '</div>';
+                                    html += '</div>';
+
+                                    html += '<div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-' + i + '">';
+                                        html += '<table class="assessment-list">';
+                                        for (var k = 0; k < data.students[i].assessmentList.length; k++) {
+                                            html += '<tr><td>';
+                                            if (data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
+                                                html += data.students[i].assessmentList[k]['duetime'];
+                                            }
+                                            html += '</td><td>' + data.students[i].assessmentList[k]['context'] + ': ' + data.students[i].assessmentList[k]['title'] + '</td>' +
+                                                '</tr>';
+                                        }
+                                        html += '</table>';
+                                    html += '</div>';
+
+                                html += '</li>';
+                            }
+
+                        html += '</ul>';
                     html += '</div>';
-                    html += '</div>';
-                    html += '<div class="small-12 column" data-collapse-state="collapsed" data-collapsable="collap-' + i + '" style="display: none;">';
-                    html += '<table class="assessment-list">';
-                    for (var k = 0; k < data.students[i].assessmentList.length; k++) {
-                        html += '<tr><td>';
-                        if (data.students[i].assessmentList[k]['duetime'] !== '11:59pm') {
-                            html += data.students[i].assessmentList[k]['duetime'];
-                        }
-                        html += '</td><td>' + data.students[i].assessmentList[k]['context'] + ': ' + data.students[i].assessmentList[k]['title'] + '</td>' +
-                            '</tr>';
-                    }
-                    html += '</table>';
-                    html += '</div>';
-                    html += '</li>';
-                }
-                html += '</ul>';
-                html += '</div>';
                 html += '</div>';
 
             }
