@@ -18,7 +18,6 @@ use Schoolbox\Filter\Selection;
 class Component extends AbstractFilterComponent
 {
 
-
     /**
      * A concrete Term model may match one or more availability configs. Eg, the admin may have selected 'all' terms.
      * We need to examine each concrete Term model to see if it matches an availability filter
@@ -26,7 +25,7 @@ class Component extends AbstractFilterComponent
      * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
      * @return GenericCollection|Selection\Model[]
      */
-    protected function getDefaultSelections(GenericCollection $optionDefaults)
+    protected function getRoleSelections(GenericCollection $optionDefaults)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
@@ -62,64 +61,11 @@ class Component extends AbstractFilterComponent
             }
 
             if ($available) {
-                $selection = $this->getFilterSelectionMapper()->createModel();
-                $selection
-                    ->setFilter($this->getDefinition()->getFilter())
-                    ->setUser($this->getUser())
-                    ->setPage($this->getPage())
-                    ->setKey((string)$term->getId())
-                    ->setSelected($selected);
-                $availableSelections[$selection->getKey()] = $selection;
+                $key                       = (string)$term->getId();
+                $availableSelections[$key] = $this->createSelection($key, $selected);
             }
         }
         return $availableSelections;
     }
 
-
-    /**
-     * @param GenericCollection|Option\Model[]    $optionDefaults
-     * @param GenericCollection|Selection\Model[] $availableSelections
-     * @return GenericCollection|Selection\Model[]
-     */
-    protected function overlayRoleTypeSelectionDefaults(GenericCollection $optionDefaults, GenericCollection $availableSelections)
-    {
-        $defaultsPerKey = $this->getDefinition()->getFilterDefaultMapper()->createCollection();
-        foreach ($optionDefaults as $key => $option) {
-            foreach ($option->getDefaults() as $roleType => $default) {
-                $defaultsPerKey[$key] = $default;
-            }
-        }
-
-        foreach ($availableSelections as $selection) {
-
-            $term       = $this->getDefinition()->getTerms()[$selection->getKey()];
-            $termStart  = $term->getStart();
-            $termFinish = $term->getActualFinish();
-
-            foreach ($defaultsPerKey as $key => $default) {
-                if (!$default->isSelected()) {
-                    continue;
-                }
-                if (Definition::KEY_ALL === $key) {
-                    $selection->setSelected(true);
-                } elseif (Definition::KEY_FUTURE === $key && $termStart->isFuture()) {
-                    $selection->setSelected(true);
-                } elseif (Definition::KEY_PAST === $key && !$termFinish->isNull() && $termFinish->isPast()) {
-                    $selection->setSelected(true);
-                } elseif (Definition::KEY_CURRENT === $key && $this->getDefinition()->getCurrentTerm()
-                    && $term->getId() === $this->getDefinition()->getCurrentTerm()->getId()
-                ) {
-                    $selection->setSelected(true);
-                } elseif (Definition::KEY_PREVIOUS === $key && $this->getDefinition()->getPreviousTerm()
-                    && $term->getId() === $this->getDefinition()->getPreviousTerm()->getId()
-                ) {
-                    $selection->setSelected(true);
-                } elseif ((string)$key === (string)$term->getId()) {
-                    $selection->setSelected(true);
-                }
-            }
-        }
-
-        return $availableSelections;
-    }
 }

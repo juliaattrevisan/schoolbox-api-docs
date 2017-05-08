@@ -1,0 +1,5 @@
+{% extends '@filters/_selectionCheckbox.twig' %}
+
+{% block extraAttrs %}
+    data-duplicate-checkbox="{{ userSelection.filter.id }}_{{ userSelection.key }}"
+{% endblock %}

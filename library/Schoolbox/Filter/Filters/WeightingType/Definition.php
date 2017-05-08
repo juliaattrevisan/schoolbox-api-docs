@@ -147,7 +147,7 @@ class Definition extends AbstractFilterDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, $page)
     {
         // by default, all WeightingTypes are available
         return true;

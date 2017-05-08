@@ -1,10 +1,10 @@
 {#
     The most basic filter sub-panel template, renders a flat list of checkboxes
     Usage:
-        isAvailable:       bool              - Should this component be available in the panel ?
-        definition:        IFilterDefinition
-        defaultSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
-        userSelections:    FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        isAvailable:    bool              - Should this component be available in the panel ?
+        definition:     IFilterDefinition
+        roleSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
 #}
 
 {# Are any options available? If not, don't render this filter at all #}
@@ -16,18 +16,11 @@
     <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px; min-width: 150px;">
         <h4 data-filter-name>{{ filterName }}</h4>
         {% for selection in userSelections %}
-            {% set roleDefaultSelection = defaultSelections[selection.key] %}
-            <input type="hidden" name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]" value="0">
-            <input
-                id="filter_selection_{{ selection.filter.id }}_{{ selection.key }}"
-                type="checkbox"
-                name="filter_selection[{{ selection.filter.id }}][{{ selection.key }}]"
-                value="1"
-                data-value-original="{% if selection.selected %}1{% else %}0{% endif %}"
-                data-value-default="{% if roleDefaultSelection.selected %}1{% else %}0{% endif %}"
-                {% if selection.selected %}checked{% endif %}
-            >
-            <label for="filter_selection_{{ selection.filter.id }}_{{ selection.key }}">{{ definition.label(selection.key) }}</label>
+            {% include '@filters/_selectionCheckbox.twig' with {
+                userSelection: selection,
+                roleSelection: defaultSelections[selection.key],
+                label:         definition.label(selection.key)
+            } only %}
         {% endfor %}
     </div>
 {% endif %}

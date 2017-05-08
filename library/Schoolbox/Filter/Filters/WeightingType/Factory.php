@@ -15,7 +15,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Filter;
 
 /**
- * A factory for building WeightingTypeFilter objects
+ * A factory for building 'WeightingType' filter objects
  */
 class Factory extends AbstractFilterFactory
 {

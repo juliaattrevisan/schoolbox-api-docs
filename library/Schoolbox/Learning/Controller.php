@@ -47,6 +47,7 @@ use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Folder as FolderFilter;
+use Schoolbox\Filter\Filters\Unit as UnitFilter;
 use Schoolbox\Filter\Filters\Term as TermFilter;
 use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
 use Schoolbox\Filter\Filters\WeightingType as WeightingFilter;
@@ -208,7 +209,7 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User                 $viewee The user whose pending assessments we are viewing.
+     * @param User                  $viewee The user whose pending assessments we are viewing.
      * @param Filter\FactoryFactory $filterFactoryFactory
      * @throws RouteNotFound
      * @throws ServiceNotFound
@@ -218,15 +219,10 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
     {
-        // Generate a list of classes/groups that the viewee teaches
-        $getSubjects          = true;
-        $groupAccessLevel     = UserAccess::ACCESS_WRITE;
-        $folders              = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel);
-        $folderRunTimeOptions = new FolderFilter\RunTimeOptions($folders);
-
         // All run-time (as opposed to hard-coded and dynamic) options, indexed by filter definition class
         $runTimeOptions= [
-            FolderFilter\Definition::class => $folderRunTimeOptions,
+            FolderFilter\Definition::class => new FolderFilter\RunTimeOptions($viewee),
+            UnitFilter\Definition::class   => new UnitFilter\RunTimeOptions($viewee),
         ];
 
         $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
@@ -267,6 +263,7 @@ class Controller extends Base
             ]));
 
         } catch (\Exception $e){
+            // TODO - can remove this block when we abandon PHP 5 support
             $this->returnJsonError($e);
         } catch (\Throwable $e){
             $this->returnJsonError($e);
@@ -303,6 +300,7 @@ class Controller extends Base
         $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentTypeFilter\Definition::class);
         $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderFilter\Definition::class);
         $selectedWeightings      = $selectionTransformer->getSelectedItems(WeightingFilter\Definition::class);
+        $selectedUnitIds         = $selectionTransformer->getSelectedItems(UnitFilter\Definition::class);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
@@ -320,6 +318,7 @@ class Controller extends Base
             $selectedWorkTypes,
             $selectedWeightings,
             $selectedFolderIds,
+            $selectedUnitIds,
             $toChaseLimit,
             $selectedAssessmentTypes,
             $this->folderMapper

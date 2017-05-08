@@ -17,10 +17,13 @@ use Schoolbox\Filter\Filters\Folder as FolderFilter;
 use Schoolbox\Filter\Filters\Term as TermFilter;
 use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
 use Schoolbox\Filter\Filters\WeightingType as WeightingTypeFilter;
+use Schoolbox\Filter\Filters\Unit as UnitSpecFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\User;
 
 
@@ -71,6 +74,8 @@ class FactoryFactory
                 return $this->buildWorkTypeFilterFactory();
             case WeightingTypeFilter\Definition::class:
                 return $this->buildWeightingFilterFactory();
+            case UnitSpecFilter\Definition::class:
+                return $this->buildUnitSpecFilterFactory();
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
@@ -202,6 +207,35 @@ class FactoryFactory
             $folderMapper
         );
     }
+
+    /**
+     * @return UnitSpecFilter\Factory
+     * @throws \InvalidArgumentException
+     */
+    private function buildUnitSpecFilterFactory()
+    {
+        /** @var Folder\Mapper $folderMapper */
+        $folderMapper = $this->mapperFactory->get(Folder\Mapper::class);
+
+        /** @var CourseImpl\Mapper $courseImplMapper */
+        $courseImplMapper = $this->mapperFactory->get(CourseImpl\Mapper::class);
+
+        /** @var UnitSpec\Mapper $unitSpecMapper */
+        $unitSpecMapper = $this->mapperFactory->get(UnitSpec\Mapper::class);
+
+
+        return new UnitSpecFilter\Factory(
+            $this->getFilterMapper(),
+            $this->getFilterOptionMapper(),
+            $this->getFilterDefaultsMapper(),
+            $this->getFilterSelectionMapper(),
+            $folderMapper,
+            $courseImplMapper,
+            $unitSpecMapper
+        );
+    }
+
+
 
 
     /**

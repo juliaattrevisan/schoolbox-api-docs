@@ -15,7 +15,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Filter;
 
 /**
- * A factory for building AssessmentTypeFilter objects
+ * A factory for building 'AssessmentType' filter objects
  */
 class Factory extends AbstractFilterFactory
 {

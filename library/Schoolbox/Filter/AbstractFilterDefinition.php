@@ -281,18 +281,6 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
 
     /**
-     * If the admin has not configured this option, should it be available in filter panels?
-     *
-     * By default, all possible options will be available on all pages. (ie just return true)
-     *
-     * @param string $customAbstractKey
-     * @param string $page
-     * @return bool
-     */
-    abstract protected function getInitialAvailability($customAbstractKey, $page);
-
-
-    /**
      * Return the templates directory for the concrete filter definition's twig templates
      *
      * @return string

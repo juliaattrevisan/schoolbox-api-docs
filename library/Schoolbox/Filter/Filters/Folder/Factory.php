@@ -15,15 +15,14 @@ use Schoolbox\Filter\IRunTimeOptions;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 
 
 /**
- * A factory for building FolderFilters
- *
- * @todo
+ * A factory for building 'Folder' filter objects
  */
 class Factory extends AbstractFilterFactory
 {
@@ -86,8 +85,25 @@ class Factory extends AbstractFilterFactory
             throw new \InvalidArgumentException($msg);
         }
 
-        // Divide folders into Classes and Groups (not mutually exclusive)
-        $folders = $runTimeOptions->getFolders();
+        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
+        $definition      = $this->buildDefinition($filter);
+        $savedSelections = $this->getSavedSelections($filter, $user, $page);
+
+        $viewee = $runTimeOptions->getViewee();
+
+        // Should this role type see classes for this page?
+        /** @var Option\Model[][] $options */
+        $options = $definition->getOptions($page);
+
+        $getSubjects = $options[Definition::KEY_CLASSES][$page]->getAvailable();
+
+        $groupAccessLevel = $options[Definition::KEY_GROUPS][$page]->getAvailable()
+            ? UserAccess::ACCESS_WRITE
+            : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
+
+        $folders          = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
+
+        // Divide folders into Classes and Groups (not mutually exclusive!)
 
         // Does the folder have class codes ?
         $classes = $folders->filter(function (Folder\Model $folder) {
@@ -99,9 +115,6 @@ class Factory extends AbstractFilterFactory
             return $folder->getGroup();
         })->indexBy('id');
 
-        $filter          = $this->getFilterMapper()->findByClass(Definition::class);
-        $definition      = $this->buildDefinition($filter);
-        $savedSelections = $this->getSavedSelections($filter, $user, $page);
 
         return new Component(
             $definition,
@@ -121,7 +134,7 @@ class Factory extends AbstractFilterFactory
      */
     public function buildKeyConverter(Filter\Model $filter)
     {
-        $folderIds = (new Collection($this->folderMapper->findAllIds()))->indexByCallback(function ($folderId) {
+        $folderIds = (new Collection($this->folderMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($folderId) {
             return $folderId;
         });
 

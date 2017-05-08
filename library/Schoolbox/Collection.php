@@ -371,14 +371,15 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * Special case of $this->sortByCallback().
      *
-     * @param string|string[] $field The name of the field[s] to sort by.
-     * @param string|string[] $direction The order[s] to sort by - 'asc' or 'desc'
-     * @param callable|callable[] $compareFunction If set, use this callable[s] as the comparison.
-     *                                               Only applied if values aren't directly comparable.
+     * @param string|string[]     $field                    The name of the field[s] to sort by.
+     * @param string|string[]     $direction                The order[s] to sort by - 'asc' or 'desc'
+     * @param callable|callable[] $compareFunction          If set, use this callable[s] as the comparison.
+     *                                                      Only applied if values aren't directly comparable.
+     * @param bool                $maintainIndexAssociation Should we preserve key association?
      *
      * @return $this
      */
-    public function sortBy($field, $direction, $compareFunction = null)
+    public function sortBy($field, $direction, $compareFunction = null, $maintainIndexAssociation = false)
     {
         $fields = (array)$field;
         $directions = (array)$direction;
@@ -394,6 +395,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             $is_asc[] = (strtolower($direction) === 'asc');
         }
 
+        /** @var iterable $compareFunctions */
         $isCallable = [];
         foreach ($compareFunctions as $compareFunction) {
             $isCallable[] = is_callable($compareFunction);
@@ -402,7 +404,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         $callback = function ($a, $b) use ($get_methods, $is_asc, $isCallable, $compareFunctions) {
             $result = 0;
             $i = 0;
-            for (; $i < count($get_methods); $i++) {
+            for ($iMax = count($get_methods); $i < $iMax; $i++) {
                 $a_value = $a->{$get_methods[$i]}();
                 $b_value = $b->{$get_methods[$i]}();
 
@@ -427,24 +429,24 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             return 0 === $result ? 0 : ($is_asc[$i] ? $result : -$result);
         };
 
-        return $this->sortByCallback($callback);
+        return $this->sortByCallback($callback, $maintainIndexAssociation);
     }
 
 
     /**
      * Convenience method to sort a collection using multiple fields
      *
-     * @param array $fields Keys = fieldName. Values = direction + optional callback. eg
-     *                                      [  'lastName'  => ['asc'],
-     *                                         'firstName' => ['asc', $callable],
-     *                                         'dob'       => 'desc',   ]
-     *
-     * @var   string|array $fields []     If value is string: Direction to sort. {'asc'|'desc'}
-     * @var   string $fields [][1]        If value is array:  1st item is direction,
-     * @var   callable $fields [][2]                          2nd item is a compare function (optional)
+     * @param array        $fields                   Keys = fieldName. Values = direction + optional callback. eg
+     *                                               [  'lastName'  => ['asc'],
+     *                                                  'firstName' => ['asc', $callable],
+     *                                                  'dob'       => 'desc',   ]
+     * @var   string|array $fields[]                 If value is string: Direction to sort. {'asc'|'desc'}
+     * @var   string       $fields[][1]              If value is array:  1st item is direction,
+     * @var   callable     $fields[][2]              2nd item is a compare function (optional)
+     * @param bool         $maintainIndexAssociation Should we maintain key association?
      * @return $this
      */
-    public function sortByMultiFields(array $fields)
+    public function sortByMultiFields(array $fields, $maintainIndexAssociation = false)
     {
         $fieldNames = [];
         $directions = [];
@@ -462,7 +464,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             }
         }
 
-        return $this->sortBy($fieldNames, $directions, $compareFunctions);
+        return $this->sortBy($fieldNames, $directions, $compareFunctions, $maintainIndexAssociation);
     }
 
 
@@ -470,13 +472,18 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      * Sorts the collection by a callback. @see usort()
      *
      * @param callable $callback
+     * @param bool     $maintainIndexAssociation Should we preserve key association?
      *
      * @return $this
      */
-    public function sortByCallback($callback)
+    public function sortByCallback($callback, $maintainIndexAssociation = false)
     {
         $stack = $this->getStack();
-        usort($stack, $callback);
+        if($maintainIndexAssociation){
+            uasort($stack, $callback);
+        } else {
+            usort($stack, $callback);
+        }
         $this->stack = $stack;
         return $this;
     }

@@ -30,6 +30,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters\WeightingType;
+use Schoolbox\Filter\Filters\Unit as UnitFilter;
 
 /**
  * Optimised DB queries to build graph of Assessments a user needs to mark or chase
@@ -175,6 +176,12 @@ class PendingFactory
      */
     private $selectedFolderIds;
 
+
+    /**
+     * @var Collection|int[]
+     */
+    private $selectedUnitSpecIds;
+
     /**
      * Intentionally not a GenericCollection so we can insert NULL items
      * @var Collection|WorkType\Model[]
@@ -255,6 +262,7 @@ class PendingFactory
      * @param Collection|WorkType\Model[]    $selectedWorkTypes
      * @param Collection|string[]            $selectedWeightings
      * @param Collection                     $selectedFolderIds Not yet authorised, need to confirm user has permission
+     * @param Collection|string[]|int[]      $selectedUnitIds
      * @param \Alaress_Date_Format           $toChaseLimit
      * @param Collection|string[]            $selectedAssessmentTypes
      * @param FolderMapper                   $folderMapper
@@ -267,24 +275,26 @@ class PendingFactory
         Collection $selectedWorkTypes,
         Collection $selectedWeightings,
         Collection $selectedFolderIds,
+        Collection $selectedUnitIds,
         \Alaress_Date_Format $toChaseLimit,
         Collection $selectedAssessmentTypes,
         FolderMapper $folderMapper
 
     ) {
-        $this->viewee            = $viewee;
-        $this->database          = $database;
-        $this->externalClass     = $externalClass;
-        $this->assessmentsCache  = new GenericCollection(IAssessable::class);  // TODO SA-2631
-        $this->terms             = $terms;
-        $this->workTypes         = $selectedWorkTypes;
-        $this->weightingTypes    = $selectedWeightings;
-        $this->selectedFolderIds = $selectedFolderIds;
-        $this->toChaseLimit      = $toChaseLimit;
-        $this->nullDate          = new \Alaress_Date_NullDate();
-        $this->assessmentTypes   = $selectedAssessmentTypes;
-        $this->folderMapper      = $folderMapper;
-        $this->selectedFolders   = $folderMapper->createCollection();
+        $this->viewee              = $viewee;
+        $this->database            = $database;
+        $this->externalClass       = $externalClass;
+        $this->assessmentsCache    = new GenericCollection(IAssessable::class);  // TODO SA-2631
+        $this->terms               = $terms;
+        $this->workTypes           = $selectedWorkTypes;
+        $this->weightingTypes      = $selectedWeightings;
+        $this->selectedFolderIds   = $selectedFolderIds;
+        $this->selectedUnitSpecIds = $selectedUnitIds;
+        $this->toChaseLimit        = $toChaseLimit;
+        $this->nullDate            = new \Alaress_Date_NullDate();
+        $this->assessmentTypes     = $selectedAssessmentTypes;
+        $this->folderMapper        = $folderMapper;
+        $this->selectedFolders     = $folderMapper->createCollection();
     }
 
 
@@ -583,6 +593,44 @@ class PendingFactory
     }
 
 
+    /**
+     * Build DB query fragments for the query filter
+     *
+     * @return mixed[]
+     */
+    private function buildUnitClause()
+    {
+        // Is this filter not being used ? (either because nothing is selected or everything is selected)
+        if (0 === $this->selectedUnitSpecIds->count()) {
+            $onFolder       = true;
+            $inUnit         = true;
+            $unitSpecClause = ' TRUE ';
+            return [$onFolder, $inUnit, $unitSpecClause];
+        }
+
+        $onFolder    = false;
+        $unitSpecIds = [];
+
+        foreach ($this->selectedUnitSpecIds as $unitSpecId) {
+            if (null === $unitSpecId) {
+                $onFolder = true;
+            } else {
+                $unitSpecIds[] = $unitSpecId;
+            }
+        }
+        if (0 === count($unitSpecIds)) {
+            $inUnit         = false;
+            $unitSpecClause = null;
+        } else {
+            $inUnit            = true;
+            $unitSpecIdsString = implode(',', $unitSpecIds);
+            $unitSpecClause    = "us.id IN ({$unitSpecIdsString})";
+        }
+
+        return [$onFolder, $inUnit, $unitSpecClause];
+    }
+
+
 
     /**
      * Get Assessments associated with Classes taught, or Groups administered, by User.
@@ -612,186 +660,197 @@ class PendingFactory
         list($aTypeSelect, $aTypeJoin, $aTypeClause)          = $this->buildAssessmentTypeClause();
         list($workTypeSelect, $workTypeJoin, $workTypeClause) = $this->buildWorkTypeClause();
         list($weightingSelect, $weightingClause)              = $this->buildWeightingClause();
+        list($onFolder, $inUnit, $unitSpecClause)             = $this->buildUnitClause();
 
         $folderIds = $this->selectedFolders->keys();
 
+        $subQueries = [];
 
-        $query1       = "
-        SELECT 
-                1            AS 'case',
-                        
-                NULL         AS 'cs.id',
-                NULL         AS 'csf.id',
-                NULL         AS 'csf.name',
-                NULL         AS 'ci.id',
-                f.id         AS 'f.id',
-                f.name       AS 'f.name',                
-                NULL         AS 'us.id',
-                NULL         AS 'usf.id',
-                NULL         AS 'usf.name',
-                NULL         AS 'ui.id',
-                NULL         AS 'p.id',
-                NULL         AS 'p.title',
-                
-                a.id         AS 'a.id',
-                a.title      AS 'a.title',
-                a.due_date   AS 'a.due_date'
-                
-                $aTypeSelect
-                $workTypeSelect
-                $weightingSelect
-            FROM assessment a 
-            $aTypeJoin
-            $workTypeJoin
-            
-            JOIN assessment_folder af   ON af.assessment_id = a.id 
-            JOIN folder f               ON f.id = af.folder_id AND f.deleted_at IS NULL
-            
-            WHERE f.id IN (" . implode(',', $folderIds) . ")
-            AND ($aTypeClause)
-            AND ($dueDateClause)
-            AND ($workTypeClause)
-            AND ($weightingClause)
-        ";
+        // Are we retrieving assessments that reside directly on folder?
+        if($onFolder){
+            $subQueries[] = "
+                SELECT
+                    1            AS 'case',
 
-        $query2       = "
-        SELECT 
-                2            AS 'case',
-                        
-                NULL         AS 'cs.id',
-                NULL         AS 'csf.id',
-                NULL         AS 'csf.name',
-                NULL         AS 'ci.id',
-                pf.id        AS 'f.id',
-                pf.name      AS 'f.name',                
-                NULL         AS 'us.id',
-                NULL         AS 'usf.id',
-                NULL         AS 'usf.name',
-                NULL         AS 'ui.id',
-                pa.id        AS 'p.id',
-                pa.title     AS 'p.title',
-                
-                a.id         AS 'a.id',
-                a.title      AS 'a.title',
-                a.due_date   AS 'a.due_date'
-                
-                $aTypeSelect
-                $workTypeSelect
-                $weightingSelect
-            FROM assessment a 
-            $aTypeJoin
-            $workTypeJoin
-            
-            JOIN project_assessment pra ON pra.assessment_id = a.id
-            JOIN project p              ON pra.project_id = p.id
-            JOIN assessment pa          ON p.assessment_id = pa.id
-            JOIN assessment_folder paf  ON paf.assessment_id = pa.id
-            JOIN folder pf              ON pf.id = paf.folder_id AND pf.deleted_at IS NULL
-            
-            WHERE pf.id IN (" . implode(',', $folderIds) . ")
-            AND ($aTypeClause)
-            AND ($dueDateClause)
-            AND ($workTypeClause)
-            AND ($weightingClause)
-        ";
+                    NULL         AS 'cs.id',
+                    NULL         AS 'csf.id',
+                    NULL         AS 'csf.name',
+                    NULL         AS 'ci.id',
+                    f.id         AS 'f.id',
+                    f.name       AS 'f.name',
+                    NULL         AS 'us.id',
+                    NULL         AS 'usf.id',
+                    NULL         AS 'usf.name',
+                    NULL         AS 'ui.id',
+                    NULL         AS 'p.id',
+                    NULL         AS 'p.title',
 
-        $query3       = "
-        SELECT 
-                3            AS 'case',
-                        
-                cs.id        AS 'cs.id',
-                csf.id       AS 'csf.id',
-                csf.name     AS 'csf.name',
-                ci.id        AS 'ci.id',
-                cif.id       AS 'f.id',
-                cif.name     AS 'f.name',                
-                us.id        AS 'us.id',
-                usf.id       AS 'usf.id',
-                usf.name     AS 'usf.name',
-                ui.id        AS 'ui.id',
-                NULL         AS 'p.id',
-                NULL         AS 'p.title',
-                
-                a.id         AS 'a.id',
-                a.title      AS 'a.title',
-                a.due_date   AS 'a.due_date'
-                
-                $aTypeSelect
-                $workTypeSelect
-                $weightingSelect
-            FROM assessment a 
+                    a.id         AS 'a.id',
+                    a.title      AS 'a.title',
+                    a.due_date   AS 'a.due_date'
 
-            $aTypeJoin
-            $workTypeJoin
-            
-            JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
-            JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id
-            JOIN course_implementation ci                  ON ci.id = ui.course_implementation_id 
-            JOIN folder cif                                ON cif.id = ci.folder_id AND cif.deleted_at IS NULL
-            JOIN course_unit_specification us              ON us.id = ui.course_unit_specification_id
-            JOIN folder usf                                ON usf.id = us.folder_id AND usf.deleted_at IS NULL
-            JOIN course_specification cs                   ON cs.id = ci.course_specification_id
-            JOIN folder csf                                ON csf.id = cs.folder_id AND csf.deleted_at IS NULL
-            
-            WHERE cif.id IN (" . implode(',', $folderIds) . ")
-            AND ($aTypeClause)
-            AND ($dueDateClause)
-            AND ($workTypeClause)
-            AND ($weightingClause)
-        ";
+                    $aTypeSelect
+                    $workTypeSelect
+                    $weightingSelect
+                FROM assessment a
+                $aTypeJoin
+                $workTypeJoin
+                
+                JOIN assessment_folder af   ON af.assessment_id = a.id
+                JOIN folder f               ON f.id = af.folder_id AND f.deleted_at IS NULL
+                
+                WHERE f.id IN (" . implode(',', $folderIds) . ")
+                AND ($aTypeClause)
+                AND ($dueDateClause)
+                AND ($workTypeClause)
+                AND ($weightingClause)
+            ";
 
-        // Assessment in Project in UnitImpl imported on Folder
-        $query4       = "
-        SELECT 
-                4            AS 'case',
-                        
-                cs.id        AS 'cs.id',
-                csf.id       AS 'csf.id',
-                csf.name     AS 'csf.name',
-                ci.id        AS 'ci.id',
-                cif.id       AS 'f.id',
-                cif.name     AS 'f.name',                
-                us.id        AS 'us.id',
-                usf.id       AS 'usf.id',
-                usf.name     AS 'usf.name',
-                ui.id        AS 'ui.id',
-                pra.id       AS 'p.id',
-                pra.title    AS 'p.title',
+            $subQueries[] = "
+                SELECT
+                    2            AS 'case',
+
+                    NULL         AS 'cs.id',
+                    NULL         AS 'csf.id',
+                    NULL         AS 'csf.name',
+                    NULL         AS 'ci.id',
+                    pf.id        AS 'f.id',
+                    pf.name      AS 'f.name',
+                    NULL         AS 'us.id',
+                    NULL         AS 'usf.id',
+                    NULL         AS 'usf.name',
+                    NULL         AS 'ui.id',
+                    pa.id        AS 'p.id',
+                    pa.title     AS 'p.title',
+
+                    a.id         AS 'a.id',
+                    a.title      AS 'a.title',
+                    a.due_date   AS 'a.due_date'
+
+                    $aTypeSelect
+                    $workTypeSelect
+                    $weightingSelect
+                FROM assessment a
+                $aTypeJoin
+                $workTypeJoin
+
+                JOIN project_assessment pra ON pra.assessment_id = a.id
+                JOIN project p              ON pra.project_id = p.id
+                JOIN assessment pa          ON p.assessment_id = pa.id
+                JOIN assessment_folder paf  ON paf.assessment_id = pa.id
+                JOIN folder pf              ON pf.id = paf.folder_id AND pf.deleted_at IS NULL
+
+                WHERE pf.id IN (" . implode(',', $folderIds) . ")
+                AND ($aTypeClause)
+                AND ($dueDateClause)
+                AND ($workTypeClause)
+                AND ($weightingClause)
+            ";
+        }
+
+
+        // Are we retrieving assessments that reside inside a unit?
+        if($inUnit) {
+            $subQueries[] = "
+                SELECT
+                    3            AS 'case',
+
+                    cs.id        AS 'cs.id',
+                    csf.id       AS 'csf.id',
+                    csf.name     AS 'csf.name',
+                    ci.id        AS 'ci.id',
+                    cif.id       AS 'f.id',
+                    cif.name     AS 'f.name',
+                    us.id        AS 'us.id',
+                    usf.id       AS 'usf.id',
+                    usf.name     AS 'usf.name',
+                    ui.id        AS 'ui.id',
+                    NULL         AS 'p.id',
+                    NULL         AS 'p.title',
+
+                    a.id         AS 'a.id',
+                    a.title      AS 'a.title',
+                    a.due_date   AS 'a.due_date'
+
+                    $aTypeSelect
+                    $workTypeSelect
+                    $weightingSelect
+                FROM assessment a
+
+                $aTypeJoin
+                $workTypeJoin
+
+                JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
+                JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id
+                JOIN course_implementation ci                  ON ci.id = ui.course_implementation_id
+                JOIN folder cif                                ON cif.id = ci.folder_id AND cif.deleted_at IS NULL
+                JOIN course_unit_specification us              ON us.id = ui.course_unit_specification_id
+                JOIN folder usf                                ON usf.id = us.folder_id AND usf.deleted_at IS NULL
+                JOIN course_specification cs                   ON cs.id = ci.course_specification_id
+                JOIN folder csf                                ON csf.id = cs.folder_id AND csf.deleted_at IS NULL
                 
-                a.id         AS 'a.id',
-                a.title      AS 'a.title',
-                a.due_date   AS 'a.due_date'
-                
-                $aTypeSelect
-                $workTypeSelect
-                $weightingSelect
-            FROM assessment a 
-            
-            $aTypeJoin
-            $workTypeJoin
-            
-            JOIN project_assessment pa                     ON pa.assessment_id = a.id
-            JOIN project p                                 ON p.id = pa.project_id
-            JOIN assessment pra                            ON pra.id = p.assessment_id
-            JOIN assessment_course_unit_implementation aui ON aui.assessment_id = pra.id
-            JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id AND ui.deleted_at IS NULL
-            JOIN course_implementation ci                  ON ci.id = ui.course_implementation_id       AND ci.deleted_at IS NULL
-            JOIN folder cif                                ON cif.id = ci.folder_id                     AND cif.deleted_at IS NULL
-            JOIN course_unit_specification us              ON us.id = ui.course_unit_specification_id   AND us.deleted_at IS NULL
-            JOIN folder usf                                ON usf.id = us.folder_id                     AND usf.deleted_at IS NULL
-            JOIN course_specification cs                   ON cs.id = ci.course_specification_id        AND cs.deleted_at IS NULL
-            JOIN folder csf                                ON csf.id = cs.folder_id                     AND csf.deleted_at IS NULL
-            
-            WHERE a.deleted_at IS NULL
-            AND cif.id IN (" . implode(',', $folderIds) . ")
-            AND ($aTypeClause)
-            AND ($dueDateClause)
-            AND ($workTypeClause)
-            AND ($weightingClause)
-        ";
+                WHERE cif.id IN (" . implode(',', $folderIds) . ")
+                AND ($aTypeClause)
+                AND ($dueDateClause)
+                AND ($workTypeClause)
+                AND ($weightingClause)
+                AND ($unitSpecClause)
+            ";
+
+            // Assessment in Project in UnitImpl imported on Folder
+            $subQueries[] = "
+                SELECT
+                    4            AS 'case',
+
+                    cs.id        AS 'cs.id',
+                    csf.id       AS 'csf.id',
+                    csf.name     AS 'csf.name',
+                    ci.id        AS 'ci.id',
+                    cif.id       AS 'f.id',
+                    cif.name     AS 'f.name',
+                    us.id        AS 'us.id',
+                    usf.id       AS 'usf.id',
+                    usf.name     AS 'usf.name',
+                    ui.id        AS 'ui.id',
+                    pra.id       AS 'p.id',
+                    pra.title    AS 'p.title',
+
+                    a.id         AS 'a.id',
+                    a.title      AS 'a.title',
+                    a.due_date   AS 'a.due_date'
+
+                    $aTypeSelect
+                    $workTypeSelect
+                    $weightingSelect
+                FROM assessment a
+
+                $aTypeJoin
+                $workTypeJoin
+
+                JOIN project_assessment pa                     ON pa.assessment_id = a.id
+                JOIN project p                                 ON p.id = pa.project_id
+                JOIN assessment pra                            ON pra.id = p.assessment_id
+                JOIN assessment_course_unit_implementation aui ON aui.assessment_id = pra.id
+                JOIN course_unit_implementation ui             ON ui.id = aui.course_unit_implementation_id AND ui.deleted_at IS NULL
+                JOIN course_implementation ci                  ON ci.id = ui.course_implementation_id       AND ci.deleted_at IS NULL
+                JOIN folder cif                                ON cif.id = ci.folder_id                     AND cif.deleted_at IS NULL
+                JOIN course_unit_specification us              ON us.id = ui.course_unit_specification_id   AND us.deleted_at IS NULL
+                JOIN folder usf                                ON usf.id = us.folder_id                     AND usf.deleted_at IS NULL
+                JOIN course_specification cs                   ON cs.id = ci.course_specification_id        AND cs.deleted_at IS NULL
+                JOIN folder csf                                ON csf.id = cs.folder_id                     AND csf.deleted_at IS NULL
+
+                WHERE a.deleted_at IS NULL
+                AND cif.id IN (" . implode(',', $folderIds) . ")
+                AND ($aTypeClause)
+                AND ($dueDateClause)
+                AND ($workTypeClause)
+                AND ($weightingClause)
+                AND ($unitSpecClause)
+            ";
+        }
 
         $this->parseAssessments(
-            $this->database->executeQueryIterator("$query1 UNION $query2 UNION $query3 UNION $query4")
+            $this->database->executeQueryIterator(implode(' UNION ', $subQueries))
         );
     }
 
