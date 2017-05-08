@@ -218,7 +218,7 @@ class Controller extends Base
      * @param  Source\Mapper $sourceMapper
      * @return $this
      */
-    public function setSourceMapper($sourceMapper)
+    public function setSourceMapper(Source\Mapper $sourceMapper)
     {
         $this->sourceMapper = $sourceMapper;
         return $this;
@@ -244,7 +244,7 @@ class Controller extends Base
      * @param  LearningArea\Mapper $areaMapper
      * @return $this
      */
-    public function setAreaMapper($areaMapper)
+    public function setAreaMapper(LearningArea\Mapper $areaMapper)
     {
         $this->areaMapper = $areaMapper;
         return $this;
@@ -262,7 +262,7 @@ class Controller extends Base
      * @param  LearningLevel\Mapper $levelMapper
      * @return $this
      */
-    public function setLevelMapper($levelMapper)
+    public function setLevelMapper(LearningLevel\Mapper $levelMapper)
     {
         $this->levelMapper = $levelMapper;
         return $this;
@@ -280,7 +280,7 @@ class Controller extends Base
      * @param  Node\Mapper $nodeMapper
      * @return $this
      */
-    public function setNodeMapper($nodeMapper)
+    public function setNodeMapper(Node\Mapper $nodeMapper)
     {
         $this->nodeMapper = $nodeMapper;
         return $this;

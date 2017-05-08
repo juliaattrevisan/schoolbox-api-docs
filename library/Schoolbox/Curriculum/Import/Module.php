@@ -16,9 +16,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
-use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
-use Schoolbox\Curriculum\Source\Mapper as SourceMapper;
-use Schoolbox\Curriculum\LearningArea\Mapper as LearningAreaMapper;
+use Schoolbox\Curriculum;
 
 class Module extends BaseModule
 {
@@ -74,12 +72,12 @@ class Module extends BaseModule
             $injector->lazyNew(Controller::class)
         );
         $injector->setters[Controller::class]['setSourceMapper']
-            = $this->getMapperFactory()->getLazy(SourceMapper::class);
+            = $this->getMapperFactory()->getLazy(Curriculum\Source\Mapper::class);
         $injector->setters[Controller::class]['setAreaMapper']
-            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
+            = $this->getMapperFactory()->getLazy(Curriculum\LearningArea\Mapper::class);
         $injector->setters[Controller::class]['setLevelMapper']
-            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
+            = $this->getMapperFactory()->getLazy(Curriculum\LearningLevel\Mapper::class);
         $injector->setters[Controller::class]['setNodeMapper']
-            = $this->getMapperFactory()->getLazy(NodeMapper::class);
+            = $this->getMapperFactory()->getLazy(Curriculum\Node\Mapper::class);
     }
 }
