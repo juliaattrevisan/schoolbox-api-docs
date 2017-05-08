@@ -124,7 +124,8 @@ class Controller extends Base
             $this->getNodeMapper()->saveTree($rootNode);
             $outcomes = new Collection();
             $outcomes->add($rootNode);
-            $data['outcomes'] = $outcomes;
+            // All the handling code cares about is the root node's ID
+            $data['outcomes'][0] = ['id' => $rootNode->getId()];
 
         } else {
             $code = 400;
@@ -133,12 +134,7 @@ class Controller extends Base
 
         // JSON something back to me
         $this->getResponse()->status->setCode($code);
-        $this->getResponse()->content->set(
-            array(
-                'format' => 'json',
-                'data'   => $data,
-            )
-        );
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**
@@ -222,7 +218,7 @@ class Controller extends Base
      * @param  Source\Mapper $sourceMapper
      * @return $this
      */
-    public function setSourceMapper($sourceMapper)
+    public function setSourceMapper(Source\Mapper $sourceMapper)
     {
         $this->sourceMapper = $sourceMapper;
         return $this;
@@ -248,7 +244,7 @@ class Controller extends Base
      * @param  LearningArea\Mapper $areaMapper
      * @return $this
      */
-    public function setAreaMapper($areaMapper)
+    public function setAreaMapper(LearningArea\Mapper $areaMapper)
     {
         $this->areaMapper = $areaMapper;
         return $this;
@@ -266,7 +262,7 @@ class Controller extends Base
      * @param  LearningLevel\Mapper $levelMapper
      * @return $this
      */
-    public function setLevelMapper($levelMapper)
+    public function setLevelMapper(LearningLevel\Mapper $levelMapper)
     {
         $this->levelMapper = $levelMapper;
         return $this;
@@ -284,7 +280,7 @@ class Controller extends Base
      * @param  Node\Mapper $nodeMapper
      * @return $this
      */
-    public function setNodeMapper($nodeMapper)
+    public function setNodeMapper(Node\Mapper $nodeMapper)
     {
         $this->nodeMapper = $nodeMapper;
         return $this;
