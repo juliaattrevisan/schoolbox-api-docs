@@ -551,7 +551,6 @@ class SitePage extends Page
                 $menuTopRenderer = new MenuTopRenderer();
                 $menuTopContents = $menuTopRenderer->menuTopRenderer($this->getTwig(), $this->currentTab, $this->user);
                 $this->setVar('MENU_TOP', $menuTopContents);
-                $this->setVar('MENU_TOP', '');
             } catch (Twig_Error_Loader $e) {
                 // This can happen if rendering an error message where the error happens before the menu module has loaded
                 $this->setVar('MENU_TOP', '');
