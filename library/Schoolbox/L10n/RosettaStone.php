@@ -43,6 +43,24 @@ class RosettaStone
     }
 
     /**
+     * Attempt to translate a sentence that contains tokens.
+     *
+     * Tokens will be wrapped in {:token}, as they are in UPS, they may have modifiers too:
+     * {|plural} and/or {|capital}.
+     *
+     * (Sentence tokenization is a stop-gap till we have proper i18n.)
+     *
+     * @param string $sentence
+     * @return string
+     */
+    public function translateSentence($sentence)
+    {
+        // TODO inject tokenizer at time of construct
+        $tokenizer = new Tokenizer($this);
+        return $tokenizer->parseToken([], $sentence);
+    }
+
+    /**
      * @return array
      */
     public function getAllTerms()
