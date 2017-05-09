@@ -112,7 +112,7 @@ class Bulk_Category
                                 'id' => '',
                                 'name' => $row[1],
                                 'status' => 'Skipped',
-                                'error' => "Subject code already exists ($subjectCode)",
+                                'error' => "Subject code already exists ({$subjectCode})",
                             ];
                         } catch (MapperException $e) {
 
