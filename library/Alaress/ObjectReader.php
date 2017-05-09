@@ -50,8 +50,13 @@ class ObjectReader
             return $filtered[0];
         }
 
-        if (is_object($value) && !method_exists($value, '__toString')) {
-            throw new DomainException("Value cannot be coerced to string");
+        if (is_object($value)) {
+            if (!method_exists($value, '__toString')) {
+                throw new DomainException("Value cannot be coerced to string");
+            }
+
+            // Do not cast to string - I need to apply filters to objects
+            return $value;
         }
 
         return (string)$value;
