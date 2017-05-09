@@ -190,10 +190,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
     }
 
     /**
-    * Output configuration settings in modify
-    *
-    * @param SitePage $page
-    * @param $config
+    * @inheritdoc
     */
     public function configure(SitePage $page, $config)
     {
