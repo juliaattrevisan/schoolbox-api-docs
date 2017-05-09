@@ -89,7 +89,7 @@
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
-        "phpunit/phpunit": "4.1.*",
+        "phpunit/phpunit": "~4.8.35",
         "behat/behat": "2.5.*",
         "behat/mink": "1.5.*",
         "behat/mink-extension": "1.3.*",
