@@ -16,6 +16,7 @@
       <directory suffix=".php">test/unit/</directory>
       <directory suffix=".php">library/Alaress/</directory>
       <directory suffix=".php">library/Schoolbox/</directory>
+      <exclude>library/Alaress/Database/</exclude>
     </testsuite>
   </testsuites>
   <filter>
