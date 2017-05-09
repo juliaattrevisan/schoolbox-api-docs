@@ -123,7 +123,7 @@ class Factory extends AbstractFilterFactory
         $directFolders = $involvedFolders->filter(function (Folder\Model $folder) use ($onClassFolder, $onGroupFolder) {
             $isClass = $folder->getCodes()->count();
             $isGroup = $folder->getGroup();
-            return $isClass && $onClassFolder || $isGroup && $onGroupFolder;
+            return ($isClass && $onClassFolder) || ($isGroup && $onGroupFolder);
         })->indexBy('id');
 
         /** @var GenericCollection $indirectFolders */
