@@ -18,7 +18,7 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
 
-class Bulk_Category extends Bulk_Abstract
+class Bulk_Category
 {
 
     /**
