@@ -10,7 +10,7 @@
 namespace Schoolbox\Admin\BulkAddFolders;
 
 use Alaress\Web\Controller\Base;
-use Bulk_Category;
+use Bulk_Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
@@ -127,11 +127,8 @@ class Controller extends Base
             $factory = new CollectorFactory();
             $csvFile = $factory->build($this->getRequest()->post['attachment'])->getFirst();
 
-            $bulkHandler = new Bulk_Category(
-                $csvFile->readStream(),
-                Scrub::text($this->getRequest()->post['template'])
-            );
-            $allFolders = $bulkHandler->addCategories();
+            $bulkHandler = new Bulk_Folder($csvFile->readStream(), Scrub::text($this->getRequest()->post['template']));
+            $allFolders = $bulkHandler->addFolders();
         } else {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }

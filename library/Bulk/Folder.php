@@ -1,6 +1,8 @@
 <?php
 /**
- * Bulk_Category
+ * Bulk_Folder
+ *
+ * Upload folder structures from a csv
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -18,7 +20,7 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
 
-class Bulk_Category
+class Bulk_Folder
 {
 
     /**
@@ -47,7 +49,7 @@ class Bulk_Category
     }
 
     /**
-     * Adds categories via csv
+     * Adds folders via csv
      *
      * CSV Fields:
      * 0.	parent
@@ -56,7 +58,7 @@ class Bulk_Category
      *
      * @return array
      */
-    public function addCategories()
+    public function addFolders()
     {
         $folderMapper = FolderMapper::getInstance();
         $folderCodeMapper = FolderCodeMapper::getInstance();
