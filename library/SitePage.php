@@ -2,6 +2,8 @@
 
 use Aura\Router\Router;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Menu\Side\Renderer as MenuSideRender;
+use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
@@ -534,15 +536,26 @@ class SitePage extends Page
 
             // Render side menu
 
-            $menuSideRenderer = new \Schoolbox\Menu\Side\Renderer();
-            $menuSideContents = $menuSideRenderer->menuSideRenderer($this->getTwig(), $this->user);
-            $this->setVar('MENU_SIDE', $menuSideContents);
+            try {
+                $menuSideRenderer = new MenuSideRender();
+                $menuSideContents = $menuSideRenderer->menuSideRenderer($this->getTwig(), $this->user);
+                $this->setVar('MENU_SIDE', $menuSideContents);
+            } catch (Twig_Error_Loader $e) {
+                // This can happen if rendering an error message where the error happens before the menu module has loaded
+                $this->setVar('MENU_SIDE', '');
+            }
 
             // Render top menu
 
-            $menuTopRenderer = new \Schoolbox\Menu\Top\Renderer();
-            $menuTopContents = $menuTopRenderer->menuTopRenderer($this->getTwig(), $this->currentTab, $this->user);
-            $this->setVar('MENU_TOP', $menuTopContents);
+            try {
+                $menuTopRenderer = new MenuTopRenderer();
+                $menuTopContents = $menuTopRenderer->menuTopRenderer($this->getTwig(), $this->currentTab, $this->user);
+                $this->setVar('MENU_TOP', $menuTopContents);
+                $this->setVar('MENU_TOP', '');
+            } catch (Twig_Error_Loader $e) {
+                // This can happen if rendering an error message where the error happens before the menu module has loaded
+                $this->setVar('MENU_TOP', '');
+            }
 
             $this->parse('banner_logged_in_block', 'banner_logged_in');
         } else {
