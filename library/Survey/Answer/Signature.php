@@ -185,12 +185,9 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     }
 
     /**
-     * Configure question/configure answer
-     *
-     * @param $page
-     * @param $config
+     * @inheritdoc
      */
-    public function configure($page, $config)
+    public function configure(SitePage $page, $config)
     {
         $options = json_decode($config);
 

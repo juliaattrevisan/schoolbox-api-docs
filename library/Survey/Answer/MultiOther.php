@@ -53,12 +53,9 @@ class Survey_Answer_MultiOther extends Evaluation_Answer_MultiOther {
 	}
 
 	/**
-	 * Configure question/configure answer during creation/modification
-	 *
-	 * @param $page
-	 * @param $config
+	 * @inheritdoc
 	 */
-	public function configure($page, $config) {
+	public function configure(SitePage $page, $config) {
 		$options = json_decode($config);
 
 		$page->setVar(array(
