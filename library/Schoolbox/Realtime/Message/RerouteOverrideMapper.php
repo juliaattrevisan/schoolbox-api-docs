@@ -10,7 +10,7 @@
 namespace Schoolbox\Realtime\Message;
 
 
-use Alaress\Database\PredicateBuilder\PredicateBuilder;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
