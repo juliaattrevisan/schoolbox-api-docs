@@ -64,41 +64,83 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    public function stringCoercionData()
+    public function stringCoercionDataToStringWithStringOutput()
     {
         return [
             [ 'string', 'string' ],
             [ 0, '0' ],
             [ true, '1' ],
             [ false, ''],
-            [ ['a','b','c'], new DomainException() ],
-            [ new stdClass(), new DomainException() ],
-            [ new ObjectReaderStringableClass('helloWorld'), 'helloWorld' ]
         ];
     }
 
+    /**
+     * Data for string coercion tests - tostringable object
+     *
+     * @return array
+     */
+    public function stringCoercionDataToStringWithObjectOutput()
+    {
+        return [
+            [ new ObjectReaderStringableClass('helloWorld'), new ObjectReaderStringableClass('helloWorld'), ],
+        ];
+    }
+
+    /**
+     * Data for string coercion tests - invalid
+     *
+     * @return array
+     */
+    public function stringCoercionDataInvalid()
+    {
+        return [
+            [ ['a','b','c'] ],
+            [ new stdClass() ],
+        ];
+    }
 
     /**
      * Test coercion of values to string
      *
-     * @dataProvider stringCoercionData
+     * @dataProvider stringCoercionDataToStringWithStringOutput
      * @param mixed $input
-     * @param mixed $expected
+     * @param string $expected
      */
-    public function testCoerceToString($input, $expected)
+    public function testCoerceToStringWithStringOutput($input, $expected)
     {
         $reader = new ObjectReader();
-
-        try {
-            $value = $reader->coerceToString($input);
-            $this->assertInternalType('string', $value);
-            $this->assertEquals($expected, $value);
-        } catch (DomainException $e) {
-            $expectedType = is_object($expected) ? get_class($expected) : gettype($expected);
-            $this->assertEquals($expectedType, get_class($e));
-        }
+        $value = $reader->coerceToString($input);
+        $this->assertInternalType('string', $value);
+        $this->assertEquals($expected, $value);
     }
 
+    /**
+     * Test coercion of values to string
+     *
+     * @dataProvider stringCoercionDataToStringWithObjectOutput
+     * @param mixed $input
+     * @param object $expected
+     */
+    public function testCoerceToStringWithObjectOutput($input, $expected)
+    {
+        $reader = new ObjectReader();
+        $value = $reader->coerceToString($input);
+        $this->assertEquals(get_class($expected), get_class($value));
+        $this->assertEquals("$expected", "$value");
+    }
+
+    /**
+     * Test coercion of values to string
+     *
+     * @dataProvider stringCoercionDataInvalid
+     * @param mixed $input
+     * @expectedException DomainException
+     */
+    public function testCoerceToStringInvalid($input)
+    {
+        $reader = new ObjectReader();
+        $reader->coerceToString($input);
+    }
 
     /**
      * Test the retrieval of a value nested inside an array hierarchy
