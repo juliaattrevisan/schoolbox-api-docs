@@ -190,15 +190,17 @@ th, td{
 // Input & buttons to sit next to eachother
 .input-group{
 	@include flex;
-	align-items: center;
-	label{
-		flex: 3 auto;
+	align-items: flex-start;
+	input{
+		flex: 0 auto;
 		& + .button{
-			flex: 1 auto;
-			margin-top: 0.6rem;
+			flex: 1 0 auto;
 		}
 	}
 	@media #{$small-only} {
+		input{
+			margin: 0;
+		}
 		flex-wrap: wrap;
 	}
 }

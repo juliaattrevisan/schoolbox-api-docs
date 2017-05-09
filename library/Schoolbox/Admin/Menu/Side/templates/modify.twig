@@ -83,12 +83,14 @@
                             <input name='title' type="text" placeholder="Item Label" value="{{ item.title }}">
                         </label>
                     </div>
-                    <div class="small-12 columns input-group">
-                        <label>
+                    <div class="small-12 columns">
+                        <label for="url">
                             Destination URL
-                            <input name="url" required type="text" size="40" maxlength="2048" placeholder="Destination URL" value="{{ item.url }}">
                         </label>
-                        <a href="#" class="button" data-role="openResourceBrowser">Browse {{ resource }}</a>
+                        <div class="input-group">
+                            <input name="url" required type="text" size="40" maxlength="2048" placeholder="Destination URL" value="{{ item.url }}">
+                            <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ resource }}</a>
+                        </div>
                     </div>
                     <div class="small-11 columns">
                         <label>
