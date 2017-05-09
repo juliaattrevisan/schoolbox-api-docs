@@ -17,6 +17,7 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -48,6 +49,24 @@ class EventMetadataNotifier extends AbstractModuleNotifier
     protected function getSlug()
     {
         return $this->msgNamespaceSlug;
+    }
+
+    /**
+     * A l10n dictionary
+     *
+     * @var RosettaStone
+     */
+    private $stone;
+
+    /**
+     * This depends on the Rosetta Stone
+     *
+     * @param array $dependencies
+     */
+    public function loadDependencies($dependencies = null)
+    {
+        $this->stone = new RosettaStone(\Schoolbox\L10n\Mapper::getInstance());
+        parent::loadDependencies($dependencies);
     }
 
     /**
@@ -183,6 +202,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         // no event? no messages
         if (!$eventCollection->count()) {
+            // Don't translate log messages
             $this->log->error("No events attached to EOTC metadata");
             return $envelope;
         }
@@ -266,11 +286,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         );
 
         $href = "/modules/eotc/status/modify/".$relEvent->getId();
-        $bob->setTitle(":applicant submitted new EOTC, :event")
+        $bob->setTitle(":applicant submitted new :eotc, :event")
             ->setParams(
                 array(
                     'applicant' => new UserParam($applicant, ParameterInterface::STACKING_REPLACE),
-                    'event'     => new Param($relEvent->getTitle(), $href)
+                    'event'     => new Param($relEvent->getTitle(), $href),
+                    'eotc'      => new Param($this->stone->translate('eotc', false, false)),
                 )
             )
             ->setIcon("/portrait.php?size={$this->iconSize}&userId=".$applicant->getExternalId())
@@ -349,7 +370,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setParams(
                 array(
                     'user' => new UserParam($effector),
-                    'note' => new Param($relEventNote, $href)
+                    'note' => new Param($relEventNote, $href),
+                    'eotc' => new Param($this->stone->translate('eotc', false, false)),
                 )
             )
             ->setSeverity(Logger::WARNING)
@@ -358,11 +380,11 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setMeta($diff);
 
         if (isset($diff['comment'])) {
-            $bob->setTitle(":user commented on the EOTC event :note")
+            $bob->setTitle(":user commented on the :eotc event :note")
                 ->setByline($effector->formatName('{firstname}') . " wrote")
                 ->setBody($diff['comment'][0]);
         } else {
-            $bob->setTitle(":user updated the EOTC event :note");
+            $bob->setTitle(":user updated the :eotc event :note");
         }
 
         $instance = $bob->build();
