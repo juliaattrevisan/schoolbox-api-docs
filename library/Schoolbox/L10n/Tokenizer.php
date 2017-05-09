@@ -7,6 +7,7 @@
 
 namespace Schoolbox\L10n;
 
+use Alaress\Rules\Token\Filter;
 use Alaress\Rules\Token\Token;
 use Alaress\Rules\Token\Tokenizer as BaseTokenizer;
 
@@ -22,7 +23,6 @@ class Tokenizer extends BaseTokenizer
      */
     public function __construct(RosettaStone $stone)
     {
-        // TODO implement these as filters ({:term|p|c)}
         foreach ($stone->getAllTerms() as $term) {
             $this
                 ->addToken(
@@ -30,37 +30,35 @@ class Tokenizer extends BaseTokenizer
                         $term,
                         '',
                         function() use ($term, $stone) {
-                            return $stone->translate($term, false, false);
+                            return new Word($term, $stone);
                         }
                     )
                 )
-                ->addToken(
-                    new Token(
-                        $term.'-p',
-                        '',
-                        function() use ($term, $stone) {
-                            return $stone->translate($term, true, false);
-                        }
-                    )
-                )
-                ->addToken(
-                    new Token(
-                        $term.'-c',
-                        '',
-                        function() use ($term, $stone) {
-                            return $stone->translate($term, false, true);
-                        }
-                    )
-                )
-                ->addToken(
-                    new Token(
-                        $term.'-pc',
-                        '',
-                        function() use ($term, $stone) {
-                            return $stone->translate($term, true, true);
-                        }
-                    )
-                );
+            ;
         }
+        $this->addFilter(
+            new Filter(
+                'p',
+                'Plural form',
+                function ($value) {
+                    if ($value instanceof Word) {
+                        $value = $value->setPlural(true);
+                    }
+                    return $value;
+                }
+            )
+        );
+        $this->addFilter(
+            new Filter(
+                'c',
+                'Capital form',
+                function ($value) {
+                    if ($value instanceof Word) {
+                        $value = $value->setCapital(true);
+                    }
+                    return $value;
+                }
+            )
+        );
     }
 }
