@@ -89,7 +89,8 @@ class Bulk_Category
                     }
                     catch (MapperException $e) {
                         $output[] = [
-                            'category' => $row[1],
+                            'id' => '',
+                            'name' => $row[1],
                             'status' => 'Not Added',
                             'error' => "Could not find parent folder {$row[0]}",
                         ];
@@ -108,7 +109,8 @@ class Bulk_Category
                             $folder = $folderMapper->findByCode($subjectCode);
 
                             $output[] = [
-                                'category' => $row[1],
+                                'id' => '',
+                                'name' => $row[1],
                                 'status' => 'Skipped',
                                 'error' => "Subject code already exists ($subjectCode)",
                             ];
@@ -194,9 +196,10 @@ class Bulk_Category
 
                     /* Successfully created
 					 */
-                    if (is_numeric($folder->getId())) {
+                    if (is_numeric($newFolder->getId())) {
                         $output[] = [
-                            'category' => $row[1],
+                            'id' => $newFolder->getId(),
+                            'name' => $row[1],
                             'status' => 'Added',
                             'error' => 'OK',
                         ];
