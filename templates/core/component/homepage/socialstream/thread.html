@@ -1,9 +1,9 @@
 <!-- BEGIN socialstream_post -->
-<li class="actions-small-1" data-socialstream-row xmlns="http://www.w3.org/1999/html">
+<li class="actions-small-2" data-socialstream-row xmlns="http://www.w3.org/1999/html">
     <div class="list-item">
         <div class="card small-12">
             <a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" title="View Profile">
-                <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="Moggy" class="hide-for-small-only">
+                <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
                 <p>{SOCIALSTREAM_POST_USER_FULLNAME}</p>
                 <p class="meta">Posted {SOCIALSTREAM_POST_CREATED_AT}</p>
             </a>
@@ -87,18 +87,15 @@
         <!-- END socialstream_post_has_attachment -->
     </article>
 
-    <!-------------------------->
-    <!-- Socialstream Comment -->
-    <!-------------------------->
+    <!-- Comment -->
     <ul class="information-list reply">
         <!-- BEGIN socialstream_comment -->
-        <li class="actions-small-1" data-socialstream-row>
+        <li class="actions-small-2" data-socialstream-row>
             <div class="list-item">
                 <div class="card small-12">
                     <a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" title="View Profile">
-                        <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square64" alt="" class="hide-for-small-only">
-                        <p>{SOCIALSTREAM_COMMENT_USER_FULLNAME}</p>
-                        <p class="meta">Posted {SOCIALSTREAM_COMMENT_CREATED_AT}</p>
+                        <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">
+                        <p>{SOCIALSTREAM_COMMENT_USER_FULLNAME} | <span class="meta">Replied {SOCIALSTREAM_COMMENT_CREATED_AT}</span></p>
                     </a>
                 </div>
             </div>
@@ -136,10 +133,9 @@
                     <!-- BEGIN socialstream_comment_has_thumbnail -->
                     <div class="card small-12">
                         <a href="{SOCIALSTREAM_COMMENT_URL}">
-                            <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
-                            <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
+                            <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square32" />
+                            <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE} | <span class="meta">{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</span></p>
                         </a>
-                        <p class="meta">{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</p>
                     </div>
                     <!-- END socialstream_comment_has_thumbnail -->
 
@@ -180,19 +176,15 @@
                 <!-- END socialstream_comment_has_attachment -->
             </article>
 
-            <!------------------------>
-            <!-- Socialstream Reply -->
-            <!------------------------>
+            <!-- Reply -->
             <ul class="information-list reply">
                 <!-- BEGIN socialstream_reply -->
                 <li class="actions-small-1" data-socialstream-row>
                     <div class="list-item">
                         <div class="card small-12">
                             <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">
-                                <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square64" alt="" class="hide-for-small-only">
-                                <p>{SOCIALSTREAM_REPLY_USER_FULLNAME}</p>
-
-                                <p class="meta">Posted {SOCIALSTREAM_REPLY_CREATED_AT}</p>
+                                <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
+                                <p>{SOCIALSTREAM_REPLY_USER_FULLNAME} | <span class="meta">Replied {SOCIALSTREAM_REPLY_CREATED_AT}</span></p>
                             </a>
                         </div>
                     </div>
@@ -225,10 +217,9 @@
                             <!-- BEGIN socialstream_reply_has_thumbnail -->
                             <div class="card small-12">
                                 <a href="{SOCIALSTREAM_REPLY_URL}">
-                                    <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
-                                    <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
+                                    <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square32" />
+                                    <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE} | <span class="meta">{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</span></p>
                                 </a>
-                                <p class="meta">{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</p>
                             </div>
                             <!-- END socialstream_reply_has_thumbnail -->
 
@@ -265,14 +256,10 @@
                 </li>
                 <!-- END socialstream_reply -->
             </ul>
-            <!------------------------>
-            <!-- Socialstream Reply -->
-            <!------------------------>
+            <!-- Reply -->
         </li>
         <!-- END socialstream_comment -->
     </ul>
-    <!-------------------------->
-    <!-- Socialstream Comment -->
-    <!-------------------------->
+    <!-- Comment -->
 </li>
 <!-- END socialstream_post -->

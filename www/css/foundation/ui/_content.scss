@@ -1160,11 +1160,6 @@ $selector-width: 2.25rem;
 
 // Block Grid
 .grid {
-    //TODO: find block grid mixin
-    //@media #{$large-up} { @include block-grid(4); }
-    //@media #{$medium-up} { @include block-grid(2); }
-    //@media #{$small-up} { @include block-grid(2); }
-    //@extend .information-list;
     > li {
         padding: 0 !important; // SORRY! foundation's selector is just too specific :'(
         border-right: 1px solid $body-bg;
@@ -1183,9 +1178,8 @@ $selector-width: 2.25rem;
     }
 
     .reply{
-        background-color: rgba(0,0,0,0.02);
+        background-color: $snow;
         border-top: 1px solid $body-bg;
-        clear: both;
         padding-left: 2rem;
 
         @media #{$small-only} {
@@ -1210,24 +1204,32 @@ $selector-width: 2.25rem;
     @extend .threaded;
 
     .reply {
+        border-top: 0;
+        border-left: 6px solid $base;
         padding-left: 1rem;
+
+        .card{
+            margin-left: 1rem;
+            img{
+                width: 2rem;
+            }
+        }
 
         @media #{$small-only} {
             padding-left: 0.5rem;
         }
 
-        li,
-        .component-form{
-            clear: both;
-        }
-
         .reply {
-            @media #{$medium-up} {
-                margin-left: rem-calc((4.3 * $base-font-size));
-            }
+            margin-left: 1rem;
 
-            @media #{$small-up} {
-                margin-left: rem-calc((2 * $base-font-size));
+            li:first-child{
+                border-top: 0;
+            }
+            li{
+                border-top: 1px solid $base;
+            }
+            .card {
+                margin-top: 1rem;
             }
         }
     }
