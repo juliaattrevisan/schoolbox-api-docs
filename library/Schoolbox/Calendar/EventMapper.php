@@ -494,10 +494,9 @@ class EventMapper extends Schoolbox\Mapper
         $query = $this->getSelectString();
         $query .= $this->getFromString();
         $query .= '
-			WHERE DATE(start_datetime) >= :startDate
-			AND DATE(end_datetime) <= :endDate
-			GROUP BY event.id
-		';
+            WHERE DATE(start_datetime) >= :startDate
+            AND DATE(end_datetime) <= :endDate
+        ';
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(":startDate", $startDate);
@@ -506,8 +505,8 @@ class EventMapper extends Schoolbox\Mapper
 
         $allEvents = $this->hydrateSelect($statement);
 
-		return $allEvents;
-	}
+        return $allEvents;
+    }
 
 
     /**
