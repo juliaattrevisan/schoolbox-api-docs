@@ -157,14 +157,29 @@ class Controller extends Base
             // regardless of any filter selections send by user
             $filters[AssessmentFilter\NullableContext\UnitSpec\Definition::SLUG] = new Collection();
 
-            $assessmentIds  = $assessmentIdFinder->findIdsByFilters($filters);
-            $content        = $this->generateMarkbookReport($assessmentIds);
+            $assessmentIds = $assessmentIdFinder->findIdsByFilters($filters);
+            $content       = $this->generateMarkbookReport($assessmentIds);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $content,
             ]));
 
+        } catch (Filter\BrokenFilterException $e){
+            $data = [
+                'status'  => 500,
+                'message' => "Sorry, the {$e->getFilterName()} filter appears to be broken. Please deselect all options and try again",
+
+            ];
+            if ($this->getConfigLoader()->get('debug_mode')) {
+                $data = array_merge($data, [
+                    'code'    => $e->getCode(),
+                    'message' => $e->getMessage(),
+                    'line'    => $e->getLine(),
+                    'file'    => $e->getFile(),
+                ]);
+            }
+            $this->getResponse()->content->set($this->buildJsonOutput($data));
         } catch (\Exception $e) {
             $this->returnJsonError($e);
             // TODO - can remove this block when we abandon PHP 5 support
@@ -181,13 +196,20 @@ class Controller extends Base
      */
     protected function returnJsonError($e)
     {
-        $this->getResponse()->content->set($this->buildJsonOutput([
+        $data = [
             'status'  => 500,
-            'code'    => $e->getCode(),
-            'message' => $e->getMessage(),
-            'line'    => $e->getLine(),
-            'file'    => $e->getFile(),
-        ]));
+            'message' => 'Sorry, an error occurred during your request and has been logged. Please try deselecting filter options',
+
+        ];
+        if ($this->getConfigLoader()->get('debug_mode')) {
+            $data = array_merge($data, [
+                'code'    => $e->getCode(),
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+            ]);
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
 
