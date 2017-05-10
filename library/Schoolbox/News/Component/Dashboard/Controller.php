@@ -106,22 +106,27 @@ class Controller extends Component_Dashboard_ControllerAbstract
          */
         foreach ($this->headlineList as $topicId => $topicItems) {
             foreach ($topicItems as $itemCurrent) {
-                $item = [];
-                $item['id'] = $itemCurrent['item_id'];
 
-                // We only want to show a read-more link if the body of the news article is not blank (but we need to trim all the junk
-                // HTML (eg. "<p>&nbsp;</p>"... "<ul></ul>") that CKeditor tends to leave behind when someone clears out the editor in the
-                // WYSIWYG view)
+                $item = [
+                    'id' => $itemCurrent['item_id'],
 
-                $item['showLink'] = !empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_body']))));
-                $item['blurb'] = empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_blurb'])))) ? '<p>' . TextFormatter::cutSentence(Scrub::html2text($itemCurrent['item_body']), 300) . '</p>' : Scrub::html($itemCurrent['item_blurb']);
+                    // We only want to show a read-more link if the body of the news article is not blank (but we need to trim all the junk
+                    // HTML (eg. "<p>&nbsp;</p>"... "<ul></ul>") that CKeditor tends to leave behind when someone clears out the editor in the
+                    // WYSIWYG view)
+                    'showLink' => !empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_body'])))),
 
-                $item['date'] = new \Alaress_Date_Format($itemCurrent['item_datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT);
-                $item['datetime'] = $itemCurrent['item_datetime_posted'];
-                $item['uid'] = $itemCurrent['uid'];
-                $item['image'] = $itemCurrent['item_image'];
-                $item['heading'] = $itemCurrent['item_heading'];
-                $item['author'] = "{$itemCurrent['title']} {$itemCurrent['firstname']} {$itemCurrent['lastname']}";
+                    'blurb' => empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_blurb'])))) ? '<p>' . TextFormatter::cutSentence(Scrub::html2text($itemCurrent['item_body']), 300) . '</p>' : Scrub::html($itemCurrent['item_blurb']),
+                    'date' => new \Alaress_Date_Format($itemCurrent['item_datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT),
+
+                    /* Used for sorting articles in All tab
+                     */
+                    'datetime' => $itemCurrent['item_datetime_posted'],
+
+                    'uid' => $itemCurrent['uid'],
+                    'image' => $itemCurrent['item_image'],
+                    'heading' => $itemCurrent['item_heading'],
+                    'author' => "{$itemCurrent['title']} {$itemCurrent['firstname']} {$itemCurrent['lastname']}"
+                ];
 
                 if (!isset($newsByTopic[$itemCurrent['newsTopicID']])) {
                     $newsByTopic[$itemCurrent['newsTopicID']] = [];
