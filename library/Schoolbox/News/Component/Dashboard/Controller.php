@@ -10,6 +10,7 @@ namespace Schoolbox\News\Component\Dashboard;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use News;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
@@ -99,7 +100,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         $newsByTopic = [];                     // Holds news items grouped by topic
-        $newsAll = [];                  // Holds all news item grouped by date
+        $newsAll = new Collection();                  // Holds all news item grouped by date
 
         /* Preprocess all the items we found in the db
          */
@@ -116,9 +117,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 $item['blurb'] = empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_blurb'])))) ? '<p>' . TextFormatter::cutSentence(Scrub::html2text($itemCurrent['item_body']), 300) . '</p>' : Scrub::html($itemCurrent['item_blurb']);
 
                 $item['date'] = new \Alaress_Date_Format($itemCurrent['item_datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT);
+                $item['datetime'] = $itemCurrent['item_datetime_posted'];
                 $item['uid'] = $itemCurrent['uid'];
                 $item['image'] = $itemCurrent['item_image'];
-                $item['heading'] = $itemCurrent['item_heading'];
+                $item['heading'] = $itemCurrent['item_datetime_posted'];
                 $item['author'] = "{$itemCurrent['title']} {$itemCurrent['firstname']} {$itemCurrent['lastname']}";
 
                 if (!isset($newsByTopic[$itemCurrent['newsTopicID']])) {
@@ -127,11 +129,19 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
                 $newsByTopic[$itemCurrent['newsTopicID']][] = $item;
 
-                if (count($newsAll) < $this->getLimit()) {
-                    $newsAll[] = $item;
-                }
+                /* Accumulate all the items that we found so that we can order
+                 * them by date, then slice away all the excess, like fat
+                 */
+                $newsAll->add($item);
             }
         }
+
+        /* Order by datetime posted (most recent first)
+         * and trim away the fat
+         */
+        $newsAll->sortByCallback(function($a, $b) {
+            return strcmp($b['datetime'], $a['datetime']);
+        });
 
         return $this->renderTwigTemplate(
             $templateHandle,
