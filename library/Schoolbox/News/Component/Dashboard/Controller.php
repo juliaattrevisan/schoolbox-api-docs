@@ -120,7 +120,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 $item['datetime'] = $itemCurrent['item_datetime_posted'];
                 $item['uid'] = $itemCurrent['uid'];
                 $item['image'] = $itemCurrent['item_image'];
-                $item['heading'] = $itemCurrent['item_datetime_posted'];
+                $item['heading'] = $itemCurrent['item_heading'];
                 $item['author'] = "{$itemCurrent['title']} {$itemCurrent['firstname']} {$itemCurrent['lastname']}";
 
                 if (!isset($newsByTopic[$itemCurrent['newsTopicID']])) {
@@ -150,7 +150,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
                 'news'                  => $newsByTopic,
-                'newsAll'               => $newsAll,
+                'newsAll'               => $newsAll->limit($this->getLimit()),
                 'topics'                => $this->getAllTopics(),
                 'heading'               => $this->getConfig('componentname','value'),
                 'allDefault'            => $this->getConfig('default', 'value'),
