@@ -114,15 +114,15 @@ class Javascript extends Base
 
         // Event may or may not have a reviewer.
         $reviewer = $this->getEvent()->getBooking()->getReviewer();
-        if (!$reviewer instanceof User) {
-            $reviewerRender = [
-                'id'   => -1,
-                'name' => '',
-            ];
-        } else {
+        if ($reviewer instanceof User) {
             $reviewerRender = [
                 'id'   => $reviewer->getId(),
                 'name' => $reviewer->formatName(),
+            ];
+        } else {
+            $reviewerRender = [
+                'id'   => -1,
+                'name' => '',
             ];
         }
 
