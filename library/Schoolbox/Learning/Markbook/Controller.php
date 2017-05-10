@@ -489,7 +489,7 @@ class Controller extends Base
     protected function retrieveTitleField(IAssessable $assessment, User $student)
     {
         if ($this->hasTotalMarkColumn($assessment)
-            && preg_match('/(\d+) \/ (\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)
+            && preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)
         ) {
             return $markParts[1];
         }
@@ -506,7 +506,7 @@ class Controller extends Base
      */
     protected function retrieveTotalMarkField(IAssessable $assessment, User $student)
     {
-        if (preg_match('/(\d+) \/ (\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)) {
+        if (preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)) {
             return $markParts[2];
         }
         return '';
