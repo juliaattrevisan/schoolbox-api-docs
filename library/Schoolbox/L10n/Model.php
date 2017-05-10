@@ -19,6 +19,8 @@ class Model
     protected $pluralForm;
     /** @var bool */
     protected $capitaliseFirst;
+    /** @var string */
+    protected $indefiniteArticle;
 
     /**
      * @param string $value
@@ -110,6 +112,24 @@ class Model
     public function getCapitaliseFirst()
     {
         return $this->capitaliseFirst;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIndefiniteArticle()
+    {
+        return $this->indefiniteArticle;
+    }
+
+    /**
+     * @param string $indefiniteArticle
+     * @return static
+     */
+    public function setIndefiniteArticle($indefiniteArticle)
+    {
+        $this->indefiniteArticle = $indefiniteArticle;
+        return $this;
     }
 
     // Helper function to pluralise/capitalise the term as required

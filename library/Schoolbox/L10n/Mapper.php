@@ -25,5 +25,6 @@ class Mapper extends BaseMapper
         $this->uses('singular_form', self::TYPE_STRING);
         $this->uses('plural_form', self::TYPE_STRING);
         $this->uses('capitalise_first', self::TYPE_BOOLEAN);
+        $this->uses('indefinite_article', self::TYPE_STRING);
     }
 }
