@@ -80,7 +80,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this->addRoutePreload($matcher,
-            '(getByDate|getDueByDate)',
+            '(getByDate|getDueByDate|getHeat)',
             function ($params) {
                 $returnedParams = [];
                 if (array_key_exists('date', $params)) {
