@@ -62,6 +62,7 @@ abstract class AbstractIdFinder implements IdFinder
 
     /**
      * @inheritdoc
+     * @throws BrokenFilterException If a injected filter is unable to be processed
      */
     public function findIdsByFilters(array $filters = [], $deleted = false)
     {
@@ -144,6 +145,7 @@ abstract class AbstractIdFinder implements IdFinder
      * @param Collection[]|null[]|mixed[][] $completeFilters
      * @param bool                          $deleted          Whether to include soft-deleted entities
      * @return mixed[]
+     * @throws BrokenFilterException If a filter SQL fragment cannot be built
      */
     protected abstract function buildQuery(array $completeFilters, $deleted);
 

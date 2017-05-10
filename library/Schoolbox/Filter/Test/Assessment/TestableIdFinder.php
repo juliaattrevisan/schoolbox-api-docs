@@ -8,6 +8,7 @@
 namespace Schoolbox\Filter\Filters\Assessment;
 
 use Schoolbox\Collection;
+use Schoolbox\Filter\BrokenFilterException;
 
 /**
  * Enables unit testing of the parent's logic by exposing internal methods.
@@ -45,6 +46,8 @@ class TestableIdFinder extends IdFinder
     /**
      * @param int[][]|null[] $completeFilters All keys must exists (to avoid needing a heap of isset() calls)
      * @return mixed[] UNION sub-query string + params array
+     * @throws BrokenFilterException If filter SQL fragment cannot be built
+     * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
      */
     public function getSqlStringForFilters(array $completeFilters)
     {

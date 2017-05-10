@@ -52,6 +52,8 @@ class IdFinder extends Filter\AbstractIdFinder
      * Each sub-queries are modified depending on which non-assessment-context filters are specified
      *
      * @inheritdoc
+     * @throws Filter\BrokenFilterException If filter SQL fragment cannot be built
+     * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
      */
     protected function buildQuery(array $completeFilters, $deleted)
     {
@@ -575,7 +577,8 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param Collection|Term\Model[] $terms (can also be NULL, but storm doesn't like that type-hint)
      * @param string $dateColumn ['due_date'|'close_date']
      * @return string
-     * @throws \InvalidArgumentException If date column is unrecognised
+     * @throws Filter\BrokenFilterException If filter cannot be constructed
+     * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
      */
     private function getClauseTerm(Collection $terms = null, $dateColumn)
     {
@@ -585,7 +588,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         if(!in_array($dateColumn, [self::DATE_COL_DUE, self::DATE_COL_CLS], true)){
-            throw new \InvalidArgumentException("Unrecognised dataColumn: $dateColumn");
+            throw new Filter\BrokenFilterException('Term', "Unrecognised dataColumn: $dateColumn");
         }
 
         // Generate the dueDate filtering
