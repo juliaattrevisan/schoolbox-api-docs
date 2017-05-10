@@ -51,7 +51,7 @@ class RosettaStone
      */
     public function indefiniteArticle($term, $capital = false)
     {
-        return $this->__get($term)->getIndefiniteArticle($capital);
+        return $this->__get($term)->translateIndefiniteArticle($capital);
     }
 
     /**

@@ -163,7 +163,7 @@ class Model
     {
         $local = $this->getIndefiniteArticle();
         if ($capital) {
-            $local = ucwords($capital);
+            $local = ucwords($local);
         }
         return $local;
     }
