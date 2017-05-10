@@ -23,6 +23,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
     };
 
+    var heatCache = {};
 
     // Timetable picker
     if (twigVars.timetable) {
@@ -116,18 +117,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     Flatpickr.localize(Flatpickr.l10ns.default);
     Flatpickr.l10ns.default.firstDayOfWeek = twigVars.weekStartDay;
 
-    // Come up with a shit load of random numbers for heatmap dummy percentages
-    var randPercent = [];
-    for (var y=1900; y <= 2100; y++) {
-        randPercent[y] = [];
-        for (var m = 1; m <= 12; m++) {
-            randPercent[y][m] = [];
-            for (var d = 1; d <= 31; d++) {
-                randPercent[y][m][d] = Math.floor((Math.random() * 100) + 1);
-            }
-        }
-    }
-
     window.pickerInstance[twigVars.id] = flatpickr("#pickerCalendar" + twigVars.id, {
         defaultDate: twigVars.date,
         inline: true,
@@ -172,7 +161,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
 
-            addHeatmap(instance);
+            addHeatmap(instance, addHeatmap);
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -193,13 +182,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
         },
         onMonthChange: function(selectedDates, dateStr, instance) {
-            addHeatmap(instance);
+            addHeatmap(instance, addHeatmap);
         },
         onYearChange: function(selectedDates, dateStr, instance) {
-            addHeatmap(instance);
+            addHeatmap(instance, addHeatmap);
         },
         onValueUpdate: function(selectedDates, dateStr, instance) {
-            addHeatmap(instance);
+            addHeatmap(instance, addHeatmap);
         }
 
     });
@@ -617,24 +606,60 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     /**
      * Adds heatmap to a month view of flatpickr
      *
-     * @param instance
+     * @param {Flatpickr} instance
+     * @param {object}     heatData
      */
     function addHeatmap(instance) {
         // loop through all days and set a heatmap height
-        var i = 0;
         $(instance.days.childNodes).each(function() {
-            var year = $(this)[0].dateObj.getFullYear(),
-                month = $(this)[0].dateObj.getMonth() + 1,
-                day = $(this)[0].dateObj.getDate();
+            var dt = $(this)[0].dateObj;
 
-            // empty out weekends to make more realistic
-            if ($(this)[0].dateObj.getDay() == 0 || $(this)[0].dateObj.getDay() == 6) {
-                randPercent[year][month][day] = 0;
+            var day = dt.getDate(),
+                mo  = dt.getMonth() + 1,
+                yr  = dt.getUTCFullYear();
+
+            if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
+                $(this).append('<span class="flatpickr-day-heat" style="height:' + heatCache[yr][mo][day] + '%;"></span>');
             }
-
-            $(this).append('<span class="flatpickr-day-heat" style="height:' + randPercent[year][month][day] + '%;"></span>');
-            i++;
         });
+    }
+
+    /**
+     *
+     * @param {Flatpickr} instance
+     * @param {Callable}   onSuccess
+     */
+    function requestHeat(instance, onSuccess) {
+        var folderId = $('*[name = "folderId"]').val(),
+            mo = instance.currentMonth + 1,
+            yr = instance.currentYear;
+
+        if ('undefined' === typeof heatCache[yr]) {
+            heatCache[yr] = {};
+        }
+
+        if ('undefined' === typeof heatCache[yr][mo]) {
+            heatCache[yr][mo] = {};
+
+            var promise = $.get((twigVars.routeLookup.getHeat
+                .replace(/{folderId}/g, folderId))
+                .replace(/{year}/g, yr)
+                .replace(/{month}/g, mo));
+
+            promise.done(function (data) {
+
+                for (var day in data) {
+                    heatCache[yr][mo][day] = data[day];
+                }
+
+                // do this async the first time (cold cache)
+                onSuccess(instance);
+            }).fail(function () { console.error(arguments); });
+
+        } else {
+            // do it sync if the cache is hot
+            onSuccess(instance);
+        }
     }
 
 };

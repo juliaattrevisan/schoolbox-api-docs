@@ -173,7 +173,8 @@
         {% endif %}
         routeLookup: {
             getDueByDate: '{{ routeLookup('pickerDatetime.getDueByDate') }}',
-            getByDate: '{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'
+            getByDate: '{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}',
+            getHeat: '{{ routeLookup('pickerDatetime.getHeat') }}'
         },
         weekStartDay: {{ weekStartDay }}
     });
