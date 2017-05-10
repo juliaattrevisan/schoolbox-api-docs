@@ -43,6 +43,10 @@ use Schoolbox\Filter;
  */
 class IdFinder extends Filter\AbstractIdFinder
 {
+    // Which date column does the term filter relate to?
+    const DATE_COL_DUE = 'due_date';
+    const DATE_COL_CLS = 'close_date';
+
     /**
      * Different sub-queries are required depending on which assessment-contexts filters are specified
      * Each sub-queries are modified depending on which non-assessment-context filters are specified
@@ -568,12 +572,11 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'TermClose' filter
      *
-     * @param Collection|Term\Model[] $termClose (can also be NULL, but storm doesn't like that type-hint)
+     * @param Collection|Term\Model[] $terms (can also be NULL, but storm doesn't like that type-hint)
      * @param string $dateColumn ['due_date'|'close_date']
      * @return string
+     * @throws \InvalidArgumentException If date column is unrecognised
      */
-    const DATE_COL_DUE = 'due_date';
-    const DATE_COL_CLS = 'close_date';
     private function getClauseTerm(Collection $terms = null, $dateColumn)
     {
         // Is this filter being applied ?
