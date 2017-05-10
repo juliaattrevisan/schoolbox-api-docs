@@ -1,0 +1,44 @@
+<div id="footer" class="clearfix">
+	<ul>
+		<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+		<li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+		<li><a href="http://www.schoolbox.com.au" title="Schoolbox, Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a>
+		{SITE_VERSION} by <a href="http://www.alaress.com.au">Alaress</a></li>
+		<!-- BEGIN feedback_link -->
+		<li><a href="{FEEDBACK_URL}">{FEEDBACK_TEXT}</a></li>
+		<!-- END feedback_link -->
+	</ul>
+	<a href="#" class="to-top" title="Back to top">&uarr; Back to top</a>
+</div>
+<script type="text/javascript">
+	Foundation.global.namespace = '';
+	$(document).foundation();
+
+	$(function () {
+		var s = $('#search');
+
+		s.on('focus blur', 'input', function (e) {
+			if (e.type == 'focusin') {
+				s.addClass('focus');
+			} else {
+				s.removeClass('focus');
+			}
+		});
+	});
+
+	// Custom CIS 'back to top' button
+    var $backToTop = $(".to-top");
+    $backToTop.hide();
+
+    $(window).on('scroll', function() {
+        if ($(this).scrollTop() > 300) {
+            $backToTop.fadeIn();
+        } else {
+            $backToTop.fadeOut();
+        }
+    });
+    $backToTop.on('click', function(e) {
+        $("html").animate({scrollTop: 0}, 500);
+    });
+</script>
+{SITE_ANALYTICS}
