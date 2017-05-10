@@ -732,9 +732,12 @@ class SitePage extends Page
             $error->setMessage('%MESSAGE%');
         }
 
+        /** @var RosettaStone $l10n */
+        $l10n = $this->getDi()->get('l10n');
+
         /* Set up any replacements
          */
-        $error->setMessage(str_replace("%MESSAGE%", $args['message'], $error->getMessage()));
+        $error->setMessage(str_replace("%MESSAGE%", $args['message'], $l10n->translateSentence($error->getMessage())));
 
         http_response_code($code);
 
