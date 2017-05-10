@@ -392,6 +392,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function createPastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
+        $silence = new SilentNotif();
+
+        $this->getPastoralMapper()->setNotifier($silence);
+        $this->getPastoralCommentMapper()->setNotifier($silence);
+
         // Get the information necessary to create the query
 
         // External student ID
