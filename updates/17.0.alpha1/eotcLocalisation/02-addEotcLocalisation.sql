@@ -4,11 +4,13 @@ INSERT INTO `localisation` (
   `title`,
   `singular_form`,
   `plural_form`,
-  `capitalise_first`
+  `capitalise_first`,
+  `indefinite_article`
 ) VALUES (
   'eotc',
   'EOTC (Education Outside the Classroom)',
   'EOTC',
   'EOTC',
-  true
+  true,
+  'an'
 );
