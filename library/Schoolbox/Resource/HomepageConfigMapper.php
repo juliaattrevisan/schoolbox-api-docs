@@ -117,19 +117,32 @@ class HomepageConfigMapper extends Mapper
         $ccm = Component_ConfigMapper::getInstance();
         /** @var Component_Instance[] $instances */
         $instances = $cim->findByContext('homepage_template', $homepage->getTemplate()->getId());
+
         if (!count($instances)) {
             return;
         }
-        foreach ($instances as $inst) {
+
+        foreach ($instances as $currentInstance) {
+
             // preserve the config
             /** @var \Component_ConfigDefinition[] $configs */
-            $configs = $inst->getConfig();
+            $configs = $currentInstance->getConfig();
+
+            /* Clone before saving, otherwise it does some magical caching stuff
+             * and tries to re-assign config instances to the wrong component instance
+             * in findByFields:247 (it tries to match the homepage template's configs
+             * to the $inst, which is a misbehaviour that is seemingly rectified by clone)
+             */
+            $inst = clone($currentInstance);
+
             $inst
                 ->setId(null)
                 ->setConfig(new Collection())
                 ->setModule('homepage')
                 ->setIdentifier($homepage->getCategory()->getId());
+
             $ids = $cim->save($inst);
+
             if (!count($configs)) {
                 continue;
             }
@@ -157,6 +170,7 @@ class HomepageConfigMapper extends Mapper
                             continue;
                         }
                     }
+
                     $conf = new Component_Config();
                     $conf
                         ->setInstanceId($id)

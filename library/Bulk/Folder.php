@@ -1,13 +1,26 @@
 <?php
 /**
- * Bulk_Category
+ * Bulk_Folder
+ *
+ * Upload folder structures from a csv
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Bulk_Category extends Bulk_Abstract
+
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
+
+
+class Bulk_Folder
 {
 
     /**
@@ -24,11 +37,11 @@ class Bulk_Category extends Bulk_Abstract
     protected $fp;
 
     /**
-    * Constructor
-    *
-    * @param $file
-    * @param $templateID
-    */
+     * Constructor
+     *
+     * @param $file
+     * @param $templateID
+     */
     public function __construct($file, $templateID)
     {
         $this->fp = $file;
@@ -36,91 +49,104 @@ class Bulk_Category extends Bulk_Abstract
     }
 
     /**
-    * Adds categories via csv
-    * CSV Fields:
-    0.	parent
-    1.	title
-    2-n. codes
-    *
-    * @return array
-    */
-    public function addCategories()
+     * Adds folders via csv
+     *
+     * CSV Fields:
+     * 0.	parent
+     * 1.	title
+     * 2-n. codes
+     *
+     * @return array
+     */
+    public function addFolders()
     {
-        $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-        $homepageConfigMapper = new \Schoolbox\Resource\HomepageConfigMapper();
+        $folderMapper = FolderMapper::getInstance();
+        $folderCodeMapper = FolderCodeMapper::getInstance();
+        $roleAccessMapper = RoleAccessMapper::getInstance();
+        $roleMapper = RoleMapper::getInstance();
+        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
+        $homepageConfigMapper = HomepageConfigMapper::getInstance();
 
         /* List of outcomes
 		 */
-        $output = array();
+        $output = [];
 
         if (is_resource($this->fp)) {
-            $groups = array_map(array('Scrub', 'text'), $_POST['groupPerm']);
+            $groups = array_map(['Scrub', 'text'], $_POST['groupPerm']);
 
             /* Process rows
 			 */
             $headerRow = fgetcsv($this->fp, 1000, ",");
+
             while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
-                    
+
+                /* Parent folder and Import Folder name must exist
+                 */
                 if (($row[0] != '') && ($row[1] != '')) {
+
                     /* Check parent exists
 					 */
                     try {
-                        $category = $categoryMapper->findById($row[0]);
-                    } catch (\Exception $e) {
-                        $output[] = array(
-                            'category' => $row[1],
+                        $folder = $folderMapper->findById($row[0]);
+                    }
+                    catch (MapperException $e) {
+                        $output[] = [
+                            'id' => '',
+                            'name' => $row[1],
                             'status' => 'Not Added',
                             'error' => "Could not find parent folder {$row[0]}",
-                        );
+                        ];
 
                         continue;
                     }
 
                     /* Check if subject code already exists
 					 */
-                    $codeExists = false;
-                    $codes = array();
+                    $codes = [];
 
                     for ($i=2; $row[$i]; $i++) {
                         $subjectCode = trim($row[$i]);
+
                         try {
-                            $category = $categoryMapper->findByCode($subjectCode);
+                            $folder = $folderMapper->findByCode($subjectCode);
 
-                            $output[] = array(
-                                'category' => $row[1],
+                            $output[] = [
+                                'id' => '',
+                                'name' => $row[1],
                                 'status' => 'Skipped',
-                                'error' => "Subject code already exists ($subjectCode)",
-                            );
+                                'error' => "Subject code already exists ({$subjectCode})",
+                            ];
+                        } catch (MapperException $e) {
 
-                            $codeExists = true;
-                        } catch (\Exception $e) {
+                            /* noop - folder doesn't exist
+                             */
                         }
 
                         $codes[] = $subjectCode;
                     }
 
-                    if ($codeExists) {
+                    if (count($codes)) {
                         continue;
                     }
 
                     /* Parent folder
                      */
-                    $parent = new \Schoolbox\Resource\Folder\Model();
+                    $parent = $folderMapper->createModel();
                     $parent->setId($row[0]);
 
                     /* Homepage config template
                      */
-                    $homepageTemplate = new \Schoolbox\Resource\HomepageTemplate();
+                    $homepageTemplate = $homepageTemplateMapper->createModel();
                     $homepageTemplate->setId($this->getTemplateID());
 
                     /* Homepage config
                      */
-                    $homepageConfig = new \Schoolbox\Resource\HomepageConfig();
+                    $homepageConfig = $homepageConfigMapper->createModel();
                     $homepageConfig->setTemplate($homepageTemplate);
 
                     /* Set up new folder
                      */
-                    $newFolder = new \Schoolbox\Resource\Folder\Model();
+                    $newFolder = $folderMapper->createModel();
                     $newFolder->setName(trim($row[1]));
                     $newFolder->setParent($parent);
                     $newFolder->setHomepage($homepageConfig);
@@ -128,16 +154,19 @@ class Bulk_Category extends Bulk_Abstract
                     /* Accumulate all folder codes
                      */
                     foreach ($codes as $currentCode) {
-                        $folderCode = new \Schoolbox\Resource\Folder\Code\Model();
+                        $folderCode = $folderCodeMapper->createModel();
                         $folderCode->setCode($currentCode);
 
                         $newFolder->getCodes()->add($folderCode);
                     }
 
-                    if (count($codes) == 0 && $_POST["inherit"])
+                    /* Inherit perms
+                     */
+                    if (count($codes) == 0 && $_POST["inherit"]) {
                         $newFolder->setInherit(true);
+                    }
 
-                    $categoryMapper->save($newFolder);
+                    $folderMapper->save($newFolder);
 
                     // Save the homepage contents
                     if ($this->getTemplateID()) {
@@ -146,33 +175,36 @@ class Bulk_Category extends Bulk_Abstract
                     }
 
                     if (!$_POST["inherit"]) {
+
                         /* Save roles
                          */
-                        $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
-
                         foreach ($groups as $id => $perm) {
                             try {
-                                $roleMapper = new \Schoolbox\RoleMapper();
+                                /** @var Role $role */
                                 $role = $roleMapper->findById($id);
 
-                                $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
+                                $roleAccess = $roleAccessMapper->createModel();
                                 $roleAccess->setCategory($newFolder);
                                 $roleAccess->setRole($role);
                                 $roleAccess->setType($perm);
                                 $roleAccessMapper->save($roleAccess);
-                            } catch (\Exception $e) {
+                            } catch (MapperException $e) {
+
+                                /* noop - role not found
+                                 */
                             }
                         }
                     }
 
                     /* Successfully created
 					 */
-                    if (is_numeric($category->getId())) {
-                        $output[] = array(
-                            'category' => $row[1],
+                    if (is_numeric($newFolder->getId())) {
+                        $output[] = [
+                            'id' => $newFolder->getId(),
+                            'name' => $row[1],
                             'status' => 'Added',
                             'error' => 'OK',
-                        );
+                        ];
                     }
                 }
             }
@@ -188,10 +220,12 @@ class Bulk_Category extends Bulk_Abstract
     * Set template id
     *
     * @param $templateID
+    * @return $this
     */
     private function setTemplateID($templateID)
     {
         $this->templateID = $templateID;
+        return $this;
     }
 
     /**
