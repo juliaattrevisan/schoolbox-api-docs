@@ -400,9 +400,9 @@ class Controller extends Base
      * Return JSON list of students and how much due work that have for a given date and class code(s)
      *
      * @param Alaress_Date_Format $date (Date we are interested in)
-     * @param string $folder (CSV list of class codes)
+     * @param int $folderId
      */
-    public function getDueByDate(Alaress_Date_Format $date, $folder)
+    public function getDueByDate(Alaress_Date_Format $date, $folderId)
     {
         // Don't show other students' due work to anyone but staff
 
@@ -420,7 +420,7 @@ class Controller extends Base
 
             // Get all students for the class or the group
 
-            $folderModel = $this->getFolderMapper()->findById($folder);
+            $folderModel = $this->getFolderMapper()->findById($folderId);
             $externalStudents = $this->getUserAccessMapper()->findUsersInCategory(
                 $folderModel,
                 Role::STUDENT,
