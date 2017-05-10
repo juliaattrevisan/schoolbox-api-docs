@@ -112,7 +112,7 @@
 </div>
 
 <script>
-    var twigVars = {
+    $.fn.alaressDateTimeModal({
         date: new Date('{{ value }}'),
         element: '{{ element }}',
         id: '{{ id }}',
@@ -145,7 +145,5 @@
             getByDate: '{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'
         },
         weekStartDay: {{ weekStartDay }}
-    };
-    $.fn.alaressDateTimeModal(twigVars);
-
+    });
 </script>
