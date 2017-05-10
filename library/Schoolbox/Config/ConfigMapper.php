@@ -41,6 +41,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
             $this->disableCache();
         }
 
+        $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->setMonitor( new LiveMonitor());
         $this->setConfigLoader($this); // this line will possibly blow up in my face
         $this->setColumnFactory(new ColumnFactory());
@@ -138,6 +139,19 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public function dropCache()
     {
         $this->cache = array();
+    }
+
+    /**
+     * Override notifications to silence them
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null $previous
+     * @return void
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        //Silence notifications
     }
 
 }
