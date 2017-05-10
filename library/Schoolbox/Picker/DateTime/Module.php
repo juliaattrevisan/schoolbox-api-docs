@@ -47,8 +47,9 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 '/type/{type}/element/{element}/id/{id}/value/{value}' => 'getPicker',
-                '/date/{date}' => 'getByDate',
-                '/date/{date}/folder/{folderId}' => 'getDueByDate',
+                '/date/{date}'                                         => 'getByDate',
+                '/date/{date}/folder/{folderId}'                       => 'getDueByDate',
+                '/heat/{year}/{month}/folder/{folderId}'               => 'getHeat'
             ],
             'POST' => [
             ]
@@ -101,9 +102,9 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-                'termMapper' => $this->getMapperFactory()->getLazy(TermMapper::class),
-                'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'termMapper'       => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
             ])
         );
