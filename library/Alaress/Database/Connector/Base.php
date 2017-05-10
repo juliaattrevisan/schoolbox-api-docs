@@ -84,6 +84,7 @@ class Base implements Serializable, IConnector
     public function enableMultipleActiveResultSets()
     {
         $this->broker->enableMultipleActiveResultSets();
+        return $this;
     }
 
     /**
@@ -92,6 +93,7 @@ class Base implements Serializable, IConnector
     public function disableMultipleActiveResultSets()
     {
         $this->broker->disableMultipleActiveResultSets();
+        return $this;
     }
 
     // ----------------------------------------------------------------------------------------------------------------

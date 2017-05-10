@@ -42,13 +42,16 @@ interface IConnector extends IQuoter
 
     /**
      * Enable the use of multiple active result sets (required if executing a query inside an iterator).
-     *
      * This may or may not be supported by all database connectors- where it is not it will just do nothing.
+     *
+     * @return $this
      */
     public function enableMultipleActiveResultSets();
 
     /**
      * Disable the use of multiple active result sets (better performance)
+     *
+     * @return $this
      */
     public function disableMultipleActiveResultSets();
 
