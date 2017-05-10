@@ -247,9 +247,10 @@
 
                 </fieldset>
 
-                {# Permissions block is only visible if not inheriting permissions #}
+                {# Permissions block is only visible if not inheriting permissions under normal circumstance
+                   However, allow perms to be set if this folder is in the root, so they can actually set perms #}
 
-                <fieldset id="permissions" class="content {% if folder.getInherit %}hide{% endif %}">
+                <fieldset id="permissions" class="content {% if folder.getInherit and parent.getId != 0 %}hide{% endif %}">
                     <table class="scrollable">
                         <thead>
                         <tr>

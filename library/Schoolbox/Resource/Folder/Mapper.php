@@ -1497,10 +1497,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Make sure we aren't hitting the root
             /** @var Model $parent */
             $parent = $folder->getParent();
-            if ($parent->isRootNode())
-            {
-                // Got to the top- somethings wrong with the data in the database as this should not be possible
-                error(2);
+            if ($parent->isRootNode()) {
+                // Don't error out - throw exception instead, and let calling code deal with it
+                throw new MapperException("Folder has no NNIAN");
             }
 
             // Round we go again
