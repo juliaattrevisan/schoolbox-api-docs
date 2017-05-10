@@ -41,6 +41,13 @@ class Word
     private $capital = false;
 
     /**
+     * Should only the indefinite article (a or an) be rendered?
+     *
+     * @var bool
+     */
+    private $indef = false;
+
+    /**
      * Constructor
      *
      * @param string       $term
@@ -73,10 +80,23 @@ class Word
     }
 
     /**
+     * @param bool $indef
+     * @return static
+     */
+    public function setIndefiniteArticle($indef)
+    {
+        $this->indef = $indef;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function __toString()
     {
+        if ($this->indef) {
+            return $this->stone->indefiniteArticle($this->term, $this->capital);
+        }
         return $this->stone->translate($this->term, $this->plural, $this->capital);
     }
 }

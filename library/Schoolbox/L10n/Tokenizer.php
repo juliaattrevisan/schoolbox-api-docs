@@ -60,5 +60,17 @@ class Tokenizer extends BaseTokenizer
                 }
             )
         );
+        $this->addFilter(
+            new Filter(
+                'indef',
+                'Indefinite Article (only)',
+                function ($value) {
+                    if ($value instanceof Word) {
+                        $value = $value->setIndefiniteArticle(true);
+                    }
+                    return $value;
+                }
+            )
+        );
     }
 }

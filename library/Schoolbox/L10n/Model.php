@@ -153,6 +153,21 @@ class Model
         return $local;
     }
 
+    /**
+     * Helper for translating an indefinite article.
+     *
+     * @param bool $capital
+     * @return string
+     */
+    public function translateIndefiniteArticle($capital = false)
+    {
+        $local = $this->getIndefiniteArticle();
+        if ($capital) {
+            $local = ucwords($capital);
+        }
+        return $local;
+    }
+
     // Twig sugar for translate
 
     /**

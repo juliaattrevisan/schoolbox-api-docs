@@ -43,6 +43,18 @@ class RosettaStone
     }
 
     /**
+     * Gets the indefinite article for this term.
+     *
+     * @param string $term
+     * @param bool   $capital
+     * @return string
+     */
+    public function indefiniteArticle($term, $capital = false)
+    {
+        return $this->__get($term)->getIndefiniteArticle($capital);
+    }
+
+    /**
      * Attempt to translate a sentence that contains tokens.
      *
      * Tokens will be wrapped in {:token}, as they are in UPS, they may have modifiers too:
