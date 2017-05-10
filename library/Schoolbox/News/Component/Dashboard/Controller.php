@@ -10,7 +10,9 @@ namespace Schoolbox\News\Component\Dashboard;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use News;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
 use Scrub;
@@ -28,6 +30,20 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * @param array $headlineList
      */
     protected $headlineList;
+
+    /**
+     * A collection of all known news topics
+     *
+     * @var
+     */
+    protected $allTopics;
+
+    /**
+     * Number of items per topic
+     * 
+     * @var
+     */
+    protected $limit;
 
     /**
      * Injectable constructor
@@ -49,17 +65,32 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
+        $this->setAllTopics(TopicMapper::getInstance()->findAll()->sortBy('sequence', 'asc'));
+        $this->setLimit($this->getConfig('size','value'));
+
         $archive     = false;
-        $topic       = '';
         $year        = 0;
         $month       = 0;
         $index       = 0;
-        $limit       = $this->getConfig('size','value');
         $orderByDate = true;
 
-        $this->headlineList = $this->news->getNewsListing($archive, $topic, $year, $month, $index, $limit, $orderByDate);
+        /* Get $limit items per news topic
+         */
+        $this->headlineList = [];
 
-        return !empty($this->headlineList);
+        /** @var Topic $currentTopic */
+        foreach ($this->getAllTopics() as $currentTopic) {
+            $topicItems = $this->news->getNewsListing($archive, $currentTopic->getName(), $year, $month, $index, $this->getLimit(), $orderByDate);
+
+            if ($topicItems) {
+                $this->headlineList[$currentTopic->getId()] = $topicItems;
+            }
+            else {
+                $this->headlineList[$currentTopic->getId()] = [];
+            }
+        }
+
+        return count($this->headlineList) > 0;
     }
 
     /**
@@ -69,36 +100,53 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         $newsByTopic = [];                     // Holds news items grouped by topic
-        $newsAll = [];                  // Holds all news item grouped by date
+        $newsAll = new Collection();                  // Holds all news item grouped by date
 
-        $topics = TopicMapper::getInstance()->findAll()->sortBy('sequence', 'asc');
+        /* Preprocess all the items we found in the db
+         */
+        foreach ($this->headlineList as $topicId => $topicItems) {
+            foreach ($topicItems as $itemCurrent) {
 
-        if (is_array($this->headlineList)) {
-            foreach ($this->headlineList as $itemCurrent) {
-                $item = [];
-                $item['id'] = $itemCurrent['item_id'];
+                $item = [
+                    'id' => $itemCurrent['item_id'],
 
-                // We only want to show a read-more link if the body of the news article is not blank (but we need to trim all the junk
-                // HTML (eg. "<p>&nbsp;</p>"... "<ul></ul>") that CKeditor tends to leave behind when someone clears out the editor in the
-                // WYSIWYG view)
+                    // We only want to show a read-more link if the body of the news article is not blank (but we need to trim all the junk
+                    // HTML (eg. "<p>&nbsp;</p>"... "<ul></ul>") that CKeditor tends to leave behind when someone clears out the editor in the
+                    // WYSIWYG view)
+                    'showLink' => !empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_body'])))),
 
-                $item['showLink'] = !empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_body']))));
-                $item['blurb'] = empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_blurb'])))) ? '<p>' . TextFormatter::cutSentence(Scrub::html2text($itemCurrent['item_body']), 300) . '</p>' : Scrub::html($itemCurrent['item_blurb']);
+                    'blurb' => empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_blurb'])))) ? '<p>' . TextFormatter::cutSentence(Scrub::html2text($itemCurrent['item_body']), 300) . '</p>' : Scrub::html($itemCurrent['item_blurb']),
+                    'date' => new \Alaress_Date_Format($itemCurrent['item_datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT),
 
-                $item['date'] = new \Alaress_Date_Format($itemCurrent['item_datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT);
-                $item['uid'] = $itemCurrent['uid'];
-                $item['image'] = $itemCurrent['item_image'];
-                $item['heading'] = $itemCurrent['item_heading'];
-                $item['author'] = "{$itemCurrent['title']} {$itemCurrent['firstname']} {$itemCurrent['lastname']}";
+                    /* Used for sorting articles in All tab
+                     */
+                    'datetime' => $itemCurrent['item_datetime_posted'],
+
+                    'uid' => $itemCurrent['uid'],
+                    'image' => $itemCurrent['item_image'],
+                    'heading' => $itemCurrent['item_heading'],
+                    'author' => "{$itemCurrent['title']} {$itemCurrent['firstname']} {$itemCurrent['lastname']}"
+                ];
 
                 if (!isset($newsByTopic[$itemCurrent['newsTopicID']])) {
                     $newsByTopic[$itemCurrent['newsTopicID']] = [];
                 }
 
                 $newsByTopic[$itemCurrent['newsTopicID']][] = $item;
-                $newsAll[] = $item;
+
+                /* Accumulate all the items that we found so that we can order
+                 * them by date, then slice away all the excess, like fat
+                 */
+                $newsAll->add($item);
             }
         }
+
+        /* Order by datetime posted (most recent first)
+         * and trim away the fat
+         */
+        $newsAll->sortByCallback(function($a, $b) {
+            return strcmp($b['datetime'], $a['datetime']);
+        });
 
         return $this->renderTwigTemplate(
             $templateHandle,
@@ -107,8 +155,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
                 'news'                  => $newsByTopic,
-                'newsAll'               => $newsAll,
-                'topics'                => $topics,
+                'newsAll'               => $newsAll->limit($this->getLimit()),
+                'topics'                => $this->getAllTopics(),
                 'heading'               => $this->getConfig('componentname','value'),
                 'allDefault'            => $this->getConfig('default', 'value'),
             ],
@@ -116,5 +164,41 @@ class Controller extends Component_Dashboard_ControllerAbstract
             false,
             true
         );
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getAllTopics()
+    {
+        return $this->allTopics;
+    }
+
+    /**
+     * @param mixed $allTopics
+     * @return $this
+     */
+    protected function setAllTopics($allTopics)
+    {
+        $this->allTopics = $allTopics;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getLimit()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @param mixed $limit
+     * @return $this
+     */
+    protected function setLimit($limit)
+    {
+        $this->limit = $limit;
+        return $this;
     }
 }
