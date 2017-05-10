@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Calendar_Api_Factory;
 use Exception;
 use External_Timetable;
+use InvalidArgumentException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
@@ -100,7 +101,7 @@ class Controller extends Base
 
         try {
             $date = new Alaress_Date_Format($value, 'Y-m-d H:i:s');
-        } catch (Exception $e) {
+        } catch (InvalidArgumentException $e) {
             $date = Alaress_Date_Format::now();
         }
 
