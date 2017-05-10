@@ -89,7 +89,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             }
         }
 
-        return (bool)count($this->headlineList);
+        return count($this->headlineList) > 0;
     }
 
     /**
