@@ -25,14 +25,14 @@ class Controller extends BaseController
      *
      * @api   GET /adminv2/filters
      * @level 17.0
-     * @param GenericCollection|Model[] $filters
+     * @param GenericCollection|Model[] $visibleFilters - Just the filters which are visible on screens
      * @throws ServiceNotFound
      */
-    public function getIndex(GenericCollection $filters)
+    public function getIndex(GenericCollection $visibleFilters)
     {
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
-            'filters' => $filters,
+            'filters' => $visibleFilters,
         ]));
     }
 

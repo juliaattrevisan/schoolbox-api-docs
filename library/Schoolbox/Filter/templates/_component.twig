@@ -18,7 +18,7 @@
         {% for selection in userSelections %}
             {% include '@filters/_selectionCheckbox.twig' with {
                 userSelection: selection,
-                roleSelection: defaultSelections[selection.key],
+                roleSelection: roleSelections[selection.key],
                 label:         definition.label(selection.key)
             } only %}
         {% endfor %}

@@ -90,6 +90,19 @@ interface IFilterDefinition
 
 
     /**
+     * Get the key that this filter uses when building URL GET param lists
+     *
+     * eg /learning/markbook/151?f=43,176&tc=2015-2
+     * * Folders 43 + 176
+     * * Term 2015-2
+     *
+     * The value must be short and unique to enable lots of data in a GET url
+     *
+     * @return string
+     */
+    public static function getQueryKey();
+
+    /**
      * Return an ordered list of pages where this filter is available
      *
      * @see FilterOption::PAGE_* constants

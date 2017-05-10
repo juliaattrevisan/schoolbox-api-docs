@@ -41,8 +41,8 @@ abstract class AbstractKeyConverter implements IKeyConverter
      */
     public function getSelectedItems(GenericCollection $availableSelections = null)
     {
-        if (!$availableSelections) {
-            return $this->getAllPossibleItems();
+        if (null === $availableSelections) {
+            return null;
         }
 
         $allItems       = $this->getAllPossibleItems();
@@ -62,14 +62,14 @@ abstract class AbstractKeyConverter implements IKeyConverter
         if (0 === $selectedItems->count()) {
             // Were all possible options available ?
             if ($allItems->count() === $availableItems->count()) {
-                // Return an empty collection - so the DB generator can forgo the filter entirely
-                return $allItems->emptyClone();
+                // Return NULL - so the DB generator can forgo the filter entirely
+                return null;
             }
             // Return the available options (ie none of a subset being selected equals all of the subset being selected)
             return $availableItems;
         }
 
-        // Either non all possible items were available for selection, or a subset of items was selected.
+        // Either not all possible items were available for selection, or a subset of items was selected.
         return $selectedItems;
 
     }

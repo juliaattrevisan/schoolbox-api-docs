@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -30,6 +31,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException
      */
     public function registerRoutes()
     {
@@ -66,11 +68,13 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException If class not found
+     * @throws ServiceNotFound
      */
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:' . $this->basename,
+            'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
                 'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
@@ -87,6 +91,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If class not found
      */
     protected function getUserMapper()
     {
@@ -95,6 +100,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|FolderMapper
+     * @throws \InvalidArgumentException If class not found
      */
     protected function getFolderMapper()
     {
@@ -103,6 +109,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|TermMapper
+     * @throws \InvalidArgumentException If class not found
      */
     protected function getTermMapper()
     {
@@ -111,6 +118,7 @@ class Module extends BaseModule
 
     /**
      * @return Mapper|ErrorMapper
+     * @throws \InvalidArgumentException If class not found
      */
     protected function getErrorMapper()
     {

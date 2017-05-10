@@ -114,6 +114,9 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
         // Convert to ordered by abstract key
         $optionsPerKey = new Collection();
+        foreach($customKeys as $customKey){
+            $optionsPerKey->setOffset($customKey, $this->getFilterOptionMapper()->createCollection());
+        }
 
         // Ensure page order is same as getPages()
         foreach ($validPages as $page) {
@@ -272,29 +275,54 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
 
     /**
+     * @inheritdoc
+     */
+    public function getAbstractKeys()
+    {
+        // Default. You MUST override if the set of options displayed in admin includes dynamic options (eg Terms, WorkTypes etc).
+        // Dynamic options depend on database contents, but do not change per viewee.
+        return $this->getCustomKeys();
+    }
+
+
+    /**
      * Each filter definition must know how to sort options
+     *
+     * By default, sort them as defined in $this->getCustomKeys()
      *
      * @param GenericCollection|Option\Model[] $options
      * @return GenericCollection
      */
-    abstract protected function sortFilterOptions(GenericCollection $options);
+    protected function sortFilterOptions(GenericCollection $options)
+    {
+        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
+
+            $leftPos  = array_search($left->getKey(), $this->getAbstractKeys(), true);
+            $rightPos = array_search($right->getKey(), $this->getAbstractKeys(), true);
+
+            return $rightPos - $leftPos;
+        });
+    }
 
 
     /**
      * Return the templates directory for the concrete filter definition's twig templates
      *
      * @return string
+     * @throws \ReflectionException if this class does not exist. (kinda impossible... !)
      */
     protected function getTemplatesDir()
     {
-        $class_info          = new \ReflectionClass($this);
-        $filterDefinitionDir = basename(dirname($class_info->getFileName())) . DIRECTORY_SEPARATOR;
-        return '@filterDefinitions' . DIRECTORY_SEPARATOR . $filterDefinitionDir . DIRECTORY_SEPARATOR . 'templates';
+        $class_info = new \ReflectionClass($this);
+        $dir        = basename(dirname($class_info->getFileName(), 2)) . DIRECTORY_SEPARATOR;
+        $subDir     = basename(dirname($class_info->getFileName(), 1)) . DIRECTORY_SEPARATOR;
+        return '@filterDefinitions' . DIRECTORY_SEPARATOR . $dir . $subDir . 'templates';
     }
 
 
     /**
      * @inheritdoc
+     * @throws \ReflectionException if this class does not exist. (kinda impossible... !)
      */
     public function getOptionsTemplate()
     {

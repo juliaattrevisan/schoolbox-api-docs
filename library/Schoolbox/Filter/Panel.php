@@ -25,6 +25,8 @@ class Panel
     private $route;
 
     /**
+     * Indexed by filter Definition class
+     *
      * @var GenericCollection|IFilterComponent[]
      */
     private $components;

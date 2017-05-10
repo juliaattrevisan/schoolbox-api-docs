@@ -1,8 +1,8 @@
 -- TODO remove this debug aids
-# DROP TABLE IF EXISTS filter_default;
-# DROP TABLE IF EXISTS filter_selection;
-# DROP TABLE IF EXISTS filter_option;
-# DROP TABLE IF EXISTS filter;
+DROP TABLE IF EXISTS filter_default;
+DROP TABLE IF EXISTS filter_selection;
+DROP TABLE IF EXISTS filter_option;
+DROP TABLE IF EXISTS filter;
 
 -- A list of filters available in the system
 CREATE TABLE filter (
@@ -66,12 +66,15 @@ DELETE FROM config WHERE `name` = 'pending_assessment_types';
 
 -- Add Filters
 INSERT INTO filter (`class`) VALUES
-  ('Schoolbox\\Filter\\Filters\\Term\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\AssessmentType\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\WorkType\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Folder\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\WeightingType\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Unit\\Definition')
+  ('Schoolbox\\Filter\\Filters\\Assessment\\Term\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\AssessmentType\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\WorkType\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\Folder\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\WeightingType\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\UnitImportSpec\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\Project\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\UnitSpec\\Definition'),
+  ('Schoolbox\\Filter\\Filters\\Assessment\\UnitImpl\\Definition')
 ;
 
 

@@ -30,26 +30,54 @@ abstract class AbstractFilterComponent implements IFilterComponent
     /** @var string */
     private $page;
 
-    /** @var GenericCollection|Selection\Model[] */
+    /**
+     * NULL if controller has specified to override the user's saved selections
+     *
+     * @var GenericCollection|Selection\Model[]|null
+     */
     private $savedSelections;
+
+    /**
+     * If non-null, ignore user's saved selections and just select the items that match these override keys
+     *
+     * This gives the controller the ability to jump to specific data sets
+     *
+     * @var string[]|null
+     */
+    private $selectionOverrides;
+
 
     /** @var Selection\Mapper */
     private $filterSelectionMapper;
 
 
     /**
-     * @param IFilterDefinition                   $definition
-     * @param User                                $user
-     * @param string                              $page
-     * @param GenericCollection|Selection\Model[] $savedSelections Existing selections for this filter, user and page
-     * @param Selection\Mapper                    $filterSelectionMapper
+     * @param IFilterDefinition                        $definition
+     * @param User                                     $user
+     * @param string                                   $page
+     * @param null|GenericCollection|Selection\Model[] $savedSelections Existing selections for this filter, user and page
+     * @param null|string[]                            $overrides
+     * @param Selection\Mapper                         $filterSelectionMapper
+     * @throws \DomainException If both saved selections and override selections are null
      */
-    public function __construct(IFilterDefinition $definition, User $user, $page, GenericCollection $savedSelections, Selection\Mapper $filterSelectionMapper)
-    {
+    public function __construct(
+        IFilterDefinition $definition,
+        User $user,
+        $page,
+        GenericCollection $savedSelections = null,
+        array $overrides = null,
+        Selection\Mapper $filterSelectionMapper
+    ) {
+        // Ensure we have either saved user selections (even if empty) or override selections
+        if(null === $savedSelections && null === $overrides){
+            throw new \DomainException('saved selections and override selections cannot both be null');
+        }
+
         $this->definition            = $definition;
         $this->user                  = $user;
         $this->page                  = $page;
         $this->savedSelections       = $savedSelections;
+        $this->selectionOverrides    = is_array($overrides) ? array_combine($overrides, $overrides) : null;
         $this->filterSelectionMapper = $filterSelectionMapper;
     }
 
@@ -72,7 +100,12 @@ abstract class AbstractFilterComponent implements IFilterComponent
     protected function getUserSelections(GenericCollection $availableOptions)
     {
         $availableSelections = $this->getRoleSelections($availableOptions);
-        $this->overlayUserSelections($availableSelections);
+
+        if (is_array($this->selectionOverrides)) {
+            $availableSelections = $this->overlayOverrideSelections($availableSelections);
+        } else {
+            $availableSelections = $this->overlayUserSelections($availableSelections);
+        }
 
         return $availableSelections;
     }
@@ -117,11 +150,28 @@ abstract class AbstractFilterComponent implements IFilterComponent
     protected function overlayUserSelections(GenericCollection $availableSelections)
     {
         // Overlay user-specific selection settings
-        $savedSelections = $this->getSavedSelections();
+        $savedSelections = $this->savedSelections;
         foreach ($availableSelections as $key => $availableSelection) {
             if ($savedSelections->offsetExists($key)) {
                 $availableSelection->setSelected($savedSelections[$key]->getSelected());
             }
+        }
+
+        return $availableSelections;
+    }
+
+
+    /**
+     * Overlay the selections specified by the controller.
+     *
+     * @param GenericCollection|Selection\Model[] $availableSelections
+     * @return GenericCollection|Selection\Model[]
+     */
+    protected function overlayOverrideSelections(GenericCollection $availableSelections)
+    {
+        // Overlay controller-injected selection settings
+        foreach ($availableSelections as $key => $availableSelection) {
+            $availableSelection->setSelected(array_key_exists($key, $this->selectionOverrides));
         }
 
         return $availableSelections;
@@ -155,17 +205,19 @@ abstract class AbstractFilterComponent implements IFilterComponent
     public function toContext()
     {
         // Get option defaults for current user's roleType
-        $page     = $this->getPage();
         $roleType = $this->getUser()->getRole()->getType();
 
         /** @var GenericCollection|Option\Model[] $availableOptions */
-        $availableOptions = $this->getDefinition()->getAvailableOptions($page, $roleType)[$page];
+        $availableOptions = $this->getDefinition()->getAvailableOptions($this->page, $roleType)[$this->page];
+
+        $roleSelections = $this->getRoleSelections($availableOptions);
+        $userSelections = $this->getUserSelections($availableOptions);
 
         return [
-            'isAvailable'    => (bool)$availableOptions->count(),
+            'isAvailable'    => (bool)$userSelections->count(),
             'definition'     => $this->getDefinition(),
-            'roleSelections' => $this->getRoleSelections($availableOptions),
-            'userSelections' => $this->getUserSelections($availableOptions),
+            'roleSelections' => $roleSelections,
+            'userSelections' => $userSelections,
         ];
     }
 
@@ -189,24 +241,6 @@ abstract class AbstractFilterComponent implements IFilterComponent
     protected function getUser()
     {
         return $this->user;
-    }
-
-
-    /**
-     * @return string
-     */
-    protected function getPage()
-    {
-        return $this->page;
-    }
-
-
-    /**
-     * @return Selection\Model[]|GenericCollection
-     */
-    protected function getSavedSelections()
-    {
-        return $this->savedSelections;
     }
 
 

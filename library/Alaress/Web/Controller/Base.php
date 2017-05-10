@@ -289,7 +289,7 @@ abstract class Base {
      * @param string  $title
      * @param string  $tab
      * @return Output\ThemedHtml
-     * @throws ServiceNotFound
+     * @throws ServiceNotFound If unable to locate HTML web Output
      */
     protected function buildHtmlOutput($template, $data, $title = '', $tab = '')
     {

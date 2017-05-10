@@ -35,6 +35,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
  * @method Model createModel($id=null)
  * @method Model findById($id)
  * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
 {

@@ -7,17 +7,12 @@
 
 namespace Schoolbox\Filter;
 
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Filter\Filters\AssessmentType as AssessmentTypeFilter;
-use Schoolbox\Filter\Filters\Folder as FolderFilter;
-use Schoolbox\Filter\Filters\Term as TermFilter;
-use Schoolbox\Filter\Filters\WorkType as WorkTypeFilter;
-use Schoolbox\Filter\Filters\WeightingType as WeightingTypeFilter;
-use Schoolbox\Filter\Filters\Unit as UnitSpecFilter;
 use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -25,6 +20,9 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\User;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Assessment\DataModel\Project;
+use Schoolbox\Filter\Filters;
 
 
 /**
@@ -38,7 +36,6 @@ class FactoryFactory
     /** @var MapperFactory */
     private $mapperFactory;
 
-
     /**
      * @param MapperFactory $mapperFactory
      * @throws \InvalidArgumentException
@@ -50,11 +47,14 @@ class FactoryFactory
 
 
     /**
-     * A registry of filter factories. Registered by filter definition class name.
+     * A registry of filter factories, along with their construction dependencies.
+     *
+     * Registered by filter definition class name.
      *
      * @param string $filterDefinitionClass
      * @return IFilterFactory
      * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
+     * @throws \ReflectionException If the specified class does not exist
      */
     public function buildFilterFactoryForFilter($filterDefinitionClass)
     {
@@ -62,20 +62,44 @@ class FactoryFactory
             throw new \InvalidArgumentException('No filter definition found for class: ' . $filterDefinitionClass);
         }
 
-        // Registry of as filters definitions. Ensures static analysis identifies usages.
+        // Registry of filters definitions, and their extra dependencies
         switch ($filterDefinitionClass) {
-            case AssessmentTypeFilter\Definition::class:
-                return $this->buildAssessmentTypeFilterFactory();
-            case FolderFilter\Definition::class:
-                return $this->buildFolderFilterFactory();
-            case TermFilter\Definition::class:
-                return $this->buildTermFilterFactory();
-            case WorkTypeFilter\Definition::class:
-                return $this->buildWorkTypeFilterFactory();
-            case WeightingTypeFilter\Definition::class:
-                return $this->buildWeightingFilterFactory();
-            case UnitSpecFilter\Definition::class:
-                return $this->buildUnitSpecFilterFactory();
+            case Filters\Assessment\AssessmentType\Definition::class:
+                return $this->buildFactory(Filters\Assessment\AssessmentType\Factory::class);
+            case Filters\Assessment\Folder\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Folder\Factory::class, [
+                    'folderMapper' => $this->mapperFactory->get(Folder\Mapper::class),
+                ]);
+            case Filters\Assessment\Term\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Term\Factory::class, [
+                    'termMapper' => $this->mapperFactory->get(Term\Mapper::class),
+                ]);
+            case Filters\Assessment\WorkType\Definition::class:
+                return $this->buildFactory(Filters\Assessment\WorkType\Factory::class, [
+                    'workTypeMapper' => $this->mapperFactory->get(WorkType\Mapper::class),
+                ]);
+            case Filters\Assessment\WeightingType\Definition::class:
+                return $this->buildFactory(Filters\Assessment\WeightingType\Factory::class);
+            case Filters\Assessment\UnitImportSpec\Definition::class:
+                return $this->buildFactory(Filters\Assessment\UnitImportSpec\Factory::class, [
+                    'folderMapper'     => $this->mapperFactory->get(Folder\Mapper::class),
+                    'courseImplMapper' => $this->mapperFactory->get(CourseImpl\Mapper::class),
+                    'unitSpecMapper'   => $this->mapperFactory->get(UnitSpec\Mapper::class),
+                ]);
+            case Filters\Assessment\Project\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Project\Factory::class, [
+                    'folderMapper'   => $this->mapperFactory->get(Folder\Mapper::class),
+                    'unitImplMapper' => $this->mapperFactory->get(UnitImpl\Mapper::class),
+                    'projectMapper'  => $this->mapperFactory->get(Project\Mapper::class),
+                ]);
+            case Filters\Assessment\UnitSpec\Definition::class:
+                return $this->buildFactory(Filters\Assessment\UnitSpec\Factory::class, [
+                    'unitSpecMapper' => $this->mapperFactory->get(UnitSpec\Mapper::class),
+                ]);
+            case Filters\Assessment\UnitImpl\Definition::class:
+                return $this->buildFactory(Filters\Assessment\UnitImpl\Factory::class, [
+                    'unitImplMapper' => $this->mapperFactory->get(UnitImpl\Mapper::class),
+                ]);
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
@@ -87,6 +111,8 @@ class FactoryFactory
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
      * @throws \InvalidArgumentException
+     * @throws ServiceNotFound
+     * @throws \ReflectionException If the specified class does not exist
      */
     public function buildKeyConverters($page)
     {
@@ -109,11 +135,45 @@ class FactoryFactory
 
 
     /**
+     * Builds a filter panel for the specified user and page, which submits selections to the specified route
+     *
+     * @param User      $user
+     * @param string    $page
+     * @param string    $route
+     * @param null|User $viewee
+     * @param array     $query
+     * @return Panel
+     * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
+     * @throws \ReflectionException If the specified class does not exist
+     */
+    public function buildPanel(User $user, $page, $route, User $viewee = null, array $query = [])
+    {
+        $filterComponents = $this->createFilterComponentCollection();
+        unset($query['page']);
+
+        foreach ($this->getDefinitions($page) as $className) {
+            $filterFactory = $this->buildFilterFactoryForFilter($className);
+            $queryKey      = $className::getQueryKey();
+            $overrides     = array_key_exists($queryKey, $query) ? explode(',', $query[$queryKey]) : null;
+            $component     = $filterFactory->buildComponent($className, $user, $page, $viewee, $overrides);
+
+            // Don't bother inserting component if it wasn't build (because no options would be available anyway)
+            if($component){
+                $filterComponents->setOffset($className, $component);
+            }
+
+        }
+
+        return new Panel($route, $filterComponents);
+    }
+
+
+    /**
      * Get the set of filters that are implemented by the specified page
      *
      * @param string $page
      * @return string[]|IFilterDefinition[]
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If unable to locate Filter Mapper class
      */
     private function getDefinitions($page)
     {
@@ -129,30 +189,6 @@ class FactoryFactory
             }
         }
         return $definitionClasses;
-    }
-
-
-    /**
-     * Builds a filter panel for the specified user and page, which submits selections to the specified route
-     *
-     * @param User   $user
-     * @param string $page
-     * @param string $route
-     * @param array  $runTimeOptions Indexed by filter definition class
-     * @return Panel
-     * @throws \InvalidArgumentException
-     */
-    public function buildPanel(User $user, $page, $route, array $runTimeOptions = [])
-    {
-        $filterComponents = $this->createFilterComponentCollection();
-
-        foreach ($this->getDefinitions($page) as $className) {
-            $filterFactory = $this->buildFilterFactoryForFilter($className);
-            $component     = $filterFactory->buildComponent($user, $page, $runTimeOptions[$className]);
-            $filterComponents->add($component);
-        }
-
-        return new Panel($route, $filterComponents);
     }
 
 
@@ -177,115 +213,25 @@ class FactoryFactory
 
 
     /**
-     * @return AssessmentTypeFilter\Factory
+     * Builds a filter factory using the base dependencies, plus any factory-specific ones
+     *
+     * @param            $factoryClass
+     * @param array|null $extraArgs
+     * @return IFilterFactory|object
      * @throws \InvalidArgumentException
+     * @throws \ReflectionException If the specified class does not exist
      */
-    private function buildAssessmentTypeFilterFactory()
+    private function buildFactory($factoryClass, array $extraArgs = [])
     {
-        return new AssessmentTypeFilter\Factory(
-            $this->getFilterMapper(),
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultsMapper(),
-            $this->getFilterSelectionMapper()
-        );
-    }
+        $args = array_merge([
+            'filterMapper'          => $this->getFilterMapper(),
+            'filterOptionMapper'    => $this->getFilterOptionMapper(),
+            'filterDefaultMapper'   => $this->getFilterDefaultsMapper(),
+            'filterSelectionMapper' => $this->getFilterSelectionMapper(),
+        ], $extraArgs);
 
-
-    /**
-     * @return FolderFilter\Factory
-     * @throws \InvalidArgumentException
-     */
-    private function buildFolderFilterFactory()
-    {
-        /** @var Folder\Mapper $folderMapper */
-        $folderMapper = $this->mapperFactory->get(Folder\Mapper::class);
-        return new FolderFilter\Factory(
-            $this->getFilterMapper(),
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultsMapper(),
-            $this->getFilterSelectionMapper(),
-            $folderMapper
-        );
-    }
-
-    /**
-     * @return UnitSpecFilter\Factory
-     * @throws \InvalidArgumentException
-     */
-    private function buildUnitSpecFilterFactory()
-    {
-        /** @var Folder\Mapper $folderMapper */
-        $folderMapper = $this->mapperFactory->get(Folder\Mapper::class);
-
-        /** @var CourseImpl\Mapper $courseImplMapper */
-        $courseImplMapper = $this->mapperFactory->get(CourseImpl\Mapper::class);
-
-        /** @var UnitSpec\Mapper $unitSpecMapper */
-        $unitSpecMapper = $this->mapperFactory->get(UnitSpec\Mapper::class);
-
-
-        return new UnitSpecFilter\Factory(
-            $this->getFilterMapper(),
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultsMapper(),
-            $this->getFilterSelectionMapper(),
-            $folderMapper,
-            $courseImplMapper,
-            $unitSpecMapper
-        );
-    }
-
-
-
-
-    /**
-     * @return TermFilter\Factory
-     * @throws \InvalidArgumentException
-     */
-    private function buildTermFilterFactory()
-    {
-        /** @var Term\Mapper $termMapper */
-        $termMapper = $this->mapperFactory->get(Term\Mapper::class);
-        return new TermFilter\Factory(
-            $this->getFilterMapper(),
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultsMapper(),
-            $this->getFilterSelectionMapper(),
-            $termMapper
-        );
-    }
-
-
-    /**
-     * @return WorkTypeFilter\Factory
-     * @throws \InvalidArgumentException
-     */
-    private function buildWorkTypeFilterFactory()
-    {
-        /** @var WorkType\Mapper $workTypeMapper */
-        $workTypeMapper = $this->mapperFactory->get(WorkType\Mapper::class);
-        return new WorkTypeFilter\Factory(
-            $this->getFilterMapper(),
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultsMapper(),
-            $this->getFilterSelectionMapper(),
-            $workTypeMapper
-        );
-    }
-
-
-    /**
-     * @return WeightingTypeFilter\Factory
-     * @throws \InvalidArgumentException
-     */
-    private function buildWeightingFilterFactory()
-    {
-        return new WeightingTypeFilter\Factory(
-            $this->getFilterMapper(),
-            $this->getFilterOptionMapper(),
-            $this->getFilterDefaultsMapper(),
-            $this->getFilterSelectionMapper()
-        );
+        $reflector = new \ReflectionClass($factoryClass);
+        return $reflector->newInstanceArgs($args);
     }
 
 
