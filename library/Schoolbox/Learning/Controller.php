@@ -216,6 +216,8 @@ class Controller extends Base
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws Mapper\Exception
+     * @throws \ReflectionException If unable to find the class for a filter registered on this page
+     * @throws \DomainException If filter definition slug not set
      * @todo  split pending assessments into own controller
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)

@@ -46,10 +46,13 @@ abstract class AbstractFilterDefinition implements IFilterDefinition
 
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public static function getSlug()
     {
+        if(null === static::SLUG){
+            throw new \DomainException('Slug not set. Concrete class must override with non-null value');
+        }
         return static::SLUG;
     }
 

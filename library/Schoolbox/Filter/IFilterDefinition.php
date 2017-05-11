@@ -98,6 +98,7 @@ interface IFilterDefinition
      * The value must be short and unique to enable lots of data in a GET url
      *
      * @return string
+     * @throws \DomainException If slug has not been set
      */
     public static function getSlug();
 
