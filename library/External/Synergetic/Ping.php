@@ -44,10 +44,12 @@ class External_Synergetic_Ping implements External_PingInterface
      * Set database
      *
      * @param $database
+     * @return $this
      */
     private function setDatabase($database)
     {
         $this->database = $database;
+        return $this;
     }
 
     /**
