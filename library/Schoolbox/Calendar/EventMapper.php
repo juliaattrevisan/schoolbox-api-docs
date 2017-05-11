@@ -491,62 +491,22 @@ class EventMapper extends Schoolbox\Mapper
     */
     public function findEventsBetween($startDate, $endDate)
     {
-        /** @var Schoolbox\UserMapper $authorMapper */
-        $authorMapper = $this->getJoinMapper('author');
-
-        /** @var EventTypeMapper $eventTypeMapper */
-        $eventTypeMapper = $this->getJoinMapper('eventType');
-
-        /** @var Schoolbox\Calendar\Relation\PersonalMapper $personalMapper */
-        $personalMapper = $this->getJoinMapper('personal');
-
-        /** @var Schoolbox\Calendar\Relation\CategoryMapper $categoryMapper */
-        $categoryMapper = $this->getJoinMapper('category');
-
-        /** @var Schoolbox\Calendar\Relation\CampusMapper $campusMapper */
-        $campusMapper = $this->getJoinMapper('campus');
-
-        $query = "
-			SELECT
-				{$this->getColumnString('e')},
-				{$authorMapper->getColumnString('a')},
-				{$eventTypeMapper->getColumnString('t')}
-			FROM `{$this->table}` e
-			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			WHERE DATE(start_datetime) >= :startDate
-			AND DATE(end_datetime) <= :endDate
-			GROUP BY e.id
-		";
+        $query = $this->getSelectString();
+        $query .= $this->getFromString();
+        $query .= '
+            WHERE DATE(start_datetime) >= :startDate
+            AND DATE(end_datetime) <= :endDate
+        ';
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(":startDate", $startDate);
         $statement->bindParam(":endDate", $endDate);
         $statement->execute();
 
-        /* Hydrate or die
-		 */
-        $allEvents = new Collection();
+        $allEvents = $this->hydrateSelect($statement);
 
-        while ($row = $statement->fetch()) {
-            $event = $this->hydrate($row, 'e');
-            $author = $authorMapper->hydrate($row, 'a');
-            $eventType = $eventTypeMapper->hydrate($row, 't');
-
-            $event->setAuthor($author);
-            $event->setType($eventType);
-
-            /* Find the auxiliary info
-             */
-            $event->setUserCollection($personalMapper->findAllForEvent($event));
-            $event->setCategoryCollection($categoryMapper->findAllForEvent($event));
-            $event->setCampusCollection($campusMapper->findAllForEvent($event));
-
-            $allEvents->add($event);
-        }
-
-		return $allEvents;
-	}
+        return $allEvents;
+    }
 
 
     /**

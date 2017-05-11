@@ -7,7 +7,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 namespace Schoolbox\Calendar\Relation;
 
@@ -17,14 +16,14 @@ class Category
     /**
      * eventId to which this sid belongs
      *
-     * @var null
+     * @var int
      */
     private $eventId = null;
 
     /**
      * Sid value
      *
-     * @var null
+     * @var int
      */
     private $categoryId = null;
 
@@ -41,7 +40,7 @@ class Category
     /**
      * Set event id
      *
-     * @param null $eventId
+     * @param int $eventId
      */
     public function setEventId($eventId)
     {
@@ -51,7 +50,7 @@ class Category
     /**
      * Get event id
      *
-     * @return null
+     * @return int
      */
     public function getEventId()
     {
@@ -61,7 +60,7 @@ class Category
     /**
      * Set category id
      *
-     * @param null $categoryId
+     * @param int $categoryId
      */
     public function setCategoryId($categoryId)
     {
@@ -71,7 +70,7 @@ class Category
     /**
      * Get category id
      *
-     * @return null
+     * @return int
      */
     public function getCategoryId()
     {
