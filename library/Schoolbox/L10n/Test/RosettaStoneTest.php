@@ -116,6 +116,8 @@ class RosettaStoneTest extends \PHPUnit_Framework_TestCase
             ['{:in|c|p} for {:in|p|c}', 'Indicators for Indicators'],
             // Unknown terms get cast to empty string?
             ['{:ca} for {:unknown|p|c}', 'calendar for '],
+            // No terms at all
+            ['No terms at all', 'No terms at all'],
         ];
     }
 
