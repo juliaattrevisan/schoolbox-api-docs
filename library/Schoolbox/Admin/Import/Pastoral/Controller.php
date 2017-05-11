@@ -10,6 +10,7 @@
 namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Log\Mapper as LogMapper;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -153,7 +154,7 @@ class Controller extends Base
         try {
             $defaultOwner = $this->getUserMapper()->findById($post["defaultOwnerId"]);
             $importParentAccess = $post["importParentAccess"];
-        } catch (\Exception $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
