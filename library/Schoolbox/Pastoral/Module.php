@@ -58,8 +58,8 @@ class Module extends BaseModule
                 '/search'                                                   => 'getSearch',
                 '/student/{studentId:\d+}'                                  => 'getStudent',
                 '/student/{studentId:\d+}/record/{recordId:\d+}'            => 'getStudentRecord',
-                '/student/{studentId:\d+}/record/insert'                    => 'getStudentRecordInsert',
-                '/student/{studentId:\d+}/record/{recordId:\d+}/update'     => 'getStudentRecordUpdate',
+                '/student/{studentId:\d+}/record/insert'                    => 'getStudentRecordInsertForm',
+                '/student/{studentId:\d+}/record/{recordId:\d+}/update'     => 'getStudentRecordUpdateForm',
             ],
             'POST' => [
                 '/record/insert'                                            => 'postRecordInsert',

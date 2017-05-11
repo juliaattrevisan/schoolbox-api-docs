@@ -328,7 +328,7 @@ class Controller extends Base
      * @param User $student
      * @throws SchoolboxException
      */
-    public function getStudentRecordInsert($student)
+    public function getStudentRecordInsertForm($student)
     {
         // Throw in a blank pastoral record with the student populated
 
@@ -336,7 +336,7 @@ class Controller extends Base
         $record = $this->pastoralMapper->createModel();
         $record->setStudent($student);
 
-        $this->getStudentRecordUpdate($record);
+        $this->getStudentRecordUpdateForm($record);
     }
 
     /**
@@ -345,7 +345,7 @@ class Controller extends Base
      * @param Model $record
      * @throws SchoolboxException
      */
-    public function getStudentRecordUpdate($record)
+    public function getStudentRecordUpdateForm($record)
     {
         if (!$this->getConfigLoader()->get('pastoral_severity')) {
             $severities = [];
