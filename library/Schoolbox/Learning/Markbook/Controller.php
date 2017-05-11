@@ -51,11 +51,6 @@ class Controller extends Base
     private $defaultGradeGroup;
 
     /**
-     * @var CourseImpl\Mapper
-     */
-    private $courseImplMapper;
-
-    /**
      * @var Term\Mapper
      */
     private $termMapper;
@@ -82,7 +77,6 @@ class Controller extends Base
      * @param Error\Mapper                    $errorMapper
      * @param AssessmentMapperProxy           $assessmentMapperProxy
      * @param GradeGroup\Model                $defaultGradeGroup
-     * @param CourseImpl\Mapper               $courseImplMapper
      * @param Term\Mapper                     $termMapper
      * @param DueWork_ErrorMapper             $dueWorkErrorMapper
      * @param Access                          $access
@@ -93,7 +87,6 @@ class Controller extends Base
         Error\Mapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         GradeGroup\Model $defaultGradeGroup,
-        CourseImpl\Mapper $courseImplMapper,
         Term\Mapper $termMapper,
         DueWork_ErrorMapper $dueWorkErrorMapper,
         Access $access,
@@ -103,7 +96,6 @@ class Controller extends Base
         $this->errorMapper           = $errorMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->defaultGradeGroup     = $defaultGradeGroup;
-        $this->courseImplMapper      = $courseImplMapper;
         $this->termMapper            = $termMapper;
         $this->dueWorkErrorMapper    = $dueWorkErrorMapper;
         $this->access                = $access;
