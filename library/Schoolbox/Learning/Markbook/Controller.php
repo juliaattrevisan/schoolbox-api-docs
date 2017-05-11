@@ -73,7 +73,6 @@ class Controller extends Base
      */
     private $access;
 
-
     /**
      * Constructor
      *
@@ -161,54 +160,38 @@ class Controller extends Base
 
 
     /**
+     * @param User                            $viewee
      * @param AssessmentFilter\IdFinder       $assessmentIdFinder
      * @param AssessmentFilter\FactoryFactory $filterFactoryFactory
      * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
-    public function postMarkbook(AssessmentFilter\IdFinder $assessmentIdFinder, AssessmentFilter\FactoryFactory $filterFactoryFactory)
+    public function postMarkbook(User $viewee, AssessmentFilter\IdFinder $assessmentIdFinder, AssessmentFilter\FactoryFactory $filterFactoryFactory)
     {
 
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
-
-            $user = $this->getUser();
-            $page = FilterOption\Model::PAGE_MARK_BOOK;
-
-            $keyConverters        = $filterFactoryFactory->buildKeyConverters($page);
-            $selectionsPerFilter  = Filter\Selection\Mapper::getInstance()->updateSelections($keyConverters, $user, $page, $postFilterSelections);
-            $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
-            $filters              = $selectionTransformer->getFilters();
-
-            // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
-            // regardless of any filter selections send by user
-            $filters[AssessmentFilter\NullableContext\UnitSpec\Definition::SLUG] = new Collection();
-
-            // Convert filters to query args so export can retrieve this report
-            // TODO Convert $filters from array to DTO and make this a method on that DTO. SA-3379 + SA-3201
-            $queryArgs = [];
-            foreach ($filters as $slug => $filter) {
-                $queryArg = "$slug=";
-                if ($filter instanceof Collection) {
-                    $queryArg .= implode(',', $filter->keys());
-                }
-                $queryArgs[] = $queryArg;
-            }
-            $queryArgs = implode('&', $queryArgs);
-
-
-            $assessmentIds = $assessmentIdFinder->findIdsByFilters($filters);
-            $content       = $this->generateMarkbookReport($assessmentIds, $queryArgs);
+            $filters              = $this->generateFilters($postFilterSelections, $filterFactoryFactory);
+            $assessmentIds        = $assessmentIdFinder->findIdsByFilters($filters);
+            $markbook             = $this->buildMarkbook($assessmentIds);
+            $writable             = $this->determineWritableAssessments($markbook->getAssessments());
+            $pendingLabel         = $this->getPendingLabel();
+            $queryArgs            = $this->buildQueryArgs($filters);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
-                'content' => $content,
+                'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
+                    'markbook'     => $markbook,
+                    'writable'     => $writable,
+                    'pendingLabel' => $pendingLabel,
+                    'viewee'       => $viewee,
+                    'queryArgs'    => $queryArgs,
+                ])->getAsString(),
             ]));
 
         } catch (Filter\BrokenFilterException $e){
             $data = [
                 'status'  => 500,
                 'message' => "Sorry, the {$e->getFilterName()} filter appears to be broken. Please deselect all options and try again",
-
             ];
             if ($this->getConfigLoader()->get('debug_mode')) {
                 $data = array_merge($data, [
@@ -225,6 +208,98 @@ class Controller extends Base
         } catch (\Throwable $e) {
             $this->returnJsonError($e);
         }
+    }
+
+    private function generateFilters(array $filterSelections, AssessmentFilter\FactoryFactory $filterFactoryFactory)
+    {
+
+        $page = FilterOption\Model::PAGE_MARK_BOOK;
+
+        $keyConverters        = $filterFactoryFactory->buildKeyConverters($page);
+        $selectionsPerFilter  = Filter\Selection\Mapper::getInstance()->updateSelections($keyConverters, $this->getUser(), $page, $filterSelections);
+        $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
+        $filters              = $selectionTransformer->getFilters();
+
+        // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
+        // regardless of any filter selections send by user
+        $filters[AssessmentFilter\NullableContext\UnitSpec\Definition::SLUG] = new Collection();
+
+        return $filters;
+    }
+
+
+    /**
+     * @param array $assessmentIds
+     * @return MarkBook
+     */
+    private function buildMarkbook(array $assessmentIds)
+    {
+        // Fetch assessments & participants
+        $assessments   = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments   = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+
+        // Build a markbook
+        $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+        $markbook->getAssessments()->sortBy(['dueAt', 'sequence'], ['asc', 'asc']);
+        return $markbook;
+    }
+
+
+    /**
+     * @param GenericCollection|IAssessable[] $assessments
+     * @return bool[]
+     */
+    private function determineWritableAssessments(GenericCollection $assessments)
+    {
+        /* Determine which assessments the user should be able to mark.
+         *
+         * Can only mark an assessment if:
+         * * Assessment is/was not due in a term that is archived, and
+         * * User has write+ perm to the page
+         */
+        /** @var bool[] $writableAssessments Indexed by assessment.id */
+        $writable = [];
+
+        $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
+        foreach($assessments as $assessment){
+            $writable[$assessment->getId()] = $this->isAssessmentMarkable($this->getUser(), $assessment, $terms);
+        }
+        return $writable;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    private function getPendingLabel()
+    {
+        // What text should we display if student has submitted but not been marked?
+        try {
+            return $this->dueWorkErrorMapper->findDefaultForNewSubmissions()->getDisplayAs();
+        } catch (Mapper\Exception $e) {
+            // Let Twig figure it out
+            return null;
+        }
+    }
+
+
+    /**
+     * @param null[]|Collection[] $filters
+     * @return string
+     */
+    private function buildQueryArgs(array $filters)
+    {
+        // Convert filters to query args so export can retrieve this report
+        // TODO Convert $filters from array to DTO and make this a method on that DTO. SA-3379  SA-3201
+        $queryArgs = [];
+        foreach ($filters as $slug => $filter) {
+            $queryArg = "$slug=";
+            if ($filter instanceof Collection) {
+                $queryArg .= implode(',', $filter->keys());
+            }
+            $queryArgs[] = $queryArg;
+        }
+        return implode('&', $queryArgs);
     }
 
 
@@ -250,55 +325,6 @@ class Controller extends Base
         }
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
-
-
-    /**
-     * @param int[] $assessmentIds
-     * @param string $queryArgs
-     * @throws ServiceNotFound If unable to find the HTML Output rendering service
-     * @return string
-     */
-    private function generateMarkbookReport(array $assessmentIds, $queryArgs)
-    {
-        // Fetch assessments & participants
-        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
-
-        // Build a markbook
-        $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
-        $markbook->getAssessments()->sortBy(['dueAt', 'sequence'], ['asc', 'asc']);
-
-        /* Determine which assessments the user should be able to mark.
-         *
-         * Can only mark an assessment if:
-         * * Assessment is/was not due in a term that is archived, and
-         * * User has write+ perm to the page
-         */
-        /** @var bool[] $writableAssessments Indexed by assessment.id */
-        $writable = [];
-
-        $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
-        foreach($assessments as $assessment){
-            $writable[$assessment->getId()] = $this->isAssessmentMarkable($this->getUser(), $assessment, $terms);
-        }
-
-        // What text should we display if student has submitted but not been marked?
-        try {
-            $pendingLabel = $this->dueWorkErrorMapper->findDefaultForNewSubmissions()->getDisplayAs();
-        } catch (Mapper\Exception $e) {
-            // Let Twig figure it out
-            $pendingLabel = null;
-        }
-
-        // And output
-        return $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
-            'markbook'     => $markbook,
-            'writable'     => $writable,
-            'pendingLabel' => $pendingLabel,
-            'queryArgs'    => $queryArgs,
-        ])->getAsString();
-    }
-
 
     /**
      * Can the specified user mark the specified assessment?
@@ -335,7 +361,7 @@ class Controller extends Base
      * @throws ApplicationException\Exception
      * @throws \UnexpectedValueException
      */
-    public function getMarkbookExport(Folder\Model $class, Term\Model $term)
+    public function getMarkbookExport(User $viewee, AssessmentFilter\FactoryFactory $filterFactoryFactory)
     {
         // Replaces /submission/listSubmission/{termSlug}/{folderId}
         //       eg /submission/listSubmission/{termSlug}/{folderId}
