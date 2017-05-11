@@ -8,6 +8,7 @@ namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Filter\IdFinder;
@@ -40,12 +41,7 @@ class Module extends BaseModule
     public function registerRoutes()
     {
         $preload = function ($params) {
-            $assessmentMapper = $this->getMapperFactory()->get(Assessment\Mapper::class);
-            $args = [
-                'filterFactoryFactory' => new AssessmentFilter\FactoryFactory($this->getMapperFactory()),
-                'assessmentIdFinder'   => AssessmentFilter\IdFinder::getInstance($assessmentMapper),
-            ];
-
+            $args = [];
             if(null !== $params['userId']){
                 try{
                     $args['viewee'] = $this->getUserMapper()->findById($params['userId']);
@@ -79,6 +75,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @param Container $injector
      * @throws \InvalidArgumentException If class not found
      * @throws ServiceNotFound
      */
@@ -94,6 +91,12 @@ class Module extends BaseModule
                 'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
                 'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
                 'access'                     => $this->getMapperFactory()->getLazy(Access::class), // Has a static 'getInstance()' method
+                'assessmentIdFinder'         => $injector->lazy(function(){
+                    return AssessmentFilter\IdFinder::getInstance($this->getMapperFactory()->get(Assessment\Mapper::class));
+                }),
+                'filterFactoryFactory'       => $injector->lazy(function(){
+                    return new AssessmentFilter\FactoryFactory($this->getMapperFactory());
+                }),
             ])
         );
     }

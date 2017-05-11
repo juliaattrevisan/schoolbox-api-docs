@@ -14,8 +14,6 @@ use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\AssessmentContextType;
-use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -32,7 +30,6 @@ use DueWork_ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 use Schoolbox\Filter\Option as FilterOption;
-use Schoolbox\Filter\Selection;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -73,16 +70,24 @@ class Controller extends Base
      */
     private $access;
 
+    /** @var  AssessmentFilter\IdFinder */
+    private $assessmentIdFinder;
+
+    /** @var AssessmentFilter\FactoryFactory */
+    private $filterFactoryFactory;
+
     /**
      * Constructor
      *
-     * @param Error\Mapper          $errorMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param GradeGroup\Model      $defaultGradeGroup
-     * @param CourseImpl\Mapper     $courseImplMapper
-     * @param Term\Mapper           $termMapper
-     * @param DueWork_ErrorMapper   $dueWorkErrorMapper
-     * @param Access                $access
+     * @param Error\Mapper                    $errorMapper
+     * @param AssessmentMapperProxy           $assessmentMapperProxy
+     * @param GradeGroup\Model                $defaultGradeGroup
+     * @param CourseImpl\Mapper               $courseImplMapper
+     * @param Term\Mapper                     $termMapper
+     * @param DueWork_ErrorMapper             $dueWorkErrorMapper
+     * @param Access                          $access
+     * @param AssessmentFilter\IdFinder       $assessmentIdFinder
+     * @param AssessmentFilter\FactoryFactory $filterFactoryFactory
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -91,7 +96,9 @@ class Controller extends Base
         CourseImpl\Mapper $courseImplMapper,
         Term\Mapper $termMapper,
         DueWork_ErrorMapper $dueWorkErrorMapper,
-        Access $access
+        Access $access,
+        AssessmentFilter\IdFinder $assessmentIdFinder,
+        AssessmentFilter\FactoryFactory $filterFactoryFactory
     ) {
         $this->errorMapper           = $errorMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
@@ -100,6 +107,8 @@ class Controller extends Base
         $this->termMapper            = $termMapper;
         $this->dueWorkErrorMapper    = $dueWorkErrorMapper;
         $this->access                = $access;
+        $this->assessmentIdFinder    = $assessmentIdFinder;
+        $this->filterFactoryFactory = $filterFactoryFactory;
     }
 
 
@@ -124,15 +133,14 @@ class Controller extends Base
      *
      * @api   GET /learning/markbook?f=1,2&td=3
      * @level 165
-     * @param \Schoolbox\Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
-     * @param null|User                                           $viewee                Whose markbook are we looking at?
+     * @param null|User $viewee Whose markbook are we looking at?
      * @throws RouteNotFound
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException      If the specified filter definition class does not exist
      * @throws ServiceNotFound           If unable to locate HTML web Output
      * @throws \DomainException          If of the filters on this page does not have its slug set
      */
-    public function getMarkbook(AssessmentFilter\FactoryFactory $filterFactoryFactory, User $viewee = null)
+    public function getMarkbook(User $viewee = null)
     {
         // If viewee not specified, then display current user's markbook.
         if(null === $viewee){
@@ -142,7 +150,7 @@ class Controller extends Base
         $route     = $this->getRouter()->generate('learningMarkbook.postMarkbook', ['userId' => $viewee->getId()]);
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
-        $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
 
         // Is a teacher looking at their own markbook, or admin looking at a teacher's markbook?
         $pageTitle = 'Markbook';
@@ -160,31 +168,26 @@ class Controller extends Base
 
 
     /**
-     * @param User                            $viewee
-     * @param AssessmentFilter\IdFinder       $assessmentIdFinder
-     * @param AssessmentFilter\FactoryFactory $filterFactoryFactory
+     * @param User $viewee Whose markbook are we fetching?
      * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
-    public function postMarkbook(User $viewee, AssessmentFilter\IdFinder $assessmentIdFinder, AssessmentFilter\FactoryFactory $filterFactoryFactory)
+    public function postMarkbook(User $viewee)
     {
 
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
-            $filters              = $this->generateFilters($postFilterSelections, $filterFactoryFactory);
-            $assessmentIds        = $assessmentIdFinder->findIdsByFilters($filters);
+            $filters              = $this->generateFilters($postFilterSelections);
+            $assessmentIds        = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook             = $this->buildMarkbook($assessmentIds);
-            $writable             = $this->determineWritableAssessments($markbook->getAssessments());
-            $pendingLabel         = $this->getPendingLabel();
-            $queryArgs            = $this->buildQueryArgs($filters);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'     => $markbook,
-                    'writable'     => $writable,
-                    'pendingLabel' => $pendingLabel,
+                    'writable'     => $this->determineWritableAssessments($markbook->getAssessments()),
+                    'pendingLabel' => $this->getPendingLabel(),
                     'viewee'       => $viewee,
-                    'queryArgs'    => $queryArgs,
+                    'queryArgs'    => $this->buildQueryArgs($filters),
                 ])->getAsString(),
             ]));
 
@@ -210,12 +213,11 @@ class Controller extends Base
         }
     }
 
-    private function generateFilters(array $filterSelections, AssessmentFilter\FactoryFactory $filterFactoryFactory)
+    private function generateFilters(array $filterSelections)
     {
-
         $page = FilterOption\Model::PAGE_MARK_BOOK;
 
-        $keyConverters        = $filterFactoryFactory->buildKeyConverters($page);
+        $keyConverters        = $this->filterFactoryFactory->buildKeyConverters($page);
         $selectionsPerFilter  = Filter\Selection\Mapper::getInstance()->updateSelections($keyConverters, $this->getUser(), $page, $filterSelections);
         $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
         $filters              = $selectionTransformer->getFilters();
