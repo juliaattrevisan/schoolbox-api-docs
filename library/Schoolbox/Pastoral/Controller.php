@@ -50,7 +50,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
-use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
 
 class Controller extends Base
 {
@@ -516,7 +515,8 @@ class Controller extends Base
 
         foreach ($students as $student_id => $value) {
 
-            $record = $this->pastoralMapper->createModel()
+            /** @var Model $record */
+            $record = $this->pastoralMapper->createModel();
 
             // If this is not the first record, set the parent ID
 
