@@ -928,13 +928,15 @@ class Controller extends Base
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
 
+            $collectorFactory = new CollectorFactory();
+
             /** @var PastoralAttachmentModel $attachment */
             foreach ($attachments as $attachment) {
 
                 $foundAttachment = false;
 
                 if (is_array($post['attachment'])) {
-                    $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
+                    $attachmentObjects = $collectorFactory->build($post['attachment'])->getAll();
 
                     /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                     foreach ($attachmentObjects as $storageObject) {
