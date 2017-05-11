@@ -516,7 +516,7 @@ class Controller extends Base
 
         foreach ($students as $student_id => $value) {
 
-            $record = new Model();
+            $record = $this->pastoralMapper->createModel()
 
             // If this is not the first record, set the parent ID
 
@@ -587,7 +587,7 @@ class Controller extends Base
                             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                         }
 
-                        $access = new PastoralAccessModel();
+                        $access = $this->pastoralAccessMapper->createModel();
                         $access->setPastoral($record);
                         $access->setUser($user);
                         $this->pastoralAccessMapper->save($access);
@@ -610,7 +610,7 @@ class Controller extends Base
                         throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                     }
 
-                    $access = new PastoralAccessModel();
+                    $access = $this->pastoralAccessMapper->createModel();
                     $access->setPastoral($record);
                     $access->setRole($role);
                     $this->pastoralAccessMapper->save($access);
@@ -627,7 +627,7 @@ class Controller extends Base
                             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                         }
 
-                        $access = new PastoralAccessModel();
+                        $access = $this->pastoralAccessMapper->createModel();
                         $access->setPastoral($record);
                         $access->setGroup($group);
                         $this->pastoralAccessMapper->save($access);
@@ -654,7 +654,7 @@ class Controller extends Base
 
                     if ($this->config->get("external_pastoral_upload")) {
                         // Queue file for upload to Synergetic DocMan
-                        $queue = new PastoralUploadQueueModel();
+                        $queue = $this->pastoralUploadQueueMapper->createModel();
                         $queue->setPastoral($record);
                         $queue->setExternalId($this->getUser()->getExternalId());
                         $queue->setStudentExternalId($record->getStudent()->getExternalId());
@@ -663,7 +663,7 @@ class Controller extends Base
                         $this->pastoralUploadQueueMapper->save($queue);
                     }
 
-                    $attachment = new PastoralAttachmentModel();
+                    $attachment = $this->pastoralAttachmentMapper->createModel();
                     $attachment->setPastoral($record);
                     $attachment->setStorage($storageObject);
                     $this->pastoralAttachmentMapper->save($attachment);
@@ -806,7 +806,7 @@ class Controller extends Base
                             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                         }
 
-                        $access = new PastoralAccessModel();
+                        $access = $this->pastoralAccessMapper->createModel();
                         $access->setPastoral($record);
                         $access->setUser($user);
                         $this->pastoralAccessMapper->save($access);
@@ -843,7 +843,7 @@ class Controller extends Base
                 }
 
                 if (!$found) {
-                    $access = new PastoralAccessModel();
+                    $access = $this->pastoralAccessMapper->createModel();
                     $access->setPastoral($record);
                     $access->setRole($role);
                     $this->pastoralAccessMapper->save($access);
@@ -887,7 +887,7 @@ class Controller extends Base
                 }
 
                 if (!$found) {
-                    $access = new PastoralAccessModel();
+                    $access = $this->pastoralAccessMapper->createModel();
                     $access->setPastoral($record);
                     $access->setGroup($group);
                     $this->pastoralAccessMapper->save($access);
@@ -1005,7 +1005,7 @@ class Controller extends Base
 
             // Queue file for upload to external SIS
 
-            $queue = new PastoralUploadQueueModel();
+            $queue = $this->pastoralUploadQueueMapper->createModel();
             $queue->setPastoral($record);
             $queue->setExternalId($this->getUser()->getExternalId());
             $queue->setStudentExternalId($record->getStudent()->getExternalId());
@@ -1014,7 +1014,7 @@ class Controller extends Base
             $this->pastoralUploadQueueMapper->save($queue);
         }
 
-        $attachment = new PastoralAttachmentModel();
+        $attachment = $this->pastoralAttachmentMapper->createModel();
         $attachment->setPastoral($record);
         $attachment->setStorage($storageObject);
         $this->pastoralAttachmentMapper->save($attachment);
