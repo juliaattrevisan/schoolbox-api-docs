@@ -82,6 +82,6 @@ abstract class KeyConverter extends AbstractKeyConverter
             return $key;
         }
         $this->assertValidKey($key);
-        return (string)(int)$key;
+        return (string)$key;
     }
 }

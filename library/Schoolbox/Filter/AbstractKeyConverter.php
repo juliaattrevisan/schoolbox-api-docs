@@ -35,6 +35,15 @@ abstract class AbstractKeyConverter implements IKeyConverter
      */
     abstract protected function getItem($key);
 
+    /**
+     * @inheritdoc
+     */
+    public function sanitiseKey($key)
+    {
+        $this->assertValidKey($key);
+        return (string)$key;
+    }
+
 
     /**
      * @inheritdoc

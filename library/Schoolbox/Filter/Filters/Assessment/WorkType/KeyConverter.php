@@ -67,19 +67,6 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    public function sanitiseKey($key)
-    {
-        $this->assertValidKey($key);
-        if (in_array($key, $this->workTypes->keys(), true)) {
-            return (string)$key;
-        }
-        return (string)(int)$key;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     protected function assertValidKey($key)
     {
         if ($key !== Definition::KEY_NONE && !$this->workTypes->offsetExists($key)) {
