@@ -269,7 +269,7 @@
                                             <div class="small-12 card wrap-down">
                                                 <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
                                                 <p>
-                                                    <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecordForm', {'studentId': related.student.id, 'recordId': related.id}) }}">
+                                                    <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
                                                         {{ related.heading }}
                                                     </a>
                                                 </p>

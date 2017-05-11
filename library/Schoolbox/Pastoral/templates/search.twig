@@ -28,7 +28,7 @@
                                                 {{ profile.imageSquare64(record.student) }}
                                             </a>
                                             <h4>
-                                                <a href="{{ routeLookup('pastoral.getStudentRecordForm', { studentId: record.student.id, recordId: record.id}) }}">
+                                                <a href="{{ routeLookup('pastoral.getStudentRecord', { studentId: record.student.id, recordId: record.id}) }}">
                                                     {{ record.student.fullName }} - {{ record.heading }}
                                                 </a>
                                             </h4>
