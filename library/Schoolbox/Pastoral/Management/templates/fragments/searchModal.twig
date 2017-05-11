@@ -7,9 +7,9 @@
     {# Container for search results #}
     {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-    <div class="row">
+    <div class="row {% if members | length == 0%}class="hide"{% endif %}" id="searchResultsContainerRow">
         <div class="small-12">
-            <section {% if members | length == 0%}class="hide"{% endif %} id="searchResultsContainer">
+            <section id="searchResultsContainer">
                 <ul class="grid information-list" id="searchResults">
                 </ul>
             </section>
@@ -120,6 +120,7 @@
         var searchResults = $('#searchResults');
         var searchResultsEmpty = $('#searchResultsEmpty');
         var searchResultsContainer = $('#searchResultsContainer');
+        var searchResultsContainerRow = $('#searchResultsContainerRow');
         var searchResultsPending = $('#searchResultsPending');
         var searchTooShort = $('#searchResultsLength');
 
@@ -151,6 +152,7 @@
             memberSearch.val('');
             searchResults.removeClass('hide');
             searchResultsContainer.addClass('hide');
+            searchResultsContainerRow.addClass('hide');
             searchResultsEmpty.addClass('hide');
             searchTooShort.addClass('hide');
 
@@ -184,6 +186,7 @@
 
                 searchResultsEmpty.removeClass('hide');
                 searchResultsContainer.addClass('hide');
+                searchResultsContainerRow.addClass('hide');
 
             } else {
 
@@ -262,6 +265,7 @@
                     {# Show search results #}
 
                     searchResultsContainer.removeClass('hide');
+                    searchResultsContainerRow.removeClass('hide');
                 }
             }
 
