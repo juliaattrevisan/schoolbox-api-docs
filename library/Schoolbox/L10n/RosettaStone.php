@@ -20,7 +20,7 @@ class RosettaStone
      * RosettaStone constructor.
      * @param Model[] $terms
      */
-    public function __construct($terms)
+    public function __construct($terms = [])
     {
         foreach ($terms as $term) {
             $this->addTerm($term);
