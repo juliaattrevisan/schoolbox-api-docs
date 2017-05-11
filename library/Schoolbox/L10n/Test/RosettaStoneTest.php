@@ -118,6 +118,8 @@ class RosettaStoneTest extends \PHPUnit_Framework_TestCase
             ['{:ca} for {:unknown|p|c}', 'calendar for '],
             // No terms at all
             ['No terms at all', 'No terms at all'],
+            // Unknown filter does nothing?
+            ['Unknown filter "filter" on "ca": {:ca|filter}', 'Unknown filter "filter" on "ca": calendar'],
         ];
     }
 
