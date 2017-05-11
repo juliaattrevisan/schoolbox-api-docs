@@ -527,7 +527,7 @@ class Controller extends Base
             try {
                 /** @var User $student */
                 $student = $this->userMapper->findById($student_id);
-            } catch (\Exception $e) {
+            } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
             }
 
