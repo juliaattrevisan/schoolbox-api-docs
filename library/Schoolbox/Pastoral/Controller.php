@@ -40,6 +40,7 @@ use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -650,7 +651,7 @@ class Controller extends Base
             if (is_array($post['attachment'])) {
                 $attachmentObjects = $collectorFactory->build($post['attachment'])->getAll();
 
-                /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                /** @var Storage $storageObject */
                 foreach ($attachmentObjects as $storageObject) {
                     // Only add attachments which don't already exist
 
@@ -695,7 +696,7 @@ class Controller extends Base
 
         // External interface
 
-        $pastoralExternal = new \External_Pastoral();
+        $pastoralExternal = new External_Pastoral();
 
         // Keep track of IDs created
 
@@ -940,7 +941,7 @@ class Controller extends Base
                 if (is_array($post['attachment'])) {
                     $attachmentObjects = $collectorFactory->build($post['attachment'])->getAll();
 
-                    /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                    /** @var Storage $storageObject */
                     foreach ($attachmentObjects as $storageObject) {
 
                         if ($attachment->getStorage()->getHash() == $storageObject->getHash()) {
