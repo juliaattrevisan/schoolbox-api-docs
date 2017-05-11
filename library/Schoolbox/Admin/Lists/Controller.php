@@ -660,8 +660,9 @@ class Controller extends Base
 
                             $id = $row->$idGetter();
 
-                            if (!isset($records[$id]))
+                            if (!isset($records[$id])) {
                                 $records[$id] = [];
+                            }
 
                             $value = $row->$getter();
 
