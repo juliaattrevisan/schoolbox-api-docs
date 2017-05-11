@@ -12,8 +12,8 @@
                 {# Only display link if the user is authorzied to view the record #}
 
                 {% if showBody %}
-                    {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
-                        <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
+                    {% if isRouteAuthorized('pastoral.getStudentRecordForm', {'record': record}) %}
+                        <a href="{{ routeLookup('pastoral.getStudentRecordForm', {'studentId': student.id, 'recordId': record.id}) }}">
                             <h3>{{ record.heading }}</h3>
                         </a>
                     {% else %}
@@ -58,7 +58,7 @@
                                 Linked Records:
                                 {% for related in record.relatedRecords %}
                                     {% if related.student.id != record.student.id %}
-                                        <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">{{ related.student.fullName }}</a>{% if not loop.last %}, {% endif %}
+                                        <a href="{{ routeLookup('pastoral.getStudentRecordForm', {'studentId': student.id, 'recordId': record.id}) }}">{{ related.student.fullName }}</a>{% if not loop.last %}, {% endif %}
                                     {% endif %}
                                 {% endfor %}
                             </p>
@@ -77,9 +77,9 @@
             {% if showBody %}
                 {# Modify record #}
 
-                {% if isRouteAuthorized('pastoral.getStudentRecordUpdate', {record: record}) %}
+                {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
                     <a class="icon-modify no-text"
-                       href="{{ routeLookup('pastoral.getStudentRecordUpdate', {'studentId': record.student.id, 'recordId': record.id}) }}"
+                       href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
                        title="Modify"></a>
                 {% endif %}
 

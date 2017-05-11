@@ -33,16 +33,16 @@
 
         {# Display link to insert pastoral record if the logged in user is authorized to do so #}
 
-        {% if isRouteAuthorized('pastoral.getStudentRecordInsert') %}
-            <a href="{{ routeLookup('pastoral.getStudentRecordInsert', {'studentId': student.id}) }}" class="icon-add" title="Add Pastoral Record"></a>
+        {% if isRouteAuthorized('pastoral.getStudentRecordInsertForm') %}
+            <a href="{{ routeLookup('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) }}" class="icon-add" title="Add Pastoral Record"></a>
         {% endif %}
 
         {# Modify record #}
 
         {% if not showBody and record is not empty %}
-            {% if isRouteAuthorized('pastoral.getStudentRecordUpdate', {record: record}) %}
+            {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
                 <a class="icon-modify no-text"
-                   href="{{ routeLookup('pastoral.getStudentRecordUpdate', {'studentId': record.student.id, 'recordId': record.id}) }}"
+                   href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
                    title="Modify"></a>
             {% endif %}
         {% endif %}
