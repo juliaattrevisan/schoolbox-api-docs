@@ -244,7 +244,7 @@ class Controller extends Base
 
         // Limit the number of pastoral records to display on each page of pastoral records
 
-        $resultsPerPage = 15;
+        $resultsPerPage = $this->config->get('pastoral_page_size');
 
         // Set the current page number
 

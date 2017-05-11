@@ -182,3 +182,6 @@ INSERT INTO `config` (
 ALTER TABLE `pastoral` MODIFY `severity_id` INT(11);
 
 
+
+
+INSERT INTO schoolbox.config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES ('pastoral_page_size', '15', 'Records On Pastoral Page', 'The number of records to display on each page of a students pastoral care record.', 1, null, 5, 'true', 'false', 'false');
