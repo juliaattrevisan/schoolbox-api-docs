@@ -2,7 +2,7 @@
 
 {{ bread.crumbs(
     ['Learning', routeLookup('learning.getClasses')],
-    [participant.assessable.context.folder.name, routeLookup('learningMarkbook.getMarkbook', {classId: participant.assessable.context.folder.id})],
+    [participant.assessable.context.folder.name, routeLookup('learningMarkbook.getMarkbook') ~ '?f='~participant.assessable.context.folder.id~'&a=&p=&uis=&wt=&wk='],
     [participant.assessable.title, routeLookup('learningAssessment.getStatus', {assessmentId: participant.assessable.id})],
     ['Timeline']
 ) }}

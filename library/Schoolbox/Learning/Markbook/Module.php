@@ -60,9 +60,6 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        // TODO 'getMarkbookForTerm' is now redundant. The 'markbookSelector.twig' can likely be removed
-//        $this->register('GET', '/{classId}/term/{termCode}', 'getMarkbookForTerm', $isStaffOrSuper, $preload);
-
         $this->register('GET',  '{/userId}',       'getMarkbook',       $isStaffOrSuper, $preload);
         $this->register('POST', '{/userId}',       'postMarkbook',       $isStaffOrSuper, $preload);  //AJAX in the report
         $this->register('GET', '/export', 'getMarkbookExport', $isStaffOrSuper, $preload);
