@@ -226,7 +226,7 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $this->pastoralAuditMapper->save($auditRecord);
 
-        if (empty($get['type']) || !is_numeric($get['type'])) {
+        if (!is_numeric($get['type'])) {
 
             // Retrieve all of the students pastoral records
 
