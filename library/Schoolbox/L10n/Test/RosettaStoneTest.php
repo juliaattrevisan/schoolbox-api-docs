@@ -23,10 +23,10 @@ class RosettaStoneTest extends \PHPUnit_Framework_TestCase
     public function setup()
     {
         $this->stone = (new RosettaStone())
-            ->addTerm($this->buildTerm('calendar', 'Calendar', 'calendar', 'calendars', 'a', true))
-            ->addTerm($this->buildTerm('indicator', 'Indicator', 'indicator', 'indicators', 'an', true))
-            ->addTerm($this->buildTerm('person', 'Person', 'person', 'people', 'a', false))
-            ->addTerm($this->buildTerm('event', 'Event', 'event', 'events', 'an', false))
+            ->addTerm($this->buildTerm('ca', 'Calendar', 'calendar', 'calendars', 'a', true))
+            ->addTerm($this->buildTerm('in', 'Indicator', 'indicator', 'indicators', 'an', true))
+            ->addTerm($this->buildTerm('pe', 'Person', 'person', 'people', 'a', false))
+            ->addTerm($this->buildTerm('ev', 'Event', 'event', 'events', 'an', false))
         ;
     }
 
@@ -39,28 +39,28 @@ class RosettaStoneTest extends \PHPUnit_Framework_TestCase
     {
         return [
             // Calendar
-            'calendar (singular)'       => ['calendar', false, false, 'calendar'],
-            'calendar (plural)'         => ['calendar', true,  false, 'calendars'],
-            'calendar (caps, singular)' => ['calendar', false, true,  'Calendar'],
-            'calendar (caps, plural)'   => ['calendar', true,  true,  'Calendars'],
+            'calendar (singular)'       => ['ca', false, false, 'calendar'],
+            'calendar (plural)'         => ['ca', true,  false, 'calendars'],
+            'calendar (caps, singular)' => ['ca', false, true,  'Calendar'],
+            'calendar (caps, plural)'   => ['ca', true,  true,  'Calendars'],
 
             // Indicator
-            'indicator (singular)'       => ['indicator', false, false, 'indicator'],
-            'indicator (plural)'         => ['indicator', true,  false, 'indicators'],
-            'indicator (caps, singular)' => ['indicator', false, true,  'Indicator'],
-            'indicator (caps, plural)'   => ['indicator', true,  true,  'Indicators'],
+            'indicator (singular)'       => ['in', false, false, 'indicator'],
+            'indicator (plural)'         => ['in', true,  false, 'indicators'],
+            'indicator (caps, singular)' => ['in', false, true,  'Indicator'],
+            'indicator (caps, plural)'   => ['in', true,  true,  'Indicators'],
 
             // Person (no capitalize first)
-            'person (singular)'       => ['person', false, false, 'person'],
-            'person (plural)'         => ['person', true,  false, 'people'],
-            'person (caps, singular)' => ['person', false, true,  'person'],
-            'person (caps, plural)'   => ['person', true,  true,  'people'],
+            'person (singular)'       => ['pe', false, false, 'person'],
+            'person (plural)'         => ['pe', true,  false, 'people'],
+            'person (caps, singular)' => ['pe', false, true,  'person'],
+            'person (caps, plural)'   => ['pe', true,  true,  'people'],
 
             // Event (no capitalize first)
-            'event (singular)'       => ['event', false, false, 'event'],
-            'event (plural)'         => ['event', true,  false, 'events'],
-            'event (caps, singular)' => ['event', false, true,  'event'],
-            'event (caps, plural)'   => ['event', true,  true,  'events'],
+            'event (singular)'       => ['ev', false, false, 'event'],
+            'event (plural)'         => ['ev', true,  false, 'events'],
+            'event (caps, singular)' => ['ev', false, true,  'event'],
+            'event (caps, plural)'   => ['ev', true,  true,  'events'],
         ];
     }
 
@@ -68,20 +68,20 @@ class RosettaStoneTest extends \PHPUnit_Framework_TestCase
     {
         return [
             // Calendar
-            'calendar (singular)' => ['calendar', false, 'a'],
-            'calendar (plural)'   => ['calendar', true,  'A'],
+            'calendar (singular)' => ['ca', false, 'a'],
+            'calendar (plural)'   => ['ca', true,  'A'],
 
             // Indicator
-            'indicator (singular)' => ['indicator', false, 'an'],
-            'indicator (plural)'   => ['indicator', true,  'An'],
+            'indicator (singular)' => ['in', false, 'an'],
+            'indicator (plural)'   => ['in', true,  'An'],
 
             // Person (no capitalize first)
-            'person (singular)' => ['person', false, 'a'],
-            'person (plural)'   => ['person', true,  'A'],
+            'person (singular)' => ['pe', false, 'a'],
+            'person (plural)'   => ['pe', true,  'A'],
 
             // Event (no capitalize first)
-            'event (singular)' => ['event', false, 'an'],
-            'event (plural)'   => ['event', true,  'An'],
+            'event (singular)' => ['ev', false, 'an'],
+            'event (plural)'   => ['ev', true,  'An'],
         ];
     }
 
@@ -96,6 +96,26 @@ class RosettaStoneTest extends \PHPUnit_Framework_TestCase
             'nothing' => ['nothing'],
             '1'       => [1],
             'null'    => [null],
+        ];
+    }
+
+    /**
+     * Data for sentence translation test
+     *
+     * @return array
+     */
+    public function getTestTranslateSentenceData()
+    {
+        return [
+            // Event is not capitalized...
+            ['{:ev|c} is starting for {:pe|p}', 'event is starting for people'],
+            // but its indefinite article ignores that rule
+            ['{:ev|indef|c} {:ev} is starting for {:pe|p}', 'An event is starting for people'],
+            ['{:ev|indef} {:ev} is starting for {:pe|p}', 'an event is starting for people'],
+            // Order of filters doesn't matter
+            ['{:in|c|p} for {:in|p|c}', 'Indicators for Indicators'],
+            // Unknown terms get cast to empty string?
+            ['{:ca} for {:unknown|p|c}', 'calendar for '],
         ];
     }
 
@@ -133,11 +153,25 @@ class RosettaStoneTest extends \PHPUnit_Framework_TestCase
         $this->stone->indefiniteArticle($term, false);
     }
 
-    public function testTranslateSentence()
+    /**
+     * @dataProvider getTestTranslateSentenceData
+     */
+    public function testTranslateSentence($sentence, $expected)
     {
-        //
+        $this->assertEquals($expected, $this->stone->translateSentence($sentence));
     }
 
+    /**
+     * Helper for building a term for testing
+     *
+     * @param string $term
+     * @param string $title
+     * @param string $singular
+     * @param string $plural
+     * @param string $indef
+     * @param bool   $capitalizeFirst
+     * @return Model
+     */
     private function buildTerm($term, $title, $singular, $plural, $indef, $capitalizeFirst)
     {
         return (new Model())
