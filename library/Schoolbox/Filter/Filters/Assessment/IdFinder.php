@@ -595,10 +595,10 @@ class IdFinder extends Filter\AbstractIdFinder
         $anyBuilder = $this->getMapper()->getPredicateBuilder();
         foreach($terms as $term){
             $allBuilder = $this->getMapper()->getPredicateBuilder();
-            $allBuilder->greaterOrEqualTo("a.$dateColumn", $term->getStart()->getDatabaseDate());
+            $allBuilder->greaterThanOrEqualTo("a.$dateColumn", $term->getStart()->getDatabaseDate());
 
             if(!$term->getActualFinish()->isNull()){
-                $allBuilder->lesserOrEqualTo("a.$dateColumn", $term->getActualFinish()->getDatabaseDate());
+                $allBuilder->lessThanOrEqualTo("a.$dateColumn", $term->getActualFinish()->getDatabaseDate());
             }
             $anyBuilder->all($allBuilder);
         }

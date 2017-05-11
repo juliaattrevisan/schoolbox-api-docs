@@ -239,9 +239,15 @@ class Builder implements IBuilder
      * @param int|string $columnValue  if string, must be datetime
      * @return Builder
      */
-    public function lesserOrEqualTo($columnName, $columnValue)
+    public function lessThanOrEqualTo($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
+        $builder = null;
+        try{
+            $builder = $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
+        } catch (UnderflowException $e){
+            // Impossible to throw, because operator is not 'IN'
+        }
+        return $builder;
     }
 
 
@@ -257,13 +263,17 @@ class Builder implements IBuilder
 
 
     /**
-     * @param string     $columnName
-     * @param int|string $columnValue If string, must be datetime
-     * @return Builder
+     * @inheritdoc
      */
-    public function greaterOrEqualTo($columnName, $columnValue)
+    public function greaterThanOrEqualTo($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
+        $builder = null;
+        try{
+            $builder = $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
+        } catch (UnderflowException $e){
+            // Impossible to throw, because operator is not 'IN'
+        }
+        return $builder;
     }
 
     /**
@@ -273,7 +283,7 @@ class Builder implements IBuilder
      */
     public function notLessThan($columnName, $columnValue)
     {
-        return $this->greaterOrEqualTo($columnName, $columnValue);
+        return $this->greaterThanOrEqualTo($columnName, $columnValue);
     }
 
     /**
@@ -283,7 +293,7 @@ class Builder implements IBuilder
      */
     public function notGreaterThan($columnName, $columnValue)
     {
-        return $this->lesserOrEqualTo($columnName, $columnValue);
+        return $this->lessThanOrEqualTo($columnName, $columnValue);
     }
 
     /**
