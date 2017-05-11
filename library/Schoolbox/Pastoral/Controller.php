@@ -640,13 +640,15 @@ class Controller extends Base
             $pastoralExternal->createPastoral($record);
         }
 
+        $collectorFactory = new CollectorFactory();
+
         /** @var Model $record */
         foreach ($records as $record) {
 
             // Save attachments
 
             if (is_array($post['attachment'])) {
-                $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
+                $attachmentObjects = $collectorFactory->build($post['attachment'])->getAll();
 
                 /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                 foreach ($attachmentObjects as $storageObject) {
@@ -912,6 +914,8 @@ class Controller extends Base
             $pastoralExternal->createPastoral($record);
         }
 
+        $collectorFactory = new CollectorFactory();
+
         /** @var Model $record */
         foreach ($records as $record) {
             // Delete attachments if required
@@ -927,8 +931,6 @@ class Controller extends Base
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
-
-            $collectorFactory = new CollectorFactory();
 
             /** @var PastoralAttachmentModel $attachment */
             foreach ($attachments as $attachment) {
@@ -965,7 +967,7 @@ class Controller extends Base
             // Save any new attachments
 
             if (is_array($post['attachment'])) {
-                $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
+                $attachmentObjects = $collectorFactory->build($post['attachment'])->getAll();
 
                 foreach ($attachmentObjects as $storageObject) {
 
