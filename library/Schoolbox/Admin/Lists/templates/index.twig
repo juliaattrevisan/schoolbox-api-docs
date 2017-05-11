@@ -285,6 +285,7 @@
 </div>
 
 {# Draw cloneable row for use when adding new rows#}
+{# #ID# is used as a placeholder for an ID that is preg_replaced in JS when rows are inserted. #}
 
 <div data-clone class="hide">
     <li class="row {% if tables[table].delete %}actions-small-1{% endif %}">
