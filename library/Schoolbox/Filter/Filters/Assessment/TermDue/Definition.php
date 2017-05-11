@@ -246,7 +246,7 @@ class Definition extends AbstractFilterDefinition
         if (self::KEY_PAST === $key) {
             return 'Past Terms';
         }
-        return $this->terms[$key]->getCode();
+        return $this->terms[$key]->getCode() . ($this->terms[$key]->getArchived() ? ' [archived]' : '');
     }
 
     /* Getters
