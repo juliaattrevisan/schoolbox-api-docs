@@ -12,6 +12,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Filter\IdFinder;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
@@ -89,6 +90,7 @@ class Module extends BaseModule
                 'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
                 'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
                 'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
+                'access'                     => $this->getMapperFactory()->getLazy(Access::class), // Has a static 'getInstance()' method
             ])
         );
     }

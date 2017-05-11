@@ -65,7 +65,10 @@ class Controller extends Base
      */
     private $dueWorkErrorMapper;
 
-
+    /**
+     * @var Access
+     */
+    private $access;
 
 
     /**
@@ -77,6 +80,7 @@ class Controller extends Base
      * @param CourseImpl\Mapper     $courseImplMapper
      * @param Term\Mapper           $termMapper
      * @param DueWork_ErrorMapper   $dueWorkErrorMapper
+     * @param Access                $access
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -84,7 +88,8 @@ class Controller extends Base
         GradeGroup\Model $defaultGradeGroup,
         CourseImpl\Mapper $courseImplMapper,
         Term\Mapper $termMapper,
-        DueWork_ErrorMapper $dueWorkErrorMapper
+        DueWork_ErrorMapper $dueWorkErrorMapper,
+        Access $access
     ) {
         $this->errorMapper           = $errorMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
@@ -92,6 +97,7 @@ class Controller extends Base
         $this->courseImplMapper      = $courseImplMapper;
         $this->termMapper            = $termMapper;
         $this->dueWorkErrorMapper    = $dueWorkErrorMapper;
+        $this->access                = $access;
     }
 
 
@@ -215,11 +221,13 @@ class Controller extends Base
 
 
     /**
-     * @param array $assessmentIds
+     * @param int[] $assessmentIds
      * @throws ServiceNotFound If unable to find the HTML Output rendering service
+     * @return string
      */
     private function generateMarkbookReport(array $assessmentIds)
     {
+        // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
 
@@ -227,10 +235,19 @@ class Controller extends Base
         $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
         $markbook->getAssessments()->sortBy(['dueAt', 'sequence'], ['asc', 'asc']);
 
+        /* Determine which assessments the user should be able to mark.
+         *
+         * Can only mark an assessment if:
+         * * Assessment is/was not due in a term that is archived, and
+         * * User has write+ perm to the page
+         */
+        /** @var bool[] $writableAssessments Indexed by assessment.id */
+        $writable = [];
 
-        // Can the viewee mark Assessments in for this class ? TODO
-//        $writable = !$term->getArchived() && Access::getInstance()->isInstructor($this->getUser(), $class);
-        $writable = false;
+        $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
+        foreach($assessments as $assessment){
+            $writable[$assessment->getId()] = $this->isAssessmentMarkable($this->getUser(), $assessment, $terms);
+        }
 
         // What text should we display if student has submitted but not been marked?
         try {
@@ -247,6 +264,32 @@ class Controller extends Base
             'contextTypes' => AssessmentContextType::getInstance(),
             'pendingLabel' => $pendingLabel,
         ])->getAsString();
+    }
+
+
+    /**
+     * Can the specified user mark the specified assessment?
+     *
+     * Will be false if assessment's folder is archived, or if user lacks WRITE+ perm to folder
+     *
+     * @param User              $user
+     * @param IAssessable       $assessment
+     * @param GenericCollection|Term\Model[] $terms
+     * @return bool
+     */
+    private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms)
+    {
+        foreach($terms as $term){
+            if($term->contains($assessment->getDueAt())){
+                if($term->getArchived()){
+                    return false;
+                }
+                // Rely on access cache to catch repeated calls to same folder.
+                return $this->access->isInstructor($user, $assessment->getContext()->getFolder());
+            }
+        }
+        // Logically should never get to here. It means assessment is due before first term in system starts.
+        return false;
     }
 
 

@@ -129,7 +129,7 @@
                                     {% include '@learningAssessment/fragments/progressTick.twig' with {
                                         assessment: assessment,
                                         participant: participant,
-                                        writable: writable
+                                        writable: writable[assessment.id]
                                     } only %}
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}

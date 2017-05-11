@@ -952,7 +952,7 @@ class MapperProxy
      * @param User       $user
      * @param bool       $includeResponses
      * @param bool       $includeFeedbacks
-     * @return Collection
+     * @return Collection|IAssessable[]
      */
     public function loadParticipantsIntoAssessmentCollection(
         Collection $collection,
