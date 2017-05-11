@@ -106,10 +106,11 @@ class Controller extends Base
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException      If the specified filter definition class does not exist
      * @throws ServiceNotFound           If unable to locate HTML web Output
+     * @throws \DomainException          If of the filters on this page does not have its slug set
      */
     public function getMarkbook(User $viewee = null, AssessmentFilter\FactoryFactory $filterFactoryFactory)
     {
-        // If viewee not specified, then - todo
+        // If viewee not specified, then display current user's markbook.
         if(null === $viewee){
             $viewee = $this->getUser();
         }
