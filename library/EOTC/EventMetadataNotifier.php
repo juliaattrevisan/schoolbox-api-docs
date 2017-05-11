@@ -18,6 +18,7 @@ use Monolog\Logger;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -65,7 +66,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        $this->stone = new RosettaStone(\Schoolbox\L10n\Mapper::getInstance());
+        $stoneFactory = new RosettaStoneFactory();
+        $this->stone  = $stoneFactory->build(\Schoolbox\L10n\Mapper::getInstance());
         parent::loadDependencies($dependencies);
     }
 

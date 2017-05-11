@@ -18,17 +18,25 @@ class RosettaStone
 
     /**
      * RosettaStone constructor.
-     * RosettaStone constructor.
-     * @param Mapper $l10nMapper
+     * @param Model[] $terms
      */
-    public function __construct($l10nMapper)
+    public function __construct($terms)
     {
-        $terms = $l10nMapper->findAll();
-
-        /** @var Model $term */
         foreach ($terms as $term) {
-            $this->dictionary[$term->getTerm()] = $term;
+            $this->addTerm($term);
         }
+    }
+
+    /**
+     * Adds a term to this stone's dictionary.
+     *
+     * @param Model $term
+     * @return $this
+     */
+    public function addTerm(Model $term)
+    {
+        $this->dictionary[$term->getTerm()] = $term;
+        return $this;
     }
 
     /**

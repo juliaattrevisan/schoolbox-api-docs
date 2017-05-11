@@ -1,5 +1,6 @@
 <?php
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\L10n\RosettaStoneFactory;
 
 /**
  * Calendar_Api_Config_Connector_Schoolbox
@@ -19,7 +20,8 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
     public function __construct()
     {
         // TODO inject RosettaStone
-        $this->stone = new RosettaStone(Schoolbox\L10n\Mapper::getInstance());
+        $stoneFactory = new RosettaStoneFactory();
+        $this->stone  = $stoneFactory->build(Schoolbox\L10n\Mapper::getInstance());
         parent::__construct();
     }
 
