@@ -248,7 +248,7 @@ class Controller extends Base
 
         // Set the current page number
 
-        $pageCurrent = isset($get['pageCurrent']) ? $get['pageCurrent'] : 1;
+        $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? $get['pageCurrent'] : 1;
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/student.twig',
