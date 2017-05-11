@@ -4,7 +4,7 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\Term;
+namespace Schoolbox\Filter\Filters\Assessment\TermDue;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;

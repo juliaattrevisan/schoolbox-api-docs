@@ -12,20 +12,17 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
-use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\Project;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Quiz;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
@@ -41,6 +38,7 @@ class Mapper extends BaseMapper
 {
     /**
      * @inheritdoc
+     * @throws BaseMapper\Exception If unable to derive an ID for mapped joins
      */
     protected function mapping()
     {
@@ -65,40 +63,11 @@ class Mapper extends BaseMapper
         // * due work
         // * quiz
         // * project
-        // These are defined without a related field, because they don't have a matching key in this mapper
-        // (that isn't this mapper's PK)
-        $this->hasJoin(
-            'task',
-            [
-                'mapper'    => TaskMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'assessment_id'
-            ]
-        );
-        $this->hasJoin(
-            'duework',
-            [
-                'mapper'    => SubmissionBoxMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'assessment_id'
-            ]
-        );
-        $this->hasJoin(
-            'quiz',
-            [
-                'mapper'    => QuizMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'assessment_id'
-            ]
-        );
-        $this->hasJoin(
-            'project',
-            [
-                'mapper'    => ProjectMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'assessment_id'
-            ]
-        );
+        $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
+        $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
+        $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
+        $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
+
         // Context joins (where does this assessment live?)
         // * folder (via assessment_folder)
         // * unit specification (via assessment_course_unit_specification)
@@ -106,7 +75,7 @@ class Mapper extends BaseMapper
         // * project (via project_assessment)
         $this->joinsVia(
             'assessment_folder',
-            FolderMapper::class,
+            Folder\Mapper::class,
             'id',
             'folder_id',
             'assessment_id',
@@ -117,7 +86,7 @@ class Mapper extends BaseMapper
         );
         $this->joinsVia(
             'assessment_course_unit_specification',
-            UnitSpecificationMapper::class,
+            UnitSpec\Mapper::class,
             'id',
             'course_unit_specification_id',
             'assessment_id',
@@ -128,7 +97,7 @@ class Mapper extends BaseMapper
         );
         $this->joinsVia(
             'assessment_course_unit_implementation',
-            UnitImplementationMapper::class,
+            UnitImpl\Mapper::class,
             'id',
             'course_unit_implementation_id',
             'assessment_id',
@@ -139,7 +108,7 @@ class Mapper extends BaseMapper
         );
         $this->joinsVia(
             'project_assessment',
-            ProjectMapper::class,
+            Project\Mapper::class,
             'id',
             'project_id',
             'assessment_id',
@@ -201,6 +170,7 @@ class Mapper extends BaseMapper
      * @param array $columnList
      * @param array $options
      * @return Collection
+     * @throws BaseMapper\Exception If invalid column names specified
      */
     public function findByColumnList($columnList, $options = [])
     {
@@ -218,7 +188,7 @@ class Mapper extends BaseMapper
      *
      * @param Builder $pb
      * @param array $options
-     * @return Collection
+     * @return GenericCollection|IAssessable[]
      */
     public function findByPredicates(Builder $pb, array $options = [])
     {
@@ -232,10 +202,13 @@ class Mapper extends BaseMapper
      * Update any associated curriculum nodes when saving an assessment
      *
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     protected function updateCurriculumNodes(Model $assessment)
     {
-        $this->getJoinMapper('curriculum_node_for_assessment')
+        /** @var CurriculumNodeMapper $curriculumNodeMapper */
+        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_assessment');
+        $curriculumNodeMapper
             ->deleteRelations($assessment->getId())
             ->insertRelations($assessment->getCurriculumNodes(), $assessment->getId());
     }
@@ -243,10 +216,11 @@ class Mapper extends BaseMapper
     /**
      * When deleting an Assessment that is a Quiz, we need to delete all sub-objects of the Quiz
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function softDeleteQuiz(Model $assessment)
     {
-        if($assessment->getQuiz() instanceof Quiz){
+        if($assessment->getQuiz() instanceof Quiz\Model){
             $quizMapper = $this->getJoinMapper('quiz');
             $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $quizMapper->delete($quiz);
@@ -256,10 +230,11 @@ class Mapper extends BaseMapper
     /**
      * When restoring an Assessment that is a Quiz, we need to restore all sub-objects of the Quiz
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function restoreQuiz(Model $assessment)
     {
-        if($assessment->getQuiz() instanceof Quiz){
+        if($assessment->getQuiz() instanceof Quiz\Model){
             $quizMapper = $this->getJoinMapper('quiz');
             $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $quizMapper->restoreSoftDeleted($quiz);
@@ -269,6 +244,7 @@ class Mapper extends BaseMapper
     /**
      * When deleting an Assessment that is a Task, we need to delete all sub-objects of the Task
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function softDeleteTask(Model $assessment)
     {
@@ -282,6 +258,7 @@ class Mapper extends BaseMapper
     /**
      * When restoring an Assessment that is a Task, we need to restore all sub-objects of the Task
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function restoreTask(Model $assessment)
     {
@@ -295,6 +272,7 @@ class Mapper extends BaseMapper
     /**
      * When deleting an Assessment that is a DueWork, we need to delete all sub-objects of the DueWork
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function softDeleteDueWork(Model $assessment)
     {
@@ -307,6 +285,7 @@ class Mapper extends BaseMapper
     /**
      * When restoring an Assessment that is a DueWork, we need to restore all sub-objects of the DueWork
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function restoreDueWork(Model $assessment)
     {
@@ -321,10 +300,11 @@ class Mapper extends BaseMapper
     /**
      * When deleting an Assessment that is a Project, we need to delete all sub-objects of the Project
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function softDeleteProject(Model $assessment)
     {
-        if($assessment->getProject() instanceof ProjectModel){
+        if($assessment->getProject() instanceof Project\Model){
             $projectMapper = $this->getJoinMapper('project');
             $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $projectMapper->delete($project);
@@ -333,10 +313,11 @@ class Mapper extends BaseMapper
     /**
      * When restoring an Assessment that is a Project, we need to restore all sub-objects of the Project
      * @param Model $assessment
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function restoreProject(Model $assessment)
     {
-        if($assessment->getProject() instanceof ProjectModel){
+        if($assessment->getProject() instanceof Project\Model){
             $projectMapper = $this->getJoinMapper('project');
             $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
             $projectMapper->restoreSoftDeleted($project);
@@ -346,11 +327,12 @@ class Mapper extends BaseMapper
     /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
-     * @param User $student
-     * @param Term $term
+     * @param User       $student
+     * @param Term\Model $term
      * @return array|int[]
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
-    public function findUniqueAssessmentIdsForStudent(User $student, Term $term)
+    public function findUniqueAssessmentIdsForStudent(User $student, Term\Model $term)
     {
         return $this->findUniqueAssessmentIdsForStudentBetweenDates($student, $term->getStart(), $term->getActualFinish());
     }
@@ -362,6 +344,7 @@ class Mapper extends BaseMapper
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @return array|int[]
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     public function findUniqueAssessmentIdsForStudentBetweenDates(User $student, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
     {
@@ -407,6 +390,7 @@ class Mapper extends BaseMapper
      * object is joined onto it.
      *
      * @return string
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     protected function getSelectString()
     {
@@ -541,6 +525,8 @@ class Mapper extends BaseMapper
      *
      * @param PDOStatement $statement
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -648,6 +634,7 @@ class Mapper extends BaseMapper
      *
      * @param Collection|Model[] $modelList
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     protected function augmentListWithCurriculumNodes($modelList)
     {
@@ -706,6 +693,8 @@ class Mapper extends BaseMapper
      * @param Collection|Model[] $modelList
      * @param array|int[]        $dueWorkIds
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
     protected function augmentListWithDueWorkFiles($modelList, $dueWorkIds)
     {
@@ -717,7 +706,7 @@ class Mapper extends BaseMapper
                     d.id as duework_id,
                     {$this->getJoinColumnString('duework.submission_box_file', 's')},
                     {$this->getJoinColumnString('duework.submission_box_file.allowedFileExtension', 'm')}
-                FROM {$this->getJoinMapper('duework', 'd')->getTable()} d
+                FROM {$this->getJoinMapper('duework')->getTable()} d
                 INNER JOIN {$this->getJoinSql('duework.submission_box_file', 'd', 's')}
                 LEFT JOIN {$this->getJoinSql('duework.submission_box_file.allowedFileExtension', 's', 'm')}
                 WHERE d.id IN {$this->getArrayPlaceholders($dueWorkIds, 'id')}
@@ -768,7 +757,7 @@ class Mapper extends BaseMapper
             foreach ($modelList as $model) {
                 // This has to be a project
                 $context = $model->getAssessmentContext();
-                if ($context instanceof ProjectModel) {
+                if ($context instanceof Project\Model) {
                     $contextId = $context->getAssessmentModel()->getId();
                     if (isset($contextProjects[$contextId])) {
                         $model->getAssessmentContext()->setAssessmentModel($contextProjects[$contextId]);
@@ -787,6 +776,7 @@ class Mapper extends BaseMapper
      *
      * @param Collection|Model[] $modelList
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     protected function augmentListWithFolderCodes($modelList)
     {
@@ -795,7 +785,7 @@ class Mapper extends BaseMapper
         // (Project context: folder was loaded in augmentListWithProjectContexts.)
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-            if (isset($context) && !$context instanceof ProjectModel) {
+            if (isset($context) && !$context instanceof Project\Model) {
                 $folderIds[] = $context->getFolder()->getId();
             }
         }
@@ -804,7 +794,7 @@ class Mapper extends BaseMapper
         // Pass 2: assign folders to all non-project contexts
         foreach ($modelList as $model) {
             $context = $model->getAssessmentContext();
-            if (isset($context) && !$context instanceof ProjectModel) {
+            if (isset($context) && !$context instanceof Project\Model) {
                 $folderId = $context->getFolder()->getId();
                 if (isset($folders[$folderId])) {
                     // Add the folder into the context
@@ -853,6 +843,7 @@ class Mapper extends BaseMapper
      *
      * @param Collection|Model[] $modelList
      * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
     protected function augmentListWithGradeGroups($modelList)
     {
@@ -866,7 +857,7 @@ class Mapper extends BaseMapper
                 // Broken assessment - not much I can do besides ignore
                 continue;
             }
-            if ($submodel instanceof SubmissionBox || $submodel instanceof ProjectModel) {
+            if ($submodel instanceof SubmissionBox || $submodel instanceof Project\Model) {
                 if ($submodel->getGradeGroup() instanceof SubmissionBox\GradeLevel\Group\Model) {
                     $submodel->setGradeGroup(
                         $gradeGroupMapper->findByIdWithFallback($submodel->getGradeGroup()->getId())
@@ -915,6 +906,7 @@ class Mapper extends BaseMapper
      * the system will allocate the next available integer in the series.
      *
      * @param Model $assessment
+     * @throws \InvalidArgumentException If AssessmentContext is not recognised
      */
     protected function setSequence(Model $assessment)
     {
@@ -925,16 +917,16 @@ class Mapper extends BaseMapper
 
         $contextClass = get_class($assessment->getAssessmentContext());
         switch($contextClass){
-            case FolderModel::class:
+            case Folder\Model::class:
                 $joinName = 'contextFolder';
                 break;
-            case ProjectModel::class:
+            case Project\Model::class:
                 $joinName = 'contextProject';
                 break;
-            case UnitImplementationModel::class:
+            case UnitImpl\Model::class:
                 $joinName = 'contextUnitImplementation';
                 break;
-            case UnitSpecificationModel::class:
+            case UnitSpec\Model::class:
                 $joinName = 'contextUnitSpecification';
                 break;
             default:
@@ -958,7 +950,7 @@ class Mapper extends BaseMapper
             $pb->notEquals("a.id", $assessment->getId());
         }
         $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());
-        $pb->isNull("a.deleted_at");
+        $pb->isNull('a.deleted_at');
         $query .= 'WHERE ' . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());

@@ -170,8 +170,8 @@ class Builder implements IBuilder
     }
 
     /**
-     * @param string     $columnName
-     * @param string|int $columnValue
+     * @param string                    $columnName
+     * @param string|int|string[]|int[] $columnValue
      * @return Builder
      */
     public function equals($columnName, $columnValue)
@@ -234,6 +234,22 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LT);
     }
 
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue  if string, must be datetime
+     * @return Builder
+     */
+    public function lessThanOrEqualTo($columnName, $columnValue)
+    {
+        $builder = null;
+        try{
+            $builder = $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
+        } catch (UnderflowException $e){
+            // Impossible to throw, because operator is not 'IN'
+        }
+        return $builder;
+    }
+
 
     /**
      * @param string     $columnName
@@ -245,6 +261,21 @@ class Builder implements IBuilder
         return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GT);
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function greaterThanOrEqualTo($columnName, $columnValue)
+    {
+        $builder = null;
+        try{
+            $builder = $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
+        } catch (UnderflowException $e){
+            // Impossible to throw, because operator is not 'IN'
+        }
+        return $builder;
+    }
+
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
@@ -252,7 +283,7 @@ class Builder implements IBuilder
      */
     public function notLessThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_GTE);
+        return $this->greaterThanOrEqualTo($columnName, $columnValue);
     }
 
     /**
@@ -262,7 +293,7 @@ class Builder implements IBuilder
      */
     public function notGreaterThan($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, $columnValue, self::OPERATOR_LTE);
+        return $this->lessThanOrEqualTo($columnName, $columnValue);
     }
 
     /**

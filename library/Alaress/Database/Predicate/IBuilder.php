@@ -113,6 +113,20 @@ interface IBuilder
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
+     * @return Builder
+     */
+    public function lessThanOrEqualTo($columnName, $columnValue);
+
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue If string, must be datetime
+     * @return Builder
+     */
+    public function greaterThanOrEqualTo($columnName, $columnValue);
+
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue  if string, must be datetime
      * @return IBuilder
      */
     public function notLessThan($columnName, $columnValue);

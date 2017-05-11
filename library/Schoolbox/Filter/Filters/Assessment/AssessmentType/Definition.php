@@ -18,16 +18,17 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 
 /**
  * Available options:
- * * Project
- * * Quiz
- * * DueWork
- * * Task
+ * □ Project
+ * □ Quiz
+ * □ DueWork
+ * □ Task
  *
  * Defaults to full set, but run-time options will enable controller to exclude individual items
  *
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'a';
 
     const KEY_PROJECT  = AssessmentType::TYPE_PROJECT;
     const KEY_QUIZ     = AssessmentType::TYPE_QUIZ;
@@ -52,15 +53,6 @@ class Definition extends AbstractFilterDefinition
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->assessmentTypes = $assessmentTypes->shallowClone();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 'a';
     }
 
 

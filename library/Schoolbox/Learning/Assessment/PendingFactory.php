@@ -465,6 +465,11 @@ class PendingFactory
             return ' TRUE ';
         }
 
+        // Did caller request assessments that are due in no-where ?
+        if(NULL === $this->terms){
+            return ' FALSE ';
+        }
+
         // Generate the dueDate filtering
         $orParts = [];
         foreach($this->terms as $term){
@@ -484,13 +489,18 @@ class PendingFactory
      * Build an assessment type clause to inject into assessment-retrieval query
      *
      * @return string[]
-     * @throws \InvalidArgumentException If AssessmentType filter does not include one of Quiz|DueWork|Task
      */
     private function buildAssessmentTypeClause()
     {
-        $selectClause = '';
-        $joinClause = '';
+        // Did caller request assessments that do not have a type?
+        if(NULL !== $this->assessmentTypes && 0 === $this->assessmentTypes->count()){
+            return ['', '', 'FALSE'];
+        }
+
+        $selectClause  = '';
+        $joinClause    = '';
         $idClauseArray = [];
+
 
         // Task
         if (NULL === $this->assessmentTypes || $this->assessmentTypes->contains(AssessmentType::TYPE_TASK)) {
@@ -525,18 +535,13 @@ class PendingFactory
             ';
             $idClauseArray[] = 'dw.id IS NOT NULL';
         }
-
-        if(NULL !== $this->assessmentTypes && 0 === count($idClauseArray)){
-            throw new \InvalidArgumentException('AssessmentType filter must include at least one from Quiz, DueWork or Task. None found');
-        }
-
         return [$selectClause, $joinClause, implode(' OR ', $idClauseArray)];
     }
 
 
     /**
      * Build the assessment.workType filter
-     * @return string
+     * @return string[]
      */
     private function buildWorkTypeClause()
     {
@@ -558,11 +563,17 @@ class PendingFactory
             ';
         $where = [];
 
-        foreach($this->workTypes as $workType){
-            if(null === $workType){
-                $where[] = ' wt.id IS NULL ';
-            } else {
-                $where[] = " wt.id = {$workType->getId()} ";
+        // Did caller request assessments without a workType ?
+        if(0 === $this->workTypes->count()){
+            $where[] = ' wt.id IS NULL ';
+        } else {
+            foreach($this->workTypes as $workType){
+                // Did caller request assessments with a workType of NULL ?
+                if(null === $workType){
+                    $where[] = ' wt.id IS NULL ';
+                } else {
+                    $where[] = " wt.id = {$workType->getId()} ";
+                }
             }
         }
         return [$select, $join, implode(' OR ', $where)];
@@ -570,15 +581,19 @@ class PendingFactory
 
     /**
      * Build the assessment.weighting filter
-     * @return string
+     * @return string[]
      */
     private function buildWeightingClause()
     {
         // If no weighting types are selected, don't filter
-        $select = '';
-        $where  = ' TRUE ';
         if(NULL === $this->weightingTypes){
-            return [$select, $where];
+            return ['', 'TRUE'];
+        }
+
+        // Did caller request assessments without a weighting type?
+        if(0 === $this->weightingTypes->count()){
+            // No assessments are without are weighting type
+            return ['', 'FALSE'];
         }
 
         // A subset of weightings is in play, apply filter

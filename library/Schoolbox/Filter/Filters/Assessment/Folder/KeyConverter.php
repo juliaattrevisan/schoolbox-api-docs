@@ -10,7 +10,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder;
 
 /**
  * No conversion. A int is converted to the same int (representing a folder.id)

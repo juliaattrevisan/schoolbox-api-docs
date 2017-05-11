@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\Term;
+namespace Schoolbox\Filter\Filters\Assessment\TermDue;
 
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter;
@@ -17,16 +17,17 @@ use Schoolbox\Assessment\Term;
 
 /**
  * Available Term options:
- * * all
- * * current
- * * previous, and
- * * all terms
+ * □ all
+ * □ future
+ * □ current
+ * □ previous, and
+ * □ all terms existing in DB
  *
  * Term options are keyed by 'current', 'previous' and the term IDs
- *
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'td';
 
     const KEY_ALL      = 'all';        // All terms
     const KEY_FUTURE   = 'future';     // All terms in future
@@ -68,13 +69,6 @@ class Definition extends AbstractFilterDefinition
         $this->previousTerm = $previousTerm;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function getQueryKey()
-    {
-        return 't';
-    }
 
     /**
      * @inheritdoc

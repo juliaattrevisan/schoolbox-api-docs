@@ -27,7 +27,6 @@ use Schoolbox\Filter;
  */
 interface IFilterDefinition
 {
-
     /**
      * @return Filter\Model
      */
@@ -99,8 +98,9 @@ interface IFilterDefinition
      * The value must be short and unique to enable lots of data in a GET url
      *
      * @return string
+     * @throws \DomainException If slug has not been set
      */
-    public static function getQueryKey();
+    public static function getSlug();
 
     /**
      * Return an ordered list of pages where this filter is available

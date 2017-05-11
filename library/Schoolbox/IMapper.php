@@ -9,6 +9,8 @@
 
 namespace Schoolbox;
 
+use Alaress\Database\Predicate\Builder;
+use Alaress\IDatabase;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -20,6 +22,32 @@ use Schoolbox\Mapper\Exception;
  */
 interface IMapper 
 {
+    /**
+     * @return IDatabase
+     */
+    public function getDatabase();
+
+    /**
+     * Retrieves identifier column name.
+     *
+     * @return string
+     */
+    public function getIdentifierColumn();
+
+    /**
+     * Create a PredicateBuilder for this Mapper's table.
+     *
+     * @return Builder
+     */
+    public function getPredicateBuilder();
+
+    /**
+     * @see $this->findAll()
+     *
+     * @param  array $options
+     * @return array
+     */
+    public function findAllIds(array $options = []);
 
     /**
      * @see $this->findAll()

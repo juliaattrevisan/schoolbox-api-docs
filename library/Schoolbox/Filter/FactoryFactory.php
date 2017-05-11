@@ -70,8 +70,12 @@ class FactoryFactory
                 return $this->buildFactory(Filters\Assessment\Folder\Factory::class, [
                     'folderMapper' => $this->mapperFactory->get(Folder\Mapper::class),
                 ]);
-            case Filters\Assessment\Term\Definition::class:
-                return $this->buildFactory(Filters\Assessment\Term\Factory::class, [
+            case Filters\Assessment\TermDue\Definition::class:
+                return $this->buildFactory(Filters\Assessment\TermDue\Factory::class, [
+                    'termMapper' => $this->mapperFactory->get(Term\Mapper::class),
+                ]);
+            case Filters\Assessment\TermClose\Definition::class:
+                return $this->buildFactory(Filters\Assessment\TermClose\Factory::class, [
                     'termMapper' => $this->mapperFactory->get(Term\Mapper::class),
                 ]);
             case Filters\Assessment\WorkType\Definition::class:
@@ -145,21 +149,22 @@ class FactoryFactory
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException If the specified class does not exist
+     * @throws \DomainException If filter definition slug not set
      */
     public function buildPanel(User $user, $page, $route, User $viewee = null, array $query = [])
     {
         $filterComponents = $this->createFilterComponentCollection();
         unset($query['page']);
 
-        foreach ($this->getDefinitions($page) as $className) {
-            $filterFactory = $this->buildFilterFactoryForFilter($className);
-            $queryKey      = $className::getQueryKey();
+        foreach ($this->getDefinitions($page) as $definitionClassName) {
+            $filterFactory = $this->buildFilterFactoryForFilter($definitionClassName);
+            $queryKey      = $definitionClassName::getSlug();
             $overrides     = array_key_exists($queryKey, $query) ? explode(',', $query[$queryKey]) : null;
-            $component     = $filterFactory->buildComponent($className, $user, $page, $viewee, $overrides);
+            $component     = $filterFactory->buildComponent($definitionClassName, $user, $page, $viewee, $overrides);
 
             // Don't bother inserting component if it wasn't build (because no options would be available anyway)
             if($component){
-                $filterComponents->setOffset($className, $component);
+                $filterComponents->setOffset($definitionClassName, $component);
             }
 
         }

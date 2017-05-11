@@ -1903,9 +1903,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * Create a PredicateBuilder for this Mapper's table.
-     *
-     * @return Builder
+     * @inheritdoc
      */
     public function getPredicateBuilder()
     {
@@ -2720,7 +2718,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param string $name The identifier for this join.
      *
      * @return Mapper
-     * @throws Mapper\DefinitionException if join $name isn't on this mapper
+     * @throws Mapper\DefinitionException If join $name isn't on this mapper
      */
     public function getJoinMapper($name)
     {

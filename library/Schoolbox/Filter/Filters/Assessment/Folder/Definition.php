@@ -15,9 +15,14 @@ use Schoolbox\GenericCollection;
  * Display a list of folders (either classes, groups or both)
  * Whether classes, groups or both are available for selection is configured by the admin
  * The list of folders is generated at run-time for the current user and page
+ *
+ * Assessments will match this filter if their ultimate/indirect folder matches that selected.
+ *
+ * eg, Assessment_A lives in project_B which lives in folder_C, if folder_C is selected, Assessment_A will be fetched.
  */
 class Definition extends AbstractFilterDefinition
 {
+    const SLUG = 'f';
 
     const KEY_CLASSES = 'classes';
     const KEY_GROUPS = 'groups';
@@ -74,10 +79,6 @@ class Definition extends AbstractFilterDefinition
         return true;
     }
 
-    public static function getQueryKey()
-    {
-        return 'f';
-    }
 
     /**
      * @inheritdoc
