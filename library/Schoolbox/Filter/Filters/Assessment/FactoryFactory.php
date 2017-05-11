@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFilterComponent;
 use Schoolbox\Filter\IFilterDefinition;
@@ -73,12 +72,12 @@ class FactoryFactory
                 return $this->buildFactory(Filters\Assessment\Folder\Factory::class, [
                     'folderMapper' => $this->mapperFactory->get(Folder\Mapper::class),
                 ]);
-            case Filters\Assessment\TermDue\Definition::class:
-                return $this->buildFactory(Filters\Assessment\TermDue\Factory::class, [
+            case Filters\Assessment\Term\Due\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Term\Due\Factory::class, [
                     'termMapper' => $this->mapperFactory->get(Term\Mapper::class),
                 ]);
-            case Filters\Assessment\TermClose\Definition::class:
-                return $this->buildFactory(Filters\Assessment\TermClose\Factory::class, [
+            case Filters\Assessment\Term\Close\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Term\Close\Factory::class, [
                     'termMapper' => $this->mapperFactory->get(Term\Mapper::class),
                 ]);
             case Filters\Assessment\WorkType\Definition::class:

@@ -4,7 +4,7 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\TermDue;
+namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
@@ -17,7 +17,7 @@ use Schoolbox\Filter;
  * Converts between termFilter concrete keys and Term models
  * @method null|GenericCollection|Term\Model[] getSelectedItems(GenericCollection $availableSelections = null)
  */
-class KeyConverter extends AbstractKeyConverter
+abstract class KeyConverter extends AbstractKeyConverter
 {
 
     /**

@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\TermDue;
+namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Filter\AbstractFilterComponent;
 use Schoolbox\GenericCollection;
@@ -17,7 +17,7 @@ use Schoolbox\Assessment\Term;
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractFilterComponent
+abstract class Component extends AbstractFilterComponent
 {
 
     /**
@@ -36,7 +36,6 @@ class Component extends AbstractFilterComponent
         // A term will be selected if any matching abstract term descriptions were selected
 
         foreach ($this->getDefinition()->getTerms() as $term) {
-
 
             if ($this->isAvailable($term, $optionDefaults)) {
                 $key                       = (string)$term->getId();

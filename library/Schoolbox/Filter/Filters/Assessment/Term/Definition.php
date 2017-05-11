@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\TermDue;
+namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Filter\AbstractFilterDefinition;
 use Schoolbox\Filter;
@@ -25,10 +25,8 @@ use Schoolbox\Assessment\Term;
  *
  * Term options are keyed by 'current', 'previous' and the term IDs
  */
-class Definition extends AbstractFilterDefinition
+abstract class Definition extends AbstractFilterDefinition
 {
-    const SLUG = 'td';
-
     const KEY_ALL      = 'all';        // All terms
     const KEY_FUTURE   = 'future';     // All terms in future
     const KEY_CURRENT  = 'current';    // current term
@@ -81,19 +79,6 @@ class Definition extends AbstractFilterDefinition
             self::KEY_CURRENT,
             self::KEY_PREVIOUS,
             self::KEY_PAST,
-        ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public static function getPages()
-    {
-        return [
-            FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
-            FilterOption\Model::PAGE_GRADES,
-            FilterOption\Model::PAGE_MARK_BOOK,
         ];
     }
 
@@ -249,6 +234,7 @@ class Definition extends AbstractFilterDefinition
         return $this->terms[$key]->getCode() . ($this->terms[$key]->getArchived() ? ' [archived]' : '');
     }
 
+
     /* Getters
      */
 
@@ -276,13 +262,5 @@ class Definition extends AbstractFilterDefinition
     public function getPreviousTerm()
     {
         return $this->previousTerm;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getTemplatesDir()
-    {
-        return '@filterDefinitions/Assessment/TermDue/templates';
     }
 }

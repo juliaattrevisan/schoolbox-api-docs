@@ -58,8 +58,8 @@ class LogicTests extends \PHPUnit_Framework_TestCase
 
         $message =
             AssessmentFilters\AssessmentType\Definition::SLUG . ':  '. $this->toStr($a).
-            AssessmentFilters\TermClose\Definition::SLUG      . ': ' . $this->toStr($tc).
-            AssessmentFilters\TermDue\Definition::SLUG        . ': ' . $this->toStr($td).
+            AssessmentFilters\Term\Close\Definition::SLUG     . ': ' . $this->toStr($tc).
+            AssessmentFilters\Term\Due\Definition::SLUG       . ': ' . $this->toStr($td).
             AssessmentFilters\WeightingType\Definition::SLUG  . ': ' . $this->toStr($wt).
             AssessmentFilters\WorkType\Definition::SLUG       . ': ' . $this->toStr($wk).
             $this->toStr($completeFilters)."\n";
@@ -178,8 +178,8 @@ class LogicTests extends \PHPUnit_Framework_TestCase
     {
         return [
             AssessmentFilters\AssessmentType\Definition::SLUG => null === $a  ? null : new Collection($a),
-            AssessmentFilters\TermClose\Definition::SLUG      => null === $tc ? null : new Collection($tc),
-            AssessmentFilters\TermDue\Definition::SLUG        => null === $td ? null : new Collection($td),
+            AssessmentFilters\Term\Close\Definition::SLUG     => null === $tc ? null : new Collection($tc),
+            AssessmentFilters\Term\Due\Definition::SLUG       => null === $td ? null : new Collection($td),
             AssessmentFilters\WeightingType\Definition::SLUG  => null === $wt ? null : new Collection($wt),
             AssessmentFilters\WorkType\Definition::SLUG       => null === $wk ? null : new Collection($wk),
         ];

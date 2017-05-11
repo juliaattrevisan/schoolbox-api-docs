@@ -293,7 +293,7 @@ class Controller extends Base
         $selectionTransformer = new Filter\Transformer($keyConverters, $selectionsPerFilter);
 
         // Get selections, defaulting to full possible set if filter not present in panel (ie if disabled by admin)
-        $selectedTerms           = $selectionTransformer->getSelectedItems(AssessmentFilters\TermDue\Definition::SLUG);
+        $selectedTerms           = $selectionTransformer->getSelectedItems(AssessmentFilters\Term\Due\Definition::SLUG);
         $selectedWorkTypes       = $selectionTransformer->getSelectedItems(AssessmentFilters\WorkType\Definition::SLUG);
         $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentFilters\AssessmentType\Definition::SLUG);
         $selectedFolderIds       = $selectionTransformer->getSelectedItems(AssessmentFilters\Folder\Definition::SLUG);
