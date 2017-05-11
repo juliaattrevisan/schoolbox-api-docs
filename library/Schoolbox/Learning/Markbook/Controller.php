@@ -183,8 +183,21 @@ class Controller extends Base
             // regardless of any filter selections send by user
             $filters[AssessmentFilter\NullableContext\UnitSpec\Definition::SLUG] = new Collection();
 
+            // Convert filters to query args so export can retrieve this report
+            // TODO Convert $filters from array to DTO and make this a method on that DTO. SA-3379 + SA-3201
+            $queryArgs = [];
+            foreach ($filters as $slug => $filter) {
+                $queryArg = "$slug=";
+                if ($filter instanceof Collection) {
+                    $queryArg .= implode(',', $filter->keys());
+                }
+                $queryArgs[] = $queryArg;
+            }
+            $queryArgs = implode('&', $queryArgs);
+
+
             $assessmentIds = $assessmentIdFinder->findIdsByFilters($filters);
-            $content       = $this->generateMarkbookReport($assessmentIds);
+            $content       = $this->generateMarkbookReport($assessmentIds, $queryArgs);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
@@ -241,10 +254,11 @@ class Controller extends Base
 
     /**
      * @param int[] $assessmentIds
+     * @param string $queryArgs
      * @throws ServiceNotFound If unable to find the HTML Output rendering service
      * @return string
      */
-    private function generateMarkbookReport(array $assessmentIds)
+    private function generateMarkbookReport(array $assessmentIds, $queryArgs)
     {
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
@@ -280,8 +294,8 @@ class Controller extends Base
         return $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
             'markbook'     => $markbook,
             'writable'     => $writable,
-            'contextTypes' => AssessmentContextType::getInstance(),
             'pendingLabel' => $pendingLabel,
+            'queryArgs'    => $queryArgs,
         ])->getAsString();
     }
 

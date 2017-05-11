@@ -1,3 +1,14 @@
+{#
+    Filtered markbook report
+
+    Usage:
+        markbook      Markbook                - the markbook to render
+        writable      bool[]                  - which assessments are writable? indexed by assessment.id
+        pendingLabel  string                  - the default label for new submissions, pulled from DB
+        queryArgs     string                  - the filters used to generate this report, so we can export the exact same report
+
+#}
+
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
@@ -32,7 +43,7 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">Report</li>
-        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {classId: class.id, termCode: currentTerm.code}) }}' class='icon-download'>Download Spreadsheet</a>
+        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport') }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
     </ul>
 </div>
 
@@ -49,10 +60,7 @@
                         </div>
                     </th>
                     {% for assessment in markbook.assessmentsWithProjectContents  %}
-                    <th data-assessment="{{ assessment.id }}"
-                        data-context-type="{{ contextTypes.objectToString(assessment.baseContext) }}"
-                        data-context="{{ assessment.baseContext.id }}"
-                    >
+                    <th data-assessment="{{ assessment.id }}">
                         <div>
                                 <span>
                                     <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" title="{{ assessment.title }}">
