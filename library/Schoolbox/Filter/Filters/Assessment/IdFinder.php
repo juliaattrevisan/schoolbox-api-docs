@@ -529,17 +529,36 @@ class IdFinder extends Filter\AbstractIdFinder
             throw new Filter\BrokenFilterException('Term', "Unrecognised dataColumn: $dateColumn");
         }
 
+        /* For now, we cannot use the predicate builder.
+         *
+         * Consider the case when $terms contains 2 terms, each with a start and finish date.
+         * Each call to inner builder will generate 2 params, named $dateColumn_0 and $dateColumn_1.
+         * But when we join these sub-clauses with the outer builder, we will have duplicates, and will lose 2 of the 4 real values
+         * due to clobbering.
+         */
+
         // Generate the dueDate filtering
         $orParts = [];
         foreach($terms as $term){
-            $andPart = " (a.$dateColumn >= '{$term->getStart()->getDatabaseDate()}' ";
-            if(!$term->getActualFinish()->isNull()){
-                $andPart .= " AND a.$dateColumn <= '{$term->getActualFinish()->getDatabaseDate()}' ";
+            $start  = $term->getStart();
+            $finish = $term->getActualFinish();
+
+            // Both null?
+            if((!$start || $start->isNull()) && (!$finish || $finish->isNull())){
+                // Then this term does not restrict assessment set
+                continue;
             }
-            $andPart .= ')';
-            $orParts[] = $andPart;
+            $andParts = [];
+            if($start && !$start->isNull()){
+                $andParts[] = "a.$dateColumn >= '{$start->getDatabaseDate()}' ";
+            }
+            if($finish && !$finish->isNull()){
+                $andPart[] = "a.$dateColumn <= '{$finish->getDatabaseDate()}' ";
+            }
+            $orParts[] = '(' . implode(' AND ', $andParts) . ')';
         }
-        return ['(' . implode(' OR ', $orParts) . ')'];
+        // If no terms restrict the set, return TRUE, else return the generated where clause string.
+        return [!count($orParts) ? 'TRUE' : '(' . implode(' OR ', $orParts) . ')'];
     }
 
     /**
