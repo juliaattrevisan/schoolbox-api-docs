@@ -109,7 +109,7 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
     public function testCoerceToStringWithStringOutput($input, $expected)
     {
         $reader = new ObjectReader();
-        $value = $reader->coerceToString($input);
+        $value = $reader->coerce($input);
         $this->assertInternalType('string', $value);
         $this->assertEquals($expected, $value);
     }
@@ -124,7 +124,7 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
     public function testCoerceToStringWithObjectOutput($input, $expected)
     {
         $reader = new ObjectReader();
-        $value = $reader->coerceToString($input);
+        $value = $reader->coerce($input);
         $this->assertEquals(get_class($expected), get_class($value));
         $this->assertEquals("$expected", "$value");
     }
@@ -139,7 +139,7 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
     public function testCoerceToStringInvalid($input)
     {
         $reader = new ObjectReader();
-        $reader->coerceToString($input);
+        $reader->coerce($input);
     }
 
     /**

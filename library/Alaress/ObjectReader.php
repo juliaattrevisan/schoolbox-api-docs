@@ -30,10 +30,13 @@ class ObjectReader
 
     /**
      * @param mixed $value
-     * @throws DomainException
-     * @return string
+     * @return mixed If $value is an array, it will return the first non-empty value.
+     *               If $value implements __toString, it will return $value.
+     *               Otherwise, it will return $value coerced to a string.
+     * @throws DomainException if $value is an array with > 1 value, or an
+     *                         object which doesn't implement __toString.
      */
-    public function coerceToString($value)
+    public function coerce($value)
     {
         if (is_array($value)) {
             // attempt to recover
@@ -65,12 +68,12 @@ class ObjectReader
     /**
      * @param  mixed $value
      * @throws DomainException if any value can't be coerced
-     * @return array|string[]
+     * @return array
      */
-    public function coerceToStringRecursively($value)
+    public function coerceRecursively($value)
     {
         return array_map(
-            [$this, 'coerceToString'],
+            [$this, 'coerce'],
             $this->coerceToFlatList($value)
         );
     }
@@ -296,7 +299,7 @@ class ObjectReader
         }
 
         if ($requireStringCoercible) {
-            $value = $this->coerceToString($value);
+            $value = $this->coerce($value);
         }
 
         return $value;

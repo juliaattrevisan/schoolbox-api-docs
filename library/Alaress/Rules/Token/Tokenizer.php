@@ -273,7 +273,7 @@ abstract class Tokenizer
 
         $newValues = [];
         foreach ($values as $value) {
-            $newValues = array_merge($newValues, $reader->coerceToStringRecursively($value));
+            $newValues = array_merge($newValues, $reader->coerceRecursively($value));
         }
 
         // No values - map to a single empty string
