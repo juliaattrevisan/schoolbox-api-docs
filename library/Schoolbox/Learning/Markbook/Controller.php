@@ -23,7 +23,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
-use Alaress\Csv\Writer AS CsvWriter;
 use DueWork_ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
@@ -147,9 +146,10 @@ class Controller extends Base
 
 
     /**
+     * @param User $viewee
      * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
-    public function postMarkbook()
+    public function postMarkbook(User $viewee)
     {
 
         try {
@@ -162,6 +162,7 @@ class Controller extends Base
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'     => $markbook,
+                    'viewee'       => $viewee,
                     'writable'     => $this->determineWritableAssessments($markbook->getAssessments()),
                     'pendingLabel' => $this->getPendingLabel(),
                     'queryArgs'    => $this->buildQueryArgs($filters),
@@ -193,16 +194,15 @@ class Controller extends Base
 
 
     /**
-     * Return the markbook in CSV format
+     * Stream the markbook in CSV format
      *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
-//     * @throws ApplicationException\Exception
-//     * @throws \UnexpectedValueException
+     * @param User $viewee
      * @throws \DomainException If attempting to get the slug from a filter where it has not been set
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      * @throws \InvalidArgumentException If any filter keys not recognised
      */
-    public function getMarkbookExport()
+    public function getMarkbookExport(User $viewee)
     {
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
@@ -212,90 +212,9 @@ class Controller extends Base
         $assessmentIds        = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook             = $this->buildMarkbook($assessmentIds);
 
-
-        /** @var IAssessable $assessment */
-
-        $export = [];
-
-        $data['Student Id']         = 'Class Average';
-        $data['Student First Name'] = '';
-        $data['Student Last Name']  = '';
-        $data['Student Average']    = $markbook->getWeightedMean();
-
-        // This is an ugly hack to get duplicate task names to appear as is the case in demo data
-        // Just prepending spaces to the end of the assessment name
-
-        $titlesFound = [];
-
-        foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
-
-            $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ')';
-
-            while (isset($titlesFound[$title])) {
-                $title .= ' ';
-            }
-
-            $titlesFound[$title]            = true;
-            $data[$title]                   = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
-            $data[$title . ' (Normalized)'] = '';
-            $data[$title . ' (Comment)']    = '';
-        }
-
-        $export[] = $data;
-
-        foreach ($markbook->getStudents() as $student) {
-
-            $data['Student Id']         = $student->getExternalId();
-            $data['Student First Name'] = $student->getFirstname();
-            $data['Student Last Name']  = $student->getLastname();
-            $data['Student Average']    = $markbook->getStudentStatistics()[$student->getId()]['weightedMean'];
-
-            $titlesFound = [];
-
-            foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
-
-                $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ')';
-
-                while (isset($titlesFound[$title])) {
-                    $title .= ' ';
-                }
-
-                $titlesFound[$title] = true;
-
-                if ($assessment->isParticipant($student)) {
-
-                    $participant        = $assessment->getParticipant($student);
-                    $mostRecentFeedback = $participant->findMostRecentFeedback();
-
-                    $comment = $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
-
-                    $data[$title]                   = $assessment->getHumanReadableMark($student, true);
-                    $data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
-                    $data[$title . ' (Comment)']    = $comment;
-                } else {
-                    $data[$title]                   = '';
-                    $data[$title . ' (Normalized)'] = '';
-                    $data[$title . ' (Comment)']    = '';
-                }
-
-            }
-            $export[] = $data;
-        }
-
-
-        //TODO This could probably be rewritten with a resource stream output object and using fputcsv to wrap up this code
-        $file   = tmpfile();
-        $writer = new CsvWriter($file, $export);
-        $writer->write();
-
-        $filename = preg_replace('/[^\w-(),]/', '_', 'Markbook_' /*. $class->getFolder()->getNameWithCodes()*/);
-
-        header('Content-Disposition: attachment; filename="' . $filename . '.csv";');
-        header('Content-Type: application/csv; charset=UTF-8');
-        rewind($file);
-        echo stream_get_contents($file);
-        fclose($file);
-        exit;
+        $csvExporter = new Export\CSV();
+        $filename = preg_replace('/[^\w-(),]/', '_', "Markbook_{$viewee->getFullName()}.csv");
+        $csvExporter->export($markbook, $filename);
     }
 
 

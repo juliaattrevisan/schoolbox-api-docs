@@ -3,6 +3,7 @@
 
     Usage:
         markbook      Markbook                - the markbook to render
+        viewee        User                    - whose markbook are we looking at
         writable      bool[]                  - which assessments are writable? indexed by assessment.id
         pendingLabel  string                  - the default label for new submissions, pulled from DB
         queryArgs     string                  - the filters used to generate this report, so we can export the exact same report
@@ -42,7 +43,7 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">Report</li>
-        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport') }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {userId: viewee.id}) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
     </ul>
 </div>
 

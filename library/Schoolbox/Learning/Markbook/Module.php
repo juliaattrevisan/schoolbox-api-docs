@@ -43,46 +43,16 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        // TODO find a way to specify routes to not collide (this next line still matches '/export')
-//        $this->register('GET',  '{/userId:\d}', 'getMarkbook',       $isStaffOrSuper, $preload);
-        $this->register('POST', '',             'postMarkbook',      $isStaffOrSuper);  //AJAX in the report
-
-        $this->register('GET',  '/export',      'getMarkbookExport', $isStaffOrSuper);
-
-
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        $this->addGetRoute($router, 'getMarkbook', $basePath, '{/userId}');
-    }
-
-
-    /**
-     * @inheritdoc
-     * @throws \InvalidArgumentException If unable to find the user mapper
-     * @throws NotFound If no user found for specified ID
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getMarkbook)',
-            function ($params) {
-                if(null !== $params['userId']){
-                    try{
-                        return ['viewee' => $this->getUserMapper()->findById($params['userId'])];
-                    } catch (Mapper\Exception $e){
-                        throw new NotFound("No user found for id: {$params['userId']}");
-                    }
+        $preload = function ($params) {
+            if(null !== $params['userId']){
+                try{
+                    return ['viewee' => $this->getUserMapper()->findById($params['userId'])];
+                } catch (Mapper\Exception $e){
+                    throw new NotFound("No user found for id: {$params['userId']}");
                 }
-                return [];
             }
-        );
+            return [];
+        };
 
         $this->register('GET',  '/class/{folderId:\d+}{/userId}', 'getMarkbookForClass', $isStaffOrSuper, $preload);
 
