@@ -11,7 +11,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
-use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -31,36 +30,28 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-    /**
-     * @var AssessmentMapperProxy
-     */
+
+    /** @var AssessmentMapperProxy */
     private $assessmentMapperProxy;
 
-    /**
-     * @var GradeGroup\Model
-     */
+    /** @var GradeGroup\Model */
     private $defaultGradeGroup;
 
-    /**
-     * @var Term\Mapper
-     */
+    /** @var Term\Mapper */
     private $termMapper;
 
-    /**
-     * @var DueWork_ErrorMapper
-     */
+    /**  @var DueWork_ErrorMapper */
     private $dueWorkErrorMapper;
 
-    /**
-     * @var Access
-     */
+    /** @var Access */
     private $access;
 
-    /** @var  AssessmentFilter\IdFinder */
+    /** @var AssessmentFilter\IdFinder */
     private $assessmentIdFinder;
 
     /** @var AssessmentFilter\FactoryFactory */
     private $filterFactoryFactory;
+
 
     /**
      * @param AssessmentMapperProxy           $assessmentMapperProxy
@@ -86,7 +77,7 @@ class Controller extends Base
         $this->dueWorkErrorMapper    = $dueWorkErrorMapper;
         $this->access                = $access;
         $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->filterFactoryFactory = $filterFactoryFactory;
+        $this->filterFactoryFactory  = $filterFactoryFactory;
     }
 
 
@@ -121,7 +112,7 @@ class Controller extends Base
     public function getMarkbook(User $viewee = null)
     {
         // If viewee not specified, then display current user's markbook.
-        if(null === $viewee){
+        if (null === $viewee) {
             $viewee = $this->getUser();
         }
         $page      = FilterOption\Model::PAGE_MARK_BOOK;
@@ -132,7 +123,7 @@ class Controller extends Base
 
         // Is a teacher looking at their own markbook, or admin looking at a teacher's markbook?
         $pageTitle = 'Markbook';
-        if($viewee->getId() !== $this->getUser()->getId()){
+        if ($viewee->getId() !== $this->getUser()->getId()) {
             $pageTitle .= " for {$viewee->getFullName()}";
         }
 
@@ -146,6 +137,8 @@ class Controller extends Base
 
 
     /**
+     * Receives a set filter panel selections and returns a filtered markbook
+     *
      * @param User $viewee
      * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
@@ -169,7 +162,7 @@ class Controller extends Base
                 ])->getAsString(),
             ]));
 
-        } catch (Filter\BrokenFilterException $e){
+        } catch (Filter\BrokenFilterException $e) {
             $data = [
                 'status'  => 500,
                 'message' => "Sorry, the {$e->getFilterName()} filter appears to be broken. Please deselect all options and try again",
@@ -192,28 +185,28 @@ class Controller extends Base
     }
 
 
-
     /**
-     * Stream the markbook in CSV format
+     * Stream a filtered markbook in CSV format
      *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
      * @param User $viewee
      * @throws \DomainException If attempting to get the slug from a filter where it has not been set
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      * @throws \InvalidArgumentException If any filter keys not recognised
+     * @throws \ReflectionException If a specified filter class does not exist
      */
     public function getMarkbookExport(User $viewee)
     {
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
 
-        $filtersById          = $this->transformQueryArgsToFilters($filtersArray);
-        $filters              = $this->generateFilters($filtersById);
-        $assessmentIds        = $this->assessmentIdFinder->findIdsByFilters($filters);
-        $markbook             = $this->buildMarkbook($assessmentIds);
+        $filtersById   = $this->transformQueryArgsToFilters($filtersArray);
+        $filters       = $this->generateFilters($filtersById);
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $markbook      = $this->buildMarkbook($assessmentIds);
 
         $csvExporter = new Export\CSV();
-        $filename = preg_replace('/[^\w-(),]/', '_', "Markbook_{$viewee->getFullName()}.csv");
+        $filename    = preg_replace('/[^\w-(),]/', '_', "Markbook_{$viewee->getFullName()}.csv");
         $csvExporter->export($markbook, $filename);
     }
 
@@ -229,18 +222,18 @@ class Controller extends Base
     private function transformQueryArgsToFilters(array $filtersArray)
     {
         // TODO clean all this up
-        foreach($filtersArray as $slug => $filter){
+        foreach ($filtersArray as $slug => $filter) {
             $filtersArray[$slug] = '' === $filter ? [] : explode(',', $filter);
         }
 
         // convert to indexed by filter.ID instead of filter.definition.SLUG
-        $filtersById = [];
-        $filterMapper = Filter\Mapper::getInstance();
+        $filtersById        = [];
+        $filterMapper       = Filter\Mapper::getInstance();
         $allFilterInstances = $filterMapper->findAll();
-        foreach($allFilterInstances as $instance){
-            foreach($filtersArray as $slug => $keys){
+        foreach ($allFilterInstances as $instance) {
+            foreach ($filtersArray as $slug => $keys) {
                 $definition = $instance->getClass();
-                if($definition::getSlug() === $slug){
+                if ($definition::getSlug() === $slug) {
                     $filtersById[$instance->getId()] = array_combine($keys, array_fill(0, count($keys), '1'));
                     break;
                 }
@@ -250,6 +243,14 @@ class Controller extends Base
     }
 
 
+    /**
+     * Convert filter panel selections into filters
+     *
+     * @param array $filterSelections
+     * @return null[]|Collection[]
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
+     * @throws \ReflectionException If the specified class does not exist
+     */
     private function generateFilters(array $filterSelections)
     {
         $page = FilterOption\Model::PAGE_MARK_BOOK;
@@ -274,8 +275,8 @@ class Controller extends Base
     private function buildMarkbook(array $assessmentIds)
     {
         // Fetch assessments & participants
-        $assessments   = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments   = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
 
         // Build a markbook
         $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
@@ -300,7 +301,7 @@ class Controller extends Base
         $writable = [];
 
         $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
-        foreach($assessments as $assessment){
+        foreach ($assessments as $assessment) {
             $writable[$assessment->getId()] = $this->isAssessmentMarkable($this->getUser(), $assessment, $terms);
         }
         return $writable;
@@ -323,6 +324,8 @@ class Controller extends Base
 
 
     /**
+     * Convert comma-separated strings into arrays
+     *
      * @param null[]|Collection[] $filters
      * @return string
      */
@@ -336,7 +339,7 @@ class Controller extends Base
                 continue;
             }
             $queryArg = "$slug=";
-            if(0 === $filter->count()){
+            if (0 === $filter->count()) {
                 $queryArg .= 'none';
             } else {
                 $queryArg .= implode(',', $filter->keys());
@@ -371,21 +374,22 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
+
     /**
      * Can the specified user mark the specified assessment?
      *
      * Will be false if assessment's folder is archived, or if user lacks WRITE+ perm to folder
      *
-     * @param User              $user
-     * @param IAssessable       $assessment
+     * @param User                           $user
+     * @param IAssessable                    $assessment
      * @param GenericCollection|Term\Model[] $terms
      * @return bool
      */
     private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms)
     {
-        foreach($terms as $term){
-            if($term->contains($assessment->getDueAt())){
-                if($term->getArchived()){
+        foreach ($terms as $term) {
+            if ($term->contains($assessment->getDueAt())) {
+                if ($term->getArchived()) {
                     return false;
                 }
                 // Rely on access cache to catch repeated calls to same folder.
@@ -395,8 +399,4 @@ class Controller extends Base
         // Logically should never get to here. It means assessment is due before first term in system starts.
         return false;
     }
-
-    /* Getters/Setters
-     */
-
 }

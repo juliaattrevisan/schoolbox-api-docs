@@ -76,9 +76,9 @@ class Transformer
 
 
     /**
-     * Get all filter selections in the form accepted by an IdFindere
+     * Get all filter selections in the form accepted by an IdFinder, indexed by filterDefinition::SLUG
      * @todo pass an interface/object instead of array
-     * @return array
+     * @return null[]|Collection[]
      */
     public function getFilters()
     {
