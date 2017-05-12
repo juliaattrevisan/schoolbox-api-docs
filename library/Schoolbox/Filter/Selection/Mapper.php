@@ -72,6 +72,12 @@ class Mapper extends \Schoolbox\Mapper
         // Has any data been passed in? (will be empty if no filters available on this page)
         if (count($filterSelectionsArray)) {
             foreach ($filterSelectionsArray as $filterId => $filterSelectionArray) {
+
+                // This can occur if we have manually inserted a filter for some reason, eg to exclude assessments in unit-spec contexts
+                if(!$keyConverters->keyExists($filterId)){
+                    // Don't attempt to save
+                    continue;
+                }
                 $keyConverter = $keyConverters[$filterId];
                 $filter       = $keyConverter->getFilter();
 

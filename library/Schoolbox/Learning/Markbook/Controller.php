@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
@@ -22,7 +21,6 @@ use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
 use Alaress\Csv\Writer AS CsvWriter;
@@ -34,12 +32,6 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
-
-    /**
-     * @var Error\Mapper
-     */
-    private $errorMapper;
-
     /**
      * @var AssessmentMapperProxy
      */
@@ -72,9 +64,6 @@ class Controller extends Base
     private $filterFactoryFactory;
 
     /**
-     * Constructor
-     *
-     * @param Error\Mapper                    $errorMapper
      * @param AssessmentMapperProxy           $assessmentMapperProxy
      * @param GradeGroup\Model                $defaultGradeGroup
      * @param Term\Mapper                     $termMapper
@@ -84,7 +73,6 @@ class Controller extends Base
      * @param AssessmentFilter\FactoryFactory $filterFactoryFactory
      */
     public function __construct(
-        Error\Mapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         GradeGroup\Model $defaultGradeGroup,
         Term\Mapper $termMapper,
@@ -93,7 +81,6 @@ class Controller extends Base
         AssessmentFilter\IdFinder $assessmentIdFinder,
         AssessmentFilter\FactoryFactory $filterFactoryFactory
     ) {
-        $this->errorMapper           = $errorMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->defaultGradeGroup     = $defaultGradeGroup;
         $this->termMapper            = $termMapper;
@@ -160,10 +147,9 @@ class Controller extends Base
 
 
     /**
-     * @param User $viewee Whose markbook are we fetching?
      * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
-    public function postMarkbook(User $viewee)
+    public function postMarkbook()
     {
 
         try {
@@ -178,7 +164,6 @@ class Controller extends Base
                     'markbook'     => $markbook,
                     'writable'     => $this->determineWritableAssessments($markbook->getAssessments()),
                     'pendingLabel' => $this->getPendingLabel(),
-                    'viewee'       => $viewee,
                     'queryArgs'    => $this->buildQueryArgs($filters),
                 ])->getAsString(),
             ]));
@@ -204,6 +189,147 @@ class Controller extends Base
             $this->returnJsonError($e);
         }
     }
+
+
+
+    /**
+     * Return the markbook in CSV format
+     *
+     * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
+//     * @throws ApplicationException\Exception
+//     * @throws \UnexpectedValueException
+     * @throws \DomainException If attempting to get the slug from a filter where it has not been set
+     * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
+     * @throws \InvalidArgumentException If any filter keys not recognised
+     */
+    public function getMarkbookExport()
+    {
+        $filtersArray = $this->request->query->getArrayCopy();
+        unset($filtersArray['page']);
+
+        $filtersById          = $this->transformQueryArgsToFilters($filtersArray);
+        $filters              = $this->generateFilters($filtersById);
+        $assessmentIds        = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $markbook             = $this->buildMarkbook($assessmentIds);
+
+
+        /** @var IAssessable $assessment */
+
+        $export = [];
+
+        $data['Student Id']         = 'Class Average';
+        $data['Student First Name'] = '';
+        $data['Student Last Name']  = '';
+        $data['Student Average']    = $markbook->getWeightedMean();
+
+        // This is an ugly hack to get duplicate task names to appear as is the case in demo data
+        // Just prepending spaces to the end of the assessment name
+
+        $titlesFound = [];
+
+        foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
+
+            $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ')';
+
+            while (isset($titlesFound[$title])) {
+                $title .= ' ';
+            }
+
+            $titlesFound[$title]            = true;
+            $data[$title]                   = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
+            $data[$title . ' (Normalized)'] = '';
+            $data[$title . ' (Comment)']    = '';
+        }
+
+        $export[] = $data;
+
+        foreach ($markbook->getStudents() as $student) {
+
+            $data['Student Id']         = $student->getExternalId();
+            $data['Student First Name'] = $student->getFirstname();
+            $data['Student Last Name']  = $student->getLastname();
+            $data['Student Average']    = $markbook->getStudentStatistics()[$student->getId()]['weightedMean'];
+
+            $titlesFound = [];
+
+            foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
+
+                $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ')';
+
+                while (isset($titlesFound[$title])) {
+                    $title .= ' ';
+                }
+
+                $titlesFound[$title] = true;
+
+                if ($assessment->isParticipant($student)) {
+
+                    $participant        = $assessment->getParticipant($student);
+                    $mostRecentFeedback = $participant->findMostRecentFeedback();
+
+                    $comment = $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
+
+                    $data[$title]                   = $assessment->getHumanReadableMark($student, true);
+                    $data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
+                    $data[$title . ' (Comment)']    = $comment;
+                } else {
+                    $data[$title]                   = '';
+                    $data[$title . ' (Normalized)'] = '';
+                    $data[$title . ' (Comment)']    = '';
+                }
+
+            }
+            $export[] = $data;
+        }
+
+
+        //TODO This could probably be rewritten with a resource stream output object and using fputcsv to wrap up this code
+        $file   = tmpfile();
+        $writer = new CsvWriter($file, $export);
+        $writer->write();
+
+        $filename = preg_replace('/[^\w-(),]/', '_', 'Markbook_' /*. $class->getFolder()->getNameWithCodes()*/);
+
+        header('Content-Disposition: attachment; filename="' . $filename . '.csv";');
+        header('Content-Type: application/csv; charset=UTF-8');
+        rewind($file);
+        echo stream_get_contents($file);
+        fclose($file);
+        exit;
+    }
+
+
+    /**
+     * Convert our GET query arg string into format required
+     *
+     * @param array $filtersArray
+     * @return array
+     * @throws \DomainException If attempting to get the slug from a filter where it has not been set
+     * @todo - consider refactor architecture to use ID instead of slug to make this unnecessary, or at least hide behind clean interface. SA-3379  SA-3201
+     */
+    private function transformQueryArgsToFilters(array $filtersArray)
+    {
+        // TODO clean all this up
+        foreach($filtersArray as $slug => $filter){
+            $filtersArray[$slug] = '' === $filter ? [] : explode(',', $filter);
+        }
+
+        // convert to indexed by filter.ID instead of filter.definition.SLUG
+        $filtersById = [];
+        $filterMapper = Filter\Mapper::getInstance();
+        $allFilterInstances = $filterMapper->findAll();
+        foreach($allFilterInstances as $instance){
+            foreach($filtersArray as $slug => $keys){
+                $definition = $instance->getClass();
+                if($definition::getSlug() === $slug){
+                    $filtersById[$instance->getId()] = array_combine($keys, array_fill(0, count($keys), '1'));
+                    break;
+                }
+            }
+        }
+        return $filtersById;
+    }
+
 
     private function generateFilters(array $filterSelections)
     {
@@ -287,10 +413,16 @@ class Controller extends Base
         // TODO Convert $filters from array to DTO and make this a method on that DTO. SA-3379  SA-3201
         $queryArgs = [];
         foreach ($filters as $slug => $filter) {
+            if (!$filter instanceof Collection) {
+                continue;
+            }
             $queryArg = "$slug=";
-            if ($filter instanceof Collection) {
+            if(0 === $filter->count()){
+                $queryArg .= 'none';
+            } else {
                 $queryArg .= implode(',', $filter->keys());
             }
+
             $queryArgs[] = $queryArg;
         }
         return implode('&', $queryArgs);
@@ -343,236 +475,6 @@ class Controller extends Base
         }
         // Logically should never get to here. It means assessment is due before first term in system starts.
         return false;
-    }
-
-
-    /**
-     * Return the markbook in CSV format
-     *
-     * @api   GET /learning/markbook/:classId/term/:termCode/export
-     * @param Folder\Model $class
-     * @param Term\Model   $term
-     * @throws ApplicationException\Exception
-     * @throws \UnexpectedValueException
-     */
-    public function getMarkbookExport(User $viewee, AssessmentFilter\FactoryFactory $filterFactoryFactory)
-    {
-        // Replaces /submission/listSubmission/{termSlug}/{folderId}
-        //       eg /submission/listSubmission/{termSlug}/{folderId}
-        // Replaces /submission/viewSubmission/{dueWorkId}
-        //       eg /submission/viewSubmission/56
-
-        // Does this class exist ?
-        if (!$class->getId()) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
-        }
-
-        // Generate data: assessments and their Participants
-        /** @var Collection|IAssessable[] $assessments */
-        $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($class->getId(), null, ['term' => $term]);
-
-        // Build a markbook
-        $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
-
-        /** @var IAssessable $assessment */
-
-        $export = [];
-
-        $data['Student Id']         = 'Class Average';
-        $data['Student First Name'] = '';
-        $data['Student Last Name']  = '';
-        $data['Student Average']    = $markbook->getWeightedMean();
-
-        // This is an ugly hack to get duplicate task names to appear as is the case in demo data
-        // Just prepending spaces to the end of the assessment name
-
-        $titlesFound = [];
-
-        foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
-
-            $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ')';
-
-            while (isset($titlesFound[$title])) {
-                $title .= ' ';
-            }
-
-            $titlesFound[$title]            = true;
-            $data[$title]                   = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
-            if ($this->hasTotalMarkColumn($assessment)) {
-                $data[$title . ' (Total)'] = '';
-            }
-            if ($this->hasNormalizedMarkColumn($assessment)) {
-                $data[$title . ' (Normalized)'] = '';
-            }
-            if ($this->hasCommentColumn($assessment)) {
-                $data[$title . ' (Comment)']    = '';
-            }
-        }
-
-        $export[] = $data;
-
-        foreach ($markbook->getStudents() as $student) {
-
-            $data['Student Id']         = $student->getExternalId();
-            $data['Student First Name'] = $student->getFirstname();
-            $data['Student Last Name']  = $student->getLastname();
-            $data['Student Average']    = $markbook->getStudentStatistics()[$student->getId()]['weightedMean'];
-
-            $titlesFound = [];
-
-            foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
-
-                $title = $assessment->getTitle() . "\r\n(" . $assessment->getTypeName() . ')';
-
-                while (isset($titlesFound[$title])) {
-                    $title .= ' ';
-                }
-
-                $titlesFound[$title] = true;
-
-                if ($assessment->isParticipant($student)) {
-                    $data[$title] = $this->retrieveTitleField($assessment, $student);
-                    if ($this->hasTotalMarkColumn($assessment)) {
-                        $data[$title . ' (Total)'] = $this->retrieveTotalMarkField($assessment, $student);
-                    }
-                    if ($this->hasNormalizedMarkColumn($assessment)) {
-                        $data[$title . ' (Normalized)'] = $this->retrieveNormalizedMarkField($assessment, $student);
-                    }
-                    if ($this->hasCommentColumn($assessment)) {
-                        $data[$title . ' (Comment)'] = $this->retrieveCommentField($assessment, $student);
-                    }
-
-                } else {
-                    $data[$title] = '';
-                    if( $this->hasTotalMarkColumn( $assessment)) {
-                        $data[$title . ' (Total)'] = '';
-                    }
-                    if ($this->hasNormalizedMarkColumn( $assessment)) {
-                        $data[$title . ' (Normalized)'] = '';
-                        }if($this->hasCommentColumn($assessment)) {
-                            $data[$title . ' (Comment)'] = '';
-
-                    }
-                }
-
-            }
-            $export[] = $data;
-        }
-
-
-        //TODO This could probably be rewritten with a resource stream output object and using fputcsv to wrap up this code
-        $file   = tmpfile();
-        $writer = new CsvWriter($file, $export);
-        $writer->write();
-
-        $filename = preg_replace('/[^\w-(),]/', '_', 'Markbook_' . $class->getFolder()->getNameWithCodes());
-
-        header('Content-Disposition: attachment; filename="' . $filename . '.csv";');
-        header('Content-Type: application/csv; charset=UTF-8');
-        rewind($file);
-        echo stream_get_contents($file);
-        fclose($file);
-        exit;
-    }
-
-    /* Helper methods for building the markbook export.
-     * TODO: It's not ideal these methods are in the controller instead of in a renderer class or something
-     */
-
-    /**
-     * Does this assessment have a total mark column?
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    protected function hasTotalMarkColumn(IAssessable $assessment)
-    {
-        return $assessment->getMarkScheme() instanceof TotalMarkAbstract;
-    }
-
-    /**
-     * Does this assessment have a normalized mark column?
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    protected function hasNormalizedMarkColumn(IAssessable $assessment)
-    {
-        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
-    }
-
-    /**
-     * Does this assessment have a comment column?
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    protected function hasCommentColumn(IAssessable $assessment)
-    {
-        // Comment check is the same as normalized mark check
-        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
-    }
-
-    /**
-     * Retrieves title field value for this assessment and student.
-     *
-     * @param IAssessable $assessment
-     * @param User        $student
-     * @return null|string
-     */
-    protected function retrieveTitleField(IAssessable $assessment, User $student)
-    {
-        if ($this->hasTotalMarkColumn($assessment)
-            && preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)
-        ) {
-            return $markParts[1];
-        }
-
-        return $assessment->getHumanReadableMark($student, true);
-    }
-
-    /**
-     * Retrieves total mark field value for this assessment and student.
-     *
-     * @param IAssessable $assessment
-     * @param User        $student
-     * @return null|string
-     */
-    protected function retrieveTotalMarkField(IAssessable $assessment, User $student)
-    {
-        if (preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)) {
-            return $markParts[2];
-        }
-        return '';
-    }
-
-    /**
-     * Retrieves normalized field value for this assessment and student.
-     *
-     * @param IAssessable $assessment
-     * @param User        $student
-     * @return null|string
-     */
-    protected function retrieveNormalizedMarkField(IAssessable $assessment, User $student)
-    {
-        return $assessment->getNormalisedMark($student, true);
-    }
-
-    /**
-     * Retrieves comment field value for this assessment and student.
-     *
-     * @param IAssessable $assessment
-     * @param User        $student
-     * @return null|string
-     */
-    protected function retrieveCommentField(IAssessable $assessment, User $student)
-    {
-        $participant = $assessment->getParticipantIfExtant($student);
-        if (!$participant) {
-            return '';
-        }
-        $mostRecentFeedback = $participant->findMostRecentFeedback();
-        return $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
     }
 
     /* Getters/Setters
