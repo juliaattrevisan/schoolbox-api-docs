@@ -12,6 +12,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use \Schoolbox\Learning\Assessment\Redirect;
 
 $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+$termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
+$currentTerm = $termMapper->findForToday();
 $folder = null;
 
 $groupID = $_SESSION['gid'];
@@ -354,6 +356,7 @@ $this->setVar(array(
     'HEADING' => Scrub::text($folder->getName()) . ($codeString ? ' (' . $codeString . ')' : ''),
     'HEADING_JS' => json_encode($folder->getName() . ($codeString ? ' (' . $codeString . ')' : '')),
     'CODE' => urlencode(urlencode($folder->getCodeString())),
+    'TERM_ID' => $currentTerm->getId(),
     'ID' => $folder->getId(),
     'ENCODED_RETURN_URL' => Redirect::encode("/homepage/{$folder->getId()}"),
     'USER_TOKEN' => $_SESSION['key'],
