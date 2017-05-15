@@ -181,4 +181,12 @@ class Definition extends AbstractFilterDefinition
         // by default, all WorkTypes are available
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTemplatesDir()
+    {
+        return '@filterDefinitions/Assessment/WorkType/templates';
+    }
 }

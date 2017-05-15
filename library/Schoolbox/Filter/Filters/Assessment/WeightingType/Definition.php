@@ -124,4 +124,12 @@ class Definition extends AbstractFilterDefinition
         // by default, all WeightingTypes are available
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTemplatesDir()
+    {
+        return '@filterDefinitions/Assessment/WeightingType/templates';
+    }
 }

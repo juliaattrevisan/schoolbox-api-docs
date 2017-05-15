@@ -100,4 +100,12 @@ class Definition extends NullableContext\Definition
         }
         throw new \InvalidArgumentException("Unknown Project filter key: $key");
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTemplatesDir()
+    {
+        return '@filterDefinitions/Assessment/NullableContext/Project/templates';
+    }
 }

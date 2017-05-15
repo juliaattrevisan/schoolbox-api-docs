@@ -95,4 +95,12 @@ class Definition extends NullableContext\Definition
         }
         throw new \InvalidArgumentException("Unknown 'UnitSpec' filter key: $key");
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTemplatesDir()
+    {
+        return '@filterDefinitions/Assessment/NullableContext/UnitImportSpec/templates';
+    }
 }

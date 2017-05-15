@@ -141,4 +141,11 @@ class Definition extends AbstractFilterDefinition
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function getTemplatesDir()
+    {
+        return '@filterDefinitions/Assessment/AssessmentType/templates';
+    }
 }

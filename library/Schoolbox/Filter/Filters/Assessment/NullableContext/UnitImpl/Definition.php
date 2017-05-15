@@ -51,4 +51,12 @@ class Definition extends NullableContext\Definition
         }
         throw new \InvalidArgumentException("Unknown 'UnitImpl' filter key: $key");
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTemplatesDir()
+    {
+        return '@filterDefinitions/Assessment/NullableContext/UnitImpl/templates';
+    }
 }

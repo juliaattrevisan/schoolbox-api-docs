@@ -81,20 +81,4 @@ abstract class Definition extends AbstractFilterDefinition
         // Nothing is selected, meaning filter is not applied
         return false;
     }
-
-
-    /**
-     * Return the templates directory for the concrete filter definition's twig templates
-     *
-     * @return string
-     * @throws \ReflectionException if this class does not exist. (kinda impossible... !)
-     */
-    protected function getTemplatesDir()
-    {
-        $class_info = new \ReflectionClass($this);
-        $dir1       = basename(dirname($class_info->getFileName(), 3)) . DIRECTORY_SEPARATOR;
-        $dir2       = basename(dirname($class_info->getFileName(), 2)) . DIRECTORY_SEPARATOR;
-        $dir3       = basename(dirname($class_info->getFileName(), 1)) . DIRECTORY_SEPARATOR;
-        return '@filterDefinitions' . DIRECTORY_SEPARATOR . $dir1 . $dir2 . $dir3 . 'templates';
-    }
 }

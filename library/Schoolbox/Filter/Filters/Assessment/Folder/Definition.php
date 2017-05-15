@@ -105,4 +105,12 @@ class Definition extends AbstractFilterDefinition
         }
         throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTemplatesDir()
+    {
+        return '@filterDefinitions/Assessment/Folder/templates';
+    }
 }
