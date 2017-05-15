@@ -469,12 +469,14 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                         LEFT JOIN event_campus ON event.id = event_campus.event_id
                         LEFT JOIN event_group ON event.id = event_group.event_id
                         LEFT JOIN event_category ON event.id = event_category.event_id
-                        WHERE (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
+                        WHERE 
+                             (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
                                   $groupQuery
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
                                 )
                             AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
                             AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
+                            AND event.deleted_at IS NULL
                         GROUP BY id
                         ORDER BY $sort_by $sort_dir
                         LIMIT $offset, $limit";
@@ -667,6 +669,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 			LEFT JOIN event_group ON event.id = event_group.event_id
 			LEFT JOIN event_campus ON event.id = event_campus.event_id
 			WHERE
+			    event.deleted_at is NULL AND
 				resource_booking.id IS NULL
 				$access_query
 				$dateQuery

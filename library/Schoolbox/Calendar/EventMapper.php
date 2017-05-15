@@ -45,32 +45,13 @@ class EventMapper extends Schoolbox\Mapper
         $this->hasTable('event');
         $this->hasModel(Event::class);
 
-        $this->hasMap(array(
-            'column' => 'owner',
-            'property' => 'owner',
-            'type' => self::TYPE_MODEL,
-            'join' => 'owner',
-        ));
-        $this->hasMap(array(
-            'column' => 'access',
-            'property' => 'access',
-            'type' => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column' => 'attendance',
-            'property' => 'attendance',
-            'type' => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column' => 'completed',
-            'property' => 'completed',
-            'type' => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column' => 'publish_date',
-            'property' => 'publishDateTime',
-            'type' => self::TYPE_DATETIME,
-        ));
+
+        $this->uses('access',self::TYPE_INTEGER);
+        $this->uses('attendance',self::TYPE_INTEGER);
+        $this->uses('completed',self::TYPE_INTEGER);
+        $this->uses('publish_date',self::TYPE_DATETIME,null,'publishDateTime');
+        $this->joins('owner', UserMapper::class,'id',self::TYPE_MODEL, null, 'owner','owner');
+
         $this->hasJoin('owner', array(
             'mapper'    => '\\Schoolbox\\UserMapper',
             'this_key'  => 'owner',
@@ -84,69 +65,23 @@ class EventMapper extends Schoolbox\Mapper
     */
     protected function coreMapping()
     {
-        $this->hasMap(array(
-            'column' => 'id',
-            'property' => 'id',
-            'type' => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column' => 'series_id',
-            'property' => 'seriesId',
-            'type' => self::TYPE_INTEGER,
-        ));
-        $this->hasMap(array(
-            'column' => 'author_id',
-            'property' => 'author',
-            'type' => self::TYPE_MODEL,
-            'join' => 'author',
-        ));
-        $this->hasMap(array(
-            'column' => 'type',
-            'property' => 'type',
-            'type' => self::TYPE_MODEL,
-            'join' => 'eventType'
-        ));
-        $this->hasMap(array(
-            'column' => 'title',
-            'property' => 'title',
-            'type' => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column' => 'detail',
-            'property' => 'detail',
-            'type' => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column' => 'location',
-            'property' => 'location',
-            'type' => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-                'column'   => 'start_datetime',
-                'property' => 'startDateTime',
-                'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-                'column'   => 'end_datetime',
-                'property' => 'endDateTime',
-                'type'     => self::TYPE_DATETIME,
-        ));
-        $this->hasMap(array(
-            'column' => 'allday',
-            'property' => 'allDay',
-            'type' => self::TYPE_INTEGER,
-        ));
+        $this->uses('id',self::TYPE_INTEGER,self::COLUMN_IDENTIFIER);
+        $this->uses('series_id',self::TYPE_INTEGER,null,'seriesId');
+        $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
+        $this->joins('type', EventTypeMapper::class, 'eventTypeID', null, null, 'type', 'eventType');
+        $this->uses('title',self::TYPE_STRING);
+        $this->uses('detail',self::TYPE_STRING);
+        $this->uses('location',self::TYPE_STRING);
+        $this->uses('start_datetime',self::TYPE_DATETIME,null,'startDateTime');
+        $this->uses('end_datetime',self::TYPE_DATETIME,null,'endDateTime');
+        $this->uses('allday',self::TYPE_INTEGER,null,'allDay');
+
         $this->hasJoin('author', array(
             'mapper'    => '\\Schoolbox\\UserMapper',
             'this_key'  => 'author_id',
             'other_key' => 'id',
         ));
-        $this->hasJoin('eventType', array(
-            'mapper'    => '\\Schoolbox\\Calendar\\EventTypeMapper',
-            'this_key'  => 'type',
-            'other_key' => 'eventTypeID',
-        ));
+
         $this->hasJoin('personal', array(
             'mapper'    => '\\Schoolbox\\Calendar\\Relation\\PersonalMapper',
             'this_key'  => 'id',
@@ -182,7 +117,13 @@ class EventMapper extends Schoolbox\Mapper
             'other_key' => 'event_id',
         ));
 
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
         $this->registerCallback('postSave', array($this, 'postSave'));
+
+
     }
 
     protected function getSelectString()
@@ -496,6 +437,7 @@ class EventMapper extends Schoolbox\Mapper
         $query .= '
             WHERE DATE(start_datetime) >= :startDate
             AND DATE(end_datetime) <= :endDate
+            AND event.deleted_at IS NULL
         ';
 
         $statement = $this->database->prepare($query);
@@ -524,6 +466,7 @@ class EventMapper extends Schoolbox\Mapper
             FROM `{$this->getTable()}` e
             WHERE e.start_datetime >= :now
             AND e.series_id = :sid
+            AND e.deleted_at IS NULL
             ORDER BY e.start_datetime ASC
             LIMIT 0, 1
         ");
