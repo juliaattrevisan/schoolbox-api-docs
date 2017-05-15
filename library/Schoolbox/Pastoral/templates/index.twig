@@ -141,8 +141,24 @@
                                 <div class="list-item">
                                     <div class="card small-12">
                                         {{ profile.imageSquare64(membership.group.user) }}
-                                        <h3>{{ membership.group.name }}</h3>
-                                        <p class="meta">Group managed by {{ membership.group.user.fullName }}</p>
+                                        {% if membership.group.user.id == user.id %}
+                                            {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
+                                                <a href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) }}" title="Modify Pastoral Group">
+                                            {% endif %}
+                                        {% endif %}
+                                            <h3>{{ membership.group.name }}</h3>
+                                        {% if membership.group.user.id == user.id %}
+                                            {% if isRouteAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                        <p class="meta">Group managed by
+                                            {% if membership.group.user.id == user.id %}
+                                                you
+                                            {% else %}
+                                                {{ membership.group.user.fullName }}
+                                            {% endif %}
+                                        </p>
                                     </div>
                                 </div>
                             </li>

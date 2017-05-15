@@ -36,6 +36,12 @@ use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
 
 class Mapper extends BaseMapper
 {
+    /** @var array Used in report builder only */
+    private $filters = [];
+
+    /** @var array Used in report builder only */
+    private $bindings = [];
+
     /**
      * @inheritdoc
      */
@@ -199,7 +205,7 @@ class Mapper extends BaseMapper
      *
      * @param $row
      * @param $hydrateRelatedRecords
-     * @return Model
+     * @return Model|bool
      */
     protected function hydrateRow($row, $hydrateRelatedRecords) {
 
@@ -255,7 +261,6 @@ class Mapper extends BaseMapper
                 break;
             }
         }
-
 
         if (!$inAudience && $model->getOwner()->getId() != $this->getSessionUser()->getId()) {
             return false;
@@ -316,6 +321,7 @@ class Mapper extends BaseMapper
      */
     public function getRelatedRecords(Model $record)
     {
+        $bindings = [];
         $query = $this->getSelectString();
 
         if ($record->getParent() instanceof Model) {
@@ -522,12 +528,10 @@ class Mapper extends BaseMapper
     /**
      * Ugly helper function to create report SQL condition
      *
-     * @param array &$filters
-     * @param array &$bindings
      * @param Collection $collection
      * @param string $field
      */
-    private function addFilter(&$filters, &$bindings, Collection $collection, $field)
+    private function addFilter(Collection $collection, $field)
     {
         $ids = [];
 
@@ -546,8 +550,8 @@ class Mapper extends BaseMapper
                 str_replace(".", "", str_replace("`", "", str_replace("_", "", $field))) . self::$placeholderIndex
             );
 
-            $bindings = array_merge($bindings, $pbArray['bindings']);
-            $filters[] = "{$field} IN ({$pbArray['placeholders']})";
+            $this->bindings = array_merge($this->bindings, $pbArray['bindings']);
+            $this->filters[] = "{$field} IN ({$pbArray['placeholders']})";
         }
 
         self::$placeholderIndex++;
@@ -583,30 +587,31 @@ class Mapper extends BaseMapper
         $involved,
         Collection $years
     ) {
-        $filters = [];
-        $bindings = [];
+        $this->bindings = [];
+        $this->filters = [];
+
         $criteriaSql = '';
         $orderSql = '';
 
         if ($before_date instanceof Alaress_Date_Format && !$before_date instanceof Alaress_Date_NullDate) {
-            $bindings[':beforeDate'] = $before_date->endOfDay()->toIso8601String();
-            $filters[] = '`created_at` <= :beforeDate';
+            $this->bindings[':beforeDate'] = $before_date->endOfDay()->toIso8601String();
+            $this->filters[] = '`created_at` <= :beforeDate';
         }
 
         if ($after_date instanceof Alaress_Date_Format && !$after_date instanceof Alaress_Date_NullDate) {
-            $bindings[':afterDate'] = $after_date->startOfDay()->toIso8601String();
-            $filters[] = '`created_at` >= :afterDate';
+            $this->bindings[':afterDate'] = $after_date->startOfDay()->toIso8601String();
+            $this->filters[] = '`created_at` >= :afterDate';
         }
 
         if (!empty($severity) && $this->getConfigLoader()->get('pastoral_severity')) {
-            $bindings[':severity'] = $severity->getId();
-            $filters[] = '`sv`.`order` >= :severity';
+            $this->bindings[':severity'] = $severity->getId();
+            $this->filters[] = '`sv`.`order` >= :severity';
         }
 
-        $this->addFilter($filters, $bindings, $students, '`student_id`');
-        $this->addFilter($filters, $bindings, $years, '`s`.`year`');
-        $this->addFilter($filters, $bindings, $types, '`type_id`');
-        $this->addFilter($filters, $bindings, $authors, '`owner_id`');
+        $this->addFilter($students, '`student_id`');
+        $this->addFilter($years, '`s`.`year`');
+        $this->addFilter($types, '`type_id`');
+        $this->addFilter($authors, '`owner_id`');
 
         foreach ($order as $orderCurrent)
         {
@@ -627,7 +632,7 @@ class Mapper extends BaseMapper
 
         if ($involved || !$this->getSessionUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0)
         {
-            $filters[] = "
+            $this->filters[] = "
                 (
                     (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = {$user->getRole()->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
                     (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = {$user->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
@@ -643,7 +648,7 @@ class Mapper extends BaseMapper
             ";
         }
 
-        foreach ($filters as $filter) {
+        foreach ($this->filters as $filter) {
             if ($criteriaSql != '') {
                 $criteriaSql .= ' AND ';
             }
@@ -657,7 +662,7 @@ class Mapper extends BaseMapper
         // Execute SQL
 
         $statement = $this->getDatabase()->prepare($this->getSelectString() . "{$criteriaSql} ORDER BY {$orderSql}");
-        $statement->execute($bindings);
+        $statement->execute($this->bindings);
 
         // Hydrate records for return
 

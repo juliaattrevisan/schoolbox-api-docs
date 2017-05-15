@@ -42,6 +42,20 @@ class Mapper extends BaseMapper
                 'multiple' => true,
             )
         );
+
+        $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteGroupMembers']);
+    }
+
+    /**
+     * Prior to deleting, make sure we delete anything that is linked to this group
+     *
+     * @param Model $model
+     */
+    public function deleteGroupMembers(Model $model) {
+
+        // Delete members from group
+
+        $this->getJoinMapper('members')->deleteByColumn('group_id', $model->getId());
     }
 
     /**

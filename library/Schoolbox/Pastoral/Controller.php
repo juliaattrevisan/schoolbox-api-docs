@@ -182,8 +182,9 @@ class Controller extends Base
     public function getIndex()
     {
         $this->getResponse()->content->set([
-                'template' => '@pastoral/index.twig',
+            'template' => '@pastoral/index.twig',
             'data' => [
+                'user' => $this->getUser(),
                 'recentStudents'    => $this->pastoralAuditMapper->findRecentStudents(),
                 'recentDashboard'   => $this->pastoralMapper->findRecentDashboard(),
                 'groups'            => $this->pastoralGroupMemberMapper->findByColumn('user_id', $this->getUser()->getId())
