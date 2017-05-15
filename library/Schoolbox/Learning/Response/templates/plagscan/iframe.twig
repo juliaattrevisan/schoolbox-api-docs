@@ -5,7 +5,7 @@
 {% if assessment.context is project %}
     {% set nodes = [
     ['Learning', routeLookup('learning.getClasses')],
-    [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbook') ~ '?f='~assessment.context.folder.id~'&amp;a=&amp;p=&amp;uis=&amp;wt=&amp;wk='],
+    [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbook') ~ '?f='~assessment.context.folder.id~'&a=&p=&uis=&wt=&wk='],
     [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
     [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
     ['Inline Grader', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
@@ -14,7 +14,7 @@
 {% else %}
     {% set nodes = [
     ['Learning', routeLookup('learning.getClasses')],
-    [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbook')  ~ '?f='~assessment.context.folder.id~'&amp;a=&amp;p=&amp;uis=&amp;wt=&amp;wk=' ],
+    [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbook')  ~ '?f='~assessment.context.folder.id~'&a=&p=&uis=&wt=&wk=' ],
     [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
     ['Inline Grader', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
     ['Plagscan Report', null]
