@@ -33,9 +33,10 @@ class Queue extends ResourceVideo
     private $videoBitrate;
 
     /**
+     * Time that ffmpeg will be allowed to run before it is killed
      * @var string
      */
-    private $processTimeout = '3600';
+    private $processTimeout;
 
     /**
      * Primary binary program used for conversion
@@ -62,6 +63,16 @@ class Queue extends ResourceVideo
     private $fallbackInfo   = 'ffprobe';
 
     /**
+     * Maximum allowed timeout for processing video, 1 day
+     */
+    const MAX_TIMEOUT = 86400;
+
+    /**
+     * Default video processing timeout if not set, 1 hour
+     */
+    const DEFAULT_TIMEOUT = 3600;
+
+    /**
      * Queue constructor.
      */
     public function __construct()
@@ -73,11 +84,10 @@ class Queue extends ResourceVideo
         $this->audioBitrate = $this->getConfig()->get('audio_bitrate');
         $this->videoBitrate = $this->getConfig()->get('video_bitrate');
         $timeout = $this->getConfig()->get('video_processing_timeout');
-        if ($timeout > 0 && $timeout < 2147483647) {
+        if ($timeout > 0 && $timeout < self::MAX_TIMEOUT) {
             $this->processTimeout = $timeout;
         } else {
-            // If timeout not within processor limits, default to sane max of 1 day
-            $this->processTimeout = '86400';
+            $this->processTimeout = DEFAULT_TIMEOUT;
         }
     }
 
