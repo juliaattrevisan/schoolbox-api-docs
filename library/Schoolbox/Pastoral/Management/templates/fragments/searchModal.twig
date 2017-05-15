@@ -385,7 +385,10 @@
 
             {# Wire up delete event so the user can remove the person from the group if they change their mind #}
 
-            $('[data-member-delete]').click(window.deleteMember);
+            $('[data-member-delete]').click(function(e) {
+                e.preventDefault();
+                window.memberDelete($(this));
+            });
 
             {# Remove the search result from the list #}
 

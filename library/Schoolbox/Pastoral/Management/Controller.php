@@ -167,19 +167,22 @@ class Controller extends Base
 
         foreach ($memberIds as $memberId) {
 
-            // Make sure they weren't already in the database
+            if (!empty($memberId)) {
 
-            if (!in_array($memberId, $membersToSkip)) {
+                // Make sure they weren't already in the database
 
-                // Not in the database, add them
+                if (!in_array($memberId, $membersToSkip)) {
 
-                /** @var PastoralGroupMember $pastoralGroupMember */
-                $pastoralGroupMember = $this->pastoralGroupMemberMapper->createModel();
-                $pastoralGroupMember->setGroup($group);
-                $pastoralGroupMember->setAuthor($this->getUser());
-                $pastoralGroupMember->setUser($this->userMapper->createModel($memberId));
+                    // Not in the database, add them
 
-                $this->pastoralGroupMemberMapper->save($pastoralGroupMember);
+                    /** @var PastoralGroupMember $pastoralGroupMember */
+                    $pastoralGroupMember = $this->pastoralGroupMemberMapper->createModel();
+                    $pastoralGroupMember->setGroup($group);
+                    $pastoralGroupMember->setAuthor($this->getUser());
+                    $pastoralGroupMember->setUser($this->userMapper->createModel($memberId));
+
+                    $this->pastoralGroupMemberMapper->save($pastoralGroupMember);
+                }
             }
         }
 

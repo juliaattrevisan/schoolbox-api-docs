@@ -19,12 +19,11 @@
 {# Heading fluff #}
 
 <div class="row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1 class="no-margin">Pastoral Care</h1>
-        </div>
+    <div class="small-12 columns">
+        <h1 class="no-margin">Pastoral Care</h1>
     </div>
 </div>
+
 <div class="row actions-small-1">
     <div class="small-12 island">
         <h2 class="subheader">{{ heading }}</h2>
@@ -127,12 +126,12 @@
             {# Only display the delete button if we are editing an existing database record #}
 
             {% if group is not empty %}
-                <li><a href="#" data-delete>Delete Group</a></li>
-
-                <form id="formDelete" class="hide" method="post" action="{{ routeLookup('pastoralManagement.postGroupsDelete') }}">
-                    <input type="hidden" name="id" value="{{ group.id }}">
-                </form>
-
+                <li>
+                    <a href="#" data-delete>Delete Group</a>
+                    <form id="formDelete" class="hide" method="post" action="{{ routeLookup('pastoralManagement.postGroupsDelete') }}">
+                        <input type="hidden" name="id" value="{{ group.id }}">
+                    </form>
+                </li>
             {% endif %}
 
             <li><a href="#" class="submit" data-save>{{ button }}</a></li>
@@ -214,33 +213,43 @@
         {# Delete Group #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        {# Remove from the list of members in the group. I threw this into a global function as it is also accessed from the modal #}
+        window.memberDelete = function(item) {
+            var memberItem = item.closest('li');
+            var memberId = item.attr('data-member-delete');
 
-        window.deleteMember = function() {
+            $(this).confirmDialog({
 
-            var id = $(this).attr('data-member-delete');
-            var index = window.membersAdded.indexOf(parseInt(id));
+                text: 'Are you sure you want to delete this person from the group?',
+                confirmEvent: function () {
 
-            if (index != -1) {
-                window.membersAdded.splice(index, 1);
-            }
+                    var index = window.membersAdded.indexOf(parseInt(memberId));
 
-            {# Remove from HTML #}
+                    if (index != -1) {
+                        window.membersAdded.splice(index, 1);
+                    }
 
-            $(this).closest('li').remove();
+                    {# Remove from HTML #}
 
-            if ($('#membersList').children('li').length == 0) {
-                $('#membersListContainer').addClass('hide');
-                $('#membersEmpty').removeClass('hide');
-            }
+                    memberItem.remove();
+
+                    if ($('#membersList').children('li').length == 0) {
+                        $('#membersListContainer').addClass('hide');
+                        $('#membersEmpty').removeClass('hide');
+                    }
+                }
+            });
         };
 
-        $('[data-member-delete]').click(window.deleteMember);
+        $('[data-member-delete]').click(function(e) {
+            e.preventDefault();
+            window.memberDelete($(this));
+        });
 
         {# If we were modifying an existing group in the database, add the javascript to allow deletion #}
 
         {% if group is not empty %}
-            $('[data-delete]').click(function() {
+            $('[data-delete]').click(function(e) {
+                e.preventDefault();
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated pastoral records.',
                     confirmEvent: function () {
