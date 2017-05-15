@@ -190,16 +190,7 @@
 
                     {# Put the group members ID numbers into a CSV string for submission with the form #}
 
-                    var members = '';
-
-                    for (var i = 0; i < window.membersAdded.length; i++) {
-                        if (i > 0) {
-                            members += ',';
-                        }
-                        members += window.membersAdded[i];
-                    }
-
-                    $('#members').val(members);
+                    $('#members').val(window.membersAdded.join());
 
                     {# Send it off to the backend #}
 
