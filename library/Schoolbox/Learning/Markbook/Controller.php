@@ -101,6 +101,13 @@ class Controller extends Base
     }
 
 
+    /**
+     * Redirect to the markbook for the specified class
+     *
+     * @param int $folderId
+     * @param User|null $viewee
+     * @throws RouteNotFound If unable to generate the redirect route
+     */
     public function getMarkbookForClass($folderId, User $viewee = null)
     {
         $user = $viewee ?: $this->getUser();
