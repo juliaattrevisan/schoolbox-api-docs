@@ -46,12 +46,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
-use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
-use Schoolbox\Filter\Filters\Assessment\UnitImportSpec as UnitImportSpecFilter;
-use Schoolbox\Filter\Filters\Assessment\TermDue as TermFilter;
-use Schoolbox\Filter\Filters\Assessment\AssessmentType as AssessmentTypeFilter;
-use Schoolbox\Filter\Filters\Assessment\WeightingType as WeightingFilter;
-use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
+use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 
 class Controller extends Base
 {
@@ -210,8 +205,8 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User                  $viewee The user whose pending assessments we are viewing.
-     * @param Filter\FactoryFactory $filterFactoryFactory
+     * @param User                             $viewee The user whose pending assessments we are viewing.
+     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @throws RouteNotFound
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException
@@ -220,7 +215,7 @@ class Controller extends Base
      * @throws \DomainException If filter definition slug not set
      * @todo  split pending assessments into own controller
      */
-    public function getPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
+    public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
     {
         $page      = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
         $route     = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
@@ -242,9 +237,9 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User                  $viewee The user whose pending assessments we are viewing.
-     * @param Filter\FactoryFactory $filterFactoryFactory
-     * @var  string[][]             $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
+     * @param User                             $viewee The user whose pending assessments we are viewing.
+     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
+     * @var  string[][]                        $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
      * @throws \LogicException
      * @throws \DomainException
      * @throws \OutOfRangeException
@@ -252,7 +247,7 @@ class Controller extends Base
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
-    public function postPendingAssessmentsForUser(User $viewee, Filter\FactoryFactory $filterFactoryFactory)
+    public function postPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
     {
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
@@ -276,17 +271,18 @@ class Controller extends Base
     /**
      * Generate a pending assessment report as HTML string
      *
-     * @param User                  $viewee
-     * @param Filter\FactoryFactory $filterFactoryFactory
-     * @param string[][]            $postFilterSelections - Indexed by filter.id, then concrete key
+     * @param User                             $viewee
+     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
+     * @param string[][]                       $postFilterSelections - Indexed by filter.id, then concrete key
      * @return string
      * @throws \InvalidArgumentException
      * @throws \DomainException
      * @throws \LogicException
+     * @throws \ReflectionException If the specified class does not exist
      */
     protected function generatePendingAssessmentReport(
         User $viewee,
-        Filter\FactoryFactory $filterFactoryFactory,
+        AssessmentFilters\FactoryFactory $filterFactoryFactory,
         array $postFilterSelections
     ) {
         $user = $this->getUser();
@@ -297,12 +293,12 @@ class Controller extends Base
         $selectionTransformer = new Filter\Transformer($keyConverters, $selectionsPerFilter);
 
         // Get selections, defaulting to full possible set if filter not present in panel (ie if disabled by admin)
-        $selectedTerms           = $selectionTransformer->getSelectedItems(TermFilter\Definition::class);
-        $selectedWorkTypes       = $selectionTransformer->getSelectedItems(WorkTypeFilter\Definition::class);
-        $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentTypeFilter\Definition::class);
-        $selectedFolderIds       = $selectionTransformer->getSelectedItems(FolderFilter\Definition::class);
-        $selectedWeightings      = $selectionTransformer->getSelectedItems(WeightingFilter\Definition::class);
-        $selectedUnitIds         = $selectionTransformer->getSelectedItems(UnitImportSpecFilter\Definition::class);
+        $selectedTerms           = $selectionTransformer->getSelectedItems(AssessmentFilters\TermDue\Definition::SLUG);
+        $selectedWorkTypes       = $selectionTransformer->getSelectedItems(AssessmentFilters\WorkType\Definition::SLUG);
+        $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentFilters\AssessmentType\Definition::SLUG);
+        $selectedFolderIds       = $selectionTransformer->getSelectedItems(AssessmentFilters\Folder\Definition::SLUG);
+        $selectedWeightings      = $selectionTransformer->getSelectedItems(AssessmentFilters\WeightingType\Definition::SLUG);
+        $selectedUnitIds         = $selectionTransformer->getSelectedItems(AssessmentFilters\NullableContext\UnitImportSpec\Definition::SLUG);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.

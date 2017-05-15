@@ -238,6 +238,20 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         return array_keys($this->getStack());
     }
 
+
+    /**
+     * Is the specified key defined in this collection?
+     *
+     * Regardless of whether its value is set to null.
+     *
+     * @param $key
+     * @return bool
+     */
+    public function keyExists($key)
+    {
+        return array_key_exists($key, $this->stack);
+    }
+
     /**
      * Gets first item in collection (regardless of its key)
      *

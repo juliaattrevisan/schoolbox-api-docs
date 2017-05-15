@@ -5,12 +5,17 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter;
+namespace Schoolbox\Filter\Filters\Assessment;
 
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Filter;
+use Schoolbox\Filter\IFilterComponent;
+use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\IFilterFactory;
+use Schoolbox\Filter\IKeyConverter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
+use Schoolbox\Filter\Panel;
 use Schoolbox\Filter\Selection;
 use Schoolbox\Assessment\Term;
 use Schoolbox\GenericCollection;
@@ -26,9 +31,7 @@ use Schoolbox\Filter\Filters;
 
 
 /**
- * The FilterFactoryFactory is responsible for creating filter factories.
- *
- * Each filter factory knows how to build a filter for the specified context.
+ * The FilterFactoryFactory is responsible for creating assessment-filter factories.
  */
 class FactoryFactory
 {
@@ -47,7 +50,7 @@ class FactoryFactory
 
 
     /**
-     * A registry of filter factories, along with their construction dependencies.
+     * A registry of assessment-filter factories, along with their construction dependencies.
      *
      * Registered by filter definition class name.
      *
@@ -84,24 +87,24 @@ class FactoryFactory
                 ]);
             case Filters\Assessment\WeightingType\Definition::class:
                 return $this->buildFactory(Filters\Assessment\WeightingType\Factory::class);
-            case Filters\Assessment\UnitImportSpec\Definition::class:
-                return $this->buildFactory(Filters\Assessment\UnitImportSpec\Factory::class, [
+            case Filters\Assessment\NullableContext\UnitImportSpec\Definition::class:
+                return $this->buildFactory(Filters\Assessment\NullableContext\UnitImportSpec\Factory::class, [
                     'folderMapper'     => $this->mapperFactory->get(Folder\Mapper::class),
                     'courseImplMapper' => $this->mapperFactory->get(CourseImpl\Mapper::class),
                     'unitSpecMapper'   => $this->mapperFactory->get(UnitSpec\Mapper::class),
                 ]);
-            case Filters\Assessment\Project\Definition::class:
-                return $this->buildFactory(Filters\Assessment\Project\Factory::class, [
+            case Filters\Assessment\NullableContext\Project\Definition::class:
+                return $this->buildFactory(Filters\Assessment\NullableContext\Project\Factory::class, [
                     'folderMapper'   => $this->mapperFactory->get(Folder\Mapper::class),
                     'unitImplMapper' => $this->mapperFactory->get(UnitImpl\Mapper::class),
                     'projectMapper'  => $this->mapperFactory->get(Project\Mapper::class),
                 ]);
-            case Filters\Assessment\UnitSpec\Definition::class:
-                return $this->buildFactory(Filters\Assessment\UnitSpec\Factory::class, [
+            case Filters\Assessment\NullableContext\UnitSpec\Definition::class:
+                return $this->buildFactory(Filters\Assessment\NullableContext\UnitSpec\Factory::class, [
                     'unitSpecMapper' => $this->mapperFactory->get(UnitSpec\Mapper::class),
                 ]);
-            case Filters\Assessment\UnitImpl\Definition::class:
-                return $this->buildFactory(Filters\Assessment\UnitImpl\Factory::class, [
+            case Filters\Assessment\NullableContext\UnitImpl\Definition::class:
+                return $this->buildFactory(Filters\Assessment\NullableContext\UnitImpl\Factory::class, [
                     'unitImplMapper' => $this->mapperFactory->get(UnitImpl\Mapper::class),
                 ]);
         }
@@ -115,7 +118,6 @@ class FactoryFactory
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
      * @throws \InvalidArgumentException
-     * @throws ServiceNotFound
      * @throws \ReflectionException If the specified class does not exist
      */
     public function buildKeyConverters($page)

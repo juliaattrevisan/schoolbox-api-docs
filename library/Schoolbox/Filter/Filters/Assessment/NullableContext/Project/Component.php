@@ -5,9 +5,10 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\Project;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
 use Schoolbox\Filter\AbstractFilterComponent;
+use Schoolbox\Filter\Filters\Assessment\NullableContext\Project\Definition;
 use Schoolbox\Filter\IFilterDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;

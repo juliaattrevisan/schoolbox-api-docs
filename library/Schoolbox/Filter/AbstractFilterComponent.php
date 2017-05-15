@@ -243,6 +243,14 @@ abstract class AbstractFilterComponent implements IFilterComponent
         return $this->user;
     }
 
+    /**
+     * @return string
+     */
+    protected function getPage()
+    {
+        return $this->page;
+    }
+
 
     /**
      * @return Selection\Mapper

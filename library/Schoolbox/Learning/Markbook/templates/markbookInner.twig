@@ -1,5 +1,4 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
-{% import 'sub/breadcrumbs.twig' as bread %}
 
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
@@ -24,47 +23,14 @@
     });
 </script>
 
-{# Crumbz: Class > Markbook #}
-{{ bread.crumbs(['Learning', '/learning/classes'], [class.title]) }}
-
 <div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Markbook for {{ class.title }}</h1>
-        </div>
-    </div>
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        {% set baseRoute = routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {contextId: class.id, contextType: 'folders', context: class }) %}
-        {% if baseRoute %}
-            <li class="separator">Create New Activity</li>
-            <li><a href="{{ baseRoute }}?type=dueWork" class='icon-due-work'>Due Work</a></li>
-            <li><a href="{{ baseRoute }}?type=quiz" class='icon-quiz'>Quiz</a></li>
-            <li><a href="{{ baseRoute }}?type=task" class='icon-task'>Task</a></li>
-            <li><a href="{{ baseRoute }}?type=project" class='icon-project'>Project</a></li>
-        {% endif %}
         <li class="separator">Report</li>
         <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {classId: class.id, termCode: currentTerm.code}) }}' class='icon-download'>Download Spreadsheet</a>
     </ul>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <div class="context-switch">
-            {% include '@learningMarkbook/fragments/markbookSelector.twig'
-                with {
-                    class: class,
-                    terms: terms,
-                    currentTerm: currentTerm,
-                    previousTerm: previousTerm,
-                    nextTerm: nextTerm,
-                    courses: courses
-                }
-            %}
-        </div>
-    </div>
 </div>
 
 <div class="row">
@@ -163,7 +129,7 @@
                                     {% include '@learningAssessment/fragments/progressTick.twig' with {
                                         assessment: assessment,
                                         participant: participant,
-                                        writable: writable
+                                        writable: writable[assessment.id]
                                     } only %}
                                 {% else %}
                                     {% set normalisedMark = assessment.getNormalisedMark(student, true) %}

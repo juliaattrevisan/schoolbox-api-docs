@@ -280,4 +280,11 @@ class Definition extends AbstractFilterDefinition
         return $this->previousTerm;
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function getTemplatesDir()
+    {
+        return '@filterDefinitions/Assessment/TermClose/templates';
+    }
 }

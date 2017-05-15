@@ -5,18 +5,16 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\Project;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\GenericCollection;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 /**
  * No conversion. A int is converted to the same int (representing a project.id)
- * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
-class KeyConverter extends AbstractKeyConverter
+class KeyConverter extends NullableContext\KeyConverter
 {
 
     /**
@@ -63,15 +61,6 @@ class KeyConverter extends AbstractKeyConverter
         return $this->projectIds->shallowClone();
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function sanitiseKey($key)
-    {
-        $this->assertValidKey($key);
-        return (string)(int)$key;
-    }
 
 
     /**

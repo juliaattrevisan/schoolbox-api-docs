@@ -38,6 +38,7 @@ interface IdFinder
      * @see IFilterDefinition::getSlug()
      * @return int[]
      * @throws \InvalidArgumentException If any filter keys not recognised
+     * @throws BrokenFilterException If a injected filter is unable to be processed
      */
     public function findIdsByFilters(array $filters = [], $deleted = false);
 }

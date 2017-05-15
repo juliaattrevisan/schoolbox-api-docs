@@ -66,16 +66,6 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    public function sanitiseKey($key)
-    {
-        $this->assertValidKey($key);
-        return (string)(int)$key;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     protected function assertValidKey($key)
     {
         if (!$this->folderIds->offsetExists($key)) {

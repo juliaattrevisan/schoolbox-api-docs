@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use RangeException;
 use Schoolbox\Collection;
 use Schoolbox\Column\Date;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use UnexpectedValueException;
 
@@ -21,7 +22,7 @@ use UnexpectedValueException;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
- * @method Collection|Model[] findAll($options = array())
+ * @method GenericCollection|Model[] findAll($options = array())
  */
 class Mapper extends BaseMapper
 {

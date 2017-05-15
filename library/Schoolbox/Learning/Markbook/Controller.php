@@ -13,7 +13,9 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentContextType;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -24,6 +26,11 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
 use Alaress\Csv\Writer AS CsvWriter;
 use DueWork_ErrorMapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
+use Schoolbox\Filter\Option as FilterOption;
+use Schoolbox\Filter\Selection;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -58,6 +65,11 @@ class Controller extends Base
      */
     private $dueWorkErrorMapper;
 
+    /**
+     * @var Access
+     */
+    private $access;
+
 
     /**
      * Constructor
@@ -68,6 +80,7 @@ class Controller extends Base
      * @param CourseImpl\Mapper     $courseImplMapper
      * @param Term\Mapper           $termMapper
      * @param DueWork_ErrorMapper   $dueWorkErrorMapper
+     * @param Access                $access
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -75,7 +88,8 @@ class Controller extends Base
         GradeGroup\Model $defaultGradeGroup,
         CourseImpl\Mapper $courseImplMapper,
         Term\Mapper $termMapper,
-        DueWork_ErrorMapper $dueWorkErrorMapper
+        DueWork_ErrorMapper $dueWorkErrorMapper,
+        Access $access
     ) {
         $this->errorMapper           = $errorMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
@@ -83,83 +97,173 @@ class Controller extends Base
         $this->courseImplMapper      = $courseImplMapper;
         $this->termMapper            = $termMapper;
         $this->dueWorkErrorMapper    = $dueWorkErrorMapper;
+        $this->access                = $access;
     }
 
 
     /**
+     * Redirect to the markbook for the specified class
+     *
+     * @param int $folderId
+     * @param User|null $viewee
+     * @throws RouteNotFound If unable to generate the redirect route
+     */
+    public function getMarkbookForClass($folderId, User $viewee = null)
+    {
+        $user = $viewee ?: $this->getUser();
+        $currentTerm = $this->termMapper->findForToday();
+        $route = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $user->getId()]);
+        $getArgs = "f={$folderId}&td={$currentTerm->getId()}&a=&p=&uis=&wt=&wk=";
+        $this->getResponse()->redirect->to("{$route}?{$getArgs}");
+    }
+
+    /**
      * Displays a list of marks for students in the specified class
      *
-     * @api   GET /learning/markbook/:classId
+     * @api   GET /learning/markbook?f=1,2&td=3
      * @level 165
-     * @param Folder\Model $class
+     * @param \Schoolbox\Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
+     * @param null|User                                           $viewee                Whose markbook are we looking at?
      * @throws RouteNotFound
+     * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
+     * @throws \ReflectionException      If the specified filter definition class does not exist
+     * @throws ServiceNotFound           If unable to locate HTML web Output
+     * @throws \DomainException          If of the filters on this page does not have its slug set
      */
-    public function getMarkbook(Folder\Model $class)
+    public function getMarkbook(AssessmentFilter\FactoryFactory $filterFactoryFactory, User $viewee = null)
     {
-        $this->getResponse()->redirect->to(
-            $this->getRouter()->generate(
-                'learningMarkbook.getMarkbookForTerm',
-                [
-                    'classId'  => $class->getId(),
-                    'termCode' => $this->termMapper->findForToday()->getCode(),
-                ]
-            )
+        // If viewee not specified, then display current user's markbook.
+        if(null === $viewee){
+            $viewee = $this->getUser();
+        }
+        $page      = FilterOption\Model::PAGE_MARK_BOOK;
+        $route     = $this->getRouter()->generate('learningMarkbook.postMarkbook', ['userId' => $viewee->getId()]);
+        $queryArgs = $this->getRequest()->query->getArrayCopy();
+
+        $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
+
+        // Is a teacher looking at their own markbook, or admin looking at a teacher's markbook?
+        $pageTitle = 'Markbook';
+        if($viewee->getId() !== $this->getUser()->getId()){
+            $pageTitle .= " for {$viewee->getFullName()}";
+        }
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learningMarkbook/markbookOuter.twig', [
+                'viewee'      => $viewee,
+                'filterPanel' => $filterPanel,
+            ])->setTab('submission')->setTitle($pageTitle)
         );
     }
 
 
     /**
-     * Displays a list of marks for students in the specified class for the given term
-     *
-     * @api   GET /learning/markbook/:classId/term/:termCode
-     * @param Folder\Model $class
-     * @param Term\Model   $term
-     * @throws ServiceNotFound
-     * @throws ApplicationException\Exception
+     * @param AssessmentFilter\IdFinder       $assessmentIdFinder
+     * @param AssessmentFilter\FactoryFactory $filterFactoryFactory
+     * @todo convert this to a GET on the same route name as getMarkbook, but distinguish as being AJAX
      */
-    public function getMarkbookForTerm(Folder\Model $class, Term\Model $term)
+    public function postMarkbook(AssessmentFilter\IdFinder $assessmentIdFinder, AssessmentFilter\FactoryFactory $filterFactoryFactory)
     {
-        // Replaces /submission/listSubmission/{termSlug}/{folderId}
-        //       eg /submission/listSubmission/{termSlug}/{folderId}
-        // Replaces /submission/viewSubmission/{dueWorkId}
-        //       eg /submission/viewSubmission/56
 
-        // Does this class exist ?
-        if (!$class->getId()) {
-            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
+        try {
+            $postFilterSelections = $this->request->post['filter_selection'] ?: [];
+
+            $user = $this->getUser();
+            $page = FilterOption\Model::PAGE_MARK_BOOK;
+
+            $keyConverters        = $filterFactoryFactory->buildKeyConverters($page);
+            $selectionsPerFilter  = Filter\Selection\Mapper::getInstance()->updateSelections($keyConverters, $user, $page, $postFilterSelections);
+            $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
+            $filters              = $selectionTransformer->getFilters();
+
+            // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
+            // regardless of any filter selections send by user
+            $filters[AssessmentFilter\NullableContext\UnitSpec\Definition::SLUG] = new Collection();
+
+            $assessmentIds = $assessmentIdFinder->findIdsByFilters($filters);
+            $content       = $this->generateMarkbookReport($assessmentIds);
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'status'  => 200,
+                'content' => $content,
+            ]));
+
+        } catch (Filter\BrokenFilterException $e){
+            $data = [
+                'status'  => 500,
+                'message' => "Sorry, the {$e->getFilterName()} filter appears to be broken. Please deselect all options and try again",
+
+            ];
+            if ($this->getConfigLoader()->get('debug_mode')) {
+                $data = array_merge($data, [
+                    'code'    => $e->getCode(),
+                    'message' => $e->getMessage(),
+                    'line'    => $e->getLine(),
+                    'file'    => $e->getFile(),
+                ]);
+            }
+            $this->getResponse()->content->set($this->buildJsonOutput($data));
+        } catch (\Exception $e) {
+            $this->returnJsonError($e);
+            // TODO - can remove this block when we abandon PHP 5 support
+        } catch (\Throwable $e) {
+            $this->returnJsonError($e);
         }
+    }
 
-        // Generate data: assessments and their Participants
-        /** @var Collection|IAssessable[] $assessments */
-        $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($class->getId(), null, ['term' => $term]);
+
+    /**
+     * Returns a JSON representation of an exception suitable for AJAX HTML alert divs
+     *
+     * @param \Throwable $e
+     */
+    protected function returnJsonError($e)
+    {
+        $data = [
+            'status'  => 500,
+            'message' => 'Sorry, an error occurred during your request and has been logged. Please try deselecting filter options',
+
+        ];
+        if ($this->getConfigLoader()->get('debug_mode')) {
+            $data = array_merge($data, [
+                'code'    => $e->getCode(),
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+            ]);
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * @param int[] $assessmentIds
+     * @throws ServiceNotFound If unable to find the HTML Output rendering service
+     * @return string
+     */
+    private function generateMarkbookReport(array $assessmentIds)
+    {
+        // Fetch assessments & participants
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
 
         // Build a markbook
         $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
         $markbook->getAssessments()->sortBy(['dueAt', 'sequence'], ['asc', 'asc']);
 
-        // And what is required for a context selector
-        $terms = $this->termMapper->findAll(['order' => ['start' => 'desc']]);
+        /* Determine which assessments the user should be able to mark.
+         *
+         * Can only mark an assessment if:
+         * * Assessment is/was not due in a term that is archived, and
+         * * User has write+ perm to the page
+         */
+        /** @var bool[] $writableAssessments Indexed by assessment.id */
+        $writable = [];
 
-        // Also show the courses/units that are on this homepage
-        $courses = $this->courseImplMapper->findByFolderId($class->getId());
-
-        // And the previous and next term
-        $previousTerm = null;
-        $nextTerm     = null;
-        foreach ($terms as $i => $termInList) {
-            if ($termInList->getId() === $term->getId()) {
-                if (isset($terms[$i + 1])) {
-                    $previousTerm = $terms[$i + 1];
-                }
-                if (isset($terms[$i - 1])) {
-                    $nextTerm = $terms[$i - 1];
-                }
-                break;
-            }
+        $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
+        foreach($assessments as $assessment){
+            $writable[$assessment->getId()] = $this->isAssessmentMarkable($this->getUser(), $assessment, $terms);
         }
-
-        // Can the viewee mark Assessments in for this class ?
-        $writable = !$term->getArchived() && Access::getInstance()->isInstructor($this->getUser(), $class);
 
         // What text should we display if student has submitted but not been marked?
         try {
@@ -170,23 +274,38 @@ class Controller extends Base
         }
 
         // And output
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@learningMarkbook/markbook.twig',
-                [
-                    'class'        => $class,
-                    'markbook'     => $markbook,
-                    'terms'        => $terms,
-                    'currentTerm'  => $term,
-                    'previousTerm' => $previousTerm,
-                    'nextTerm'     => $nextTerm,
-                    'courses'      => $courses,
-                    'writable'     => $writable,
-                    'contextTypes' => AssessmentContextType::getInstance(),
-                    'pendingLabel' => $pendingLabel,
-                ]
-            )->setTitle('Markbook for ' . $class->getTitle())
-        );
+        return $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
+            'markbook'     => $markbook,
+            'writable'     => $writable,
+            'contextTypes' => AssessmentContextType::getInstance(),
+            'pendingLabel' => $pendingLabel,
+        ])->getAsString();
+    }
+
+
+    /**
+     * Can the specified user mark the specified assessment?
+     *
+     * Will be false if assessment's folder is archived, or if user lacks WRITE+ perm to folder
+     *
+     * @param User              $user
+     * @param IAssessable       $assessment
+     * @param GenericCollection|Term\Model[] $terms
+     * @return bool
+     */
+    private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms)
+    {
+        foreach($terms as $term){
+            if($term->contains($assessment->getDueAt())){
+                if($term->getArchived()){
+                    return false;
+                }
+                // Rely on access cache to catch repeated calls to same folder.
+                return $this->access->isInstructor($user, $assessment->getContext()->getFolder());
+            }
+        }
+        // Logically should never get to here. It means assessment is due before first term in system starts.
+        return false;
     }
 
 

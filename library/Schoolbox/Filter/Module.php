@@ -12,6 +12,7 @@ use \Alaress\Module\Module as AlaressModule;
 use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Filter\Filters\Assessment\FactoryFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Twig_Loader_Chain;
 use Schoolbox\Filter\Option\Defaults;

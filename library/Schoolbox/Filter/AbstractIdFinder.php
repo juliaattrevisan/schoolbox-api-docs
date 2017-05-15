@@ -84,7 +84,13 @@ abstract class AbstractIdFinder implements IdFinder
 
         list($query, $params) = $this->buildQuery($completeFilters, $deleted);
         $idStatement = $this->getMapper()->getDatabase()->query($query, $params);
-        return array_column($idStatement->fetchAll(), $this->getMapper()->getIdentifierColumn());
+        $ids         = array_column($idStatement->fetchAll(), $this->getMapper()->getIdentifierColumn());
+
+        // Need to deduplicate some forms of sub-query combination
+        // (eg, if nullable assessment context filter has both (none) + 1 or more concrete items checked)
+        $uniqueIds = array_unique($ids);
+        sort($uniqueIds);
+        return $uniqueIds;
     }
 
     /**

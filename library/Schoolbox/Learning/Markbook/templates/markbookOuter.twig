@@ -1,0 +1,14 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{# Crumbz: Class > Markbook #}
+{{ bread.crumbs(['Learning', '/learning/classes'], ['Markbook']) }}
+
+{% set reportContentId = 'report_content' %}
+
+{% include filterPanel.template with {
+    contentId: reportContentId,
+    panel: filterPanel
+} only %}
+
+
+<div id="{{ reportContentId }}"></div>

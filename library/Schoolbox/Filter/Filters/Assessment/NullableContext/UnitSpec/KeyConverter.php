@@ -4,25 +4,23 @@
  * Created: 2/04/17 3:15 PM
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\UnitImportSpec;
+namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\GenericCollection;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 /**
  * No conversion. A int is converted to the same int (representing a unitSpec.id)
- * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
-class KeyConverter extends AbstractKeyConverter
+class KeyConverter extends NullableContext\KeyConverter
 {
 
     /**
      * All UnitSpecs IDs known to the system (regardless of whether they are
      * available for selection for current user)
      *
-     * We use IDs instead of Models as too slow for no value
+     * We use IDs instead of Models as models are too slow to build and add no extra value
      *
      * @var Collection|int[]
      */
@@ -49,7 +47,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getItem($key)
     {
-        if(Definition::KEY_ON_FOLDER === $key){
+        if(Definition::KEY_NONE === $key){
             return null;
         }
         $this->assertValidKey($key);
@@ -71,22 +69,9 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    public function sanitiseKey($key)
-    {
-        if(Definition::KEY_ON_FOLDER === $key){
-            return $key;
-        }
-        $this->assertValidKey($key);
-        return (string)(int)$key;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     protected function assertValidKey($key)
     {
-        if(Definition::KEY_ON_FOLDER === $key){
+        if(Definition::KEY_NONE === $key){
             return;
         }
         if (!$this->unitSpecIds->offsetExists($key)) {
