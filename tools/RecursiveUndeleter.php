@@ -652,10 +652,19 @@ class RecursiveUndeleter
             $mapper      = $mapperClass::getInstance();
             $countModels = $models->count();
             if(0 === $countModels) {
-                $this->logger->debug(sprintf("No soft-deleted models found for '%s', skipping...", $mapperClass));
+                $this->logger->debug(
+                    sprintf("No soft-deleted models found for table '%s' (mapper '%s'), skipping...",
+                        $mapper->getTable(),
+                        $mapperClass)
+                );
                 continue;
             }
-            $this->logger->info(sprintf("Restoring %d soft-deleted models for '%s'...", $models->count(), $mapperClass));
+            $this->logger->info(
+                sprintf("Restoring %d soft-deleted models for table '%s' (mapper '%s')...",
+                    $models->count(),
+                    $mapper->getTable(),
+                    $mapperClass)
+            );
             $mapper->restoreSoftDeleted($models);
         }
     }
@@ -745,7 +754,7 @@ class RecursiveUndeleter
             if(!$firstLoop){
                 $this->logger->info('');
             }
-            $this->logger->info(sprintf("Deleted at values for mapper '%s':", $mapperClass));
+            $this->logger->info(sprintf("Deleted at values for table '%s' (mapper '%s'):", $mapper->getTable(), $mapperClass));
 
             // Align ID columns. Right-align numeric, left align textual.
             $longestId = 0;
