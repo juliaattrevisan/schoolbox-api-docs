@@ -32,7 +32,7 @@ if ($sessionUser->isSuperuser()) {
 	$dailyReminder->setValue($_POST['dailyReminder']);
 	$urgentThreshold->setValue($_POST['urgentThreshold']);
 	$policy->setValue($_POST['policy']);
-	$ramsWarning->setValue($_POST['rams_warning']);
+	$ramsWarning->setValue($_POST['ramsWarning']);
 
 	$configMapper->save($firstReminder);
 	$configMapper->save($dailyReminder);
