@@ -325,8 +325,8 @@
 
             <fieldset class="content">
                 <legend>
-                    RAMS Required?
-                    <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
+                    {TPL_LOCAL_EOTCRAMSABBREVIATION} Required?
+                    <span class='hint has-tip tip-top' data-tooltip title="Please confirm if {TPL_LOCAL_EOTCRAMSABBREVIATION} is required for this event to take place.">?</span>
                 </legend>
 
                 <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
@@ -334,7 +334,7 @@
 
                 <div class="small-12 columns">
                     <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
-                    <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
+                    <label for="ramsRequiredCheckbox" class="checkbox-label">{TPL_LOCAL_EOTCRAMSABBREVIATION} is required</label>
                 </div>
                 <div class="small-12 columns">
                     {ATTACH_ZONE}
@@ -469,14 +469,14 @@
         Are you sure you want to delete this event?
     </p>
 </div>
-<div id='ramsModal' class="reveal-modal" data-reveal title="Remove RAMS Requirement">
+<div id='ramsModal' class="reveal-modal" data-reveal title="Remove {TPL_LOCAL_EOTCRAMSABBREVIATION} Requirement">
     <p>
-        <span class="label alert full-width">Warning: please confirm RAMS is not required.</span>
+        <span class="label alert full-width">Warning: please confirm {TPL_LOCAL_EOTCRAMSABBREVIATION} is not required.</span>
     </p>
 
     <p>
-        The organiser is required to submit a completed <strong>RAMS</strong>
-        (Risk Analysis Management System) form if the {TPL_LOCAL_EOTC} is associated with
+        The organiser is required to submit a completed <strong>{TPL_LOCAL_EOTCRAMSABBREVIATION}</strong>
+        ({TPL_LOCAL_EOTCRAMS}) form if the {TPL_LOCAL_EOTC} is associated with
         certain activities which are deemed to have significant associated risks.
         These include: Activities close to or on <strong>WATER</strong>;
         <strong>TRAMPS</strong>; <strong>TRIPS</strong> (overseas, outside of
@@ -486,7 +486,7 @@
     </p>
 
     <p>
-        <a href="/modules/eotc/policy" target="_blank">Read the full RAMS policy.</a>
+        <a href="/modules/eotc/policy" target="_blank">Read the full {TPL_LOCAL_EOTCRAMSABBREVIATION} policy.</a>
     </p>
 
     <p>
