@@ -13,7 +13,6 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
@@ -142,12 +141,12 @@ class Mapper extends BaseMapper
 
         foreach ($statement as $row) {
 
-            /** @var Model $model */
-            $model = $this->hydrate($row);
-
             if (empty($row['id'])) {
                 continue;
             }
+
+            /** @var Model $model */
+            $model = $this->hydrate($row);
 
             if ($this->getConfigLoader()->get('pastoral_severity')) {
                 if (!empty($row['severity_id'])) {
@@ -198,9 +197,11 @@ class Mapper extends BaseMapper
      * Retreive all report definitions the user has access to
      *
      * @param User $user
+     * @return Collection|\Schoolbox\GenericCollection
      */
     public function findForUser(User $user)
     {
+        $groupSql = '';
         $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
 
         $groupIds = [];
@@ -212,7 +213,7 @@ class Mapper extends BaseMapper
 
         $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
 
-	if (!empty($bindings['placeholders'])) {
+	    if (!empty($bindings['placeholders'])) {
     	    $groupSql = "group_id` IN ({$bindings['placeholders']}) AND";
         }
 
