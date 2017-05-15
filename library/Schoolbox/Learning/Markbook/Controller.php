@@ -101,6 +101,15 @@ class Controller extends Base
     }
 
 
+    public function getMarkbookForClass($folderId, User $viewee = null)
+    {
+        $user = $viewee ?: $this->getUser();
+        $currentTerm = $this->termMapper->findForToday();
+        $route = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $user->getId()]);
+        $getArgs = "f={$folderId}&td={$currentTerm->getId()}&a=&p=&uis=&wt=&wk=";
+        $this->getResponse()->redirect->to("{$route}?{$getArgs}");
+    }
+
     /**
      * Displays a list of marks for students in the specified class
      *
