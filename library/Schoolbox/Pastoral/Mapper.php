@@ -436,7 +436,7 @@ class Mapper extends BaseMapper
         $auditRecord->setUser($this->getSessionUser());
         $auditRecord->setSearch($search);
 
-        if (strlen($search) >= 3) {
+        if (strlen($search) >= 2) {
 
             $searchArray = explode(' ', $search);
 
