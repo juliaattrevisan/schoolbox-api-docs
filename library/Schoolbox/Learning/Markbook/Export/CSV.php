@@ -39,7 +39,6 @@ class CSV implements IExporter
         $this->writeStudents($out, $sortedAssessments, $markbook, $students, $participants);
 
         fclose($out);
-        exit;
     }
 
 

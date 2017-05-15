@@ -208,6 +208,7 @@ class Controller extends Base
         $csvExporter = new Export\CSV();
         $filename    = preg_replace('/[^\w-(),]/', '_', "Markbook_{$viewee->getFullName()}.csv");
         $csvExporter->export($markbook, $filename);
+        exit;
     }
 
 
