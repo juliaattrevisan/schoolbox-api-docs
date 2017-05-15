@@ -39,8 +39,16 @@ $sessionUser = $_SESSION['user'];
 
 $defaultTypeId = '';
 
+$configMapper = \EOTC\ConfigMapper::getInstance();
+try {
+    $ramsWarning = $configMapper->findOneByColumn('name', 'rams_warning')->getValue();
+} catch (\Schoolbox\Mapper\Exception $e) {
+    $ramsWarning = '';
+}
+
 $page->setVar([
-    'ATTACH_ZONE' => ''
+    'ATTACH_ZONE'  => '',
+    'RAMS_WARNING' => Scrub::html($ramsWarning),
 ]);
 
 /* Modify existing event
