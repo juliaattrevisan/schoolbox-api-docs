@@ -11,7 +11,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\Learning\Assessment\Redirect;
 
-$folderMapper = new \Schoolbox\Resource\Folder\Mapper();
+$folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 $folder = null;
 
 $groupID = $_SESSION['gid'];
