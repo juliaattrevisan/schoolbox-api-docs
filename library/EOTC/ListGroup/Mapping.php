@@ -25,7 +25,7 @@ class Mapping {
 	private $mapping = array(
 		'Urgent',
 		'Awaiting Final Approval',
-		'Confirm RAMs',
+		'Confirm {:eotcRamsAbbreviation|p}',
 		'Pending Initial Application Review',
 		'Pending Details',
 		'Approved',
