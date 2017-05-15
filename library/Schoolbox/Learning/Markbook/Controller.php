@@ -106,15 +106,15 @@ class Controller extends Base
      *
      * @api   GET /learning/markbook?f=1,2&td=3
      * @level 165
-     * @param null|User                                           $viewee                Whose markbook are we looking at?
      * @param \Schoolbox\Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
+     * @param null|User                                           $viewee                Whose markbook are we looking at?
      * @throws RouteNotFound
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException      If the specified filter definition class does not exist
      * @throws ServiceNotFound           If unable to locate HTML web Output
      * @throws \DomainException          If of the filters on this page does not have its slug set
      */
-    public function getMarkbook(User $viewee = null, AssessmentFilter\FactoryFactory $filterFactoryFactory)
+    public function getMarkbook(AssessmentFilter\FactoryFactory $filterFactoryFactory, User $viewee = null)
     {
         // If viewee not specified, then display current user's markbook.
         if(null === $viewee){
