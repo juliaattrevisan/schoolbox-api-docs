@@ -135,11 +135,13 @@ if (is_numeric($_GET['eventID'])) {
             }
 
             $zone = new \Schoolbox\Resource\Attachment\Zone('ramsZone');
+            /** @var Schoolbox\L10n\RosettaStone $l10n */
+            $l10n = $page->getDi()->get('l10n');
             $zone
                 ->setMulti(true)
                 ->attachFiles($hashes)
                 ->setThumbnailSize(64)
-                ->setModalTitle('Select RAMS files')
+                ->setModalTitle($l10n->translateSentence('Select {:eotcRamsAbbreviation} files'))
                 ->setMimeFilter('*/*')
                 ->setAttachPrompt('Attach files')
                 ->renderIntoSitePage($page, 'ATTACH_ZONE');
