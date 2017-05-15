@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Pastoral;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
@@ -43,38 +42,59 @@ class Module extends BaseModule
     /** @var string $basename */
     protected $basename = 'pastoral';
 
-    /** @var ErrorMapper $errorMapper */
-    protected $errorMapper;
-
     /**
      * {@inheritdoc}
      */
     protected function registerRoutes()
     {
-        $routes = [
+        // Define permissions for the routes
+
+        $permissionPastoralModerator = new Rule\All(new Rule\IsLoggedIn(), new Rule\HasRole(Role::STAFF), new IsPastoralModerator());
+        $permissionPastoralModeratorWrite = new Rule\All(new Rule\IsLoggedIn(), new Rule\HasRole(Role::STAFF), new IsPastoralModeratorWrite());
+        $permissionStaff = new Rule\All(new Rule\IsLoggedIn(), new Rule\HasRole(Role::STAFF));
+        $permissionParentOfStudent = new Rule\All(new Rule\IsLoggedIn(), new IsParentAccessAllowed(), new Rule\HasRole(Role::PARENT), new Rule\IsParentOfUser($this->getExternalUser(), UserMapper::getInstance(), 'studentId'));
+
+        // User is in the audience of the pastoral record
+
+        $permissionInRecordAudience = new IsInAudience();
+
+        // Permissions required to view a students pastoral page
+
+        $permissionStudentView = new Rule\Any($permissionPastoralModerator, $permissionStaff, $permissionParentOfStudent);
+
+        // Permissions required to view/update/delete a pastoral record (any staff member can insert)
+
+        $permissionRecordOwner = new Rule\All(new IsOwner(), $permissionStaff);
+        $permissionRecordView = new Rule\Any($permissionPastoralModerator, new Rule\All($permissionStaff, $permissionInRecordAudience), new Rule\All($permissionParentOfStudent, $permissionInRecordAudience));
+        $permissionRecordUpdate = new Rule\All(new Rule\Any($permissionPastoralModeratorWrite, $permissionRecordOwner));
+        $permissionRecordDelete = new Rule\All(new Rule\Any($permissionPastoralModeratorWrite, $permissionRecordOwner));
+
+        // Permissions required to insert/delete a pastoral comment
+
+        $permissionCommentOwner = new Rule\All(new IsCommentOwner(), $permissionStaff);
+        $permissionCommentInsert = new Rule\All($permissionStaff, new Rule\Any($permissionPastoralModeratorWrite, $permissionInRecordAudience, $permissionRecordOwner));
+        $permissionCommentDelete = new Rule\All($permissionStaff, new Rule\Any($permissionPastoralModeratorWrite, $permissionCommentOwner, $permissionRecordOwner));
+
+        // Define routes and assign permissions to them
+
+        $this->registerRoutesArray([
             'GET' => [
-                ''                                                          => 'getIndex',
-                '/groups'                                                   => 'getGroups',
-                '/search'                                                   => 'getSearch',
-                '/student/{studentId:\d+}'                                  => 'getStudent',
-                '/student/{studentId:\d+}/record/{recordId:\d+}'            => 'getStudentRecord',
-                '/student/{studentId:\d+}/record/insert'                    => 'getStudentRecordInsertForm',
-                '/student/{studentId:\d+}/record/{recordId:\d+}/update'     => 'getStudentRecordUpdateForm',
+                ''                                                          => ['getIndex' => $permissionStaff],
+                '/groups'                                                   => ['getGroups' => $permissionPastoralModerator],
+                '/search'                                                   => ['getSearch' => $permissionStaff],
+                '/student/{studentId:\d+}'                                  => ['getStudent' => $permissionStudentView],
+                '/student/{studentId:\d+}/record/{recordId:\d+}'            => ['getStudentRecord' => $permissionRecordView],
+                '/student/{studentId:\d+}/record/insert'                    => ['getStudentRecordInsertForm' => $permissionStaff],
+                '/student/{studentId:\d+}/record/{recordId:\d+}/update'     => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
             ],
             'POST' => [
-                '/record/insert'                                            => 'postRecordInsert',
-                '/record/update'                                            => 'postRecordUpdate',
-                '/record/{recordId:\d+}/delete'                             => 'postRecordDelete',
-                '/comment/insert'                                           => 'postCommentInsert',
-                '/record/{recordId:\d+}/comment/{commentId:\d+}/delete'     => 'postCommentDelete',
+                '/record/insert'                                            => ['postRecordInsert' => $permissionStaff],
+                '/record/{recordId:\d+}/update'                             => ['postRecordUpdate' => $permissionRecordUpdate],
+                '/record/{recordId:\d+}/delete'                             => ['postRecordDelete' => $permissionRecordDelete],
+                '/record/{recordId:\d+}/comment/insert'                     => ['postCommentInsert' => $permissionCommentInsert],
+                '/record/{recordId:\d+}/comment/{commentId:\d+}/delete'     => ['postCommentDelete' => $permissionCommentDelete],
             ]
-        ];
-
-        foreach ($routes as $httpMethod => $route) {
-            foreach ($route as $path => $controllerMethod) {
-                $this->register($httpMethod, $path, $controllerMethod);
-            }
-        }
+        ]);
     }
 
     /**
@@ -168,127 +188,5 @@ class Module extends BaseModule
 
             return $injectedValues;
         });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        /** @var UserMapper $userMapper */
-        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
-
-        // In most cases pastoral moderators that are staff members get access to everything regardless of all other permissions.
-        // The only exception is write permissions where the moderator is not a write level moderator
-
-        $permissionPastoralModerator = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new IsPastoralModerator(),
-            new Rule\HasRole(Role::STAFF)
-        );
-
-        // To access a students pastoral page you must be either
-        //
-        // - Any staff member, or
-        // - Parent of child and have parent access in enabled in Schoolbox config
-
-        $permissionViewStudent = new Rule\Any(
-            $permissionPastoralModerator,
-            new Rule\HasRole(Role::STAFF),
-            new Rule\All
-            (
-                new Rule\HasRole(Role::PARENT),
-                new IsParentAccessAllowed(),
-                new Rule\IsParentOfUser($this->getExternalUser(), $userMapper, 'studentId')
-            )
-        );
-
-        // To view a pastoral record you must be either
-        //
-        // - Staff member in the audience of the record, or
-        // - Parent of child who is in the audience of the record and have parent access enabled in Schoolbox config
-
-        $permissionViewRecord = new Rule\Any(
-            $permissionPastoralModerator,
-            new Rule\All(
-                new Rule\HasRole(Role::STAFF),
-                new IsInAudience()
-            ),
-            new Rule\All (
-                new Rule\HasRole(Role::PARENT),
-                new IsParentAccessAllowed(),
-                new IsInAudience(),
-                new Rule\IsParentOfUser($this->getExternalUser(), $userMapper, 'studentId')
-            )
-        );
-
-        // In order to update a pastoral record you must be a staff member who is either
-        //
-        // - The author of the record, or
-        // - A pastoral moderator with write level permissions
-
-        $permissionRecordUpdate = new Rule\All(
-            new Rule\HasRole(Role::STAFF),
-            new Rule\Any (
-                new IsPastoralModeratorWrite(),
-                new IsOwner()
-            )
-        );
-
-        // In order to delete a pastoral comment you must be a staff member who is either
-        //
-        // - The author of the comment, or
-        // - A pastoral moderator with write level permissions
-
-        $permissionCommentDelete = new Rule\All(
-            new Rule\HasRole(Role::STAFF),
-            new Rule\Any (
-                new IsPastoralModeratorWrite(),
-                new IsCommentOwner()
-            )
-        );
-
-        // In order to insert a pastoral comment you must be a staff member who is either
-        //
-        // - The author of the record, or
-        // - A pastoral moderator with write level permissions, or
-        // - In the audience of the record
-
-        $permissionCommentInsert = new Rule\All(
-            new Rule\HasRole(Role::STAFF),
-            new Rule\Any (
-                new IsPastoralModeratorWrite(),
-                new IsOwner(),
-                new IsInAudience()
-            )
-        );
-
-        // All staff (and only staff) can access these functions
-        //
-        // - Pastoral dashboard
-        // - Pastoral search
-        // - Add pastoral record
-        // - Add pastoral comment
-
-        $this->addRoutePermission($authorizer,
-            'getIndex|getSearch|getStudentRecordInsert|postCommentInsert|postCommentInsert',
-            new Rule\Any(
-                $permissionPastoralModerator,
-                new Rule\HasRole(Role::STAFF)
-            )
-        );
-
-        // Only write level pastoral moderators can access the group management screen
-
-        $this->addRoutePermission($authorizer, 'getGroups', new IsPastoralModeratorWrite());
-
-        // These are all described above
-
-        $this->addRoutePermission($authorizer, 'getStudent', $permissionViewStudent);
-        $this->addRoutePermission($authorizer, 'getStudentRecord', $permissionViewRecord);
-        $this->addRoutePermission($authorizer, 'getStudentRecordUpdate|postRecordUpdate|postRecordDelete', $permissionRecordUpdate);
-        $this->addRoutePermission($authorizer, 'postCommentDelete', $permissionCommentDelete);
-        $this->addRoutePermission($authorizer, 'postCommentInsert', $permissionCommentInsert);
-
     }
 }

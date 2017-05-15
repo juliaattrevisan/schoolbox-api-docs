@@ -26,7 +26,7 @@
         {# Delete record #}
 
         {% if record is not empty %}
-            {% if isRouteAuthorized('pastoral.postRecordDelete', {record: record}) %}
+            {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
                 <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
             {% endif %}
         {% endif %}

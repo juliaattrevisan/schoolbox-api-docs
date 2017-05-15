@@ -14,6 +14,8 @@ use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class IsInAudience implements IAuthorizationRule
 {
@@ -22,6 +24,18 @@ class IsInAudience implements IAuthorizationRule
      */
     public function authorize(array $params = array(), User $user = null)
     {
+        if (!isset($params['record'])) {
+            if (!isset($params['recordId'])) {
+                return false;
+            } else {
+                try {
+                    $params['record'] = PastoralMapper::getInstance()->findById($params['recordId']);
+                } catch (MapperException $e) {
+                    return false;
+                }
+            }
+        }
+
         if (!$params['record'] instanceof Pastoral) {
             throw new Unauthorized();
         }

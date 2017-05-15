@@ -38,35 +38,20 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $routes = [
+        $permissionStaff = new Rule\HasRole(Role::STAFF);
+
+        $this->registerRoutesArray([
             'GET' => [
-                ''                              => 'getIndex',
-                '/insert'                       => 'getReportInsert',
-                '/update/{reportId:\d+}'        => 'getReportUpdate',
-                '/results/{reportId:\d+}'       => 'getReportResults',
-                '/results/{reportId:\d+}/print' => 'getReportResultsPrint',
+                ''                              => ['getIndex' => $permissionStaff],
+                '/insert'                       => ['getReportInsert' => $permissionStaff],
+                '/update/{reportId:\d+}'        => ['getReportUpdate' => $permissionStaff],
+                '/results/{reportId:\d+}'       => ['getReportResults' => $permissionStaff],
+                '/results/{reportId:\d+}/print' => ['getReportResultsPrint' => $permissionStaff],
             ],
             'POST' => [
-                '/modify'                       => 'postReportModify',
+                '/modify'                       => ['postReportModify' => $permissionStaff],
             ]
-        ];
-
-        foreach ($routes as $httpMethod => $route) {
-            foreach ($route as $path => $controllerMethod) {
-                $this->register($httpMethod, $path, $controllerMethod);
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        // All staff have access to the pastoral report builder. The actual contents of the report will be filtered based on
-        // access to each individual pastoral record.
-
-        $this->addRoutePermission($authorizer, '.*', new Rule\HasRole(Role::STAFF));
+        ]);
     }
 
     /**

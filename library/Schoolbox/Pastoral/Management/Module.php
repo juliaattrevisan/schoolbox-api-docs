@@ -39,39 +39,24 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $routes = [
+        // Define routes and permissions
+
+        $ruleStaff = new Rule\HasRole(Role::STAFF);
+        $rulePastoralModeratorWrite = new IsPastoralModeratorWrite();
+
+        $this->registerRoutesArray([
             'GET' => [
-                '/groups'                   => 'getGroups',
-                '/groups/modify{/groupId}'  => 'getGroupsModify',
+                '/groups'                   => ['getGroups' => $rulePastoralModeratorWrite],
+                '/groups/modify{/groupId}'  => ['getGroupsModify' => $rulePastoralModeratorWrite],
                 '/report'                   => 'getReport',
-                '/report/builder'           => 'getReportBuilder',
-                '/report/print'             => 'getReportPrint',
+                '/report/builder'           => ['getReportBuilder' => $ruleStaff],
+                '/report/print'             => ['getReportPrint' => $ruleStaff],
             ],
             'POST' => [
-                '/groups/delete'            => 'postGroupsDelete',
-                '/groups/modify'            => 'postGroupsModify'
+                '/groups/delete'            => ['postGroupsDelete' => $rulePastoralModeratorWrite],
+                '/groups/modify'            => ['postGroupsModify' =>$rulePastoralModeratorWrite],
             ]
-        ];
-
-        foreach ($routes as $httpMethod => $route) {
-            foreach ($route as $path => $controllerMethod) {
-                $this->register($httpMethod, $path, $controllerMethod);
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        // Pastoral groups management is restricted to write level pastoral moderators only
-
-        $this->addRoutePermission($authorizer, 'getGroups|getGroupsModify|postGroupsDelete|postGroupsModify', new IsPastoralModeratorWrite());
-
-        // Everything else is staff only
-        
-        $this->addRoutePermission($authorizer, 'getDashboard|getReport|getReportBuilder|getReportPrint', new Rule\HasRole(Role::STAFF));
+        ]);
     }
 
     /**

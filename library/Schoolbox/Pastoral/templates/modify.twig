@@ -188,7 +188,11 @@
                             <p class="meta">Important Note: Users granted individual access can view the contents of private records.</p>
                         </div>
                     </fieldset>
-                    {% if record.access.count > 0 %}
+                    {% set found = 0 %}
+                    {% for access in record.access if access.user.id != '' %}
+                        {% set found = 1 %}
+                    {% endfor %}
+                    {% if found %}
                         <fieldset class="content">
                             <div class="small-12 columns">
                                 <label>

@@ -142,7 +142,7 @@
 
                                 {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
 
-                                {% if isRouteAuthorized('pastoral.postCommentDelete', {comment: comment}) %}
+                                {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
                                     <nav>
                                         <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
                                     </nav>
@@ -179,7 +179,7 @@
     </div>
 </div>
 
-{% if isRouteAuthorized('pastoral.postCommentInsert') %}
+{% if isRouteAuthorized('pastoral.postCommentInsert', {recordId: record.id}) %}
 
     <script type="text/javascript">
         $(function () {
