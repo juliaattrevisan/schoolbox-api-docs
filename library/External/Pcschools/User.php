@@ -16,6 +16,10 @@ class External_Pcschools_User implements External_UserInterface
     const CONTACT_TYPE_GUARDIAN  = 'G';
     const CONTACT_TYPE_CAREGIVER = 'C';
 
+    const CONTACT_LEVEL_FULL           = 'F';
+    const CONTACT_LEVEL_NONE           = 'N';
+    const CONTACT_LEVEL_NO_DEMOGRAPHIC = 'D';
+
     /**
      * @var MSSQL
      */
