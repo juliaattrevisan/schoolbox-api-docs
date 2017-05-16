@@ -17,6 +17,13 @@ use Schoolbox\User;
  */
 interface IFactoryFactory
 {
+    /**
+     * Return a constant that represents the entity that is being filtered,
+     * eg 1 => 'assessments'
+     *
+     * @return int
+     */
+    public static function getEntity();
 
     /**
      * A registry of assessment-filter factories, along with their construction dependencies.

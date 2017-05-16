@@ -32,11 +32,14 @@ use Schoolbox\Filter\Filters;
 /**
  * The FilterFactoryFactory is responsible for creating assessment-filter factories.
  */
-class FactoryFactory implements Filter\IFactoryFactory
+class FactoryFactory extends Filter\AbstractFactoryFactory
 {
+
+    const ENTITY = Filter\Model::ENTITY_ASSESSMENTS;
 
     /** @var MapperFactory */
     private $mapperFactory;
+
 
     /**
      * @param MapperFactory $mapperFactory
@@ -164,7 +167,7 @@ class FactoryFactory implements Filter\IFactoryFactory
             $component     = $filterFactory->buildComponent($definitionClassName, $user, $page, $viewee, $overrides);
 
             // Don't bother inserting component if it wasn't build (because no options would be available anyway)
-            if($component){
+            if ($component) {
                 $filterComponents->setOffset($definitionClassName, $component);
             }
 
