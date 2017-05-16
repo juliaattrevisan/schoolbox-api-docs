@@ -155,7 +155,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
                 'news'                  => $newsByTopic,
-                'newsAll'               => $newsAll->limit($this->getLimit()),
+                'newsAll'               => $this->getLimit() ? $newsAll->limit($this->getLimit()) : $newsAll,
                 'topics'                => $this->getAllTopics(),
                 'heading'               => $this->getConfig('componentname','value'),
                 'allDefault'            => $this->getConfig('default', 'value'),
