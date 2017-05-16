@@ -361,19 +361,13 @@
         $('[data-delete-permission]').click(function (event) {
             event.preventDefault();
 
-            $(this).confirmDialog({
-                text: 'Are you sure you want to remove this users permission from the record?',
-                confirmEvent: function () {
-
-                    var selector = $("#deleteIds");
-                    var deleteIds = selector.val();
-                    if (deleteIds != '') {
-                        deleteIds += ',';
-                    }
-                    selector.val(deleteIds + $(event.target).attr('data-delete-permission'));
-                    $(event.target).closest('li').remove();
-                }
-            });
+            var selector = $("#deleteIds");
+            var deleteIds = selector.val();
+            if (deleteIds != '') {
+                deleteIds += ',';
+            }
+            selector.val(deleteIds + $(event.target).attr('data-delete-permission'));
+            $(event.target).closest('li').remove();
         });
 
         {% endif %}
