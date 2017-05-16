@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
-use Schoolbox\Filter\AbstractFilterComponent;
+use Schoolbox\Filter\AbstractComponent;
 use Schoolbox\GenericCollection;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Selection;
@@ -17,7 +17,7 @@ use Schoolbox\Assessment\Term;
 /**
  * @method Definition getDefinition()
  */
-abstract class Component extends AbstractFilterComponent
+abstract class Component extends AbstractComponent
 {
 
     /**

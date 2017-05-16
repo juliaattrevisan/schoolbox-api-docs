@@ -9,7 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\WorkType;
  * □ None
  * □ One per workType that exists in system
  */
-class Definition extends AbstractFilterDefinition
+class Definition extends AbstractDefinition
 {
     const SLUG = 'wk';
 

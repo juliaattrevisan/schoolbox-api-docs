@@ -8,9 +8,9 @@
 namespace Schoolbox\Filter\Filters\Assessment;
 
 use Schoolbox\Filter;
-use Schoolbox\Filter\IFilterComponent;
-use Schoolbox\Filter\IFilterDefinition;
-use Schoolbox\Filter\IFilterFactory;
+use Schoolbox\Filter\IComponent;
+use Schoolbox\Filter\IDefinition;
+use Schoolbox\Filter\IFactory;
 use Schoolbox\Filter\IKeyConverter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
@@ -54,7 +54,7 @@ class FactoryFactory implements Filter\IFactoryFactory
      * Registered by filter definition class name.
      *
      * @param string $filterDefinitionClass
-     * @return IFilterFactory
+     * @return IFactory
      * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
      * @throws \ReflectionException If the specified class does not exist
      */
@@ -125,7 +125,7 @@ class FactoryFactory implements Filter\IFactoryFactory
 
         foreach ($this->getFilterMapper()->findAll() as $filter) {
 
-            /** @var IFilterDefinition $class */
+            /** @var IDefinition $class */
             $class = $filter->getClass();
 
             // Does this filter appear on the specified page?
@@ -178,7 +178,7 @@ class FactoryFactory implements Filter\IFactoryFactory
      * Get the set of filters that are implemented by the specified page
      *
      * @param string $page
-     * @return string[]|IFilterDefinition[]
+     * @return string[]|IDefinition[]
      * @throws \InvalidArgumentException If unable to locate Filter Mapper class
      */
     private function getDefinitions($page)
@@ -186,7 +186,7 @@ class FactoryFactory implements Filter\IFactoryFactory
         $allFilters        = $this->getFilterMapper()->findAll();
         $definitionClasses = [];
         foreach ($allFilters as $filter) {
-            /** @var string|IFilterDefinition $definitionClass */
+            /** @var string|IDefinition $definitionClass */
             $definitionClass = $filter->getClass();
 
             // Does this filter appear on the specified page?
@@ -199,12 +199,12 @@ class FactoryFactory implements Filter\IFactoryFactory
 
 
     /**
-     * @param null|IFilterComponent[] $contents
-     * @return GenericCollection|IFilterComponent[]
+     * @param null|IComponent[] $contents
+     * @return GenericCollection|IComponent[]
      */
     private function createFilterComponentCollection(array $contents = [])
     {
-        return new GenericCollection(IFilterComponent::class, $contents);
+        return new GenericCollection(IComponent::class, $contents);
     }
 
 
@@ -223,7 +223,7 @@ class FactoryFactory implements Filter\IFactoryFactory
      *
      * @param            $factoryClass
      * @param array|null $extraArgs
-     * @return IFilterFactory|object
+     * @return IFactory|object
      * @throws \InvalidArgumentException
      * @throws \ReflectionException If the specified class does not exist
      */

@@ -25,7 +25,7 @@ use Schoolbox\Filter;
  *
  * Each of these 3 purposes has a corresponding buildFor* method
  */
-interface IFilterDefinition
+interface IDefinition
 {
     /**
      * @return Filter\Model

@@ -35,7 +35,7 @@ interface IdFinder
      *
      * @param Collection[]|null[]|mixed[][] $filters Indexed by filter definition key
      * @param bool                          $deleted Whether to include soft-deleted assessments
-     * @see IFilterDefinition::getSlug()
+     * @see IDefinition::getSlug()
      * @return int[]
      * @throws \InvalidArgumentException If any filter keys not recognised
      * @throws BrokenFilterException If a injected filter is unable to be processed

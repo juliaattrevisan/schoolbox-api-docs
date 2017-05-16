@@ -47,7 +47,7 @@ class Transformer
 
         foreach ($keyConverters as $filterId => $keyConverter) {
             $filter = $keyConverter->getFilter();
-            /** @var IFilterDefinition $filterDefinitionClass */
+            /** @var IDefinition $filterDefinitionClass */
             $filterDefinitionClass = $filter->getClass();
             $filterSlug            = $filterDefinitionClass::getSlug();
             $this->keyConverters->offsetSet($filterSlug, $keyConverter);

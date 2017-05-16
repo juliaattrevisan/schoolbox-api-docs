@@ -16,11 +16,11 @@ use Schoolbox\Filter\Option;
 /**
  * Common logic for Filter Components
  */
-abstract class AbstractFilterComponent implements IFilterComponent
+abstract class AbstractComponent implements IComponent
 {
 
     /**
-     * @var IFilterDefinition
+     * @var IDefinition
      */
     private $definition;
 
@@ -52,7 +52,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
 
 
     /**
-     * @param IFilterDefinition                        $definition
+     * @param IDefinition                              $definition
      * @param User                                     $user
      * @param string                                   $page
      * @param null|GenericCollection|Selection\Model[] $savedSelections Existing selections for this filter, user and page
@@ -61,7 +61,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
      * @throws \DomainException If both saved selections and override selections are null
      */
     public function __construct(
-        IFilterDefinition $definition,
+        IDefinition $definition,
         User $user,
         $page,
         GenericCollection $savedSelections = null,
@@ -227,7 +227,7 @@ abstract class AbstractFilterComponent implements IFilterComponent
 
 
     /**
-     * @return IFilterDefinition
+     * @return IDefinition
      */
     public function getDefinition()
     {

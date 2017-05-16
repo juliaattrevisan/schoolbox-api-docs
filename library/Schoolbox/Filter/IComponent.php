@@ -17,11 +17,11 @@ namespace Schoolbox\Filter;
  * By its nature, a Controller knows which extra args are required for specific components and
  * can pass runtime parameters into the factory build method.
  */
-interface IFilterComponent
+interface IComponent
 {
 
     /**
-     * @return IFilterDefinition
+     * @return IDefinition
      */
     public function getDefinition();
 

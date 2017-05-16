@@ -17,7 +17,7 @@ use Schoolbox\Mapper;
 /**
  * Provides common filter definition behaviour
  */
-abstract class AbstractFilterDefinition implements IFilterDefinition
+abstract class AbstractDefinition implements IDefinition
 {
     // Concrete classes must override with short string, eg 'f' for 'folder' filter
     const SLUG = null;

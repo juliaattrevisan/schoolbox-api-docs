@@ -9,7 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
@@ -26,7 +26,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
  * Defaults to full set, but run-time options will enable controller to exclude individual items
  *
  */
-class Definition extends AbstractFilterDefinition
+class Definition extends AbstractDefinition
 {
     const SLUG = 'a';
 

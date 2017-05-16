@@ -24,7 +24,7 @@ interface IFactoryFactory
      * Registered by filter definition class name.
      *
      * @param string $filterDefinitionClass
-     * @return IFilterFactory
+     * @return IFactory
      * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
      * @throws \ReflectionException If the specified class does not exist
      */

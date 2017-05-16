@@ -8,14 +8,14 @@
 namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter\AbstractFilterFactory;
+use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\User;
 use Schoolbox\Filter;
 
 /**
  * A factory for building 'WeightingType' filter objects
  */
-class Factory extends AbstractFilterFactory
+class Factory extends AbstractFactory
 {
 
     /**
@@ -32,7 +32,7 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, Filter\IFilterDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, Filter\IDefinition $definition, User $viewee = null)
     {
         return [];
     }

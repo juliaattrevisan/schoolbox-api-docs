@@ -9,7 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
@@ -21,7 +21,7 @@ use Schoolbox\GenericCollection;
  * □ Unweighted
  *
  */
-class Definition extends AbstractFilterDefinition
+class Definition extends AbstractDefinition
 {
     const SLUG = 'wt';
 

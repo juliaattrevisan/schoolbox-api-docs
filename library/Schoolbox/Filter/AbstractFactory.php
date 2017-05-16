@@ -16,7 +16,7 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 
 
-abstract class AbstractFilterFactory implements IFilterFactory
+abstract class AbstractFactory implements IFactory
 {
 
     /** @var Filter\Mapper */
@@ -51,7 +51,7 @@ abstract class AbstractFilterFactory implements IFilterFactory
      * No dynamic options or user-selections relevant.
      *
      * @param Filter\Model $filter
-     * @return IFilterDefinition|object
+     * @return IDefinition|object
      * @throws \ReflectionException If unable to create an instance of the reflected class
      */
     public function buildDefinition(Filter\Model $filter)
@@ -125,13 +125,13 @@ abstract class AbstractFilterFactory implements IFilterFactory
     }
 
     /**
-     * @param User              $user
-     * @param string            $page
-     * @param IFilterDefinition $definition
-     * @param null|User         $viewee
+     * @param User        $user
+     * @param string      $page
+     * @param IDefinition $definition
+     * @param null|User   $viewee
      * @return mixed[]
      */
-    protected abstract function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null);
+    protected abstract function buildExtraComponentArgs(User $user, $page, IDefinition $definition, User $viewee = null);
 
 
     /**

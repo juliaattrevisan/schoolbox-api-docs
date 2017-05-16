@@ -7,9 +7,9 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
-use Schoolbox\Filter\AbstractFilterComponent;
+use Schoolbox\Filter\AbstractComponent;
 use Schoolbox\Filter\Filters\Assessment\NullableContext\Project\Definition;
-use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\IDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Filter\Selection;
@@ -21,7 +21,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractFilterComponent
+class Component extends AbstractComponent
 {
     /**
      * Projects that reside on options set as available in admin, and are linked
@@ -32,18 +32,18 @@ class Component extends AbstractFilterComponent
     private $projects;
 
     /**
-     * @param IFilterDefinition                           $definition
-     * @param User                                        $user
-     * @param string                                      $page
-     * @param null|GenericCollection|Selection\Model[]    $savedSelections
-     * @param string[]|null                               $selectionOverrides
-     * @param Selection\Mapper                            $filterSelectionMapper
-     * @param GenericCollection|Project\Model[]           $projects
+     * @param IDefinition                              $definition
+     * @param User                                     $user
+     * @param string                                   $page
+     * @param null|GenericCollection|Selection\Model[] $savedSelections
+     * @param string[]|null                            $selectionOverrides
+     * @param Selection\Mapper                         $filterSelectionMapper
+     * @param GenericCollection|Project\Model[]        $projects
      *
      * @throws \DomainException If both saved selections and override selections are null
      */
     public function __construct(
-        IFilterDefinition $definition,
+        IDefinition $definition,
         User $user,
         $page,
         GenericCollection $savedSelections = null,

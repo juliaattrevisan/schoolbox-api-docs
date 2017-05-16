@@ -9,8 +9,8 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterFactory;
-use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\AbstractFactory;
+use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
@@ -22,7 +22,7 @@ use Schoolbox\Resource\Folder;
 /**
  * A factory for building 'Folder' filter objects
  */
-class Factory extends AbstractFilterFactory
+class Factory extends AbstractFactory
 {
 
     /**
@@ -53,7 +53,7 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, User $viewee = null)
     {
         // Should this role type see classes for this page?
         /** @var Option\Model[][] $options */

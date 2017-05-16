@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\GenericCollection;
 
@@ -20,7 +20,7 @@ use Schoolbox\GenericCollection;
  *
  * eg, Assessment_A lives in project_B which lives in folder_C, if folder_C is selected, Assessment_A will be fetched.
  */
-class Definition extends AbstractFilterDefinition
+class Definition extends AbstractDefinition
 {
     const SLUG = 'f';
 

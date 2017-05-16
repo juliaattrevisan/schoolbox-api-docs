@@ -16,7 +16,7 @@ use Schoolbox\Filter;
  *
  * All DB access should happen in factory, with results injected into objects being built.
  */
-interface IFilterFactory
+interface IFactory
 {
 
     /**
@@ -25,7 +25,7 @@ interface IFilterFactory
      * No dynamic options or user-selections relevant.
      *
      * @param Filter\Model $filter
-     * @return IFilterDefinition
+     * @return IDefinition
      */
     public function buildDefinition(Filter\Model $filter);
 
@@ -40,7 +40,7 @@ interface IFilterFactory
      * @param string               $page
      * @param null|User            $viewee
      * @param null|string[]        $selectionOverrides
-     * @return IFilterComponent|null
+     * @return IComponent|null
      */
     public function buildComponent($definitionClass, User $user, $page, User $viewee = null, array $selectionOverrides = null);
 
