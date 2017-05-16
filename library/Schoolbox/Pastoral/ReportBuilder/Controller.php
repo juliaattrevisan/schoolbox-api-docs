@@ -231,7 +231,7 @@ class Controller extends Base
 
         // This is the number of records before we force them to browse to another page
 
-        $resultsPerPage = 15;
+        $resultsPerPage = $this->getConfigLoader()->get('pastoral_page_size');
         $totalPages = ceil($records->count() / $resultsPerPage);
 
         // Put some limit checks on page numbers
