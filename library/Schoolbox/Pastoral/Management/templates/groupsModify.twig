@@ -53,7 +53,8 @@
                     <div class="small-12 columns">
                         <label>
                             Group Name
-                            <input type="text"
+                            <input id="groupName"
+                                   type="text"
                                    placeholder="Enter group name"
                                    class="required"
                                    name="name"
@@ -169,7 +170,13 @@
         {# Save Changes #}
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-        $('[data-save]').click(function() {
+        $('[data-save]').click(function(e) {
+
+            e.preventDefault();
+
+            var groupName = $('#groupName');
+
+            groupName.val(groupName.val().trim());
 
             if (form.valid()) {
 
