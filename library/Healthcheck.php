@@ -705,4 +705,16 @@ class Healthcheck
 
         $this->selectTest($tables);
     }
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function isamsCheckTables()
+    {
+        $list[] = 'V_Class';
+        $list[] = 'V_Parent';
+        $list[] = 'V_Staff';
+        $list[] = 'V_Student';
+        $list[] = 'V_TimetableSchedule';
+        $list[] = 'V_TimetableStructure';
+        $this->selectTest($list);
+    }
 }
