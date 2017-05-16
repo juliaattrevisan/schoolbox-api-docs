@@ -21,7 +21,7 @@ class IFrame extends Base {
      */
     public function test() {
         foreach ($this->getAllowedURLs() as $allowedURL) {
-            if (false !== stripos($this->getUrl(), $allowedURL)) {
+            if (false !== stripos($this->getUrl(), trim($allowedURL))) {
                 return [
                     'type' => 'iframe',
                     'src' => $this->getUrl(),
