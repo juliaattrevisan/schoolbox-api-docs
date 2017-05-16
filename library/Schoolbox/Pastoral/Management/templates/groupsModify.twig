@@ -20,13 +20,15 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1 class="no-margin">Pastoral Care</h1>
+        <h1>Pastoral Care</h1>
     </div>
 </div>
 
 <div class="row actions-small-1">
-    <div class="small-12 island">
-        <h2 class="subheader">{{ heading }}</h2>
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">{{ heading }}</h2>
+        </div>
     </div>
     <nav>
         {# If editing an existing group from the database, display delete icon #}
@@ -74,8 +76,10 @@
     <div class="small-12 island">
 
         <div class="row actions-small-1">
-            <div class="small-12 island">
-                <h2 class="subheader">Group Members</h2>
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Group Members</h2>
+                </div>
             </div>
             <nav>
                 <a data-member-search href="#" class="icon-add" title="Add Group Member"></a>
@@ -122,9 +126,9 @@
         {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
         <ul class="flex-list buttons">
+            <li><a href="#" class="submit" data-save>{{ button }}</a></li>
 
             {# Only display the delete button if we are editing an existing database record #}
-
             {% if group is not empty %}
                 <li>
                     <a href="#" data-delete>Delete Group</a>
@@ -133,8 +137,6 @@
                     </form>
                 </li>
             {% endif %}
-
-            <li><a href="#" class="submit" data-save>{{ button }}</a></li>
         </ul>
 
     </div>
