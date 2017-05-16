@@ -214,7 +214,7 @@ class Mapper extends BaseMapper
         $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
 
 	    if (!empty($bindings['placeholders'])) {
-    	    $groupSql = "group_id` IN ({$bindings['placeholders']}) AND";
+    	    $groupSql = "`group_id` IN ({$bindings['placeholders']}) AND";
         }
 
         $sql = "
