@@ -297,7 +297,9 @@
                 <div class="small-12 column">
                     <ul class="flex-list buttons">
                         <li><input type="submit" data-submit class="submit" value="Save"></li>
-                        <li><button data-delete>Delete Record</button></li>
+                        {% if record.id %}
+                            <li><button data-delete>Delete Record</button></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -346,8 +348,8 @@
 
         var deleteIds = [];
 
-        $('[data-delete]').click(function (event) {
-            event.preventDefault();
+        $('[data-delete]').click(function (e) {
+            e.preventDefault();
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this record?',
