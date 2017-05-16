@@ -385,7 +385,13 @@
                 type: 'GET',
                 data: {roleTypeID: 'staff{% if allowParents %};parentofstudent{% endif %}'},
                 dataType: 'json'
-            }
+            },
+            value: [
+                {% for access in record.access if access.user.id != '' %}
+                    {% set userName = (access.user.fullName ~ ' - ' ~ access.user.role.name ~ ' (' ~ access.user.id ~ ')') | escape('js') %}
+                    {'id':'{{ access.user.id }}','name':'{{ userName }}'},
+                {% endfor %}
+            ]
         });
 
         $('#addStudent').selectizeSelector({
