@@ -117,6 +117,10 @@ class Controller extends Base
             $group = $this->pastoralGroupMapper->findByIdWithFallback($post['id']);
         }
 
+        if (empty(trim($post['name']))) {
+            $post['name'] = 'Untitled Group';
+        }
+
         $group->setName($post['name']);
         $this->pastoralGroupMapper->save($group);
 
