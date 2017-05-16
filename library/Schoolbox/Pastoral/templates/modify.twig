@@ -219,12 +219,9 @@
                         </fieldset>
                     {% endif %}
                 {% endif %}
-            </section>
-
-            <section>
-                {% if groups | length %}
-                    <fieldset class="content">
-                        <div class="small-12 columns">
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% if groups | length %}
                             <label>
                                 Pastoral Group Access
                                 <span class="hint has-tip tip-top" data-tooltip
@@ -245,9 +242,15 @@
                                 {% endfor %}
                             </label>
                             <p class="meta">Important Note: Users that are members of these groups can view the contents of private records.</p>
-                        </div>
-                    </fieldset>
-                {% endif %}
+                        {% else %}
+                            <label>Pastoral Group Access</label>
+                            <p class="meta">
+                                No pastoral groups are currently defined, please contact your pastoral administrator
+                                to use the pastoral group functionality.
+                            </p>
+                        {% endif %}
+                    </div>
+                </fieldset>
             </section>
 
             {# Show linked pastoral records #}
