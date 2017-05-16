@@ -37,6 +37,7 @@ use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\IStorage;
@@ -799,6 +800,21 @@ class Controller extends Base
                                     $found = true;
                                     break;
                                 }
+                            }
+                        }
+                    }
+
+                    $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
+
+                    if (!$found) {
+
+                        // Check not already have access
+
+                        /** @var PastoralAccessModel $accessCurrent */
+                        foreach ($existingAccess as $accessCurrent) {
+                            if ($accessCurrent->getUser()->getId() == $user_id) {
+                                $found = true;
+                                break;
                             }
                         }
                     }
