@@ -13,16 +13,16 @@ header('Content-Type: application/json');
 
 $string = isset($_REQUEST['string']) ? $_REQUEST['string'] : '';
 $format = isset($_REQUEST['format']) ? $_REQUEST['format'] : '';
+$full   = $format === 'local_full';
 
-
-if (empty($format) || $format === 'local_full') {
+if (empty($format) || $full) {
     // for performance, only include the boostrap if you *absolutely* must
     require_once __DIR__ . '/../../library/Bootstrap.php';
 
     $format = Config::get('date_local');
 
     // if we want a full datetime as localised, append the time
-    if ($format === 'local_full') {
+    if ($full) {
         $format .= ' ' . Config::get('date_time');
     }
 }
