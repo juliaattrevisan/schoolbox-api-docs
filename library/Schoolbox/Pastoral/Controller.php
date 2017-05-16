@@ -1071,9 +1071,9 @@ class Controller extends Base
         $zone = new Zone('attachment');
         $zone
             ->setThumbnailSize(64)
-            ->setModalTitle('Select Image')
+            ->setModalTitle('Select document')
             ->setAttachmentsLabel('')
-            ->setAttachPrompt('Upload Image')
+            ->setAttachPrompt('Upload document')
             ->setMimeFilter('*/*')
             ->setReadOnly(false)
             ->setMulti(true);
