@@ -12,8 +12,19 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
 {
+    // This architecture enables us to apply filters to various entities, eg 'assessments', or 'users' or anything else
+    const ENTITY_ASSESSMENTS = 1;
 
     use Id;
+
+
+    /**
+     * What type of entity does this instance filter?
+     *
+     * @var int
+     */
+    private $entity;
+
 
     /**
      * File name of the class that contains the filter-type-specific logic
@@ -36,6 +47,25 @@ class Model
 
     /* Getters/Setters
      */
+
+    /**
+     * @return int
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+
+    /**
+     * @param int $entity
+     * @return $this
+     */
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+        return $this;
+    }
 
     /**
      * @return string|IDefinition

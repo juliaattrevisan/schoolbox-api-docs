@@ -7,6 +7,7 @@
 -- A list of filters available in the system
 CREATE TABLE filter (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `entity` INT(11) NOT NULL,
   `class` VARCHAR(255) NOT NULL
 ) ENGINE=INNODB;
 
@@ -65,17 +66,17 @@ CREATE TABLE filter_selection (
 DELETE FROM config WHERE `name` = 'pending_assessment_types';
 
 -- Add Filters
-INSERT INTO filter (`class`) VALUES
-  ('Schoolbox\\Filter\\Filters\\Assessment\\AssessmentType\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\Folder\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\Project\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\Term\\Due\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\Term\\Close\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImpl\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImportSpec\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitSpec\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\WeightingType\\Definition'),
-  ('Schoolbox\\Filter\\Filters\\Assessment\\WorkType\\Definition')
+INSERT INTO filter (`entity`, `class`) VALUES
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\AssessmentType\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\Folder\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\Project\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\Term\\Due\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\Term\\Close\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImpl\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImportSpec\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitSpec\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\WeightingType\\Definition'),
+  (1, 'Schoolbox\\Filter\\Filters\\Assessment\\WorkType\\Definition')
 ;
 
 
