@@ -20,6 +20,10 @@ class Sync extends Base implements ISync
     const CONTACT_TYPE_GUARDIAN  = 'G';
     const CONTACT_TYPE_CAREGIVER = 'C';
 
+    const CONTACT_LEVEL_FULL           = 'F';
+    const CONTACT_LEVEL_NONE           = 'N';
+    const CONTACT_LEVEL_NO_DEMOGRAPHIC = 'D';
+
     /**
      * {@inheritdoc}
      */
@@ -84,7 +88,7 @@ class Sync extends Base implements ISync
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
             WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
-            AND   F.DAD_DOMICILE = 'Y'
+            AND   F.DAD_LMS = :contactLevel
 
             UNION ALL
 
@@ -103,7 +107,7 @@ class Sync extends Base implements ISync
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
             WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
-            AND   F.MUM_DOMICILE = 'Y'
+            AND   F.MUM_LMS = :contactLevel
 
             UNION ALL
 
@@ -122,7 +126,7 @@ class Sync extends Base implements ISync
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
             WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
-            AND   F.CGIVE_DOMICILE = 'Y'
+            AND   F.CGIVE_LMS = :contactLevel
 
             UNION ALL
 
@@ -141,7 +145,7 @@ class Sync extends Base implements ISync
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
             WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
-            AND   F.GUARD_DOMICILE = 'Y'
+            AND   F.GUARD_LMS = :contactLevel
 
             ORDER BY student_contact_id ASC
         ";
@@ -150,10 +154,11 @@ class Sync extends Base implements ISync
             $this->databaseExternal->executeQueryIterator(
                 $query,
                 [
-                    'suffixF' => self::CONTACT_TYPE_FATHER,
-                    'suffixM' => self::CONTACT_TYPE_FATHER,
-                    'suffixC' => self::CONTACT_TYPE_CAREGIVER,
-                    'suffixG' => self::CONTACT_TYPE_GUARDIAN,
+                    'suffixF'      => self::CONTACT_TYPE_FATHER,
+                    'suffixM'      => self::CONTACT_TYPE_FATHER,
+                    'suffixC'      => self::CONTACT_TYPE_CAREGIVER,
+                    'suffixG'      => self::CONTACT_TYPE_GUARDIAN,
+                    'contactLevel' => self::CONTACT_LEVEL_FULL,
                 ]
             )
         );
