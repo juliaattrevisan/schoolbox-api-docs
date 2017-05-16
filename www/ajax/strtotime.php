@@ -7,14 +7,32 @@
  * To change this template use File | Settings | File Templates.
  */
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+// always JSON response
+header('Content-Type: application/json');
 
-$string = $_REQUEST['string'];
-$format = $_REQUEST['format'];
 
-if (empty($format)) {
+$string = isset($_REQUEST['string']) ? $_REQUEST['string'] : '';
+$format = isset($_REQUEST['format']) ? $_REQUEST['format'] : '';
+
+
+if (empty($format) || $format === 'local_full') {
+    // for performance, only include the boostrap if you *absolutely* must
+    require_once __DIR__ . '/../../library/Bootstrap.php';
+
     $format = Config::get('date_local');
+
+    // if we want a full datetime as localised, append the time
+    if ($format === 'local_full') {
+        $format .= ' ' . Config::get('date_time');
+    }
 }
+
+
+
+////
+////  WARNING: no library code beyond this point - bootstrap is not guaranteed  ////
+////
+
 
 /* Allow null values
  */
