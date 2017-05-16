@@ -129,30 +129,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <legend>
-                            <label for="private">
-                                Mark Record Contents As Private
-                                <span class="hint has-tip tip-top"
-                                      data-tooltip
-                                      title="If this is enabled only users given individual access, or users that are members of groups ticked below will be able to view the content of this pastoral record. Individuals in the roles ticked above will be able to see that the record exists, but will not be able to see the content.">?</span>
-                            </label>
-                        </legend>
-                        <div class="switch">
-                            <input id="private" name="private" {% if record.getPrivate %}checked{% endif %} value="1" type="checkbox">
-                            <label for="private">
-                                <span>Yes</span>
-                                <span>No</span>
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-            </section>
-
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
                         <label>
-                            Roles
+                            Display Record To Users In These Roles
                             <span class="hint has-tip tip-top" data-tooltip
                                   title="Select the user roles you would like to access this record and its contents.">?</span>
                             {% for role in roles if not role.isStudent and not role.isGuest %}
@@ -175,8 +153,64 @@
                         </label>
                     </div>
                 </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <legend>
+                            <label for="private">
+                                Hide Record Contents
+                                <span class="hint has-tip tip-top"
+                                      data-tooltip
+                                      title="If this is enabled users in these roles will only be able to see the title of the pastoral record.">?</span>
+                            </label>
+                        </legend>
+                        <div class="switch">
+                            <input id="private" name="private" {% if record.getPrivate %}checked{% endif %} value="1" type="checkbox">
+                            <label for="private">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
 
-                {% if allowIndividual %}
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% if groups | length %}
+                            <label>
+                                Pastoral Group Access
+                                <span class="hint has-tip tip-top" data-tooltip
+                                      title="Select the pastoral groups you would like to have access to this record.">?</span>
+                                {% for group in groups %}
+                                    <input type="hidden" name="group[{{ group.id }}]" value="0"/>
+                                    <input type="checkbox" name="group[{{ group.id }}]"
+                                           id="group[{{ group.id }}]" value="1"
+                                            {% if record.id != '' %}
+                                                {% for access in record.access if access.group.id != '' %}
+                                                    {% if access.group.id == group.id %}
+                                                        checked
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                    />
+                                    <label for="group[{{ group.id }}]" class="checkbox-label">{{ group.name }}</label>
+                                {% endfor %}
+                            </label>
+                            <p class="meta">Important Note: Users that are members of these groups can view the contents of private records.</p>
+                        {% else %}
+                            <label>Pastoral Group Access</label>
+                            <p class="meta">
+                                No pastoral groups are currently defined, please contact your pastoral administrator
+                                to use the pastoral group functionality.
+                            </p>
+                        {% endif %}
+                    </div>
+                </fieldset>
+            </section>
+
+            {% if allowIndividual %}
+                <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
@@ -218,40 +252,8 @@
                             </div>
                         </fieldset>
                     {% endif %}
-                {% endif %}
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        {% if groups | length %}
-                            <label>
-                                Pastoral Group Access
-                                <span class="hint has-tip tip-top" data-tooltip
-                                      title="Select the pastoral groups you would like to have access to this record.">?</span>
-                                {% for group in groups %}
-                                    <input type="hidden" name="group[{{ group.id }}]" value="0"/>
-                                    <input type="checkbox" name="group[{{ group.id }}]"
-                                           id="group[{{ group.id }}]" value="1"
-                                            {% if record.id != '' %}
-                                                {% for access in record.access if access.group.id != '' %}
-                                                    {% if access.group.id == group.id %}
-                                                        checked
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endif %}
-                                    />
-                                    <label for="group[{{ group.id }}]" class="checkbox-label">{{ group.name }}</label>
-                                {% endfor %}
-                            </label>
-                            <p class="meta">Important Note: Users that are members of these groups can view the contents of private records.</p>
-                        {% else %}
-                            <label>Pastoral Group Access</label>
-                            <p class="meta">
-                                No pastoral groups are currently defined, please contact your pastoral administrator
-                                to use the pastoral group functionality.
-                            </p>
-                        {% endif %}
-                    </div>
-                </fieldset>
-            </section>
+                </section>
+            {% endif %}
 
             {# Show linked pastoral records #}
 

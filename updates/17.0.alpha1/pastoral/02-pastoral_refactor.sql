@@ -98,11 +98,13 @@ CREATE TABLE pastoral_revision
   updated_at DATETIME DEFAULT '0000-00-00 00:00:00',
   deleted_at DATETIME NULL,
   category_id INT(11),
-  points INT(11) DEFAULT '0',
+  points FLOAT DEFAULT '0',
   modified_by_user_id INT(11),
   CONSTRAINT fk_pastoral_revision_severity FOREIGN KEY (severity_id) REFERENCES lu_pastoral_severity (id),
   CONSTRAINT fk_pastoral_revision_type FOREIGN KEY (type_id) REFERENCES lu_pastoral_type (id)
 );
+
+ALTER TABLE pastoral MODIFY points FLOAT DEFAULT '0';
 
 CREATE INDEX fk_revision_student ON pastoral_revision (student_id);
 CREATE INDEX fk_revision_type ON pastoral_revision (type_id);
