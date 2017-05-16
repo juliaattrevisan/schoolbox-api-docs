@@ -21,42 +21,12 @@
 
 namespace Schoolbox\External\Connector\Isams\Base;
 
-use External_User;
-use MSSQL;
-use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Connector\Base;
+use Schoolbox\External\Connector\ISync;
 use Schoolbox\Sync\Iterator;
 
-class Sync implements SyncInterface
+class Sync extends Base implements ISync
 {
-    /**
-     * @var \MSSQL
-     */
-    protected $database;
-
-    /**
-     * @var string
-     */
-    protected $year;
-
-    /**
-     * @var string
-     */
-    protected $semester;
-
-    /**
-     * Sync constructor
-     */
-    public function __construct()
-    {
-        $this->database = \MSSQL::getInstance();
-
-        // Figure out the current year and semester
-
-        $externalUser = new \External_User();
-        $this->year     = $externalUser->getCurrentYear();
-        $this->semester = $externalUser->getCurrentSemester();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -85,7 +55,7 @@ class Sync implements SyncInterface
             ORDER BY StudentID
         ";
 
-        return new Iterator\Student($this->database->getIterator($query));
+        return new Iterator\Student($this->databaseExternal->executeQueryIterator($query));
     }
 
     /**
@@ -119,7 +89,7 @@ class Sync implements SyncInterface
             ORDER BY    ParentID
         ";
 
-        return new Iterator\Guardian($this->database->getIterator($query));
+        return new Iterator\Guardian($this->databaseExternal->executeQueryIterator($query));
     }
 
     /**
@@ -142,7 +112,7 @@ class Sync implements SyncInterface
                         Campus                              AS staff_campus,
                         DivisionID                          AS staff_category_type,
                         ''                                  AS staff_category,
-			            ''                                  AS staff_position,
+                        ''                                  AS staff_position,
                         ''                                  AS staff_department,
                         ''                                  AS staff_year_level,
                         ''                                  AS staff_year_level_description                
@@ -151,7 +121,7 @@ class Sync implements SyncInterface
             ORDER BY    V_Staff.StaffID
         ";
 
-        return new Iterator\Staff($this->database->getIterator($query));
+        return new Iterator\Staff($this->databaseExternal->executeQueryIterator($query));
     }
 }
 
