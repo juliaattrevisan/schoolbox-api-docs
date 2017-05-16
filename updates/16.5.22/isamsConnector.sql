@@ -1,5 +1,8 @@
-UPDATE `config` SET `options` = 'synergetic:tass:denbigh:edumate:schoolbox:schoolpro:maze:pcschools:humanedge:doublefirst:isams'
-WHERE `name` = 'external_type';
+UPDATE `config`
+SET `options` = CONCAT(`options`, ':isams')
+WHERE `name` = 'external_type'
+AND `options` NOT LIKE '%isams%'
+LIMIT 1;
 
 INSERT INTO `config` (
     `name`,
