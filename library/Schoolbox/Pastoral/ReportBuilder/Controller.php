@@ -222,7 +222,7 @@ class Controller extends Base
         if (!isset($query["pageCurrent"])) {
             $pageCurrent = 1;
         } else {
-            $pageCurrent = $query["pageCurrent"];
+            $pageCurrent = (int)$query["pageCurrent"] == 0 ? 1 : (int)$query["pageCurrent"];
         }
 
         // This is the number of pages the user is allowed to select from at any one time (Must be even)
