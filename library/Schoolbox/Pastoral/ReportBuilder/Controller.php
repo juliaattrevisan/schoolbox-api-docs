@@ -227,7 +227,7 @@ class Controller extends Base
 
         // This is the number of pages the user is allowed to select from at any one time (Must be even)
 
-        $pagesToDisplay = 8;
+        $pagesToDisplay = $this->getConfigLoader()->get('pastoral_page_visible');
 
         // This is the number of records before we force them to browse to another page
 
