@@ -31,11 +31,11 @@ class Controller extends BaseController
     public function getIndex(GenericCollection $visibleFilters)
     {
         // Group by entity type
-        $visibleFiltersPerEntity = $visibleFilters->groupByCallback(function(Model $filter){
+        $visibleFiltersPerEntity = $visibleFilters->groupByCallback(function (Model $filter) {
             return $filter->getEntity();
         });
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
-            'filtersPerEntity' => $visibleFiltersPerEntity,
+            'filtersPerEntity'   => $visibleFiltersPerEntity,
             'ENTITY_ASSESSMENTS' => Model::ENTITY_ASSESSMENTS,
         ]));
     }
