@@ -226,6 +226,7 @@ class Controller extends Base
         }
 
         // This is the number of pages the user is allowed to select from at any one time (Must be even)
+        // This is the number of pages the user is allowed to select from at any one time (Must be even)
 
         $pagesToDisplay = $this->getConfigLoader()->get('pastoral_page_visible');
 
@@ -248,7 +249,7 @@ class Controller extends Base
 
         $paginatedRecords = new Collection;
 
-        for ($i = ($pageCurrent - 1) * $resultsPerPage; $i < ($pageCurrent - 1) * $resultsPerPage + $resultsPerPage; $i++) {
+        for ($i = ($pageCurrent - 1) * $resultsPerPage; $i < $pageCurrent * $resultsPerPage; $i++) {
             if ($records[$i] != null) {
                 $paginatedRecords[] = $records[$i];
             }
