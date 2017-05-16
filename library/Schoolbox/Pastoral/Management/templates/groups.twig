@@ -31,7 +31,7 @@
             <section>
                 <ul class="action-list">
                     {% for group in groups %}
-                        <li class="actions-small-1">
+                        <li class="actions-small-2">
                             <div class="list-item">
                                 <div class="card small-12">
                                     <a href='{{ profile.link(group.user) }}'>
@@ -52,6 +52,7 @@
                             </div>
                             <nav>
                                 <a class="icon-modify no-text" href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}" title="Edit Group"></a>
+                                <a href="#" data-delete="{{ group.id }}" class="icon-delete" title="Delete Pastoral Group"></a>
                             </nav>
                         </li>
                     {% endfor %}
@@ -68,3 +69,26 @@
         {% endif %}
     </div>
 </div>
+
+<form id="formDelete" class="hide" method="post" action="">
+    <input type="hidden" name="id" value="{{ group.id }}">
+</form>
+
+<script>
+    $(function() {
+        $('[data-delete]').click(function(e) {
+            e.preventDefault();
+            var groupId = $(this).attr('data-delete');
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated pastoral records.',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('pastoralManagement.postGroupsDelete') }}', {
+                        id: groupId
+                    }).done(function() {
+                        $('[data-delete="' + groupId + '"]').closest('li').remove();
+                    })
+                }
+            });
+        });
+    });
+</script>
