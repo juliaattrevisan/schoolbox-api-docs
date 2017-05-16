@@ -36,6 +36,7 @@ class Module extends AlaressModule
      * @throws NotFound If invalid roleType
      * @throws \InvalidArgumentException
      * @throws ServiceNotFound
+     * @throws \ReflectionException If the filter definition class cannot be found in code base
      */
     protected function registerRoutes()
     {
@@ -56,13 +57,22 @@ class Module extends AlaressModule
 
         $loadDefinition = function (array $params) {
             try {
-                $filterInstance       = $this->getFilterMapper()->findById($params['filter']);
-                $filterFactoryFactory = new FactoryFactory($this->getMapperFactory());
-                $filterFactory        = $filterFactoryFactory->buildFilterFactoryForFilter($filterInstance->getClass());
-                $definition           = $filterFactory->buildDefinition($filterInstance);
-                if (0 === count($definition::getPages())) {
-                    throw new NotFound('This filter does not appear in UI.');
+                $filterId       = $params['filter'];
+                $filterInstance = $this->getFilterMapper()->findById($filterId);
+
+                $filterFactoryFactory = null;
+                switch ($filterInstance->getEntity()) {
+                    case Model::ENTITY_ASSESSMENTS:
+                        $filterFactoryFactory = new FactoryFactory($this->getMapperFactory());
+                        break;
+                    // Other entity types can have their factory factories registered here
                 }
+                $definitionClass = $filterInstance->getClass();
+                if (0 === count($definitionClass::getPages())) {
+                    throw new NotFound("This filter does not appear in UI: $filterId");
+                }
+                $filterFactory = $filterFactoryFactory->buildFilterFactoryForFilter($definitionClass);
+                $definition    = $filterFactory->buildDefinition($filterInstance);
                 return [
                     'definition' => $definition,
                 ];
