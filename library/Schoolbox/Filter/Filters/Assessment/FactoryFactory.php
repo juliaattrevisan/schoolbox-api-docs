@@ -32,7 +32,7 @@ use Schoolbox\Filter\Filters;
 /**
  * The FilterFactoryFactory is responsible for creating assessment-filter factories.
  */
-class FactoryFactory
+class FactoryFactory implements Filter\IFactoryFactory
 {
 
     /** @var MapperFactory */
