@@ -193,7 +193,7 @@ class External_Pcschools_User implements External_UserInterface
                 F.COR_POST_CODE,
                 F.STATE_COR,
                 -- Father
-                F.DAD_DOMICILE,
+                F.DAD_LMS,
                 F.FATHER_TITLE,
                 F.DAD_FIRSTNAME,
                 F.DAD_SURNAME,
@@ -203,7 +203,7 @@ class External_Pcschools_User implements External_UserInterface
                 F.DAD_BUSS_PHONE,
                 F.DAD_STATUS,
                 -- Mother
-                F.MUM_DOMICILE,
+                F.MUM_LMS,
                 F.MOTHER_TITLE,
                 F.MUM_FIRSTNAME,
                 F.MUM_SURNAME,
@@ -213,7 +213,7 @@ class External_Pcschools_User implements External_UserInterface
                 F.MUM_BUSS_PHONE,
                 F.MUM_STATUS,
                 -- Guardian
-                F.GUARD_DOMICILE,
+                F.GUARD_LMS,
                 F.GUARDIAN_TITLE,
                 F.GUARD_FIRSTNAME,
                 F.GUARD_SURNAME,
@@ -223,7 +223,7 @@ class External_Pcschools_User implements External_UserInterface
                 F.GUARD_BUSS_PH,
                 F.GUARD_STATUS,
                 -- Carer
-                F.CGIVE_DOMICILE,
+                F.CGIVE_LMS,
                 F.CGIVE_TITLE,
                 F.CGIVE_FIRSTNAME,
                 F.CGIVE_SURNAME,
@@ -469,16 +469,16 @@ class External_Pcschools_User implements External_UserInterface
             SELECT
                 F.IDENTITY_ID#,
                 -- Father
-                F.DAD_DOMICILE,
+                F.DAD_LMS,
                 F.DAD_EMAIL,
                 -- Mother
-                F.MUM_DOMICILE,
+                F.MUM_LMS,
                 F.MUM_EMAIL,
                 -- Guardian
-                F.GUARD_DOMICILE,
+                F.GUARD_LMS,
                 F.GUARD_EMAIL,
                 -- Carer
-                F.CGIVE_DOMICILE,
+                F.CGIVE_LMS,
                 F.CGIVE_EMAIL
             FROM FAMILY AS F
             INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
@@ -495,16 +495,16 @@ class External_Pcschools_User implements External_UserInterface
             $row = $this->getDatabase()->trimRow($row);
             $id  = $row['IDENTITY_ID#'];
             // For now, I'm going to assume that parent IDs will be suffixed
-            if ($row['DAD_DOMICILE'] === 'Y') {
+            if ($row['DAD_LMS'] === self::CONTACT_LEVEL_FULL) {
                 $result[$id.'-'.self::CONTACT_TYPE_FATHER] = $row['DAD_EMAIL'];
             }
-            if ($row['MUM_DOMICILE'] === 'Y') {
+            if ($row['MUM_LMS'] === self::CONTACT_LEVEL_FULL) {
                 $result[$id.'-'.self::CONTACT_TYPE_MOTHER] = $row['MUM_EMAIL'];
             }
-            if ($row['GUARD_DOMICILE'] === 'Y') {
+            if ($row['GUARD_LMS'] === self::CONTACT_LEVEL_FULL) {
                 $result[$id.'-'.self::CONTACT_TYPE_GUARDIAN] = $row['GUARD_EMAIL'];
             }
-            if ($row['CGIVE_DOMICILE'] === 'Y') {
+            if ($row['CGIVE_LMS'] === self::CONTACT_LEVEL_FULL) {
                 $result[$id.'-'.self::CONTACT_TYPE_CAREGIVER] = $row['CGIVE_EMAIL'];
             }
         }
@@ -622,25 +622,25 @@ class External_Pcschools_User implements External_UserInterface
                     F.IDENTITY_ID#,
                     ID.LOGIN,
                     -- Father
-                    F.DAD_DOMICILE,
+                    F.DAD_LMS,
                     F.FATHER_TITLE,
                     F.DAD_FIRSTNAME,
                     F.DAD_SURNAME,
                     F.DAD_EMAIL,
                     -- Mother
-                    F.MUM_DOMICILE,
+                    F.MUM_LMS,
                     F.MOTHER_TITLE,
                     F.MUM_FIRSTNAME,
                     F.MUM_SURNAME,
                     F.MUM_EMAIL,
                     -- Guardian
-                    F.GUARD_DOMICILE,
+                    F.GUARD_LMS,
                     F.GUARDIAN_TITLE,
                     F.GUARD_FIRSTNAME,
                     F.GUARD_SURNAME,
                     F.GUARD_EMAIL,
                     -- Carer
-                    F.CGIVE_DOMICILE,
+                    F.CGIVE_LMS,
                     F.CGIVE_TITLE,
                     F.CGIVE_FIRSTNAME,
                     F.CGIVE_SURNAME,
@@ -921,18 +921,19 @@ class External_Pcschools_User implements External_UserInterface
             INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
             WHERE S_FAMILY.IDENTITY_ID# = {$this->getDatabase()->smartQuote($familyCode)}
         ";
+        $quotedContactLevel = $this->getDatabase()->smartQuote(self::CONTACT_LEVEL_FULL);
         switch ($suffix) {
             case 'F':
-                $query .= " AND S_FAMILY.DAD_DOMICILE = 'Y'";
+                $query .= " AND S_FAMILY.DAD_LMS = $quotedContactLevel";
                 break;
             case 'M':
-                $query .= " AND S_FAMILY.MUM_DOMICILE = 'Y'";
+                $query .= " AND S_FAMILY.MUM_LMS = $quotedContactLevel";
                 break;
             case 'C':
-                $query .= " AND S_FAMILY.CGIVE_DOMICILE = 'Y'";
+                $query .= " AND S_FAMILY.CGIVE_LMS = $quotedContactLevel";
                 break;
             case 'G':
-                $query .= " AND S_FAMILY.GUARD_DOMICILE = 'Y'";
+                $query .= " AND S_FAMILY.GUARD_LMS = $quotedContactLevel";
                 break;
             default:
                 break;
@@ -1122,8 +1123,8 @@ class External_Pcschools_User implements External_UserInterface
                 return [];
         }
 
-        // Assumption: if $mainPrefix.'_DOMICILE' is empty, don't build this record
-        if ($row[$mainPrefix.'_DOMICILE'] !== 'Y') {
+        // Assumption: if $mainPrefix.'_LMS' isn't full, don't build this record
+        if ($row[$mainPrefix.'_LMS'] !== self::CONTACT_LEVEL_FULL) {
             return [];
         }
 
