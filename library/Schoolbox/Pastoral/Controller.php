@@ -304,7 +304,7 @@ class Controller extends Base
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
 
-        if ($moderator) {
+        if ($moderator->count() > 0) {
             $record->setRevisions(
                 $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId())
             );

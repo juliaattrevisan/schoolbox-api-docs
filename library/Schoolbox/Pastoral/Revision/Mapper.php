@@ -112,7 +112,9 @@ class Mapper extends PastoralMapper
                 if ($method != 'setId') {
                     $getter = $method;
                     $getter[0] = 'g';
-                    $revision->$method($pastoral->$getter());
+                    if (is_callable([$pastoral, $getter]) && is_callable([$revision, $method])) {
+                        $revision->$method($pastoral->$getter());
+                    }
                 } else {
                     $revision->setRootId($pastoral->getId());
                 }
