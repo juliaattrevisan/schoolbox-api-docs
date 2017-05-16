@@ -49,7 +49,7 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $body;
 
-    /** @var int */
+    /** @var float */
     protected $points;
 
     /** @var bool */
@@ -170,7 +170,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param int $points
+     * @param float $points
      * @return self
      */
     public function setPoints($points)
@@ -180,7 +180,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getPoints()
     {
