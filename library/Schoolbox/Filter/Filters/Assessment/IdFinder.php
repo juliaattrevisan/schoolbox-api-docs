@@ -11,6 +11,8 @@ use Schoolbox\Collection;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\WorkType as AWorkType;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\Term\Due;
+use Schoolbox\Filter\Filters\Assessment\Term\Close;
 
 
 /**
@@ -74,8 +76,8 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // Sub-query modifiers
         $aTypes     = $completeFilters[AssessmentType\Definition::SLUG];
-        $termsDue   = $completeFilters[TermDue\Definition::SLUG];
-        $termsClose = $completeFilters[TermClose\Definition::SLUG];
+        $termsDue   = $completeFilters[Due\Definition::SLUG];
+        $termsClose = $completeFilters[Close\Definition::SLUG];
         $weightings = $completeFilters[WeightingType\Definition::SLUG];
         $workTypes  = $completeFilters[WorkType\Definition::SLUG];
 
@@ -191,17 +193,17 @@ class IdFinder extends Filter\AbstractIdFinder
         return [
             // Context-filters
             NullableContext\UnitImportSpec\Definition::SLUG => NullableContext\UnitImportSpec\Definition::class,
-            Folder\Definition::SLUG                         => Folder\Definition::class,
-            NullableContext\Project\Definition::SLUG        => NullableContext\Project\Definition::class,
-            NullableContext\UnitImpl\Definition::SLUG       => NullableContext\UnitImpl\Definition::class,
-            NullableContext\UnitSpec\Definition::SLUG       => NullableContext\UnitSpec\Definition::class,
+            Folder\Definition::SLUG                   => Folder\Definition::class,
+            NullableContext\Project\Definition::SLUG  => NullableContext\Project\Definition::class,
+            NullableContext\UnitImpl\Definition::SLUG => NullableContext\UnitImpl\Definition::class,
+            NullableContext\UnitSpec\Definition::SLUG => NullableContext\UnitSpec\Definition::class,
 
             // Non-context filters
-            AssessmentType\Definition::SLUG                 => AssessmentType\Definition::class,
-            TermDue\Definition::SLUG                        => TermDue\Definition::class,
-            TermClose\Definition::SLUG                      => TermClose\Definition::class,
-            WeightingType\Definition::SLUG                  => WeightingType\Definition::class,
-            WorkType\Definition::SLUG                       => WorkType\Definition::class,
+            AssessmentType\Definition::SLUG           => AssessmentType\Definition::class,
+            Due\Definition::SLUG                      => Due\Definition::class,
+            Close\Definition::SLUG                    => Close\Definition::class,
+            WeightingType\Definition::SLUG            => WeightingType\Definition::class,
+            WorkType\Definition::SLUG                 => WorkType\Definition::class,
         ];
     }
 
@@ -797,14 +799,14 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Did call explicitly request assessments due in some term, but no terms supplied?
-        $termsDue = $completeFilters[TermDue\Definition::SLUG];
+        $termsDue = $completeFilters[Due\Definition::SLUG];
         if ($termsDue instanceOf Collection && !$termsDue->count()) {
             // All assessments have due dates
             return true;
         }
 
         // Did call explicitly request assessments close in some term, but no terms supplied?
-        $termsClose = $completeFilters[TermClose\Definition::SLUG];
+        $termsClose = $completeFilters[Close\Definition::SLUG];
         if ($termsClose instanceOf Collection && !$termsClose->count()) {
             // All assessments have have a close date
             return true;

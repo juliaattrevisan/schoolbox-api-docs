@@ -1,10 +1,11 @@
 <?php
 /**
- * Author: andrewryantech@gmail.com
- * Created: 2/04/17 3:15 PM
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\TermDue;
+namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
@@ -17,7 +18,7 @@ use Schoolbox\Filter;
  * Converts between termFilter concrete keys and Term models
  * @method null|GenericCollection|Term\Model[] getSelectedItems(GenericCollection $availableSelections = null)
  */
-class KeyConverter extends AbstractKeyConverter
+abstract class KeyConverter extends AbstractKeyConverter
 {
 
     /**

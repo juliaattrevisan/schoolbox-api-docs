@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\TermDue;
+namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\AbstractFilterFactory;
@@ -19,7 +19,7 @@ use Schoolbox\Filter\Selection;
 /**
  * A factory for building 'Term' filter objects
  */
-class Factory extends AbstractFilterFactory
+abstract class Factory extends AbstractFilterFactory
 {
 
     /**

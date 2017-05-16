@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Filters\Assessment\TermDue;
+namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Filter\AbstractFilterComponent;
 use Schoolbox\GenericCollection;
@@ -17,7 +17,7 @@ use Schoolbox\Assessment\Term;
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractFilterComponent
+abstract class Component extends AbstractFilterComponent
 {
 
     /**
@@ -37,7 +37,6 @@ class Component extends AbstractFilterComponent
 
         foreach ($this->getDefinition()->getTerms() as $term) {
 
-
             if ($this->isAvailable($term, $optionDefaults)) {
                 $key                       = (string)$term->getId();
                 $availableSelections[$key] = $this->createSelection($key, $this->isSelected($term, $optionDefaults, $roleType));
@@ -53,7 +52,6 @@ class Component extends AbstractFilterComponent
      * @param Term\Model        $term
      * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
      * @return bool
-     * @todo make this method redundant by moving the logic to factory so that only available terms are pumped into this component
      */
     private function isAvailable(Term\Model $term, GenericCollection $optionDefaults)
     {
