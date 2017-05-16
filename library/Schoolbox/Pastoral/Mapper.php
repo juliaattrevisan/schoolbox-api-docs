@@ -369,12 +369,16 @@ class Mapper extends BaseMapper
                               `user`.`firstname` AS `first_name`
             FROM              `pastoral`
             JOIN              `user` ON `user`.`id` = `student_id`
-            WHERE             `parent_id` IN (
+            WHERE             `pastoral`.`deleted_at` IS NULL AND
+                              `user`.`deleted_at` IS NULL AND
+                              `parent_id` IN (
                                   SELECT `id`
                                   FROM pastoral
-                                  WHERE `student_id` = :student_id_0) OR `pastoral`.`id` IN (SELECT `parent_id`
+                                  WHERE 
+                                    `deleted_at` is null and (
+                                    `student_id` = :student_id_0) OR `pastoral`.`id` IN (SELECT `parent_id`
                                                                                              FROM pastoral
-                                                                                             WHERE `student_id` = :student_id_1)
+                                                                                             WHERE `student_id` = :student_id_1 AND `deleted_at` is null))
             GROUP BY `student_id`
             ORDER BY `count` DESC, `user`.`lastname`, `user`.`firstname`
         ");
