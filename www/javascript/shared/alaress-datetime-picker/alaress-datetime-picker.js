@@ -86,11 +86,11 @@ function getPickerFormats(allDayState, options) {
     var from, to;
     // Format is always date or datetime
     if (options.altFormat !== false) {
-        if (options.altFormat == 'date') {
+        if (options.altFormat === 'date') {
             from = options.displayFormatDate;
             to = options.displayFormatDate;
         }
-        else if (options.altFormat == 'datetime') {
+        else if (options.altFormat === 'datetime') {
             from = options.displayFormat;
             to = options.displayFormat;
         }
@@ -385,7 +385,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             });
 
-        } else if (picker.data('status') == 'loaded') {
+        } else if (picker.data('status') === 'loaded') {
 
             // Update picker values, in case element field value has changed
             window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());

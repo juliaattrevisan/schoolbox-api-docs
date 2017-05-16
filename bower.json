@@ -36,8 +36,7 @@
     "datatables": "1.10.8",
     "highcharts-release": "4.2.3",
     "flatpickr": "2.4.8",
-    "jquery.scrollTo": "2.1.2",
-    "inputmask" : "3.3.5"
+    "jquery.scrollTo": "2.1.2"
   },
   "ignore": [
     "**/.*",

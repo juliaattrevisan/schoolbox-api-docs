@@ -139,14 +139,11 @@ module.exports = function(grunt) {
                     // Random Scripts
                     // Various javascripts that are so tiny they didn't get
                     // their own files/plugins
-                    'www/javascript/shared/miscellaneous.js',
+                    'www/javascript/shared/miscellaneous.js'
 
                     //Maths formulas
                     //'www/javascript/math/jscurry-0.3.0.js',
                     //'www/javascript/math/jqmath-0.4.0.js'
-
-                    // Input masking
-                    'www/javascript/components/inputmask/dist/jquery.inputmask.bundle.js'
                 ],
                 dest: 'www/javascript/components/<%= pkg.name %>.min.js'
             },
