@@ -43,8 +43,7 @@
                                             {% if record.points != 0 %}
                                                 {% if record.points < 0 %}
                                                     {% set labelClass='alert' %}
-                                                {% endif %}
-                                                {% if record.points > 0 %}
+                                                {% else %}
                                                     {% set labelClass='success' %}
                                                 {% endif %}
                                                 <span class="{{ labelClass }} label hide-on-print">{{ record.points }} Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
@@ -132,7 +131,7 @@
 
     {% else %}
 
-        <div class="small-12 island">
+        <div class="small-12 column">
             <div class="empty-state">
                 <i class="icon-pastoral"></i>
                 <p>No pastoral records matched your report criteria.</p>
