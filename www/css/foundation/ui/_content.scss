@@ -839,6 +839,7 @@ $selector-width: 2.25rem;
         @include list-interaction(expander, pointer);
         ul{
             list-style: none;
+            margin: 0;
         }
         li .expander{
             flex: 1 2.5rem;

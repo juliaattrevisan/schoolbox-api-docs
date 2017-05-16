@@ -94,23 +94,21 @@
                         {% if teamCount %}
                         <div class="expander icon-down-arrow" data-collapser="division-{{ division.id }}"></div>
                         {% endif %}
-
-                            <div class="card small-12 list-item">
-                                <a href="{{ routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) }}" title="Go to {{ division.name }} lobby">
-                                    <div class="icon-division"></div>
-                                    <h3>{{ division.name }}</h3>
-                                </a>
-                                <p class="meta">
-                                    {%- if teamCount == 1 -%}
-                                        One team
-                                    {%- elseif teamCount -%}
-                                        {{ teamCount }} teams
-                                    {%- else -%}
-                                        No teams
-                                    {%- endif -%}
-                                </p>
-                            </div>
-
+                        <div class="card small-12 list-item">
+                            <a href="{{ routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) }}" title="Go to {{ division.name }} lobby">
+                                <div class="icon-division"></div>
+                                <h3>{{ division.name }}</h3>
+                            </a>
+                            <p class="meta">
+                                {%- if teamCount == 1 -%}
+                                    One team
+                                {%- elseif teamCount -%}
+                                    {{ teamCount }} teams
+                                {%- else -%}
+                                    No teams
+                                {%- endif -%}
+                            </p>
+                        </div>
                         <nav>
                             <a href="#" class="icon-overflow" data-dropdown="division-{{ division.id }}-dropdown" aria-expanded="false" title="Actions"></a>{#-dessicant-#}
                         </nav>
@@ -127,11 +125,13 @@
                                 <li data-team="{{ team.id }}">
                                     <div class="actions-small-1">
                                         <div class="list-item">
+                                            <div class="card compact small-12">
                                             <span class="icon-team"></span>
-                                            <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}">{{ team.name }}</a>
-                                            {% if team.coaches | length %}
-                                                <span class="meta">({{ team.coaches | column('name') | join(', ') }})</span>
-                                            {% endif %}
+                                                <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}">{{ team.name }}</a>
+                                                {% if team.coaches | length %}
+                                                    | <span class="meta">({{ team.coaches | column('name') | join(', ') }})</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                         <nav>
                                             <a href="{{ routeLookup('sportsfixturesTeam.deleteEntity', {entityId: team.id}) }}" class="icon-delete" title="Delete Team" data-delete-team="{{ team.id }}"></a>
