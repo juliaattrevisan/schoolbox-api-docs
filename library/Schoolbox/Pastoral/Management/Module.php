@@ -42,19 +42,20 @@ class Module extends BaseModule
         // Define routes and permissions
 
         $ruleStaff = new Rule\HasRole(Role::STAFF);
-        $rulePastoralModeratorWrite = new IsPastoralModeratorWrite();
+        $rulePastoralModeratorWrite = new Rule\All(
+            $ruleStaff,
+            new Rule\IsLoggedIn(),
+            new IsPastoralModeratorWrite()
+        );
 
         $this->registerRoutesArray([
             'GET' => [
-                '/groups'                   => ['getGroups' => $rulePastoralModeratorWrite],
-                '/groups/modify{/groupId}'  => ['getGroupsModify' => $rulePastoralModeratorWrite],
-                '/report'                   => 'getReport',
-                '/report/builder'           => ['getReportBuilder' => $ruleStaff],
-                '/report/print'             => ['getReportPrint' => $ruleStaff],
+                '/groups' => ['getGroups' => $rulePastoralModeratorWrite],
+                '/groups/modify{/groupId}' => ['getGroupsModify' => $rulePastoralModeratorWrite],
             ],
             'POST' => [
-                '/groups/delete'            => ['postGroupsDelete' => $rulePastoralModeratorWrite],
-                '/groups/modify'            => ['postGroupsModify' =>$rulePastoralModeratorWrite],
+                '/groups/delete' => ['postGroupsDelete' => $rulePastoralModeratorWrite],
+                '/groups/modify' => ['postGroupsModify' => $rulePastoralModeratorWrite],
             ]
         ]);
     }
@@ -62,7 +63,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector) {
+    public function initControllers(ContainerInterface $injector)
+    {
         $mappers = [
             'userMapper' => UserMapper::getInstance(),
             'pastoralMapper' => PastoralMapper::getInstance(),
@@ -71,13 +73,15 @@ class Module extends BaseModule
             'pastoralAccessMapper' => PastoralAccessMapper::getInstance(),
             'pastoralTagMapper' => PastoralTagMapper::getInstance()
         ];
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class, $mappers));
+
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
