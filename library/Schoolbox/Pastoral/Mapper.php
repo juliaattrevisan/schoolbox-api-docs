@@ -99,6 +99,7 @@ class Mapper extends BaseMapper
             )
         );
 
+
         $this->registerCallback(Mapper::CALLBACK_PRESAVE, [$this, 'saveRevision']);
         $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteReferences']);
     }
@@ -296,6 +297,7 @@ class Mapper extends BaseMapper
         }
 
         if ($accessGranted) {
+            $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
             $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
             $model->setAttachments($this->getJoinMapper('attachments')->findByColumn('pastoral_id', $model->getId()));
         } else {

@@ -338,6 +338,7 @@
             },
             value: [
                 {% for tag in record.tags %}
+
                 {% set tagName = tag.name | escape('js') %}
                 {'id':'{{ tagName }}','name':'{{ tagName }}'}{% if not loop.last %},{% endif %}
                 {% endfor %}
