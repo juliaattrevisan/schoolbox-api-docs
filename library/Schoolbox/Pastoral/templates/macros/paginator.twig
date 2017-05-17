@@ -1,7 +1,7 @@
 {% macro text(pageCurrent, recordCount, resultsPerPage) %}
     {% spaceless %}
         {% if recordCount > resultsPerPage %}
-            Showing Records {{ ((pageCurrent - 1) * resultsPerPage) + 1 }} - {{ ((pageCurrent - 1) * resultsPerPage) + resultsPerPage }} Of {{ recordCount }}
+            Showing Records {{ ((pageCurrent - 1) * resultsPerPage) + 1 }} - {{ min(recordCount, ((pageCurrent - 1) * resultsPerPage) + resultsPerPage) }} Of {{ recordCount }}
         {% endif %}
     {% endspaceless %}
 {% endmacro %}

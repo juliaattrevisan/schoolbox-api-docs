@@ -40,7 +40,6 @@ use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
@@ -204,10 +203,10 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoral/search.twig',
             'data' => [
-                'search'                => trim($get['keyword']),
-                'results'               => $this->pastoralMapper->getSearchResults($get['keyword']),
-                'students'              => $this->userMapper->findStudents($get['keyword']),
-                'minimumSearchLength'   => Results::MIN_SEARCH_LENGTH
+                'search'            => trim($get['keyword']),
+                'results'           => $this->pastoralMapper->getSearchResults($get['keyword']),
+                'students'          => $this->userMapper->findStudents($get['keyword']),
+                'min_'
             ]
         ]);
     }
@@ -234,7 +233,9 @@ class Controller extends Base
 
             // Retrieve all of the students pastoral records
 
-            $records = $this->pastoralMapper->findByColumn('student_id', $student->getId());
+            $records = $this->pastoralMapper->findByColumn('student_id', $student->getId(), ['order' => [
+                'created_at' => 'desc'
+            ]]);
 
         } else {
 
@@ -243,7 +244,9 @@ class Controller extends Base
             $records = $this->pastoralMapper->findByColumnList([
                 'student_id' => $student->getId(),
                 'type_id' => $get['type']
-            ]);
+            ], ['order' => [
+                'created_at' => 'desc'
+            ]]);
         }
 
         // Limit the number of pastoral records to display on each page of pastoral records
@@ -254,10 +257,17 @@ class Controller extends Base
 
         $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? $get['pageCurrent'] : 1;
 
+        if ($pageCurrent > ceil($records->count() / $resultsPerPage)) {
+            $pageCurrent = ceil($records->count() / $resultsPerPage);
+        } else if ($pageCurrent < 1) {
+            $pageCurrent = 1;
+        }
+
         $this->getResponse()->content->set([
             'template' => '@pastoral/student.twig',
             'data' => [
-                'records'           => $records,
+                'recordCount'       => $records->count(),
+                'records'           => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
                 'student'           => $student,
                 'pageCurrent'       => $pageCurrent,
                 'resultsPerPage'    => $resultsPerPage,

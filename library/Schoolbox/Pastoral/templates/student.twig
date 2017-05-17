@@ -72,7 +72,7 @@
             <h2 class="subheader">
                 Pastoral Care Records
                 <span class="hide-for-medium-down right">
-                    {{ paginator.text(pageCurrent, records | length, resultsPerPage) }}
+                    {{ paginator.text(pageCurrent, recordCount, resultsPerPage) }}
                 </span>
             </h2>
 
@@ -83,7 +83,7 @@
             {% endfor %}
 
             <div class="right">
-                {{ paginator.buttons(pageCurrent, records | length, resultsPerPage) }}
+                {{ paginator.buttons(pageCurrent, recordCount, resultsPerPage) }}
             </div>
         </div>
     </div>
