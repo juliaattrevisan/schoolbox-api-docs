@@ -124,16 +124,18 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         /** @var WebDav $dav */
         foreach ($davs as $dav) {
-
-            if (!isset($settings)) {
-                $settings = [
-                    'baseUri' => $dav->getUri(),
-                    'userName' => $dav->getUsernamePrefix() . $_SESSION['username'] . $dav->getUsernameSuffix(),
-                    'password' => $_SESSION['password'],
-                ];
-            }
-
             if ($dav->matches($user)) {
+
+                // Only one connection can be created.
+                // (Multiple paths within the same connection may be created, though.)
+                if (!isset($settings)) {
+                    $settings = [
+                        'baseUri' => $dav->getUri(),
+                        'userName' => $dav->getUsernamePrefix() . $_SESSION['username'] . $dav->getUsernameSuffix(),
+                        'password' => $_SESSION['password'],
+                    ];
+                }
+
                 // --------------------------------------------------------------------------------------------------------
                 // Replaceable tokens
                 // --------------------------------------------------------------------------------------------------------
