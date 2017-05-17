@@ -78,7 +78,7 @@ function denaturalise($string)
     $string = preg_replace('`\s+`', ' ', trim($string));
 
     // remove "^in " and " from now$"
-    $string = str_replace(['in ', ' from now', ' at '], ' ', $string);
+    $string = str_replace(['in ', ' from now', ' at ', ' on ', ', '], ' ', $string);
 
     // replace all word-numbers with number-numbers
     $words = [
