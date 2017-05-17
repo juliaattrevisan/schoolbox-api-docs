@@ -72,7 +72,6 @@
                                 {% endfor %}
                             </p>
                         </div>
-                        {% if showOverallGrade %}
                         <div class="medium-2 small-4 columns no-pad">
                             <div class="grade content">
                                 <span class="{{ urgency.marks(markbooks[folder.id].studentStatistics[student.id].meanNormalised) }}">
@@ -80,7 +79,6 @@
                                 </span>
                             </div>
                         </div>
-                        {% endif %}
                         </a>
                     </li>
                     {% for teacher in folder.teachers %}

@@ -467,8 +467,13 @@ class Controller extends Base
         /** @var GenericCollection|Markbook[] Indexed by folder.id */
         $markbooks = new GenericCollection(Markbook::class);
         // Generate markbooks for these assessments
-        if($showOverallGrade) {
-            foreach ($assessmentsPerFolder as $folderId => $assessments) {
+        foreach ($assessmentsPerFolder as $folderId => $assessments) {
+            $assessment = $assessments->first();
+            if ($assessment instanceof IAssessable
+                && ($showOverallGrade
+                    || $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())
+                )
+            ) {
                 $markbooks->setOffset($folderId, new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()));
             }
         }
