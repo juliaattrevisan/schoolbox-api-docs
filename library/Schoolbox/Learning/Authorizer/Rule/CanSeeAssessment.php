@@ -108,7 +108,13 @@ class CanSeeAssessment implements IAuthorizationRule
             throw new Unauthorized();
         }
 
+        // Hide all due work from parents
         if ($this->conf->get('restrict_parent_duework_access')) {
+            throw new Unauthorized();
+        }
+
+        // Hide just the detail of work from parents
+        if ($this->conf->get('restrict_student_submissions')) {
             throw new Unauthorized();
         }
 
