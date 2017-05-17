@@ -16,7 +16,7 @@ class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connec
      */
     public function getDefaultLabel()
     {
-        return 'Events';
+        return 'Schoolbox Events';
     }
 
     /**

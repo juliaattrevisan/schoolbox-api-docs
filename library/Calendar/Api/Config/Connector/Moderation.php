@@ -17,7 +17,7 @@ class Calendar_Api_Config_Connector_Moderation extends Calendar_Api_Config_Conne
      */
     public function getDefaultLabel()
     {
-        return 'Resource Booking';
+        return 'Resource Moderation';
     }
 
     /**

@@ -15,9 +15,7 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
      */
     public function getDefaultLabel()
     {
-        // Will depend on value of $this->eventType if more external connectors
-        // beyond Timetable get added.
-        return $this->getConnectorClass();
+        return 'External Database';
     }
 
     /**
