@@ -31,11 +31,11 @@ class LogicTests extends \PHPUnit_Framework_TestCase
         $actual          = $qbt->getDoContextFiltersGuaranteeEmptySet($completeFilters);
 
         $message =
-            AssessmentFilters\NullableContext\UnitImportSpec\Definition::SLUG . ': ' . $this->toStr($uis).
-            AssessmentFilters\Folder\Definition::SLUG                         . ': ' . $this->toStr($f).
-            AssessmentFilters\NullableContext\Project\Definition::SLUG        . ': ' . $this->toStr($p).
-            AssessmentFilters\NullableContext\UnitImpl\Definition::SLUG       . ': ' . $this->toStr($ui).
-            AssessmentFilters\NullableContext\UnitSpec\Definition::SLUG       . ': ' . $this->toStr($us).
+            AssessmentFilters\NullableContext\UnitImportSpec\Definition::class . ': ' . $this->toStr($uis).
+            AssessmentFilters\Folder\Definition::class                         . ': ' . $this->toStr($f).
+            AssessmentFilters\NullableContext\Project\Definition::class        . ': ' . $this->toStr($p).
+            AssessmentFilters\NullableContext\UnitImpl\Definition::class       . ': ' . $this->toStr($ui).
+            AssessmentFilters\NullableContext\UnitSpec\Definition::class       . ': ' . $this->toStr($us).
             $this->toStr($completeFilters)."\n";
 
         $this->assertEquals($expected, $actual, $message);

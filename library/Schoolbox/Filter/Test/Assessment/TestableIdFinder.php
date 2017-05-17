@@ -8,7 +8,8 @@
 namespace Schoolbox\Filter\Filters\Assessment;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter\BrokenFilterException;
+use Schoolbox\Filter;
+use Schoolbox\IMapper;
 
 /**
  * Enables unit testing of the parent's logic by exposing internal methods.
@@ -64,5 +65,28 @@ class TestableIdFinder extends IdFinder
     public function insertMissingFilters($filters)
     {
         return $this->normaliseFilters($filters);
+    }
+
+    /**
+     * Build a registry of filters known to this class
+     *
+     * @param Filter\Mapper $filterMapper The filter instance mapper
+     * @param IMapper       $entityMapper A mapper for the entity being filtered, eg 'assessments'
+     */
+    protected function buildRegistry(Filter\Mapper $filterMapper, IMapper $entityMapper)
+    {
+        $filterClasses = [
+            AssessmentType\Definition::class,
+            Folder\Definition::class,
+            NullableContext\UnitImportSpec\Definition::class,
+            NullableContext\Project\Definition::class,
+            NullableContext\UnitImpl\Definition::class,
+            NullableContext\UnitSpec\Definition::class,
+            Term\Due\Definition::class,
+            Term\Close\Definition::class,
+            WeightingType\Definition::class,
+            WorkType\Definition::class,
+        ];
+        $this->setRegistry(array_combine($filterClasses, $filterClasses));
     }
 }

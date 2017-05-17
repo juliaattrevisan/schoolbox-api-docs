@@ -62,20 +62,6 @@ abstract class AbstractIdFinder implements IdFinder
 
 
     /**
-     * Build a registry of filters known to this class
-     *
-     * @param Mapper  $filterMapper The filter instance mapper
-     * @param IMapper $entityMapper A mapper for the entity being filtered, eg 'assessments'
-     */
-    protected function buildRegistry(Mapper $filterMapper, IMapper $entityMapper)
-    {
-        $filterInstances = $filterMapper->findForEntity(get_class($entityMapper));
-        $filterClasses = $filterInstances->getColumnValues('class');
-        $this->registry  = array_combine($filterClasses, $filterClasses);
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function findIdsByFilters(array $filters = [], $deleted = false)
@@ -105,6 +91,20 @@ abstract class AbstractIdFinder implements IdFinder
         $uniqueIds = array_unique($ids);
         sort($uniqueIds);
         return $uniqueIds;
+    }
+
+
+    /**
+     * Build a registry of filters known to this class
+     *
+     * @param Mapper  $filterMapper The filter instance mapper
+     * @param IMapper $entityMapper A mapper for the entity being filtered, eg 'assessments'
+     */
+    protected function buildRegistry(Mapper $filterMapper, IMapper $entityMapper)
+    {
+        $filterInstances = $filterMapper->findForEntity(get_class($entityMapper));
+        $filterClasses = $filterInstances->getColumnValues('class');
+        $this->registry  = array_combine($filterClasses, $filterClasses);
     }
 
 
@@ -186,5 +186,15 @@ abstract class AbstractIdFinder implements IdFinder
     public function getMapper()
     {
         return $this->mapper;
+    }
+
+    /**
+     * @param string[] $registry
+     * @return $this
+     */
+    protected function setRegistry(array $registry)
+    {
+        $this->registry = $registry;
+        return $this;
     }
 }
