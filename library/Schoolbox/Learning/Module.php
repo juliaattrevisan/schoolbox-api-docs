@@ -32,6 +32,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter;
+use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 class Module extends BaseModule
 {
@@ -194,8 +195,14 @@ class Module extends BaseModule
             'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
             'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
             'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'externalClass'              => $this->getInjector()->get('externalClass'),
-            'database'                   => $this->getInjector()->get('databaseInternal'),
+            'filterMapper'               => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
+            'assessmentIdFinder'         => $injector->lazy(function(){
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                return Filter\Filters\Assessment\IdFinder::getInstance(
+                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
+                );
+            }),
         ];
     }
 

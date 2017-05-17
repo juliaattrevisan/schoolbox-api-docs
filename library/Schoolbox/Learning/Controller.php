@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Learning;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
@@ -101,21 +100,21 @@ class Controller extends Base
     /** @var CourseSpecificationMapper */
     private $courseSpecificationMapper;
 
-    /** @var  \External_ClassInterface */
-    private $externalClass;
-
     /**
      * @var Access
      */
     private $access;
 
-    /**
-     * @var IConnector
-     */
-    private $database;
+    /** @var Filter\Mapper */
+    private $filterMapper;
+
 
     /** @var FilterSelection\Mapper */
     private $filterSelectionMapper;
+
+
+    /** @var AssessmentFilters\IdFinder */
+    private $assessmentIdFinder;
 
 
     /**
@@ -132,9 +131,9 @@ class Controller extends Base
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param CourseSpecificationMapper  $courseSpecificationMapper
      * @param FilterSelection\Mapper     $filterSelectionMapper
-     * @param \External_ClassInterface   $externalClass
-     * @param IConnector                 $database
      * @param Access                     $access
+     * @param Filter\Mapper              $filterMapper
+     * @param AssessmentFilters\IdFinder $assessmentIdFinder
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -150,9 +149,9 @@ class Controller extends Base
         CourseImplementationMapper $courseImplementationMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
         FilterSelection\Mapper $filterSelectionMapper,
-        \External_ClassInterface $externalClass,
-        IConnector $database,
-        Access $access
+        Access $access,
+        Filter\Mapper $filterMapper,
+        AssessmentFilters\IdFinder $assessmentIdFinder
     ) {
         $this->errorMapper                = $errorMapper;
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
@@ -167,9 +166,9 @@ class Controller extends Base
         $this->courseImplementationMapper = $courseImplementationMapper;
         $this->courseSpecificationMapper  = $courseSpecificationMapper;
         $this->filterSelectionMapper      = $filterSelectionMapper;
-        $this->externalClass              = $externalClass;
-        $this->database                   = $database;
         $this->access                     = $access;
+        $this->filterMapper               = $filterMapper;
+        $this->assessmentIdFinder         = $assessmentIdFinder;
     }
 
 
@@ -281,6 +280,7 @@ class Controller extends Base
      * @throws \DomainException
      * @throws \LogicException
      * @throws \ReflectionException If the specified class does not exist
+     * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      */
     protected function generatePendingAssessmentReport(
         User $viewee,
@@ -305,11 +305,10 @@ class Controller extends Base
 
         // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
         // regardless of any filter selections sent by user
-        $unitSpecFilter = Filter\Mapper::getInstance()->findByClass(AssessmentFilters\NullableContext\UnitSpec\Definition::class)->first();
+        $unitSpecFilter = $this->filterMapper->findByClass(AssessmentFilters\NullableContext\UnitSpec\Definition::class)->first();
         $filters->setSelections($unitSpecFilter, new Collection());
 
-        $idFinder = AssessmentFilters\IdFinder::getInstance(Filter\Mapper::getInstance(), \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance());
-        $assessmentIds = $idFinder->findIdsByFilters($filters->getByClass());
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters->getByClass());
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
