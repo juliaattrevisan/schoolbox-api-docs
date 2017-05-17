@@ -60,9 +60,9 @@
     {# This is only in an <ul> to prevent storm crying #}
 
     <ul id="cloneUser" class="hide">
-        <a class="list-item" data-member-add="{ID}">
+        <li>
             <!--suppress HtmlUnknownTarget -->
-            <a href="/search/user/{ID}" class="link-row">
+            <a data-member-add="{ID}" class="list-item link-row">
                 <div class="card small-12">
                     {# Have hardcoded the image size, and a background color so the list heights don't change as images pop in #}
                     <img src="/portrait.php?userId={EXTERNALID}&size=square64" alt="{NAME}" title="{NAME}">
