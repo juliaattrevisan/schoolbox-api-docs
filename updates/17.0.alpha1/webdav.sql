@@ -1,16 +1,16 @@
 CREATE TABLE `webdav`
 (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
-  `uri` VARCHAR(1024),
-  `path` VARCHAR(1024),
-  `username_prefix` VARCHAR(100),
-  `username_suffix` VARCHAR(100),
-  `campus_id` INT,
-  `role_id` INT,
-  `enabled` TINYINT DEFAULT 1,
-  `created_at` DATETIME,
-  `updated_at` DATETIME,
-  `deleted_at` DATETIME
+  `uri` VARCHAR(1024) NOT NULL,
+  `path` VARCHAR(1024) NOT NULL,
+  `username_prefix` VARCHAR(100) NOT NULL,
+  `username_suffix` VARCHAR(100) NOT NULL,
+  `campus_id` INT NULL,
+  `role_id` INT NULL,
+  `enabled` BOOL NOT NULL DEFAULT TRUE,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
+  `deleted_at` DATETIME NULL DEFAULT NULL
 );
 
 INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES
