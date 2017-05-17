@@ -119,8 +119,8 @@
                             <li><a href="#" data-division-action="delete" data-post-action="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: division.id}) }}" class="icon-delete">Delete</a></li>
                         </ul>
                     </div>
-                    <div class="small-12 column no-pad hide" data-collapse-state="collapsed" data-collapsable="division-{{ division.id }}">
-                        <ul>
+                    <div class="hide" data-collapse-state="collapsed" data-collapsable="division-{{ division.id }}">
+                        <ul class="information-list">
                             {% for team in division.teams %}
                                 <li data-team="{{ team.id }}">
                                     <div class="actions-small-1">
