@@ -461,12 +461,21 @@ class Controller extends Base
                                          return $assessment->getBaseContext()->getFolder()->getId();
                                      });
 
-        // Generate markbooks for these assessments
+        $showOverallGrade = $this->getConfigLoader()->get('show_overall_grade');
+
+
         /** @var GenericCollection|Markbook[] Indexed by folder.id */
         $markbooks = new GenericCollection(Markbook::class);
-
+        // Generate markbooks for these assessments
         foreach ($assessmentsPerFolder as $folderId => $assessments) {
-            $markbooks->setOffset($folderId, new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()));
+            $assessment = $assessments->first();
+            if ($assessment instanceof IAssessable
+                && ($showOverallGrade
+                    || $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())
+                )
+            ) {
+                $markbooks->setOffset($folderId, new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser()));
+            }
         }
 
         // Squish this mess out
@@ -477,6 +486,7 @@ class Controller extends Base
             'terms'      => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
             'folders'    => $folders,
             'markbooks'  => $markbooks,
+            'showOverallGrade' => $showOverallGrade,
             'mailHandle' => $this->getSession()->get('mailhandle'),
         ])->setTab('grade'));
     }
