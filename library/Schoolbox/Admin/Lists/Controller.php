@@ -301,7 +301,7 @@ class Controller extends Base
                         'width'     => 1,
                         'lookup'    => array_merge($luEmpty, $luCampus),
                     ],
-                    'role_type'        => [
+                    'roleType'      => [
                         'caption'   => 'Role Type',
                         'width'     => 1,
                         'lookup'    => array_merge($luEmpty, $luRoleType),
