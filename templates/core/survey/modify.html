@@ -2,9 +2,6 @@
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
 <script type="text/javascript">
     $(function() {
         $.fn.alaressEditor({
@@ -13,42 +10,12 @@
 
         $('#start_date').syncDates({endDate: $('#finish_date')});
 
-        /* Timepicker
-         */
-        $('input[data-timepicker="hour"]').hourpicker({
-            hours: 12,
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-        $('input[data-timepicker="minute"]').minutepicker({
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-
         $('#createAssess').alaressValidate({
             rules: {
                 title: {
                     required: true,
                     minlength: 2
                 },
-                "finish[hour]": {
-                    required: true,
-                    '12hour': true
-                },
-                "finish[minute]": {
-                    required: true,
-                    minute: true
-                },
-                "start[hour]": {
-                    required: true,
-                    '12hour': true
-                },
-                "start[minute]": {
-                    required: true,
-                    minute: true
-                }
             },
             messages: {
                 title: "Please enter a title",
