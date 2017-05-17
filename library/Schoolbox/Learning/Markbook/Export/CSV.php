@@ -188,7 +188,7 @@ class CSV implements IExporter
      */
     private function addHeaders(array &$row, IAssessable $assessment)
     {
-        $title = "{$assessment->getTitle()} \r\n( {$assessment->getTypeName()})";
+        $title = "{$assessment->getTitle()} \r\n({$assessment->getTypeName()})";
 
         if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = "$title";
