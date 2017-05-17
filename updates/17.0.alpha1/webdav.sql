@@ -13,6 +13,6 @@ CREATE TABLE `webdav`
   `deleted_at` DATETIME
 );
 
-INSERT INTO schoolbox.config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES
+INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES
   ('webdav_fallback_enabled', '1', 'Legacy WebDAV Configuration Fallback',
    'For schools with legacy WebDAV configuration setups prior to v17.0 only. When enabled Schoolbox will fallback to using the legacy configuration if no matching rules were found for the current logged in user.', 3, '', 5, 'true', 'false', 'false');
