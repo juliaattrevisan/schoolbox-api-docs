@@ -187,13 +187,18 @@ class Controller extends Base
      */
     private function getTableData()
     {
+        $luEmpty = [
+            ['key' => '', 'value' => ''],
+        ];
+        $luRoleType = [
+            ['key' => 'guest', 'value' => 'Guest'],
+            ['key' => 'staff', 'value' => 'Staff'],
+            ['key' => 'student', 'value' => 'Student'],
+            ['key' => 'parent', 'value' => 'Parent'],
+        ];
+
         $luRole = [];
         $roles = RoleMapper::getInstance()->findAll();
-
-        $luRole[] = [
-            'key' => '',
-            'value' => ''
-        ];
 
         foreach ($roles as $role) {
             $luRole[] = [
@@ -204,11 +209,6 @@ class Controller extends Base
 
         $luCampus = [];
         $campuses = CampusMapper::getInstance()->findAll();
-
-        $luCampus[] = [
-            'key' => '',
-            'value' => ''
-        ];
 
         foreach ($campuses as $campus) {
             $luCampus[] = [
@@ -240,12 +240,7 @@ class Controller extends Base
                         //'nullable'  => '1'                                    // If defined the column will have a checkbox that can be ticked to select NULL as a value
                         //'getter'    => 'getTimetableColourId',                // Can be used to override getter if it has some weird name
                         'caption'   => 'Role Type',
-                        'lookup'    => [                                        // If defined the column will appear as a select box
-                            ['key' => 'guest', 'value' => 'Guest'],
-                            ['key' => 'staff', 'value' => 'Staff'],
-                            ['key' => 'student', 'value' => 'Student'],
-                            ['key' => 'parent', 'value' => 'Parent'],
-                        ],
+                        'lookup'    => $luRoleType,                             // If defined the column will appear as a select box
                         'width'     => 3,
                     ],
                     'canChangePassword' => [
@@ -304,12 +299,17 @@ class Controller extends Base
                     'campus'        => [
                         'caption'   => 'Campus',
                         'width'     => 1,
-                        'lookup'    => $luCampus
+                        'lookup'    => array_merge($luEmpty, $luCampus),
+                    ],
+                    'role_type'        => [
+                        'caption'   => 'Role Type',
+                        'width'     => 1,
+                        'lookup'    => array_merge($luEmpty, $luRoleType),
                     ],
                     'role'        => [
                         'caption'   => 'Role',
-                        'width'     => 2,
-                        'lookup'    => $luRole
+                        'width'     => 1,
+                        'lookup'    => array_merge($luEmpty, $luRole),
                     ],
                     'enabled' => [
                         'caption'   => 'Enabled',
