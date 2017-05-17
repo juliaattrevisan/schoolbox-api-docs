@@ -24,11 +24,11 @@ class Component_Config_Date extends Component_Config_Abstract
             return '';
         }
         try {
-            $dateObject = Alaress_Date_Format::newLocalShort($value);
+            $dateObject = Alaress_Date_Format::newLocal($value);
         } catch (Exception $e) {
             return '';
         }
-        return $dateObject->getDatabaseDate();
+        return $dateObject->getDatabase();
     }
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
@@ -36,9 +36,9 @@ class Component_Config_Date extends Component_Config_Abstract
         if (!empty($configValue)) {
             $date = new Alaress_Date_Format(
                 $configValue,
-                Alaress_Date_Format::DATABASE_DATE_FORMAT
+                Alaress_Date_Format::DATABASE_FORMAT
             );
-            $configValue = $date->getLocalShort();
+            $configValue = $date->getLocal();
         }
         $page->setVar('COMPONENT_CONFIG_DATE', $configValue);
     }
