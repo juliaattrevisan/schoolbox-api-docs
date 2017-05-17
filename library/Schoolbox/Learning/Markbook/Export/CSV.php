@@ -8,11 +8,14 @@
 namespace Schoolbox\Learning\Markbook\Export;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Markbook\IExporter;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\MarkScheme\Completion;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 use Schoolbox\User;
 
 /**
@@ -169,7 +172,7 @@ class CSV implements IExporter
             ];
 
             foreach ($sortedAssessments as $assessmentId => $assessment) {
-                $this->addParticipant($studentRow, $participants, $assessmentId, $userId);
+                $this->addParticipant($studentRow, $participants, $assessment, $userId);
             }
             fputcsv($out, $studentRow);
         }
@@ -186,9 +189,19 @@ class CSV implements IExporter
     private function addHeaders(array &$row, IAssessable $assessment)
     {
         $title = "{$assessment->getTitle()} \r\n( {$assessment->getTypeName()})";
-        $row[] = "$title";
-        $row[] = "$title (Normalized)";
-        $row[] = "$title (Comment)";
+
+        if ($this->hasTotalMarkColumn($assessment)) {
+            $row[] = "$title";
+            $row[] = "$title (Total)";
+        } else {
+            $row[] = "$title";
+        }
+        if ($this->hasNormalizedMarkColumn($assessment)) {
+            $row[] = "$title (Normalized)";
+        }
+        if ($this->hasCommentColumn($assessment)) {
+            $row[] = "$title (Comment)";
+        }
         return $row;
     }
 
@@ -204,8 +217,15 @@ class CSV implements IExporter
     private function addAverage(array &$row, Markbook $markbook, IAssessable $assessment)
     {
         $row[] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
-        $row[] = '';
-        $row[] = '';
+        if ($this->hasTotalMarkColumn($assessment)) {
+            $row[] = '';
+        }
+        if ($this->hasNormalizedMarkColumn($assessment)) {
+            $row[] = '';
+        }
+        if ($this->hasCommentColumn($assessment)) {
+            $row[] = '';
+        }
         return $row;
     }
 
@@ -215,24 +235,125 @@ class CSV implements IExporter
      *
      * @param string[]                                              $row
      * @param GenericCollection|GenericCollection[]|Participant[][] $participants Indexed by assessment.id, then user.id
-     * @param int                                                   $assessmentId
+     * @param IAssessable $assessment
      * @param int                                                   $userId
      * @return string[]
      */
-    private function addParticipant(array &$row, GenericCollection $participants, $assessmentId, $userId)
+    private function addParticipant(array &$row, GenericCollection $participants, IAssessable $assessment, $userId)
     {
-        if ($participants[$assessmentId]->keyExists($userId)) {
-            $mostRecentFeedback = $participants[$assessmentId][$userId]->findMostRecentFeedback();
+        if ($participants[$assessment->getId()]->keyExists($userId)) {
+            $participant = $participants[$assessment->getId()][$userId];
 
-            $row[] = $participants[$assessmentId][$userId]->getPublishedHumanReadableMark();
-            $row[] = $participants[$assessmentId][$userId]->getPublishedNormalisedMark();
-            $row[] = $mostRecentFeedback instanceof IFeedback ? $mostRecentFeedback->getComment() : '';
+            $humanReadableMark = $participant->getPublishedHumanReadableMark();
+
+            if ($this->hasTotalMarkColumn($assessment)) {
+                $row[] = $this->parseNumerator($humanReadableMark);
+                $row[] = $this->parseDenominator($humanReadableMark);
+            } else {
+                $row[] = $humanReadableMark;
+            }
+            if ($this->hasNormalizedMarkColumn($assessment)) {
+                $row[] = $participant->getPublishedNormalisedMark();
+            }
+            if ($this->hasCommentColumn($assessment)) {
+                $row[] = $this->retrieveCommentField($assessment, $participant->getUser());
+            }
         } else {
             $row[] = '';
-            $row[] = '';
-            $row[] = '';
+            if ($this->hasTotalMarkColumn($assessment)) {
+                $row[] = '';
+            }
+            if ($this->hasNormalizedMarkColumn($assessment)) {
+                $row[] = '';
+            }
+            if ($this->hasCommentColumn($assessment)) {
+                $row[] = '';
+            }
         }
         return $row;
+    }
+
+    /* Helper methods for building the markbook export.
+    */
+
+    /**
+     * Does this assessment have a total mark column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    private function hasTotalMarkColumn(IAssessable $assessment)
+    {
+        return $assessment->getMarkScheme() instanceof TotalMarkAbstract;
+    }
+
+    /**
+     * Does this assessment have a normalized mark column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    private function hasNormalizedMarkColumn(IAssessable $assessment)
+    {
+        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
+    }
+
+    /**
+     * Does this assessment have a comment column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    private function hasCommentColumn(IAssessable $assessment)
+    {
+        // Only DueWorks have comments at the moment
+        return $assessment instanceof DueWork\Model;
+    }
+
+    /**
+     * Parse the numerator from a total mark
+     *
+     * @param null|string $humanReadableMark
+     * @return null|string
+     */
+    private function parseNumerator($humanReadableMark)
+    {
+        if(preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $humanReadableMark, $markParts)){
+            return $markParts[1];
+        }
+        return null;
+    }
+
+    /**
+     * Parse the denominator from a total mark
+     *
+     * @param null|string $humanReadableMark
+     * @return null|string
+     */
+    private function parseDenominator($humanReadableMark)
+    {
+        if(preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $humanReadableMark, $markParts)){
+            return $markParts[2];
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieves comment field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    private function retrieveCommentField(IAssessable $assessment, User $student)
+    {
+        $participant = $assessment->getParticipantIfExtant($student);
+        if (!$participant) {
+            return '';
+        }
+        $mostRecentFeedback = $participant->findMostRecentFeedback();
+        return $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
     }
 
 }

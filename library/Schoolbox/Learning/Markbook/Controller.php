@@ -11,7 +11,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -27,6 +26,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\User;
+use Schoolbox\GenericCollection;
 
 class Controller extends Base
 {
