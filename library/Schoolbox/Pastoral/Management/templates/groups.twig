@@ -1,9 +1,10 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
-    <li class="active"><a href="#">Groups Management</a></li>
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ 'Groups Management' ]
+) }}
 
 <div class='row'>
     <div class='small-12 columns'>

@@ -1,10 +1,11 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
-    <li><a href="{{ routeLookup('pastoral.getStudent', {studentId: record.student.id}) }}">{{ record.student.fullName }}</a></li>
-    <li class="active"><a href="#">{{ record.heading }}</a></li>
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ record.student.fullName,            routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
+[ record.heading ]
+) }}
 
 {% include '@pastoral/fragments/studentDetails.twig' with { student: record.student } %}
 

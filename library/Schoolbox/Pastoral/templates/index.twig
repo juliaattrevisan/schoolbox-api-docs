@@ -1,8 +1,9 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
-<ul class="breadcrumb">
-    <li class="active"><a href="#">Pastoral Care</a></li>
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care' ]
+) }}
 
 <div class="row">
     <div class="list-item">

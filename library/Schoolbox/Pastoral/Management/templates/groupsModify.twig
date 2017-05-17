@@ -10,11 +10,12 @@
     {% set button = 'Create Group' %}
 {% endif %}
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
-    <li><a href="{{ routeLookup('pastoralManagement.getGroups') }}">Groups Management</a></li>
-    <li class="active"><a href="#">{{ heading }}</a></li>
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ 'Groups Management',  routeLookup('pastoralManagement.getGroups') ],
+[ heading ]
+) }}
 
 {# Heading fluff #}
 

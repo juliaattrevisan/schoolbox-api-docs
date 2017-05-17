@@ -1,4 +1,5 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
+{% import 'sub/breadcrumbs.twig' as bread %}
 
 {# Decide which save route we are using #}
 
@@ -10,11 +11,12 @@
     {% set pageTitle = 'Add Pastoral Record' %}
 {% endif %}
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
-    <li><a href="{{ routeLookup('pastoral.getStudent', {studentId: record.student.id}) }}">{{ record.student.fullName }}</a></li>
-    <li class="active"><a href="#">{{ pageTitle }}</a></li>
-</ul>
+{{ bread.crumbs(
+[ 'Pastoral Care',              routeLookup('pastoral.getIndex') ],
+[ record.student.fullName,      routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
+[ record.heading,               routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) ],
+[ pageTitle ]
+) }}
 
 <div class="row">
     <div>

@@ -4,6 +4,13 @@
     {% set pageTitle = 'Modify Report' %}
 {% endif %}
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ 'Reports',            routeLookup('pastoralReportBuilder.getIndex') ],
+[ pageTitle ]
+) }}
+
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
@@ -182,12 +189,6 @@
     });
 
 </script>
-
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
-    <li><a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Reports</a></li>
-    <li class="active"><a href="#">{{ pageTitle }}</a></li>
-</ul>
 
 <div class="actions-small-1 row">
     <div class="list-item">
