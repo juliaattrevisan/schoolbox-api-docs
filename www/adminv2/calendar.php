@@ -103,6 +103,7 @@ foreach ($typeList as $type) {
     if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
         $this->parse('import_block', 'import');
     } elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
+
         /* Subscribe page
          */
         $allApi = Calendar_Api_Config_Mapper::getInstance()->generateApiHierarchy();
@@ -110,40 +111,35 @@ foreach ($typeList as $type) {
         /* All calendar subscription options go here
          */
         foreach ($allApi as $currentEventType => $allConnectors) {
+
             /* Render titles etc
              * Put a space between 'CamelCase' names so they become 'Camel Case'
              */
-            $this->setVar(
-                array(
-                    'EVENTTYPE_LABEL' => trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType)),
-                    'EVENTTYPE_NAME' => $currentEventType,
-                )
-            );
+            $this->setVar([
+                'EVENTTYPE_LABEL' => trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType)),
+                'EVENTTYPE_NAME' => $currentEventType,
+            ]);
 
             /* Inject individual templates just like before -_-
              */
-            foreach ($allConnectors as $currentConnector) {
+            foreach ($allConnectors as $currentConnector => $stubInstance) {
+
                 /* Render titles etc
                  *
                  * Some kind of rendering issue exists where I can't combine it with the other
                  * setVar() further down. It leads to the wrong connector name being used.
                  */
-                $this->setVar(
-                    array(
-                        'CONNECTOR_NAME' => $currentConnector,
-                        'CONNECTOR_ICON' => $currentConnector == 'Schoolbox' ? 'schoolbox' : 'calendar'
-                    )
-                );
+                $this->setVar([
+                    'CONNECTOR_NAME' => $stubInstance->getDefaultLabel(),
+                    'CONNECTOR_ICON' => $currentConnector == 'Schoolbox' ? 'schoolbox' : 'calendar'
+                ]);
 
                 /* Process each config for this kind of connector
                  */
-                /** @var Calendar_Api_Config_Connector_Interface[] $allConfigs */
                 $allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs(
                     $currentEventType,
                     $currentConnector
                 );
-
-
 
                 if (count($allConfigs)) {
                     foreach ($allConfigs as $currentConfig) {
@@ -180,12 +176,10 @@ foreach ($typeList as $type) {
 
                 /* Render checkbox setting
                  */
-                $this->setVar(
-                    array(
-                        'CONNECTOR_CHECKED' => $connectorChecked,
-                        'CONNECTOR_ACTIVE' => $connectorActive,
-                    )
-                );
+                $this->setVar([
+                    'CONNECTOR_CHECKED' => $connectorChecked,
+                    'CONNECTOR_ACTIVE' => $connectorActive,
+                ]);
 
                 $this->parse('connector_block', 'connector', true);
 

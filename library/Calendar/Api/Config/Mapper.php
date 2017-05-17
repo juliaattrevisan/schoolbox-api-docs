@@ -138,15 +138,13 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      */
     public function getAllConfigs($currentEventType, $currentConnector)
     {
-        $configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(
-            array(
-                'event_type'      => $currentEventType,
-                'connector_class' => $currentConnector,
-                'status'          => 1
-            )
-        );
+        $configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList([
+            'event_type'      => $currentEventType,
+            'connector_class' => $currentConnector,
+            'status'          => 1
+        ]);
 
-        $allConfigs = array();
+        $allConfigs = [];
 
         foreach ($configs as $currentConfig) {
             try {
@@ -238,15 +236,16 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
                 // Check module is not disabled
                 try{
                     $className = 'Calendar_Api_Config_Connector_' . $connectorClassFilename;
-                    new $className;
-                } catch (DomainException $e){
+
+                    /* Module is not disabled. Augment that array
+                     */
+                    $allApi[$eventTypeFilename][$connectorClassFilename] = new $className;
+                }
+                catch (DomainException $e){
+
                     // Expected if module is disabled.
                     continue;
                 }
-
-                /* Module is not disabled. Augment that array
-                 */
-                $allApi[$eventTypeFilename][] = $connectorClassFilename;
             }
         }
 
