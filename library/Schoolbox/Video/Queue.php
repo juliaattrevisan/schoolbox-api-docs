@@ -84,7 +84,9 @@ class Queue extends ResourceVideo
         $this->audioBitrate = $this->getConfig()->get('audio_bitrate');
         $this->videoBitrate = $this->getConfig()->get('video_bitrate');
         $timeout = $this->getConfig()->get('video_processing_timeout');
-        if ($timeout > 0 && $timeout < self::MAX_TIMEOUT) {
+        if ($timeout <= 0) {
+            $this->processTimeout = self::MAX_TIMEOUT;
+        } elseif ($timeout < self::MAX_TIMEOUT) {
             $this->processTimeout = $timeout;
         } else {
             $this->processTimeout = self::DEFAULT_TIMEOUT;
