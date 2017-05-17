@@ -837,6 +837,10 @@ $selector-width: 2.25rem;
     &.expandable,
     &.expandable-card{
         @include list-interaction(expander, pointer);
+        ul{
+            list-style: none;
+            margin: 0;
+        }
         li .expander{
             flex: 1 2.5rem;
         }
