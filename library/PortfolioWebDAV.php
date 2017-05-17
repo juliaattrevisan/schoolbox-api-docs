@@ -133,11 +133,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 ];
             }
 
-            // If the user is in the campus and role- or they are empty- this path applies to them
-
-            if ((!$dav->getRole() instanceof Role || $dav->getRole()->getId() == $user->getRole()->getId()) &&
-                (!$dav->getCampus() instanceof Campus || $user->getCampusCollection()->getBy('id', $dav->getCampus()->getId()) != null)
-            ) {
+            if ($dav->matches($user)) {
                 // --------------------------------------------------------------------------------------------------------
                 // Replaceable tokens
                 // --------------------------------------------------------------------------------------------------------

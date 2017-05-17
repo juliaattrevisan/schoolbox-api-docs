@@ -13,6 +13,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Campus;
 use Schoolbox\Role;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
@@ -44,6 +45,52 @@ class Model implements ISoftDeletable
 
     /** @var bool */
     protected $enabled;
+
+    /**
+     * Does this WebDAV rule match the given user?
+     *
+     * In order to do so it must match at least one of:
+     * * Role type
+     * * Role
+     * * Campus
+     * Or all must be empty.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function matches(User $user)
+    {
+        $isRoleTypeRule = !empty($this->getRoleType());
+        $isRoleRule     = $this->getRole() instanceof Role;
+        $isCampusRule   = $this->getCampus() instanceof Campus;
+
+        // This is a generic rule - it matches all users
+        if (!($isRoleTypeRule || $isRoleRule || $isCampusRule)) {
+            return true;
+        }
+
+        // Roletype match
+        if ($isRoleTypeRule && $this->getRoleType() == $user->getRole()->getType()) {
+            return true;
+        }
+
+        // Role match
+        if ($isRoleRule && $this->getRole()->getId() == $user->getRole()->getId()) {
+            return true;
+        }
+
+        // Campus match
+        if ($isCampusRule) {
+            foreach ($user->getCampusCollection() as $campus) {
+                if ($this->getCampus()->getId() == $campus->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        // No match
+        return false;
+    }
 
     /**
      * @param string $uri
