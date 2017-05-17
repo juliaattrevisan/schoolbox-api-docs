@@ -6,6 +6,7 @@ CREATE TABLE `webdav`
   `username_prefix` VARCHAR(100) NOT NULL,
   `username_suffix` VARCHAR(100) NOT NULL,
   `campus_id` INT NULL,
+  `role_type` ENUM('guest','student','parent','staff') NULL,
   `role_id` INT NULL,
   `enabled` BOOL NOT NULL DEFAULT TRUE,
   `created_at` DATETIME NOT NULL,
