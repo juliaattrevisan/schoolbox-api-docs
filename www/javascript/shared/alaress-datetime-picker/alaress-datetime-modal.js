@@ -128,6 +128,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         onReady: function (selectedDates, dateStr, instance) {
             renderAllDaySwitch();
+            renderHeatMapHelp();
 
             // Hide time picker if allday hidden field is set to 1
             if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 1) {
@@ -693,5 +694,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     }
 
+    function renderHeatMapHelp() {
+
+        // TODO allow this to be injected by construction
+        var tt = 'The "heat" of a day represents the largest number of assessments any of your students has due that day, capped at 5.';
+
+        var $monthDiv = $('#picker' + twigVars.id).find('.flatpickr-current-month');
+        $monthDiv.append($('<a class="icon-help" />').attr('title', tt));
+    }
 
 };
