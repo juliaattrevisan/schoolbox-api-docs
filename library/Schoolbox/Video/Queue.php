@@ -33,6 +33,12 @@ class Queue extends ResourceVideo
     private $videoBitrate;
 
     /**
+     * Time that ffmpeg will be allowed to run before it is killed
+     * @var string
+     */
+    private $processTimeout;
+
+    /**
      * Primary binary program used for conversion
      * @var string
      */
@@ -57,6 +63,16 @@ class Queue extends ResourceVideo
     private $fallbackInfo   = 'ffprobe';
 
     /**
+     * Maximum allowed timeout for processing video, 1 day
+     */
+    const MAX_TIMEOUT = 86400;
+
+    /**
+     * Default video processing timeout if not set, 1 hour
+     */
+    const DEFAULT_TIMEOUT = 3600;
+
+    /**
      * Queue constructor.
      */
     public function __construct()
@@ -67,6 +83,14 @@ class Queue extends ResourceVideo
 
         $this->audioBitrate = $this->getConfig()->get('audio_bitrate');
         $this->videoBitrate = $this->getConfig()->get('video_bitrate');
+        $timeout = $this->getConfig()->get('video_processing_timeout');
+        if ($timeout <= 0) {
+            $this->processTimeout = self::MAX_TIMEOUT;
+        } elseif ($timeout < self::MAX_TIMEOUT) {
+            $this->processTimeout = $timeout;
+        } else {
+            $this->processTimeout = self::DEFAULT_TIMEOUT;
+        }
     }
 
     /**
@@ -99,11 +123,11 @@ class Queue extends ResourceVideo
         $executable = $this->getConverterExecutable();
 
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) . " -map 0:a -c:a libmp3lame -b {$this->audioBitrate}k -ar:a 44100"
-            . ' -timelimit ' . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' '
+            . ' -timelimit ' . escapeshellarg($this->processTimeout) . ' '
             . escapeshellarg($this->getAudioLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
-        $this->setMessage(implode("\n", $message));
+        $this->setMessage($processString . "\n" . implode("\n", $message));
 
         preg_match('/Duration: ([0-9\:]+)/', $this->getMessage(), $match);
 
@@ -117,7 +141,7 @@ class Queue extends ResourceVideo
         if ($return == 0) {
             return true;
         } else {
-            throw new \RuntimeException(implode(' ',$message));
+            throw new \RuntimeException($processString . "\n" . implode("\n",$message));
         }
 
     }
@@ -215,12 +239,12 @@ class Queue extends ResourceVideo
         /* Process video to 512kb in libx264 format for mobile and html5 streaming */
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             " -c:v libx264 $scale -preset slow -b:v {$this->videoBitrate}k -pix_fmt yuv420p -b:a {$this->audioBitrate}k -r 24 -ar:a 44100" .
-            " -timelimit " . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' ' .
+            " -timelimit " . escapeshellarg($this->processTimeout) . ' ' .
             ($strict ? '-strict -2 ' : '') .
             '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
-        $this->setMessage(implode("\n", $message));
+        $this->setMessage($processString . "\n" . implode("\n", $message));
 
         preg_match('/Duration: ([0-9\:]+)/', $this->getMessage(), $match);
 
@@ -265,7 +289,7 @@ class Queue extends ResourceVideo
                 throw new \RuntimeException($output);
             }
         }
-        throw new \RuntimeException(implode(' ',$message));
+        throw new \RuntimeException($processString . "\n" . implode("\n",$message));
 
 
     }
