@@ -449,12 +449,11 @@ class Controller extends Base
         foreach ($tags as $tagCurrent) {
             if (trim($tagCurrent) != '') {
                 try {
-
                     /* Assign an existing tag to this pastoral record
                      */
 
                     /** @var PastoralTagsModel $tag */
-                    $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent);
+                    $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, [], ['cache' => false]);
                 }
                 catch (MapperDeletedException $e) {
 
