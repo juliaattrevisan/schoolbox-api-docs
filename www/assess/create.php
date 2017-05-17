@@ -69,14 +69,8 @@ if (!empty($_POST)) {
         $assessment->setTask($task);
     }
     else {
-        $start = Alaress_Date_Format::newLocalShort($_POST['start']['date'])
-            ->set12Hour($_POST['start']['hour'], $_POST['start']['meridiem'])
-            ->setMinute($_POST['start']['minute'])
-        ;
-        $finish = Alaress_Date_Format::newLocalShort($_POST['finish']['date'])
-            ->set12Hour($_POST['finish']['hour'], $_POST['finish']['meridiem'])
-            ->setMinute($_POST['finish']['minute'])
-        ;
+        $start = Alaress_Date_Format::newLocal($_POST['start']['date']);
+        $finish = Alaress_Date_Format::newLocal($_POST['finish']['date']);
 
 		/* Check for valid dates
 		 */
@@ -140,12 +134,6 @@ else {
     $is_unit        = preg_match('/^unit:(\d+)$/', $this->arg[1], $matches);
     $assessDate     = new Alaress_Date_Format(time(), 'U');
     $assessEndDate  = new Alaress_Date_Format(strtotime('+1 week'), 'U');
-    $startHour      = date('g', time() + 3600);
-	$startMinute    = '00';
-    $startMeridiem  = date('A', time() + 3600);
-    $finishHour     = date('g', time() + 2 * 3600);
-	$finishMinute   = '00';
-    $finishMeridiem = date('A', time() + 2 * 3600);
 
     if ($is_unit) {
         $unit_id = $matches[1];
@@ -157,10 +145,6 @@ else {
             $end            = $unit->getDueDate()->getDateTimeObject();
             $end->modify('00:00:00 +1 day');
             $assessEndDate  = new Alaress_Date_Format($end);
-            $startHour      = $assessDate->get12Hour();
-            $startMeridiem  = $assessDate->getMeridiem();
-            $finishHour     = $assessEndDate->get12Hour();
-            $finishMeridiem = $assessEndDate->getMeridiem();
         }
         catch (Schoolbox\Mapper\Exception $e) {
             error(126);
@@ -187,8 +171,6 @@ else {
      */
     $this->setFile(TEMPLATE_content,   'assess/modify.html');
     $this->setBlock(TEMPLATE_content,  'assess_timespan', 'assess_timespan_block');
-    $this->setBlock('assess_timespan', 'startMeridiem', 'startMeridiem_block');
-    $this->setBlock('assess_timespan', 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content,  'importXML', 'importXML_block');
     $this->setBlock(TEMPLATE_content,  'max_attempts', 'max_attempts_block');
     $this->setBlock(TEMPLATE_content, 'curriculum_code_input', 'curriculum_code_input_block');
@@ -221,8 +203,8 @@ else {
         'ASSESS_TITLE'              => '',
         'ASSESS_WEIGHT'             => 0,
         'ASSESS_DESCRIPTION'        => '',
-        'ASSESS_START_DATE'         => $assessDate->getLocalShort(),
-        'ASSESS_FINISH_DATE'        => $assessEndDate->getLocalShort(),
+        'ASSESS_START_DATE'         => $assessDate->getLocal(),
+        'ASSESS_FINISH_DATE'        => $assessEndDate->getLocal(),
         'ASSESS_COMPLETION_MESSAGE' => '',
         'HAS_ALL_QUESTIONS'         => 'large-12',
         // Curriculum codes: by default use the ones that are part of the folder
@@ -234,52 +216,6 @@ else {
             'sub/curriculumBrowseButton.twig'
         ),
     ));
-
-    /* Render starting times
-     */
-	$this->setVar(array(
-		'START_HOUR_VALUE' => $startHour,
-		'START_MINUTE_VALUE' => $startMinute,
-	));
-
-	foreach (array('AM', 'PM') as $meridiem) {
-        if ($meridiem == $startMeridiem) {
-            $selected = 'selected=\'selected\'';
-        }
-		else {
-            $selected = '';
-        }
-
-        $this->setVar(array(
-            'START_MERIDIEM_VALUE' => $meridiem,
-            'START_MERIDIEM_SELECTED' => $selected
-        ));
-
-        $this->parse('startMeridiem_block', 'startMeridiem', true);
-    }
-
-    /* Render finish times
-     */
-	$this->setVar(array(
-		'FINISH_HOUR_VALUE' => $finishHour,
-		'FINISH_MINUTE_VALUE' => $finishMinute,
-	));
-
-	foreach (array('AM', 'PM') as $meridiem) {
-        if ($meridiem == $finishMeridiem) {
-            $selected = 'selected=\'selected\'';
-        }
-		else {
-            $selected = '';
-        }
-
-        $this->setVar(array(
-            'FINISH_MERIDIEM_VALUE' => $meridiem,
-            'FINISH_MERIDIEM_SELECTED' => $selected
-        ));
-
-        $this->parse('finishMeridiem_block', 'finishMeridiem', true);
-    }
 
     // Task or instance?
     if (!$is_task) {
@@ -324,6 +260,7 @@ else {
     $crumbs = array_merge($crumbs, [
         [
             'text' => 'New Quiz',
+            'text' => 'New Quiz',
             'href' => '',
             'class' => 'active',
         ]
@@ -332,5 +269,3 @@ else {
     // bake in a moderate oven for 40 minutes
     $trail->renderIntoSitePage($this, 'BREADCRUMB', $crumbs);
 }
-
-
