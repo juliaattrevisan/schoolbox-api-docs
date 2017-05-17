@@ -59,17 +59,15 @@
 
                     <h2 class="subheader">Matching Students</h2>
                     <section>
-                        <ul id="studentsList" class="grid information-list">
+                        <ul id="studentsList" class="information-list">
                             {% for student in students %}
                                 <li>
-                                    <div class="list-item">
-                                        <div class="card small-12">
-                                            <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
-                                                {{ profile.imageSquare64(student) }}
-                                                <h3>{{ student.fullName }}</h3>
-                                            </a>
-                                            <p class="meta">{{ student.role.name }}</p>
-                                        </div>
+                                    <div class="card small-12">
+                                        <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
+                                            {{ profile.imageSquare64(student) }}
+                                            <h3>{{ student.fullName }}</h3>
+                                        </a>
+                                        <p class="meta">{{ student.role.name }}</p>
                                     </div>
                                 </li>
                             {% endfor %}

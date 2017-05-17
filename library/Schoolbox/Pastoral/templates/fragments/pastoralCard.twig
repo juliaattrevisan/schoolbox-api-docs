@@ -1,19 +1,15 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 <ul class="information-list">
-    <li data-record-type="{{ record.type.id }}" class="actions-small-1" id="pastoral-{{ record.id }}">
+    <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
         <div class="list-item">
             <div class="card small-12 wrap-down">
-
-                <a href='{{ profile.link(record.owner) }}'>
-                    {{ profile.imageSquare64(record.owner) }}
-                </a>
-
                 {# Only display link if the user is authorzied to view the record #}
 
                 {% if showBody %}
                     {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
                         <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
+                            {{ profile.imageSquare64(record.owner) }}
                             <h3>{{ record.heading }}</h3>
                         </a>
                     {% else %}
@@ -39,38 +35,37 @@
                 {% if showBody %}
                     {% include '@pastoral/fragments/recordTags.twig' %}
                 {% endif %}
-
-                {% if showBody %}
-                    <article>
-                        <p class="spaced">
-                            {{ record.body | html2text | cutSentence(375, true) }}
-                        </p>
-                    </article>
-                {% endif %}
-
-                {% if not user.role.isParent %}
-                    {% if showBody %}
-
-                        {# Show related records #}
-
-                        {% if record.relatedRecords | length > 1 %}
-                            <p class="spaced">
-                                Linked Records:
-                                {% for related in record.relatedRecords %}
-                                    {% if related.student.id != record.student.id %}
-                                        <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">{{ related.student.fullName }}</a>{% if not loop.last %}, {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                            </p>
-                        {% endif %}
-                    {% endif %}
-
-                    {# Record metddata #}
-
-                    {% include '@pastoral/fragments/recordMeta.twig' with {record: record, showBody: showBody} %}
-
-                {% endif %}
             </div>
+            {% if showBody %}
+                <article>
+                    <p class="spaced">
+                        {{ record.body | html2text | cutSentence(375, true) }}
+                    </p>
+
+                    {% if not user.role.isParent %}
+                        {% if showBody %}
+
+                            {# Show related records #}
+
+                            {% if record.relatedRecords | length > 1 %}
+                                <p class="spaced">
+                                    Linked Records:
+                                    {% for related in record.relatedRecords %}
+                                        {% if related.student.id != record.student.id %}
+                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">{{ related.student.fullName }}</a>{% if not loop.last %}, {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Record metddata #}
+
+                        {% include '@pastoral/fragments/recordMeta.twig' with {record: record, showBody: showBody} %}
+
+                    {% endif %}
+                </article>
+            {% endif %}
         </div>
 
         <nav>

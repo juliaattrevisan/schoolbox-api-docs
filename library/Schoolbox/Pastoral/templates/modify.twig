@@ -55,10 +55,10 @@
                             Title
                             <input type="text" class="required" name="heading" size="35" maxlength="100" value="{{ record.heading }}"/>
                         </label>
-                        <p class="meta">
+                        <div class="alert-box warning icon-info">
                             Important Note: The title of a pastoral record will remain visible on pastoral records listed as private.
                             Please do not include confidential information in the title of the record.
-                        </p>
+                        </div>
                     </div>
                 </fieldset>
             </section>
@@ -199,7 +199,7 @@
                                     <label for="group[{{ group.id }}]" class="checkbox-label">{{ group.name }}</label>
                                 {% endfor %}
                             </label>
-                            <p class="meta">Important Note: Users that are members of these groups can view the contents of private records.</p>
+                            <div class="alert-box warning icon-info">Important Note: Users that are members of these groups can view the contents of private records.</div>
                         {% else %}
                             <label>Pastoral Group Access</label>
                             <p class="meta">
@@ -221,7 +221,7 @@
                                       title="Add individual users who you would like to access this record and its contents. These users will be able to see content marked as hidden.">?</span>
                                 <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
                             </label>
-                            <p class="meta">Important Note: Users granted individual access can view the contents of private records.</p>
+                            <div class="alert-box warning icon-info">Important Note: Users granted individual access can view the contents of private records.</div>
                         </div>
                     </fieldset>
                     {% set found = 0 %}
@@ -234,7 +234,7 @@
                                 <label>
                                     Existing Individual User Access
                                 </label>
-                                <ul class="grid information-list">
+                                <ul class="information-list">
                                     {% for access in record.access if access.user.id != '' %}
                                         <li class="actions-small-1">
                                             <div class="list-item">

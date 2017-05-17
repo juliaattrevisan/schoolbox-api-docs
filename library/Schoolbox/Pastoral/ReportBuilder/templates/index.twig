@@ -34,7 +34,7 @@
                 {% if loop.first %}
                     {% set found = 1 %}
                     <section>
-                    <ul id="studentsList" class="grid information-list">
+                    <ul id="studentsList" class="information-list">
                 {% endif %}
                 <li class="actions-small-2">
                     <div class="list-item">
@@ -88,26 +88,24 @@
                     <h2 class="subheader">Shared Pastoral Reports</h2>
                     <p class="meta">These reports have been shared with you based on your pastoral group membership.</p>
                     <section>
-                    <ul id="studentsList" class="grid information-list">
+                    <ul id="studentsList" class="information-list">
 
                 {% endif %}
 
                 <li>
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <a href="{{ profile.link(report.owner) }}">
-                                {{ profile.imageSquare64(report.owner) }}
-                            </a>
-                            <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
-                                <h3>{{ report.name }}</h3>
-                            </a>
-                            <p class="meta">
-                                <i title="Pastoral Groups" class="icon-group"></i>
-                                {% for group in report.groups %}
-                                    {{ group.name }}{% if not loop.last %},{% endif %}
-                                {% endfor %}
-                            </p>
-                        </div>
+                    <div class="card small-12">
+                        <a href="{{ profile.link(report.owner) }}">
+                            {{ profile.imageSquare64(report.owner) }}
+                        </a>
+                        <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
+                            <h3>{{ report.name }}</h3>
+                        </a>
+                        <p class="meta">
+                            <i title="Pastoral Groups" class="icon-group"></i>
+                            {% for group in report.groups %}
+                                {{ group.name }}{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        </p>
                     </div>
                 </li>
             {% endfor %}

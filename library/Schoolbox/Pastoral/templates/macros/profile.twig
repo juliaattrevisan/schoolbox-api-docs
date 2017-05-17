@@ -11,7 +11,7 @@
 {%- endmacro %}
 
 {% macro imagePortrait(user) -%}
-    <img src="/portrait.php?userId={{ user.externalId }}&size=profile" alt="{{ user.fullName }}" title="{{ user.fullName }}">
+    <img class="full-width" src="/portrait.php?userId={{ user.externalId }}&size=profile" alt="{{ user.fullName }}" title="{{ user.fullName }}">
 {%- endmacro %}
 
 {% macro link(user) -%}
