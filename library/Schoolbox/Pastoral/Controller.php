@@ -287,6 +287,12 @@ class Controller extends Base
      */
     public function getStudentRecord($record, $student)
     {
+        // They've manually stuck in an ID number they don't have access to- so the record doesn't get hydrated in the preload
+
+        if (!$record instanceof Model) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+        }
+
         // Create an audit record
 
         /** @var PastoralAudit $auditRecord */
