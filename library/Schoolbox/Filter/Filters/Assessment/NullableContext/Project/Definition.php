@@ -22,14 +22,13 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
  */
 class Definition extends NullableContext\Definition
 {
-    const SLUG = 'p';
 
     // Where does the project reside?
-    const KEY_ON_CLASS_FOLDER    = 'on_class_folder';     // created directly on a class folder
-    const KEY_ON_GROUP_FOLDER    = 'on_group_folder';     // created directly on a group folder
+    const KEY_ON_CLASS_FOLDER = 'on_class_folder';     // created directly on a class folder
+    const KEY_ON_GROUP_FOLDER = 'on_group_folder';     // created directly on a group folder
     const KEY_ON_CLASS_UNIT_IMPL = 'on_class_unit_impl';  // imported onto class folder
     const KEY_ON_GROUP_UNIT_IMPL = 'on_group_unit_impl';  // imported onto group folder
-    const KEY_ON_UNIT_SPEC       = 'on_unit_spec';        // on unit spec
+    const KEY_ON_UNIT_SPEC = 'on_unit_spec';        // on unit spec
 
 
     /**
@@ -65,8 +64,6 @@ class Definition extends NullableContext\Definition
     }
 
 
-
-
     /**
      * @inheritdoc
      */
@@ -100,6 +97,7 @@ class Definition extends NullableContext\Definition
         }
         throw new \InvalidArgumentException("Unknown Project filter key: $key");
     }
+
 
     /**
      * @inheritdoc

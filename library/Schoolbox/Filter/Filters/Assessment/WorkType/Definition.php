@@ -23,7 +23,6 @@ use Schoolbox\Learning\Assessment\WorkType;
  */
 class Definition extends AbstractDefinition
 {
-    const SLUG = 'wk';
 
     // If assessment does not have a WorkType at all
     const KEY_NONE = ' none';
@@ -62,6 +61,7 @@ class Definition extends AbstractDefinition
             self::KEY_NONE,
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -181,6 +181,7 @@ class Definition extends AbstractDefinition
         // by default, all WorkTypes are available
         return true;
     }
+
 
     /**
      * @inheritdoc

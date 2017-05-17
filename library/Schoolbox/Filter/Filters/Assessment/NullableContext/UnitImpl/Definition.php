@@ -26,9 +26,6 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
 class Definition extends NullableContext\Definition
 {
 
-    const SLUG = 'ui';
-
-
     /**
      * @inheritdoc
      */
@@ -51,6 +48,7 @@ class Definition extends NullableContext\Definition
         }
         throw new \InvalidArgumentException("Unknown 'UnitImpl' filter key: $key");
     }
+
 
     /**
      * @inheritdoc

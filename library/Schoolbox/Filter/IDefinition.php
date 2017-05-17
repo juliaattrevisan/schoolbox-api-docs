@@ -27,6 +27,7 @@ use Schoolbox\Filter;
  */
 interface IDefinition
 {
+
     /**
      * @return Filter\Model
      */
@@ -89,20 +90,6 @@ interface IDefinition
 
 
     /**
-     * Get the key that this filter uses when building URL GET param lists
-     *
-     * eg /learning/markbook/151?f=43,176&tc=2015-2
-     * * Folders 43 + 176
-     * * Term 2015-2
-     *
-     * The value must be short and unique to enable lots of data in a GET url
-     *
-     * @return string
-     * @throws \DomainException If slug has not been set
-     */
-    public static function getSlug();
-
-    /**
      * Return an ordered list of pages where this filter is available
      *
      * @see FilterOption::PAGE_* constants
@@ -131,6 +118,7 @@ interface IDefinition
      * @throws \InvalidArgumentException If key is recognised as invalid
      */
     public function getLabel($key);
+
 
     /**
      * If the admin has not configured this option, should it be available in filter panels?

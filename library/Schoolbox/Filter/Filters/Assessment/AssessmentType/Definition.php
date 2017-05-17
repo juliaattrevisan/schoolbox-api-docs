@@ -28,12 +28,11 @@ use Schoolbox\Learning\Assessment\AssessmentType;
  */
 class Definition extends AbstractDefinition
 {
-    const SLUG = 'a';
 
-    const KEY_PROJECT  = AssessmentType::TYPE_PROJECT;
-    const KEY_QUIZ     = AssessmentType::TYPE_QUIZ;
+    const KEY_PROJECT = AssessmentType::TYPE_PROJECT;
+    const KEY_QUIZ = AssessmentType::TYPE_QUIZ;
     const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
-    const KEY_TASK     = AssessmentType::TYPE_TASK;
+    const KEY_TASK = AssessmentType::TYPE_TASK;
 
     /** @var Collection|string[] */
     private $assessmentTypes;
@@ -90,6 +89,7 @@ class Definition extends AbstractDefinition
         throw new \InvalidArgumentException("Unknown AssessmentType key: $key");
     }
 
+
     /**
      * @inheritdoc
      */
@@ -99,6 +99,7 @@ class Definition extends AbstractDefinition
         return true;
     }
 
+
     /**
      * @inheritdoc
      */
@@ -106,6 +107,7 @@ class Definition extends AbstractDefinition
     {
         return $this->assessmentTypes->getAll();
     }
+
 
     /**
      * @inheritdoc
@@ -140,6 +142,7 @@ class Definition extends AbstractDefinition
         // No options checked
         return false;
     }
+
 
     /**
      * @inheritdoc

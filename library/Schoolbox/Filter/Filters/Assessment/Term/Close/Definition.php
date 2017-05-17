@@ -27,9 +27,6 @@ use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
 class Definition extends AssessmentTermFilter\Definition
 {
 
-    const SLUG = 'tc';
-
-
     /**
      * @inheritdoc
      */
@@ -38,6 +35,7 @@ class Definition extends AssessmentTermFilter\Definition
         // Not currently exposed in the UI - used just for internal query building
         return [];
     }
+
 
     /**
      * @inheritdoc

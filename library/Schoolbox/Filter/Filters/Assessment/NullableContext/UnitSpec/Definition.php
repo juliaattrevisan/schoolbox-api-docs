@@ -25,7 +25,6 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
  */
 class Definition extends NullableContext\Definition
 {
-    const SLUG = 'us';
 
     /**
      * @inheritdoc
@@ -44,11 +43,12 @@ class Definition extends NullableContext\Definition
      */
     public function getLabel($key)
     {
-        if(self::KEY_NONE === $key){
+        if (self::KEY_NONE === $key) {
             return 'None (assessment does reside inside a unit specification)';
         }
         throw new \InvalidArgumentException("Unknown 'UnitSpec' filter key: $key");
     }
+
 
     /**
      * @inheritdoc

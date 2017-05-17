@@ -19,8 +19,6 @@ use Schoolbox\Mapper;
  */
 abstract class AbstractDefinition implements IDefinition
 {
-    // Concrete classes must override with short string, eg 'f' for 'folder' filter
-    const SLUG = null;
 
     /** @var Filter\Model */
     private $filter;
@@ -44,17 +42,6 @@ abstract class AbstractDefinition implements IDefinition
         $this->filterDefaultMapper = $filterDefaultMapper;
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public static function getSlug()
-    {
-        if(null === static::SLUG){
-            throw new \DomainException('Slug not set. Concrete class must override with non-null value');
-        }
-        return static::SLUG;
-    }
 
     /**
      * Grouped by option.key (abstract key), then indexed by option.page
@@ -127,7 +114,7 @@ abstract class AbstractDefinition implements IDefinition
 
         // Convert to ordered by abstract key
         $optionsPerKey = new Collection();
-        foreach($customKeys as $customKey){
+        foreach ($customKeys as $customKey) {
             $optionsPerKey->setOffset($customKey, $this->getFilterOptionMapper()->createCollection());
         }
 

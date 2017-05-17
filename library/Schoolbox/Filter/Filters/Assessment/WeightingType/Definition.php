@@ -23,10 +23,9 @@ use Schoolbox\GenericCollection;
  */
 class Definition extends AbstractDefinition
 {
-    const SLUG = 'wt';
 
-    const KEY_WEIGHTED    = 'weighted';
-    const KEY_UNWEIGHTED  = 'unweighted';
+    const KEY_WEIGHTED = 'weighted';
+    const KEY_UNWEIGHTED = 'unweighted';
 
 
     /** @var Collection|string[] */
@@ -48,6 +47,7 @@ class Definition extends AbstractDefinition
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->weightingTypes = $weightingTypes->shallowClone();
     }
+
 
     /**
      * @inheritdoc
@@ -96,6 +96,7 @@ class Definition extends AbstractDefinition
         return $pageOptions;
     }
 
+
     /**
      * @inheritdoc
      */
@@ -124,6 +125,7 @@ class Definition extends AbstractDefinition
         // by default, all WeightingTypes are available
         return true;
     }
+
 
     /**
      * @inheritdoc

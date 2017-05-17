@@ -22,7 +22,6 @@ use Schoolbox\GenericCollection;
  */
 class Definition extends AbstractDefinition
 {
-    const SLUG = 'f';
 
     const KEY_CLASSES = 'classes';
     const KEY_GROUPS = 'groups';
@@ -105,6 +104,7 @@ class Definition extends AbstractDefinition
         }
         throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
     }
+
 
     /**
      * @inheritdoc

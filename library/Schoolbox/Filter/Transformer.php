@@ -86,7 +86,7 @@ class Transformer
      *
      * @param string $filterClass
      * @return null|Collection|mixed[]
-     * @throws \InvalidArgumentException If no KeyConverter registered for specified slug
+     * @throws \InvalidArgumentException If no KeyConverter registered for specified filter class
      */
     public function getSelectedItems($filterClass)
     {
