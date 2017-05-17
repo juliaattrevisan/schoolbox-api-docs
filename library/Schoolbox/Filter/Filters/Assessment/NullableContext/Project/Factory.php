@@ -80,7 +80,7 @@ class Factory extends AbstractFactory
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      */
-    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         return [
             'projects' => $this->getProjects($definition->getOptions($page), $page, $viewee),

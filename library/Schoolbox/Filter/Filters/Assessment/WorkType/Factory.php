@@ -12,6 +12,7 @@ use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -55,7 +56,7 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, Filter\IDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, Filter\IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         return [];
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\IDefinition;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
 
@@ -33,7 +34,7 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         return [];
     }

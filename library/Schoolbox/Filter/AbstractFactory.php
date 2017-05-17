@@ -91,7 +91,7 @@ abstract class AbstractFactory implements IFactory
             'filterSelectionMapper' => $this->filterSelectionMapper,
         ];
 
-        $extraArgs = $this->buildExtraComponentArgs($user, $page, $definition, $viewee);
+        $extraArgs = $this->buildExtraComponentArgs($user, $page, $definition, $selectionOverrides, $viewee);
 
         $componentClass = $this->getAdjacentClass($definitionClass, 'Component');
 
@@ -126,13 +126,14 @@ abstract class AbstractFactory implements IFactory
     }
 
     /**
-     * @param User        $user
-     * @param string      $page
-     * @param IDefinition $definition
-     * @param null|User   $viewee
+     * @param User                                     $user
+     * @param string                                   $page
+     * @param IDefinition                              $definition
+     * @param null|GenericCollection|Selection\Model[] $overrides
+     * @param null|User                                $viewee
      * @return mixed[]
      */
-    protected abstract function buildExtraComponentArgs(User $user, $page, IDefinition $definition, User $viewee = null);
+    protected abstract function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null);
 
 
     /**
