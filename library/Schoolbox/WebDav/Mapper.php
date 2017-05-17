@@ -34,6 +34,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME);
+        $this->uses('role_type', self::TYPE_STRING);
         $this->joins('campus_id', CampusMapper::class, 'id', null, null, 'campus', 'campus');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
         $this->hasSoftDeleteDateField('deleted_at');

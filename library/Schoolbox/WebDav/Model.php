@@ -36,6 +36,9 @@ class Model implements ISoftDeletable
     /** @var Role */
     protected $role;
 
+    /** @var string */
+    protected $roleType;
+
     /** @var Campus */
     protected $campus;
 
@@ -166,5 +169,23 @@ class Model implements ISoftDeletable
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoleType()
+    {
+        return $this->roleType;
+    }
+
+    /**
+     * @param string $roleType
+     * @return self
+     */
+    public function setRoleType($roleType)
+    {
+        $this->roleType = $roleType;
+        return $this;
     }
 }
