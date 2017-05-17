@@ -470,7 +470,7 @@ class Factory
             }
             if ($user->getRole()->isParent()) {
                 $paths = array(
-                    $settings['baseUri'] . '/reports/' . $session['username'] . '/',
+                    $settings['baseUri'] . '/reports/' . $session['year'] . '/',
                 );
             }
         } elseif ($siteLocation === 'sicol') {
