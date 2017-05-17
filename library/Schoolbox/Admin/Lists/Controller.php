@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Lists;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -191,10 +192,10 @@ class Controller extends Base
             ['key' => '', 'value' => ''],
         ];
         $luRoleType = [
-            ['key' => 'guest', 'value' => 'Guest'],
-            ['key' => 'staff', 'value' => 'Staff'],
-            ['key' => 'student', 'value' => 'Student'],
-            ['key' => 'parent', 'value' => 'Parent'],
+            ['key' => Role::GUEST,   'value' => 'Guest'],
+            ['key' => Role::STAFF,   'value' => 'Staff'],
+            ['key' => Role::STUDENT, 'value' => 'Student'],
+            ['key' => Role::PARENT,  'value' => 'Parent'],
         ];
 
         $luRole = [];
