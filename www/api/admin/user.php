@@ -37,8 +37,8 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
     if (!empty($getValues['lastname'])) {
         $user = $user->setLastname($getValues['lastname']);
     }
-    if (!empty($getValues['local_email'])) {
-        $user = $user->setLocalEmail($getValues['local_email']);
+    if (isset($getValues['local_email'])) {
+        $user = $user->setLocalEmail((bool)$getValues['local_email']);
     }
     if (!empty($getValues['alt_email'])) {
         $user = $user->setAltEmail($getValues['alt_email']);
@@ -46,8 +46,8 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
     if (!empty($getValues['position_title'])) {
         $user = $user->setPositionTitle($getValues['position_title']);
     }
-    if (!empty($getValues['su'])) {
-        $user = $user->setSuperuser($getValues['su']);
+    if (isset($getValues['su'])) {
+        $user = $user->setSuperuser((bool)$getValues['su']);
     }
     if (is_numeric($getValues['database_id'])) {
         $user = $user->setExternalId($getValues['database_id']=='' ? null : $getValues['database_id']);
@@ -55,13 +55,13 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
     if (is_numeric($getValues['year'])) {
         $user = $user->setYear($getValues['year'] == '' ? null : $getValues['year']);
     }
-    if (is_numeric($getValues['eportfolio_enabled'])) {
+    if (isset($getValues['eportfolio_enabled'])) {
         $user = $user->setEportfolioEnable((bool)$getValues['eportfolio_enabled']);
     }
-    if (is_numeric($getValues['hide_contacts'])) {
+    if (isset($getValues['hide_contacts'])) {
         $user = $user->setHideContacts((bool)$getValues['hide_contacts']);
     }
-    if (is_numeric($getValues['hide_timetable'])) {
+    if (isset($getValues['hide_timetable'])) {
         $user = $user->setHideTimetable((bool)$getValues['hide_timetable']);
     }
     if (!empty($getValues['password'])) {
@@ -84,10 +84,10 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
         );
     }
 
-    if (is_numeric($getValues['display_grade_graph'])) {
+    if (isset($getValues['display_grade_graph'])) {
         $user = $user->setDisplayGradeGraph((bool)$getValues['display_grade_graph']);
     }
-    if (is_numeric($getValues['enabled'])) {
+    if (isset($getValues['enabled'])) {
         $user = $user->setEnabled((bool)$getValues['enabled']);
     }
 
