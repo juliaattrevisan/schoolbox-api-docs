@@ -34,39 +34,60 @@ if (empty($format) || $full) {
 ////
 
 
-/* Allow null values
- */
 if (empty($string)) {
-	echo json_encode(array(
-		'time' => null,
-	));
+    // null is ok: failfast
+    die(json_encode([ 'time' => null ]));
 }
-else {
-	$datetime = DateTime::createFromFormat($format, $string);
 
-	if (!$datetime) {
-		try {
-			$datetime = new DateTime(str_replace('/','-',$string));
-		}
-		catch (Exception $ex) {}
-	}
+// compensate for natural language
+$parseable = denaturalise($string);
 
-	if ($datetime instanceof DateTime) {
-		echo json_encode(
-			array(
-				'time' => $datetime->format($format)
-			)
-		);
-	}
-	else {
-		//
-		// Datetime wasn't able to be created? error out but preserve old error
-		// functionality (where time doesn't change at all)
-		echo json_encode(
-			array(
-				'time'  => $string,
-				'error' => 'Could not parse date',
-			)
-		);
-	}
+$datetime = DateTime::createFromFormat($format, $parseable);
+
+if (!$datetime) {
+    try {
+        $datetime = new DateTime(str_replace('/','-', $parseable));
+
+    } catch (Exception $ex) {
+        // noop
+    }
+}
+
+if ($datetime instanceof DateTime) {
+    die(json_encode([ 'time' => $datetime->format($format) ]));
+}
+
+// Datetime wasn't able to be created? error out but preserve old error
+// functionality (where time doesn't change at all)
+die(json_encode([
+    'time'  => $string,
+    'error' => 'Could not parse date',
+]));
+
+
+/**
+ * Attempt to normalise natural language into what strtotime() will be able to understand
+ *
+ * @param string $string
+ * @return string
+ */
+function denaturalise($string)
+{
+
+    // normalise any whitespace
+    $string = preg_replace('`\s+`', ' ', trim($string));
+
+    // remove "^in " and " from now$"
+    $string = str_replace(['in ', ' from now', ' at '], ' ', $string);
+
+    // replace all word-numbers with number-numbers
+    $words = [
+        'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'
+    ];
+
+    $string = str_replace($words, array_keys($words), $string);
+
+    // known limitation: 23:00am fails to parse
+
+    return $string;
 }
