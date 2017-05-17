@@ -10,8 +10,13 @@
 // always JSON response
 header('Content-Type: application/json');
 
-
 $string = isset($_REQUEST['string']) ? $_REQUEST['string'] : '';
+
+if (empty($string)) {
+    // null is ok: failfast
+    die(json_encode([ 'time' => null ]));
+}
+
 $format = isset($_REQUEST['format']) ? $_REQUEST['format'] : '';
 $full   = $format === 'local_full';
 
@@ -33,11 +38,6 @@ if (empty($format) || $full) {
 ////  WARNING: no library code beyond this point - bootstrap is not guaranteed  ////
 ////
 
-
-if (empty($string)) {
-    // null is ok: failfast
-    die(json_encode([ 'time' => null ]));
-}
 
 // compensate for natural language
 $parseable = denaturalise($string);
