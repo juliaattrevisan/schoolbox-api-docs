@@ -186,4 +186,4 @@ ALTER TABLE `pastoral` MODIFY `severity_id` INT(11);
 INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES ('pastoral_page_size', '15', 'Records On Pastoral Page', 'The number of records to display on each page of a students pastoral care record.', 1, null, 5, 'true', 'false', 'false');
 INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES ('pastoral_page_visible', '15', 'Number Of Pages Visible On Pastoral Paginator', 'The number of pages to display on the pastoral care paginator.', 1, null, 5, 'true', 'false', 'false');
 
-UPDATE config SET name = 'external_pastoral', value = '1', title = 'External Pastoral Syncronisation', description = 'Enables the writeback of pastoral records to your SIS.', field_id = 3, options = '', type_id = 7, editable = 'true', hidden = 'false', required = 'false' WHERE configID = 313;
+UPDATE config SET description = 'Enables the writeback of pastoral records to your SIS.' WHERE `name` = 'external_pastoral';
