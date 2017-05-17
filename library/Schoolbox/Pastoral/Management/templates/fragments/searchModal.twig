@@ -286,7 +286,7 @@
 
                 updateSearchResults(ajaxCache[searchText.toLowerCase()]);
 
-            } else if (searchText.length > 1) {
+            } else if (searchText.length >= {{ minimumSearchLength }}) {
 
                 {# Clear previous search results from the dialog and display preloader while we wait for the AJAX request to fire #}
 

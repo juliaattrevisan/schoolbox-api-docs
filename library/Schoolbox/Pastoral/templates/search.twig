@@ -15,7 +15,8 @@
 
             {% include '@pastoral/fragments/search.twig' with {'search': search} %}
 
-            {% if search | length >= 3 %}
+            {% if search | length >= minimumSearchLength %}
+
                 {% if results | length %}
 
                     <h2 class="subheader">Matching Pastoral Records</h2>

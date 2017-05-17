@@ -40,6 +40,7 @@ use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
@@ -203,9 +204,10 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoral/search.twig',
             'data' => [
-                'search'            => trim($get['keyword']),
-                'results'           => $this->pastoralMapper->getSearchResults($get['keyword']),
-                'students'          => $this->userMapper->findStudents($get['keyword'])
+                'search'                => trim($get['keyword']),
+                'results'               => $this->pastoralMapper->getSearchResults($get['keyword']),
+                'students'              => $this->userMapper->findStudents($get['keyword']),
+                'minimumSearchLength'   => Results::MIN_SEARCH_LENGTH
             ]
         ]);
     }

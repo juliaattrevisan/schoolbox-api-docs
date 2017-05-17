@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Resource\Search\Results;
 use Schoolbox\UserMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -72,7 +73,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/groupsModify.twig',
             'data' => [
-                'group' => $group
+                'group'                     => $group,
+                'minimumSearchLength'       => Results::MIN_SEARCH_LENGTH
             ]
         ]);
     }
