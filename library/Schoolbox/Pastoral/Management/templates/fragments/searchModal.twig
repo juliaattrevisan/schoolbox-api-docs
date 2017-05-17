@@ -7,7 +7,7 @@
     {# Container for search results #}
     {# --------------------------------------------------------------------------------------------------------------------------------------------#}
 
-    <div class="row {% if members | length == 0%}class="hide"{% endif %}" id="searchResultsContainerRow">
+    <div class="row {% if members | length == 0%}hide{% endif %}" id="searchResultsContainerRow">
         <div class="small-12">
             <section id="searchResultsContainer">
                 <ul class="grid information-list" id="searchResults">
@@ -57,30 +57,19 @@
         {ROLE}          - Users role
      #}
 
-    {# TODO: Front-end developer needs to tidy this mess up. #}
-
-    <style>
-        .list-item-selectable {
-            cursor:pointer;
-        }
-        .list-item-selectable:hover {
-            background-color: rgba(244, 244, 244, 1);
-        }
-    </style>
-
     {# This is only in an <ul> to prevent storm crying #}
 
     <ul id="cloneUser" class="hide">
-        <li class="list-item list-item-selectable" data-member-add="{ID}">
-            <div class="card small-12">
-                <!--suppress HtmlUnknownTarget -->
-                <a href="/search/user/{ID}">
+        <a class="list-item" data-member-add="{ID}">
+            <!--suppress HtmlUnknownTarget -->
+            <a href="/search/user/{ID}" class="link-row">
+                <div class="card small-12">
                     {# Have hardcoded the image size, and a background color so the list heights don't change as images pop in #}
-                    <img src="/portrait.php?userId={EXTERNALID}&size=square64" style="background-color:#c6c6c6;width:64px;height:64px;" alt="{NAME}" title="{NAME}">
-                </a>
-                <p>{FIRSTNAME} {LASTNAME}</p>
-                <p class="meta">{ROLE}</p>
-            </div>
+                    <img src="/portrait.php?userId={EXTERNALID}&size=square64" alt="{NAME}" title="{NAME}">
+                    <p>{FIRSTNAME} {LASTNAME}</p>
+                    <p class="meta">{ROLE}</p>
+                </div>
+            </a>
         </li>
     </ul>
 
