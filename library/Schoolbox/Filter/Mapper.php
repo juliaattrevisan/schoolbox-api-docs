@@ -26,14 +26,14 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('entity', self::TYPE_INTEGER);
+        $this->uses('entity', self::TYPE_STRING);
         $this->uses('class', self::TYPE_STRING);
     }
 
     /**
      * Find all filter instances that relate to the specified entity
      *
-     * @param int $entity
+     * @param string $entity  The mapper class for the filtered entity
      * @return GenericCollection|Model[]
      */
     public function findForEntity($entity)

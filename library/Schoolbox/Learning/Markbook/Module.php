@@ -24,6 +24,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error;
 use DueWork_ErrorMapper;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 
 
@@ -90,7 +91,9 @@ class Module extends BaseModule
                 'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
                 'access'                     => $this->getMapperFactory()->getLazy(Access::class), // Has a static 'getInstance()' method
                 'assessmentIdFinder'         => $injector->lazy(function(){
-                    return AssessmentFilter\IdFinder::getInstance($this->getMapperFactory()->get(Assessment\Mapper::class));
+                    return AssessmentFilter\IdFinder::getInstance(
+                        $this->getMapperFactory()->get(Filter\Mapper::class),
+                        $this->getMapperFactory()->get(Assessment\Mapper::class));
                 }),
                 'filterFactoryFactory'       => $injector->lazy(function(){
                     return new AssessmentFilter\FactoryFactory($this->getMapperFactory());

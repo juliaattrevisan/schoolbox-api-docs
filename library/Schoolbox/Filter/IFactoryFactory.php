@@ -58,11 +58,11 @@ interface IFactoryFactory
      * @param string    $page
      * @param string    $route
      * @param null|User $viewee
-     * @param array     $query
+     * @param array     $queryArgs
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If filter definition slug not set
      */
-    public function buildPanel(User $user, $page, $route, User $viewee = null, array $query = []);
+    public function buildPanel(User $user, $page, $route, User $viewee = null, array $queryArgs = []);
 }

@@ -261,7 +261,7 @@ class Controller extends Base
 
         // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
         // regardless of any filter selections send by user
-        $filters[AssessmentFilter\NullableContext\UnitSpec\Definition::SLUG] = new Collection();
+        $filters[AssessmentFilter\NullableContext\UnitSpec\Definition::class] = new Collection();
 
         return $filters;
     }

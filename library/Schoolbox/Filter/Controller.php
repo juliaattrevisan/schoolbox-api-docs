@@ -36,7 +36,7 @@ class Controller extends BaseController
         });
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
             'filtersPerEntity'   => $visibleFiltersPerEntity,
-            'ENTITY_ASSESSMENTS' => Model::ENTITY_ASSESSMENTS,
+            'ENTITY_ASSESSMENTS' => \Schoolbox\Learning\Assessment\DataModel\Mapper::class,
         ]));
     }
 

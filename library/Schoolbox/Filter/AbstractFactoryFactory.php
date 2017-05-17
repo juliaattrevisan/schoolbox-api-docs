@@ -16,11 +16,9 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 {
 
     /**
-     * What entity type does is the factoryFactory responsible for?
-     *
-     * @const int ENTITY
+     * Mapper class of the entity being filtered
      */
-    const ENTITY = 0;
+    const ENTITY = '';
 
     /** @var MapperFactory */
     private $mapperFactory;
@@ -37,12 +35,14 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
+     * Return the mapper class of the entity being filtered by this FactoryFactory
+     *
      * @return string
      * @throws \DomainException If called on abstract, or concrete class that does not override
      */
     public static function getEntity()
     {
-        if (0 === static::ENTITY) {
+        if ('' === static::ENTITY) {
             throw new \DomainException('Concrete classes must define this constant');
         }
         return static::ENTITY;
@@ -80,61 +80,49 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     /**
      * Builds a filter panel for the specified user and page, which submits selections to the specified route
      *
+     * Any overrides in $queryArgs will clobber any saved selections
+     *
      * @param User      $user
      * @param string    $page
      * @param string    $route
      * @param null|User $viewee
-     * @param array     $query
+     * @param array     $queryArgs Indexed by filter.id
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException If the specified class does not exist
-     * @throws \DomainException If filter definition slug not set
+     * @throws \DomainException If this class has not defined the entity it is filtering
      */
-    public function buildPanel(User $user, $page, $route, User $viewee = null, array $query = [])
+    public function buildPanel(User $user, $page, $route, User $viewee = null, array $queryArgs = [])
     {
         $filterComponents = $this->createFilterComponentCollection();
-        unset($query['page']);
+        unset($queryArgs['page']);
 
-        foreach ($this->getDefinitions($page) as $definitionClassName) {
-            $filterFactory = $this->buildFilterFactoryForFilter($definitionClassName);
-            $queryKey      = $definitionClassName::getSlug();
-            $overrides     = array_key_exists($queryKey, $query) ? explode(',', $query[$queryKey]) : null;
-            $component     = $filterFactory->buildComponent($definitionClassName, $user, $page, $viewee, $overrides);
+        // Get filters for this factoryFactory's entity type
+        $entityFilters = $this->getFilterMapper()->findForEntity(self::getEntity());
+
+        foreach($entityFilters as $filter){
+            $filterClass = $filter->getClass();
+
+            // Does the filter not appear on the specified page?
+            if (!in_array($page, $filterClass::getPages(), true)) {
+                // Don't insert the filter component in panel
+                continue;
+            }
+
+            $filterFactory = $this->buildFilterFactoryForFilter($filter->getClass());
+
+            // Did controller or URL request to override saved user-selections ?
+            $overrides     = array_key_exists($filter->getId(), $queryArgs) ? explode(',', $queryArgs[$filter->getId()]) : null;
+            $component     = $filterFactory->buildComponent($filterClass, $user, $page, $viewee, $overrides);
 
             // Don't bother inserting component if it wasn't build (because no options would be available anyway)
             if ($component) {
-                $filterComponents->setOffset($definitionClassName, $component);
+                $filterComponents->setOffset($filterClass, $component);
             }
-
         }
 
         return new Panel($route, $filterComponents);
     }
-
-
-    /**
-     * Get the set of filters that are implemented by the specified page
-     *
-     * @param string $page
-     * @return string[]|IDefinition[]
-     * @throws \InvalidArgumentException If unable to locate Filter Mapper class
-     */
-    private function getDefinitions($page)
-    {
-        $allFilters        = $this->getFilterMapper()->findAll();
-        $definitionClasses = [];
-        foreach ($allFilters as $filter) {
-            /** @var string|IDefinition $definitionClass */
-            $definitionClass = $filter->getClass();
-
-            // Does this filter appear on the specified page?
-            if (in_array($page, $definitionClass::getPages(), true)) {
-                $definitionClasses[] = $definitionClass;
-            }
-        }
-        return $definitionClasses;
-    }
-
 
     /**
      * @param null|IComponent[] $contents

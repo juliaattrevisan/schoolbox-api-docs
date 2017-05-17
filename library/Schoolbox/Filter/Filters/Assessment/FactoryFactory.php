@@ -20,12 +20,12 @@ use Schoolbox\Filter\Filters;
 
 
 /**
- * The FilterFactoryFactory is responsible for creating assessment-filter factories.
+ * The Assessment FilterFactoryFactory is responsible for creating assessment-filter factories.
  */
 class FactoryFactory extends Filter\AbstractFactoryFactory
 {
 
-    const ENTITY = Filter\Model::ENTITY_ASSESSMENTS;
+    const ENTITY = \Schoolbox\Learning\Assessment\DataModel\Mapper::class;
 
 
     /**

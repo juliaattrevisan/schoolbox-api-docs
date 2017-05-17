@@ -62,7 +62,7 @@ class Module extends AlaressModule
 
                 $filterFactoryFactory = null;
                 switch ($filterInstance->getEntity()) {
-                    case Model::ENTITY_ASSESSMENTS:
+                    case \Schoolbox\Learning\Assessment\DataModel\Mapper::class:
                         $filterFactoryFactory = new FactoryFactory($this->getMapperFactory());
                         break;
                     // Other entity types can have their factory factories registered here

@@ -207,12 +207,13 @@ class Controller extends Base
      * @level 165
      * @param User                             $viewee The user whose pending assessments we are viewing.
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
+     * @var mixed[][] $_GET. Comma-separated keys, indexed by filter.id. Eg '1=&2=weighted&3=1,2,3' (1 => [], 2 => [weighted], 3 => [1,2,3])
      * @throws RouteNotFound
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws Mapper\Exception
      * @throws \ReflectionException If unable to find the class for a filter registered on this page
-     * @throws \DomainException If filter definition slug not set
+//     * @throws \DomainException If filter definition class not set
      * @todo  split pending assessments into own controller
      */
     public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
@@ -293,12 +294,12 @@ class Controller extends Base
         $selectionTransformer = new Filter\Transformer($keyConverters, $selectionsPerFilter);
 
         // Get selections, defaulting to full possible set if filter not present in panel (ie if disabled by admin)
-        $selectedTerms           = $selectionTransformer->getSelectedItems(AssessmentFilters\Term\Due\Definition::SLUG);
-        $selectedWorkTypes       = $selectionTransformer->getSelectedItems(AssessmentFilters\WorkType\Definition::SLUG);
-        $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentFilters\AssessmentType\Definition::SLUG);
-        $selectedFolderIds       = $selectionTransformer->getSelectedItems(AssessmentFilters\Folder\Definition::SLUG);
-        $selectedWeightings      = $selectionTransformer->getSelectedItems(AssessmentFilters\WeightingType\Definition::SLUG);
-        $selectedUnitIds         = $selectionTransformer->getSelectedItems(AssessmentFilters\NullableContext\UnitImportSpec\Definition::SLUG);
+        $selectedTerms           = $selectionTransformer->getSelectedItems(AssessmentFilters\Term\Due\Definition::class);
+        $selectedWorkTypes       = $selectionTransformer->getSelectedItems(AssessmentFilters\WorkType\Definition::class);
+        $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentFilters\AssessmentType\Definition::class);
+        $selectedFolderIds       = $selectionTransformer->getSelectedItems(AssessmentFilters\Folder\Definition::class);
+        $selectedWeightings      = $selectionTransformer->getSelectedItems(AssessmentFilters\WeightingType\Definition::class);
+        $selectedUnitIds         = $selectionTransformer->getSelectedItems(AssessmentFilters\NullableContext\UnitImportSpec\Definition::class);
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
