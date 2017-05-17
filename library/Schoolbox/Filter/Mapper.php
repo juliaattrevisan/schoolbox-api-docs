@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
 /**
@@ -43,12 +44,12 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * @param string $class
-     * @return Model
+     * @param string|string[] $class
+     * @return Collection|Model[]
      */
     public function findByClass($class)
     {
-        return $this->findByColumn('class', $class)->first();
+        return $this->findByColumn('class', $class);
     }
 
 }

@@ -52,10 +52,11 @@ class Transformer extends \Schoolbox\Filter\Transformer
      */
     public function getSelectedItems($filterClass)
     {
-        if (!$this->getKeyConverters()->offsetExists($filterClass)) {
-            throw new \InvalidArgumentException("No KeyConverter found for filter definition class: $filterClass");
+        if (!$this->getFiltersByClass()->offsetExists($filterClass)) {
+            throw new \InvalidArgumentException("No KeyConverter found for filter class: $filterClass");
         }
-        $keyConverter = $this->getKeyConverters()[$filterClass];
+        $instance = $this->getFiltersByClass()[$filterClass];
+        $keyConverter = $this->getKeyConverters()[$instance->getId()];
 
         // Is this a 'nullable-context' assessment filter
         $nullableContexts = [
@@ -67,8 +68,8 @@ class Transformer extends \Schoolbox\Filter\Transformer
         if(in_array($filterClass, $nullableContexts, true)){
             $foldersFiltered = null !== $this->folderSelections;
             /** @var NullableContext\KeyConverter $keyConverter */
-            return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$filterClass], $foldersFiltered);
+            return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()], $foldersFiltered);
         }
-        return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$filterClass]);
+        return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()]);
     }
 }

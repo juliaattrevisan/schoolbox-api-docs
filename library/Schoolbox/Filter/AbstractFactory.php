@@ -66,9 +66,9 @@ abstract class AbstractFactory implements IFactory
      * @throws \ReflectionException If unable to create an instance of the reflected class
      * @throws Mapper\Exception If invalid columns names are used
      */
-    public function buildComponent($definitionClass, User $user, $page, User $viewee = null, array $selectionOverrides = null)
+    public function buildComponent($definitionClass, User $user, $page, User $viewee = null, GenericCollection $selectionOverrides = null)
     {
-        $filter     = $this->filterMapper->findByClass($definitionClass);
+        $filter     = $this->filterMapper->findByClass($definitionClass)->first();
         $definition = $this->buildDefinition($filter);
 
         // Don't bother building a component if it will be empty
@@ -79,6 +79,7 @@ abstract class AbstractFactory implements IFactory
             return null;
         }
 
+        // Don't bother loading user's saved selections if we are just going to override them
         $overrideUserSelections = null !== $selectionOverrides;
 
         $baseArgs = [

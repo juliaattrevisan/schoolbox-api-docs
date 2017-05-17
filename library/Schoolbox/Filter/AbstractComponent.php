@@ -42,7 +42,7 @@ abstract class AbstractComponent implements IComponent
      *
      * This gives the controller the ability to jump to specific data sets
      *
-     * @var string[]|null
+     * @var null|GenericCollection|Selection\Model[]
      */
     private $selectionOverrides;
 
@@ -56,7 +56,7 @@ abstract class AbstractComponent implements IComponent
      * @param User                                     $user
      * @param string                                   $page
      * @param null|GenericCollection|Selection\Model[] $savedSelections Existing selections for this filter, user and page
-     * @param null|string[]                            $overrides
+     * @param null|GenericCollection|Selection\Model[] $overrides
      * @param Selection\Mapper                         $filterSelectionMapper
      * @throws \DomainException If both saved selections and override selections are null
      */
@@ -65,7 +65,7 @@ abstract class AbstractComponent implements IComponent
         User $user,
         $page,
         GenericCollection $savedSelections = null,
-        array $overrides = null,
+        GenericCollection $overrides = null,
         Selection\Mapper $filterSelectionMapper
     ) {
         // Ensure we have either saved user selections (even if empty) or override selections
@@ -77,7 +77,7 @@ abstract class AbstractComponent implements IComponent
         $this->user                  = $user;
         $this->page                  = $page;
         $this->savedSelections       = $savedSelections;
-        $this->selectionOverrides    = is_array($overrides) ? array_combine($overrides, $overrides) : null;
+        $this->selectionOverrides    = $overrides;
         $this->filterSelectionMapper = $filterSelectionMapper;
     }
 
@@ -101,7 +101,7 @@ abstract class AbstractComponent implements IComponent
     {
         $availableSelections = $this->getRoleSelections($availableOptions);
 
-        if (is_array($this->selectionOverrides)) {
+        if ($this->selectionOverrides instanceof GenericCollection) {
             $availableSelections = $this->overlayOverrideSelections($availableSelections);
         } else {
             $availableSelections = $this->overlayUserSelections($availableSelections);
@@ -171,7 +171,7 @@ abstract class AbstractComponent implements IComponent
     {
         // Overlay controller-injected selection settings
         foreach ($availableSelections as $key => $availableSelection) {
-            $availableSelection->setSelected(array_key_exists($key, $this->selectionOverrides));
+            $availableSelection->setSelected($this->selectionOverrides->keyExists($key) && $this->selectionOverrides[$key]->getSelected());
         }
 
         return $availableSelections;

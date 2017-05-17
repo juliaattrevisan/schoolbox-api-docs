@@ -39,6 +39,16 @@ class KeyConverter extends AbstractKeyConverter
     }
 
 
+//    /**
+//     * @param string $item
+//     * @return string
+//     */
+//    public function getKey($item)
+//    {
+//        return (string)$item;
+//    }
+
+
     /**
      * @inheritdoc
      * @return string

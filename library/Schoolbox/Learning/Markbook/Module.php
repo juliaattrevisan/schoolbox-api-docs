@@ -54,8 +54,9 @@ class Module extends BaseModule
             }
             return [];
         };
+        $this->register('GET',  '/class/{folderId:\d+}{/userId}',                   'getMarkbookForClass',        $isStaffOrSuper, $preload);
+        $this->register('GET',  '/class/{folderId:\d+}/term/{termId:\d+}{/userId}', 'getMarkbookForClassAndTerm', $isStaffOrSuper, $preload);
 
-        $this->register('GET',  '/class/{folderId:\d+}{/userId}', 'getMarkbookForClass', $isStaffOrSuper, $preload);
 
         $this->register('GET',  '/export', 'getMarkbookExport', $isStaffOrSuper);
 

@@ -40,18 +40,12 @@ class Mapper extends \Schoolbox\Mapper
      * Update the specified user's filter selections for the specified page
      * Returns the saved selections, grouped by filter.id, then indexed by selection.key
      *
-     * @param GenericCollection|Filter\IKeyConverter[] $keyConverters         Indexed by filter.id
      * @param User                                     $user
      * @param string                                   $page
-     * @param bool[][]                                 $filterSelectionsArray Indexed by filter.id, selection.key
-     * @throws \InvalidArgumentException If a posted selection.key is invalid
-     * @return Collection|GenericCollection[]|Model[][]  Grouped by filter.id, then indexed by selection.key
-     * @todo Building selections and saving selections should be distinct methods.
-     *       The former does not belong on the mapper.
-     *       Splitting into distinct methods would enable us to just want to build selections without saving them.
-     *       This may be the case, eg, when a SU is viewing a teacher's markbook.
+     * @param Collection|GenericCollection[]|Model[][] $selectionsPerFilter Indexed by filter.id, selection.key
+     * @return bool
      */
-    public function updateSelections(GenericCollection $keyConverters, User $user, $page, array $filterSelectionsArray = [])
+    public function updateSelections(User $user, $page, Collection $selectionsPerFilter)
     {
         // Delete user's current selections for this page
         $this->deleteByColumnList([
@@ -61,43 +55,12 @@ class Mapper extends \Schoolbox\Mapper
 
         // Save User's current selections
         $selectionsToSave = $this->createCollection();
-
-        /**
-         * Parse the array data to build a graph of all user selections, grouped by filter.id
-         *
-         * @var Collection|GenericCollection[]|Model[][] $selectionsPerFilter
-         */
-        $selectionsPerFilter = new Collection();
-
-        // Has any data been passed in? (will be empty if no filters available on this page)
-        if (count($filterSelectionsArray)) {
-            foreach ($filterSelectionsArray as $filterId => $filterSelectionArray) {
-
-                // This can occur if we have manually inserted a filter for some reason, eg to exclude assessments in unit-spec contexts
-                if(!$keyConverters->keyExists($filterId)){
-                    // Don't attempt to save
-                    continue;
-                }
-                $keyConverter = $keyConverters[$filterId];
-                $filter       = $keyConverter->getFilter();
-
-                $selectionsPerFilter->setOffset($filterId, $this->createCollection());
-
-                /** @var bool[] $filterSelectionArray */
-                foreach ($filterSelectionArray as $key => $isSelected) {
-                    $selection = $this->createModel();
-                    $selection
-                        ->setFilter($filter)
-                        ->setUser($user)
-                        ->setPage($page)
-                        ->setKey($keyConverter->sanitiseKey($key))
-                        ->setSelected((bool)$isSelected);
-                    $selectionsToSave->add($selection);
-                    $selectionsPerFilter[$filterId]->offsetSet($key, $selection);
-                }
+        foreach($selectionsPerFilter as $filterId => $filterSelections){
+            /** @var Model[] $filterSelections */
+            foreach($filterSelections as $key => $selection){
+                $selectionsToSave->add($selection);
             }
-            $this->save($selectionsToSave);
         }
-        return $selectionsPerFilter;
+        return $this->save($selectionsToSave);
     }
 }

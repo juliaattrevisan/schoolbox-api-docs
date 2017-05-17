@@ -56,12 +56,13 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
      * @throws \InvalidArgumentException If unable to find the filter mapper class
      * @throws \ReflectionException If the specified class does not exist
+     * @throws \DomainException If this class has not defined what entity it is filtering
      */
     public function buildKeyConverters($page)
     {
         $keyConverters = $this->createKeyConverterCollection();
 
-        foreach ($this->getFilterMapper()->findAll() as $filter) {
+        foreach ($this->getFilterMapper()->findForEntity(self::getEntity()) as $filter) {
 
             /** @var IDefinition $class */
             $class = $filter->getClass();
@@ -95,7 +96,14 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     public function buildPanel(User $user, $page, $route, User $viewee = null, array $queryArgs = [])
     {
         $filterComponents = $this->createFilterComponentCollection();
-        unset($queryArgs['page']);
+
+        if(array_key_exists('page', $queryArgs)){
+            unset($queryArgs['page']);
+        }
+
+        $keyConverters = $this->buildKeyConverters($page);
+        $codec         = new Codec();
+        $overrides     = $codec->convertRequestToSelectionModels($this->getFilterSelectionMapper(), $keyConverters, $user, $page, $queryArgs);
 
         // Get filters for this factoryFactory's entity type
         $entityFilters = $this->getFilterMapper()->findForEntity(self::getEntity());
@@ -112,8 +120,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             $filterFactory = $this->buildFilterFactoryForFilter($filter->getClass());
 
             // Did controller or URL request to override saved user-selections ?
-            $overrides     = array_key_exists($filter->getId(), $queryArgs) ? explode(',', $queryArgs[$filter->getId()]) : null;
-            $component     = $filterFactory->buildComponent($filterClass, $user, $page, $viewee, $overrides);
+            $component     = $filterFactory->buildComponent($filterClass, $user, $page, $viewee, $overrides[$filter->getId()]);
 
             // Don't bother inserting component if it wasn't build (because no options would be available anyway)
             if ($component) {

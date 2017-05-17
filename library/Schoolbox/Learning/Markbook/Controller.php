@@ -82,20 +82,73 @@ class Controller extends Base
 
 
     /**
-     * Redirect to the markbook for the specified class
+     * Redirect to the markbook for the specified class and current term
      *
-     * @param int $folderId
+     * @param int       $folderId
      * @param User|null $viewee
      * @throws RouteNotFound If unable to generate the redirect route
      */
     public function getMarkbookForClass($folderId, User $viewee = null)
     {
-        $user = $viewee ?: $this->getUser();
         $currentTerm = $this->termMapper->findForToday();
-        $route = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $user->getId()]);
-        $getArgs = "f={$folderId}&td={$currentTerm->getId()}&a=&p=&uis=&wt=&wk=";
-        $this->getResponse()->redirect->to("{$route}?{$getArgs}");
+        $this->getMarkbookForClassAndTerm($folderId, $currentTerm->getId(), $viewee);
     }
+
+    /**
+     * Redirect to the markbook for the specified class and term
+     *
+     * @param int       $folderId
+     * @param null|int  $termId
+     * @param null|User $viewee
+     * @throws RouteNotFound If unable to generate the redirect route
+     */
+    public function getMarkbookForClassAndTerm($folderId, $termId, User $viewee = null)
+    {
+        $user        = $viewee ?: $this->getUser();
+        $route       = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $user->getId()]);
+
+        $filterMapper = Filter\Mapper::getInstance();
+        $selectionMapper = Filter\Selection\Mapper::getInstance();
+
+        $selections = new GenericCollection(GenericCollection::class);
+        $filters    = $filterMapper->findForEntity(\Schoolbox\Learning\Assessment\DataModel\Mapper::class);
+        foreach($filters as $filter){
+            $selections[$filter->getId()] = $selectionMapper->createCollection();
+
+            if(Filter\Filters\Assessment\Folder\Definition::class === $filter->getClass()){
+                $selections[$filter->getId()][$folderId] = $this->createSelectionModel($selectionMapper, $filter, (string)$folderId);
+            } elseif(Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()){
+                $selections[$filter->getId()][$termId] = $this->createSelectionModel($selectionMapper, $filter, (string)$termId);
+            }
+        }
+
+        $codec = new Filter\Codec();
+        $getArgString = $codec->convertSelectionsToQueryString($selections);
+
+        $this->getResponse()->redirect->to("{$route}?{$getArgString}");
+    }
+
+
+    /**
+     * Helper method to create a Filter Selection model
+     *
+     * @param Filter\Selection\Mapper $selectionMapper
+     * @param Filter\Model            $filter
+     * @param string                  $key
+     * @return Filter\Selection\Model
+     */
+    private function createSelectionModel(Filter\Selection\Mapper $selectionMapper, Filter\Model $filter, $key)
+    {
+        $selection = $selectionMapper->createModel();
+        $selection
+            ->setFilter($filter)
+            ->setUser($this->getUser())
+            ->setPage(FilterOption\Model::PAGE_MARK_BOOK)
+            ->setKey($key)
+            ->setSelected(true);
+        return $selection;
+    }
+
 
     /**
      * Displays a list of marks for students in the specified class
@@ -144,21 +197,27 @@ class Controller extends Base
      */
     public function postMarkbook(User $viewee)
     {
-
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
-            $filters              = $this->generateFilters($postFilterSelections);
-            $assessmentIds        = $this->assessmentIdFinder->findIdsByFilters($filters);
-            $markbook             = $this->buildMarkbook($assessmentIds);
+
+            /**
+             * @var Filter\Dto   $filtersDto
+             * @var Filter\Codec $codec
+             * @var Filter\Selection\Model[][]
+             */
+            list($filtersDto, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($postFilterSelections, true);
+
+            $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filtersDto->getByClass());
+            $markbook      = $this->buildMarkbook($assessmentIds);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'     => $markbook,
                     'viewee'       => $viewee,
-                    'writable'     => $this->determineWritableAssessments($markbook->getAssessments()),
+                    'writable'     => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'pendingLabel' => $this->getPendingLabel(),
-                    'queryArgs'    => $this->buildQueryArgs($filters),
+                    'queryArgs'    => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                 ])->getAsString(),
             ]));
 
@@ -186,6 +245,40 @@ class Controller extends Base
 
 
     /**
+     * @param array $request
+     * @param bool  $save Should we persist these selections to the DB ?
+     * @return null[]|Collection[]|mixed[][]
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
+     * @throws \ReflectionException If the specified class does not exist
+     * @throws \DomainException If this class has not defined what entity it is filtering
+     */
+    private function convertRequestToFilters(array $request, $save)
+    {
+        $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
+        $page            = FilterOption\Model::PAGE_MARK_BOOK;
+        $keyConverters   = $this->filterFactoryFactory->buildKeyConverters($page);
+        $codec           = new Filter\Codec();
+
+        // Convert Request to Selection models
+        $selectionsPerFilter = $codec->convertRequestToSelectionModels($selectionMapper, $keyConverters, $this->getUser(), $page, $request);
+        if ($save) {
+            $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+        }
+
+        // Convert Selection models to Filters
+        $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
+        $filtersTODO          = $selectionTransformer->getFiltersDto();
+
+        // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
+        // regardless of any filter selections send by user
+        $unitSpecFilter = Filter\Mapper::getInstance()->findByClass(AssessmentFilter\NullableContext\UnitSpec\Definition::class)->first();
+        $filtersTODO->setSelections($unitSpecFilter, new Collection());
+
+        return [$filtersTODO, $codec, $selectionsPerFilter];
+    }
+
+
+    /**
      * Stream a filtered markbook in CSV format
      *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
@@ -199,9 +292,9 @@ class Controller extends Base
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
 
-        $filtersById   = $this->transformQueryArgsToFilters($filtersArray);
-        $filters       = $this->generateFilters($filtersById);
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+        list($filtersTODO) = $this->convertRequestToFilters($filtersArray, false);
+
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filtersTODO->getByClass());
         $markbook      = $this->buildMarkbook($assessmentIds);
 
         $csvExporter = new Export\CSV();
@@ -209,62 +302,6 @@ class Controller extends Base
         exit;
     }
 
-
-    /**
-     * Convert our GET query arg string into format required
-     *
-     * @param array $filtersArray
-     * @return array
-     * @throws \DomainException If attempting to get the slug from a filter where it has not been set
-     * @todo - consider refactor architecture to use ID instead of slug to make this unnecessary, or at least hide behind clean interface. SA-3379  SA-3201
-     */
-    private function transformQueryArgsToFilters(array $filtersArray)
-    {
-        // TODO clean all this up
-        foreach ($filtersArray as $slug => $filter) {
-            $filtersArray[$slug] = '' === $filter ? [] : explode(',', $filter);
-        }
-
-        // convert to indexed by filter.ID instead of filter.definition.SLUG
-        $filtersById        = [];
-        $filterMapper       = Filter\Mapper::getInstance();
-        $allFilterInstances = $filterMapper->findAll();
-        foreach ($allFilterInstances as $instance) {
-            foreach ($filtersArray as $slug => $keys) {
-                $definition = $instance->getClass();
-                if ($definition::getSlug() === $slug) {
-                    $filtersById[$instance->getId()] = array_combine($keys, array_fill(0, count($keys), '1'));
-                    break;
-                }
-            }
-        }
-        return $filtersById;
-    }
-
-
-    /**
-     * Convert filter panel selections into filters
-     *
-     * @param array $filterSelections
-     * @return null[]|Collection[]
-     * @throws \InvalidArgumentException If unable to find the filter mapper class
-     * @throws \ReflectionException If the specified class does not exist
-     */
-    private function generateFilters(array $filterSelections)
-    {
-        $page = FilterOption\Model::PAGE_MARK_BOOK;
-
-        $keyConverters        = $this->filterFactoryFactory->buildKeyConverters($page);
-        $selectionsPerFilter  = Filter\Selection\Mapper::getInstance()->updateSelections($keyConverters, $this->getUser(), $page, $filterSelections);
-        $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
-        $filters              = $selectionTransformer->getFilters();
-
-        // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
-        // regardless of any filter selections send by user
-        $filters[AssessmentFilter\NullableContext\UnitSpec\Definition::class] = new Collection();
-
-        return $filters;
-    }
 
 
     /**
@@ -288,7 +325,7 @@ class Controller extends Base
      * @param GenericCollection|IAssessable[] $assessments
      * @return bool[]
      */
-    private function determineWritableAssessments(GenericCollection $assessments)
+    private function getAssessmentsWritability(GenericCollection $assessments)
     {
         /* Determine which assessments the user should be able to mark.
          *

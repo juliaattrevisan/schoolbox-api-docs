@@ -38,7 +38,7 @@ class Component extends AbstractComponent
      * @param User                                        $user
      * @param string                                      $page
      * @param null|GenericCollection|Selection\Model[]    $savedSelections
-     * @param string[]|null                               $selectionOverrides
+     * @param null|GenericCollection|Selection\Model[]    $selectionOverrides
      * @param Selection\Mapper                            $filterSelectionMapper
      * @param Collection|GenericCollection|Folder\Model[] $classes
      * @param Collection|GenericCollection|Folder\Model[] $groups
@@ -50,7 +50,7 @@ class Component extends AbstractComponent
         User $user,
         $page,
         GenericCollection $savedSelections = null,
-        array $selectionOverrides = null,
+        GenericCollection $selectionOverrides = null,
         Selection\Mapper $filterSelectionMapper,
         GenericCollection $classes,
         GenericCollection $groups

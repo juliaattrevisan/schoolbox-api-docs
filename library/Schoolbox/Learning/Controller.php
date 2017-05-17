@@ -286,11 +286,17 @@ class Controller extends Base
         AssessmentFilters\FactoryFactory $filterFactoryFactory,
         array $postFilterSelections
     ) {
-        $user = $this->getUser();
-        $page = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
 
-        $keyConverters        = $filterFactoryFactory->buildKeyConverters($page);
-        $selectionsPerFilter  = $this->filterSelectionMapper->updateSelections($keyConverters, $user, $page, $postFilterSelections);
+        $selectionMapper     = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
+        $page                = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
+        $keyConverters       = $filterFactoryFactory->buildKeyConverters($page);
+        $codec               = new Filter\Codec();
+
+        // Convert Request to Selection models
+        $selectionsPerFilter = $codec->convertRequestToSelectionModels($selectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
+        $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Convert Selection models to Filters
         $selectionTransformer = new Filter\Transformer($keyConverters, $selectionsPerFilter);
 
         // Get selections, defaulting to full possible set if filter not present in panel (ie if disabled by admin)
