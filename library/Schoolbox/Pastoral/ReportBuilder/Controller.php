@@ -344,30 +344,44 @@ class Controller extends Base
 
         if (!empty($post['before'])) {
             $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
+        } else {
+            $pastoralReport->setBeforeDate(null);
         }
 
         if (!empty($post['after'])) {
             $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post['after']));
+        } else {
+            $pastoralReport->setAfterDate(null);
         }
 
         if (is_array($post['types'])) {
             $pastoralReport->setTypesCsv(implode(',', $post['types']));
+        } else {
+            $pastoralReport->setTypesCsv('');
         }
 
         if (is_array($post['authors'])) {
             $pastoralReport->setAuthorsCsv(implode(',', $post['authors']));
+        } else {
+            $pastoralReport->setAuthorsCsv('');
         }
 
         if (is_array($post['students'])) {
             $pastoralReport->setStudentsCsv(implode(',', $post['students']));
+        } else {
+            $pastoralReport->setStudentsCsv('');
         }
 
         if (is_array($post['tags'])) {
             $pastoralReport->setTagsCsv(implode(',', $post['tags']));
+        } else {
+            $pastoralReport->setTagsCsv('');
         }
 
         if (is_array($post['years'])) {
             $pastoralReport->setYearsCsv(implode(',', $post['years']));
+        } else {
+            $pastoralReport->setTypesCsv('');
         }
 
         // Save groups the report is shared with
