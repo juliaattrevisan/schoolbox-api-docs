@@ -87,7 +87,7 @@ class Queue extends ResourceVideo
         if ($timeout > 0 && $timeout < self::MAX_TIMEOUT) {
             $this->processTimeout = $timeout;
         } else {
-            $this->processTimeout = DEFAULT_TIMEOUT;
+            $this->processTimeout = self::DEFAULT_TIMEOUT;
         }
     }
 
