@@ -41,28 +41,7 @@
             toggleDates($(this));
         });
 
-        $(document).on('blur', '[data-datepicker] [type=text]', function (e) {
-            var t = e.target;
-
-            var $div = $(this);
-
-            $(t).prop('readonly', true);
-            $(t).prop('disabled', true);
-
-            $.get('/ajax/strtotime.php', { string: t.value, format: 'local_full' }, function (data) {
-                $(t).prop('disabled', false);
-
-                $(t).val(data.time);
-
-                // perform validation... again...
-                $form.valid();
-
-            }).always(function () {
-                $(t).prop('readonly', false);
-                $(t).prop('disabled', false);
-            })
-        });
-
+        // init form validation
         var $form = $('#assessmentForm');
         $form.alaressValidate();
         if ('beforeSubmit' in window) {

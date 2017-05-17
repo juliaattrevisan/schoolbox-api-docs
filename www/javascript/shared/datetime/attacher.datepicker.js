@@ -17,6 +17,27 @@
 
             if($(this).attr('data-datepicker-id') === undefined) {
                 $(this).alaressDateTimePicker();
+
+                // delegate blurs to text inputs
+                $(this).on('blur', '[type=text]', function (e) {
+                    var t = e.target;
+
+                    $(t).prop('readonly', true);
+                    $(t).prop('disabled', true);
+
+                    $.get('/ajax/strtotime.php', { string: t.value, format: 'local_full' }, function (data) {
+                        $(t).prop('disabled', false);
+
+                        $(t).val(data.time);
+
+                        // re-run form validation
+                        $(t).closest('form').valid();
+
+                    }).always(function () {
+                        $(t).prop('readonly', false);
+                        $(t).prop('disabled', false);
+                    })
+                });
             }
         });
 
