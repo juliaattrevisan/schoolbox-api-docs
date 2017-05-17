@@ -224,9 +224,22 @@
                                                     <ul class="information-list">
                                                         {% for activity in indicator.activities %}
                                                             <li>
-                                                                {%- set activityHref = routeLookupIfAuthorized('learningAssessment.getSummary', { assessmentId: activity.id, studentId: student.id, student: student, assessment: markbook.assessments.by('id', activity.id) }) ~ returnUrlSuffix -%}
+                                                                {% set activityAssessment = markbook.assessments.by('id', activity.id) %}
+                                                                {% if activityAssessment %}
+                                                                    {%- set activityHref = routeLookupIfAuthorized(
+                                                                        'learningAssessment.getSummary',
+                                                                        {
+                                                                            assessmentId: activity.id,
+                                                                            studentId: student.id,
+                                                                            student: student,
+                                                                            assessment: activityAssessment,
+                                                                        }
+                                                                    ) -%}
+                                                                {% else %}
+                                                                    {%- set activityHref = '' -%}
+                                                                {% endif %}
                                                                 {%- if activityHref -%}
-                                                                    <a href="{{ activityHref }}">{{ activity.name }}</a>
+                                                                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
                                                                 {%- else -%}
                                                                     {{ activity.name }}
                                                                 {%- endif -%}
