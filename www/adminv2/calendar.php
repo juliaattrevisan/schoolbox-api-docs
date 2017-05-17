@@ -131,6 +131,7 @@ foreach ($typeList as $type) {
                  */
                 $this->setVar([
                     'CONNECTOR_NAME' => $stubInstance->getDefaultLabel(),
+                    'CONNECTOR_CLASS' => $stubInstance->getConnectorClass(),
                     'CONNECTOR_ICON' => $currentConnector == 'Schoolbox' ? 'schoolbox' : 'calendar'
                 ]);
 

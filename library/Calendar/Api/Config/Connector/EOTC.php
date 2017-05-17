@@ -13,10 +13,20 @@ use Schoolbox\L10n\RosettaStoneFactory;
 class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_Abstract
 {
     /**
+     * Hardcoded to match db
+     *
+     * @var string
+     */
+    protected $connectorClass = 'EOTC';
+
+    /**
      * @var RosettaStone
      */
     private $stone;
 
+    /**
+     * Calendar_Api_Config_Connector_EOTC constructor.
+     */
     public function __construct()
     {
         // TODO inject RosettaStone

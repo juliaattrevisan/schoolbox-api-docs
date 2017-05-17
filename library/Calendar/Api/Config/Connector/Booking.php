@@ -11,6 +11,20 @@
  */
 class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connector_Abstract
 {
+    /**
+     * Hardcoded to match db
+     *
+     * @var string
+     */
+    protected $connectorClass = 'Booking';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultLabel()
+    {
+        return 'Resource Booking';
+    }
 
     /**
      * Checks if Resource Booking module is enabled. If not, throw Exception.
@@ -25,14 +39,6 @@ class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connecto
             throw new DomainException('Resource Booking Module is disabled');
         }
         return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultLabel()
-    {
-        return 'Resource Booking';
     }
 
     /**
