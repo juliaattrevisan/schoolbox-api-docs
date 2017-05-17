@@ -23,6 +23,13 @@ use Schoolbox\Mapper\Exception;
 interface IMapper 
 {
     /**
+     * Retrieve the singleton instance of this class.
+     *
+     * @return static
+     */
+    public static function getInstance();
+
+    /**
      * @return IDatabase
      */
     public function getDatabase();
@@ -48,6 +55,68 @@ interface IMapper
      * @return array
      */
     public function findAllIds(array $options = []);
+
+    /**
+     * Override base mapper to always return new collection object
+     *
+     * @param array $contents
+     *
+     * @return GenericCollection
+     */
+    public function createCollection($contents = []);
+
+    /**
+     * Gets a single object as a collection, if it isn't one already.
+     *
+     * Different possible actions based on $object:
+     * * instanceof Collection: returns that object
+     * * instanceof \ICollection: returns that object converted to collection
+     * * array: returns a Collection object wrapping that array
+     * * anything else: returns Collection with $object as only item
+     *
+     * @param mixed $object
+     *
+     * @return Collection
+     */
+    public function getModelAsCollection($object);
+
+    /**
+     * Retrieves identifier property name.
+     *
+     * @return string
+     */
+    public function getIdentifierProperty();
+
+
+    /**
+     * @return string
+     */
+    public function getTable();
+
+    /**
+     * @return MappingCollection
+     */
+    public function getMap();
+
+    /**
+     * Overridden to use getter and hydrator instead of getting property
+     * directly.
+     *
+     * @param object $model
+     * @param string $property
+     *
+     * @return mixed
+     */
+    public function getModelProperty($model, $property);
+
+    /**
+     * Restores one or more models that were soft deleted.
+     *
+     * @param object|Collection $object Model or collection of models to restore
+     *
+     * @return bool
+     */
+    public function restoreSoftDeleted($object);
 
     /**
      * @see $this->findAll()
@@ -101,14 +170,15 @@ interface IMapper
      */
     public function findById($identifierValue);
 
+
     /**
      * Returns a collection with models filtered by column/property
      *
      * @param String $columnName
-     * @param String $columnValue
+     * @param mixed|mixed[] $columnValue
      * @param array  $options @see findByColumnList() $options param
      *
-     * @return Collection
+     * @return GenericCollection
      */
     public function findByColumn($columnName, $columnValue, $options = array());
     /**
@@ -185,4 +255,4 @@ interface IMapper
      * @return bool
      */
     public function delete($object);
-} 
+}
