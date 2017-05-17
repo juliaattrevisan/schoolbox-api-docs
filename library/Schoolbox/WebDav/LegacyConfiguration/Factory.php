@@ -25,7 +25,7 @@ class Factory
      * @param array  $session      The current session
      * @return array
      */
-    public function build($siteLocation, User $user, $session)
+    public static function build($siteLocation, User $user, $session)
     {
         $settings = [];
         $paths    = [];
