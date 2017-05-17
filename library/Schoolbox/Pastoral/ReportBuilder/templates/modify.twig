@@ -23,11 +23,9 @@
 
         var dataCheckType = $('[data-check-type]');
         var dataCheckAllType = $('[data-check-all-type]');
-        var dataCheckTypeSelected = $('[data-check-type]:checked');
 
         var dataCheckYear = $('[data-check-year]');
         var dataCheckAllYear = $('[data-check-all-year]');
-        var dataCheckYearSelected = $('[data-check-year]:checked');
 
         var datetimeAfter = $('#datetime_after');
         var datetimeBefore = $('#datetime_before');
@@ -49,32 +47,32 @@
         {# Dynamically decide when all checkboxes are selected while you're ticking boxes #}
 
         dataCheckType.change(function () {
-            if (dataCheckTypeSelected.length == dataCheckType.length) {
+            if ($('[data-check-type]:checked').length == dataCheckType.length) {
                 dataCheckAllType.prop('checked', true);
             }
             else {
-                dataCheckAllType.prop('checked', false);
+                dataCheckAllType.removeAttr('checked');
             }
         });
 
         {# Dynamically decide when all checkboxes are selected while you're ticking boxes #}
 
         dataCheckYear.change(function () {
-            if (dataCheckYearSelected.length == dataCheckYear.length) {
+            if ($('[data-check-year]:checked').length == dataCheckYear.length) {
                 dataCheckAllYear.prop('checked', true);
             }
             else {
-                dataCheckAllYear.prop('checked', false);
+                dataCheckAllYear.removeAttr('checked');
             }
         });
 
         {# If we are changing report criteria this will tick the 'Select All' box if every type was selected, this occurs upon page load #}
 
-        if (dataCheckTypeSelected.length == dataCheckType.length) {
+        if ($('[data-check-type]:checked').length == dataCheckType.length) {
             dataCheckAllType.prop('checked', true);
         }
 
-        if (dataCheckYearSelected.length == dataCheckYear.length) {
+        if ($('[data-check-year]:checked').length == dataCheckYear.length) {
             dataCheckAllYear.prop('checked', true);
         }
 

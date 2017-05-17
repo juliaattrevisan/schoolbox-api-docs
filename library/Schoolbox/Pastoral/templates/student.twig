@@ -6,15 +6,8 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
 [ 'Pastoral Care',              routeLookup('pastoral.getIndex') ],
-[ record.student.fullName,      routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
-[ record.heading,               routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) ],
-[ pageTitle ]
+[ student.fullName ]
 ) }}
-
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
-    <li class="active"><a href="#">{{ student.fullName }}</a></li>
-</ul>
 
 {% include '@pastoral/fragments/studentDetails.twig' with { student: student } %}
 
