@@ -212,6 +212,7 @@ class Mapper extends BaseMapper
 
         // This method gets called before checking authorization- so if the session timed out this might be blank
 
+
         if (!$this->getSessionUser() instanceof User) {
             return false;
         }
@@ -253,13 +254,15 @@ class Mapper extends BaseMapper
 
         // If the user is not in the audience- and is not the owner, they can't see the record
 
-        $inAudience = false;
+        $inAudience = $this->getSessionUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
-        /** @var Access $access */
-        foreach ($model->getAccess() as $access) {
-            if ($access->hasAccess($this->getSessionUser())) {
-                $inAudience = true;
-                break;
+        if (!$inAudience) {
+            /** @var Access $access */
+            foreach ($model->getAccess() as $access) {
+                if ($access->hasAccess($this->getSessionUser())) {
+                    $inAudience = true;
+                    break;
+                }
             }
         }
 
@@ -290,7 +293,6 @@ class Mapper extends BaseMapper
                         break;
                     }
                 }
-
             }
         } else {
             $accessGranted = true;
