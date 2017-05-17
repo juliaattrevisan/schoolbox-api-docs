@@ -31,14 +31,8 @@ if (!empty($_POST)) {
 
     /* Format date, time
      */
-    $start = Alaress_Date_Format::newLocalShort($_POST['start']['date'])
-        ->set12Hour($_POST['start']['hour'], $_POST['start']['meridiem'])
-        ->setMinute($_POST['start']['minute'])
-    ;
-    $finish = Alaress_Date_Format::newLocalShort($_POST['finish']['date'])
-        ->set12Hour($_POST['finish']['hour'], $_POST['finish']['meridiem'])
-        ->setMinute($_POST['finish']['minute'])
-    ;
+    $start = Alaress_Date_Format::newLocal($_POST['start']['date']);
+    $finish = Alaress_Date_Format::newLocal($_POST['finish']['date']);
 
     /* Check for valid dates
      */
@@ -78,8 +72,6 @@ if (!empty($_POST)) {
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'survey/modify.html');
-    $this->setBlock(TEMPLATE_content, 'startMeridiem', 'startMeridiem_block');
-    $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
@@ -111,64 +103,14 @@ if (!empty($_POST)) {
             'ASSESS_CATEGORY_NAME'            => Scrub::text($folder->getName()),
             'ASSESS_TITLE'                    => Scrub::text($survey['title']),
             'ASSESS_DESCRIPTION'              => $survey['description'],
-            'ASSESS_START_DATE'               => $assessStartDate->getLocalShort(),
-            'ASSESS_FINISH_DATE'              => $assessFinishDate->getLocalShort(),
+            'ASSESS_START_DATE'               => $assessStartDate->getLocal(),
+            'ASSESS_FINISH_DATE'              => $assessFinishDate->getLocal(),
             'ASSESS_ANONYMOUS_RESULT_CHECKED' => $survey['anonymous_result'] ? 'checked="checked"' : '',
             'ASSESS_NOTIFY_AUTHOR_CHECKED'    => $survey['notify_author'] ? 'checked="checked"' : '',
             'ASSESS_COMPLETION_MESSAGE'       => Scrub::text($survey['completion_message']),
             'HAS_ALL_QUESTIONS'               => 'large-8',
         )
     );
-
-    /* Render starting times
-     */
-    $assessStartHour = $assessStartDate->get12Hour();
-    $assessStartMinute = $assessStartDate->getMinute(true);
-    $assessStartMeridiem = $assessStartDate->getMeridiem();
-
-    $this->setVar(
-        array(
-            'START_HOUR_VALUE'   => $assessStartHour,
-            'START_MINUTE_VALUE' => $assessStartMinute,
-        )
-    );
-
-    foreach (array('AM', 'PM') as $meridiem) {
-        $this->setVar(
-            array(
-                'START_MERIDIEM_VALUE'    => $meridiem,
-                'START_MERIDIEM_SELECTED' => ($meridiem == $assessStartMeridiem) ? 'selected=\'selected\'' : '',
-            )
-        );
-
-        $this->parse('startMeridiem_block', 'startMeridiem', true);
-    }
-
-    /* Render finish times
-     */
-    $assessFinishHour = $assessFinishDate->get12Hour();
-    $assessFinishMinute = $assessFinishDate->getMinute(true);
-    $assessFinishMeridiem = $assessFinishDate->getMeridiem();
-
-    /* Render finish times
-     */
-    $this->setVar(
-        array(
-            'FINISH_HOUR_VALUE'   => $assessFinishHour,
-            'FINISH_MINUTE_VALUE' => $assessFinishMinute,
-        )
-    );
-
-    foreach (array('AM', 'PM') as $meridiem) {
-        $this->setVar(
-            array(
-                'FINISH_MERIDIEM_VALUE'    => $meridiem,
-                'FINISH_MERIDIEM_SELECTED' => ($meridiem == $assessFinishMeridiem) ? 'selected=\'selected\'' : '',
-            )
-        );
-
-        $this->parse('finishMeridiem_block', 'finishMeridiem', true);
-    }
 
     /* Resit amounts
      */
