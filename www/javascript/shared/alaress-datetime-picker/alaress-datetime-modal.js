@@ -625,6 +625,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     }
 
     /**
+     * Places a request for heat from the server, then caches the response. On repeat requests, cached values
+     * will be returned immediately.
      *
      * @param {Flatpickr} instance
      * @param {Callable}   onSuccess
@@ -634,6 +636,35 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             mo = instance.currentMonth + 1,
             yr = instance.currentYear;
 
+        fetchHeat(yr, mo, folderId, instance, onSuccess);
+
+        // TODO: very open to a better way of handling the month/year wraparound
+
+        // also process previous month
+        if (mo === 1) {
+            fetchHeat(yr - 1, 12, folderId, instance, onSuccess);
+        } else {
+            fetchHeat(yr, mo - 1, folderId, instance, onSuccess);
+        }
+
+        // also also process next month
+        if (mo === 12) {
+            fetchHeat(yr + 1, 1, folderId, instance, onSuccess);
+        } else {
+            fetchHeat(yr, mo + 1, folderId, instance, onSuccess);
+        }
+    }
+
+
+    /**
+     *
+     * @param {Integer} yr
+     * @param {Integer} mo
+     * @param {Integer} folderId
+     * @param {Flatpickr} instance
+     * @param {Callable} onSuccess
+     */
+    function fetchHeat(yr, mo, folderId, instance, onSuccess) {
         if ('undefined' === typeof heatCache[yr]) {
             heatCache[yr] = {};
         }
@@ -647,7 +678,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 .replace(/{month}/g, mo));
 
             promise.done(function (data) {
-
                 for (var day in data) {
                     heatCache[yr][mo][day] = data[day];
                 }
@@ -660,6 +690,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // do it sync if the cache is hot
             onSuccess(instance);
         }
+
     }
+
 
 };
