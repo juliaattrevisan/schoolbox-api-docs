@@ -74,13 +74,15 @@ class IdFinder extends Filter\AbstractIdFinder
         list($uImpSpcJoin, $uImpSpcWhere, $uImpSpcParams) = $this->getClauseUnitImplSpec($unitImpSpcIds);
 
         // Sub-query modifiers
-        $aTypes     = $completeFilters[AssessmentType\Definition::class];
-        $termsDue   = $completeFilters[Due\Definition::class];
-        $termsClose = $completeFilters[Close\Definition::class];
-        $weightings = $completeFilters[WeightingType\Definition::class];
-        $workTypes  = $completeFilters[WorkType\Definition::class];
+        $aTypes         = $completeFilters[AssessmentType\Definition::class];
+        $temporalStates = $completeFilters[TemporalState\Definition::class];
+        $termsDue       = $completeFilters[Due\Definition::class];
+        $termsClose     = $completeFilters[Close\Definition::class];
+        $weightings     = $completeFilters[WeightingType\Definition::class];
+        $workTypes      = $completeFilters[WorkType\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)           = $this->getClauseAType($aTypes);
+        list($temporalWhere)                    = $this->getClauseTemporalState($temporalStates);
         list($termDueWhere)                     = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         list($termCloseWhere)                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams) = $this->getClauseWeighting($weightings);
@@ -96,7 +98,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$aTypeJoin}
                 WHERE {$deletedWhere}
-                AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                AND {$temporalWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                 ";
         } else {
             if($this->subQueryFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -106,7 +108,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN assessment_folder af ON af.assessment_id = a.id
                     {$folderJoin} {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$folderWhere}
-                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryProjectFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -118,7 +120,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN assessment_folder paf ON paf.assessment_id = p.assessment_id
                     {$folderJoin} {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere}
-                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -132,7 +134,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$uImpSpcJoin} {$folderJoin} {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$unitImplWhere}
-                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     
                     ";
             }
@@ -149,7 +151,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
                     {$uImpSpcJoin} {$folderJoin} {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
-                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -161,7 +163,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$unitSpecWhere}
-                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
             if($this->subQueryProjectUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -175,7 +177,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     {$folderJoin}
                     {$aTypeJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere}
-                    AND {$aTypeWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
+                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDueWhere} AND {$termCloseWhere} AND {$weightingWhere} AND {$workTypeWhere}
                     ";
             }
         }
@@ -637,6 +639,42 @@ class IdFinder extends Filter\AbstractIdFinder
             }
         }
         return ['(' . implode(' OR ', $builder->getWhere()) . ')', $builder->getParams()];
+    }
+
+
+    /**
+     * Get query fragments dependent on 'TemporalState' filter
+     *
+     * @param Collection|string[] $temporalStates (can also be NULL but storm doesn't like iterating that type-hint)
+     * @return mixed[]
+     */
+    private function getClauseTemporalState(Collection $temporalStates = null)
+    {
+        // If no weighting types are selected, don't filter
+        if(NULL === $temporalStates){
+            return ['TRUE', []];
+        }
+
+        /* We cannot use the MySQL 'BETWEEN' operator as that includes both limits.
+         * To ensure distinct subsets, we need to treat one limit as inclusive, the other as exclusive
+         */
+
+        $now = \Alaress_Date_Format::now()->getDatabase();
+        $orParts = [];
+        foreach($temporalStates as $temporalState){
+            if(TemporalState\Definition::KEY_UPCOMING === $temporalState){
+                $orParts[] = "('$now' < a.publish_date)";
+            } elseif (TemporalState\Definition::KEY_PREVIEW === $temporalState){
+                $orParts[] = "(a.publish_date <= '$now' AND '$now' < a.open_date)";
+            } elseif (TemporalState\Definition::KEY_DUE === $temporalState){
+                $orParts[] = "(a.open_date <= '$now' AND '$now' < a.due_date)";
+            } elseif (TemporalState\Definition::KEY_OVERDUE === $temporalState){
+                $orParts[] = "(a.due_date <= '$now' AND '$now' < a.close_date)";
+            } elseif (TemporalState\Definition::KEY_CLOSED === $temporalState){
+                $orParts[] = "(a.close_date <= '$now')";
+            }
+        }
+        return ['(' . implode(' OR ', $orParts) . ')'];
     }
 
     /**

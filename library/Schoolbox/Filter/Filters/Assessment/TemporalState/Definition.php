@@ -70,6 +70,7 @@ class Definition extends AbstractDefinition
     {
         return [
             Option\Model::PAGE_PENDING_ASSESSMENTS,
+            Option\Model::PAGE_MARK_BOOK,
         ];
     }
 
