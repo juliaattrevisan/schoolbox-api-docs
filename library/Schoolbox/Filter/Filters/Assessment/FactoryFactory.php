@@ -60,6 +60,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                 return $this->buildFactory(Filters\Assessment\Term\Close\Factory::class, [
                     'termMapper' => $this->getMapperFactory()->get(Term\Mapper::class),
                 ]);
+            case Filters\Assessment\TemporalState\Definition::class:
+                return $this->buildFactory(Filters\Assessment\TemporalState\Factory::class);
             case Filters\Assessment\WorkType\Definition::class:
                 return $this->buildFactory(Filters\Assessment\WorkType\Factory::class, [
                     'workTypeMapper' => $this->getMapperFactory()->get(WorkType\Mapper::class),

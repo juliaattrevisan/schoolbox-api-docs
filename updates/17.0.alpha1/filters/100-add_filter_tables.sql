@@ -75,6 +75,7 @@ INSERT INTO filter (`entity`, `class`) VALUES
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImpl\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImportSpec\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitSpec\\Definition'),
+  ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\TemporalState\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\WeightingType\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\WorkType\\Definition')
 ;
