@@ -19,6 +19,9 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\MarkScheme\Completion;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -361,8 +364,15 @@ class Controller extends Base
 
             $titlesFound[$title]            = true;
             $data[$title]                   = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
-            $data[$title . ' (Normalized)'] = '';
-            $data[$title . ' (Comment)']    = '';
+            if ($this->hasTotalMarkColumn($assessment)) {
+                $data[$title . ' (Total)'] = '';
+            }
+            if ($this->hasNormalizedMarkColumn($assessment)) {
+                $data[$title . ' (Normalized)'] = '';
+            }
+            if ($this->hasCommentColumn($assessment)) {
+                $data[$title . ' (Comment)']    = '';
+            }
         }
 
         $export[] = $data;
@@ -387,19 +397,28 @@ class Controller extends Base
                 $titlesFound[$title] = true;
 
                 if ($assessment->isParticipant($student)) {
+                    $data[$title] = $this->retrieveTitleField($assessment, $student);
+                    if ($this->hasTotalMarkColumn($assessment)) {
+                        $data[$title . ' (Total)'] = $this->retrieveTotalMarkField($assessment, $student);
+                    }
+                    if ($this->hasNormalizedMarkColumn($assessment)) {
+                        $data[$title . ' (Normalized)'] = $this->retrieveNormalizedMarkField($assessment, $student);
+                    }
+                    if ($this->hasCommentColumn($assessment)) {
+                        $data[$title . ' (Comment)'] = $this->retrieveCommentField($assessment, $student);
+                    }
 
-                    $participant        = $assessment->getParticipant($student);
-                    $mostRecentFeedback = $participant->findMostRecentFeedback();
-
-                    $comment = $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
-
-                    $data[$title]                   = $assessment->getHumanReadableMark($student, true);
-                    $data[$title . ' (Normalized)'] = $assessment->getNormalisedMark($student, true);
-                    $data[$title . ' (Comment)']    = $comment;
                 } else {
-                    $data[$title]                   = '';
-                    $data[$title . ' (Normalized)'] = '';
-                    $data[$title . ' (Comment)']    = '';
+                    $data[$title] = '';
+                    if( $this->hasTotalMarkColumn( $assessment)) {
+                        $data[$title . ' (Total)'] = '';
+                    }
+                    if ($this->hasNormalizedMarkColumn( $assessment)) {
+                        $data[$title . ' (Normalized)'] = '';
+                        }if($this->hasCommentColumn($assessment)) {
+                            $data[$title . ' (Comment)'] = '';
+
+                    }
                 }
 
             }
@@ -420,6 +439,106 @@ class Controller extends Base
         echo stream_get_contents($file);
         fclose($file);
         exit;
+    }
+
+    /* Helper methods for building the markbook export.
+     * TODO: It's not ideal these methods are in the controller instead of in a renderer class or something
+     */
+
+    /**
+     * Does this assessment have a total mark column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function hasTotalMarkColumn(IAssessable $assessment)
+    {
+        return $assessment->getMarkScheme() instanceof TotalMarkAbstract;
+    }
+
+    /**
+     * Does this assessment have a normalized mark column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function hasNormalizedMarkColumn(IAssessable $assessment)
+    {
+        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
+    }
+
+    /**
+     * Does this assessment have a comment column?
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    protected function hasCommentColumn(IAssessable $assessment)
+    {
+        // Comment check is the same as normalized mark check
+        return !($assessment->getMarkScheme() instanceof None || $assessment->getMarkScheme() instanceof Completion);
+    }
+
+    /**
+     * Retrieves title field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    protected function retrieveTitleField(IAssessable $assessment, User $student)
+    {
+        if ($this->hasTotalMarkColumn($assessment)
+            && preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)
+        ) {
+            return $markParts[1];
+        }
+
+        return $assessment->getHumanReadableMark($student, true);
+    }
+
+    /**
+     * Retrieves total mark field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    protected function retrieveTotalMarkField(IAssessable $assessment, User $student)
+    {
+        if (preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $assessment->getHumanReadableMark($student, true), $markParts)) {
+            return $markParts[2];
+        }
+        return '';
+    }
+
+    /**
+     * Retrieves normalized field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    protected function retrieveNormalizedMarkField(IAssessable $assessment, User $student)
+    {
+        return $assessment->getNormalisedMark($student, true);
+    }
+
+    /**
+     * Retrieves comment field value for this assessment and student.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return null|string
+     */
+    protected function retrieveCommentField(IAssessable $assessment, User $student)
+    {
+        $participant = $assessment->getParticipantIfExtant($student);
+        if (!$participant) {
+            return '';
+        }
+        $mostRecentFeedback = $participant->findMostRecentFeedback();
+        return $mostRecentFeedback ? $mostRecentFeedback->getComment() : '';
     }
 
     /* Getters/Setters
