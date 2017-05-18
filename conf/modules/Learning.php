@@ -30,7 +30,9 @@ class Learning extends ModuleLoader
     {
         $namespace  = 'learning';
 
+        // TODO - split 'LearningModule' into ClassModule + PendingModule + GradesModule
         $this->loadModule($kernel, LearningModule::class,           "/{$namespace}");
+
         $this->loadModule($kernel, AssessmentModule::class,         "/{$namespace}");
         $this->loadModule($kernel, FeedbackModule::class,           "/{$namespace}");
         $this->loadModule($kernel, ResponseModule::class,           "/{$namespace}");
