@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
 /**
@@ -26,17 +27,29 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('entity', self::TYPE_STRING);
         $this->uses('class', self::TYPE_STRING);
+    }
+
+    /**
+     * Find all filter instances that relate to the specified entity
+     *
+     * @param string $entity  The mapper class for the filtered entity
+     * @return GenericCollection|Model[]
+     */
+    public function findForEntity($entity)
+    {
+        return $this->findByColumn('entity', $entity);
     }
 
 
     /**
-     * @param string $class
-     * @return Model
+     * @param string|string[] $class
+     * @return Collection|Model[]
      */
     public function findByClass($class)
     {
-        return $this->findByColumn('class', $class)->first();
+        return $this->findByColumn('class', $class);
     }
 
 }

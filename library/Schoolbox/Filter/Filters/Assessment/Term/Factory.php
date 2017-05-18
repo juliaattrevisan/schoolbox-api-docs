@@ -8,7 +8,7 @@
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Assessment\Term;
-use Schoolbox\Filter\AbstractFilterFactory;
+use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
@@ -19,7 +19,7 @@ use Schoolbox\Filter\Selection;
 /**
  * A factory for building 'Term' filter objects
  */
-abstract class Factory extends AbstractFilterFactory
+abstract class Factory extends AbstractFactory
 {
 
     /**
@@ -65,7 +65,7 @@ abstract class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, Filter\IFilterDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, Filter\IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         return [];
     }

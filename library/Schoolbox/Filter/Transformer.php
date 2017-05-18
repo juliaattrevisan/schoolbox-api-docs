@@ -14,20 +14,34 @@ use Schoolbox\GenericCollection;
  * Encapsulates the transform of filter selections into filters (collections of entities)
  * eg Term Models, WorkType Models, AssessmentType strings etc
  *
- * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter::SLUG) should return a set of 3 Term models.
+ * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter::class) should return a set of 3 Term models.
  */
 class Transformer
 {
 
     /**
-     * Indexed by IFilterDefinition::SLUG, then selection.key
+     * Indexed by filter.id
+     *
+     * @var GenericCollection|Model[]
+     */
+    private $filtersById;
+
+    /**
+     * Indexed by filter.class
+     *
+     * @var GenericCollection|Model[]
+     */
+    private $filtersByClass;
+
+    /**
+     * Indexed by filter.id, then selection.key
      *
      * @var Collection|GenericCollection[]|Selection\Model[][] $selectionsPerFilter
      */
     private $selectionsPerFilter;
 
     /**
-     * Indexed by IFilterDefinition::SLUG
+     * Indexed by filter.id
      *
      * @var GenericCollection|IKeyConverter[]
      */
@@ -41,51 +55,64 @@ class Transformer
      */
     public function __construct(GenericCollection $keyConverters, Collection $selectionsPerFilter)
     {
-        // Convert indexing by filter.id to IFilterDefinition::SLUG
-        $this->selectionsPerFilter = $selectionsPerFilter->emptyClone();
-        $this->keyConverters       = $keyConverters->emptyClone();
+//        $this->filtersById    = new GenericCollection(Model::class);
+        $this->filtersByClass = new GenericCollection(Model::class);
 
-        foreach ($keyConverters as $filterId => $keyConverter) {
-            $filter = $keyConverter->getFilter();
-            /** @var IFilterDefinition $filterDefinitionClass */
-            $filterDefinitionClass = $filter->getClass();
-            $filterSlug            = $filterDefinitionClass::getSlug();
-            $this->keyConverters->offsetSet($filterSlug, $keyConverter);
-            if ($selectionsPerFilter->offsetExists($filter->getId())) {
-                $this->selectionsPerFilter[$filterSlug] = $selectionsPerFilter[$filter->getId()];
-            }
+        foreach ($keyConverters as $keyConverter) {
+            $filter                                    = $keyConverter->getFilter();
+//            $this->filtersById[$filter->getId()]       = $filter;
+            $this->filtersByClass[$filter->getClass()] = $filter;
         }
+
+        $this->keyConverters       = $keyConverters;
+        $this->selectionsPerFilter = $selectionsPerFilter;
+//
+//
+//        // Convert indexing by filter.id to IFilterDefinition::class
+//        $this->selectionsPerFilter = $selectionsPerFilter->emptyClone();
+//        $this->keyConverters       = $keyConverters->emptyClone();
+//
+//        foreach ($keyConverters as $filterId => $keyConverter) {
+//            $filter = $keyConverter->getFilter();
+//            $this->keyConverters->offsetSet($filter->getClass(), $keyConverter);
+//            if ($selectionsPerFilter->offsetExists($filter->getId())) {
+//                $this->selectionsPerFilter[$filter->getClass()] = $selectionsPerFilter[$filter->getId()];
+//            }
+//        }
     }
 
     /**
      * Get a set of entities represented by a filter component's selections
      *
-     * @param string $filterSlug
+     * @param string $filterClass
      * @return null|Collection|mixed[]
-     * @throws \InvalidArgumentException If no KeyConverter registered for specified slug
+     * @throws \InvalidArgumentException If no KeyConverter registered for specified filter class
      */
-    public function getSelectedItems($filterSlug)
+    public function getSelectedItems($filterClass)
     {
-        if (!$this->keyConverters->offsetExists($filterSlug)) {
-            throw new \InvalidArgumentException("No KeyConverter found for filter slug: $filterSlug");
+        if (!$this->filtersByClass->offsetExists($filterClass)) {
+            throw new \InvalidArgumentException("No KeyConverter found for filter class: $filterClass");
         }
-        $keyConverter = $this->keyConverters[$filterSlug];
+        $filterId = $this->filtersByClass[$filterClass]->getId();
+        $keyConverter = $this->keyConverters[$filterId];
 
-        return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterSlug]);
+        return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterId]);
     }
 
 
     /**
-     * Get all filter selections in the form accepted by an IdFinder, indexed by filterDefinition::SLUG
-     * @todo pass an interface/object instead of array
-     * @return null[]|Collection[]
+     * Get all filter selections in the form accepted by an IdFinder, indexed by filterDefinition::class
+     *
+     * @todo think of a good name for the TODO class
+     * @return DataTransferObject
      */
-    public function getFilters()
+    public function getFiltersDto()
     {
-        $filters = [];
-        foreach($this->getSelectionsPerFilter() as $slug => $selections){
+        $filters = new DataTransferObject();
+        foreach($this->getSelectionsPerFilter() as $filterId => $selections){
             try{
-                $filters[$slug] = $this->getSelectedItems($slug);
+                $instance = $this->keyConverters[$filterId]->getFilter();
+                $filters->setSelections($instance, $this->getSelectedItems($instance->getClass()));
             } catch (\InvalidArgumentException $e){
                 // This is logically impossible to throw when called from here.
                 // But just in case...
@@ -107,6 +134,16 @@ class Transformer
     {
         return $this->selectionsPerFilter;
     }
+
+
+    /**
+     * @return Model[]|GenericCollection
+     */
+    protected function getFiltersByClass()
+    {
+        return $this->filtersByClass;
+    }
+
 
     /**
      * @return IKeyConverter[]|GenericCollection

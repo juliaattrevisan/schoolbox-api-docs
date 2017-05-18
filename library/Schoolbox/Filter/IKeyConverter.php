@@ -27,6 +27,15 @@ interface IKeyConverter
     public function getFilter();
 
 
+//    /**
+//     * Get the concrete key for some item
+//     *
+//     * @param $item
+//     * @return string
+//     */
+//    public function getKey($item);
+
+
     /**
      * Sanitises a key before insertion in filter_selection table
      *

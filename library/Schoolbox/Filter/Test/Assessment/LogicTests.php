@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Test;
 
+use Schoolbox\Filter;
 use Schoolbox\Collection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -30,11 +31,11 @@ class LogicTests extends \PHPUnit_Framework_TestCase
         $actual          = $qbt->getDoContextFiltersGuaranteeEmptySet($completeFilters);
 
         $message =
-            AssessmentFilters\NullableContext\UnitImportSpec\Definition::SLUG . ': ' . $this->toStr($uis).
-            AssessmentFilters\Folder\Definition::SLUG                         . ': ' . $this->toStr($f).
-            AssessmentFilters\NullableContext\Project\Definition::SLUG        . ': ' . $this->toStr($p).
-            AssessmentFilters\NullableContext\UnitImpl\Definition::SLUG       . ': ' . $this->toStr($ui).
-            AssessmentFilters\NullableContext\UnitSpec\Definition::SLUG       . ': ' . $this->toStr($us).
+            AssessmentFilters\NullableContext\UnitImportSpec\Definition::class . ': ' . $this->toStr($uis).
+            AssessmentFilters\Folder\Definition::class                         . ': ' . $this->toStr($f).
+            AssessmentFilters\NullableContext\Project\Definition::class        . ': ' . $this->toStr($p).
+            AssessmentFilters\NullableContext\UnitImpl\Definition::class       . ': ' . $this->toStr($ui).
+            AssessmentFilters\NullableContext\UnitSpec\Definition::class       . ': ' . $this->toStr($us).
             $this->toStr($completeFilters)."\n";
 
         $this->assertEquals($expected, $actual, $message);
@@ -57,11 +58,11 @@ class LogicTests extends \PHPUnit_Framework_TestCase
         $actual          = $qbt->getDoNonContextFiltersGuaranteeEmptySet($completeFilters);
 
         $message =
-            AssessmentFilters\AssessmentType\Definition::SLUG . ':  '. $this->toStr($a).
-            AssessmentFilters\Term\Close\Definition::SLUG     . ': ' . $this->toStr($tc).
-            AssessmentFilters\Term\Due\Definition::SLUG       . ': ' . $this->toStr($td).
-            AssessmentFilters\WeightingType\Definition::SLUG  . ': ' . $this->toStr($wt).
-            AssessmentFilters\WorkType\Definition::SLUG       . ': ' . $this->toStr($wk).
+            AssessmentFilters\AssessmentType\Definition::class . ':  '. $this->toStr($a).
+            AssessmentFilters\Term\Close\Definition::class     . ': ' . $this->toStr($tc).
+            AssessmentFilters\Term\Due\Definition::class       . ': ' . $this->toStr($td).
+            AssessmentFilters\WeightingType\Definition::class  . ': ' . $this->toStr($wt).
+            AssessmentFilters\WorkType\Definition::class       . ': ' . $this->toStr($wk).
             $this->toStr($completeFilters)."\n";
 
         $this->assertEquals($expected, $actual, $message);
@@ -156,11 +157,11 @@ class LogicTests extends \PHPUnit_Framework_TestCase
     private function buildContextFilterArray($uis, $f, $p, $ui, $us)
     {
         return [
-            AssessmentFilters\NullableContext\UnitImportSpec\Definition::SLUG => null === $uis ? null : new Collection($uis),
-            AssessmentFilters\Folder\Definition::SLUG                         => null === $f   ? null : new Collection($f),
-            AssessmentFilters\NullableContext\Project\Definition::SLUG        => null === $p   ? null : new Collection($p),
-            AssessmentFilters\NullableContext\UnitImpl\Definition::SLUG       => null === $ui  ? null : new Collection($ui),
-            AssessmentFilters\NullableContext\UnitSpec\Definition::SLUG       => null === $us  ? null : new Collection($us),
+            AssessmentFilters\NullableContext\UnitImportSpec\Definition::class => null === $uis ? null : new Collection($uis),
+            AssessmentFilters\Folder\Definition::class                         => null === $f   ? null : new Collection($f),
+            AssessmentFilters\NullableContext\Project\Definition::class        => null === $p   ? null : new Collection($p),
+            AssessmentFilters\NullableContext\UnitImpl\Definition::class       => null === $ui  ? null : new Collection($ui),
+            AssessmentFilters\NullableContext\UnitSpec\Definition::class       => null === $us  ? null : new Collection($us),
         ];
     }
 
@@ -177,11 +178,11 @@ class LogicTests extends \PHPUnit_Framework_TestCase
     private function buildNonContextFilterArray($a, $tc, $td, $wt, $wk)
     {
         return [
-            AssessmentFilters\AssessmentType\Definition::SLUG => null === $a  ? null : new Collection($a),
-            AssessmentFilters\Term\Close\Definition::SLUG     => null === $tc ? null : new Collection($tc),
-            AssessmentFilters\Term\Due\Definition::SLUG       => null === $td ? null : new Collection($td),
-            AssessmentFilters\WeightingType\Definition::SLUG  => null === $wt ? null : new Collection($wt),
-            AssessmentFilters\WorkType\Definition::SLUG       => null === $wk ? null : new Collection($wk),
+            AssessmentFilters\AssessmentType\Definition::class => null === $a  ? null : new Collection($a),
+            AssessmentFilters\Term\Close\Definition::class     => null === $tc ? null : new Collection($tc),
+            AssessmentFilters\Term\Due\Definition::class       => null === $td ? null : new Collection($td),
+            AssessmentFilters\WeightingType\Definition::class  => null === $wt ? null : new Collection($wt),
+            AssessmentFilters\WorkType\Definition::class       => null === $wk ? null : new Collection($wk),
         ];
     }
 
@@ -191,7 +192,7 @@ class LogicTests extends \PHPUnit_Framework_TestCase
     private function getTester()
     {
         require_once __DIR__ . '/TestableIdFinder.php';
-        return AssessmentFilters\TestableIdFinder::getInstance(Assessment\Mapper::getInstance());
+        return AssessmentFilters\TestableIdFinder::getInstance(Filter\Mapper::getInstance(), Assessment\Mapper::getInstance());
     }
 
     // ---------------- data providers --------------

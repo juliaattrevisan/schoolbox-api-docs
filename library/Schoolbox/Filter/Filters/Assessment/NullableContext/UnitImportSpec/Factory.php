@@ -9,12 +9,13 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterFactory;
+use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
-use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
@@ -25,7 +26,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 /**
  * A factory for building 'UnitSpec' filter objects
  */
-class Factory extends AbstractFilterFactory
+class Factory extends AbstractFactory
 {
 
     /** @var Folder\Mapper */
@@ -66,7 +67,7 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         // Should this role type see classes for this page?
         /** @var Option\Model[][] $options */

@@ -24,6 +24,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Error;
 use DueWork_ErrorMapper;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 
 
@@ -54,7 +55,20 @@ class Module extends BaseModule
             return [];
         };
 
-        $this->register('GET',  '/class/{folderId:\d+}{/userId}', 'getMarkbookForClass', $isStaffOrSuper, $preload);
+        $termAndViewee = function ($params) use ($preload) {
+            $args = $preload($params);
+            try{
+                $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
+            } catch (Mapper\Exception $e){
+                throw new NotFound("No term found for code: {$params['termCode']}");
+            }
+            return $args;
+        };
+
+        // TODO - add 'getMarkbookForUnitImportSpec' to be used in 'outline/unit.twig' to jump to specific unit import
+
+        $this->register('GET',  '/class/{folderId:\d+}{/userId}',                 'getMarkbookForClass',        $isStaffOrSuper, $preload);
+        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}{/userId}', 'getMarkbookForClassAndTerm', $isStaffOrSuper, $termAndViewee);
 
         $this->register('GET',  '/export', 'getMarkbookExport', $isStaffOrSuper);
 
@@ -90,7 +104,9 @@ class Module extends BaseModule
                 'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
                 'access'                     => $this->getMapperFactory()->getLazy(Access::class), // Has a static 'getInstance()' method
                 'assessmentIdFinder'         => $injector->lazy(function(){
-                    return AssessmentFilter\IdFinder::getInstance($this->getMapperFactory()->get(Assessment\Mapper::class));
+                    return AssessmentFilter\IdFinder::getInstance(
+                        $this->getMapperFactory()->get(Filter\Mapper::class),
+                        $this->getMapperFactory()->get(Assessment\Mapper::class));
                 }),
                 'filterFactoryFactory'       => $injector->lazy(function(){
                     return new AssessmentFilter\FactoryFactory($this->getMapperFactory());

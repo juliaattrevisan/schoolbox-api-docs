@@ -7,9 +7,9 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
-use Schoolbox\Filter\AbstractFilterComponent;
+use Schoolbox\Filter\AbstractComponent;
 use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
-use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -20,7 +20,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractFilterComponent
+class Component extends AbstractComponent
 {
 
     /**
@@ -44,22 +44,22 @@ class Component extends AbstractFilterComponent
 
 
     /**
-     * @param IFilterDefinition                        $definition
+     * @param IDefinition                              $definition
      * @param User                                     $user
      * @param string                                   $page
      * @param null|GenericCollection|Selection\Model[] $savedSelections
-     * @param null|string[]                            $selectionOverrides
+     * @param null|GenericCollection|Selection\Model[] $selectionOverrides
      * @param Selection\Mapper                         $filterSelectionMapper
      * @param GenericCollection|UnitSpec\Model[]       $unitSpecsImportedToClasses
      * @param GenericCollection|UnitSpec\Model[]       $unitSpecsImportedToGroups
      * @throws \DomainException If both saved selections and override selections are null
      */
     public function __construct(
-        IFilterDefinition $definition,
+        IDefinition $definition,
         User $user,
         $page,
         GenericCollection $savedSelections = null,
-        array $selectionOverrides = null,
+        GenericCollection $selectionOverrides = null,
         Selection\Mapper $filterSelectionMapper,
         GenericCollection $unitSpecsImportedToClasses,
         GenericCollection $unitSpecsImportedToGroups

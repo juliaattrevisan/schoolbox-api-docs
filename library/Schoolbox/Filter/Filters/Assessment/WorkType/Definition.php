@@ -9,7 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
@@ -21,9 +21,8 @@ use Schoolbox\Learning\Assessment\WorkType;
  * □ None
  * □ One per workType that exists in system
  */
-class Definition extends AbstractFilterDefinition
+class Definition extends AbstractDefinition
 {
-    const SLUG = 'wk';
 
     // If assessment does not have a WorkType at all
     const KEY_NONE = ' none';
@@ -62,6 +61,7 @@ class Definition extends AbstractFilterDefinition
             self::KEY_NONE,
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -181,6 +181,7 @@ class Definition extends AbstractFilterDefinition
         // by default, all WorkTypes are available
         return true;
     }
+
 
     /**
      * @inheritdoc

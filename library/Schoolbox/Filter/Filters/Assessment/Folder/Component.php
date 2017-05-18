@@ -8,8 +8,8 @@
 namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter\AbstractFilterComponent;
-use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\AbstractComponent;
+use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -19,7 +19,7 @@ use Schoolbox\Filter\Option;
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractFilterComponent
+class Component extends AbstractComponent
 {
 
     /**
@@ -34,11 +34,11 @@ class Component extends AbstractFilterComponent
 
 
     /**
-     * @param IFilterDefinition                           $definition
+     * @param IDefinition                                 $definition
      * @param User                                        $user
      * @param string                                      $page
      * @param null|GenericCollection|Selection\Model[]    $savedSelections
-     * @param string[]|null                               $selectionOverrides
+     * @param null|GenericCollection|Selection\Model[]    $selectionOverrides
      * @param Selection\Mapper                            $filterSelectionMapper
      * @param Collection|GenericCollection|Folder\Model[] $classes
      * @param Collection|GenericCollection|Folder\Model[] $groups
@@ -46,11 +46,11 @@ class Component extends AbstractFilterComponent
      * @throws \DomainException If both saved selections and override selections are null
      */
     public function __construct(
-        IFilterDefinition $definition,
+        IDefinition $definition,
         User $user,
         $page,
         GenericCollection $savedSelections = null,
-        array $selectionOverrides = null,
+        GenericCollection $selectionOverrides = null,
         Selection\Mapper $filterSelectionMapper,
         GenericCollection $classes,
         GenericCollection $groups

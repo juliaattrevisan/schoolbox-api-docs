@@ -23,7 +23,7 @@
             </nav>
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
                 <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
-                <li><a href="{{ routeLookup('learningMarkbook.getMarkbook') }}?f={{ class.id }}&amp;td={{ term.id }}&amp;a=&amp;p=&amp;uis=&amp;wt=&amp;wk=" class="icon-curriculum">Markbook</a></li>
+                <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClassAndTerm', {folderId: class.id, termCode: term.code}) }}" class="icon-curriculum">Markbook</a></li>
                 <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
                 {% if courses | length %}
                     <li class="separator">Analytics</li>

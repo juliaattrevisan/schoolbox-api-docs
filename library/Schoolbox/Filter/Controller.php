@@ -30,9 +30,13 @@ class Controller extends BaseController
      */
     public function getIndex(GenericCollection $visibleFilters)
     {
-
+        // Group by entity type
+        $visibleFiltersPerEntity = $visibleFilters->groupByCallback(function (Model $filter) {
+            return $filter->getEntity();
+        });
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
-            'filters' => $visibleFilters,
+            'filtersPerEntity'   => $visibleFiltersPerEntity,
+            'ENTITY_ASSESSMENTS' => \Schoolbox\Learning\Assessment\DataModel\Mapper::class,
         ]));
     }
 
@@ -42,11 +46,11 @@ class Controller extends BaseController
      *
      * @api   GET /adminv2/filters/{$filter}/options
      * @level 17.0
-     * @param IFilterDefinition $definition
+     * @param IDefinition $definition
      * @throws ServiceNotFound
      * @throws RouteNotFound
      */
-    public function getAvailableOptions(IFilterDefinition $definition)
+    public function getAvailableOptions(IDefinition $definition)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getOptionsTemplate(), [
             'filter'     => $definition->getFilter(),
@@ -61,10 +65,10 @@ class Controller extends BaseController
      *
      * @api   GET /adminv2/filters/{$filter}/defaults
      * @level 17.0
-     * @param IFilterDefinition $definition
+     * @param IDefinition $definition
      * @throws ServiceNotFound
      */
-    public function getDefaultsSelections(IFilterDefinition $definition)
+    public function getDefaultsSelections(IDefinition $definition)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getDefaultsTemplate(), [
             'filter'         => $definition->getFilter(),
@@ -83,12 +87,12 @@ class Controller extends BaseController
     /**
      * Saves which options should be available for each filter on each page
      *
-     * @param IFilterDefinition $definition
-     * @param Option\Mapper     $optionMapper
-     * @var string[][]          $_POST ['filter_option'] indexed by filterOption.key then page
+     * @param IDefinition   $definition
+     * @param Option\Mapper $optionMapper
+     * @var string[][]      $_POST ['filter_option'] indexed by filterOption.key then page
      * @throws MapperException
      */
-    public function postSaveOptions(IFilterDefinition $definition, Option\Mapper $optionMapper)
+    public function postSaveOptions(IDefinition $definition, Option\Mapper $optionMapper)
     {
         /** @var string[][] $postFilterOptions */
         $postFilterOptions = $this->getRequest()->post->get('filter_option');
@@ -141,13 +145,13 @@ class Controller extends BaseController
     /**
      * Saves which filter options should be selected by default per role and page
      *
-     * @param IFilterDefinition $definition
-     * @param Option\Mapper     $optionMapper
-     * @param Defaults\Mapper   $defaultMapper
-     * @var string[][][]        $_POST ['filter_defaults'] indexed by option.page, option.key, default.roleType
+     * @param IDefinition     $definition
+     * @param Option\Mapper   $optionMapper
+     * @param Defaults\Mapper $defaultMapper
+     * @var string[][][]      $_POST ['filter_defaults'] indexed by option.page, option.key, default.roleType
      * @throws MapperException
      */
-    public function postSaveDefaults(IFilterDefinition $definition, Option\Mapper $optionMapper, Defaults\Mapper $defaultMapper)
+    public function postSaveDefaults(IDefinition $definition, Option\Mapper $optionMapper, Defaults\Mapper $defaultMapper)
     {
         /** @var string[][][] $postFilterDefaults */
         $postFilterDefaults = $this->getRequest()->post->get('filter_defaults');

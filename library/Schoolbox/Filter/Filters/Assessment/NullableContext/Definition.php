@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\GenericCollection;
 
 /**
@@ -27,7 +27,7 @@ use Schoolbox\GenericCollection;
  * If both the (none) and some other options are selected, then the idFinder needs to treat it as empty for other filters, but not empty for this filter.
  * This will ensure other sub-queries will run, but we will UNION those with the concrete items in this filter
  */
-abstract class Definition extends AbstractFilterDefinition
+abstract class Definition extends AbstractDefinition
 {
 
     const KEY_NONE = 'none';  // match assessments that do NOT reside in this context

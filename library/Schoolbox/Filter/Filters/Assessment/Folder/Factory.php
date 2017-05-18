@@ -9,11 +9,13 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterFactory;
-use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\AbstractFactory;
+use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
@@ -22,7 +24,7 @@ use Schoolbox\Resource\Folder;
 /**
  * A factory for building 'Folder' filter objects
  */
-class Factory extends AbstractFilterFactory
+class Factory extends AbstractFactory
 {
 
     /**
@@ -53,7 +55,7 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         // Should this role type see classes for this page?
         /** @var Option\Model[][] $options */
@@ -65,7 +67,21 @@ class Factory extends AbstractFilterFactory
             ? UserAccess::ACCESS_WRITE
             : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
 
-        $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
+        $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true)->indexBy('id');
+
+        // Did caller specify they wish to insert some custom folders in the list?
+        if($overrides && $overrides->count()){
+            $folderIds = $overrides->getColumnValues('key');
+            $extraFolders = $this->folderMapper->findByColumn($this->folderMapper->getIdentifierColumn(), $folderIds);
+
+            // Check permission
+            $access = Access::getInstance();
+            foreach($extraFolders as $extraFolder){
+                if($access->isInstructor($user, $extraFolder)){
+                    $folders[$extraFolder->getId()] = $extraFolder;
+                }
+            }
+        }
 
         // Divide folders into Classes and Groups (not mutually exclusive!)
 

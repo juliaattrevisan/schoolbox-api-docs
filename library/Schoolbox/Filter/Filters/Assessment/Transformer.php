@@ -39,36 +39,37 @@ class Transformer extends \Schoolbox\Filter\Transformer
     public function __construct($keyConverters, $selectionsPerFilter)
     {
         parent::__construct($keyConverters, $selectionsPerFilter);
-        $this->folderSelections = $this->getSelectedItems(Folder\Definition::SLUG);
+        $this->folderSelections = $this->getSelectedItems(Folder\Definition::class);
     }
 
 
     /**
      * Get a set of entities represented by a filter component's selections
      *
-     * @param string $filterSlug
+     * @param string $filterClass
      * @return null|Collection|mixed[]
      * @throws \InvalidArgumentException
      */
-    public function getSelectedItems($filterSlug)
+    public function getSelectedItems($filterClass)
     {
-        if (!$this->getKeyConverters()->offsetExists($filterSlug)) {
-            throw new \InvalidArgumentException("No KeyConverter found for filter slug: $filterSlug");
+        if (!$this->getFiltersByClass()->offsetExists($filterClass)) {
+            throw new \InvalidArgumentException("No KeyConverter found for filter class: $filterClass");
         }
-        $keyConverter = $this->getKeyConverters()[$filterSlug];
+        $instance = $this->getFiltersByClass()[$filterClass];
+        $keyConverter = $this->getKeyConverters()[$instance->getId()];
 
         // Is this a 'nullable-context' assessment filter
-        $nullableContextSlugs = [
-            NullableContext\Project\Definition::SLUG,
-            NullableContext\UnitImpl\Definition::SLUG,
-            NullableContext\UnitImportSpec\Definition::SLUG,
-            NullableContext\UnitSpec\Definition::SLUG,
+        $nullableContexts = [
+            NullableContext\Project\Definition::class,
+            NullableContext\UnitImpl\Definition::class,
+            NullableContext\UnitImportSpec\Definition::class,
+            NullableContext\UnitSpec\Definition::class,
         ];
-        if(in_array($filterSlug, $nullableContextSlugs, true)){
+        if(in_array($filterClass, $nullableContexts, true)){
             $foldersFiltered = null !== $this->folderSelections;
             /** @var NullableContext\KeyConverter $keyConverter */
-            return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$filterSlug], $foldersFiltered);
+            return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()], $foldersFiltered);
         }
-        return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$filterSlug]);
+        return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()]);
     }
 }

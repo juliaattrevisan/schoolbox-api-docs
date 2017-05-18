@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option\Defaults as FilterDefault;
 use Schoolbox\Filter\Option as FilterOption;
@@ -25,7 +25,7 @@ use Schoolbox\Assessment\Term;
  *
  * Term options are keyed by 'current', 'previous' and the term IDs
  */
-abstract class Definition extends AbstractFilterDefinition
+abstract class Definition extends AbstractDefinition
 {
     const KEY_ALL      = 'all';        // All terms
     const KEY_FUTURE   = 'future';     // All terms in future

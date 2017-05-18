@@ -18,7 +18,7 @@ use Schoolbox\Filter\Filters\Assessment\Term\Close;
 /**
  * Helper for building the query clauses.
  *
- * The overall query will be made up of 0-8 sub-queries that are combined using UNION.
+ * The overall query will be made up of 0-6 sub-queries that are combined using UNION.
  * If 0, then caller should short-circuit to return an empty set
  * Sub-query for each extra assessment context.
  *
@@ -29,8 +29,7 @@ use Schoolbox\Filter\Filters\Assessment\Term\Close;
  * * 4. In Project  in UnitImpl on Folder
  * * 5. In UnitSpec in Folder   on Folder
  * * 6. In Project  in UnitSpec on Folder
- * * 7. In UnitImpl in UnitSpec on Folder
- * * 8. In Project  in UnitImpl in UnitSpec on Folder
+
  *
  * Callers (eg Controllers) should call this like:
  *  1. $ids                = $this->assessmentIdFinder->findIdsByFilters($filters, $deleted);
@@ -60,11 +59,11 @@ class IdFinder extends Filter\AbstractIdFinder
     protected function buildQuery(array $completeFilters, $deleted)
     {
         // Filters which effect which sub-queries are required
-        $folderIds     = $completeFilters[Folder\Definition::SLUG];
-        $projectIds    = $completeFilters[NullableContext\Project\Definition::SLUG];
-        $unitImplIds   = $completeFilters[NullableContext\UnitImpl\Definition::SLUG];
-        $unitSpecIds   = $completeFilters[NullableContext\UnitSpec\Definition::SLUG];
-        $unitImpSpcIds = $completeFilters[NullableContext\UnitImportSpec\Definition::SLUG];
+        $folderIds     = $completeFilters[Folder\Definition::class];
+        $projectIds    = $completeFilters[NullableContext\Project\Definition::class];
+        $unitImplIds   = $completeFilters[NullableContext\UnitImpl\Definition::class];
+        $unitSpecIds   = $completeFilters[NullableContext\UnitSpec\Definition::class];
+        $unitImpSpcIds = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
 
         list($folderWhere,   $folderParams)               = $this->getClauseFolder($folderIds);
         list($projectWhere,  $projectParams)              = $this->getClauseProject($projectIds);
@@ -75,11 +74,11 @@ class IdFinder extends Filter\AbstractIdFinder
         list($uImpSpcJoin, $uImpSpcWhere, $uImpSpcParams) = $this->getClauseUnitImplSpec($unitImpSpcIds);
 
         // Sub-query modifiers
-        $aTypes     = $completeFilters[AssessmentType\Definition::SLUG];
-        $termsDue   = $completeFilters[Due\Definition::SLUG];
-        $termsClose = $completeFilters[Close\Definition::SLUG];
-        $weightings = $completeFilters[WeightingType\Definition::SLUG];
-        $workTypes  = $completeFilters[WorkType\Definition::SLUG];
+        $aTypes     = $completeFilters[AssessmentType\Definition::class];
+        $termsDue   = $completeFilters[Due\Definition::class];
+        $termsClose = $completeFilters[Close\Definition::class];
+        $weightings = $completeFilters[WeightingType\Definition::class];
+        $workTypes  = $completeFilters[WorkType\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)           = $this->getClauseAType($aTypes);
         list($termDueWhere)                     = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
@@ -183,29 +182,6 @@ class IdFinder extends Filter\AbstractIdFinder
         return [implode("\n\n\tUNION\n\n", $subQueries), $params];
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildRegistry()
-    {
-        // Manually register instead of auto-glob, as we have to manually implement anyway.
-        return [
-            // Context-filters
-            NullableContext\UnitImportSpec\Definition::SLUG => NullableContext\UnitImportSpec\Definition::class,
-            Folder\Definition::SLUG                   => Folder\Definition::class,
-            NullableContext\Project\Definition::SLUG  => NullableContext\Project\Definition::class,
-            NullableContext\UnitImpl\Definition::SLUG => NullableContext\UnitImpl\Definition::class,
-            NullableContext\UnitSpec\Definition::SLUG => NullableContext\UnitSpec\Definition::class,
-
-            // Non-context filters
-            AssessmentType\Definition::SLUG           => AssessmentType\Definition::class,
-            Due\Definition::SLUG                      => Due\Definition::class,
-            Close\Definition::SLUG                    => Close\Definition::class,
-            WeightingType\Definition::SLUG            => WeightingType\Definition::class,
-            WorkType\Definition::SLUG                 => WorkType\Definition::class,
-        ];
-    }
 
     /**
      * Include (#0) 'base' sub-query? (and just the base query)
@@ -747,7 +723,7 @@ class IdFinder extends Filter\AbstractIdFinder
     protected function doContextFiltersGuaranteeEmptySet(array $completeFilters){
 
         // Ultimate folder (ie either direct or indirectly associated)
-        $folderIds = $completeFilters[Folder\Definition::SLUG];
+        $folderIds = $completeFilters[Folder\Definition::class];
 
         // Did call explicitly request assessments that do not have an ultimate folder?
         if($folderIds instanceOf Collection && !$folderIds->count()){
@@ -755,8 +731,8 @@ class IdFinder extends Filter\AbstractIdFinder
             return true;
         }
 
-        $unitImplIds = $completeFilters[NullableContext\UnitImpl\Definition::SLUG];
-        $unitSpecIds = $completeFilters[NullableContext\UnitSpec\Definition::SLUG];
+        $unitImplIds = $completeFilters[NullableContext\UnitImpl\Definition::class];
+        $unitSpecIds = $completeFilters[NullableContext\UnitSpec\Definition::class];
 
         // Did caller request assessments that live in unit-impls and unit-specs simultaneously?
         if($unitImplIds instanceOf Collection && $unitSpecIds instanceOf Collection && $unitImplIds->count() && $unitSpecIds->count()){
@@ -766,7 +742,7 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // Did caller specify assessment must reside directly in some unit-spec, and also be
         // directly in a unit-impl (that was imported from some spec)?
-        $unitImportSpecIds = $completeFilters[NullableContext\UnitImportSpec\Definition::SLUG];
+        $unitImportSpecIds = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
         if($unitImportSpecIds instanceOf Collection && $unitSpecIds instanceOf Collection && $unitImportSpecIds->count() && $unitSpecIds->count()){
             return true;
         }
@@ -792,21 +768,21 @@ class IdFinder extends Filter\AbstractIdFinder
     protected function doNonContextFiltersGuaranteeEmptySet(array $completeFilters)
     {
         // Did call explicitly request assessments that do not have an assessment type?
-        $assessmentTypes = $completeFilters[AssessmentType\Definition::SLUG];
+        $assessmentTypes = $completeFilters[AssessmentType\Definition::class];
         if ($assessmentTypes instanceOf Collection && !$assessmentTypes->count()) {
             // All assessments have a type
             return true;
         }
 
         // Did call explicitly request assessments due in some term, but no terms supplied?
-        $termsDue = $completeFilters[Due\Definition::SLUG];
+        $termsDue = $completeFilters[Due\Definition::class];
         if ($termsDue instanceOf Collection && !$termsDue->count()) {
             // All assessments have due dates
             return true;
         }
 
         // Did call explicitly request assessments close in some term, but no terms supplied?
-        $termsClose = $completeFilters[Close\Definition::SLUG];
+        $termsClose = $completeFilters[Close\Definition::class];
         if ($termsClose instanceOf Collection && !$termsClose->count()) {
             // All assessments have have a close date
             return true;
@@ -816,7 +792,7 @@ class IdFinder extends Filter\AbstractIdFinder
 
 
         // Did call explicitly request assessments with a weightingType, but no weightingTypes supplied?
-        $weightingType = $completeFilters[WeightingType\Definition::SLUG];
+        $weightingType = $completeFilters[WeightingType\Definition::class];
         if ($weightingType instanceOf Collection && !$weightingType->count()) {
             // All assessments have a weighting type
             return true;

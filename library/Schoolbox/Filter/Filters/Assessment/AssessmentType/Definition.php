@@ -9,7 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterDefinition;
+use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
@@ -26,14 +26,13 @@ use Schoolbox\Learning\Assessment\AssessmentType;
  * Defaults to full set, but run-time options will enable controller to exclude individual items
  *
  */
-class Definition extends AbstractFilterDefinition
+class Definition extends AbstractDefinition
 {
-    const SLUG = 'a';
 
-    const KEY_PROJECT  = AssessmentType::TYPE_PROJECT;
-    const KEY_QUIZ     = AssessmentType::TYPE_QUIZ;
+    const KEY_PROJECT = AssessmentType::TYPE_PROJECT;
+    const KEY_QUIZ = AssessmentType::TYPE_QUIZ;
     const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
-    const KEY_TASK     = AssessmentType::TYPE_TASK;
+    const KEY_TASK = AssessmentType::TYPE_TASK;
 
     /** @var Collection|string[] */
     private $assessmentTypes;
@@ -90,6 +89,7 @@ class Definition extends AbstractFilterDefinition
         throw new \InvalidArgumentException("Unknown AssessmentType key: $key");
     }
 
+
     /**
      * @inheritdoc
      */
@@ -99,6 +99,7 @@ class Definition extends AbstractFilterDefinition
         return true;
     }
 
+
     /**
      * @inheritdoc
      */
@@ -106,6 +107,7 @@ class Definition extends AbstractFilterDefinition
     {
         return $this->assessmentTypes->getAll();
     }
+
 
     /**
      * @inheritdoc
@@ -140,6 +142,7 @@ class Definition extends AbstractFilterDefinition
         // No options checked
         return false;
     }
+
 
     /**
      * @inheritdoc

@@ -23,9 +23,6 @@ use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
 class Definition extends AssessmentTermFilter\Definition
 {
 
-    const SLUG = 'td';
-
-
     /**
      * @inheritdoc
      */
@@ -37,6 +34,7 @@ class Definition extends AssessmentTermFilter\Definition
             FilterOption\Model::PAGE_MARK_BOOK,
         ];
     }
+
 
     /**
      * @inheritdoc

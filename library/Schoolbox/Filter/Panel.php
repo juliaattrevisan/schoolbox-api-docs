@@ -27,14 +27,14 @@ class Panel
     /**
      * Indexed by filter Definition class
      *
-     * @var GenericCollection|IFilterComponent[]
+     * @var GenericCollection|IComponent[]
      */
     private $components;
 
 
     /**
-     * @param string                               $route      The route to send the filter selections to
-     * @param GenericCollection|IFilterComponent[] $components The set of filters to display in this panel instance
+     * @param string                         $route      The route to send the filter selections to
+     * @param GenericCollection|IComponent[] $components The set of filters to display in this panel instance
      */
     public function __construct($route, GenericCollection $components)
     {
@@ -63,7 +63,7 @@ class Panel
 
     /**
      *
-     * @return IFilterComponent[]|GenericCollection
+     * @return IComponent[]|GenericCollection
      */
     public function getComponents()
     {

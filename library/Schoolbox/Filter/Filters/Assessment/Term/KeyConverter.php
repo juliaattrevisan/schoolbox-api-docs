@@ -42,6 +42,16 @@ abstract class KeyConverter extends AbstractKeyConverter
     }
 
 
+//    /**
+//     * @param Term\Model $item
+//     * @return string
+//     */
+//    public function getKey($item)
+//    {
+//        return (string)$item->getId();
+//    }
+
+
     /**
      * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
      *

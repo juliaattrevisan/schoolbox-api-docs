@@ -9,9 +9,9 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterFactory;
+use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\Filters\Assessment\NullableContext\Project\Definition;
-use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
@@ -29,7 +29,7 @@ use Schoolbox\Mapper;
 /**
  * A factory for building 'Project' filter objects
  */
-class Factory extends AbstractFilterFactory
+class Factory extends AbstractFactory
 {
 
     /**
@@ -80,7 +80,7 @@ class Factory extends AbstractFilterFactory
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      */
-    protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         return [
             'projects' => $this->getProjects($definition->getOptions($page), $page, $viewee),

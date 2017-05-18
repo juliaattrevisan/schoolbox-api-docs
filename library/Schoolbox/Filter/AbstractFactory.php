@@ -16,7 +16,7 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 
 
-abstract class AbstractFilterFactory implements IFilterFactory
+abstract class AbstractFactory implements IFactory
 {
 
     /** @var Filter\Mapper */
@@ -51,7 +51,7 @@ abstract class AbstractFilterFactory implements IFilterFactory
      * No dynamic options or user-selections relevant.
      *
      * @param Filter\Model $filter
-     * @return IFilterDefinition|object
+     * @return IDefinition|object
      * @throws \ReflectionException If unable to create an instance of the reflected class
      */
     public function buildDefinition(Filter\Model $filter)
@@ -66,9 +66,9 @@ abstract class AbstractFilterFactory implements IFilterFactory
      * @throws \ReflectionException If unable to create an instance of the reflected class
      * @throws Mapper\Exception If invalid columns names are used
      */
-    public function buildComponent($definitionClass, User $user, $page, User $viewee = null, array $selectionOverrides = null)
+    public function buildComponent($definitionClass, User $user, $page, User $viewee = null, GenericCollection $selectionOverrides = null)
     {
-        $filter     = $this->filterMapper->findByClass($definitionClass);
+        $filter     = $this->filterMapper->findByClass($definitionClass)->first();
         $definition = $this->buildDefinition($filter);
 
         // Don't bother building a component if it will be empty
@@ -79,6 +79,7 @@ abstract class AbstractFilterFactory implements IFilterFactory
             return null;
         }
 
+        // Don't bother loading user's saved selections if we are just going to override them
         $overrideUserSelections = null !== $selectionOverrides;
 
         $baseArgs = [
@@ -90,7 +91,7 @@ abstract class AbstractFilterFactory implements IFilterFactory
             'filterSelectionMapper' => $this->filterSelectionMapper,
         ];
 
-        $extraArgs = $this->buildExtraComponentArgs($user, $page, $definition, $viewee);
+        $extraArgs = $this->buildExtraComponentArgs($user, $page, $definition, $selectionOverrides, $viewee);
 
         $componentClass = $this->getAdjacentClass($definitionClass, 'Component');
 
@@ -125,13 +126,14 @@ abstract class AbstractFilterFactory implements IFilterFactory
     }
 
     /**
-     * @param User              $user
-     * @param string            $page
-     * @param IFilterDefinition $definition
-     * @param null|User         $viewee
+     * @param User                                     $user
+     * @param string                                   $page
+     * @param IDefinition                              $definition
+     * @param null|GenericCollection|Selection\Model[] $overrides
+     * @param null|User                                $viewee
      * @return mixed[]
      */
-    protected abstract function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null);
+    protected abstract function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null);
 
 
     /**

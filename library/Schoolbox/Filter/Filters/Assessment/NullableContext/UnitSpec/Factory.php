@@ -9,11 +9,12 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFilterFactory;
-use Schoolbox\Filter\IFilterDefinition;
+use Schoolbox\Filter\AbstractFactory;
+use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 
@@ -21,7 +22,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 /**
  * A factory for building 'UnitSpec' filter objects
  */
-class Factory extends AbstractFilterFactory
+class Factory extends AbstractFactory
 {
     /** @var UnitSpec\Mapper */
     private $unitSpecMapper;
@@ -49,7 +50,7 @@ class Factory extends AbstractFilterFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IFilterDefinition $definition, User $viewee = null)
+    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         return [];
     }

@@ -11,20 +11,22 @@ use Schoolbox\Collection;
 use Schoolbox\IMapper;
 
 /**
- * An 'IdFinder' is able to take a set of filters, and return a list of IDs of entities that match those filters.
+ * An 'IdFinder' is able to take a set of filters (indexed by filter definition class),
+ * and return a list of IDs of entities that match those filters.
  */
 interface IdFinder
 {
     /**
      * Fetch the singleton instance of this class
      *
-     * @param IMapper $mapper
+     * @param Mapper  $filterMapper The filter instance mapper
+     * @param IMapper $mapper       A mapper for the entity being filtered, eg 'assessments'
      * @return IdFinder
      */
-    public static function getInstance(IMapper $mapper);
+    public static function getInstance(Mapper $filterMapper, IMapper $mapper);
 
     /**
-     * Fetch an array of assessment IDs that match the specified filters
+     * Fetch an array of IDs that match the specified filters
      *
      * Filters are applied using ∩ (intersection).
      *
@@ -33,9 +35,8 @@ interface IdFinder
      * * []    => LEFT JOIN must match NULL. eg if project filter is [] then assessment does not live in project
      * * [X..] => INNER JOIN must be in X.   eg if project filter is [1] then assessments must reside directly in project_1
      *
-     * @param Collection[]|null[]|mixed[][] $filters Indexed by filter definition key
-     * @param bool                          $deleted Whether to include soft-deleted assessments
-     * @see IFilterDefinition::getSlug()
+     * @param Collection[]|null[]|mixed[][] $filters Indexed by filter definition class
+     * @param bool                          $deleted Whether to include soft-deleted entities
      * @return int[]
      * @throws \InvalidArgumentException If any filter keys not recognised
      * @throws BrokenFilterException If a injected filter is unable to be processed

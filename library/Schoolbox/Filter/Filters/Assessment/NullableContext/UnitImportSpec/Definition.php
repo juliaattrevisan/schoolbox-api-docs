@@ -38,8 +38,6 @@ use Schoolbox\Filter\Option;
 class Definition extends NullableContext\Definition
 {
 
-    const SLUG = 'uis';
-
     /* Show units imported to the following folder types:
      * eg,
      * * Unit A imported to Archery(group) + Math3/4(class)
@@ -95,6 +93,7 @@ class Definition extends NullableContext\Definition
         }
         throw new \InvalidArgumentException("Unknown 'UnitSpec' filter key: $key");
     }
+
 
     /**
      * @inheritdoc

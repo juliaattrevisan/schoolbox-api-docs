@@ -7,12 +7,12 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
-use Schoolbox\Filter\AbstractFilterComponent;
+use Schoolbox\Filter\AbstractComponent;
 
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractFilterComponent
+class Component extends AbstractComponent
 {
 
     // no methods - all defined by abstract

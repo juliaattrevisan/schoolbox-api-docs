@@ -12,8 +12,17 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
 {
-
     use Id;
+
+    /**
+     * The mapper class of the entity this filter relates to,
+     *
+     * eg the 'weighting' assessment filter relates to the 'assessment' mapper
+     *
+     * @var string
+     */
+    private $entity;
+
 
     /**
      * File name of the class that contains the filter-type-specific logic
@@ -38,7 +47,26 @@ class Model
      */
 
     /**
-     * @return string|IFilterDefinition
+     * @return string
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+
+    /**
+     * @param string $entity
+     * @return $this
+     */
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+        return $this;
+    }
+
+    /**
+     * @return string|IDefinition
      */
     public function getClass()
     {

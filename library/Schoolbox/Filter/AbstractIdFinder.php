@@ -15,16 +15,24 @@ use Schoolbox\IMapper;
  */
 abstract class AbstractIdFinder implements IdFinder
 {
+
     /** @var static[] $instance */
     private static $instance = [];
 
-    /** @var IMapper */
+    /**
+     * The mapper for the entity being filtered
+     *
+     * eg, the 'assessment' mapper if this instance is fetching 'assessment' IDs
+     *
+     * @var IMapper
+     */
     private $mapper;
 
     /**
      * A list of filter definitions this class knows how to apply
      *
-     * Indexed by IFilterDefinition->getSlug()
+     * Indexed by filterDefinition.class
+     *
      * @var string[]
      */
     private $registry;
@@ -33,12 +41,12 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * @inheritdoc
      */
-    public static function getInstance(IMapper $mapper)
+    public static function getInstance(Mapper $filterMapper, IMapper $mapper)
     {
         $className = get_called_class();
         if (!isset(self::$instance[$className])) {
             self::$instance[$className] = new static($mapper);
-            self::$instance[$className]->setRegistry(self::$instance[$className]->buildRegistry());
+            self::$instance[$className]->buildRegistry($filterMapper, $mapper);
         }
         return self::$instance[$className];
     }
@@ -51,13 +59,6 @@ abstract class AbstractIdFinder implements IdFinder
     {
         $this->mapper = $mapper;
     }
-
-
-    /**
-     * Build a registry of filters known to this class
-     * @return string[]
-     */
-    protected abstract function buildRegistry();
 
 
     /**
@@ -85,24 +86,39 @@ abstract class AbstractIdFinder implements IdFinder
         $idStatement = $this->getMapper()->getDatabase()->query($query, $params);
         $ids         = array_column($idStatement->fetchAll(), $this->getMapper()->getIdentifierColumn());
 
-        // Need to deduplicate some forms of sub-query combination
+        // Need to de-duplicate some forms of sub-query combination
         // (eg, if nullable assessment context filter has both (none) + 1 or more concrete items checked)
         $uniqueIds = array_unique($ids);
         sort($uniqueIds);
         return $uniqueIds;
     }
 
+
+    /**
+     * Build a registry of filters known to this class
+     *
+     * @param Mapper  $filterMapper The filter instance mapper
+     * @param IMapper $entityMapper A mapper for the entity being filtered, eg 'assessments'
+     */
+    protected function buildRegistry(Mapper $filterMapper, IMapper $entityMapper)
+    {
+        $filterInstances = $filterMapper->findForEntity(get_class($entityMapper));
+        $filterClasses = $filterInstances->getColumnValues('class');
+        $this->registry  = array_combine($filterClasses, $filterClasses);
+    }
+
+
     /**
      * Ensures that any filters passed in are known to this class
      *
      * @param Collection[]|null[]|mixed[][] $filters
-     * @throws \InvalidArgumentException If filter key not recognised
+     * @throws \InvalidArgumentException If filter definition class not recognised
      */
     protected function checkValidFilterKeys(array $filters)
     {
-        foreach($filters as $key => $val){
-            if(!array_key_exists($key, $this->registry)){
-                throw new \InvalidArgumentException("Unknown filter: $key");
+        foreach ($filters as $filterClass => $val) {
+            if (!array_key_exists($filterClass, $this->registry)) {
+                throw new \InvalidArgumentException("Unknown filter: $filterClass");
             }
         }
     }
@@ -119,39 +135,41 @@ abstract class AbstractIdFinder implements IdFinder
     protected function normaliseFilters(array $sparseFilters)
     {
         $completeFilters = [];
-        foreach($this->registry as $filterKey => $filterClass){
+        foreach ($this->registry as $filterClass) {
             // Not in the passed filters? Set it explicitly to null.
-            if(!array_key_exists($filterKey, $sparseFilters)){
-                $completeFilters[$filterKey] = null;
+            if (!array_key_exists($filterClass, $sparseFilters)) {
+                $completeFilters[$filterClass] = null;
                 continue;
             }
             // Ensure it is either null, or a (potentially empty) Collection
-            if(is_array($sparseFilters[$filterKey])){
-                $completeFilters[$filterKey] = new Collection($sparseFilters[$filterKey]);
+            if (is_array($sparseFilters[$filterClass])) {
+                $completeFilters[$filterClass] = new Collection($sparseFilters[$filterClass]);
             }
-            if(null === $sparseFilters[$filterKey] || $sparseFilters[$filterKey] instanceof Collection){
-                $completeFilters[$filterKey] = $sparseFilters[$filterKey];
+            if (null === $sparseFilters[$filterClass] || $sparseFilters[$filterClass] instanceof Collection) {
+                $completeFilters[$filterClass] = $sparseFilters[$filterClass];
             } else {
                 // Enables caller to specify a inject a single entity, or an array, and have it normalised here.
-                $completeFilters[$filterKey] = new Collection((array)$sparseFilters[$filterKey]);
+                $completeFilters[$filterClass] = new Collection((array)$sparseFilters[$filterClass]);
             }
         }
         return $completeFilters;
     }
 
+
     /**
      * Can examination of the filters using set-theory indicate that no entities could ever match?
      *
-     * @param int[][]|null[] $completeFilters
+     * @param Collection[]|null[]|mixed[][] $completeFilters
      * @return bool
      */
     protected abstract function doFiltersGuaranteeEmptySet(array $completeFilters);
+
 
     /**
      * Protected so we can call from child unit-testing class
      *
      * @param Collection[]|null[]|mixed[][] $completeFilters
-     * @param bool                          $deleted          Whether to include soft-deleted entities
+     * @param bool                          $deleted Whether to include soft-deleted entities
      * @return mixed[]
      * @throws BrokenFilterException If a filter SQL fragment cannot be built
      */
@@ -170,21 +188,11 @@ abstract class AbstractIdFinder implements IdFinder
         return $this->mapper;
     }
 
-
-    /**
-     * @return string[]
-     */
-    protected function getRegistry()
-    {
-        return $this->registry;
-    }
-
-
     /**
      * @param string[] $registry
      * @return $this
      */
-    private function setRegistry(array $registry)
+    protected function setRegistry(array $registry)
     {
         $this->registry = $registry;
         return $this;
