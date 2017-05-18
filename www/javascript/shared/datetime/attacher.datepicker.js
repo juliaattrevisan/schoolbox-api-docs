@@ -17,8 +17,10 @@
 
             if($(this).attr('data-datepicker-id') === undefined) {
 
-                $(this).after('<button type="button" class="button icon-calendar datepicker-button">Select Date</button>');
-                $(this).addClass('datepicker-input');
+                if ($(this).attr('data-datepicker-nobutton') === undefined) {
+                    $(this).after('<button type="button" class="button icon-calendar datepicker-button">Select Date</button>');
+                    $(this).addClass('datepicker-input');
+                }
 
                 $(this).alaressDateTimePicker();
 
