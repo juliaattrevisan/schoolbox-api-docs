@@ -24,7 +24,7 @@ Usage: include 'sub/subjectSelector.twig
     <select id="context-selector-subject" title="Select a subject">
         <option disabled="" selected="" label="Select a subject">Select a subject</option>
         {% for folder in subjects %}
-            <option data-href="{{ routeLookup('learning.getGradesForSubject', routeArgs|merge({subjectId: folder.id})) }}" {% if folder.id == currentSubject.id %}selected{% endif %} value="{{ folder.id }}">
+            <option data-href="{{ routeLookup('learningGrades.getGradesForSubject', routeArgs|merge({subjectId: folder.id})) }}" {% if folder.id == currentSubject.id %}selected{% endif %} value="{{ folder.id }}">
                 {#- dessicate -#}{{ folder.nameWithCodes }}{#- dessicate -#}
             </option>
         {% endfor %}

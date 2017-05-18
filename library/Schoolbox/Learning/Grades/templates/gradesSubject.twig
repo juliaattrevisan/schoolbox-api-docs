@@ -17,7 +17,7 @@
     });
 </script>
 
-{{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], ['Grades', routeLookup('learning.getGrades', {userId: student.id}) ], [subject.name, '#']) }}
+{{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], ['Grades', routeLookup('learningGrades.getGrades', {userId: student.id}) ], [subject.name, '#']) }}
 
 <div class="row">
     <div class="small-12 columns">
@@ -47,13 +47,13 @@
                 {% include 'sub/semesterSelector.twig' with {
                 currentTerm: term,
                 terms: terms,
-                route: 'learning.getGradesForSubject',
+                route: 'learningGrades.getGradesForSubject',
                 routeArgs: {viewee: student, userId: student.id, subject: subject}
                 } only %}
                 {% include 'sub/subjectSelector.twig' with {
                 currentSubject: subject,
                 subjects: folders,
-                route: 'learning.getGradesForSubject',
+                route: 'learningGrades.getGradesForSubject',
                 routeArgs: {viewee: student, userId: student.id, term: term, termCode: term.code, subject: subject}
                 } only %}
             </div>

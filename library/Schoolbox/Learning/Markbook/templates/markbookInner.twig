@@ -126,7 +126,7 @@
                     <th class="{{ urgency.marks(meanNormalised) }}-bg">
                         {# TODO use actual selected term code #}
                         <a class="{{ urgency.marks(meanNormalised) }}-bg"
-                           href="{{ routeLookup('learning.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students {{ locale.grades.plural }}">
+                           href="{{ routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students {{ locale.grades.plural }}">
                             {{ studentMean | default('–') }}
                         </a>
                     </th>

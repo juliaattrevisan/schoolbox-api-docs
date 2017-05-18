@@ -10,6 +10,7 @@ namespace Config\Modules;
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\Learning\Module as LearningModule;
+use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Feedback\Module as FeedbackModule;
@@ -33,6 +34,7 @@ class Learning extends ModuleLoader
         // TODO - split 'LearningModule' into ClassModule + PendingModule + GradesModule
         $this->loadModule($kernel, LearningModule::class,           "/{$namespace}");
 
+        $this->loadModule($kernel, Grades\Module::class,            "/{$namespace}/grades");
         $this->loadModule($kernel, AssessmentModule::class,         "/{$namespace}");
         $this->loadModule($kernel, FeedbackModule::class,           "/{$namespace}");
         $this->loadModule($kernel, ResponseModule::class,           "/{$namespace}");
