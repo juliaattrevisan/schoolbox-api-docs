@@ -89,7 +89,7 @@ $(function() {
         return function(value, element) {
             return (errors[key || element.name] || []).indexOf(code) < 0;
         }
-    }
+    };
 
     // Remote rules for start date
     // Some of these should be made into local rules.
@@ -97,49 +97,49 @@ $(function() {
         'remote.invalidStart',
         getValidatorRemoteMethod('invalid', 'start_datetime'),
         'Please enter a valid date.'
-    )
+    );
     $.validator.addMethod(
         'remote.conflict',
         getValidatorRemoteMethod('conflict', 'start_datetime'),
         'This item has already been booked for this time.'
-    )
+    ;
     $.validator.addMethod(
         'remote.timetabledClass',
         getValidatorRemoteMethod('timetabled_class', 'start_datetime'),
         'This room is already timetabled for this time.'
-    )
+    );
     $.validator.addMethod(
         'remote.inPast',
         getValidatorRemoteMethod('in_past', 'start_datetime'),
         'Items may not be booked for the past.'
-    )
+    );
     $.validator.addMethod(
         'remote.tooEarly',
         getValidatorRemoteMethod('too_early', 'start_datetime'),
         'This item must be booked at least ' + {{ include('sub/interval.twig', {interval: item.resource.minLeadTime})|json_encode|raw }} + ' in advance.'
-    )
+    );
 
     // Remote rules for end date
     $.validator.addMethod(
         'remote.invalidEnd',
         getValidatorRemoteMethod('invalid', 'end_datetime'),
         'Please enter a valid date.'
-    )
+    );
     $.validator.addMethod(
         'remote.beforeStart',
         getValidatorRemoteMethod('before_start', 'end_datetime'),
         'The booking start time must be before the end time.'
-    )
+    );
     $.validator.addMethod(
         'remote.tooShort',
         getValidatorRemoteMethod('too_short', 'end_datetime'),
         'This item must be booked for at least ' + {{ include('sub/interval.twig', {interval: item.resource.minReservationTime})|json_encode|raw }} + '.'
-    )
+    );
     $.validator.addMethod(
         'remote.tooLong',
         getValidatorRemoteMethod('too_long', 'end_datetime'),
         'This item may not be booked for more than ' + {{ include('sub/interval.twig', {interval: item.resource.maxReservationTime})|json_encode|raw }} + '.'
-    )
+    );
 
     // Repeat-Until must be after StartDate
     $.validator.addMethod(
@@ -155,11 +155,11 @@ $(function() {
 
 
     // Set up errors, dialog boxes, form
-    var errors = {}
-    var form   = $('form#resource-booking-form')
+    var errors = {};
+    var form   = $('form#resource-booking-form');
 
     // Input for efficacy of update for series bookings (update all, or this only)
-    var efficacyInput = form.find('input[name="efficacy"]')
+    var efficacyInput = form.find('input[name="efficacy"]');
 
     // Set up dialog boxes for cancel and update
     var updateDialog = $('#dialog-bulk-update');
@@ -199,7 +199,7 @@ $(function() {
             type:     form.attr('method'),
             data:     form.serializeArray(),
             dataType: 'json'
-        }
+        };
         var ajaxDone = function(data) {
 
             /* Use a calling module's callback url, pass it booking ids
@@ -219,11 +219,11 @@ $(function() {
                 }
                 window.location.href = $('#resource-booking-back').attr('href')+dateQuery;
             }
-        }
+        };
         var ajaxFail = function(jqXHR) {
-            errors = jqXHR.responseJSON.errors
+            errors = jqXHR.responseJSON.errors;
             form.valid()
-        }
+        };
 
         // Deactivate the button
         var button   = form.find('input#resource-booking-save');
@@ -235,7 +235,7 @@ $(function() {
             .always(function() {
                 button.prop('disabled', false).attr('value', oldValue);
             });
-    }
+    };
 
     // Submit resource booking form via AJAX
     form.alaressValidate({
@@ -292,8 +292,8 @@ $(function() {
         },
         submitHandler: function() {
             // Consider: one pass for validation, another pass for saving
-            var bookingId = form.find('input[name="id"]').val()
-            var repeat    = form.find('input[name="repeat"]').val()
+            var bookingId = form.find('input[name="id"]').val();
+            var repeat    = form.find('input[name="repeat"]').val();
             if (bookingId && repeat) {
                 // Show a different dialog for deletes
                 if (form.data('action') === 'cancel') {
@@ -326,30 +326,30 @@ $(function() {
                 'afterStart': "Repeat-until date must be after start date"
             }
         }
-    })
+    });
 
     // On submission attempt: clear list of errors
     form.find('#resource-booking-save')
         .click(function() {
-            errors = {}
+            errors = {};
             form.valid()
         })
         .click(function() {
             // Record that I clicked Save
             form.data('action', 'save')
-        })
+        });
     form.find('#resource-booking-cancel')
         .click(function() {
             // Record that I clicked Cancel
             form.data('action', 'cancel')
-        })
+        });
 
     // did I click the cancel button? If so, cancel this booking.
     // This should be in a different form to everything else.
     form.on('click', '#resource-booking-cancel', function(event) {
         event.preventDefault();
         $('#resource-booking-cancel-form').submit();
-    })
+    });
 
     // Show/hide the repeat until input, depending on if a repeat is chosen.
     form.find('#repeatUntilSelect')
@@ -363,7 +363,7 @@ $(function() {
                 $("#repeat_until").rules("remove", "required");
             }
         })
-        .change()
+        .change();
 
     // Related Resources:
     // show/hide name and notes
