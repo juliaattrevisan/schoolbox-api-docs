@@ -71,6 +71,7 @@ class Definition extends AbstractDefinition
         return [
             Option\Model::PAGE_PENDING_ASSESSMENTS,
             Option\Model::PAGE_MARK_BOOK,
+            Option\Model::PAGE_GRADES,
         ];
     }
 
@@ -113,7 +114,12 @@ class Definition extends AbstractDefinition
      */
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
-        // noop - TemporalStates are purely hard-coded.
+        foreach ($pageOptions as $idx => $option) {
+            // Do not permit 'upcoming' on the 'grades' page
+            if (self::KEY_UPCOMING === $option->getKey() && Option\Model::PAGE_GRADES === $option->getPage()) {
+                $pageOptions->offsetUnset($idx);
+            }
+        }
         return $pageOptions;
     }
 
