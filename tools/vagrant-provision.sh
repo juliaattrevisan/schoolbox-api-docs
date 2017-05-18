@@ -42,6 +42,18 @@ then
     a2enmod php7.1;
 fi
 
+if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ];
+then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
+    apt-get install -y libgss3;
+    wget -c https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/php7.1-pdo_sqlsrv-package-trusty.tar.gz;
+    tar xzf php7.1-pdo_sqlsrv-package-trusty.tar.gz;
+    wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb;
+    wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb;
+    dpkg -i package-artifacts/*.deb;
+    phpenmod pdo_sqlsrv;
+fi
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
