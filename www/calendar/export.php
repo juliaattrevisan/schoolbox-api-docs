@@ -16,9 +16,10 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
+
 
 try {
     $token = $_GET['token'];
@@ -139,7 +140,9 @@ try {
         case 'external':
             /** @var IConnector $databaseExternal */
             $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
-            $api = new Calendar_Api_EventType_Event_External_Default($user, $databaseExternal, array());
+            $factory = new ExternalConnectorFactory();
+            $externalEvents = $factory->build(new \Schoolbox\Config\Loader(), $databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
+            $api = new Calendar_Api_EventType_Event_External_Default($user, array(),$externalEvents);
             $filename =  'external';
             break;
 

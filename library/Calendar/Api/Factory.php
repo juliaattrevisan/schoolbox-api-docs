@@ -16,6 +16,9 @@
  */
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
+
 
 class Calendar_Api_Factory
 {
@@ -37,10 +40,13 @@ class Calendar_Api_Factory
      * Constructor
      *
      * @param AssessmentDataSource $assessmentDataSource
+     * @param  IConnector $databaseExternal
      */
-    public function __construct(AssessmentDataSource $assessmentDataSource)
+    public function __construct(AssessmentDataSource $assessmentDataSource, IConnector $databaseExternal)
     {
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->databaseExternal = $databaseExternal;
+
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
         /* These configs are base64-encode()'d to get around a weird issue with unserialize
@@ -112,6 +118,13 @@ class Calendar_Api_Factory
             case 'Calendar_Api_EventType_Submission_Schoolbox_Default':
                 // Same as default constructor, but add the assessment data source
                 $params = [$user, $config, $this->assessmentDataSource,];
+                break;
+
+            case 'Calendar_Api_EventType_Event_External_Default':
+                // Same as default constructor, but add the assessment data source
+                $factory = new ExternalConnectorFactory();
+                $externalEvents = $factory->build(new \Schoolbox\Config\Loader(), $this->databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
+                $params = [$user, $config, $externalEvents,];
                 break;
 
             default:

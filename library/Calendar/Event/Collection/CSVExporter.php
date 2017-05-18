@@ -42,7 +42,7 @@ class CSVExporter extends Renderer {
     /**
      * This will stream the vcal output as it parses over the event collection
      */
-    public function renderAll() {
+    public function renderAll($type = null) {
 		// Output base calendar, and output its start and end separately
 		echo implode(',',$this->csvFormat)."\n";
 
