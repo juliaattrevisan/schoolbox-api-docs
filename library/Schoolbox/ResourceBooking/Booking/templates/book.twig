@@ -40,48 +40,48 @@ $(function() {
 //
 //    })
 
-    // Timetable selector
+    {#// Timetable selector#}
     {#var campusList         = {{ campusList|json_encode|raw }}#}
-    $('[data-interaction="timetableSelector"]')
-        .timetableDaySelector({
-            dateFormat: momentFormat,
-            campusList: {{ campusList|json_encode|raw }},
-            getChangeDateAjax: function(campus, day, date, previous) {
-                return {
-                    url:      {{ routeLookup('timetable.dateForTimetableDay')|json_encode|raw }},
-                    dataType: 'json',
-                    data:     {
-                        campus:   campus,
-                        day:      day,
-                        previous: (previous ? 1 : 0),
-                        date:     date
-                    }
-                }
-            }
-        })
-        .on('selectDate.timetableDaySelector', function(event, date, startTime, endTime) {
-            var timetableTab = $('#timetableSelector')
-            date = moment(date)
-            if (date.isValid()) {
-                var dateOutput = date.format(momentFormat)
-                timetableTab.find('input[name="start_datetime[date]"]').val(dateOutput)
-                timetableTab.find('input[name="end_datetime[date]"]').val(dateOutput)
-            }
+    {#$('[data-interaction="timetableSelector"]')#}
+        {#.timetableDaySelector({#}
+            {#dateFormat: momentFormat,#}
+            {#campusList: {{ campusList|json_encode|raw }},#}
+            {#getChangeDateAjax: function(campus, day, date, previous) {#}
+                {#return {#}
+                    {#url:      {{ routeLookup('timetable.dateForTimetableDay')|json_encode|raw }},#}
+                    {#dataType: 'json',#}
+                    {#data:     {#}
+                        {#campus:   campus,#}
+                        {#day:      day,#}
+                        {#previous: (previous ? 1 : 0),#}
+                        {#date:     date#}
+                    {#}#}
+                {#}#}
+            {#}#}
+        {#})#}
+        {#.on('selectDate.timetableDaySelector', function(event, date, startTime, endTime) {#}
+            {#var timetableTab = $('#timetableSelector')#}
+            {#date = moment(date)#}
+            {#if (date.isValid()) {#}
+                {#var dateOutput = date.format(momentFormat)#}
+                {#timetableTab.find('input[name="start_datetime[date]"]').val(dateOutput)#}
+                {#timetableTab.find('input[name="end_datetime[date]"]').val(dateOutput)#}
+            {#}#}
 
-            startTime = moment(startTime, 'HH:mm')
-            if (startTime.isValid()) {
-                timetableTab.find('input[name="start_datetime[hour]"]').val(startTime.format('h'))
-                timetableTab.find('input[name="start_datetime[minute]"]').val(startTime.format('mm'))
-                timetableTab.find('input[name="start_datetime[meridien]"]').val(startTime.format('a'))
-            }
+            {#startTime = moment(startTime, 'HH:mm')#}
+            {#if (startTime.isValid()) {#}
+                {#timetableTab.find('input[name="start_datetime[hour]"]').val(startTime.format('h'))#}
+                {#timetableTab.find('input[name="start_datetime[minute]"]').val(startTime.format('mm'))#}
+                {#timetableTab.find('input[name="start_datetime[meridien]"]').val(startTime.format('a'))#}
+            {#}#}
 
-            endTime = moment(endTime, 'HH:mm')
-            if (endTime.isValid()) {
-                timetableTab.find('input[name="end_datetime[hour]"]').val(endTime.format('h'))
-                timetableTab.find('input[name="end_datetime[minute]"]').val(endTime.format('mm'))
-                timetableTab.find('input[name="end_datetime[meridien]"]').val(endTime.format('a'))
-            }
-        })
+            {#endTime = moment(endTime, 'HH:mm')#}
+            {#if (endTime.isValid()) {#}
+                {#timetableTab.find('input[name="end_datetime[hour]"]').val(endTime.format('h'))#}
+                {#timetableTab.find('input[name="end_datetime[minute]"]').val(endTime.format('mm'))#}
+                {#timetableTab.find('input[name="end_datetime[meridien]"]').val(endTime.format('a'))#}
+            {#}#}
+        {#})#}
 
     // remote validation rules
     // Have some sort of helper for creating remote validations.
