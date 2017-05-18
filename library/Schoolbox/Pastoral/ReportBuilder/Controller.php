@@ -99,6 +99,20 @@ class Controller extends Base
      */
     public function getIndex()
     {
+        $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser());
+
+        $reportsMine = [];
+        $reportsGroup = [];
+
+        /** @var \Schoolbox\Pastoral\Report\Model $reportCurrent */
+        foreach ($reportsAll as $reportCurrent) {
+            if ($reportCurrent->getOwner()->getId() == $this->getUser()->getId()) {
+                $reportsMine[] = $reportCurrent;
+            } else {
+                $reportsGroup[] = $reportCurrent;
+            }
+        }
+
         // And render this thing out
 
         $this->getResponse()->content->set(
@@ -106,7 +120,8 @@ class Controller extends Base
                 'template' => '@pastoralReportBuilder/index.twig',
                 'data' => array(
                     'user' => $this->getUser(),
-                    'reports' => $this->pastoralReportMapper->findForUser($this->getUser())
+                    'reportsMine' => $reportsMine,
+                    'reportsGroup' => $reportsGroup
                 ),
             )
         );

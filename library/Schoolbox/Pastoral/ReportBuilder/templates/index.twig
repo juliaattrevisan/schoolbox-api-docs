@@ -29,8 +29,8 @@
     <div class="small-12 island">
         {% set found = 0 %}
 
-        {% if reports | length %}
-            {% for report in reports if report.owner.id == user.id %}
+        {% if reportsMine | length or reportsGroup | length %}
+            {% for report in reportsMine %}
                 {% if loop.first %}
                     {% set found = 1 %}
                     <section>
@@ -80,7 +80,7 @@
 
             {% set found = 0 %}
 
-            {% for report in reports if report.owner.id != user.id %}
+            {% for report in reportsGroup %}
 
                 {% if loop.first %}
 
@@ -116,11 +116,13 @@
             {% endif %}
 
         {% else %}
+
             <div class="empty-state">
                 <i class="icon-report"></i>
                 <p>You do not have any saved pastoral care reports.</p>
                 <p><a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" title="New Pastoral Report">Create your first report.</a></p>
             </div>
+
         {% endif %}
     </div>
 </div>
