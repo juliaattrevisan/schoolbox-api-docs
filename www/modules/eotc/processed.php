@@ -11,6 +11,8 @@
  * @version     SVN: $Id$
  */
 
+/** @var SitePage $this */
+
 /* Only EOTC Administrators can view this page
  */
 $authenticator = new \EOTC\Authenticator($this);
@@ -63,10 +65,14 @@ else {
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
  */
+
+/** @var Schoolbox\L10n\RosettaStone $l10n */
+$l10n = $this->getDi()->get('l10n');
+
 foreach ($allListGroups as $key => $currentListGroup) {
 	if ($currentListGroup->count()) {
 		$this->setVar([
-			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName($key)
+			'EVENT_LIST_GROUP_NAME' => $l10n->translateSentence($allListGroups->getCurrentName($key)),
 		]);
 
 		$i = 0;

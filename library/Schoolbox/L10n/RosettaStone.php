@@ -18,17 +18,25 @@ class RosettaStone
 
     /**
      * RosettaStone constructor.
-     * RosettaStone constructor.
-     * @param Mapper $l10nMapper
+     * @param Model[] $terms
      */
-    public function __construct($l10nMapper)
+    public function __construct($terms = [])
     {
-        $terms = $l10nMapper->findAll();
-
-        /** @var Model $term */
         foreach ($terms as $term) {
-            $this->dictionary[$term->getTerm()] = $term;
+            $this->addTerm($term);
         }
+    }
+
+    /**
+     * Adds a term to this stone's dictionary.
+     *
+     * @param Model $term
+     * @return $this
+     */
+    public function addTerm(Model $term)
+    {
+        $this->dictionary[$term->getTerm()] = $term;
+        return $this;
     }
 
     /**
@@ -40,6 +48,36 @@ class RosettaStone
     public function translate($term, $plural = false, $capital = false)
     {
         return $this->__get($term)->translate($plural, $capital);
+    }
+
+    /**
+     * Gets the indefinite article for this term.
+     *
+     * @param string $term
+     * @param bool   $capital
+     * @return string
+     */
+    public function indefiniteArticle($term, $capital = false)
+    {
+        return $this->__get($term)->translateIndefiniteArticle($capital);
+    }
+
+    /**
+     * Attempt to translate a sentence that contains tokens.
+     *
+     * Tokens will be wrapped in {:token}, as they are in UPS, they may have modifiers too:
+     * {|plural} and/or {|capital}.
+     *
+     * (Sentence tokenization is a stop-gap till we have proper i18n.)
+     *
+     * @param string $sentence
+     * @return string
+     */
+    public function translateSentence($sentence)
+    {
+        // TODO inject tokenizer at time of construct
+        $tokenizer = new Tokenizer($this);
+        return $tokenizer->parseToken([], $sentence);
     }
 
     /**

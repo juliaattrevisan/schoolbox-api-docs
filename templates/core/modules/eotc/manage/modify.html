@@ -121,7 +121,7 @@
 </script>
 
 <ul class="breadcrumb">
-    <li><a href="/modules/eotc/myReview" title="EOTC">EOTC</a></li>
+    <li><a href="/modules/eotc/myReview" title="{TPL_LOCAL_EOTC_PLURAL_PC}">{TPL_LOCAL_EOTC_PLURAL_PC}</a></li>
     <li class="active"><a href="#">{FUNCTION} {EVENT_TITLE}</a></li>
 </ul>
 
@@ -325,8 +325,8 @@
 
             <fieldset class="content">
                 <legend>
-                    RAMS Required?
-                    <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
+                    {TPL_LOCAL_EOTCRAMSABBREVIATION} Required?
+                    <span class='hint has-tip tip-top' data-tooltip title="Please confirm if {TPL_LOCAL_EOTCRAMSABBREVIATION} is required for this event to take place.">?</span>
                 </legend>
 
                 <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
@@ -334,7 +334,7 @@
 
                 <div class="small-12 columns">
                     <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
-                    <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
+                    <label for="ramsRequiredCheckbox" class="checkbox-label">{TPL_LOCAL_EOTCRAMSABBREVIATION} is required</label>
                 </div>
                 <div class="small-12 columns">
                     {ATTACH_ZONE}
@@ -342,7 +342,7 @@
             </fieldset>
 
             <fieldset class="content">
-                <legend>Details <span class='hint has-tip tip-top' data-tooltip title="Include support comments required as part of your EOTC approval, e.g. Names of non-staff adults; How this trip supports the curriculum (For College SS EOTCs, state how trip relates to assessment) ">?</span></legend>
+                <legend>Details <span class='hint has-tip tip-top' data-tooltip title="Include support comments required as part of your {TPL_LOCAL_EOTC} approval, e.g. Names of non-staff adults; How this trip supports the curriculum (For College SS {TPL_LOCAL_EOTC_PLURAL}, state how trip relates to assessment) ">?</span></legend>
 
                 <div class="small-12 columns">
                     <textarea id='event-detail' class='event-detail' name="detail" data-html-editor>{EVENT_DETAIL}</textarea>
@@ -443,7 +443,7 @@
 
         <ul class="flex-list buttons">
             <li><input id="b{FUNCTION}" class='expand' type="submit" name="{FUNCTION}" value="{EOTC_FUNCTION}" /></li>
-            <li><a href="/modules/eotc/myReview" class="button icon-previous">Back to My EOTC Events</a></li>
+            <li><a href="/modules/eotc/myReview" class="button icon-previous">Back to My {TPL_LOCAL_EOTC_PC} Events</a></li>
         </ul>
     </fieldset>
 </form>
@@ -469,28 +469,19 @@
         Are you sure you want to delete this event?
     </p>
 </div>
-<div id='ramsModal' class="reveal-modal" data-reveal title="Remove RAMS Requirement">
+<div id='ramsModal' class="reveal-modal" data-reveal title="Remove {TPL_LOCAL_EOTCRAMSABBREVIATION} Requirement">
     <p>
-        <span class="label alert full-width">Warning: please confirm RAMS is not required.</span>
+        <span class="label alert full-width">Warning: please confirm {TPL_LOCAL_EOTCRAMSABBREVIATION} is not required.</span>
+    </p>
+
+    {RAMS_WARNING}
+
+    <p>
+        <a href="/modules/eotc/policy" target="_blank">Read the full {TPL_LOCAL_EOTCRAMSABBREVIATION} policy.</a>
     </p>
 
     <p>
-        The organiser is required to submit a completed <strong>RAMS</strong>
-        (Risk Analysis Management System) form if the EOTC is associated with
-        certain activities which are deemed to have significant associated risks.
-        These include: Activities close to or on <strong>WATER</strong>;
-        <strong>TRAMPS</strong>; <strong>TRIPS</strong> (overseas, outside of
-        Auckland, as well as requiring activities outdoors or fieldwork);
-        <strong>CAMPS</strong>; <strong>OUTDOOR EDUCATION</strong> and
-        <strong>PRESCHOOL</strong> (all excursions off-site).
-    </p>
-
-    <p>
-        <a href="/modules/eotc/policy" target="_blank">Read the full RAMS policy.</a>
-    </p>
-
-    <p>
-        Press OK to confirm that RAMS is not required.
+        Press OK to confirm that {TPL_LOCAL_EOTCRAMSABBREVIATION} is not required.
     </p>
 
     <ul class="flex-list buttons">

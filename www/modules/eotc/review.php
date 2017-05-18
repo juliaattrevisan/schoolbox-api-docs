@@ -13,6 +13,8 @@
 use \EOTC\EventStatusMapper;
 use \EOTC\EventMapper;
 
+/** @var SitePage $this */
+
 /* Only EOTC Administrators can view this page
  */
 $authenticator = new \EOTC\Authenticator($this);
@@ -41,11 +43,14 @@ $allListGroups = EventMapper::getInstance()->findAllByListGroups([
 	EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
 ], EventMapper::INTERVAL_MAX_6MONTH_OLD);
 
+/** @var Schoolbox\L10n\RosettaStone $l10n */
+$l10n = $this->getDi()->get('l10n');
+
 foreach ($allListGroups as $key => $currentListGroup) {
 	if ($currentListGroup->count()) {
-		$this->setVar(array(
-			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName($key)
-		));
+		$this->setVar([
+			'EVENT_LIST_GROUP_NAME' => $l10n->translateSentence($allListGroups->getCurrentName($key)),
+		]);
 
 		$i = 0;
 

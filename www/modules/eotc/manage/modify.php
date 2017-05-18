@@ -39,8 +39,16 @@ $sessionUser = $_SESSION['user'];
 
 $defaultTypeId = '';
 
+$configMapper = \EOTC\ConfigMapper::getInstance();
+try {
+    $ramsWarning = $configMapper->findOneByColumn('name', 'rams_warning')->getValue();
+} catch (\Schoolbox\Mapper\Exception $e) {
+    $ramsWarning = '';
+}
+
 $page->setVar([
-    'ATTACH_ZONE' => ''
+    'ATTACH_ZONE'  => '',
+    'RAMS_WARNING' => Scrub::html($ramsWarning),
 ]);
 
 /* Modify existing event
@@ -135,11 +143,13 @@ if (is_numeric($_GET['eventID'])) {
             }
 
             $zone = new \Schoolbox\Resource\Attachment\Zone('ramsZone');
+            /** @var Schoolbox\L10n\RosettaStone $l10n */
+            $l10n = $page->getDi()->get('l10n');
             $zone
                 ->setMulti(true)
                 ->attachFiles($hashes)
                 ->setThumbnailSize(64)
-                ->setModalTitle('Select RAMS files')
+                ->setModalTitle($l10n->translateSentence('Select {:eotcRamsAbbreviation} files'))
                 ->setMimeFilter('*/*')
                 ->setAttachPrompt('Attach files')
                 ->renderIntoSitePage($page, 'ATTACH_ZONE');

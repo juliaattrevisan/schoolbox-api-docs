@@ -10,13 +10,19 @@
  */
 class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connector_Abstract
 {
+    /**
+     * Hardcoded to match db
+     *
+     * @var string
+     */
+    protected $connectorClass = 'Schoolbox';
 
     /**
      * {@inheritdoc}
      */
     public function getDefaultLabel()
     {
-        return 'Events';
+        return 'Schoolbox Events';
     }
 
     /**

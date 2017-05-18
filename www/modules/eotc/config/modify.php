@@ -22,6 +22,7 @@ if ($sessionUser->isSuperuser()) {
 	$dailyReminder = $configMapper->findByColumn('name', 'daily_reminder')->first();
 	$urgentThreshold = $configMapper->findByColumn('name', 'urgent_threshold')->first();
 	$policy = $configMapper->findByColumn('name', 'policy')->first();
+	$ramsWarning = $configMapper->findByColumn('name', 'rams_warning')->first();
 
 	/* Render it out
 	 */
@@ -32,6 +33,7 @@ if ($sessionUser->isSuperuser()) {
 		'CONFIG_DAILY_REMINDER' => $dailyReminder->getValue(),
 		'CONFIG_URGENT_THRESHOLD' => $urgentThreshold->getValue(),
 		'CONFIG_POLICY' => $policy->getValue(),
+		'CONFIG_RAMS_WARNING' => $ramsWarning->getValue(),
 	));
 }
 else {

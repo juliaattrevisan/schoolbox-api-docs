@@ -9,6 +9,13 @@
 class Calendar_Api_Config_Connector_EventExternal extends Calendar_Api_Config_Connector_Abstract
 {
     /**
+     * Hardcoded to match db
+     *
+     * @var string
+     */
+    protected $connectorClass = 'External';
+
+    /**
      * {@inheritdoc}
      */
     public function getDefaultLabel()

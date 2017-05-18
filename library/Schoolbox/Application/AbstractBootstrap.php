@@ -28,6 +28,7 @@ use Schoolbox\Collection;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
@@ -233,7 +234,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'l10n',
             $di->lazy(
                 function () use ($di) {
-                    return new RosettaStone($di->get('mapperFactory')->get(L10nMapper::class));
+                    $stoneFactory = new RosettaStoneFactory();
+                    return $stoneFactory->build($di->get('mapperFactory')->get(L10nMapper::class));
                 }
             )
         );

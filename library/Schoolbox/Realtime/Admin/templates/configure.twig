@@ -250,7 +250,7 @@
         <div id="configurator">
             {% for namespace in config %}
                 {% if ns[namespace.id].slug != false %}
-                <h3 class="subheader">{{ ns[namespace.id].label }}</h3>
+                <h3 class="subheader">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
                 <section data-namespace="{{ ns[namespace.id].slug }}">
                     {% for source in namespace.sources %}
                         {% include '@messages/source.twig' with { source: source } %}

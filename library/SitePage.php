@@ -732,9 +732,12 @@ class SitePage extends Page
             $error->setMessage('%MESSAGE%');
         }
 
+        /** @var RosettaStone $l10n */
+        $l10n = $this->getDi()->get('l10n');
+
         /* Set up any replacements
          */
-        $error->setMessage(str_replace("%MESSAGE%", $args['message'], $error->getMessage()));
+        $error->setMessage(str_replace("%MESSAGE%", $args['message'], $l10n->translateSentence($error->getMessage())));
 
         http_response_code($code);
 
@@ -1399,10 +1402,12 @@ class SitePage extends Page
             $upperTerm = strtoupper($term);
 
             $this->setVar([
-                "TPL_LOCAL_$upperTerm" => $l10n->translate($term, false, false),
-                "TPL_LOCAL_{$upperTerm}_PC" => $l10n->translate($term, false, true),
-                "TPL_LOCAL_{$upperTerm}_PLURAL" => $l10n->translate($term, true, false),
-                "TPL_LOCAL_{$upperTerm}_PLURAL_PC" => $l10n->translate($term, true, true)
+                "TPL_LOCAL_$upperTerm"             => $l10n->translate($term, false, false),
+                "TPL_LOCAL_{$upperTerm}_PC"        => $l10n->translate($term, false, true),
+                "TPL_LOCAL_{$upperTerm}_PLURAL"    => $l10n->translate($term, true, false),
+                "TPL_LOCAL_{$upperTerm}_PLURAL_PC" => $l10n->translate($term, true, true),
+                "TPL_LOCAL_{$upperTerm}_INDEF"     => $l10n->indefiniteArticle($term, false),
+                "TPL_LOCAL_{$upperTerm}_INDEF_PC"  => $l10n->indefiniteArticle($term, true),
             ]);
         }
     }

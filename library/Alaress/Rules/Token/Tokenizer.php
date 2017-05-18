@@ -264,11 +264,16 @@ abstract class Tokenizer
     protected function applyToken($token, $dataset, $settings)
     {
         $reader = new ObjectReader();
-        $values = (array)$this->getToken($token)->apply($dataset, $settings);
+
+        // This may return a string, an array or a tostring object.
+        $values = $this->getToken($token)->apply($dataset, $settings);
+        if (!is_array($values)) {
+            $values = [$values];
+        }
 
         $newValues = [];
         foreach ($values as $value) {
-            $newValues = array_merge($newValues, $reader->coerceToStringRecursively($value));
+            $newValues = array_merge($newValues, $reader->coerceRecursively($value));
         }
 
         // No values - map to a single empty string

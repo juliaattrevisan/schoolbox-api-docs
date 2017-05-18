@@ -14,7 +14,7 @@ require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 $page = new SitePage();
 
-new \EOTC\Authenticator($this);
+new \EOTC\Authenticator($page);
 
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
@@ -26,16 +26,19 @@ if ($sessionUser->isSuperuser()) {
 	$dailyReminder = $configMapper->findByColumn('name', 'daily_reminder')->first();
 	$urgentThreshold = $configMapper->findByColumn('name', 'urgent_threshold')->first();
 	$policy = $configMapper->findByColumn('name', 'policy')->first();
+	$ramsWarning = $configMapper->findByColumn('name', 'rams_warning')->first();
 
 	$firstReminder->setValue($_POST['firstReminder']);
 	$dailyReminder->setValue($_POST['dailyReminder']);
 	$urgentThreshold->setValue($_POST['urgentThreshold']);
 	$policy->setValue($_POST['policy']);
+	$ramsWarning->setValue($_POST['ramsWarning']);
 
 	$configMapper->save($firstReminder);
 	$configMapper->save($dailyReminder);
 	$configMapper->save($urgentThreshold);
 	$configMapper->save($policy);
+	$configMapper->save($ramsWarning);
 
 	$page->localRedir('/modules/eotc/config/modify');
 }

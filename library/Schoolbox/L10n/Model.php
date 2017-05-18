@@ -19,6 +19,8 @@ class Model
     protected $pluralForm;
     /** @var bool */
     protected $capitaliseFirst;
+    /** @var string */
+    protected $indefiniteArticle;
 
     /**
      * @param string $value
@@ -112,6 +114,24 @@ class Model
         return $this->capitaliseFirst;
     }
 
+    /**
+     * @return string
+     */
+    public function getIndefiniteArticle()
+    {
+        return $this->indefiniteArticle;
+    }
+
+    /**
+     * @param string $indefiniteArticle
+     * @return static
+     */
+    public function setIndefiniteArticle($indefiniteArticle)
+    {
+        $this->indefiniteArticle = $indefiniteArticle;
+        return $this;
+    }
+
     // Helper function to pluralise/capitalise the term as required
 
     /**
@@ -130,6 +150,21 @@ class Model
             }
         }
 
+        return $local;
+    }
+
+    /**
+     * Helper for translating an indefinite article.
+     *
+     * @param bool $capital
+     * @return string
+     */
+    public function translateIndefiniteArticle($capital = false)
+    {
+        $local = $this->getIndefiniteArticle();
+        if ($capital) {
+            $local = ucwords($local);
+        }
         return $local;
     }
 

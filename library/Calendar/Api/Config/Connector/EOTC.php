@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\L10n\RosettaStoneFactory;
 
 /**
  * Calendar_Api_Config_Connector_Schoolbox
@@ -10,13 +12,35 @@
  */
 class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_Abstract
 {
+    /**
+     * Hardcoded to match db
+     *
+     * @var string
+     */
+    protected $connectorClass = 'EOTC';
+
+    /**
+     * @var RosettaStone
+     */
+    private $stone;
+
+    /**
+     * Calendar_Api_Config_Connector_EOTC constructor.
+     */
+    public function __construct()
+    {
+        // TODO inject RosettaStone
+        $stoneFactory = new RosettaStoneFactory();
+        $this->stone  = $stoneFactory->build(Schoolbox\L10n\Mapper::getInstance());
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
      */
     public function getDefaultLabel()
     {
-        return 'EOTC';
+        return $this->stone->translate('eotc', false, true);
     }
 
     /**
@@ -29,7 +53,7 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
         //Ensure EOTC module is enabled
         $configMapper = \Schoolbox\Config\ConfigMapper::getInstance();
         if(0 == $configMapper->get('eotc_enabled')){
-            throw new DomainException('EOTC Module is disabled');
+            throw new DomainException(sprintf('%s Module is disabled', $this->stone->translate('eotc', false, false)));
         }
         return true;
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Terminology;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\Model as L10n;
 
 class Controller extends Base
 {
@@ -53,10 +54,12 @@ class Controller extends Base
         try {
 
             foreach ($post['singularForm'] as $term => $singularForm) {
+                /** @var L10n $localisation */
                 $localisation = $this->l10nMapper->findById($term);
                 $localisation->setSingularForm($singularForm);
                 $localisation->setPluralForm($post['pluralForm'][$term]);
                 $localisation->setCapitaliseFirst(!empty($post['capitaliseFirst'][$term]));
+                $localisation->setIndefiniteArticle($post['indefiniteArticle'][$term]);
                 $this->l10nMapper->save($localisation);
             }
 
