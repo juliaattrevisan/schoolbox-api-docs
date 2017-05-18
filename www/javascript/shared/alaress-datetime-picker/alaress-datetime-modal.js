@@ -23,7 +23,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
 
     };
-
     function hasTime(value) {
         var v = moment(value);
         if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
@@ -451,7 +450,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var newDate, latestDate;
 
     function renderAllDaySwitch() {
-        var $timeDiv = $('#pickerCalendar' + twigVars.id).closest('#picker' + twigVars.id).find('.flatpickr-time');
+        var $timeDiv = $('#picker' + twigVars.id).find('.flatpickr-time');
 
         var html = '';
 
@@ -504,6 +503,11 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                         checkAllDaySwitch(false, twigVars.id);
                     }
                 });
+            }
+
+            // Fix Flatpickr display enableTime
+            if (pickerOptions.enableTime) {
+                $('#picker' + twigVars.id).find('.flatpickr-time').css('display', 'block');
             }
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
