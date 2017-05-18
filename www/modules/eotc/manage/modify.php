@@ -171,16 +171,8 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_AUTHOR_ID' => $event->getAuthor()->getId(),
             'EVENT_TITLE' => $event->getTitle(),
             'EVENT_TIMEINPUTS' => $event->getAllDay() ? 'hide' : '',
-            'EVENT_START_DATE' => $event->getStartDateTime()->getLocalShort(),
-            'EVENT_START_HOUR' => $event->getStartDateTime()->get12Hour(),
-            'EVENT_START_MIN' => $event->getStartDateTime()->getMinute(true),
-            'EVENT_START_AM' => $event->getStartDateTime()->isAM() ? 'selected="selected"' : '',
-            'EVENT_START_PM' => $event->getStartDateTime()->isPM() ? 'selected="selected"' : '',
-            'EVENT_END_DATE' => $event->getEndDateTime()->getLocalShort(),
-            'EVENT_END_HOUR' => $event->getEndDateTime()->get12Hour(),
-            'EVENT_END_MIN' => $event->getEndDateTime()->getMinute(true),
-            'EVENT_END_AM' => $event->getEndDateTime()->isAM() ? 'selected="selected"' : '',
-            'EVENT_END_PM' => $event->getEndDateTime()->isPM() ? 'selected="selected"' : '',
+            'EVENT_START_DATE' => $event->getStartDateTime()->getLocal(),
+            'EVENT_END_DATE' => $event->getEndDateTime()->getLocal(),
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
             'EVENT_LOCATION' => $event->getLocation(),
             'EVENT_DETAIL' => $event->getDetail(),
@@ -350,7 +342,10 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     $groupHandler = new Group();
 
     /* Set an arbitrary start/end time initially
+     * (9:00-10:00, for some reason)
      */
+    $event->getStartDateTime()->setTime(9, 0, 0);
+    $event->getEndDateTime()->setTime(10, 0, 0);
     $page->setVar(array(
         'EVENT_RAMS_FILE' => '',
         'EVENT_CURRENT_STUDENTS' => 0,
@@ -363,16 +358,8 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
         'EVENT_AUTHOR_ID' => $sessionUser->getId(),
         'EVENT_TITLE' => '',
         'EVENT_TIMEINPUTS' => 'hide',
-        'EVENT_START_DATE' => $event->getStartDateTime()->getLocalShort(),
-        'EVENT_START_HOUR' => '9',
-        'EVENT_START_MIN' => '00',
-        'EVENT_START_AM' => '',
-        'EVENT_START_PM' => '',
-        'EVENT_END_DATE' => $event->getEndDateTime()->getLocalShort(),
-        'EVENT_END_HOUR' => '10',
-        'EVENT_END_MIN' => '00',
-        'EVENT_END_AM' => '',
-        'EVENT_END_PM' => '',
+        'EVENT_START_DATE' => $event->getStartDateTime()->getLocal(),
+        'EVENT_END_DATE' => $event->getEndDateTime()->getLocal(),
         'EVENT_LOCATION' => '',
         'EVENT_DETAIL' => '',
         'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
