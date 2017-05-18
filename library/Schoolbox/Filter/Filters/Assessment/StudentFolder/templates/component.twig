@@ -1,0 +1,87 @@
+{#
+    Usage:
+        isAvailable:    bool              - Should this component be available in the panel ?
+        definition:     IFilterDefinition
+        roleSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        classes:        Folder\Model[]
+        groups:         Folder\Model[]
+
+#}
+
+{% set hasClasses = classes | length %}
+{% set hasGroups  = groups | length %}
+
+{# What should this filter name be for the UI ?#}
+{% if hasClasses and hasGroups %}
+    {% set filterName  = 'Class / Group' %}
+{% elseif hasClasses %}
+    {% set filterName  = 'Class' %}
+{% else %}
+    {% set filterName  = 'Group' %}
+{% endif %}
+
+<script>
+    $(function() {
+
+        var $component = $('[data-component="{{ definition.filter.id }}"]');
+
+        // Ensure if a folder is both a class and a group, they are either both selected, or neither selected
+        // This solves issue of later checkedState clobbering first.
+        $component.on('change', 'input[type=checkbox]', function(){
+            var $checkbox    = $(this);
+            var checkedState = $checkbox.prop('checked');
+            var filter_key   = $checkbox.data('duplicate-checkbox');
+            $component.find('input[type=checkbox][data-duplicate-checkbox=' + filter_key + ']').prop('checked', checkedState);
+        });
+    });
+</script>
+
+{# Are any options available? If not, don't render this filter at all #}
+{% if isAvailable %}
+
+    <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px;">
+
+        <h4 data-filter-name style="display: none;">{{ filterName }}</h4>
+
+        {% if hasClasses %}
+            <h4>Classes</h4>
+            {% for classFolder in classes %}
+                {% set selection = userSelections[classFolder.id] %}
+
+                {% include '@filters/_selectionCheckboxWithDuplicates.twig' with {
+                    userSelection: selection,
+                    roleSelection: defaultClassSelections[selection.key],
+                    label:         classFolder.nameWithCodes,
+                    idSuffix:      '_class'
+                } only %}
+
+            {% endfor %}
+        {% endif %}
+
+        {% if hasClasses and hasGroups %}
+        <hr>
+        {% endif %}
+
+        {% if hasGroups %}
+            <h4>Groups</h4>
+            {% for groupFolder in groups %}
+                {% set selection = userSelections[groupFolder.id] %}
+                {% include '@filters/_selectionCheckboxWithDuplicates.twig' with {
+                    userSelection: selection,
+                    roleSelection: defaultGroupSelections[selection.key],
+                    label:         groupFolder.name,
+                    idSuffix:      '_group'
+                } only %}
+            {% endfor %}
+        {% endif %}
+
+        {% if not hasClasses and not hasGroups %}
+            <h4>Class / Group</h4>
+            <div data-alert="" class="alert-box alert">
+                Warning. No Classes or Groups. No results possible.
+            </div>
+        {% endif %}
+    </div>
+
+{% endif %}
