@@ -16,6 +16,10 @@
         $('[data-datepicker]').each(function() {
 
             if($(this).attr('data-datepicker-id') === undefined) {
+
+                $(this).after('<button type="button" class="button icon-calendar datepicker-button"></button>');
+                $(this).addClass('datepicker-input');
+
                 $(this).alaressDateTimePicker();
 
                 // delegate blurs to text inputs

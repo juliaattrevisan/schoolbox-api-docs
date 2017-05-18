@@ -209,12 +209,11 @@ function checkAllDaySwitch (state, pickerId) {
 
 $.fn.alaressDateTimePicker = function (optionsOverride) {
 
-    var inputGroup = this;
-    var element = $(this).find('input');
-    var $datepickerButton = $(this).find('button');
+    var element = this;
+    var $datepickerButton = $(this).parent().find('button');
 
     // Build datepicker options form the element data attributes
-    var options = getOptions(inputGroup);
+    var options = getOptions(element);
 
     // Override with user any options --- should this stay? Todo
     for (var attribute in optionsOverride) {
@@ -272,7 +271,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            picker.load('/picker/datetime/type/' + options.type + '/element/' + inputGroup.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD HH:mm:ss')), function () {
+            picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD HH:mm:ss')), function () {
 
                 // Capture open of modal
                 $(document).on('opened.fndtn.reveal', '#picker' + pickerId, function () {
