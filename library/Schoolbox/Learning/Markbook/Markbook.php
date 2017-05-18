@@ -317,7 +317,7 @@ class Markbook
      * Retrieves a generator which iterates all assessments, and drills down into project
      * sub-assessments.
      *
-     * @return \Generator
+     * @return \Generator|IAssessable[]
      */
     public function getAssessmentsWithProjectContents()
     {

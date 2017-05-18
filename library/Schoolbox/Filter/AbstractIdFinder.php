@@ -62,7 +62,6 @@ abstract class AbstractIdFinder implements IdFinder
 
     /**
      * @inheritdoc
-     * @throws BrokenFilterException If a injected filter is unable to be processed
      */
     public function findIdsByFilters(array $filters = [], $deleted = false)
     {
@@ -127,6 +126,9 @@ abstract class AbstractIdFinder implements IdFinder
                 continue;
             }
             // Ensure it is either null, or a (potentially empty) Collection
+            if(is_array($sparseFilters[$filterKey])){
+                $completeFilters[$filterKey] = new Collection($sparseFilters[$filterKey]);
+            }
             if(null === $sparseFilters[$filterKey] || $sparseFilters[$filterKey] instanceof Collection){
                 $completeFilters[$filterKey] = $sparseFilters[$filterKey];
             } else {

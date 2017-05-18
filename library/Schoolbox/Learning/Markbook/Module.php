@@ -8,22 +8,21 @@ namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
+use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Filter\IdFinder;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
 use Twig_Loader_Chain;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Assessment\Term;
 use Schoolbox\UserMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Error;
 use DueWork_ErrorMapper;
-use Schoolbox\Filter;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 
@@ -39,34 +38,32 @@ class Module extends BaseModule
      */
     public function registerRoutes()
     {
-        $preload = function ($params) {
-            $assessmentMapper = $this->getMapperFactory()->get(Assessment\Mapper::class);
-            $args = [
-                'filterFactoryFactory' => new AssessmentFilter\FactoryFactory($this->getMapperFactory()),
-                'assessmentIdFinder'   => AssessmentFilter\IdFinder::getInstance($assessmentMapper),
-            ];
-
-            if(null !== $params['userId']){
-                try{
-                    $args['viewee'] = $this->getUserMapper()->findById($params['userId']);
-                } catch (Mapper\Exception $e){
-                    throw new NotFound("No user found for id: {$params['userId']}");
-                }
-            }
-            return $args;
-        };
-
         $isStaffOrSuper = new Rule\Any(
             new Rule\HasRole(Role::STAFF),
             new Rule\IsSuperuser()
         );
 
+        $preload = function ($params) {
+            if(null !== $params['userId']){
+                try{
+                    return ['viewee' => $this->getUserMapper()->findById($params['userId'])];
+                } catch (Mapper\Exception $e){
+                    throw new NotFound("No user found for id: {$params['userId']}");
+                }
+            }
+            return [];
+        };
+
         $this->register('GET',  '/class/{folderId:\d+}{/userId}', 'getMarkbookForClass', $isStaffOrSuper, $preload);
 
-        $this->register('GET',  '{/userId}',       'getMarkbook',       $isStaffOrSuper, $preload);
-        $this->register('POST', '{/userId}',       'postMarkbook',       $isStaffOrSuper, $preload);  //AJAX in the report
-        $this->register('GET', '/export', 'getMarkbookExport', $isStaffOrSuper, $preload);
+        $this->register('GET',  '/export', 'getMarkbookExport', $isStaffOrSuper);
+
+        $this->register('GET',  '{/userId:\d+}',        'getMarkbook',       $isStaffOrSuper, $preload);
+        $this->register('POST', '/{userId:\d+}',        'postMarkbook',      $isStaffOrSuper, $preload);  //AJAX in the report
+
+
     }
+
 
     /**
      * @inheritdoc
@@ -78,6 +75,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     * @param Container $injector
      * @throws \InvalidArgumentException If class not found
      * @throws ServiceNotFound
      */
@@ -86,13 +84,17 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
-                'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
-                'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
                 'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
                 'access'                     => $this->getMapperFactory()->getLazy(Access::class), // Has a static 'getInstance()' method
+                'assessmentIdFinder'         => $injector->lazy(function(){
+                    return AssessmentFilter\IdFinder::getInstance($this->getMapperFactory()->get(Assessment\Mapper::class));
+                }),
+                'filterFactoryFactory'       => $injector->lazy(function(){
+                    return new AssessmentFilter\FactoryFactory($this->getMapperFactory());
+                }),
             ])
         );
     }
@@ -110,29 +112,29 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper|FolderMapper
+     * @return Mapper|Folder\Mapper
      * @throws \InvalidArgumentException If class not found
      */
     protected function getFolderMapper()
     {
-        return $this->getMapperFactory()->get(FolderMapper::class);
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 
     /**
-     * @return Mapper|TermMapper
+     * @return Mapper|Term\Mapper
      * @throws \InvalidArgumentException If class not found
      */
     protected function getTermMapper()
     {
-        return $this->getMapperFactory()->get(TermMapper::class);
+        return $this->getMapperFactory()->get(Term\Mapper::class);
     }
 
     /**
-     * @return Mapper|ErrorMapper
+     * @return Mapper|Error\Mapper
      * @throws \InvalidArgumentException If class not found
      */
     protected function getErrorMapper()
     {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
+        return $this->getMapperFactory()->get(Error\Mapper::class);
     }
 }

@@ -116,7 +116,7 @@ class FactoryFactory
      *
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
      * @throws \ReflectionException If the specified class does not exist
      */
     public function buildKeyConverters($page)
@@ -243,7 +243,7 @@ class FactoryFactory
 
     /**
      * @return \Schoolbox\Mapper|Filter\Mapper
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If unable to find the mapper class
      */
     private function getFilterMapper()
     {

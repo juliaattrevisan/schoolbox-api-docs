@@ -1,3 +1,14 @@
+{#
+    Filtered markbook report
+
+    Usage:
+        markbook      Markbook                - the markbook to render
+        viewee        User                    - whose markbook are we looking at
+        writable      bool[]                  - which assessments are writable? indexed by assessment.id
+        pendingLabel  string                  - the default label for new submissions, pulled from DB
+        queryArgs     string                  - the filters used to generate this report, so we can export the exact same report
+#}
+
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
@@ -11,6 +22,9 @@
         $.fn.marksheetAverages();
         $('[data-mark-sheet]').marksheetInputs();
 
+        // Enable the download report menu
+        $('#report_actions').foundation();
+
         // Save form for task completion
         $('form[data-progress-tick-form]').progressTickForm({
             label: $('[data-save-progress-state]'),
@@ -23,13 +37,13 @@
     });
 </script>
 
-<div class="actions-small-1 row">
+<div id="report_actions" class="actions-small-1 row">
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">Report</li>
-        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {classId: class.id, termCode: currentTerm.code}) }}' class='icon-download'>Download Spreadsheet</a>
+        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport') }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
     </ul>
 </div>
 
@@ -46,10 +60,7 @@
                         </div>
                     </th>
                     {% for assessment in markbook.assessmentsWithProjectContents  %}
-                    <th data-assessment="{{ assessment.id }}"
-                        data-context-type="{{ contextTypes.objectToString(assessment.baseContext) }}"
-                        data-context="{{ assessment.baseContext.id }}"
-                    >
+                    <th data-assessment="{{ assessment.id }}">
                         <div>
                                 <span>
                                     <a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" title="{{ assessment.title }}">

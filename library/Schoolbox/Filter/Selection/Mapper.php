@@ -46,6 +46,10 @@ class Mapper extends \Schoolbox\Mapper
      * @param bool[][]                                 $filterSelectionsArray Indexed by filter.id, selection.key
      * @throws \InvalidArgumentException If a posted selection.key is invalid
      * @return Collection|GenericCollection[]|Model[][]  Grouped by filter.id, then indexed by selection.key
+     * @todo Building selections and saving selections should be distinct methods.
+     *       The former does not belong on the mapper.
+     *       Splitting into distinct methods would enable us to just want to build selections without saving them.
+     *       This may be the case, eg, when a SU is viewing a teacher's markbook.
      */
     public function updateSelections(GenericCollection $keyConverters, User $user, $page, array $filterSelectionsArray = [])
     {
@@ -68,6 +72,12 @@ class Mapper extends \Schoolbox\Mapper
         // Has any data been passed in? (will be empty if no filters available on this page)
         if (count($filterSelectionsArray)) {
             foreach ($filterSelectionsArray as $filterId => $filterSelectionArray) {
+
+                // This can occur if we have manually inserted a filter for some reason, eg to exclude assessments in unit-spec contexts
+                if(!$keyConverters->keyExists($filterId)){
+                    // Don't attempt to save
+                    continue;
+                }
                 $keyConverter = $keyConverters[$filterId];
                 $filter       = $keyConverter->getFilter();
 
