@@ -145,13 +145,13 @@ $(function() {
     $.validator.addMethod(
             'afterStart',
             function(value,element){
-                var startDate       = moment($('#start_datetime_date').val(),momentFormat);
+                var startDate       = moment($('#startDate').val(),momentFormat);
                 var repeatUntilDate = moment(value,momentFormat);
 
                 return '' == value || startDate.valueOf() < repeatUntilDate.valueOf();
             },
             'Repeat-Until date must be after start date'
-    )
+    );
 
 
     // Set up errors, dialog boxes, form
