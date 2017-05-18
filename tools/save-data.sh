@@ -8,6 +8,27 @@ helpmsg() {
     echo "  -v | --verbose   verbose mode for easier debugging";
 }
 
+stopservices() {
+    echo "Stopping Services";
+    service apache2 stop >/dev/null 2>&1;
+    service nginx stop >/dev/null 2>&1;
+    service schoolbox-socketd stop >/dev/null 2>&1;
+    service schoolbox-routed stop >/dev/null 2>&1;
+    service schoolbox-digestd stop >/dev/null 2>&1;
+    service schoolbox-scheduled stop >/dev/null 2>&1;
+}
+
+restartservices() {
+    echo "Restarting Services";
+    mysql schoolbox < /vagrant/vagrantcache/vagrant.sql;
+    service apache2 restart >/dev/null 2>&1;
+    service nginx restart >/dev/null 2>&1;
+    service schoolbox-socketd restart >/dev/null 2>&1;
+    service schoolbox-routed restart >/dev/null 2>&1;
+    service schoolbox-digestd restart >/dev/null 2>&1;
+    service schoolbox-scheduled restart >/dev/null 2>&1;
+}
+
 if [ -z $1 ];
 then
     helpmsg;
@@ -75,6 +96,8 @@ echo "Saving data as: $filename";
 cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 
+stopservices;
+
 if [ ! -z $initial ];
 then
     echo "Cleaning data for Initial dataset";
@@ -107,6 +130,7 @@ mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords -i -e -q -a -c sch
 if [ $? -ne 0 ];
 then
     echo "Error: exporting database failed";
+    restartservices;
     exit 1;
 fi
 
@@ -116,6 +140,7 @@ tar czf$verbose $cachedir/$filename data;
 if [ $? -ne 0 ];
 then
     echo "Error: tarball creation failed";
+    restartservices;
     exit 1;
 fi
 du -sh $cachedir/$filename;
@@ -126,12 +151,14 @@ then
     if [ -z $S3KEY ];
     then
         echo "Error: an AWS S3 Key must be supplied";
+        restartservices;
         exit 1;
     fi
     echo -e "AWS S3 Secret: \c" && read S3SECRET;
     if [ -z $S3SECRET ];
     then
         echo "Error: an AWS S3 Secret must be supplied";
+        restartservices;
         exit 1;
     fi
     # below is based on: https://gist.github.com/chrismdp/6c6b6c825b07f680e710
@@ -158,3 +185,5 @@ then
         echo "Error: an error occurred uploading to S3";
     fi
 fi
+restartservices;
+echo "Save complete";
