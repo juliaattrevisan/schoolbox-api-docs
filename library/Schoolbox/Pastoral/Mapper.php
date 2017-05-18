@@ -21,6 +21,7 @@ use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Search\Results;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
@@ -450,7 +451,7 @@ class Mapper extends BaseMapper
         $auditRecord->setUser($this->getSessionUser());
         $auditRecord->setSearch($search);
 
-        if (strlen($search) >= 2) {
+        if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
 
             $searchArray = explode(' ', $search);
 
