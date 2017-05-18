@@ -189,13 +189,12 @@ class Controller extends Base
      * Stream a filtered markbook in CSV format
      *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
-     * @param User $viewee
      * @throws \DomainException If attempting to get the slug from a filter where it has not been set
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      * @throws \InvalidArgumentException If any filter keys not recognised
      * @throws \ReflectionException If a specified filter class does not exist
      */
-    public function getMarkbookExport(User $viewee)
+    public function getMarkbookExport()
     {
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
@@ -206,8 +205,7 @@ class Controller extends Base
         $markbook      = $this->buildMarkbook($assessmentIds);
 
         $csvExporter = new Export\CSV();
-        $filename    = preg_replace('/[^\w-(),]/', '_', "Markbook_{$viewee->getFullName()}.csv");
-        $csvExporter->export($markbook, $filename);
+        $csvExporter->export($markbook, 'Markbook.csv');
         exit;
     }
 

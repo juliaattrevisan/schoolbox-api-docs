@@ -59,7 +59,7 @@ class Module extends BaseModule
         $this->register('GET',  '{/userId}',        'getMarkbook',       $isStaffOrSuper, $preload);
         $this->register('POST', '/{userId}',        'postMarkbook',      $isStaffOrSuper, $preload);  //AJAX in the report
 
-        $this->register('GET',  '/{userId}/export', 'getMarkbookExport', $isStaffOrSuper, $preload);
+        $this->register('GET',  '/export', 'getMarkbookExport', $isStaffOrSuper);
     }
 
 
