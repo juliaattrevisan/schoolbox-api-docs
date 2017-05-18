@@ -4,41 +4,41 @@
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-validation/dist/additional-methods.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.timetablepicker.js"></script>
+{#<script type="text/javascript" src="/javascript/shared/datetime/attacher.timetablepicker.js"></script>#}
 <script type="text/javascript">
 $(function() {
     // A global variable
     var momentFormat = dateDisplayFormats.momentJs;
     $.fn.alaressEditor();
 
-    $('#repeat_until').datepicker({
-        constrainInput: false,
-        minDate: moment($('#start_datetime_date').val(),momentFormat).toDate()
-    })
+//    $('#repeat_until').datepicker({
+//        constrainInput: false,
+//        minDate: moment($('#start_datetime_date').val(),momentFormat).toDate()
+//    })
+//
+//    // Datepickers
+//    $('input[data-datepicker]').datepicker({
+//        constrainInput:false,
+//        minDate: 0
+//
+////        onClose:function (string) {
+////            var input = $j(this);
+////            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+////                input.val(data.time);
+////            })
+////        }
+//    })
 
-    // Datepickers
-    $('input[data-datepicker]').datepicker({
-        constrainInput:false,
-        minDate: 0
+//    $('input[name="start_datetime[date]"]').syncDates({
+//        endDate: $('input[name="end_datetime[date]"]')
+//    });
 
-//        onClose:function (string) {
-//            var input = $j(this);
-//            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-//                input.val(data.time);
-//            })
-//        }
-    })
-
-    $('input[name="start_datetime[date]"]').syncDates({
-        endDate: $('input[name="end_datetime[date]"]')
-    })
-
-    $('input[name="start_datetime[date]"]').change(function () {
-        $('#repeat_until').datepicker('option', {
-            minDate: moment($('#start_datetime_date').val(), momentFormat).toDate()
-        })
-
-    })
+//    $('input[name="start_datetime[date]"]').change(function () {
+//        $('#repeat_until').datepicker('option', {
+//            minDate: moment($('#start_datetime_date').val(), momentFormat).toDate()
+//        })
+//
+//    })
 
     // Timetable selector
     {#var campusList         = {{ campusList|json_encode|raw }}#}
@@ -445,11 +445,36 @@ $(function() {
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <div class="small-12 columns">
-                        {% include '@resourceBooking/sub/datetimeSelector.twig' with {
-                            select: select,
-                            item: item
-                        } %}
+                    <div class="small-6 columns">
+                        <label for="startDate">
+                            From
+                        </label>
+                        <input name="startDate"
+                               id="startDate"
+                               data-datepicker
+                               data-datepicker-time
+                               data-datepicker-call="event"
+                               data-datepicker-sync
+                               data-datepicker-sync-enddate="#endDate"
+                               type="text"
+                               size="15"
+                               maxlength="30"
+                               value="{{ item.event.startDateTime.local }}"/>
+                    </div>
+                    <div class="small-6 columns">
+                        <label for="endDate">
+                            Until
+                        </label>
+                        <input name="endDate"
+                               id="endDate"
+                               data-datepicker
+                               data-datepicker-time
+                               data-datepicker-call="event"
+                               data-datepicker-endofperiod
+                               type="text"
+                               size="15"
+                               maxlength="30"
+                               value="{{ item.event.endDateTime.local }}"/>
                     </div>
                 </fieldset>
 
