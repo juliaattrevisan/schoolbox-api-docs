@@ -583,7 +583,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // so we need to reload the model from the database to get the date it was created
 
         try {
-            
+
             /** @var PastoralComment $comment */
             $comment = $this->getPastoralCommentMapper()->findById($comment->getId());
 
@@ -847,7 +847,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             }
         }
 
-        return true;
+        return false;
     }
 
     // Helper functions for retrieving Schoolbox data that matches Synergetic strings and caching the result
