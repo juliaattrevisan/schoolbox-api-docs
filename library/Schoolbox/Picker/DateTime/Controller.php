@@ -368,7 +368,7 @@ class Controller extends Base
 
         $start = $date;
         $end = clone $start;
-        $end->addDays(1);
+        $end = $end->addDays(1);
 
         /** @var Calendar_Api_Factory $factory */
         $factory = $this->getDi()->get('calendarApiFactory');
@@ -412,7 +412,8 @@ class Controller extends Base
         } else {
 
             $start = $date->startOfDay();
-            $end = (clone $start)->endOfDay();
+            $end = clone $start;
+            $end = $end->endOfDay();
 
             // Get all students for the class or the group
 
