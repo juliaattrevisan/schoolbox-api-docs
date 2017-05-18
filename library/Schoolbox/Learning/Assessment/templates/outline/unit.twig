@@ -35,7 +35,7 @@
                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task">Task</a></li>
                     {% endif %}
                     <li class="separator">Manage</li>
-                    <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClassAndTerm', {folderId: class.id, termId: term.id}) }}" class="icon-curriculum">Markbook</a></li>
+                    <li><a href="{{ routeLookup('learningMarkbook.getMarkbookForClass', {folderId: unit.course.folder.id}) }}" class="icon-curriculum">Markbook</a></li>
                     <li><a href="{{ routeLookupIfAuthorized('course.deleteUnitImplementation', {id: unit.id}) }}" data-action="delete-unit" class="icon-delete" title="Delete this unit">Delete</a></li>
                 </ul>
                 {% endif %}

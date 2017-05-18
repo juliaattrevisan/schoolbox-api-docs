@@ -54,9 +54,21 @@ class Module extends BaseModule
             }
             return [];
         };
-        $this->register('GET',  '/class/{folderId:\d+}{/userId}',                   'getMarkbookForClass',        $isStaffOrSuper, $preload);
-        $this->register('GET',  '/class/{folderId:\d+}/term/{termId:\d+}{/userId}', 'getMarkbookForClassAndTerm', $isStaffOrSuper, $preload);
 
+        $termAndViewee = function ($params) use ($preload) {
+            $args = $preload($params);
+            try{
+                $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
+            } catch (Mapper\Exception $e){
+                throw new NotFound("No term found for code: {$params['termCode']}");
+            }
+            return $args;
+        };
+
+        // TODO - add 'getMarkbookForUnitImportSpec' to be used in 'outline/unit.twig' to jump to specific unit import
+
+        $this->register('GET',  '/class/{folderId:\d+}{/userId}',                 'getMarkbookForClass',        $isStaffOrSuper, $preload);
+        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}{/userId}', 'getMarkbookForClassAndTerm', $isStaffOrSuper, $termAndViewee);
 
         $this->register('GET',  '/export', 'getMarkbookExport', $isStaffOrSuper);
 

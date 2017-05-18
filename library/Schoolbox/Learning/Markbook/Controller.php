@@ -91,18 +91,18 @@ class Controller extends Base
     public function getMarkbookForClass($folderId, User $viewee = null)
     {
         $currentTerm = $this->termMapper->findForToday();
-        $this->getMarkbookForClassAndTerm($folderId, $currentTerm->getId(), $viewee);
+        $this->getMarkbookForClassAndTerm($folderId, $currentTerm, $viewee);
     }
 
     /**
      * Redirect to the markbook for the specified class and term
      *
-     * @param int       $folderId
-     * @param null|int  $termId
-     * @param null|User $viewee
+     * @param int        $folderId
+     * @param Term\Model $term
+     * @param null|User  $viewee
      * @throws RouteNotFound If unable to generate the redirect route
      */
-    public function getMarkbookForClassAndTerm($folderId, $termId, User $viewee = null)
+    public function getMarkbookForClassAndTerm($folderId, Term\Model $term, User $viewee = null)
     {
         $user        = $viewee ?: $this->getUser();
         $route       = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $user->getId()]);
@@ -118,7 +118,7 @@ class Controller extends Base
             if(Filter\Filters\Assessment\Folder\Definition::class === $filter->getClass()){
                 $selections[$filter->getId()][$folderId] = $this->createSelectionModel($selectionMapper, $filter, (string)$folderId);
             } elseif(Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()){
-                $selections[$filter->getId()][$termId] = $this->createSelectionModel($selectionMapper, $filter, (string)$termId);
+                $selections[$filter->getId()][$termId] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
             }
         }
 
