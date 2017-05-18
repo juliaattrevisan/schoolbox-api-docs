@@ -582,10 +582,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Annoyingly the use of self::COLUMN_CREATED_TIMESTAMP does not populate the model with the creation date after saving
         // so we need to reload the model from the database to get the date it was created
 
-        /** @var PastoralComment $comment */
-        $comment = $this->getPastoralCommentMapper()->findById($comment->getId());
-
         try {
+            
+            /** @var PastoralComment $comment */
+            $comment = $this->getPastoralCommentMapper()->findById($comment->getId());
+
             /** @var Pastoral $pastoral */
             $pastoral = $this->getPastoralMapper()->findById($comment->getPastoral()->getId());
 
