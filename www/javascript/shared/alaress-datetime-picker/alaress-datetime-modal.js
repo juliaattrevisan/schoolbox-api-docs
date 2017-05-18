@@ -625,6 +625,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 },
                 defaultView: 'agendaDay',
                 events: events,
+                eventColor: '#def',
                 height: 270,
                 defaultDate: moment(data.date)
             });
