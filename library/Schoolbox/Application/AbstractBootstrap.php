@@ -738,7 +738,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'calendarApiFactory',
             $di->lazyNew(
                 \Calendar_Api_Factory::class,
-                ['assessmentDataSource' => $di->lazyGet('assessmentDataSource'),]
+                ['assessmentDataSource' => $di->lazyGet('assessmentDataSource'),
+                'databaseExternal' => $di->lazyGet('databaseExternal')]
             )
         );
 

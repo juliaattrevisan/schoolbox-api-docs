@@ -5,15 +5,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
-use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Calendar\EventType;
+use \Schoolbox\External\Connector\IExternalEvents;
 
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
 
@@ -33,13 +32,12 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * Constructor
      *
      * @param User $user
-     * @param IConnector $databaseExternal
      * @param $config
+     * @param IExternalEvents $externalEvents
      */
-    public function __construct($user, $databaseExternal, $config) {
+    public function __construct($user, $config, $externalEvents) {
         $this->setUser($user);
-        $factory = new ExternalConnectorFactory();
-        $this->externalEvents = $factory->build($config, $databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
+        $this->externalEvents = $externalEvents;
         $this->setEventTypeMapper(EventTypeMapper::getInstance());
     }
 

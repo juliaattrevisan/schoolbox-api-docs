@@ -52,7 +52,7 @@ class Exporter extends Renderer {
     /**
      * This will stream the vcal output as it parses over the event collection
      */
-    public function renderAll() {
+    public function renderAll($type = null) {
 		// Output base calendar, and output its start and end separately
 		echo trim(str_replace('END:VCALENDAR', '', $this->getVCalendar()->serialize()))."\r\n";
 
