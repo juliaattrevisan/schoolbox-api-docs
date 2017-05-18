@@ -213,7 +213,7 @@ class Controller extends Base
      * @throws \InvalidArgumentException
      * @throws Mapper\Exception
      * @throws \ReflectionException If unable to find the class for a filter registered on this page
-//     * @throws \DomainException If filter definition class not set
+     * @throws \DomainException If filter definition class not set
      * @todo  split pending assessments into own controller
      */
     public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
