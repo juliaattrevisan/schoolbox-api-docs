@@ -7,84 +7,87 @@
  * This is so you can turn sources on/off and have school-specific
  * implementations for each data source
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
+ * @link        http://www.alaress.com.au/
  */
 
 use Calendar\Event\Collection;
 
-class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
+class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
+{
+    /**
+     * @var array $api A list of all the api classes which produce Collections to combine
+     */
+    private $api = [];
 
-	/**
-	 * A list of all the api classes which produce Collections to combine
-	 *
-	 * @var array
-	 */
-	private $api = array();
+    /**
+     * Get day events
+     *
+     * @param $startTimestamp
+     * @param $endTimestamp
+     * @internal param $currentDay
+     * @return Collection
+     */
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
+        $result = new Collection();
 
-	/**
-	 * Get day events
-	 *
-	 * @param $startTimestamp
-	 * @param $endTimestamp
-	 * @internal param $currentDay
-	 * @return Collection
-	 */
-	public function getEvents($startTimestamp, $endTimestamp) {
-		$result = new Collection();
+        foreach ($this->getApi() as $currentApi) {
+            $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
+        }
 
-		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
-		}
-		$result->sort();
+        $result->sort();
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Find a particular event matching an eventId from all registered sources
-	 *
-	 * @param $eventId
-	 * @return Calendar_Event_Type_Abstract
-	 */
-	public function getEvent($eventId) {
-		$result = new Collection();
+    /**
+     * Find a particular event matching an eventId from all registered sources
+     *
+     * @param $eventId
+     * @return Calendar_Event_Type_Abstract
+     */
+    public function getEvent($eventId)
+    {
+        $result = new Collection();
 
-		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getEvent($eventId));
-		}
+        foreach ($this->getApi() as $currentApi) {
+            $result->merge($currentApi->getEvent($eventId));
+        }
 
-		return $result->getFirst();
-	}
+        return $result->getFirst();
+    }
 
-	/**
-	 * Add an api to the stack
-	 *
-	 * @param $api
-	 */
-	public function add($api) {
-		$this->api[] = $api;
-	}
+    /**
+     * Add an api to the stack
+     *
+     * @param $api
+     */
+    public function add($api)
+    {
+        $this->api[] = $api;
+    }
 
-	/**
-	 * Get the number of apis currently being used
-	 *
-	 * @return int
-	 */
-	public function getCount() {
-		return count($this->getApi());
-	}
+    /**
+     * Get the number of apis currently being used
+     *
+     * @return int
+     */
+    public function getCount()
+    {
+        return count($this->getApi());
+    }
 
-	/* Getters/Setters
-	 */
+    // Getters & Setters
 
-	/**
-	 * Get api
-	 *
-	 * @return array
-	 */
-	public function getApi() {
-		return $this->api;
-	}
+    /**
+     * Get api
+     *
+     * @return array
+     */
+    public function getApi()
+    {
+        return $this->api;
+    }
 }

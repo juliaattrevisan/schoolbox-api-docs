@@ -91,7 +91,6 @@ class Controller extends Base
      * @param string $element input field that calls a datepicker
      * @param int $id The ID number of the javascript picker
      * @param string $value Default date to display
-     * @throws Exception
      */
     public function getPicker($type, $element, $id, $value)
     {
