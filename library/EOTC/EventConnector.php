@@ -83,9 +83,8 @@ class EventConnector extends EventMapper
                 $campusIds[] = $currentCampus->getId();
             }
 
-            /* Translate an \EOTC\Event type into a
-             * Calendar_Event_Type_Abstract type
-             */
+            /* Translate an \EOTC\Event type into a EventInterface descendant */
+
             $event = new Event();
             $event->setAuthorName($eventItem->getAuthor()->getFullname());
             $event->setAuthorId($eventItem->getAuthor()->getId());
@@ -94,9 +93,8 @@ class EventConnector extends EventMapper
             $event->setEndTime($eventItem->getEndDateTime());
             $event->setCampusList(implode(',', $campusIds));
 
-            /* EOTC Events are always of the type "EOTC" for usage
-             * in calendar filters
-             */
+            /* EOTC Events are always of the type "EOTC" for usage in calendar filters */
+
             $event->setType($eventItem->getType()->getId());
             $event->setAccess($eventItem->getAccess());
             $event->setEventType($eventItem->getType()->getType());
@@ -105,9 +103,8 @@ class EventConnector extends EventMapper
             $event->setLocation($eventItem->getLocation());
             $event->setAllDay(0);
 
-            /* If you have write access to the event. Only superusers
-             * and authors can modify an event
-             */
+            /* If you have write access to the event. Only superusers and authors can modify an event */
+
             if ($this->getUser()->isSuperuser() || $this->getUser()->getId() == $event->getAuthorId()) {
                 $event->setIsEditable(true);
             } else {
@@ -367,9 +364,8 @@ class EventConnector extends EventMapper
             if ($isEOTCManager || $isAttendee || ($eventItem->getMetadata()->getStatus()->isApproved() && $inCampus)) {
 
 
-                /* Translate an \EOTC\Event type into a
-                 * Calendar_Event_Type_Abstract type
-                 */
+                /* Translate an \EOTC\Event type into a EventInterface descendant */
+
                 $event = new Event();
                 $event->setAuthorName($eventItem->getAuthor()->getFullname());
                 $event->setAuthorId($eventItem->getAuthor()->getId());

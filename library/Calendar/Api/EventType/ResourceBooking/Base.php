@@ -7,30 +7,35 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\ResourceBooking\Booking;
-use Schoolbox\Mapper;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Calendar\Event\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
+use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatus;
+use Schoolbox\ResourceBooking\Booking\Util\EventConverter;
 
-abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_EventType_Abstract {
+abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_EventType_Abstract
+{
 
     /**
      * Statuses to filter out
      *
      * @var array
      */
-    protected $status = array(
-        Booking\Status\Model::STATUS_APPROVED,
-        Booking\Status\Model::STATUS_PENDING
-    );
+    protected $status = [
+        BookingStatus::STATUS_APPROVED,
+        BookingStatus::STATUS_PENDING
+    ];
 
     /**
-     * @var Booking\Mapper
+     * @var BookingMapper
      */
     protected $bookingMapper;
 
     /**
-     * @var Booking\Util\EventConverter
+     * @var EventConverter
      */
     protected $eventConverter;
 
@@ -40,14 +45,15 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      * @param $user
      * @param $config
      */
-    public function __construct($user, $config) {
+    public function __construct($user, $config)
+    {
+        // Ensure ResourceBooking module is enabled
 
-        //Ensure ResourceBooking module is enabled
-        $configMapper = \Schoolbox\Config\ConfigMapper::getInstance();
-        if(0 == $configMapper->get('resource_booking_enabled')){
+        $configMapper = ConfigMapper::getInstance();
+
+        if (0 == $configMapper->get('resource_booking_enabled')) {
             throw new DomainException('Resource Booking Module is disabled');
         }
-
 
         $this->setUser($user);
         $this->setup();
@@ -56,16 +62,17 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
     /**
      * Sets up booking mapper and event converter
      */
-    protected function setup() {
-        $this
-            ->setBookingMapper(Booking\Mapper::getInstance())
-            ->setEventConverter(new Booking\Util\EventConverter());
+    protected function setup()
+    {
+        $this->setBookingMapper(BookingMapper::getInstance())
+            ->setEventConverter(new EventConverter());
+
         try {
-            $this->getEventConverter()->setBookingEventType(
-                EventTypeMapper::getInstance()->findOneByColumn('eventType', 'Booking')
-            );
-        }
-        catch (Mapper\Exception $e) {
+            /** @var EventType $eventType */
+            $eventType = EventTypeMapper::getInstance()->findOneByColumn('eventType', 'Booking');
+            $this->getEventConverter()->setBookingEventType($eventType);
+
+        } catch (MapperException $e) {
             // Not found: doesn't matter, don't use it
         }
     }
@@ -75,7 +82,6 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      *
      * @param int $startTimestamp
      * @param int $endTimestamp
-     *
      * @return Collection
      */
     abstract public function getEvents($startTimestamp, $endTimestamp);
@@ -88,45 +94,53 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      * @param $eventId
      * @return Collection
      */
-    public function getEvent($eventId) {}
+    public function getEvent($eventId)
+    {
+        return new Collection;
+    }
 
     /**
-     * @param  Booking\Mapper $bookingMapper
+     * @param BookingMapper $bookingMapper
      * @return $this
      */
-    public function setBookingMapper($bookingMapper) {
+    public function setBookingMapper($bookingMapper)
+    {
         $this->bookingMapper = $bookingMapper;
         return $this;
     }
 
     /**
-     * @return Booking\Mapper
+     * @return BookingMapper
      */
-    public function getBookingMapper() {
+    public function getBookingMapper()
+    {
         return $this->bookingMapper;
     }
 
     /**
-     * @param  Booking\Util\EventConverter $eventConverter
+     * @param EventConverter $eventConverter
      * @return $this
      */
-    public function setEventConverter($eventConverter) {
+    public function setEventConverter($eventConverter)
+    {
         $this->eventConverter = $eventConverter;
         return $this;
     }
 
     /**
-     * @return Booking\Util\EventConverter
+     * @return EventConverter
      */
-    public function getEventConverter() {
+    public function getEventConverter()
+    {
         return $this->eventConverter;
     }
 
     /**
-     * @param  array $status
+     * @param array $status
      * @return $this
      */
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         $this->status = $status;
         return $this;
     }
@@ -134,8 +148,8 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
     /**
      * @return array
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->status;
     }
-
 }

@@ -13,6 +13,7 @@
  */
 
 use Calendar\Event\Collection;
+use Calendar\Event\Type\EventInterface;
 
 class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
 {
@@ -33,6 +34,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
     {
         $result = new Collection();
 
+        /** @var Calendar_Api_EventType_Interface $currentApi */
         foreach ($this->getApi() as $currentApi) {
             $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
         }
@@ -46,7 +48,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
      * Find a particular event matching an eventId from all registered sources
      *
      * @param $eventId
-     * @return Calendar_Event_Type_Abstract
+     * @return EventInterface
      */
     public function getEvent($eventId)
     {

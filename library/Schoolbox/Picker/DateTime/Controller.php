@@ -377,6 +377,7 @@ class Controller extends Base
 
         try {
             $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
+
             foreach ($events as $event) {
                 $appointments[] = [
                     'displayDateTime' => $event->getEventSpan(),
