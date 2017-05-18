@@ -292,9 +292,10 @@ class Controller extends Base
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
 
-        list($filtersTODO) = $this->convertRequestToFilters($filtersArray, false);
+        /** @var Filter\DataTransferObject  $dto */
+        list($dto) = $this->convertRequestToFilters($filtersArray, false);
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filtersTODO->getByClass());
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($dto->getByClass());
         $markbook      = $this->buildMarkbook($assessmentIds);
 
         $csvExporter = new Export\CSV();
