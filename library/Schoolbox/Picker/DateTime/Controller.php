@@ -369,7 +369,8 @@ class Controller extends Base
         // Get start/end of the date
 
         $start = $date;
-        $end = (clone $start)->addDays(1);
+        $end = clone $start;
+        $end->addDays(1);
 
         /** @var Calendar_Api_Factory $factory */
         $factory = $this->getDi()->get('calendarApiFactory');
