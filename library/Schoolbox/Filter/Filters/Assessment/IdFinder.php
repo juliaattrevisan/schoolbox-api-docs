@@ -59,13 +59,14 @@ class IdFinder extends Filter\AbstractIdFinder
     protected function buildQuery(array $completeFilters, $deleted)
     {
         // Filters which effect which sub-queries are required
-        $folderIds     = $completeFilters[Folder\Definition::class];
-        $projectIds    = $completeFilters[NullableContext\Project\Definition::class];
-        $unitImplIds   = $completeFilters[NullableContext\UnitImpl\Definition::class];
-        $unitSpecIds   = $completeFilters[NullableContext\UnitSpec\Definition::class];
-        $unitImpSpcIds = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
+        $teacherFolderIds = $completeFilters[Folder\Definition::class];
+        $studentFolderIds = $completeFilters[StudentFolder\Definition::class];
+        $projectIds       = $completeFilters[NullableContext\Project\Definition::class];
+        $unitImplIds      = $completeFilters[NullableContext\UnitImpl\Definition::class];
+        $unitSpecIds      = $completeFilters[NullableContext\UnitSpec\Definition::class];
+        $unitImpSpcIds    = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
 
-        list($folderWhere,   $folderParams)               = $this->getClauseFolder($folderIds);
+        list($folderWhere,   $folderParams)               = $this->getClauseFolder($teacherFolderIds, $studentFolderIds);
         list($projectWhere,  $projectParams)              = $this->getClauseProject($projectIds);
         list($unitImplWhere, $unitImplParams)             = $this->getClauseUnitImpl($unitImplIds);
         list($unitSpecWhere, $unitSpecParams)             = $this->getClauseUnitSpec($unitSpecIds);
@@ -93,7 +94,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $params = array_merge($folderParams, $projectParams, $unitImplParams, $unitSpecParams, $uImpSpcParams, $temporalParams, $weightingParams, $workTypeParams);
 
         $subQueries = [];
-        if($this->subQueryBase($unitImpSpcIds, $folderIds, $projectIds, $unitImplIds, $unitSpecIds)){
+        if($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $projectIds, $unitImplIds, $unitSpecIds)){
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$aTypeJoin}
@@ -448,21 +449,36 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'Folder' filter
      *
-     * @param null|Collection|int[] $folderIds
+     * @param null|Collection|int[] $teacherFolderIds
+     * @param null|Collection|int[] $studentFolderIds
      * @return mixed[]
      */
-    private function getClauseFolder(Collection $folderIds = null)
+    private function getClauseFolder(Collection $teacherFolderIds = null, Collection $studentFolderIds = null)
     {
-        if(null === $folderIds){
-            $whereClause = 'TRUE';
-            $whereParams = [];
-        } else {
-            $builder = $this->getMapper()->getPredicateBuilder();
-            $builder->equals('f.id', $folderIds);
-            $whereClause = $builder->getWhere()[0];
-            $whereParams = $builder->getParams();
+        // Different filters are always combined using INTERSECT
+
+        // Both NULL ?
+        if(null === $teacherFolderIds && null === $studentFolderIds){
+            return ['TRUE', []];
         }
-        return [$whereClause, $whereParams];
+
+        // Just teacher folders?
+        if(null === $studentFolderIds){
+            $folderIds = $teacherFolderIds->getAll();
+        }
+        // Just student folders?
+        elseif(null === $teacherFolderIds){
+            $folderIds = $studentFolderIds->getAll();
+        }
+        // Both specified. Take INTERSECT
+        else {
+            $folderIds = array_intersect($teacherFolderIds->getAll(), $studentFolderIds->getAll());
+        }
+
+        $builder = $this->getMapper()->getPredicateBuilder();
+        $builder->equals('f.id', $folderIds);
+
+        return [$builder->getWhere()[0], $builder->getParams()];
     }
 
     /**
@@ -760,11 +776,20 @@ class IdFinder extends Filter\AbstractIdFinder
      */
     protected function doContextFiltersGuaranteeEmptySet(array $completeFilters){
 
-        // Ultimate folder (ie either direct or indirectly associated)
-        $folderIds = $completeFilters[Folder\Definition::class];
+        // Teacher folder (ie either direct or indirectly associated)
+        $teacherFolderIds = $completeFilters[Folder\Definition::class];
 
-        // Did call explicitly request assessments that do not have an ultimate folder?
-        if($folderIds instanceOf Collection && !$folderIds->count()){
+        // Did call explicitly request assessments that do not have an teacher folder?
+        if($teacherFolderIds instanceOf Collection && !$teacherFolderIds->count()){
+            // All assessments have an ultimate folder
+            return true;
+        }
+
+        // Student folder (ie either direct or indirectly associated)
+        $studentFolderIds = $completeFilters[StudentFolder\Definition::class];
+
+        // Did call explicitly request assessments that do not have an student folder?
+        if($studentFolderIds instanceOf Collection && !$studentFolderIds->count()){
             // All assessments have an ultimate folder
             return true;
         }
