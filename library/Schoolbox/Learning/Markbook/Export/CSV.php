@@ -52,7 +52,7 @@ class CSV implements IExporter
      */
     private function sendHeaders($filename)
     {
-        header('Content-Disposition: attachment; filename="' . $filename . '.csv";');
+        header('Content-Disposition: attachment; filename="' . $filename . '";');
         header('Content-Type: application/csv; charset=UTF-8');
     }
 
