@@ -82,7 +82,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $workTypes      = $completeFilters[WorkType\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)           = $this->getClauseAType($aTypes);
-        list($temporalWhere)                    = $this->getClauseTemporalState($temporalStates);
+        list($temporalWhere, $temporalParams)   = $this->getClauseTemporalState($temporalStates);
         list($termDueWhere)                     = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         list($termCloseWhere)                   = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams) = $this->getClauseWeighting($weightings);
@@ -90,7 +90,7 @@ class IdFinder extends Filter\AbstractIdFinder
         list($deletedWhere)                     = $this->getClauseDeleted($deleted);
 
         // Merge all the params
-        $params = array_merge($folderParams, $projectParams, $unitImplParams, $unitSpecParams, $uImpSpcParams, $weightingParams, $workTypeParams);
+        $params = array_merge($folderParams, $projectParams, $unitImplParams, $unitSpecParams, $uImpSpcParams, $temporalParams, $weightingParams, $workTypeParams);
 
         $subQueries = [];
         if($this->subQueryBase($unitImpSpcIds, $folderIds, $projectIds, $unitImplIds, $unitSpecIds)){
@@ -663,18 +663,18 @@ class IdFinder extends Filter\AbstractIdFinder
         $orParts = [];
         foreach($temporalStates as $temporalState){
             if(TemporalState\Definition::KEY_UPCOMING === $temporalState){
-                $orParts[] = "('$now' < a.publish_date)";
+                $orParts[] = '(:now < a.publish_date)';
             } elseif (TemporalState\Definition::KEY_PREVIEW === $temporalState){
-                $orParts[] = "(a.publish_date <= '$now' AND '$now' < a.open_date)";
+                $orParts[] = '(a.publish_date <= :now AND :now < a.open_date)';
             } elseif (TemporalState\Definition::KEY_DUE === $temporalState){
-                $orParts[] = "(a.open_date <= '$now' AND '$now' < a.due_date)";
+                $orParts[] = '(a.open_date <= :now AND :now < a.due_date)';
             } elseif (TemporalState\Definition::KEY_OVERDUE === $temporalState){
-                $orParts[] = "(a.due_date <= '$now' AND '$now' < a.close_date)";
+                $orParts[] = '(a.due_date <= :now AND :now < a.close_date)';
             } elseif (TemporalState\Definition::KEY_CLOSED === $temporalState){
-                $orParts[] = "(a.close_date <= '$now')";
+                $orParts[] = '(a.close_date <= :now)';
             }
         }
-        return ['(' . implode(' OR ', $orParts) . ')'];
+        return ['(' . implode(' OR ', $orParts) . ')', [':now' => $now]];
     }
 
     /**
