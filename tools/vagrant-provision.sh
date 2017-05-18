@@ -503,6 +503,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Run Notifications binding cache rebuild (in background)";
+/vagrant/tools/notif/route/refresh-binding-cache.php --instance=vagrantx &
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Install schoolbox-scheduled";
 cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
 cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
