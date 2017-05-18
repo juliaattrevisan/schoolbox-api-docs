@@ -119,20 +119,14 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			}
 
 			/* Start and end dates
+			 * (allday input doesn't exist on form, but is supported in the save method below?)
 			 */
-            $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate']);
-            if ($_POST['startHour'] && $_POST['startPeriod']) {
-                $startDate->set12Hour($_POST['startHour'], $_POST['startPeriod']);
-            }
-            if ($_POST['startMinute']) {
-                $startDate->setMinute($_POST['startMinute']);
-            }
-            $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate']);
-            if ($_POST['endHour'] && $_POST['endPeriod']) {
-                $endDate->set12Hour($_POST['endHour'], $_POST['endPeriod']);
-            }
-            if ($_POST['endMinute']) {
-                $endDate->setMinute($_POST['endMinute']);
+            if ($_POST['allday']) {
+                $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])->startOfDay();
+                $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])->endOfDay();
+            } else {
+                $startDate = Alaress_Date_Format::newLocal($_POST['startDate']);
+                $endDate = Alaress_Date_Format::newLocal($_POST['endDate']);
             }
 
 			/* Start Date cannot be after End Date
