@@ -26,8 +26,10 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\File;
@@ -781,9 +783,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             SELECT $selectClause
             FROM {$this->getTable()} c
             $joinClause
-			WHERE (
-			    c.name LIKE :nameLike
-			    OR cc.code LIKE :codeLike
+            WHERE (
+                c.name LIKE :nameLike
+                OR cc.code LIKE :codeLike
             ) AND c.deleted_at IS NULL
         ";
 
@@ -803,19 +805,19 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // No need to hydrate groups
         foreach ($statement as $row) {
             $folderId = $row['c.id'];
-            if(!$folderCache[$folderId] instanceof Model){
+            if (!$folderCache[$folderId] instanceof Model) {
                 $folder = $this->hydrate($row, 'c');
 
-                if($getCourseSpec){
+                if ($getCourseSpec) {
                     $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
-                    if($courseSpec->getId()){
+                    if ($courseSpec instanceof CourseSpecification) {
                         $folder->setCourseSpecification($courseSpec);
                     }
                 }
 
-                if($getUnitSpec){
+                if ($getUnitSpec){
                     $unitSpec = $unitSpecMapper->hydrate($row, 'us');
-                    if($unitSpec->getId()){
+                    if ($unitSpec instanceof UnitSpecification) {
                         $folder->setUnitSpecification($unitSpec);
                     }
                 }
