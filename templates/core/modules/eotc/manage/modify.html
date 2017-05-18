@@ -4,10 +4,6 @@
 <script type="text/javascript" src="/modules/eotc/js/jquery.eventModify.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
-<!--<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>-->
-<!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>-->
 
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
@@ -72,22 +68,6 @@
                 self.attr('checked', true);
             }
         });
-
-//        /* https://bugs.jqueryui.com/ticket/7451
-//         */
-//        $('input[name=startDate]').datepicker({
-//            onClose: function() {
-//                $('input[name=startDate]').valid();
-//            }
-//        });
-//
-//        /* https://bugs.jqueryui.com/ticket/7451
-//         */
-//        $('input[name=endDate]').datepicker({
-//            onClose: function() {
-//                $('input[name=endDate]').valid();
-//            }
-//        });
 
         $('[data-form=event]').eventModify({
             functionLabel: "{FUNCTION}"
