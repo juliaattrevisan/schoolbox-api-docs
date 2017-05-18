@@ -19,7 +19,7 @@ use Schoolbox\Collection;
  * @todo Consider if this class is even needed. If always called as getByClass(), then the transformed can just
  * @todo     return an array indexed by class. It is the codec's responsibility to convert between Selection models and GET url param strings
  */
-class Dto
+class DataTransferObject
 {
     /**
      * Indexed by filter.id

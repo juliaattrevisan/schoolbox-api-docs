@@ -201,8 +201,8 @@ class Controller extends Base
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
 
             /**
-             * @var Filter\Dto   $filtersDto
-             * @var Filter\Codec $codec
+             * @var Filter\DataTransferObject $filtersDto
+             * @var Filter\Codec              $codec
              * @var Filter\Selection\Model[][]
              */
             list($filtersDto, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($postFilterSelections, true);

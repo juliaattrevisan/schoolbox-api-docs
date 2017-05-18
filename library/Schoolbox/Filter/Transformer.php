@@ -104,11 +104,11 @@ class Transformer
      * Get all filter selections in the form accepted by an IdFinder, indexed by filterDefinition::class
      *
      * @todo think of a good name for the TODO class
-     * @return Dto
+     * @return DataTransferObject
      */
     public function getFiltersDto()
     {
-        $filters = new Dto();
+        $filters = new DataTransferObject();
         foreach($this->getSelectionsPerFilter() as $filterId => $selections){
             try{
                 $instance = $this->keyConverters[$filterId]->getFilter();
