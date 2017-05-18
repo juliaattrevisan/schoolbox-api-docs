@@ -118,7 +118,7 @@ class Controller extends Base
             if(Filter\Filters\Assessment\Folder\Definition::class === $filter->getClass()){
                 $selections[$filter->getId()][$folderId] = $this->createSelectionModel($selectionMapper, $filter, (string)$folderId);
             } elseif(Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()){
-                $selections[$filter->getId()][$termId] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
+                $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
             }
         }
 
