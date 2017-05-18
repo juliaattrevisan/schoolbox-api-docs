@@ -199,7 +199,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Log start of import
 
-        $log = new PastoralLog();
+        $log = $this->pastoralLogMapper->createModel();
         $log->setImportId($importId);
         $log->setUserId($user->getId());
         $log->setPastoralId(null);
@@ -220,7 +220,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 // Pastoral severity was not found, this should never happen as it is a mandatory field in Schoolbox. We will just create a default one called
                 // "Low" in case it every does happen
 
-                $severity = new PastoralSeverity();
+                $severity = $this->getPastoralSeverityMapper()->createModel();
                 $severity->setOrder(0);
                 $severity->setName("Low");
                 $this->getPastoralSeverityMapper()->save($severity);
@@ -282,7 +282,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             $heading = substr(trim($record["Details"]), 0, 50);
 
-            $logRecord = new PastoralLog();
+            $logRecord = $this->pastoralLogMapper->createModel();
 
             try {
 
@@ -316,7 +316,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
 
-                $pastoralRecord = new Pastoral();
+                $pastoralRecord = $this->getPastoralMapper()->createModel();
                 $pastoralRecord->setExternalId($record["PastoralCareSeq"]);
                 $pastoralRecord->setOwner($owner);
                 $pastoralRecord->setStudent($student);
@@ -337,7 +337,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 } else {
                     // Public record blank, skip it
 
-                    $log = new PastoralLog();
+                    $log = $this->getPastoralLogMapper()->createModel();
                     $log->setImportId($importId);
                     $log->setUserId($user->getId());
                     $log->setPastoralId($pastoralRecord->getId());
@@ -370,12 +370,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                             if ($importParentAccess || $audienceUser->getRole()->isStaff()) {
 
-                                $accessRecord = new PastoralAccess();
+                                $accessRecord = $this->getPastoralAccessMapper()->createModel();
                                 $accessRecord->setPastoral($pastoralRecord);
                                 $accessRecord->setUser($audienceUser);
                                 $this->getPastoralAccessMapper()->save($accessRecord);
 
-                                $log = new PastoralLog();
+                                $log = $this->getPastoralLogMapper()->createModel();
                                 $log->setImportId($importId);
                                 $log->setUserId($user->getId());
                                 $log->setPastoralId($pastoralRecord->getId());
@@ -429,7 +429,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $logRecord->setResult('ERROR');
                 $this->getPastoralLogMapper()->save($logRecord);
 
-                $log = new PastoralLog();
+                $log = $this->getPastoralLogMapper()->createModel();
                 $log->setImportId($importId);
                 $log->setUserId($user->getId());
                 $log->setHeading($e->getMessage());
@@ -440,7 +440,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $this->connector->disableMultipleActiveResultSets();
 
-        $log = new PastoralLog();
+        $log = $this->getPastoralLogMapper()->createModel();
         $log->setImportId($importId);
         $log->setUserId($user->getId());
         $log->setHeading("Import Completed");
@@ -871,7 +871,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 // The records pastoral type doesn't exist in Schoolbox, create one that matches
 
-                $type = new PastoralType();
+                $type = $this->getPastoralTypeMapper()->createModel();
                 $type->setName($record["TypeDescription"]);
                 $type->setExternalCode($record["TypeCode"]);
                 $this->getPastoralTypeMapper()->save($type);
@@ -910,7 +910,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 // The records pastoral category doesn't exist in Schoolbox, create one that matches
 
-                $category = new PastoralCategory();
+                $category = $this->pastoralCategoryMapper->createModel();
                 $category->setName($record["CategoryDescription"]);
                 $category->setExternalCode($record["CategoryCode"]);
                 $category->setPastoralType($pastoralType);
