@@ -271,3 +271,13 @@ $pickr-month-padding: 5px;
     }
 
 }
+input.datepicker-input {
+    padding-right: 50px;
+    display: inline-block;
+}
+button.datepicker-button {
+    margin-left: -38px;
+    margin-bottom: 0;
+    padding: 0 10px;
+    min-height: 2.4rem;
+}

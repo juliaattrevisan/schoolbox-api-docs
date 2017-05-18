@@ -1,15 +1,11 @@
 {%  macro dateField(dateTitle, dateProperty, dateValue, syncEndDate) %}
 <div class="row" id="{{ dateProperty }}">
 
-    <div id="{{ dateProperty }}-date-inputgroup" class="column small-6 input-group" data-datepicker data-datepicker-time data-datepicker-format="datetime" data-datepicker-alldayswitch {% if USER.getRole.isStaff %} data-datepicker-call="duework" {% endif %} {% if dateProperty in ['due','late','close'] %} data-datepicker-endofday data-datepicker-endofperiod {% endif %} {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate='{{ syncEndDate }}'{% endif %}>
-
+    <div class="column small-12">
         <label>
             {{ dateTitle }} Date
-            <input id="{{ dateProperty }}Date" name="{{ dateProperty }}Date" type="text" value="{{ dateValue.local }}" placeholder="eg. 'tomorrow at 2pm', 'May 4', date and time" />
+            <input id="{{ dateProperty }}Date" name="{{ dateProperty }}Date" type="text" value="{{ dateValue.local }}" data-datepicker data-datepicker-time data-datepicker-format="datetime" data-datepicker-alldayswitch {% if USER.getRole.isStaff %} data-datepicker-call="duework" {% endif %} {% if dateProperty in ['due','late','close'] %} data-datepicker-endofday data-datepicker-endofperiod {% endif %} {% if syncEndDate is not empty %}data-datepicker-sync data-datepicker-sync-enddate='{{ syncEndDate }}'{% endif %} />
         </label>
-
-        <button type="button" class="button icon-calendar"></button>
-
     </div>
 
 </div>
