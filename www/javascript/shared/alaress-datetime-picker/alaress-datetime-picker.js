@@ -210,7 +210,7 @@ function checkAllDaySwitch (state, pickerId) {
 $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
-    var $datepickerButton = $(this).parent().find('button');
+    var $datepickerButton = $(this).siblings('button');
 
     // Build datepicker options form the element data attributes
     var options = getOptions(element);
