@@ -400,16 +400,11 @@ class Controller extends Base
      */
     public function getDueByDate(Alaress_Date_Format $date, $folderId)
     {
-        // Don't show other students' due work to anyone but staff
+        $data = [];
 
-        if (!$this->getUser()->getRole()->isStaff()) {
+        // Only show results to staff
 
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => []
-            ]);
-
-        } else {
+        if ($this->getUser()->getRole()->isStaff()) {
 
             $start = $date->startOfDay();
             $end = clone $start;
@@ -478,14 +473,18 @@ class Controller extends Base
 
             // Spit this out in a JSON array
 
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => [
-                    'students' => $students,
-                    'date' => $date->toIso8601String()
-                ]
-            ]);
+            $data = [
+                'students' => $students,
+                'date' => $date->toIso8601String()
+            ];
         }
+
+        // Return results, if any
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => $data
+        ]);
     }
 
     /**
