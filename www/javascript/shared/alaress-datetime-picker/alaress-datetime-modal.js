@@ -22,6 +22,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         endDay: getValue($picker, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
         endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
     };
+    var dictMostLoaded  = 'Heaviest Workload';
+    var dictTop5Loaded  = '5 Heaviest Workloads';
+    var dictNoWorkToday = 'Your students have nothing due this day';
 
     var heatCache = {};
 
@@ -508,13 +511,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         if (template == 'duework') {
 
-            html = '<h2 class="mini">Due Work (<span data-due-work-title>Most Loaded Student</span>)</h2>';
+            html = '<h2 class="mini">Due Work (<span data-due-work-title>' + dictMostLoaded + '</span>)</h2>';
 
             if (data.students === undefined) {
                 html = 'Error loading data';
             }
             else if (data.students.length == 0) {
-                html += '<p class="no-margin">Your students have nothing due this day</p>';
+                html += '<p class="no-margin">' + dictNoWorkToday + '</p>';
                 $pickerResponseDueWork.addClass('meta');
             }
             else {
@@ -579,7 +582,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $(this).parents('.top-due-work').addClass('hide');
                 $('#' + listDiv).removeClass('hide');
                 $pickerResponseEvents.addClass('hide');
-                $('[data-due-work-title]').text('Top 5 Students');
+                $('[data-due-work-title]').text(dictTop5Loaded);
             });
 
             $('[data-hide-full-due]').click(function() {
@@ -587,7 +590,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $pickerResponseDueWork.find('.top-due-work').removeClass('hide');
                 $('#' + listDiv).addClass('hide');
                 $pickerResponseEvents.removeClass('hide');
-                $('[data-due-work-title]').text('Most Loaded Student');
+                $('[data-due-work-title]').text(dictMostLoaded);
             });
         }
         else if (template == 'events') {
