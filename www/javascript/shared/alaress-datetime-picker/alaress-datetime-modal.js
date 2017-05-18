@@ -599,27 +599,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             html = '<h2 class="mini">Your Calendar</h2>';
 
-            if (data.appointments === undefined) {
-                //html = 'Error loading data';
-            }
-            else if (data.appointments.length == 0) {
-                //html += 'No events found for ' + displayDate;
-                //$pickerResponse.addClass('meta');
-            }
-            else {
-                //$pickerResponse.removeClass('meta');
-
-                // html += '<div class="row">';
-                // html += '<div class="small-12 medium-12 columns">';
-                // html += '<h2>Events on ' + displayDate + '</h2>';
-                // html += '<ul class="small-12 information-list card">';
-
-                // Populate with appointments for the selected date
+            if (data.appointments !== undefined && data.appointments.length !== 0) {
                 for (var i = 0; i < data.appointments.length; i++) {
-                    // html += '<li>';
-                    // html += '<h3>' + data.appointments[i].title + '</h3>';
-                    // html += '<p class="meta">' + data.appointments[i].displayDateTime + '</p>';
-                    // html += '</li>';
                     events.push({
                         id: i,
                         start: data.appointments[i].start,
@@ -628,10 +609,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                         allDay: data.appointments[i].allDay
                     });
                 }
-
-                // html += '</ul>';
-                // html += '</div>';
-                // html += '</div>';
             }
 
             html += '<div id="calendar-response-fc"></div>';
