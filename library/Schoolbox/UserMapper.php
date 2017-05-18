@@ -17,6 +17,7 @@ use Schoolbox;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Search\Results;
 use UnexpectedValueException;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Schoolbox\Mapper as BaseMapper;
@@ -495,9 +496,9 @@ class UserMapper extends Mapper
 
         $students = new Collection();
 
-        if (strlen($search) >= 3) {
+        if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
 
-            // Only search if theres 3 or more characters
+            // Only search if theres X or more characters
 
             $keywordArray = explode(' ', $search);
 
