@@ -514,20 +514,20 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 html = 'Error loading data';
             }
             else if (data.students.length == 0) {
-                html += '<span style="font-size:13px;">Your students have nothing due this day</span>';
+                html += '<p class="no-margin">Your students have nothing due this day</p>';
                 $pickerResponseDueWork.addClass('meta');
             }
             else {
                 $pickerResponse.removeClass('meta');
 
                 // Show most loaded student
-                html += '<div class="top-due-work" style="display:flex; margin-bottom:.5rem;">';
+                html += '<div class="top-due-work">';
                 html += '<div class="compact card small-12">';
                 html += '<img src="/portrait.php?userId=' + data.students[0].externalId + '&amp;size=square80">';
                 html += '<h3>' + data.students[0].firstname + ' ' + data.students[0].lastname + '</h3>';
                 html += '<p class="meta">' + data.students[0].assessmentsDue + ' due' + '</p>';
                 html += '</div>';
-                html += '<div class="icon-next" data-show-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '" title="Show all students and work due" style="cursor:pointer; line-height:44px;"></div>';
+                html += '<div class="icon-next" data-show-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '" title="Show all students and work due"></div>';
                 html += '</div>';
 
                 // Create a full list of students, hidden by default
@@ -536,7 +536,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 //html += '<h2>Work due on ' + displayDate + '</h2>';
                 html += '<ul class="small-12 information-list expandable-card">';
 
-                html += '<li><a data-hide-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '"><div class="compact card small-12 icon-previous" style="color:#0066b0;">Back</div></a></li>';
+                html += '<li><a data-hide-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '"><span class="compact card small-12 icon-previous">Back</span></a></li>';
 
                 for (var i = 0; i < data.students.length; i++) {
 

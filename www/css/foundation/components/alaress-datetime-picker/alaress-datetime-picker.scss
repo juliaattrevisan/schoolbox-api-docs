@@ -239,6 +239,22 @@ $pickr-month-padding: 5px;
      */
     .adtp-response {
         margin-top: 1rem;
+
+        .top-due-work {
+            display:flex;
+            margin-bottom:.5rem;
+
+            .icon-next {
+                @extend .cursor-pointer;
+                line-height: rem-calc(44);
+            }
+        }
+    }
+
+    .adtp-response-duework {
+        .icon-previous {
+            color: $accent-foreground;
+        }
     }
 
     table.assessment-list td {
