@@ -122,7 +122,7 @@ class CSV implements IExporter
             'Student Average',
         ];
         foreach ($sortedAssessments as $assessment) {
-            $this->addHeaders($row, $assessment);
+            $row = $this->addHeaders($row, $assessment);
         }
         fputcsv($out, $row);
     }
@@ -145,7 +145,7 @@ class CSV implements IExporter
             $markbook->getWeightedMean(),
         ];
         foreach ($sortedAssessments as $assessment) {
-            $this->addAverage($averageRow, $markbook, $assessment);
+            $averageRow = $this->addAverage($averageRow, $markbook, $assessment);
         }
         fputcsv($out, $averageRow);
     }
@@ -172,7 +172,7 @@ class CSV implements IExporter
             ];
 
             foreach ($sortedAssessments as $assessmentId => $assessment) {
-                $this->addParticipant($studentRow, $participants, $assessment, $userId);
+                $studentRow = $this->addParticipant($studentRow, $participants, $assessment, $userId);
             }
             fputcsv($out, $studentRow);
         }
@@ -186,7 +186,7 @@ class CSV implements IExporter
      * @param IAssessable $assessment
      * @return string[]
      */
-    private function addHeaders(array &$row, IAssessable $assessment)
+    private function addHeaders(array $row, IAssessable $assessment)
     {
         $title = "{$assessment->getTitle()} \r\n({$assessment->getTypeName()})";
 
@@ -214,7 +214,7 @@ class CSV implements IExporter
      * @param IAssessable $assessment
      * @return string[]
      */
-    private function addAverage(array &$row, Markbook $markbook, IAssessable $assessment)
+    private function addAverage(array $row, Markbook $markbook, IAssessable $assessment)
     {
         $row[] = $markbook->getAssessmentStatistics()[$assessment->getId()]['mean'];
         if ($this->hasTotalMarkColumn($assessment)) {
@@ -239,7 +239,7 @@ class CSV implements IExporter
      * @param int                                                   $userId
      * @return string[]
      */
-    private function addParticipant(array &$row, GenericCollection $participants, IAssessable $assessment, $userId)
+    private function addParticipant(array $row, GenericCollection $participants, IAssessable $assessment, $userId)
     {
         if ($participants[$assessment->getId()]->keyExists($userId)) {
             $participant = $participants[$assessment->getId()][$userId];
