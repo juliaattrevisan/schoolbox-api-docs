@@ -285,11 +285,11 @@ class Controller extends Base
      * @param int $termId
      * @param int $cycle timetable cycle or week (calculated from the beginning of the term)
      * @param int $day timetable day number
-     * @param int $folder class code
+     * @param int $folderId
      * @param bool $dateOnly just returns date
      * @return Collection
      */
-    public function getByTimetableDay($campusId, $termId, $cycle, $day, $folder = 0, $dateOnly = false)
+    public function getByTimetableDay($campusId, $termId, $cycle, $day, $folderId = 0, $dateOnly = false)
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -304,8 +304,8 @@ class Controller extends Base
 
         // Return due work
 
-        if ($folder > 0) {
-            return $this->getDueByDate($date, $folder);
+        if ($folderId > 0) {
+            return $this->getDueByDate($date, $folderId);
         }
 
         if ($dateOnly == true) {
