@@ -496,9 +496,11 @@ class UserMapper extends Mapper
 
         $students = new Collection();
 
+        $foundValidKeyword = false;
+
         if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
 
-            // Only search if theres X or more characters
+            // Only search if there are X or more characters
 
             $keywordArray = explode(' ', $search);
 
@@ -506,16 +508,28 @@ class UserMapper extends Mapper
 
             foreach ($keywordArray as $keyword) {
 
-                $pb->like('firstname', "%{$this->getDatabase()->escapeForLike($keyword)}%")
-                    ->like('lastname', "%{$this->getDatabase()->escapeForLike($keyword)}%");
+                if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
+
+                    // Each keyword must be long enough to search
+
+                    $foundValidKeyword = true;
+
+                    $pb->like('firstname', "%{$this->getDatabase()->escapeForLike($keyword)}%")
+                        ->like('lastname', "%{$this->getDatabase()->escapeForLike($keyword)}%");
+
+                }
             }
 
-            $users = $this->findByPredicates($this->getPredicateBuilder()->any($pb));
+            // Had to have at least one valid keyword
 
-            /** @var User $user */
-            foreach ($users as $user) {
-                if ($user->getRole()->isStudent()) {
-                    $students->add($user);
+            if ($foundValidKeyword) {
+                $users = $this->findByPredicates($this->getPredicateBuilder()->any( $pb));
+
+                /** @var User $user */
+                foreach ($users as $user) {
+                    if ($user->getRole()->isStudent()) {
+                        $students->add($user);
+                    }
                 }
             }
         }
