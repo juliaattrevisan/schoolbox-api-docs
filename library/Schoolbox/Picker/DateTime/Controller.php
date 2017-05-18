@@ -12,7 +12,6 @@ namespace Schoolbox\Picker\DateTime;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Calendar_Api_Factory;
-use Exception;
 use External_Timetable;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -375,17 +374,13 @@ class Controller extends Base
         $factory = $this->getDi()->get('calendarApiFactory');
         $api = $factory->produceForUser($this->getUser());
 
-        try {
-            $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
+        $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
-            foreach ($events as $event) {
-                $appointments[] = [
-                    'displayDateTime' => $event->getEventSpan(),
-                    'title' => $event->getTitle()
-                ];
-            }
-        } catch (Exception $e) {
-            $this->getResponse()->status->setCode(404);
+        foreach ($events as $event) {
+            $appointments[] = [
+                'displayDateTime' => $event->getEventSpan(),
+                'title' => $event->getTitle()
+            ];
         }
 
         $this->getResponse()->content->set([
