@@ -25,21 +25,10 @@
     </div>
 </div>
 
-<div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h2 class="subheader">{{ heading }}</h2>
-        </div>
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">{{ heading }}</h2>
     </div>
-    <nav>
-        {# If editing an existing group from the database, display delete icon #}
-
-        {% if group is not empty %}
-            {% if isRouteAuthorized('pastoralManagement.postGroupsDelete', {groupId: group.id}) %}
-                <a href="#" data-delete class="icon-delete" title="Delete Pastoral Group"></a>
-            {% endif %}
-        {% endif %}
-    </nav>
 </div>
 
 {# The form- containing the only editable thing on this screen, the group name #}
