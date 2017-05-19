@@ -1,4 +1,0 @@
-ALTER TABLE `user`
-  CHANGE COLUMN `firstname` `firstname` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ,
-  CHANGE COLUMN `lastname` `lastname` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL ;
-
