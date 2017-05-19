@@ -592,7 +592,7 @@ class Leave_Controller extends Controller
             return true;
         }
 
-        $thresholdDateTime = \Alaress_Date_Format::newLocalShort($startDate);
+        $thresholdDateTime = \Alaress_Date_Format::newLocal($startDate);
         $weekdayIndex = $thresholdDateTime->getWeekDayNumber();
 
         /* Get back to nearest Friday, which comes after furthest Thursday
@@ -637,12 +637,8 @@ class Leave_Controller extends Controller
         /* Limit leave creation to a threshold
 		 */
         if ($this->isOutsideCreationThreshold($data['request']['start']['date'])) {
-            $start = Alaress_Date_Format::newLocalShort($data['request']['start']['date'])
-                ->modify($data['request']['start']['time'])
-            ;
-            $finish = Alaress_Date_Format::newLocalShort($data['request']['finish']['date'])
-                ->modify($data['request']['finish']['time'])
-            ;
+            $start = Alaress_Date_Format::newLocal($data['request']['start']['date']);
+            $finish = Alaress_Date_Format::newLocal($data['request']['finish']['date']);
             $created = Alaress_Date_Format::now();
             $request = new Leave_Request();
 
