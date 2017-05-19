@@ -2,17 +2,6 @@
 <script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('input[data-datepicker]').datepicker({
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $(this);
-
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
         $(document).on('click', '[data-action]', function (event) {
             event.preventDefault();
 
