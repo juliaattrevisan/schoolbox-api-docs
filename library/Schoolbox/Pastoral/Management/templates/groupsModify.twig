@@ -129,16 +129,6 @@
 
         <ul class="flex-list buttons">
             <li><a href="#" class="submit" data-save>{{ button }}</a></li>
-
-            {# Only display the delete button if we are editing an existing database record #}
-            {% if group is not empty %}
-                <li>
-                    <a href="#" data-delete>Delete Group</a>
-                    <form id="formDelete" class="hide" method="post" action="{{ routeLookup('pastoralManagement.postGroupsDelete') }}">
-                        <input type="hidden" name="id" value="{{ group.id }}">
-                    </form>
-                </li>
-            {% endif %}
         </ul>
 
     </div>
