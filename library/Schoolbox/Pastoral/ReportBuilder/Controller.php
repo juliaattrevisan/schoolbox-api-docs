@@ -185,6 +185,7 @@ class Controller extends Base
             'date',
             'category',
             'author',
+            'points',
             'year'
         ];
 
