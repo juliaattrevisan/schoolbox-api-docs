@@ -1,0 +1,98 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care',              routeLookup('pastoral.getIndex') ],
+[ 'Search Results - ' ~ search ]
+) }}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 island">
+
+            <h1>Search Pastoral Records</h1>
+            <h2 class="subheader">Search Results</h2>
+
+            {% include '@pastoral/fragments/search.twig' with {'search': search} %}
+
+            {% if search | length >= minimumSearchLength %}
+
+                {% if results | length %}
+
+                    <h2 class="subheader">Matching Pastoral Records</h2>
+                    <section>
+                        <ul class="action-list">
+                            {% for record in results %}
+                                <li class="actions-small-1">
+                                    <div class="list-item">
+                                        <div class="small-12 card wrap-down">
+                                            <a href="{{ profile.link(record.owner) }}">
+                                                {{ profile.imageSquare64(record.student) }}
+                                            </a>
+                                            <h4>
+                                                <a href="{{ routeLookup('pastoral.getStudentRecord', { studentId: record.student.id, recordId: record.id}) }}">
+                                                    {{ record.student.fullName }} - {{ record.heading }}
+                                                </a>
+                                            </h4>
+                                            <p class="spaced meta">
+                                                Posted by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a> {{ record.createdAt.short }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+
+                {% else %}
+
+                    <h2 class="subheader">No Matching Pastoral Records Found</h2>
+                    <div class="empty-state">
+                        <i class="icon-pastoral"></i>
+                        <p>No pastoral records were found that matched your search.</p>
+                        <p>Did you want to try <a href="/search?keyword={{ search }}">searching the whole system?</a>.</p>
+                    </div>
+
+                {% endif %}
+
+                {% if students | length %}
+
+                    <h2 class="subheader">Matching Students</h2>
+                    <section>
+                        <ul id="studentsList" class="information-list">
+                            {% for student in students %}
+                                <li>
+                                    <div class="card small-12">
+                                        <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
+                                            {{ profile.imageSquare64(student) }}
+                                            <h3>{{ student.fullName }}</h3>
+                                        </a>
+                                        <p class="meta">{{ student.role.name }}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+
+                {% else %}
+
+                    <h2 class="subheader">No Matching Students Found</h2>
+
+                    <div class="empty-state">
+                        <i class="icon-user"></i>
+                        <p>No students were found that matched your search.</p>
+                    </div>
+
+                {% endif %}
+
+            {% else %}
+
+                <div class="alert-box alert">
+                   The search you entered was too short. Your search must be {{ minimumSearchLength }} characters or longer.
+                </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+</div>

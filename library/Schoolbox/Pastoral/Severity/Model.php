@@ -10,12 +10,13 @@
 namespace Schoolbox\Pastoral\Severity;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model implements ISoftDeletable {
 
-    /** @var int */
-    protected $id;
+    use Id;
+    use DeletedAtDate;
 
     /** @var string */
     protected $name;
@@ -23,8 +24,8 @@ class Model implements ISoftDeletable {
     /** @var int */
     protected $order;
 
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
+    /** @var bool $dashboard */
+    protected $dashboard;
 
     /**
      * @param string $name
@@ -32,7 +33,7 @@ class Model implements ISoftDeletable {
      */
     public function setName($name) {
         $this->name = $name;
-        return $name;
+        return $this;
     }
 
     /**
@@ -40,22 +41,6 @@ class Model implements ISoftDeletable {
      */
     public function getName() {
         return $this->name;
-    }
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId() {
-        return $this->id;
     }
 
     /**
@@ -75,27 +60,20 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param \Alaress_Date_Format $deletedAt
+     * @param bool $dashboard
      * @return self
      */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
+    public function setDashboard($dashboard)
+    {
+        $this->dashboard = $dashboard;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
      * @return bool
      */
-    public function isDeleted() {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
+    public function getDashboard()
+    {
+        return $this->dashboard;
     }
 }

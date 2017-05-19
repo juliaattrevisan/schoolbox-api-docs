@@ -40,6 +40,8 @@ use Schoolbox\Resource\File\Search\Renderer as FileRenderer;
 class Results implements Searchable
 {
 
+    const MIN_SEARCH_LENGTH = 2;
+
     /**
      * Registry of mappers
      *

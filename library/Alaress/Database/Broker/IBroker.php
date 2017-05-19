@@ -61,6 +61,21 @@ interface IBroker extends IQuoter
      */
     public function connect($options = []);
 
+    /**
+     * Enable the use of multiple active result sets (required if executing a query inside an iterator)
+     */
+    public function enableMultipleActiveResultSets();
+
+    /**
+     * Disable the use of multiple active result sets (better performance)
+     */
+    public function disableMultipleActiveResultSets();
+
+    /**
+     * Disconnect from database
+     */
+    public function disconnect();
+
     // ----------------------------------------------------------------------------------------------------------------
     // Database query execution
     // ----------------------------------------------------------------------------------------------------------------

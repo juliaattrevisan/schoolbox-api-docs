@@ -1,0 +1,95 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ 'Groups Management' ]
+) }}
+
+<div class='row'>
+    <div class='small-12 columns'>
+        <h1>Pastoral Care</h1>
+    </div>
+</div>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">Groups Management</h2>
+        </div>
+    </div>
+    <nav>
+        {# Pastoral moderators can manage pastoral groups #}
+        {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
+            <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}" class="icon-add" title="Add Pastoral Group"></a>
+        {% endif %}
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if groups is not empty %}
+            <section>
+                <ul class="action-list">
+                    {% for group in groups %}
+                        <li class="actions-small-2">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href='{{ profile.link(group.user) }}'>
+                                        {{ profile.imageSquare64(group.user) }}
+                                    </a>
+                                    <a href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}">
+                                        <h3>
+                                            {{ group.name}}
+                                            {% if group.members | length %}
+                                                ({{ group.members | length }} Member{% if group.members | length %}s{% endif %})
+                                            {% endif %}
+                                        </h3>
+                                    </a>
+                                    <p class="meta">
+                                        Created by <a href="{{ profile.link(group.user) }}">{{ group.user.fullName }}</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-modify no-text" href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}" title="Edit Group"></a>
+                                <a href="#" data-delete="{{ group.id }}" class="icon-delete" title="Delete Pastoral Group"></a>
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-group"></i>
+                <p>No pastoral groups have been created.</p>
+                {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
+                    <p>Pastoral groups can be used to dynamically audience pastoral records. Do you want to <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}">create a pastoral group</a>?</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<form id="formDelete" class="hide" method="post" action="">
+    <input type="hidden" name="id" value="{{ group.id }}">
+</form>
+
+<script>
+    $(function() {
+        $('[data-delete]').click(function(e) {
+            e.preventDefault();
+            var groupId = $(this).attr('data-delete');
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated pastoral records.',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('pastoralManagement.postGroupsDelete') }}', {
+                        id: groupId
+                    }).done(function() {
+                        $('[data-delete="' + groupId + '"]').closest('li').remove();
+                    })
+                }
+            });
+        });
+    });
+</script>

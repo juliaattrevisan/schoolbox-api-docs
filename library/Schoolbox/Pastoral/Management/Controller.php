@@ -1,0 +1,199 @@
+<?php
+/**
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Pastoral\Management;
+
+use Alaress\Web\Controller\Base;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
+use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Resource\Search\Results;
+use Schoolbox\UserMapper;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
+
+class Controller extends Base
+{
+    /** @var PastoralAccessMapper $pastoralAccessMapper */
+    private $pastoralAccessMapper;
+
+    /** @var PastoralGroupMapper $pastoralGroupMapper */
+    private $pastoralGroupMapper;
+
+    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
+    private $pastoralGroupMemberMapper;
+
+    /** @var UserMapper $userMapper */
+    private $userMapper;
+
+    /**
+     * Constructor
+     * @param UserMapper $userMapper
+     * @param PastoralAccessMapper $pastoralAccessMapper
+     * @param PastoralGroupMapper $pastoralGroupMapper
+     * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        PastoralAccessMapper $pastoralAccessMapper,
+        PastoralGroupMapper $pastoralGroupMapper,
+        PastoralGroupMemberMapper $pastoralGroupMemberMapper
+    ) {
+        $this->userMapper = $userMapper;
+        $this->pastoralAccessMapper = $pastoralAccessMapper;
+        $this->pastoralGroupMapper = $pastoralGroupMapper;
+        $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
+    }
+    
+    /**
+     * Display pastoral group management page
+     */
+    public function getGroups()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@pastoralManagement/groups.twig',
+            'data' => [
+                'groups' => $this->pastoralGroupMapper->findAll()
+            ]
+        ]);
+    }
+
+    /**
+     * Display form to allow insert/update of a pastoral group
+     *
+     * @param PastoralGroup $group
+     */
+    public function getGroupsModify($group)
+    {
+        $this->getResponse()->content->set([
+            'template' => '@pastoralManagement/groupsModify.twig',
+            'data' => [
+                'group'                     => $group,
+                'minimumSearchLength'       => Results::MIN_SEARCH_LENGTH
+            ]
+        ]);
+    }
+
+    /**
+     * Delete pastoral care group
+     */
+    public function postGroupsDelete()
+    {
+        $post = $this->getRequest()->post;
+
+        $this->pastoralGroupMapper->deleteByColumn('id', $post['id']);
+        $this->pastoralAccessMapper->deleteByColumn('group_id', $post['id']);
+
+        $this->getResponse()->redirect->afterPost(
+            $this->router->generate('pastoralManagement.getGroups')
+        );
+    }
+
+    /**
+     * Insert/update/delete pastoral group in database
+     */
+    public function postGroupsModify()
+    {
+        $post = $this->getRequest()->post;
+
+        $memberIds = explode(",", $post['members']);
+
+        /** @var PastoralGroup $group */
+
+        if (empty($post['id'])) {
+
+            // Creating new group
+
+            $group = $this->pastoralGroupMapper->createModel();
+            $group->setUser($this->getUser());
+
+        } else {
+
+            // Updating existing group (or create a new one if its been deleted from under us)
+
+            $group = $this->pastoralGroupMapper->findByIdWithFallback($post['id']);
+        }
+
+        if (empty(trim($post['name']))) {
+            $post['name'] = 'Untitled Group';
+        }
+
+        $group->setName($post['name']);
+        $this->pastoralGroupMapper->save($group);
+
+        // If we are updating an existing group, we need to delete unwanted existing group members
+
+        // Store all of the IDs we find in the database so we don't re-add them later
+
+        $membersToSkip = [];
+
+        if (!empty($post['id'])) {
+
+            $membersExisting = $this->pastoralGroupMemberMapper->findByColumn('group_id', $group->getId());
+
+            // Go through every member in the database
+
+            /** @var PastoralGroupMember $memberCurrent */
+            foreach ($membersExisting as $memberCurrent) {
+
+                // Store all of the IDs we find in the database so we don't re-add them later
+
+                $membersToSkip[] = $memberCurrent->getuser()->getId();
+
+                // We need to find out if we should keep this member in the database
+
+                $deleteMember = true;
+
+                // Go through all the members the user saved in the group
+
+                /** @var int $memberId */
+                foreach ($memberIds as $memberId) {
+                    if ($memberCurrent->getUser()->getId() == $memberId) {
+
+                        // The user will wants this member
+
+                        $deleteMember = false;
+                    }
+                }
+
+                // Check if we need to delete this person
+
+                if ($deleteMember) {
+                    $this->pastoralGroupMemberMapper->delete($memberCurrent);
+                }
+            }
+        }
+
+        // Now add people to this group
+
+        foreach ($memberIds as $memberId) {
+
+            if (!empty($memberId)) {
+
+                // Make sure they weren't already in the database
+
+                if (!in_array($memberId, $membersToSkip)) {
+
+                    // Not in the database, add them
+
+                    /** @var PastoralGroupMember $pastoralGroupMember */
+                    $pastoralGroupMember = $this->pastoralGroupMemberMapper->createModel();
+                    $pastoralGroupMember->setGroup($group);
+                    $pastoralGroupMember->setAuthor($this->getUser());
+                    $pastoralGroupMember->setUser($this->userMapper->createModel($memberId));
+
+                    $this->pastoralGroupMemberMapper->save($pastoralGroupMember);
+                }
+            }
+        }
+
+        $this->getResponse()->redirect->afterPost(
+            $this->router->generate('pastoralManagement.getGroups')
+        );
+    }
+}

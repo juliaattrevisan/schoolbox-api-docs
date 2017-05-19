@@ -1,0 +1,248 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{# Change a couple of labels depending on if we are creating/updating a group #}
+
+{% if group is not empty %}
+    {% set heading = 'Modify Pastoral Group' %}
+    {% set button = 'Save Changes' %}
+{% else %}
+    {% set heading = 'Create Pastoral Group' %}
+    {% set button = 'Create Group' %}
+{% endif %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ 'Groups Management',  routeLookup('pastoralManagement.getGroups') ],
+[ heading ]
+) }}
+
+{# Heading fluff #}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Pastoral Care</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">{{ heading }}</h2>
+    </div>
+</div>
+
+{# The form- containing the only editable thing on this screen, the group name #}
+
+<div class="row">
+    <div class="small-12 island">
+        <form id="formGroup" method="post" action="{{ routeLookup('pastoralManagement.postGroupsModify') }}">
+            <input type="hidden" name="id" value="{{ group.id }}">
+            <input type="hidden" id="members" name="members" value="">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Group Name
+                            <input id="groupName"
+                                   type="text"
+                                   placeholder="Enter group name"
+                                   class="required"
+                                   name="name"
+                                   size="35"
+                                   maxlength="100"
+                                   value="{{ group.name }}"/>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
+
+{# --------------------------------------------------------------------------------------------------------------------------------------------#}
+{# The list of existing group members #}
+{# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+<div id="groupMembers" class="row">
+    <div class="small-12 island">
+
+        <div class="row actions-small-1">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Group Members</h2>
+                </div>
+            </div>
+            <nav>
+                <a data-member-search href="#" class="icon-add" title="Add Group Member"></a>
+            </nav>
+        </div>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# This HTML is duplicated inside the `searchModal.twig` file for the purposes of adding new rows dynamically #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <section id="membersListContainer" {% if group.members | length == 0 %}class="hide"{% endif %}>
+            <ul id="membersList" class="information-list">
+                {% for member in group.members %}
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href="{{ profile.link(member.user) }}" title="View Profile">
+                                    {{ profile.imageSquare64(member.user) }}
+                                </a>
+                                <p><a href="{{ profile.link(member.user) }}" title="View Profile">{{ member.user.fullName }}</a></p>
+                                <p class="meta">{{ member.user.role.name }}</p>
+                            </div>
+                        </div>
+                        <nav>
+                            <a data-member-delete="{{ member.user.id }}" class="icon-delete no-text" href="#" title="Remove Group Member"></a>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Empty state when there are no members in the group #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <div id="membersEmpty" class="empty-state {% if group.members | length %}hide{% endif %}">
+            <i class="icon-group"></i>
+            <p>There are no users current in this group.</p>
+            <p>Do you want to <a href="#" data-member-search>add a user to this group</a>?</p>
+        </div>
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Action buttons #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        <ul class="flex-list buttons">
+            <li><a href="#" class="submit" data-save>{{ button }}</a></li>
+        </ul>
+
+    </div>
+</div>
+
+<script>
+
+    $(function() {
+
+        {# This is a list of IDs that have been added to the group. This is what ultimately gets sent off to the database #}
+
+        window.membersAdded = [{% for member in group.members %}{% if not loop.first %},{% endif %}{{ member.user.id }}{% endfor %}];
+
+        var form = $('#formGroup');
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Setup form validation (for that one lonely field...) #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        form.alaressValidate({
+            rules: {
+                'name': {required: true}
+            },
+            messages: {
+                'name': {required: 'You must enter a name for this group before you can proceed.'}
+            }
+        });
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Save Changes #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        $('[data-save]').click(function(e) {
+
+            e.preventDefault();
+
+            var groupName = $('#groupName');
+
+            groupName.val(groupName.val().trim());
+
+            if (form.valid()) {
+
+                if (window.membersAdded.length == 0) {
+
+                    {# Warn the user they are saving an empty group #}
+
+                    $(this).confirmDialog({
+
+                        text: 'Are you sure you want to save this group with no members?',
+                        confirmEvent: function () {
+
+                            {# Save it anyway #}
+
+                            form.submit();
+                        }
+                    });
+
+                } else {
+
+                    {# Put the group members ID numbers into a CSV string for submission with the form #}
+
+                    $('#members').val(window.membersAdded.join());
+
+                    {# Send it off to the backend #}
+
+                    form.submit();
+                }
+            }
+
+        });
+
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+        {# Delete Group #}
+        {# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+        window.memberDelete = function(item) {
+            var memberItem = item.closest('li');
+            var memberId = item.attr('data-member-delete');
+
+            $(this).confirmDialog({
+
+                text: 'Are you sure you want to delete this person from the group?',
+                confirmEvent: function () {
+
+                    var index = window.membersAdded.indexOf(parseInt(memberId));
+
+                    if (index != -1) {
+                        window.membersAdded.splice(index, 1);
+                    }
+
+                    {# Remove from HTML #}
+
+                    memberItem.remove();
+
+                    if ($('#membersList').children('li').length == 0) {
+                        $('#membersListContainer').addClass('hide');
+                        $('#membersEmpty').removeClass('hide');
+                    }
+                }
+            });
+        };
+
+        $('[data-member-delete]').click(function(e) {
+            e.preventDefault();
+            window.memberDelete($(this));
+        });
+
+        {# If we were modifying an existing group in the database, add the javascript to allow deletion #}
+
+        {% if group is not empty %}
+            $('[data-delete]').click(function(e) {
+                e.preventDefault();
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated pastoral records.',
+                    confirmEvent: function () {
+                        $('#formDelete').submit();
+                    }
+                });
+            });
+        {% endif %}
+    });
+</script>
+
+{# --------------------------------------------------------------------------------------------------------------------------------------------#}
+{# Search modal stuff is fragmented in another templated to stop this getting much larger #}
+{# --------------------------------------------------------------------------------------------------------------------------------------------#}
+
+{% include '@pastoralManagement/fragments/searchModal.twig' %}

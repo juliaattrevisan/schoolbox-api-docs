@@ -1,0 +1,172 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care' ]
+) }}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Pastoral Care</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">Dashboard</h2>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="Pastoral Report Builder"></a>
+
+        {# Pastoral moderators can manage pastoral groups #}
+
+        {% if isRouteAuthorized('pastoralManagement.getGroups') %}
+            <a href="{{ routeLookup('pastoralManagement.getGroups') }}" class="icon-group" title="Manage Pastoral Groups"></a>
+        {% endif %}
+    </nav>
+</div>
+
+{# If the user has never viewed a pastoral record, show a welcome message #}
+
+{% if recentStudents is empty %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <h2>
+                    Welcome to the Pastoral Care Dashboard!
+                </h2>
+                <i class="icon-pastoral size-64 left"></i>
+                <p>
+                    It looks like this is the first time you have used the pastoral care system. Begin by searching for a students
+                    name, or the details of a pastoral record in the search box below. Once you start using the system this page will
+                    display your recently viewed students and any items which have been flagged by yourself and other staff as important.
+                </p>
+            </section>
+        </div>
+    </div>
+
+{% endif %}
+
+{% include '@pastoral/fragments/search.twig' %}
+
+{% set count = 0 %}
+
+{% if recentDashboard is not empty %}
+    {% set count = count + 1 %}
+{% endif %}
+
+{% if recentStudents is not empty %}
+    {% set count = count + 1 %}
+{% endif %}
+
+{% if groups is not empty %}
+    {% set count = count + 1 %}
+{% endif %}
+
+{% if count > 0 %}
+
+<div class="row">
+    {# Display recently searched student records #}
+
+    <div class="small-{{ 12 / count }} island">
+
+        {% if recentStudents is not empty %}
+
+            <h2 class="subheader">Recently Viewed Students</h2>
+            <p class="meta">You recently viewed these students records.</p>
+
+            <section>
+                <ul class="action-list">
+                    {% for student in recentStudents %}
+                        <li>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
+                                        {{ profile.imageSquare64(student) }}
+                                        <h3>{{ student.fullName }}</h3>
+                                    </a>
+                                    <p class="meta">{{ student.role.name }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+    </div>
+
+    {# Display high priority records #}
+
+    {% if recentDashboard is not empty %}
+
+        <div class="small-{{ 12 / count }} island">
+            <h2 class="subheader">Important Records</h2>
+            <p class="meta">The following records have been marked as important.</p>
+
+            <section>
+                <ul class="action-list">
+                    {% for record in recentDashboard %}
+                        <li>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href='{{ routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) }}'>
+                                        {{ profile.imageSquare64(record.student) }}
+                                        <h3>{{ record.student.fullName }}</h3>
+                                    </a>
+                                    <p class="meta">{{ record.heading }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+
+    {% endif %}
+
+    {% if groups | length %}
+        <div class="small-{{ 12 / count }} island">
+            <h2 class="subheader">Pastoral Group Memberships</h2>
+            <p class="meta">You are a member of the following pastoral groups.</p>
+            <section>
+                <ul class="action-list">
+                    {% for membership in groups %}
+                        <li>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    {{ profile.imageSquare64(membership.group.user) }}
+                                    {% if membership.group.user.id == user.id %}
+                                        {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
+                                            <a href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) }}" title="Modify Pastoral Group">
+                                        {% endif %}
+                                    {% endif %}
+                                        <h3>{{ membership.group.name }}</h3>
+                                    {% if membership.group.user.id == user.id %}
+                                        {% if isRouteAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                    <p class="meta">Group managed by
+                                        {% if membership.group.user.id == user.id %}
+                                            you
+                                        {% else %}
+                                            {{ membership.group.user.fullName }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+
+    {% endif %}
+</div>
+
+{% endif %}

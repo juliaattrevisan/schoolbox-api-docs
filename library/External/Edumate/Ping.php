@@ -8,16 +8,27 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class External_Edumate_Ping extends External_Edumate_Connection implements External_PingInterface {
+class External_Edumate_Ping extends External_Edumate_Connection implements External_PingInterface
+{
     /**
      * @inheritdoc
      */
-	public function isResponsive() {
+	public function isResponsive()
+    {
 		try {
 			parent::__construct();
 			return true;
-		}
-		catch (Exception $e) {}
+		} catch (Exception $e) {
+        }
+
 		return false;
 	}
+
+    /**
+     * @inheritdoc
+     */
+    public function getVersion()
+    {
+        return '';
+    }
 }

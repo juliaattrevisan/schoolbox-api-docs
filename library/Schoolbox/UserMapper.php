@@ -17,6 +17,7 @@ use Schoolbox;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Search\Results;
 use UnexpectedValueException;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Schoolbox\Mapper as BaseMapper;
@@ -481,6 +482,59 @@ class UserMapper extends Mapper
         $user = new User;
         $user->setLastname('Unknown User');
         return $user;
+    }
+
+    /**
+     * Do a keyword search for students
+     *
+     * @param $search
+     * @return Collection
+     */
+    public function findStudents($search)
+    {
+        $search = trim($search);
+
+        $students = new Collection();
+
+        $foundValidKeyword = false;
+
+        if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
+
+            // Only search if there are X or more characters
+
+            $keywordArray = explode(' ', $search);
+
+            $pb = $this->getPredicateBuilder();
+
+            foreach ($keywordArray as $keyword) {
+
+                if (strlen($keyword) >= Results::MIN_SEARCH_LENGTH) {
+
+                    // Each keyword must be long enough to search
+
+                    $foundValidKeyword = true;
+
+                    $pb->like('firstname', "%{$this->getDatabase()->escapeForLike($keyword)}%")
+                        ->like('lastname', "%{$this->getDatabase()->escapeForLike($keyword)}%");
+
+                }
+            }
+
+            // Had to have at least one valid keyword
+
+            if ($foundValidKeyword) {
+                $users = $this->findByPredicates($this->getPredicateBuilder()->any( $pb));
+
+                /** @var User $user */
+                foreach ($users as $user) {
+                    if ($user->getRole()->isStudent()) {
+                        $students->add($user);
+                    }
+                }
+            }
+        }
+
+        return $students;
     }
 
     /**

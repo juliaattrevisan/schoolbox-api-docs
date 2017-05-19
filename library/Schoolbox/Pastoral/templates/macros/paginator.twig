@@ -1,0 +1,90 @@
+{% macro text(pageCurrent, recordCount, resultsPerPage) %}
+    {% spaceless %}
+        {% if recordCount > resultsPerPage %}
+            Showing Records {{ ((pageCurrent - 1) * resultsPerPage) + 1 }} - {{ min(recordCount, ((pageCurrent - 1) * resultsPerPage) + resultsPerPage) }} Of {{ recordCount }}
+        {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+
+{# TODO: Front-end developer needs to make this thing properly pretty #}
+
+{% macro buttons(pageCurrent, recordCount, resultsPerPage, pagesToDisplay) %}
+    {% spaceless %}
+
+        <style>
+            .pagination li {
+                width: 40px !important;
+                text-align: center !important;
+            }
+        </style>
+
+        {# This is the maximum number of pages to display- this must be an even number#}
+
+        {% if pagesToDisplay is empty %}
+            {% set pagesToDisplay = 8 %}
+        {% endif %}
+
+        {# This is the number of records to display per page #}
+
+        {% if resultsPerPage is empty %}
+            {% set resultsPerPage = 15 %}
+        {% endif %}
+
+        {# Pagination is only relevant if we've got records to display #}
+
+        {% if recordCount > 0 %}
+            <div class="row paginator">
+                <div class="small-12 island">
+
+                    {# This is the total number of pages page on the number of results per page #}
+
+                    {% set totalPages = (recordCount / resultsPerPage) | round(0, 'ceil') %}
+
+                    {# We only want to show the paginator if there is more than one page to actually display #}
+
+                    {% if totalPages > 1 %}
+                        <ul class="pagination">
+                            {# Jump to first page link #}
+
+                            <li class="arrow  {% if pageCurrent == 1 %}unavailable{% endif %}">
+                                <a href="?pageCurrent=1">
+                                    &lt;&lt;
+                                </a>
+                            </li>
+
+                            {# Previous page link #}
+
+                            <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}">
+                                <a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}{% endif %}">
+                                    &lt;
+                                </a>
+                            </li>
+
+                            {% for i in range (max(1, pageCurrent - ( pagesToDisplay - (min(totalPages, pageCurrent +  pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2) ))) - pageCurrent))), min(totalPages, pageCurrent + pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2))))) %}
+                                <li {% if i == pageCurrent %} class='active' {% endif %}>
+                                    <a href="?pageCurrent={{ i }}">{{ i }}</a>
+                                </li>
+                            {% endfor %}
+
+                            {# Next page link #}
+
+                            <li class="arrow {% if pageCurrent == totalPages %}unavailable{% endif %}">
+                                <a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}{% endif %}">
+                                    &gt;
+                                </a>
+                            </li>
+
+                            {# Jump to last page link #}
+
+                            <li class="arrow {% if pageCurrent == totalPages %}unavailable{% endif %}">
+                                <a href="?pageCurrent={{ totalPages }}">
+                                    &gt;&gt;
+                                </a>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{%- endmacro %}

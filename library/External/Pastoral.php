@@ -1,23 +1,19 @@
 <?php
 /**
- *
  * @author      Damian Sloane <jdsloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  */
 
 use \Schoolbox\Pastoral\Model as PastoralModel;
 use \Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
+use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
 
 class External_Pastoral implements External_PastoralInterface
 {
-    /**
-     * @var External_PastoralInterface
-     */
+    /** @var External_PastoralInterface */
     private $database;
 
-    /**
-     * @var External_Offline_Pastoral
-     */
+    /** @var External_Offline_Pastoral */
     private $offline;
     
     /**
@@ -33,10 +29,15 @@ class External_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * Returns the pastoral record if found in remote system
-     *
-     * @param PastoralModel $pastoral
-     * @return array
+     * @inheritdoc
+     */
+    public function importPastoral($user, $defaultOwner, $importParentAccess)
+    {
+        return $this->getDatabase()->importPastoral($user, $defaultOwner, $importParentAccess);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getPastoral(PastoralModel $pastoral)
     {
@@ -44,18 +45,7 @@ class External_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * Import pastoral care records from external SIS
-     */
-    public function importPastoral($userId, $defaultOwnerId)
-    {
-        return $this->getDatabase()->importPastoral($userId, $defaultOwnerId);
-    }
-
-    /**
-     * Creates a new pastoral record in the remote system
-     *
-     * @param PastoralModel $pastoral
-     * @return mixed
+     * @inheritdoc
      */
     public function createPastoral(PastoralModel $pastoral)
     {
@@ -63,36 +53,11 @@ class External_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * Updates an existing pastoral assessment
-     *
-     * @param PastoralModel $pastoral
-     * @return mixed
+     * @inheritdoc
      */
     public function updatePastoral(PastoralModel $pastoral)
     {
         return $this->getDatabase()->updatePastoral($pastoral);
-    }
-
-    /**
-     * Creates a new pastoral comment in the remote system
-     *
-     * @param PastoralCommentModel $comment
-     * @return mixed
-     */
-    public function createComment(PastoralCommentModel $comment)
-    {
-        return $this->getDatabase()->createComment($comment);
-    }
-
-    /**
-     * Updates an existing pastoral comment
-     *
-     * @param PastoralCommentModel $comment
-     * @return mixed
-     */
-    public function updateComment(PastoralCommentModel $comment)
-    {
-        return $this->getDatabase()->updateComment($comment);
     }
 
     /**
@@ -104,6 +69,14 @@ class External_Pastoral implements External_PastoralInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function createComment(PastoralCommentModel $comment)
+    {
+        return $this->getDatabase()->createComment($comment);
+    }
+
+    /**
      * @inheritDoc
      */
     public function deleteComment(PastoralCommentModel $comment)
@@ -112,19 +85,29 @@ class External_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * @param mixed $database
+     * @inheritDoc
      */
-    public function setDatabase($database)
+    public function uploadPastoralDocument(UploadQueue $upload)
     {
-        $this->database = $database;
+        return $this->getDatabase()->uploadPastoralDocument($upload);
     }
 
     /**
-     * @return mixed
+     * @return External_PastoralInterface
      */
     public function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * @param External_PastoralInterface $database
+     * @return self
+     */
+    public function setDatabase($database)
+    {
+        $this->database = $database;
+        return $this;
     }
 
     /**
@@ -137,10 +120,11 @@ class External_Pastoral implements External_PastoralInterface
 
     /**
      * @param External_Offline_Pastoral $offline
+     * @return self
      */
     public function setOffline($offline)
     {
         $this->offline = $offline;
+        return $this;
     }
-
-} 
+}

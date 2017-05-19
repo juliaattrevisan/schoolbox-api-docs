@@ -1,0 +1,233 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ record.student.fullName,            routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
+[ record.heading ]
+) }}
+
+{% include '@pastoral/fragments/studentDetails.twig' with { student: record.student } %}
+
+<div class="row">
+    <div class="small-12 island">
+
+        <section>
+            {% include '@pastoral/fragments/pastoralCard.twig' with {record: record, showBody: false} %}
+
+            <div class="content">
+                {{ record.body | purify }}
+            </div>
+                {% if record.points != 0 or (record.tags | length) or record.private %}
+                    <div class="content">
+                        {% include '@pastoral/fragments/recordTags.twig' %}
+                    </div>
+                {% endif %}
+
+        </section>
+
+        {# Show revision history to moderators #}
+
+        {% if moderator %}
+            {% if record.revisions | length > 0 %}
+                {% set bodyPrevious = '' %}
+                {% set headingPrevious = '' %}
+                {% for revision in record.revisions %}
+                    {# Only division revisions if they are different #}
+                    {% if revision.body != bodyPrevious and revision.body != record.body or
+                          revision.heading != headingPrevious and revision.heading != record.heading %}
+                        {% if loop.first %}
+                            <h2 class="subheader" id="accordion">Revision History</h2>
+                            <dl class="accordion" data-accordion>
+                        {% endif %}
+                        {% set bodyPrevious = revision.body %}
+                        {% set headingPrevious = revision.heading %}
+                        <dd class="accordion-navigation">
+                            <a href="#revision-{{ loop.index }}">
+                                {{ revision.heading }}
+                                <span class="right">Edited by {{ revision.modifiedBy.fullName }} - {{ revision.updatedAt.long }}</span>
+                            </a>
+                            <div id="revision-{{ loop.index }}" class="content">
+                                {{ revision.body | purify }}
+                            </div>
+                        </dd>
+                    {% endif %}
+                {% endfor %}
+                {% if bodyPrevious is not empty %}
+                    </dl>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+        {% if record.attachments| length %}
+            <h2 class="subheader">Attached Files</h2>
+            <section>
+                {% for attachment in record.attachments %}
+                    <div class="card small-12">
+                        <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
+		            {% if attachment.storage.mimetype.isImage %}
+		                <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
+		                {% else %}
+		                <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
+		            {% endif %}
+                            {{ attachment.storage.filename }}
+                        </a>
+                        <p class="meta">{{ attachment.storage.size | bytes}}</p>
+                    </div>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        {# Parents cannot ever add/view comments or related records #}
+
+        {% if not user.role.isParent %}
+
+            {# Show related records #}
+
+            {% if record.relatedRecords | length > 1 %}
+
+                <h2 class="subheader">Other Students Involved</h2>
+                <section>
+                    <ul class="action-list">
+                        {% for related in record.relatedRecords %}
+                            {% if related.student.id != record.student.id %}
+                                <li>
+                                    <div class="small-12 card wrap-down">
+                                        <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
+                                        <p>
+                                            <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
+                                                {{ related.getHeading }}
+                                            </a>
+                                        </p>
+                                        <p class="spaced meta">{{ related.student.fullName }}</p>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+
+            {# Show comments #}
+
+            {% if record.comments | length %}
+                <h2 class="subheader">Comments</h2>
+                <section>
+                    <ul class="action-list">
+
+                        {# Show all comments for this record #}
+
+                        {% for comment in record.comments %}
+
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 card wrap-down">
+                                        {# Comment author photo #}
+                                        <a href="{{ profile.link(comment.owner) }}" title="View Profile">
+                                            {{ profile.imageSquare64(comment.owner) }}
+                                        </a>
+
+                                        {# Show comment author #}
+                                        <p class="meta">Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}</p>
+
+                                        {# Show comment body #}
+                                        <p class="spaced">
+                                            {{ comment.body | purify | nl2br }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
+
+                                {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
+                                    <nav>
+                                        <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
+                                    </nav>
+                                {% endif %}
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+
+            {% if record.comments | length == 0%}
+                <h2 class="subheader">Comments</h2>
+            {% endif %}
+
+            {% if isRouteAuthorized('pastoral.postCommentInsert', {record: record}) %}
+
+                {# Show add comment box #}
+                <section>
+                    <div class="content">
+                        <form method="post" action="{{ routeLookup('pastoral.postCommentInsert', {'recordId': record.id}) }}">
+                            <input type="hidden" name="pastoral_id" value="{{ record.id }}">
+                            <input type="hidden" name="student_id" value="{{ record.student.id }}">
+                            <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
+                            <input disabled data-post type="submit" class="expand" value="Add Comment">
+                        </form>
+                    </div>
+                </section>
+
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% if isRouteAuthorized('pastoral.postCommentInsert', {recordId: record.id}) %}
+
+    <script type="text/javascript">
+        $(function () {
+
+            // Disable post comment button if there is no comment
+
+            $('#body').on('change keyup paste', function() {
+                $('[data-post]').prop('disabled', $('#body').val().trim() === '');
+            });
+
+            // Delete pastoral record
+
+            $('[data-delete]').click(function(event) {
+                event.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this record?',
+                    confirmEvent: function() {
+                        $.post('{{ routeLookup('pastoral.postRecordDelete', {studentId: record.student.id, recordId: record.id}) }}')
+                            .done(function() {
+                                window.location.href = '{{ routeLookup('pastoral.getIndex', {studentId: record.student.id}) }}';
+                            });
+                    }
+                });
+            });
+
+            // Delete comment
+
+            $('[data-delete-comment]').click(function(event) {
+                event.preventDefault();
+
+                deleteCommentRoute = '{{ routeLookup('pastoral.postCommentDelete', {
+                        'recordId': 'recordId',
+                        'commentId': 'commentId'
+                    })
+                }}';
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this comment?',
+                    confirmEvent: function() {
+                        $.post(
+                            deleteCommentRoute
+                                .replace(/recordId/g, {{ record.id }})
+                                .replace(/commentId/g, $(event.target).attr('data-delete-comment'))
+                        ).success(function() {
+                            $(event.target).closest('li').remove();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endif %}

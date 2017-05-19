@@ -7,13 +7,14 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Pastoral\Tags;
+namespace Schoolbox\Pastoral\Tag;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Pastoral\Model as Pastoral;
 
 class Model implements ISoftDeletable, \JsonSerializable
 {
@@ -22,8 +23,8 @@ class Model implements ISoftDeletable, \JsonSerializable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var int */
-    protected $pastoralId;
+    /** @var Pastoral */
+    protected $pastoral;
 
     /** @var string */
     protected $name;
@@ -45,10 +46,24 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * Tags can be spawned inside a selectize
-     *
-     * If it returns a id/name tuple it can't work out when a new tag name
-     * is an id or an actual name
+     * @return Pastoral
+     */
+    public function getPastoral() {
+        return $this->pastoral;
+    }
+
+    /**
+     * @param $pastoral
+     * @return $this
+     */
+    public function setPastoral($pastoral) {
+        $this->pastoral = $pastoral;
+        return $this;
+    }
+
+    /**
+     * Tags can be spawned inside a selectize. If it returns a id/name tuple it can't work out when a new tag
+     * name is an id or an actual name
      *
      * @return array
      */

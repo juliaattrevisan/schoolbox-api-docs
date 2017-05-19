@@ -15,13 +15,21 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
+use Component_DefinitionMapper;
+use DueWork_ErrorMapper;
+use HouseMapper;
+use HouseResidentialMapper;
+use ReflectionClass;
+use ReflectionProperty;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
-use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
-use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
+use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
+use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
+use Timetable_ColourMapper;
 
 class Controller extends Base
 {
@@ -221,7 +229,29 @@ class Controller extends Base
         // This array defines the tables that can be updated
         // Note that they are NOT indexed by actual table name, but by an arbitrary key.
 
-        return [
+        $pastoralTypes = PastoralTypeMapper::getInstance()->findAll();
+
+        $luPastoralType = [];
+
+        foreach ($pastoralTypes as $type) {
+            $luPastoralType[] = [
+                'key' => $type->getId(),
+                'value' => $type->getName()
+            ];
+        }
+
+        $documentClassifications = PastoralDocumentClassificationMapper::getInstance()->findAll();
+
+        $luDocumentClassifications = [];
+
+        foreach ($documentClassifications as $classification) {
+            $luDocumentClassifications[] = [
+                'key' => $classification->getId(),
+                'value' => $classification->getName()
+            ];
+        }
+
+        $return = [
             'roles' => [
                 'title'             => 'Roles',                                 // Title of the tab
                 'delete'            => true,
@@ -257,7 +287,7 @@ class Controller extends Base
             ],
             'house' => [
                 'title'             => 'Houses',
-                'mapper'            => \HouseMapper::class,
+                'mapper'            => HouseMapper::class,
                 'fields'            => [
                     'house'         => [
                         'caption'   => 'Name',
@@ -267,7 +297,7 @@ class Controller extends Base
             ],
             'residential-house'    => [
                 'title'             => 'Residential Houses',
-                'mapper'            => \HouseResidentialMapper::class,
+                'mapper'            => HouseResidentialMapper::class,
                 'fields'            => [
                     'house'         => [
                         'caption'   => 'Name',
@@ -383,7 +413,7 @@ class Controller extends Base
             ],
             'submission-errors'     => [
                 'title'             => 'Submission States',
-                'mapper'            => \DueWork_ErrorMapper::class,
+                'mapper'            => DueWork_ErrorMapper::class,
                 'fields'            => [
                     'code'          => [
                         'caption'   => 'Code',
@@ -408,7 +438,7 @@ class Controller extends Base
             ],
             'component-definition'  => [
                 'title'             => 'Components',
-                'mapper'            => \Component_DefinitionMapper::class,
+                'mapper'            => Component_DefinitionMapper::class,
                 'findAllMethod'     => 'findAllIncludeHidden',
                 'fields'            => [
                     'module'        => [
@@ -438,7 +468,7 @@ class Controller extends Base
             ],
             'timetable-colour'   => [
                 'title'             => 'Timetable Colours',
-                'mapper'            => \Timetable_ColourMapper::class,
+                'mapper'            => Timetable_ColourMapper::class,
                 'fields'            => [
                     'id'            => [
                         'getter'    => 'getTimetableColourId',
@@ -453,35 +483,40 @@ class Controller extends Base
             ],
             'pastoral-type'      => [
                 'title'             => 'Pastoral Types',
-                'mapper'            => TypeMapper::class,
+                'mapper'            => PastoralTypeMapper::class,
                 'sort'              => 'name',
                 'fields'            => [
-                    'id'          => [
-                        'readonly'  => true,
-                        'caption'   => 'Pastoral Type ID',
-                        'width'     => 2,
-                    ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 8,
+                        'width'     => 6,
+                    ],
+                    'documentClassification' => [
+                        'getter'    => 'getDocumentClassification',
+                        'caption'   => 'SIS Document Classification',
+                        'lookup'    => $luDocumentClassifications,
+                        'mandatory' => false,
+                        'width'     => 3,
+                        'tooltip'   => 'This is document classification code that will be assigned to uploaded documents in your SIS for records of this type. These are defined in the Pastoral Document Classifications list.',
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
-                        'width'     => 2,
+                        'width'     => 3,
                         'tooltip'   => 'This is used when exporting pastoral care records to your SIS pastoral care module. This should be the matching code in your SIS lookup table for this pastoral record type (e.g. luPastoralCareType). If you are not using (or do not want to export back to) your external SIS pastoral care module this can be left blank.',
                     ],
                 ]
             ],
             'pastoral-category'    => [
                 'title'             => 'Pastoral Sub-Types',
-                'mapper'            => CategoryMapper::class,
+                'mapper'            => PastoralCategoryMapper::class,
                 'sort'              => 'pastoralTypeId',
                 'fields'            => [
-                    'pastoralTypeId' => [
-                        'getter'    => 'getPastoralTypeId',
-                        'caption'   => 'Parent Pastoral Type ID',
+                    'pastoralType' => [
+                        'getter'    => 'getPastoralType',
+                        'caption'   => 'Pastoral Type',
+                        'lookup'    => $luPastoralType,
+                        'mandatory' => true,
                         'width'     => 2,
-                        'tooltip'   => 'This is the ID number of the Pastoral Type under which this category will appear (refer to the \'Pastoral Types\' tab for a list of ID numbers).',
+                        'tooltip'   => 'This is the pastoral type under which this sub-type will appear.',
                     ],
                     'name'          => [
                         'caption'   => 'Name',
@@ -494,18 +529,50 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'pastoral-severity'    => [
-                'title'             => 'Pastoral Record Severity',
-                'mapper'            => SeverityMapper::class,
-                'sortable'          => 'order',
+            'pastoral-document-classification' => [
+                'title'             => 'Pastoral SIS Document Classifications',
+                'mapper'            => PastoralDocumentClassificationMapper::class,
+                'sort'              => 'name',
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 11,
+                        'width'     => 10,
+                    ],
+                    'externalCode' => [
+                        'caption'   => 'SIS Code',
+                        'width'     => 2,
+                        'tooltip'   => 'This is used when exporting pastoral care records to your SIS pastoral care module. This should be the matching code in your SIS lookup table for this pastoral record type (e.g. luDocumentClassification). If you are not using (or do not want to export back to) your external SIS pastoral care module this can be left blank.',
                     ],
                 ]
             ],
         ];
+
+        // If pastoral severities are disabled by policy, don't display item on the list screen
+
+        if ($this->getConfigLoader()->get('pastoral_severity')) {
+            $return['pastoral-severity'] = [
+                'title' => 'Pastoral Record Severity',
+                'mapper' => PastoralSeverityMapper::class,
+                'sortable' => 'order',
+                'fields' => [
+                    'name' => [
+                        'caption' => 'Name',
+                        'width' => 8,
+                    ],
+                    'dashboard' => [
+                        'caption' => 'Show On Pastoral Dashboard',
+                        'width' => 3,
+                        'mandatory' => true,
+                        'lookup' => [
+                            ['key' => '1', 'value' => 'Yes'],
+                            ['key' => '0', 'value' => 'No'],
+                        ],
+                    ],
+                ]
+            ];
+        }
+
+        return $return;
     }
 
     /**
@@ -535,8 +602,8 @@ class Controller extends Base
         $model_name = $mapper->getModel();
         $prototype  = new $model_name;
 
-        $reflect    = new \ReflectionClass($prototype);
-        $properties = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
+        $reflect    = new ReflectionClass($prototype);
+        $properties = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
 
         $records = [];
 
@@ -593,14 +660,20 @@ class Controller extends Base
 
                             $id = $row->$idGetter();
 
-                            if (!isset($records[$id]))
+                            if (!isset($records[$id])) {
                                 $records[$id] = [];
-
-                            if (method_exists($row->$getter(), 'getId')) {
-                                $records[$id][$prop->getName()] = $row->$getter()->getId();
-                            } else {
-                                $records[$id][$prop->getName()] = $row->$getter();
                             }
+
+                            $value = $row->$getter();
+
+                            // If we get an object back, we really want its ID
+
+                            if (is_object($value)) {
+                                /** @noinspection PhpUndefinedMethodInspection */
+                                $value = $value->getId();
+                            }
+
+                            $records[$id][$prop->getName()] = $value;
                         }
                     }
                 }

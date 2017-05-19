@@ -50,6 +50,8 @@ class Controller extends Base
 
         // External database checked 
 
+        $external_db_version = '';
+
         if(ConfigMapper::getInstance()->get('external_enable'))
         {
             $external_ping = new \External_Ping();
@@ -59,6 +61,7 @@ class Controller extends Base
                 $external_db = ucfirst(ConfigMapper::getInstance()->get('external_type'));
                 $external_db_light = 'success';
                 $external_db_status = 'Online';
+                $external_db_version = $external_ping->getVersion();
             }
             else
             {
@@ -237,6 +240,7 @@ class Controller extends Base
                     'memory_percentage' => $memory_percentage,
                     'memory_gradient' => $memory_gradient,
                     'external_db' => $external_db,
+                    'external_db_version' => $external_db_version,
                     'external_db_light' => $external_db_light,
                     'external_db_status' => $external_db_status,
                     'email_light' => $email_light,

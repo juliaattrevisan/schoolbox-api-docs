@@ -325,6 +325,45 @@ class Module {
     }
 
     /**
+     * Shortcut method to register routes with permissions
+     *
+     * The array structure passed should resemble something like this:
+     *
+     * $rulePastoralModeratorWrite = new IsPastoralModeratorWrite();
+     * $ruleStaff = new Rule\HasRole(Role::STAFF);
+     *
+     * $routes = [
+     *     'GET' => [
+     *         '/groups'                   => ['getGroups' => $rulePastoralModeratorWrite],           <-- Pass controller function as array key, and permission as value
+     *         '/groups/modify{/groupId}'  => ['getGroupsModify' => $rulePastoralModeratorWrite],
+     *         '/report'                   => 'getReport',                                            <-- If no rule, just pass string method name
+     *         '/report/builder'           => ['getReportBuilder' => $ruleStaff],
+     *         '/report/print'             => ['getReportPrint' => $ruleStaff],
+     *     ],
+     *     'POST' => [
+     *         '/groups/delete'            => ['postGroupsDelete' => $rulePastoralModeratorWrite],
+     *         '/groups/modify'            => ['postGroupsModify' =>$rulePastoralModeratorWrite],
+     *     ]
+     * ];
+     *
+     * @param array $routes
+     */
+    protected function registerRoutesArray($routes)
+    {
+        foreach ($routes as $httpMethod => $route) {
+            foreach ($route as $path => $controllerMethod) {
+                if (is_array($controllerMethod)) {
+                    foreach ($controllerMethod as $methodName => $permissions) {
+                        $this->register($httpMethod, $path, $methodName, $permissions);
+                    }
+                } else {
+                    $this->register($httpMethod, $path, $controllerMethod);
+                }
+            }
+        }
+    }
+
+    /**
      * Initializes any routes for this module, with a given base path.
      *
      * The base path for each route needs to match up to the name of the

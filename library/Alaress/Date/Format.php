@@ -47,6 +47,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     protected $warnings = array();
 
     const DATABASE_FORMAT = 'Y-m-d H:i:s';
+    const DATABASE_FORMAT_MS = 'Y-m-d H:i:s.u';
     const DATABASE_DATE_FORMAT = 'Y-m-d';
     const DATABASE_TIME_FORMAT = 'H:i:s';
     const TIMESTAMP = 'U';
@@ -151,8 +152,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * Static constructor: creates a new date, with the format based on
-     * URL_FORMAT.
+     * Static constructor: creates a new date, with the format based on URL_FORMAT.
      *
      * @param string                        $dateTime
      * @param DateTimeZone                  $timezone Optional timezone
@@ -173,6 +173,44 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         }
         // Zero out unset parts - IMO that's the least surprising behavior.
         return new static($dateTime, static::URL_FORMAT.'|', $timezone, $locale);
+    }
+
+    /**
+     * Static constructor: creates a new date, with the format based on DATABASE_FORMAT.
+     *
+     * @param string                        $dateTime
+     * @param DateTimeZone                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     *                                                new Alaress_Date_Locale_Config()
+     *
+     * @return static
+     */
+    public static function newDatabaseDate(
+        $dateTime,
+        DateTimeZone $timezone = null,
+        Alaress_Date_Locale_Interface $locale = null
+    ) {
+        if (!$locale instanceof Alaress_Date_Locale_Interface) {
+            // @codeCoverageIgnoreStart
+            $locale = new Alaress_Date_Locale_Config();
+            // @codeCoverageIgnoreEnd
+        }
+
+        // PDO_SQLSRV returns the time with milliseconds on the end- (e.g. "2017-03-10 17:53:50.000")
+        // this tries to work out which format ot use based on string length. Otherwise date function
+        // complains about trailing data.
+
+        if (strlen($dateTime) > 19) {
+            // Example: '2017-03-10 17:53:50.000'
+            $format = static::DATABASE_FORMAT_MS;
+        } else {
+
+            // Example: '2017-03-10 17:53:50'
+            $format = static::DATABASE_FORMAT;
+        }
+
+        // Zero out unset parts - IMO that's the least surprising behavior.
+        return new static($dateTime, $format.'|', $timezone, $locale);
     }
 
     /**
@@ -670,7 +708,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function toAtomString()
     {
         return $this->getDateTimeObject()->toAtomString();
-
     }
 
     /**
@@ -681,7 +718,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function toCookieString()
     {
         return $this->getDateTimeObject()->toCookieString();
-
     }
 
     /**
@@ -704,7 +740,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function toRfc822String()
     {
         return $this->getDateTimeObject()->toRfc822String();
-
     }
 
     /**

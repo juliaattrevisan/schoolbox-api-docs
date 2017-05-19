@@ -1,25 +1,25 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\Category;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Pastoral\Type\Model as PastoralType;
 use JsonSerializable;
 
-class Model implements ISoftDeletable, JsonSerializable {
-
-    /** @var int */
-    protected $id;
-
-    /** @var int */
-    protected $pastoralTypeId;
+class Model implements ISoftDeletable, JsonSerializable
+{
+    use Id;
+    use DeletedAtDate;
+    
+    /** @var PastoralType */
+    protected $pastoralType;
 
     /** @var string */
     protected $name;
@@ -27,16 +27,13 @@ class Model implements ISoftDeletable, JsonSerializable {
     /** @var string */
     protected $externalCode;
 
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
-
     /**
      * @param string $name
      * @return self
      */
     public function setName($name) {
         $this->name = $name;
-        return $name;
+        return $this;
     }
 
     /**
@@ -47,35 +44,19 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @param int $id
+     * @param PastoralType $pastoralType
      * @return self
      */
-    public function setId($id) {
-        $this->id = $id;
+    public function setPastoralType($pastoralType) {
+        $this->pastoralType = $pastoralType;
         return $this;
     }
 
     /**
-     * @return int
+     * @return PastoralType
      */
-    public function getId() {
-        return $this->id;
-    }
-
-    /**
-     * @param int $pastoralTypeId
-     * @return self
-     */
-    public function setPastoralTypeId($pastoralTypeId) {
-        $this->pastoralTypeId = $pastoralTypeId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPastoralTypeId() {
-        return $this->pastoralTypeId;
+    public function getPastoralType() {
+        return $this->pastoralType;
     }
 
     /**
@@ -95,31 +76,6 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted() {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
-    }
-
-    /**
      * Specify data which should be serialized to JSON
      *
      * @return array
@@ -130,5 +86,4 @@ class Model implements ISoftDeletable, JsonSerializable {
             'name'        => $this->getName(),
         );
     }
-
 }

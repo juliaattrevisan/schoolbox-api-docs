@@ -1,0 +1,105 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<ul class="information-list">
+    <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
+        <div class="list-item">
+            <div class="card small-12 wrap-down">
+                {# Only display link if the user is authorzied to view the record #}
+
+                {% if showBody %}
+                    {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
+                        <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
+                            {{ profile.imageSquare64(record.owner) }}
+                            <h3>{{ record.heading }}</h3>
+                        </a>
+                    {% else %}
+                        <h3>{{ record.heading }}</h3>
+                    {% endif %}
+
+                {% else %}
+
+                    {{ profile.imageSquare64(record.owner) }}
+                    <h3>{{ record.heading }}</h3>
+
+                {% endif %}
+
+                {# Display name of poster #}
+
+                <p class="spaced meta">
+                    Posted by <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a> {{ record.createdAt.short }}
+                </p>
+            </div>
+            {% if showBody %}
+                <article>
+                    <p class="spaced">
+                        {{ record.body | html2text | cutSentence(375, true) }}
+                    </p>
+
+                    {% if not user.role.isParent %}
+                        {% if showBody %}
+
+                            {# Show related records #}
+
+                            {% if record.relatedRecords | length > 1 %}
+                                <p class="spaced">
+                                    Linked Records:
+                                    {% for related in record.relatedRecords %}
+                                        {% if related.student.id != record.student.id %}
+                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">{{ related.student.fullName }}</a>{% if not loop.last %}, {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Record metddata #}
+
+                        {% include '@pastoral/fragments/recordMeta.twig' with {record: record, showBody: showBody} %}
+                        {# Display tags #}
+
+                        {% include '@pastoral/fragments/recordTags.twig' %}
+
+                    {% endif %}
+                </article>
+            {% endif %}
+        </div>
+
+        <nav>
+            {% if showBody %}
+                {# Modify record #}
+
+                {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
+                    <a class="icon-modify no-text"
+                       href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
+                       title="Modify"></a>
+                {% endif %}
+
+                {# Delete record #}
+
+                {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
+                    <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                {% endif %}
+            {% endif %}
+        </nav>
+    </li>
+</ul>
+
+{# Display attachments #}
+
+{% if record.attachments | length and showBody %}
+    {% for attachment in record.attachments %}
+        <div class="card small-12">
+            <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
+		{% if attachment.storage.mimetype.isImage %}
+                    <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
+		{% else %}
+                    <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
+		{% endif %}
+
+                {{ attachment.storage.filename }}
+            </a>
+            <p class="meta">{{ attachment.storage.size | bytes }}</p>
+        </div>
+    {% endfor %}
+{% endif %}
+

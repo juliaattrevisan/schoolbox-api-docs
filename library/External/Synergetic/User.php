@@ -100,7 +100,7 @@ class External_Synergetic_User implements External_UserInterface
                 // The cache has expired, overwrite it with the one from the SIS
 
                 $photoHandle = fopen($photoPath, "w");
-                fwrite($photoHandle, hex2bin($photo['Photo']));
+                fwrite($photoHandle, $photo['Photo']);
                 fclose($photoHandle);
             }
 

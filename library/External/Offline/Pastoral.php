@@ -9,17 +9,19 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-use \Schoolbox\Pastoral;
+use Schoolbox\Pastoral\Comment\Model as PastoralComment;
+use Schoolbox\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
 
 class External_Offline_Pastoral implements External_PastoralInterface
 {
     /**
      * Returns the pastoral record if it exists
      *
-     * @param \Schoolbox\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return array
      */
-    public function getPastoral(\Schoolbox\Pastoral\Model $pastoral)
+    public function getPastoral(PastoralModel $pastoral)
     {
         // NOOP
         return array();
@@ -28,10 +30,10 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * Creates a new pastoral record in the external database
      *
-     * @param \Schoolbox\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return array
      */
-    public function createPastoral(\Schoolbox\Pastoral\Model $pastoral)
+    public function createPastoral(PastoralModel $pastoral)
     {
         // NOOP
         return array();
@@ -40,66 +42,46 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * Updates an existing pastoral record
      *
-     * @param \Schoolbox\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return array
      */
-    public function updatePastoral(\Schoolbox\Pastoral\Model $pastoral)
+    public function updatePastoral(PastoralModel $pastoral)
     {
         // NOOP
         return array();
     }
 
     /**
-     * Returns the comment record if it exists
-     *
-     * @param \Schoolbox\Pastoral\Comment\Model $comment
-     * @return array
+     * @inheritdoc
      */
-    public function getComment(\Schoolbox\Pastoral\Comment\Model $comment)
+    public function createComment(PastoralComment $comment)
     {
         // NOOP
-        return array();
+        return false;
     }
 
     /**
-     * Creates a new comment record in the external database
-     *
-     * @param \Schoolbox\Pastoral\Comment\Model $comment
-     * @return array
+     * @inheritdoc
      */
-    public function createComment(\Schoolbox\Pastoral\Comment\Model $comment)
+    public function deleteComment(PastoralComment $comment)
     {
         // NOOP
-        return array();
+        return false;
     }
 
     /**
-     * Updates an existing comment record
-     *
-     * @param \Schoolbox\Pastoral\Comment\Model $comment
-     * @return array
+     * @inheritdoc
      */
-    public function updateComment(\Schoolbox\Pastoral\Comment\Model $comment)
+    public function uploadPastoralDocument(UploadQueue $upload)
     {
         // NOOP
-        return array();
+        return false;
     }
 
     /**
-     * Deletes an existing comment record
-     *
-     * @param \Schoolbox\Pastoral\Comment\Model $comment
-     * @return array
+     * @inheritdoc
      */
-    public function deleteComment(\Schoolbox\Pastoral\Comment\Model $comment)
-    {
-        // NOOP
-    }
-
-    /**
-     * Import pastoral care records from external SIS
-     */
-    public function importPastoral($userId)
+    public function importPastoral($userId, $defaultOwnerId, $importParentAccess)
     {
         // NOOP
     }
@@ -107,7 +89,7 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * @inheritDoc
      */
-    public function deletePastoral(\Schoolbox\Pastoral\Model $pastoral)
+    public function deletePastoral(PastoralModel $pastoral)
     {
         // NOOP
         return false;

@@ -78,6 +78,24 @@ class Base implements Serializable, IConnector
         return $this->broker->connect($options);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function enableMultipleActiveResultSets()
+    {
+        $this->broker->enableMultipleActiveResultSets();
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function disableMultipleActiveResultSets()
+    {
+        $this->broker->disableMultipleActiveResultSets();
+        return $this;
+    }
+
     // ----------------------------------------------------------------------------------------------------------------
     // Getters for the immutable properties
     // ----------------------------------------------------------------------------------------------------------------
@@ -205,7 +223,7 @@ class Base implements Serializable, IConnector
             $this->options = $options;
         }
 
-        unset($this->broker);
+        $this->broker->disconnect();
         return $this->broker->connect($this->options);
     }
 
@@ -331,6 +349,13 @@ class Base implements Serializable, IConnector
         /** @var IStoredProcedure $statement */
         $statement = $this->prepareStoredProcedure($procedure, $inputs, $outputs, $return);
         return $statement->executeIterator();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function lastInsertId($name = null) {
+        return $this->broker->lastInsertId($name);
     }
 
     // ----------------------------------------------------------------------------------------------------------------

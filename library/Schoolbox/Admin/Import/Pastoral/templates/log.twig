@@ -30,23 +30,38 @@
 
 <div class="small-12 island">
     <h2 class="subheader">Pastoral Care Import Logs</h2>
+    {% if message %}
+        <div data-alert class="alert-box">
+            Your pastoral import is now running, you will receive a notification once it has completed - alternatively
+            you can click on the most recent log record below to view its current progress.
+        </div>
+    {% endif %}
     {% if logs | length > 0 %}
-    <section>
-        <table>
-            {% for log in logs %}
-            <tr>
-                <td>
-                    <a href="/adminv2/import-pastoral/log/{{ log.import_id }}">{{ log.created_at.getLong }}</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </section>
-    <input type="submit" data-back value="Back">
+        <section>
+            <ul class="information-list">
+                {% for log in logs %}
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <img src="/portrait.php?userId={{ log.creator.externalId }}&amp;size=square64" alt="View Profile">
+                                <h3>{{ log.creator.fullName }} - {{ log.createdAt.short }}</h3>
+                                <p class="meta">Last Message - {{ log.result }}</p>
+                                <p></p>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-eye no-text" href="{{ routeLookup('adminImportPastoral.getLogDetail', {logId: log.importId}) }}" title="View Log"></a>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        <input type="submit" data-back value="Back">
     {% else %}
         <div class="empty-state">
             <i class="icon-pastoral"></i>
-            <p>No import logs found, return to <a href="/adminv2/import-pastoral">import screen</a></p>
+            <p>No log entries were found.</p>
+            <p>If you just started an import it may take a few seconds to start. <a href="{{ routeLookup('adminImportPastoral.getLog') }}" onclick="window.reload()">Click here to refresh the page</a>.</p>
         </div>
     {% endif %}
 </div>

@@ -1,6 +1,6 @@
 <?php
 /**
- * IsOwner - Determine if a pastoral record is owned by the logged in user
+ * Determine if a pastoral record is owned by the logged in user
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -11,6 +11,8 @@ namespace Schoolbox\Pastoral\Authorizer\Rule;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 
@@ -21,17 +23,25 @@ class IsOwner implements IAuthorizationRule
      */
     public function authorize(array $params = array(), User $user = null)
     {
-        // If there is no record then we have to assume they're creating a new one
-
         if (!isset($params['record'])) {
-            return true;
+            if (!isset($params['recordId'])) {
+                throw new Unauthorized();
+            } else {
+                try {
+                    $params['record'] = PastoralMapper::getInstance()->findById($params['recordId']);
+                } catch (MapperException $e) {
+                    throw new Unauthorized();
+                }
+            }
+        }
+
+        if (!$params['record'] instanceof Pastoral) {
+            throw new Unauthorized();
         }
 
         if ($params['record']->getOwner()->getId() == $user->getId()) {
             return true;
         }
-
-        // BZZZZZT! You're outta here.
 
         throw new Unauthorized();
     }

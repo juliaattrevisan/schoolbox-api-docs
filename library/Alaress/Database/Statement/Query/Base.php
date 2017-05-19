@@ -84,11 +84,18 @@ class Base extends BaseStatement
 
             if (is_array($value)) {
 
-                $this->parameters['input'][$key] = [];
                 $this->parameters['input'][$key] = [
                     'value' => $value['value'],
                     'type' => isset($value['type']) ? $this->getDataType($value, $value['type']) : null,
-                    'length' => isset($value['length']) ? $value['length'] : null
+                    'length' => isset($value['length']) ?
+
+                        // Parameters length was specified, use it
+
+                        $value['length'] :
+
+                        // Length was not specified, if the parameter is a string, use its length- otherwise pass NULL
+
+                        $this->getDataType($value, $value['type']) == PDO::PARAM_STR ? strlen($value['value']) : null
                 ];
 
             } else {
@@ -96,7 +103,15 @@ class Base extends BaseStatement
                 $this->parameters['input'][$key] = [
                     'value' => $value,
                     'type' => $this->getDataType($value),
-                    'length' => null
+                    'length' => isset($value['length']) ?
+
+                        // Parameters length was specified, use it
+
+                        $value['length'] :
+
+                        // Length was not specified, if the parameter is a string, use its length- otherwise pass NULL
+
+                        $this->getDataType($value) == PDO::PARAM_STR ? strlen($value) : null
                 ];
             }
         }
@@ -111,14 +126,17 @@ class Base extends BaseStatement
         /** @var PDOStatement $statement */
         $statement = $this->statement;
 
-        // Bind input parameters
-
         if (isset($this->parameters['input'])) {
             foreach ($this->parameters['input'] as $name => $input) {
-                $statement->bindValue(
-                    $name,
-                    $input['value']
-                );
+                if (isset($input['type'])) {
+                    if ($input['type'] == PDO::PARAM_LOB) {
+                        $statement->bindParam($name, $input['value'], PDO::PARAM_LOB, 0);
+                    } else {
+                        $statement->bindValue($name, $input['value'], $input['type']);
+                    }
+                } else {
+                    $statement->bindValue($name, $input['value']);
+                }
             }
         }
     }

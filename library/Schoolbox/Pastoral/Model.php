@@ -1,24 +1,29 @@
 <?php
 /**
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral;
 
-use Schoolbox\Pastoral;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Pastoral\Category\Model as PastoralCategory;
+use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
+use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\User;
-use Scrub;
 
 class Model implements ISoftDeletable
 {
-    /** @var int */
-    protected $id;
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /** @var int */
     protected $externalId;
@@ -26,16 +31,16 @@ class Model implements ISoftDeletable
     /** @var Model */
     protected $parent;
 
-    /** @var Pastoral\Type\Model */
+    /** @var PastoralType */
     protected $type;
 
-    /** @var Pastoral\Category\Model */
+    /** @var PastoralCategory */
     protected $category;
 
-    /** @var Pastoral\Severity\Model */
+    /** @var PastoralSeverity */
     protected $severity;
 
-    /** @var \Schoolbox\User */
+    /** @var User */
     protected $student;
 
     /** @var string */
@@ -44,7 +49,7 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $body;
 
-    /** @var int */
+    /** @var float */
     protected $points;
 
     /** @var bool */
@@ -53,67 +58,61 @@ class Model implements ISoftDeletable
     /** @var User */
     protected $owner;
 
-    /** @var Collection|Pastoral\Access\Model[] */
-    protected $accessList;
+    /** @var User */
+    protected $modifiedBy;
 
-    /** @var Collection|Pastoral\Comment\Model[] */
-    protected $commentList;
+    /** @var Collection */
+    protected $access;
 
-    /** @var Collection|Pastoral\Attachment\Model[] */
-    protected $attachmentList;
+    /** @var Collection */
+    protected $comments;
 
-    /** @var Collection|Pastoral\Tags\Model[] */
-    protected $tagsList;
+    /** @var Collection */
+    protected $attachments;
 
-    /** @var Collection|Model[] */
+    /** @var Collection */
+    protected $tags;
+
+    /** @var Collection */
     protected $relatedRecords;
 
-    /** @var \Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $updatedAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
-
-    /** @var Boolean */
-    protected $showPrivate;
+    /** @var Collection */
+    protected $revisions;
 
     /**
-     * @param  Collection|Pastoral\Access\Model[] $accessList
+     * @param  Collection $access
      * @return $this
      */
-    public function setAccessList($accessList)
+    public function setAccess($access)
     {
-        $this->accessList = $accessList;
+        $this->access = $access;
         return $this;
     }
 
     /**
-     * @return Collection|Pastoral\Access\Model[]
+     * @return Collection
      */
-    public function getAccessList()
+    public function getAccess()
     {
-        return $this->accessList;
+        return $this->access;
     }
 
     /**
-     * @param  Collection|Pastoral\Tags\Model[] $tagsList
+     * @param  Collection $tags
      * @return $this
      */
-    public function setTagsList($tagsList)
+    public function setTags($tags)
     {
-        $this->tagsList = $tagsList;
+        $this->tags = $tags;
         return $this;
     }
 
     /**
-     * @return Collection|Pastoral\Tags\Model[]
+     * @return Collection
      */
-    public function getTagsList()
+    public function getTags()
     {
-        return $this->tagsList;
+        return $this->tags;
     }
 
     /**
@@ -153,14 +152,6 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
-     */
-    public function getBodyText()
-    {
-        return Scrub::html2text($this->body);
-    }
-
-    /**
      * @param string $heading
      * @return self
      */
@@ -179,25 +170,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $points
+     * @param float $points
      * @return self
      */
     public function setPoints($points)
@@ -207,7 +180,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getPoints()
     {
@@ -215,38 +188,38 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection|Pastoral\Comment\Model[] $commentList
+     * @param Collection $comments
      * @return self
      */
-    public function setCommentList($commentList)
+    public function setComments($comments)
     {
-        $this->commentList = $commentList;
+        $this->comments = $comments;
         return $this;
     }
 
     /**
-     * @return Collection|Pastoral\Comment\Model[]
+     * @return Collection
      */
-    public function getCommentList()
+    public function getComments()
     {
-        return $this->commentList;
+        return $this->comments;
     }
 
     /**
-     * @return Collection|Pastoral\Attachment\Model[]
+     * @return Collection
      */
-    public function getAttachmentList()
+    public function getAttachments()
     {
-        return $this->attachmentList;
+        return $this->attachments;
     }
 
     /**
-     * @param Collection|Pastoral\Attachment\Model[] $attachmentList
+     * @param Collection $attachments
      * @return self
      */
-    public function setAttachmentList($attachmentList)
+    public function setAttachments($attachments)
     {
-        $this->attachmentList = $attachmentList;
+        $this->attachments = $attachments;
         return $this;
     }
 
@@ -269,7 +242,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Pastoral\Type\Model $type
+     * @param PastoralType $type
      * @return self
      */
     public function setType($type)
@@ -279,7 +252,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Pastoral\Type\Model
+     * @return PastoralType
      */
     public function getType()
     {
@@ -287,7 +260,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Pastoral\Category\Model $category
+     * @param PastoralCategory $category
      * @return self
      */
     public function setCategory($category)
@@ -297,7 +270,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Pastoral\Category\Model
+     * @return PastoralCategory
      */
     public function getCategory()
     {
@@ -323,7 +296,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Pastoral\Severity\Model $severity
+     * @param PastoralSeverity $severity
      * @return self
      */
     public function setSeverity($severity)
@@ -333,7 +306,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Pastoral\Severity\Model
+     * @return PastoralSeverity
      */
     public function getSeverity()
     {
@@ -377,68 +350,22 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param \Alaress_Date_Format $updatedAt
+     * @param User $modifiedBy
      * @return self
      */
-    public function setUpdatedAt($updatedAt)
+    public function setModifiedBy($modifiedBy)
     {
-        $this->updatedAt = $updatedAt;
+        $this->modifiedBy = $modifiedBy;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return User
      */
-    public function getUpdatedAt()
+    public function getModifiedBy()
     {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
-    }
+        return $this->modifiedBy;
+    }    
 
     /**
      * @param Collection|Model
@@ -457,18 +384,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Boolean
+     * @return Collection
      */
-    public function setShowPrivate($showPrivate)
-    {
-        $this->showPrivate = $showPrivate;
+    public function getRevisions() {
+        return $this->revisions;
     }
 
     /**
-     * @return Boolean
+     * @param Collection $revisions
+     * @return self
      */
-    public function getShowPrivate()
-    {
-        return $this->showPrivate;
+    public function setRevisions($revisions) {
+        $this->revisions = $revisions;
+        return $this;
     }
+
 }

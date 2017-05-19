@@ -1,6 +1,6 @@
 <?php
 /**
- * IsPastoralModerator - Determine if the logged in user is a pastoral moderator
+ * Determine if the logged in user is a pastoral moderator
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
