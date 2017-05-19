@@ -24,7 +24,6 @@ use \Schoolbox\Fixtures\Result\Model as Result;
 use \Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
-use Schoolbox\Mapper\Exception;
 
 class ComponentDelegate
 {
@@ -197,7 +196,7 @@ class ComponentDelegate
             }
 
             return $this->sortMatches($matches);
-        } catch (Exception $exception) {
+        } catch (MapperException $exception) {
             return $matches;
         }
     }
