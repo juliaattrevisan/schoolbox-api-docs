@@ -24,6 +24,7 @@ use \Schoolbox\Fixtures\Result\Model as Result;
 use \Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
+use Schoolbox\Mapper\Exception;
 
 class ComponentDelegate
 {
@@ -161,40 +162,44 @@ class ComponentDelegate
 
         // Get the team we are looking at
 
-        $team = $this->getTeamMapper()->findById($teamId);
+        try {
+            $team = $this->getTeamMapper()->findById($teamId);
 
-        // Load all home and away matches for the team
+            // Load all home and away matches for the team
 
-        $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
-        $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
+            $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
+            $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
 
-        $all_matches = $home_matches->mergeUnique($away_matches, 'id');
+            $all_matches = $home_matches->mergeUnique($away_matches, 'id');
 
-        // Filter matches
-        foreach ($all_matches as $match) {
-            if ($includeHistorical || $match->getStartAt()->isFuture()) {
-                $matches[$match->getId()] = $match;
-            }
-        }
-
-        // Are we getting matches that have been played ?
-        if ($includeHistorical) {
-            $playedMatchIds = [];
-            foreach ($matches as $match) {
-                // Has the match been played ?
-                if ($match->getStartAt()->isPast()) {
-                    $playedMatchIds[] = $match->getId();
+            // Filter matches
+            foreach ($all_matches as $match) {
+                if ($includeHistorical || $match->getStartAt()->isFuture()) {
+                    $matches[$match->getId()] = $match;
                 }
             }
-            /** @var Collection|Result[] $results */
-            $results = $this->getResultMapper()->findByColumnList(['match_id' => $playedMatchIds]);
 
-            foreach ($results as $result) {
-                $matches[$result->getMatch()->getId()]->getResults()[$result->getTeam()->getId()] = $result;
+            // Are we getting matches that have been played ?
+            if ($includeHistorical) {
+                $playedMatchIds = [];
+                foreach ($matches as $match) {
+                    // Has the match been played ?
+                    if ($match->getStartAt()->isPast()) {
+                        $playedMatchIds[] = $match->getId();
+                    }
+                }
+                /** @var Collection|Result[] $results */
+                $results = $this->getResultMapper()->findByColumnList(['match_id' => $playedMatchIds]);
+
+                foreach ($results as $result) {
+                    $matches[$result->getMatch()->getId()]->getResults()[$result->getTeam()->getId()] = $result;
+                }
             }
-        }
 
-        return $this->sortMatches($matches);
+            return $this->sortMatches($matches);
+        } catch (Exception $exception) {
+            return $matches;
+        }
     }
 
 
