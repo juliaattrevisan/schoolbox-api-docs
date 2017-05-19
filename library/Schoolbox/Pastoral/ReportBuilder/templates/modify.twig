@@ -204,12 +204,10 @@
 
 </script>
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Pastoral Care Reports</h1>
-            <h2 class="subheader">{{ pageTitle }}</h2>
-        </div>
+<div class="row">
+    <div class="small-12 column">
+        <h1>Pastoral Care Reports</h1>
+        <h2 class="subheader">{{ pageTitle }}</h2>
     </div>
 </div>
 
@@ -286,9 +284,7 @@
             </section>
 
             <h2 class="subheader">Record Types</h2>
-            <ul class="meta">
-                Select the record types you want to appear in the report
-            </ul>
+            <p class="meta">Select the record types you want to appear in the report</p>
             <section>
                 <div class="small-12 columns content">
                     <div class="checklist">
@@ -371,58 +367,72 @@
                         {# This is a hideous hack to display these in the right order #}
 
                         {% if order == 'student' %}
-                            <li class="row" data-order="student">
+                            <li data-order="student">
                                 <div>
                                     <div class="grip"></div>
-                                    <div class="card small-11">Student Name</div>
+                                    <div class="card small-12">
+                                        <p>Student Name</p>
+                                    </div>
                                 </div>
                             </li>
                         {% elseif order == 'date' %}
-                            <li class="row" data-order="date">
+                            <li data-order="date">
                                 <div>
                                     <div class="grip"></div>
-                                    <div class="card small-11">Published Date</div>
+                                    <div class="card small-12">
+                                        <p>Published Date</p>
+                                    </div>
                                 </div>
                             </li>
                         {% elseif order == 'year' %}
-                            <li class="row" data-order="year">
+                            <li data-order="year">
                                 <div>
                                     <div class="grip"></div>
-                                    <div class="card small-11">Year Level</div>
+                                    <div class="card small-12">
+                                        <p>Year Level</p>
+                                    </div>
                                 </div>
                             </li>
                         {% elseif order == 'points' %}
-                            <li class="row" data-order="points">
+                            <li data-order="points">
                                 <div>
                                     <div class="grip"></div>
-                                    <div class="card small-11">Points</div>
+                                    <div class="card small-12">
+                                        <p>Points</p>
+                                    </div>
                                 </div>
                             </li>
                         {% elseif order == 'category' %}
-                            <li class="row" data-order="category">
+                            <li data-order="category">
                                 <div>
                                     <div class="grip"></div>
-                                    <div class="card small-11">
-                                        Record Type
-                                        <div class="meta">({% for type in types %}{{ type.name }}{% if not loop.last %}, {% endif %}{% endfor %})</div>
+                                    <div class="card small-12 wrap-down">
+                                        <p>
+                                            Record Type
+                                            <span class="meta"> ({% for type in types %}{{ type.name }}{% if not loop.last %}, {% endif %}{% endfor %})</span>
+                                        </p>
                                     </div>
                                 </div>
                             </li>
                         {% elseif order == 'severity' and severities | length %}
-                            <li class="row" data-order="severity">
+                            <li data-order="severity">
                                 <div>
                                     <div class="grip"></div>
-                                    <div class="card small-11">
-                                        Severity
-                                        <div class="meta">({% for severity in severities %}{{ severity.name }}{% if not loop.last %}, {% endif %}{% endfor %})</div>
+                                    <div class="card small-12 wrap-down">
+                                        <p>
+                                            Severity
+                                            <span class="meta"> ({% for severity in severities %}{{ severity.name }}{% if not loop.last %}, {% endif %}{% endfor %})</span>
+                                        </p>
                                     </div>
                                 </div>
                             </li>
                         {% elseif order == 'author' %}
-                            <li class="row" data-order="author">
+                            <li data-order="author">
                                 <div>
                                     <div class="grip"></div>
-                                    <div class="card small-11">Author Name</div>
+                                    <div class="card small-12">
+                                        <p>Author Name</p>
+                                    </div>
                                 </div>
                             </li>
                         {% endif %}
