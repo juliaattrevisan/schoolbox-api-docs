@@ -17,7 +17,7 @@
 
     {# Only show details of comments if the user is authorized to make comments #}
 
-    {% if isRouteAuthorized('pastoral.postCommentSave') and showBody %}
+    {% if isRouteAuthorized('pastoral.postCommentInsert') and showBody %}
         {% if record.comments | length %}
             {{ record.comments | length }} Comment{% if record.comments | length > 1 %}s{% endif %} |
         {% endif %}
