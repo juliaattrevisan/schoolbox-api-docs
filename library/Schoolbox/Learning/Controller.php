@@ -229,13 +229,14 @@ class Controller extends Base
         $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->filterSelectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
 
         // Don't save selections if viewing someone else's pending assessments
+        // TODO Add ability to save per viewee. SA-3444
         if($viewee->getId() === $this->getUser()->getId()){
             $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
         // Convert Selection models to Filters
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filters              = $selectionTransformer->getFiltersDto();
+        $filters              = $selectionTransformer->buildFiltersDto();
 
         // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
         // regardless of any filter selections sent by user
