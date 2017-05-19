@@ -369,28 +369,45 @@ class Mapper extends BaseMapper
     {
         $statement = $this->database->prepare("
             SELECT DISTINCT   `student_id`,
-                              COUNT(*) AS `count`,
-                              `user`.`lastname` AS `last_name`, 
-                              `user`.`firstname` AS `first_name`
-            FROM              `pastoral`
-            JOIN              `user` ON `user`.`id` = `student_id`
-            WHERE             `pastoral`.`deleted_at` IS NULL AND
+              COUNT(*) AS `count`,
+              `user`.`lastname` AS `last_name`,
+              `user`.`firstname` AS `first_name`
+            FROM              `pastoral` p
+              JOIN              `user` ON `user`.`id` = `student_id`
+            WHERE             `p`.`deleted_at` IS NULL AND
                               `user`.`deleted_at` IS NULL AND
-                              `parent_id` IN (
+                              (
+                                p.`parent_id` IN (
                                   SELECT `id`
                                   FROM pastoral
-                                  WHERE 
-                                    `deleted_at` is null and (
-                                    `student_id` = :student_id_0) OR `pastoral`.`id` IN (SELECT `parent_id`
+                                  WHERE
+                                    `deleted_at` IS NULL AND (
+                                      `student_id` = :student_id_0) OR `pastoral`.`id` IN (SELECT `parent_id`
+                                                                                           FROM pastoral
+                                                                                           WHERE `student_id` = :student_id_1 AND `deleted_at` IS NULL))
+            
+                                OR
+                                  p.`id` IN (
+                                    SELECT `id`
+                                    FROM pastoral
+                                    WHERE
+                                      `deleted_at` IS NULL AND (
+                                        `student_id` = :student_id_2) OR `pastoral`.`id` IN (SELECT `parent_id`
                                                                                              FROM pastoral
-                                                                                             WHERE `student_id` = :student_id_1 AND `deleted_at` is null))
+                                                                                             WHERE `student_id` = :student_id_3 AND `deleted_at` IS NULL)
+                                  )
+                              )
+              AND student_id <> :student_id_4
             GROUP BY `student_id`
-            ORDER BY `count` DESC, `user`.`lastname`, `user`.`firstname`
+            ORDER BY `count` DESC, `user`.`lastname`, `user`.`firstname`            
         ");
 
         $statement->execute([
             ':student_id_0' => $student->getId(),
-            ':student_id_1' => $student->getId()
+            ':student_id_1' => $student->getId(),
+            ':student_id_2' => $student->getId(),
+            ':student_id_3' => $student->getId(),
+            ':student_id_4' => $student->getId()
         ]);
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
