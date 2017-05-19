@@ -99,8 +99,15 @@ class Controller extends Base
 
         try {
             $date = new Alaress_Date_Format($value, 'Y-m-d H:i:s');
+
         } catch (InvalidArgumentException $e) {
+            // if parsing the given date failed we still have to respond with a picker, so falling back
+            // to the current date is the only recourse. We do, however, log the failure if possible.
             $date = Alaress_Date_Format::now();
+
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error('Failed to parse date in picker init', $e);
+            }
         }
 
         // Don't bother calculating if the timetable is offline, we'll only display the calendar
