@@ -44,7 +44,7 @@ class KeyConverter extends AbstractKeyConverter
      *
      * @param string $key
      * @return int
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If key is invalid
      */
     public function getItem($key)
     {
