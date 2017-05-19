@@ -316,67 +316,6 @@ class Leave_Controller extends Controller
     }
 
     /**
-     * Render the dropdown for the start of Leave
-     *
-     * @param null $startTime
-     */
-    private function renderStartTimeDropdown($startTime = null)
-    {
-        $this->getPage()->setBlock(TEMPLATE_content, 'request_start_time', 'request_start_time_block');
-
-        /* Iterate through each option and preselect
-           */
-        foreach ($this->getTimeMap() as $value => $label) {
-            if ($startTime == $value) {
-                $selected = 'selected=\'selected\'';
-            } else {
-                $selected = '';
-            }
-
-            $this->getPage()->setVar(
-                array(
-                    'REQUEST_START_TIME_VALUE' => $value,
-                    'REQUEST_START_TIME_LABEL' => $label,
-                    'REQUEST_START_TIME_SELECTED' => $selected,
-                )
-            );
-
-            $this->getPage()->parse('request_start_time_block', 'request_start_time', true);
-        }
-    }
-
-    /**
-     * Render the dropdown for the end of Leave
-     *
-     * @param null $finishTime
-     */
-    private function renderFinishTimeDropdown($finishTime = null)
-    {
-        $this->getPage()->setBlock(TEMPLATE_content, 'request_finish_time', 'request_finish_time_block');
-
-        /* Iterate through each option and preselect
-           */
-        foreach ($this->getTimeMap() as $value => $label) {
-            if ($finishTime == $value) {
-                $selected = 'selected=\'selected\'';
-            } else {
-                $selected = '';
-            }
-
-            $this->getPage()->setVar(
-                array(
-                    'REQUEST_FINISH_TIME_VALUE' => $value,
-                    'REQUEST_FINISH_TIME_LABEL' => $label,
-                    'REQUEST_FINISH_TIME_SELECTED' => $selected,
-                )
-            );
-
-
-            $this->getPage()->parse('request_finish_time_block', 'request_finish_time', true);
-        }
-    }
-
-    /**
      * Execute create request
      *
      * @return array
@@ -411,8 +350,6 @@ class Leave_Controller extends Controller
            */
         $request = new Leave_Request();
 
-//        $this->renderStartTimeDropdown();
-//        $this->renderFinishTimeDropdown();
         $this->renderHostTypeDropdown($request);
 
         $this->getPage()->setVar($data);
@@ -755,8 +692,6 @@ class Leave_Controller extends Controller
 
         /* Render dropdowns
          */
-//        $this->renderStartTimeDropdown($request->getStart()->getDatabaseTime());
-//        $this->renderFinishTimeDropdown($request->getFinish()->getDatabaseTime());
         $this->renderHostTypeDropdown($request);
         $this->renderConfirmedByCheckboxes($request);
 
