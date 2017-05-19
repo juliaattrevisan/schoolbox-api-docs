@@ -159,7 +159,7 @@ class Controller extends Base
                 $bookingList = $this->saveBookingsForRecurrences(
                     $bookingList,
                     $this->getRequest()->post['repeat'],
-                    DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
+                    Alaress_Date_Format::newLocalShort($this->getRequest()->post['repeat_until'])->getDateTimeObject(),
                     $this->getRequest()->post['timetable']['campus']
                 );
             } else {
