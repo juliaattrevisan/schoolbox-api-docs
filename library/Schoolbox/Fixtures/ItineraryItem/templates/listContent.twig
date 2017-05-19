@@ -15,14 +15,10 @@
                 element.closest('[data-item]').find('[data-unsaved-indicator]').addClass('hide');
             },
             onCreate: function (element) {
-                element.find('[data-itinerary-date]').val($('[name=startAtDate]').val());
-                element.find('[data-itinerary-date]').datepicker();
-                element.find('[data-timepicker]').timepicker({
-                    appendTo: function ($input) {
-                        return $input.closest('.timepick');
-                    },
-                    scrollDefault: '08:00'
-                });
+                // Add datepicker
+                element.find('[data-datepicker]')
+                    .attr('id', 'itineraryDate-new-' + String(Date.now()))
+                    .alaressDateTimePicker();
             }
         });
     });

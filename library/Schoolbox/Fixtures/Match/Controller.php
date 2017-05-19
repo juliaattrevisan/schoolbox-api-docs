@@ -131,12 +131,12 @@ class Controller extends AbstractController
                 $isMatchesInCurrentSeason = true;
             }
 
-            if (!$currentMatch->getHomeTeam()->getId()) {
+            if (!$currentMatch->getHomeTeam() instanceof Team) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($currentMatch->getHomeSchool()->getName());
                 $currentMatch->setHomeTeam($facelessTeam);
             }
 
-            if (!$currentMatch->getAwayTeam()->getId()) {
+            if (!$currentMatch->getAwayTeam() instanceof Team) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($currentMatch->getAwaySchool()->getName());
                 $currentMatch->setAwayTeam($facelessTeam);
             }
@@ -311,7 +311,7 @@ class Controller extends AbstractController
 
         // Start At
         try {
-            $dateTime = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
+            $dateTime = $this->getRequest()->post['startAtDate'];
             $startAt  = \Alaress_Date_Format::newLocal($dateTime);
         } catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
@@ -366,7 +366,7 @@ class Controller extends AbstractController
             }
 
             try {
-                $datetime = Alaress_Date_Format::newLocal($itPost['date'][$i] . ' ' . $itPost['time'][$i]);
+                $datetime = Alaress_Date_Format::newLocal($itPost['date'][$i]);
             } catch (\InvalidArgumentException $e) {
                 continue;
             }

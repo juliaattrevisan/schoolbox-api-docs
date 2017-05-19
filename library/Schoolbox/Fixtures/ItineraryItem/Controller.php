@@ -171,8 +171,8 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
 
-        if (strlen($this->getRequest()->post['startAtDate']) && strlen($this->getRequest()->post['startAtTime'])) {
-            $date    = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
+        if (strlen($this->getRequest()->post['startAtDate'])) {
+            $date    = $this->getRequest()->post['startAtDate'];
             $startAt = \Alaress_Date_Format::newLocal($date);
         }
         else {

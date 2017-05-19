@@ -1,19 +1,11 @@
 <div class="list-item">
     <input type="hidden" name="itinerary[matchId][]" value="{{ match.id }}"/>
     <input type="hidden" name="itinerary[itemId][]" value="{{ itineraryItem.id }}"/>
-    <div class="column small-6 large-3 xlarge-2">
+    <div class="column small-12 large-6 xlarge-4">
         <label>
             Date
-            <input type="text" name="itinerary[date][]" placeholder="Date" {{ (itineraryItem.startAt.localShort) ? 'data-datepicker' : 'data-itinerary-date' }} value="{{ itineraryItem.startAt.localShort }}">
+            <input type="text" name="itinerary[date][]" id="itineraryDate-{{ itineraryItem.id }}" placeholder="Date" data-datepicker data-datepicker-time value="{{ itineraryItem.startAt.local }}">
         </label>
-    </div>
-    <div class="column small-6 large-3 xlarge-2">
-        <div class="timepick">
-            <label>
-                Time
-                <input type="text" name="itinerary[time][]" autocomplete="off" placeholder="Time" class="ui-timepicker-input" data-timepicker value="{{ itineraryItem.startAt.timeOnly }}">
-            </label>
-        </div>
     </div>
     <div class="small-12 large-6 xlarge-8 columns">
         <label>
