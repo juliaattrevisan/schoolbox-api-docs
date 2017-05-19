@@ -243,7 +243,6 @@ class Controller extends Base
         }
 
         // This is the number of pages the user is allowed to select from at any one time (Must be even)
-        // This is the number of pages the user is allowed to select from at any one time (Must be even)
 
         $pagesToDisplay = $this->getConfigLoader()->get('pastoral_page_visible');
 
@@ -291,6 +290,7 @@ class Controller extends Base
         $pastoralAuditMapper->save($auditRecord);
 
         // And spit this thing out
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoralReportBuilder/reportResults.twig',
