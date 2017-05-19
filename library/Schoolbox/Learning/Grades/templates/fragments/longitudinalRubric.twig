@@ -4,7 +4,7 @@
     Usage:
         longitudinalRubric    array
         student               User
-        markbook              Markbook
+        assessments           IAssessable[]
         returnUrlSuffix       string
 #}
 
@@ -33,7 +33,7 @@
                                             <ul class="information-list">
                                                 {% for activity in indicator.activities %}
                                                     <li>
-                                                        {% set activityAssessment = markbook.assessments.by('id', activity.id) %}
+                                                        {% set activityAssessment = assessments.by('id', activity.id) %}
                                                         {% if activityAssessment %}
                                                             {%- set activityHref = routeLookupIfAuthorized(
                                                                 'learningAssessment.getSummary',
