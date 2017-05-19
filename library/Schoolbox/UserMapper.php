@@ -508,7 +508,7 @@ class UserMapper extends Mapper
 
             foreach ($keywordArray as $keyword) {
 
-                if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
+                if (strlen($keyword) >= Results::MIN_SEARCH_LENGTH) {
 
                     // Each keyword must be long enough to search
 
