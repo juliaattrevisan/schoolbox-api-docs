@@ -844,8 +844,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $code_mapper = $this->getJoinMapper('codes');
-
         /** @var HomepageConfigMapper $homepageConfig_mapper */
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
