@@ -42,6 +42,7 @@ use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Learning\Assessment\DueWork;
 
 class Controller extends Base
 {
@@ -406,14 +407,7 @@ class Controller extends Base
 
         $graph = $this->buildGraph($canSeeGraph, $aggregateMarkbook, $viewee);
 
-
-
-
-        // One rubric graph for all filtered assessments TODO
-//        $longitudinalRubrics = new Collection();
-//        foreach($selectedFolders as $folder){
-//            $longitudinalRubrics[$folder->getId()] = $this->getLongitudinalRubricData($folder, $viewee, $term);
-//        }
+        $longitudinalRubric = $this->getLongitudinalRubricData($assessments, $viewee);
 
 
         $this->getResponse()->content->set($this->buildJsonOutput([
@@ -428,7 +422,7 @@ class Controller extends Base
                 'returnUrlSuffix'        => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
                 'conversationsPerFolder' => $conversationsPerFolder,
 
-//            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term),
+            'longitudinalRubric' => $longitudinalRubric,
 
             ])->getAsString(),
         ]));
@@ -557,23 +551,24 @@ class Controller extends Base
     }
 
 
-
     /**
-     * @param Folder\Model     $subject
-     * @param User       $student
-     * @param null|Alaress_Date_Format $start
-     * @param null|Alaress_Date_Format $end
+     * @param GenericCollection|IAssessable[] $assessments
+     * @param User                            $student
      * @return array
-     * @todo rewrite this to take a set of terms to make it more efficient, also, it should match filtered assessments only
      */
-    protected function getLongitudinalRubricData(Folder\Model $subject, User $student, Alaress_Date_Format $start = null, Alaress_Date_Format $end = null)
+    protected function getLongitudinalRubricData(GenericCollection $assessments, User $student)
     {
         if (!$this->getConfigLoader()->get('enable_grades_criteria')) {
             // only populate this if we're actually allowed to see it
             return [];
         }
 
-        return $this->getRubricMapper()->getLongitudinal($subject, $student, $start, $end);
+        // Filter out anything but due work
+        $dueWorks = $assessments->filter(function(IAssessable $assessment){
+            return $assessment instanceof DueWork\Model;
+        });
+
+        return $this->getRubricMapper()->getLongitudinal($dueWorks, $student);
     }
 
 

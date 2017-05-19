@@ -906,41 +906,42 @@ class RubricMapper
 
     /**
      * Specialised query for returning the longitudinal cross-section of rubric data for a
-     * student in a subject, optionally date-restricted according to the DUE date of the
-     * assessment. Data is returned in a primitive hierarchy of:
+     * student and set of DueWorks. Data is returned in a primitive hierarchy of:
      *   - capability
      *   - indicator
      *   - assessment
      *   - descriptor (student result)
      *
-     * @param Folder              $subject
-     * @param User                $student
-     * @param Alaress_Date_Format $noEarlierThan
-     * @param Alaress_Date_Format $noLaterThan
-     * @return array
+     * @param GenericCollection|DueWork\Model[] $dueWorks
+     * @param User                              $student
+     * @return array $longitude
+     * @var array  $longitude[$capability]
+     * @var string $longitude[$capability]['name']
+     * @var array  $longitude[$capability][$indicator]
+     * @var string $longitude[$capability][$indicator]['name']
+     * @var array  $longitude[$capability][$indicator]['activities']
+     * @var array  $longitude[$capability][$indicator]['activities'][$assessmentId]
+     * @var int    $longitude[$capability][$indicator]['activities'][$assessmentId]['id']
+     * @var string $longitude[$capability][$indicator]['activities'][$assessmentId]['name']
+     * @var string $longitude[$capability][$indicator]['activities'][$assessmentId]['descriptor']
      */
-    public function getLongitudinal(Folder $subject, User $student, Alaress_Date_Format $noEarlierThan = null, Alaress_Date_Format $noLaterThan = null)
+    public function getLongitudinal(GenericCollection $dueWorks, User $student)
     {
+        if(0 === $dueWorks->count()){
+            return [];
+        }
+
         $pb = new Builder($this->database, '');
 
         $pb
-            ->equals('rc.parent_type', 'category')
-            ->equals('rc.parent_id', $subject->getId())
+            ->equals('sb.assessment_id', $dueWorks->getColumnValues('id'))
             ->equals('rm.student_id', $student->getId())
-            ->isNull('rc.deleted_at')
-            ->isNull('rl.deleted_at')
-            ->isNull('rd.deleted_at')
-            ->isNull('a.deleted_at')
             ->notNull('rm.published_at')
-            ->isTrue('rm.valid');
-
-        if ($noEarlierThan) {
-            $pb->notLessThan('a.due_date', $noEarlierThan->getDatabase());
-        }
-
-        if ($noLaterThan && !$noLaterThan instanceof \Alaress_Date_NullDate) {
-            $pb->notGreaterThan('a.due_date', $noLaterThan->getDatabase());
-        }
+            ->isTrue('rm.valid')
+            ->isNull('rd.deleted_at')
+            ->isNull('rl.deleted_at')
+            ->isNull('rc.deleted_at')
+            ->isNull('a.deleted_at');
 
         $where = implode(' AND ', $pb->getWhere());
 
@@ -958,27 +959,24 @@ class RubricMapper
 
         $stmt = $this->database->prepare("
             SELECT rc.grouping, rc.name, a.id, a.title, rd.description
-            FROM rubric_criterion rc
-            JOIN rubric_usage ru      ON rc.id                = ru.criterion_id
-            JOIN submission_box sb    ON ru.submission_box_id = sb.id
-            JOIN assessment a         ON sb.assessment_id     = a.id
-            JOIN rubric_level rl      ON sb.id                = rl.box_id
-            JOIN rubric_descriptor rd ON rd.level_id          = rl.id           AND rd.criterion_id = rc.id
-            JOIN rubric_mark rm       ON rm.descriptor_id     = rd.id
+            FROM assessment         a
+            JOIN submission_box    sb ON  a.id = sb.assessment_id
+            JOIN rubric_level      rl ON sb.id = rl.box_id
+            JOIN rubric_descriptor rd ON rl.id = rd.level_id
+            JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
+            JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
             JOIN (
-                SELECT sb.id AS 'sb.id', rc.id as 'rc.id', max(rm.published_at) AS 'rm.max_published_at'
-                FROM rubric_mark rm
+                SELECT a.id AS 'a.id', rd.criterion_id AS 'rc.id', max(rm.published_at) AS 'rm.max_published_at'
+                FROM rubric_mark       rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-                JOIN rubric_criterion rc  ON rc.id = rd.criterion_id
-                JOIN rubric_usage ru      ON rc.id = ru.criterion_id
-                JOIN rubric_level rl      ON rl.id = rd.level_id
-                JOIN submission_box sb    ON sb.id = rl.box_id                  AND ru.submission_box_id = sb.id
-                JOIN assessment a         ON a.id = sb.assessment_id
+                JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
+                JOIN rubric_level      rl ON rl.id = rd.level_id
+                JOIN submission_box    sb ON sb.id = rl.box_id
+                JOIN assessment         a ON  a.id = sb.assessment_id
                 WHERE {$where}
-                GROUP BY sb.id, rc.id
+                GROUP BY sb.assessment_id, rd.criterion_id
             ) t
-            WHERE {$where}
-            AND `sb`.`id` = `t`.`sb.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
+            WHERE `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `rm`.`published_at` = `t`.`rm.max_published_at`
             ORDER BY rc.grouping ASC, rc.name ASC, a.due_date DESC;
         ");
 
