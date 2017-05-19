@@ -88,14 +88,14 @@
                     <div class="small-6 columns">
                         <label for="startDate">
                             Leaving
-                            <input name="request[start][date]" id="startDate" type="text" required data-datepicker />
+                            <input name="request[start][date]" id="startDate" type="text" required data-datepicker data-datepicker-time data-datepicker-sync data-datepicker-sync-enddate="#endDate" size="15" maxlength="30" />
                         </label>
                     </div>
                     <div class="small-6 columns">
                         <label for="finishDate">
                             Returning
                         </label>
-                        <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker />
+                        <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker data-datepicker-time size="15" maxlength="30" />
                     </div>
                 </fieldset>
 
