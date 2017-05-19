@@ -376,7 +376,7 @@ class Controller extends Base
             array(
                 'template' => '@statistics/topVisitors.twig',
                 'data' => [
-                    'pageRoute' => 'topVisitors',
+                    'pageRoute' => 'getTopVisitors',
                     'folder' => $folder,
                     'startDate' => $this->getStartDate()->getYear() . '-' . $this->getStartDate()->getMonth(1),
                     'endDate' => $this->getEndDate()->getYear() . '-' . $this->getEndDate()->getMonth(1),
