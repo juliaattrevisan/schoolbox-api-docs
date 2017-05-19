@@ -131,12 +131,12 @@ class Controller extends AbstractController
                 $isMatchesInCurrentSeason = true;
             }
 
-            if (!$currentMatch->getHomeTeam()->getId()) {
+            if (!$currentMatch->getHomeTeam() instanceof Team) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($currentMatch->getHomeSchool()->getName());
                 $currentMatch->setHomeTeam($facelessTeam);
             }
 
-            if (!$currentMatch->getAwayTeam()->getId()) {
+            if (!$currentMatch->getAwayTeam() instanceof Team) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($currentMatch->getAwaySchool()->getName());
                 $currentMatch->setAwayTeam($facelessTeam);
             }
