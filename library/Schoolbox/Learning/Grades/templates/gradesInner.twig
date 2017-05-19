@@ -1,7 +1,18 @@
 {#
-    TODO - purpose
+    Displays aggregate grade data for a set of assessments.
 
-    TODO - usage
+    Also renders the teacher + comment section for each student-involved folder selected in the filter panel.
+
+    Usage:
+        'student'                User
+        'canSeeGradeAverage'     bool
+        'folders'                Folder[]         All folders available in filter panel
+        'aggregateMarkbook'      Markbook         Markbook made up of assessments that match filters
+        'canSeeGraph'            bool
+        'graph'                  array
+        'returnUrlSuffix'        string
+        'conversationsPerFolder' Conversation[]   Conversations of selected folders, indexed by folder.id
+        'longitudinalRubric'     TODO
 #}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -18,6 +29,13 @@
     $(function () {
         $('[data-collapser="true"]').collapsable({
             container: '[data-collapse-container]'
+        });
+
+
+        $('[data-teacher-comment-selector]').on('change', function(){
+            var folderId = $(this).find(':selected').val();
+            $('[data-teacher-comments]').hide();
+            $('[data-teacher-comments=' + folderId + ']').show();
         });
 
         /* Set up comment abilities: post
@@ -153,3 +171,112 @@
     </div>
 
 {% endif %}
+
+
+{# Teachers and Comments for all student-involved folders #}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Comments (per Class / Group)</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <select title="Select a class / group to view teachers and comments" data-teacher-comment-selector>
+            <option value="" disabled selected>Select a Class / Group</option>
+            {% for folderId, conversations in conversationsPerFolder %}
+                <option value="{{ folderId }}">{{ folders[folderId].title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+{% for folderId, conversation in conversationsPerFolder %}
+    <div data-teacher-comments="{{ folderId }}" class="row" style="display: none;">
+        <div class="small-12 large-6 island">
+            <h2 class="subheader">Teachers</h2>
+            <section>
+                <ul class="action-list">
+                    {% for teacher in folders[folderId].teachers %}
+                        <li>
+                            <div class="small-12 card">
+                                <a href="/search/user/{{ teacher.id }}" title="View Profile">
+                                    <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
+                                         alt="{{ teacher.fullName }}">
+                                    <p>{{ teacher.fullName }}</p>
+                                </a>
+                                <p class="meta">Teacher</p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+
+        {% set comments   = conversation.getVisibleComments(USER) %}
+        {% set canComment = conversation.canComment(USER) %}
+
+        {% if comments|length or canComment %}
+            <div class="small-12 island">
+                <h2 class="subheader">Comments</h2>
+            </div>
+        {% endif %}
+        {% if canComment %}
+            <div class="small-12 columns">
+                <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
+                    <input type="hidden" name="studentId" value="{{ viewee.id }}"/>
+                    <input type="hidden" name="categoryId" value="{{ folderId }}"/>
+                    <textarea title="TODO" name="comment" rows="3"></textarea>
+                    <div class="row">
+                        <div class="small-6 medium-offset-6 medium-3 column">
+                            <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
+                            <label for="vis-student" class="checkbox-label">Visible To Student</label>
+                        </div>
+                        <div class="small-6 medium-3 column">
+                            <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
+                            <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
+                        </div>
+                    </div>
+                    <a class="button expand submit" data-comment-post="new">Post to {{ folders[folderId].title }}</a>
+                </form>
+            </div>
+        {% endif %}
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list" data-comment-list>
+                    {% for comment in comments %}
+                        <li class="actions-small-2" data-id="{{ comment.id }}">
+                            <div class="list-item">
+                                <div class="small-10 card">
+                                    <a href="/search/user/{{ comment.commenter.id }}" title="View Profile">
+                                        <img src="/portrait.php?userId={{ comment.commenter.externalId }}&size=square64" alt="{{ comment.commenter.fullName }}" />
+                                        <p>{{ comment.commenter.fullName }}</p>
+                                    </a>
+                                    <p class="meta">{{ comment.commenter.role.name }}</p>
+                                    <p class="meta">{{ comment.createdAt.relativeTime }}</p>
+                                </div>
+                                <div class="small-2 column content">
+                            <span class="icon-staff-students {% if comment.studentVisibility %}on{% else %}off{% endif %}"
+                                  title="{% if comment.studentVisibility %}Visible to {% else %}Hidden from {% endif %}student"></span>
+                                    <span class="icon-staff {% if comment.parentVisibility %}on{% else %}off{% endif %}"
+                                          title="{% if comment.parentVisibility %}Visible to {% else %}Hidden from {% endif %}parents"></span>
+                                </div>
+                            </div>
+                            <nav>
+                                {% if canComment %}
+                                    <a class="icon-delete" title="Delete" data-comment-delete></a>
+                                    <a class="icon-modify" title="Modify" data-comment-modify></a>
+                                {% endif %}
+                            </nav>
+                            <article>
+                                <p>
+                                    {{ comment.body | purify }}
+                                </p>
+                            </article>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+{% endfor %}

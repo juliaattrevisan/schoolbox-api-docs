@@ -302,7 +302,7 @@ class Controller extends Base
      * @throws \ReflectionException If a specified filter definition class cannot be found
      * @throws \DomainException If the filter FactoryFactory has not defined its filterable entity
      * @throws ServiceNotFound If unable to fetch the HTML output renderer from the DI
-     * @throws DefinitionException If specified mapper join is not defined
+
      */
     public function getGrades(User $viewee)
     {
@@ -318,44 +318,10 @@ class Controller extends Base
             $pageTitle .= " for {$viewee->getFullName()}";
         }
 
-        $involvedFolders = $this->findFoldersWithStudentInteractions($viewee);
-
-        // Grab the students conversation history (this also implicitly loads teachers)
-        $conversationsPerFolder = new GenericCollection(Conversation::class);
-        foreach($involvedFolders as $soleFolder){
-            $conversationsPerFolder[$soleFolder->getId()] = new Conversation($this->getConfigLoader(), $viewee, $soleFolder);
-        }
-
-        // Is a single folder being filtered to
-
-        /** @var AssessmentFilters\StudentFolder\Component $folderComponent */
-        $folderComponent = $filterPanel->getComponents()[AssessmentFilters\StudentFolder\Definition::class];
-
-        /** @var GenericCollection|FilterSelection\Model[] $selections */
-        $selections = $folderComponent->toContext()['userSelections'];
-        $soleSelectedFolderId = null;
-        foreach($selections as $selection){
-            // Is this folder selected?
-            if($selection->getSelected()){
-                // But we already encountered a selected folder?
-                if(null !== $soleSelectedFolderId){
-                    // Set it to null and conclude we do not have a sole-selected folder
-                    $soleSelectedFolderId = null;
-                    break;
-                }
-                // This may be the sole-selected folder, but we need to examine the rest to be sure.
-                $soleSelectedFolderId = $selection->getKey();
-            }
-        }
-        $soleFolder = $involvedFolders[$soleSelectedFolderId];
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learningGrades/gradesOuter.twig', [
                 'viewee'                 => $viewee,
                 'filterPanel'            => $filterPanel,
-                'soleFolder'             => $soleFolder,
-                'folders'                => $involvedFolders,
-                'conversationsPerFolder' => $conversationsPerFolder,
             ])->setTab('grade')->setTitle($pageTitle)
         );
     }
@@ -368,6 +334,7 @@ class Controller extends Base
      * @throws \DomainException If this class has not defined what entity it is filtering
      * @throws Filter\BrokenFilterException If a filter is unable to be processed
      * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws DefinitionException If specified mapper join is not defined
      * @todo merge the with getGrades() and distinguish via synchronous vs AJAX
      */
     public function postGrades(User $viewee)
@@ -389,30 +356,36 @@ class Controller extends Base
 
         // Convert Selection models to Filters
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filters              = $selectionTransformer->buildFiltersDto();
+        $filtersDto           = $selectionTransformer->buildFiltersDto();
 
         // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
         // regardless of any filter selections sent by user
         $unitSpecFilter = $this->filterMapper->findByClass(AssessmentFilters\NullableContext\UnitSpec\Definition::class)->first();
-        $filters->setSelections($unitSpecFilter, new Collection());
+        $filtersDto->setSelections($unitSpecFilter, new Collection());
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters->getByClass());
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filtersDto->getByClass());
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
 
+        $studentFolders = $this->findFoldersWithStudentInteractions($viewee);
+        $selectedFolders = $this->folderMapper->createCollection();
 
-        // Fetch all folders
-        $folders = $this->folderMapper->createCollection();
-        foreach($assessments as $assessment){
-            $folder = $assessment->getBaseContext()->getFolder();
-            $folders[$folder->getId()] = $folder;
+        // Load students conversation history (this also implicitly loads teachers) for each folder selected in panel
+        $selectedFolderIds = $filtersDto->getByClass()[AssessmentFilters\StudentFolder\Definition::class];
+        $conversationsPerFolder = new GenericCollection(Conversation::class);
+
+        foreach($selectedFolderIds as $folderId){
+            $stubFolder = $this->folderMapper->createModel($folderId);
+            $selectedFolders[$folderId] = $studentFolders[$folderId];
+            $conversationsPerFolder[$folderId] = new Conversation($this->getConfigLoader(), $viewee, $stubFolder);
         }
+
 
         // Instructors can see the graph regardless of the config settings. (they must have WRITE+ perm to all folders)
         $isInstructor = true;
-        foreach($folders as $folder){
+        foreach($selectedFolders as $folder){
             if(!$this->getAccess()->isInstructor($this->getUser(), $folder)){
                 $isInstructor = false;
                 break;
@@ -438,7 +411,7 @@ class Controller extends Base
 
         // One rubric graph for all filtered assessments TODO
 //        $longitudinalRubrics = new Collection();
-//        foreach($folders as $folder){
+//        foreach($selectedFolders as $folder){
 //            $longitudinalRubrics[$folder->getId()] = $this->getLongitudinalRubricData($folder, $viewee, $term);
 //        }
 
@@ -446,13 +419,15 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
-                'student'            => $viewee,
-                'canSeeGradeAverage' => $canSeeGradeAverage,
-                'folders'            => $folders,
-                'aggregateMarkbook'  => $aggregateMarkbook,
-                'canSeeGraph'        => $canSeeGraph,
-                'graph'              => $graph,
-                'returnUrlSuffix'    => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
+                'student'                => $viewee,
+                'canSeeGradeAverage'     => $canSeeGradeAverage,
+                'folders'                => $selectedFolders,
+                'aggregateMarkbook'      => $aggregateMarkbook,
+                'canSeeGraph'            => $canSeeGraph,
+                'graph'                  => $graph,
+                'returnUrlSuffix'        => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
+                'conversationsPerFolder' => $conversationsPerFolder,
+
 //            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term),
 
             ])->getAsString(),
@@ -589,7 +564,7 @@ class Controller extends Base
      * @param null|Alaress_Date_Format $start
      * @param null|Alaress_Date_Format $end
      * @return array
-     * @todo rewrite this to take a set of terms to make it more efficient
+     * @todo rewrite this to take a set of terms to make it more efficient, also, it should match filtered assessments only
      */
     protected function getLongitudinalRubricData(Folder\Model $subject, User $student, Alaress_Date_Format $start = null, Alaress_Date_Format $end = null)
     {
