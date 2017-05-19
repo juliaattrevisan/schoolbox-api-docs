@@ -140,8 +140,8 @@ class Controller extends Base
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
-            $event->setStartDateTime(new Alaress_Date_Format($this->getDateFromForm('start_datetime')));
-            $event->setEndDateTime(new Alaress_Date_Format($this->getDateFromForm('end_datetime')));
+            $event->setStartDateTime(Alaress_Date_Format::newLocal($this->getRequest()->post['startDate']));
+            $event->setEndDateTime(Alaress_Date_Format::newLocal($this->getRequest()->post['endDate']));
             $event->setTitle("Booking: " . $item->getName());
             $event->setDetail($this->getRequest()->post['notes']);
 
@@ -242,8 +242,8 @@ class Controller extends Base
             ;
             $series = $this->getUpdatedSeries(
                 $item,
-                $this->getDateFromForm('start_datetime'),
-                $this->getDateFromForm('end_datetime'),
+                Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
+                Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
                 $this->request->post['efficacy'],
                 $isTimeChanged
@@ -512,17 +512,18 @@ class Controller extends Base
         // Check:
         // Beginning and end of booking are valid datetime
         // (These checks can't be overridden.)
+        // TODO rewrite start/end checks to use Alaress_Date_Format directly
         $errors    = array();
         $startDate = null;
         $endDate   = null;
         try {
-            $startDate = $this->getDateFromForm('start_datetime');
-        } catch (\UnexpectedValueException $e) {
+            $startDate = Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject();
+        } catch (\Exception $e) {
             $errors['start_datetime'][] = 'invalid';
         }
         try {
-            $endDate = $this->getDateFromForm('end_datetime');
-        } catch (\UnexpectedValueException $e) {
+            $endDate = Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject();
+        } catch (\Exception $e) {
             $errors['end_datetime'][] = 'invalid';
         }
 
