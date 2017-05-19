@@ -63,6 +63,9 @@ class Model implements ISoftDeletable
         $isRoleTypeRule = !empty($this->getRoleType());
         $isRoleRule     = $this->getRole() instanceof Role;
         $isCampusRule   = $this->getCampus() instanceof Campus;
+        $campusMatch    = false;
+        $roleMatch      = false;
+        $roleTypeMatch  = false;
 
         // This is a generic rule - it matches all users
         if (!($isRoleTypeRule || $isRoleRule || $isCampusRule)) {
@@ -71,25 +74,25 @@ class Model implements ISoftDeletable
 
         // Roletype match
         if ($isRoleTypeRule && $this->getRoleType() == $user->getRole()->getType()) {
-            return true;
+            $roleTypeMatch = true;
         }
 
         // Role match
         if ($isRoleRule && $this->getRole()->getId() == $user->getRole()->getId()) {
-            return true;
+            $roleMatch = true;
         }
 
         // Campus match
         if ($isCampusRule) {
             foreach ($user->getCampusCollection() as $campus) {
                 if ($this->getCampus()->getId() == $campus->getId()) {
-                    return true;
+                    $campusMatch = true;
                 }
             }
         }
 
-        // No match
-        return false;
+        //All rules that are set are applied
+        return ((!$isCampusRule || $campusMatch) && (!$isRoleRule || $roleMatch) && (!$isRoleTypeRule || $roleTypeMatch));
     }
 
     /**

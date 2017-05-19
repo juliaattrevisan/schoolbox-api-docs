@@ -286,29 +286,34 @@ class Controller extends Base
                     ],
                     'path'           => [
                         'caption'   => 'Path',
-                        'width'     => 2,
+                        'width'     => 3,
                         'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
                     ],
                     'usernamePrefix' => [
-                        'caption'   => 'Username Prefix',
-                        'width'     => 2,
+                        'tooltip'   => 'String will be placed infront of username when authenticating, commonly a domain string like "domain/"',
+                        'caption'   => 'User Prefix',
+                        'width'     => 1,
                     ],
                     'usernameSuffix' => [
-                        'caption'   => 'Suffix',
+                        'tooltip'   => 'String will be placed at the end of username when authenticating, commonly a domain string like "@domain.edu"',
+                        'caption'   => 'User Suffix',
                         'width'     => 1,
                     ],
                     'campus'        => [
                         'caption'   => 'Campus',
+                        'tooltip'   => 'Drive will only display to users of this type, can be left blank',
                         'width'     => 1,
                         'lookup'    => array_merge($luEmpty, $luCampus),
                     ],
                     'roleType'      => [
                         'caption'   => 'Role Type',
+                        'tooltip'   => 'Drive will only display to users of this type, can be left blank',
                         'width'     => 1,
                         'lookup'    => array_merge($luEmpty, $luRoleType),
                     ],
                     'role'        => [
                         'caption'   => 'Role',
+                        'tooltip'   => 'Drive will only display to users of this type, can be left blank',
                         'width'     => 1,
                         'lookup'    => array_merge($luEmpty, $luRole),
                     ],
