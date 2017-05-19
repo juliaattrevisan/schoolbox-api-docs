@@ -69,7 +69,7 @@
                     <div class="small-6 columns">
                         <label for="startDate">
                             Leaving
-                            <input name="request[start][date]" id="startDate" type="text" required data-datepicker data-datepicker-time data-datepicker-sync data-datepicker-sync-enddate="#endDate" size="15" maxlength="30" value="{REQUEST_START_DATE}" />
+                            <input name="request[start][date]" id="startDate" type="text" required data-datepicker data-datepicker-time data-datepicker-sync data-datepicker-sync-enddate="#finishDate" size="15" maxlength="30" value="{REQUEST_START_DATE}" />
                         </label>
                     </div>
                     <div class="small-6 columns">
@@ -158,6 +158,8 @@
     </div>
 </div>
 
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.warning-length.js"></script>
 <script type="text/javascript">
     $(function () {
