@@ -1,4 +1,3 @@
-<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
@@ -88,14 +87,6 @@
         });
 
         // Ensure match is scheduled within the season
-        $('[data-datepicker]').datepicker();
-
-        $('#matchForm').find('[data-timepicker]').timepicker({
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            },
-            scrollDefault: '08:00'
-        });
 
         $('#homeTeam').selectizeSelector({
             {% if match.homeTeam.id -%}
@@ -246,27 +237,18 @@
                         </label>
                     </div>
 
-                    <div class="column small-12 medium-4">
+                    <div class="column small-12 medium-6">
                         <label>
                             Season
                             <input id="season" name="seasonId" type="text" value='' placeholder="Search Seasons" />
                         </label>
                     </div>
 
-                    <div class="column small-12 medium-4">
+                    <div class="column small-12 medium-6">
                         <label>
                             Date
-                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.localShort }}">
+                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker data-datepicker-time value="{{ match.startAt.local }}">
                         </label>
-                    </div>
-
-                    <div class="column small-12 medium-4">
-                        <div class="timepick">
-                            <label>
-                                Time
-                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ match.startAt.timeOnly }}">
-                            </label>
-                        </div>
                     </div>
 
                     <div class="small-12 columns">
