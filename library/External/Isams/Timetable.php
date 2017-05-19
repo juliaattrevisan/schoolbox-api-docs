@@ -279,7 +279,7 @@ class External_Isams_Timetable implements External_TimetableInterface
                     V_TimetableSchedule.ClassCode AS ClassCode,
                     Tutor1ID AS StaffID
             FROM    V_TimetableSchedule
-            JOIN    V_TimetableStructure ON V_TimetableStructure.PeriodID = V_TimetableScheduled.PeriodID 
+            JOIN    V_TimetableStructure ON V_TimetableStructure.PeriodID = V_TimetableSchedule.PeriodID 
             JOIN    V_Class ON V_Class.ClassCode = V_TimetableSchedule.ClassCode
             JOIN    V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
             JOIN    V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
