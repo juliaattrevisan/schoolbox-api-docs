@@ -860,11 +860,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
-            $testId = $row['id'];
+            $folderId = $row['id'];
 
             // create if not exists
-            if (!array_key_exists($testId, $categories)) {
-                $category = $categories[$testId] = $this->hydrate($row);
+            if (!array_key_exists($folderId, $categories)) {
+                $category = $categories[$folderId] = $this->hydrate($row);
 
                 /** @var HomepageConfig $homepageConfig */
                 $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
@@ -891,7 +891,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $code = $code_mapper->hydrate($row, 'cc');
 
             if ($code->getFolder() instanceof Model) {
-                $addedClassCodes[$testId][$code->getCode()] = $code;
+                $addedClassCodes[$folderId][$code->getCode()] = $code;
             }
 
             // Hydrate curriculum node codes (avoiding duplicates) and cache
@@ -902,7 +902,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $joinMapper = $this->getJoinMapper('curriculum_node_for_category');
             $curriculumNode = $joinMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
             if ($curriculumNode) {
-                $addedCurriculumNodes[$testId][$curriculumNode->getId()] = $curriculumNode;
+                $addedCurriculumNodes[$folderId][$curriculumNode->getId()] = $curriculumNode;
             }
         }
 
