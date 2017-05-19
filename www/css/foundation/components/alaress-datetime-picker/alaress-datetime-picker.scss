@@ -126,16 +126,11 @@ $pickr-month-padding: 5px;
             margin-right: 0;
         }
 
-        &.pickerSingle.pickerNarrow {
-            width: 375px;
-        }
-        &.pickerSingle.pickerWide {
+        &.pickerSingle {
             width: 435px;
         }
-        &.pickerDouble.pickerNarrow {
-            width: 720px;
-        }
-        &.pickerDouble.pickerWide {
+
+        &.pickerDouble {
             width: 750px;
         }
     }
@@ -144,55 +139,91 @@ $pickr-month-padding: 5px;
     /**
      * Timetable picker
      */
-    table.timetablePicker {
-        padding: 0;
-        margin: 0;
-        border: 1px solid rgb(230, 230, 230);
+    .adtp-tt-container {
+        border: 1px solid #e6e6e6;
+        padding: 0.75rem;
+        margin-bottom: .25rem;
+    }
 
-        td {
-            padding: 0;
-            margin: 0;
-            vertical-align: middle;
-            text-align: center;
-        }
+    .adtp-tt-date {
+        margin-bottom: .25rem;
+        padding-bottom: .5rem;
+        text-align: right;
+    }
 
-        th {
-            width: 36px;
-            height: 36px;
-            border: 1px solid #ededed;
-            text-align: center;
-            background: #c1e5ff;
-        }
+    .day-picker {
+        width: 100%;
+        /*margin-bottom: .5rem;*/
+    }
 
-        .has-period {
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            border-radius: 150px;
-            border: 3px solid #fff;
-            margin-left: auto;
-            margin-right: auto;
-        }
+    .day-cell {
+        /*border-right: 1px solid #ccc;*/
+        display: inline-block;
+        height: 2rem;
+        line-height: 2rem;
+        text-align: center;
+        font-size: 0.875rem;
+        cursor: pointer;
+        min-width: 40px;
+        height: 40px;
+        line-height: 40px;
+        padding: 0 .75rem;
+        border-radius: 150px;
 
-        .has-period:hover,
-        .period-hover {
+        &:hover:not(.disabled) {
             background: #e5f4ff;
         }
 
-        .has-period.period-selected {
-            background: #0066b0;
+        &:last-child {
+            border-right: none;
         }
 
-        .period-selected {
+        &.class {
+            background: #eee;
+        }
+
+        &.disabled {
+            color: rgba(57, 57, 57, 0.3);
+        }
+
+        &.active {
             background: #0066b0;
             color: #fff;
         }
+    }
 
-        .period-description {
-            border-right: 1px solid #ededed;
-            font-size: $small-font-size;
-            padding: 0 2px;
-        }
+    .adtp-tt-weeks {
+        display: inline-block;
+        flex-grow: 1;
+    }
+
+    .adtp-tt-week {
+        text-align: center;
+    }
+
+    .adtp-tt-week-number {
+        font-size: 1.1875rem;
+    }
+
+    .adtp-tt-week-date {
+        font-size: 0.75rem;
+    }
+
+    .adtp-tt-week-selector {
+        display: flex;
+        margin-bottom: 1rem;
+        user-select: none;
+    }
+
+    .adtp-tt-week-next,
+    .adtp-tt-week-prev {
+        line-height: 45px;
+        cursor: pointer;
+    }
+
+    .adtp-tt-week-next,
+    .adtp-tt-week-prev:hover {
+        color: #959ea9;
     }
 
     input[type=radio]:not(.plain) + label.input-toggle {
@@ -201,9 +232,11 @@ $pickr-month-padding: 5px;
     }
 
     span.displayDate {
-        font-size: 0.875rem;
-        font-weight: 400;
-        color: #000;
+        color: #333;
+    }
+
+    .adtp-tt-week-bold {
+        font-weight: 700;
     }
 
 
