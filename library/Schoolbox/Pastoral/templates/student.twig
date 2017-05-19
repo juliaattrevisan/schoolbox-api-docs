@@ -43,7 +43,7 @@
         <div class="empty-state">
             <i class="icon-pastoral"></i>
             <p>There are no pastoral records {% if typeSelected is not empty %}of this type{% endif %} available for {{ student.fullName }}.</p>
-            {% if isRouteAuthorized('pastoral.getStudentRecordInsert') %}
+            {% if isRouteAuthorized('pastoral.getStudentRecordInsertForm') %}
                 <p>
                     You can <a href="{{ routeLookup('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) }}">create a new
                     pastoral record</a> now{% if typeSelected is not empty %} or <a href="{{ routeLookup('pastoral.getStudent', {'studentId': student.id}) }}">remove your pastoral type filter</a>{% endif %}.</a>
