@@ -219,9 +219,14 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     $externalHandler = new External_User();
                     $allParents = $externalHandler->getParentEmails($synergyIds);
 
-                    /* Uniquify emails
-                    */
-                    $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
+                    if(is_array($allParents)) {
+                        /* Uniquify emails
+                        */
+                        $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
+                    }
+                    else {
+                        $emailAllParents = '';
+                    }
 
                     $this->setVar([
                         'REPLY_TO'          => $this->getUser()->getEmail(),
