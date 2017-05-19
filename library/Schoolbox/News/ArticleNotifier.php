@@ -99,7 +99,8 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		/** @var Article $article */
 		$article = $this->mapper->findById($article->getId());
 
-		if($hash = $article->getImage()->getHash()) {
+		if(is_object($article->getImage())) {
+            $hash = $article->getImage()->getHash();
 			$icon = "/storage/image.php?hash=$hash&size=square64";
             $thumb = "/storage/image.php?hash=$hash&size=square200";
 		}
