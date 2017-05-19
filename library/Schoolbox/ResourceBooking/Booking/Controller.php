@@ -775,30 +775,6 @@ class Controller extends Base
     }
 
     /**
-     * Creates a date object out of the datepicker and inputs.
-     *
-     * @param  string $paramName
-     *
-     * @return DateTime
-     * @throws \UnexpectedValueException if creating the date doesn't work
-     */
-    protected function getDateFromForm($paramName)
-    {
-        try {
-            $dateObject = Alaress_Date_Format::newLocalShort($this->getRequest()->post[$paramName]['date'])
-                ->set12Hour(
-                    $this->getRequest()->post[$paramName]['hour'],
-                    $this->getRequest()->post[$paramName]['meridien']
-                )
-                ->setMinute($this->getRequest()->post[$paramName]['minute'])
-            ;
-        } catch (\Exception $e) {
-            throw new \UnexpectedValueException('Could not build date out of form inputs', 0, $e);
-        }
-        return $dateObject->getDateTimeObject();
-    }
-
-    /**
      * Gets selected related items out of the form, along with notes and name.
      *
      * @return array
