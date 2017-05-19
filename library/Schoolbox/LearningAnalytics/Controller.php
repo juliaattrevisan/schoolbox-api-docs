@@ -27,8 +27,8 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType as SubmissionType;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use \Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 
 class Controller extends Base
@@ -40,20 +40,20 @@ class Controller extends Base
     /** @var FolderMapper */
     private $folderMapper;
 
-    /** @var SubmissionTypeMapper */
-    private $submissionTypeMapper;
+    /** @var WorkTypeMapper */
+    private $workTypeMapper;
 
 
     /**
      * @param TermMapper           $termMapper
      * @param FolderMapper         $folderMapper
-     * @param SubmissionTypeMapper $submissionTypeMapper
+     * @param WorkTypeMapper $workTypeMapper
      */
-    public function __construct(TermMapper $termMapper, FolderMapper $folderMapper, SubmissionTypeMapper $submissionTypeMapper)
+    public function __construct(TermMapper $termMapper, FolderMapper $folderMapper, WorkTypeMapper $workTypeMapper)
     {
         $this->termMapper           = $termMapper;
         $this->folderMapper         = $folderMapper;
-        $this->submissionTypeMapper = $submissionTypeMapper;
+        $this->workTypeMapper       = $workTypeMapper;
     }
 
 
@@ -122,7 +122,7 @@ class Controller extends Base
      * @param Collection|UnitImplementation[] $unitImplsInTerm
      * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
-     * @param SubmissionType                  $submissionType
+     * @param WorkType                  $submissionType
      * @throws ApplicationException
      * @throws \DomainException
      * @throws MapperException
@@ -132,7 +132,7 @@ class Controller extends Base
         Collection $unitImplsInTerm,
         Collection $dueAssessments,
         Term $term,
-        SubmissionType $submissionType
+        WorkType $submissionType
     ) {
         $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'course', null, $submissionType);
     }
@@ -217,7 +217,7 @@ class Controller extends Base
      * @param Collection|UnitImplementation[] $unitImplsInTerm
      * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
-     * @param SubmissionType                  $submissionType
+     * @param WorkType                  $submissionType
      * @throws ApplicationException
      * @throws \DomainException
      * @throws MapperException
@@ -228,7 +228,7 @@ class Controller extends Base
         Collection $unitImplsInTerm,
         Collection $dueAssessments,
         Term $term,
-        SubmissionType $submissionType
+        WorkType $submissionType
     ) {
         $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'folder', $classFolder, $submissionType);
     }
@@ -306,7 +306,7 @@ class Controller extends Base
      * @param Term                            $term                term to filter
      * @param Folder                          $classFolder         if given, the class folder to filter
      * @param string                          $routeType           'course'|'folder'
-     * @param null|SubmissionType             $submissionType      if specified, a submission type filter
+     * @param null|WorkType             $submissionType      if specified, a submission type filter
      * @throws ApplicationException
      * @throws \DomainException
      * @throws MapperException
@@ -318,7 +318,7 @@ class Controller extends Base
         Term $term,
         $routeType,
         Folder $classFolder = null,
-        SubmissionType $submissionType = null
+        WorkType $submissionType = null
     ) {
         $analysis = new CohortAnalysis($dueAssessments, $classFolder, $submissionType);
 
@@ -348,7 +348,7 @@ class Controller extends Base
             'courseSpec'          => $courseSpecification,
             'classFolder'         => $classFolder,
             'submissionType'      => $submissionType,
-            'submissionTypes'     => $this->submissionTypeMapper->findAll(),
+            'submissionTypes'     => $this->workTypeMapper->findAll(),
             'currentRoute'        => $this->getRouter()->getMatchedRoute()->name,
             'route'               => $routeType,
             'classFolders'        => $courseImplementationFolders,
