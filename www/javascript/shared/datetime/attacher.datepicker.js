@@ -25,7 +25,7 @@
                 $(this).alaressDateTimePicker();
 
                 // delegate blurs to text inputs
-                $(this).on('blur', '[type=text]', function (e) {
+                $(this).on('blur', function (e) {
                     var t = e.target;
 
                     $(t).prop('readonly', true);
