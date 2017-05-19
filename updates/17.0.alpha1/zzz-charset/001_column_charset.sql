@@ -237,7 +237,7 @@ ALTER TABLE luCampus MODIFY ext_timetable_code varchar(255) CHARACTER SET utf8mb
 ALTER TABLE luEventType MODIFY eventType varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE luEventType MODIFY eventColour varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE luResidentialHouse MODIFY name varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE luServices MODIFY name varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE lu_service MODIFY name varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE luTitle MODIFY titleName varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE lu_config_field MODIFY field varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE lu_config_type MODIFY type varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
