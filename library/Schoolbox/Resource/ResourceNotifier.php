@@ -164,8 +164,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             try {
                 $resource = $log->getObject();
                 $user = $log->getUser();
-                $time = $log->getTimestamp()
-                    ->getUnixTimestamp();
+                $time = $log->getTimestamp()->getUnixTimeStamp();
 
                 if ($user instanceof User) {
                     switch ($log->getAction()) {
