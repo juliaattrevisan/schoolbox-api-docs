@@ -25,6 +25,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
@@ -876,6 +877,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $category->setHomepage($homepageConfig);
                 $category->setGroup($group);
 
+                /** @var CourseSpecification\Model $courseSpec */
                 $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
                 if($courseSpec){
                     $category->setCourseSpecification($courseSpec);
