@@ -24,11 +24,10 @@ use Schoolbox\Learning\Classes\ClassList;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Assessment\Term;
+use Schoolbox\UserMapper;
 use Timetable_ColourMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Assessment\Quiz\Model as AssessmentQuiz;
@@ -63,7 +62,7 @@ class Controller extends Base
     private $showcaseMapper;
 
     /**
-     * @var TermMapper
+     * @var Term\Mapper
      */
     private $termMapper;
 
@@ -73,7 +72,7 @@ class Controller extends Base
     private $defaultGradeGroup;
 
     /**
-     * @var FolderMapper
+     * @var Folder\Mapper
      */
     private $folderMapper;
 
@@ -110,18 +109,23 @@ class Controller extends Base
 
 
     /** @var FilterSelection\Mapper */
-    private $filterSelectionMapper;
+    private $selectionMapper;
 
 
     /** @var AssessmentFilters\IdFinder */
     private $assessmentIdFinder;
 
+    /**
+     * @var AssessmentFilters\FactoryFactory
+     */
+    private $filterFactoryFactory;
+
 
     /**
      * @param ErrorMapper                $errorMapper
      * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param FolderMapper               $folderMapper
-     * @param TermMapper                 $termMapper
+     * @param Folder\Mapper               $folderMapper
+     * @param Term\Mapper                 $termMapper
      * @param GradeGroup                 $defaultGradeGroup
      * @param ShowcaseMapper             $showcaseMapper
      * @param RubricMapper               $rubricMapper
@@ -134,12 +138,13 @@ class Controller extends Base
      * @param Access                     $access
      * @param Filter\Mapper              $filterMapper
      * @param AssessmentFilters\IdFinder $assessmentIdFinder
+     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      */
     public function __construct(
         ErrorMapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
-        FolderMapper $folderMapper,
-        TermMapper $termMapper,
+        Folder\Mapper $folderMapper,
+        Term\Mapper $termMapper,
         GradeGroup $defaultGradeGroup,
         ShowcaseMapper $showcaseMapper,
         RubricMapper $rubricMapper,
@@ -151,7 +156,8 @@ class Controller extends Base
         FilterSelection\Mapper $filterSelectionMapper,
         Access $access,
         Filter\Mapper $filterMapper,
-        AssessmentFilters\IdFinder $assessmentIdFinder
+        AssessmentFilters\IdFinder $assessmentIdFinder,
+        AssessmentFilters\FactoryFactory $filterFactoryFactory
     ) {
         $this->errorMapper                = $errorMapper;
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
@@ -164,34 +170,29 @@ class Controller extends Base
         $this->quizAttemptMapper          = $quizAttemptMapper;
         $this->timetableColourMapper      = $timetableColourMapper;
         $this->access                     = $access;
+        $this->filterFactoryFactory       = $filterFactoryFactory;
+        $this->filterMapper = $filterMapper;
+        $this->selectionMapper = $filterSelectionMapper;
+        $this->assessmentIdFinder = $assessmentIdFinder;
     }
 
 
-
-
-
     /**
-     * Displays a list of grades/results for the specified user and term for all subjects
+     * Display the grade summary page. With a list of classes/groups that have student interactions
+     * for the specified Viewee and Term
      *
-     * @api   GET /learning/grades/{userId}{/termCode}
-     * @level 165
-     * @param User  $viewee
-     * @param  Term $term
-     * @throws ServiceNotFound If unable to find mail handler service
-     * @throws DefinitionException
-     * @throws MapperException
+     * @param User       $viewee
+     * @param Term\Model $term
+     * @throws DefinitionException If a required mapper join is not defined
+     * @throws ServiceNotFound If unable to locate HTML web Output
      */
-    public function getGrades(User $viewee, Term $term)
+    public function getSummaryGrades(User $viewee, Term\Model $term)
     {
         // Regardless of whether the term is current, only show folders where the student
         // has responses or feedback
 
         // Add folders with response or feedback
-        /** @var GenericCollection|Folder[] $folders */
-        $folders = $this->folderMapper->createCollection()
-                                      ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($viewee, $term), 'id')
-                                      ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id')
-                                      ->sortBy('name', 'ASC');
+        $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
 
         // Load Teachers
         foreach ($folders as $folder) {
@@ -224,7 +225,7 @@ class Controller extends Base
 
         // Squish this mess out
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/grades.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'    => $viewee,
             'term'       => $term,
             'terms'      => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
@@ -237,39 +238,186 @@ class Controller extends Base
 
 
     /**
-     * Displays a list of grades for the specified user, term and subject
+     * Convenience route to redirect to equivalent filtered report
      *
-     * @api   GET /learning/grades/{userId}/{termCode}/{subjectId}
-     * @level 165
-     * @param User   $viewee
-     * @param Term   $term
-     * @param Folder $subject
-     * @throws DefinitionException
-     * @throws MapperException
-     * @throws ServiceNotFound
-     * @throws \InvalidArgumentException
+     * @param int $userId
+     * @param int $subjectId
+     * @param Term\Model $term
+     * @throws RouteNotFound If unable to generate the route for the filtered grades page
      */
-    public function getGradesForSubject(User $viewee, Term $term, Folder $subject)
+    public function getGradesForSubject($userId, $subjectId, Term\Model $term)
     {
-        // Despite the fact that this is displaying grades for a single student,
-        // ALL participants are still required (because the student is compared
-        // against all other participants).
-        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview(
-            $subject->getId(),
-            null,
-            [
-                'term'  => $term,
-                'order' => ['due_date' => 'asc'],
-            ]
+        $route       = $this->getRouter()->generate('learningGrades.getGrades', ['userId' => $userId]);
+
+        $selections = new GenericCollection(GenericCollection::class);
+        $filters    = $this->filterMapper->findForEntity(\Schoolbox\Learning\Assessment\DataModel\Mapper::class);
+        foreach($filters as $filter){
+            $selections[$filter->getId()] = $this->selectionMapper->createCollection();
+
+            if(Filter\Filters\Assessment\StudentFolder\Definition::class === $filter->getClass()){
+                $selections[$filter->getId()][$subjectId] = $this->createSelectionModel($this->selectionMapper, $filter, (string)$subjectId);
+            } elseif(Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()){
+                $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel($this->selectionMapper, $filter, (string)$term->getId());
+            }
+        }
+
+        $codec = new Filter\Codec();
+        $getArgString = $codec->convertSelectionsToQueryString($selections);
+
+        $this->getResponse()->redirect->to("{$route}?{$getArgString}");
+    }
+
+
+    /**
+     * Helper method to create a Filter Selection model.
+     *
+     * Useful for redirect routes to convert URL fragments into filter query args
+     *
+     * @param Filter\Selection\Mapper $selectionMapper
+     * @param Filter\Model            $filter
+     * @param string                  $key
+     * @return Filter\Selection\Model
+     */
+    private function createSelectionModel(Filter\Selection\Mapper $selectionMapper, Filter\Model $filter, $key)
+    {
+        $selection = $selectionMapper->createModel();
+        $selection
+            ->setFilter($filter)
+            ->setUser($this->getUser())
+            ->setPage(FilterOption\Model::PAGE_MARK_BOOK)
+            ->setKey($key)
+            ->setSelected(true);
+        return $selection;
+    }
+
+
+    /**
+     * Generate the page with filter panel where we will insert a filtered grades report
+     *
+     * Also generates the Teacher/Comment section for all student-involved folders
+     *
+     * @param User $viewee
+     * @throws RouteNotFound If unable to generate the route to fetch the filtered report
+     * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
+     * @throws \ReflectionException If a specified filter definition class cannot be found
+     * @throws \DomainException If the filter FactoryFactory has not defined its filterable entity
+     * @throws ServiceNotFound If unable to fetch the HTML output renderer from the DI
+     * @throws DefinitionException If specified mapper join is not defined
+     */
+    public function getGrades(User $viewee)
+    {
+        $page      = FilterOption\Model::PAGE_GRADES;
+        $route     = $this->getRouter()->generate('learningGrades.postGrades', ['userId' => $viewee->getId()]);
+        $queryArgs = $this->getRequest()->query->getArrayCopy();
+
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
+
+        // Is a user looking at their own markbook, teacher/parent looking at student?
+        $pageTitle = 'Grades';
+        if ($viewee->getId() !== $this->getUser()->getId()) {
+            $pageTitle .= " for {$viewee->getFullName()}";
+        }
+
+        $involvedFolders = $this->findFoldersWithStudentInteractions($viewee);
+
+        // Grab the students conversation history (this also implicitly loads teachers)
+        $conversationsPerFolder = new GenericCollection(Conversation::class);
+        foreach($involvedFolders as $soleFolder){
+            $conversationsPerFolder[$soleFolder->getId()] = new Conversation($this->getConfigLoader(), $viewee, $soleFolder);
+        }
+
+        // Is a single folder being filtered to
+
+        /** @var AssessmentFilters\StudentFolder\Component $folderComponent */
+        $folderComponent = $filterPanel->getComponents()[AssessmentFilters\StudentFolder\Definition::class];
+
+        /** @var GenericCollection|FilterSelection\Model[] $selections */
+        $selections = $folderComponent->toContext()['userSelections'];
+        $soleSelectedFolderId = null;
+        foreach($selections as $selection){
+            // Is this folder selected?
+            if($selection->getSelected()){
+                // But we already encountered a selected folder?
+                if(null !== $soleSelectedFolderId){
+                    // Set it to null and conclude we do not have a sole-selected folder
+                    $soleSelectedFolderId = null;
+                    break;
+                }
+                // This may be the sole-selected folder, but we need to examine the rest to be sure.
+                $soleSelectedFolderId = $selection->getKey();
+            }
+        }
+        $soleFolder = $involvedFolders[$soleSelectedFolderId];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learningGrades/gradesOuter.twig', [
+                'viewee'                 => $viewee,
+                'filterPanel'            => $filterPanel,
+                'soleFolder'             => $soleFolder,
+                'folders'                => $involvedFolders,
+                'conversationsPerFolder' => $conversationsPerFolder,
+            ])->setTab('grade')->setTitle($pageTitle)
         );
+    }
 
-        /** @var GenericCollection|IAssessable[] $assessments */
-        $assessments = $assessments->filter(function (IAssessable $activity) {
-            return $activity->isPublished();
-        });
 
-        // Instructors can see the graph regardless of the config settings.
-        $isInstructor = $this->getAccess()->isInstructor($this->getUser(), $subject);
+    /**
+     * @param User $viewee
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
+     * @throws \ReflectionException If the specified class does not exist
+     * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws Filter\BrokenFilterException If a filter is unable to be processed
+     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @todo merge the with getGrades() and distinguish via synchronous vs AJAX
+     */
+    public function postGrades(User $viewee)
+    {
+        $postFilterSelections = $this->request->post['filter_selection'] ?: [];
+
+        $page          = FilterOption\Model::PAGE_GRADES;
+        $keyConverters = $this->filterFactoryFactory->buildKeyConverters($page);
+        $codec         = new Filter\Codec();
+
+        // Convert Request to Selection models
+        $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->selectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
+
+        // Don't save selections if viewing someone else's grades
+        // TODO Add ability to save per viewee. SA-3444
+        if($viewee->getId() === $this->getUser()->getId()){
+            $this->selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+        }
+
+        // Convert Selection models to Filters
+        $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
+        $filters              = $selectionTransformer->buildFiltersDto();
+
+        // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
+        // regardless of any filter selections sent by user
+        $unitSpecFilter = $this->filterMapper->findByClass(AssessmentFilters\NullableContext\UnitSpec\Definition::class)->first();
+        $filters->setSelections($unitSpecFilter, new Collection());
+
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters->getByClass());
+
+        // Fetch assessments & participants
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+
+
+        // Fetch all folders
+        $folders = $this->folderMapper->createCollection();
+        foreach($assessments as $assessment){
+            $folder = $assessment->getBaseContext()->getFolder();
+            $folders[$folder->getId()] = $folder;
+        }
+
+        // Instructors can see the graph regardless of the config settings. (they must have WRITE+ perm to all folders)
+        $isInstructor = true;
+        foreach($folders as $folder){
+            if(!$this->getAccess()->isInstructor($this->getUser(), $folder)){
+                $isInstructor = false;
+                break;
+            }
+        }
 
         // Show the graph for:
         // * instructors (always)
@@ -281,42 +429,91 @@ class Controller extends Base
         $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Let markbook calculate the statistics
-        $markbook   = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
-        $statistics = $markbook->getAssessmentStatistics();
+        $aggregateMarkbook   = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
+
+        $graph = $this->buildGraph($canSeeGraph, $aggregateMarkbook, $viewee);
+
+
+
+
+        // One rubric graph for all filtered assessments TODO
+//        $longitudinalRubrics = new Collection();
+//        foreach($folders as $folder){
+//            $longitudinalRubrics[$folder->getId()] = $this->getLongitudinalRubricData($folder, $viewee, $term);
+//        }
+
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'status'  => 200,
+            'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
+                'student'            => $viewee,
+                'canSeeGradeAverage' => $canSeeGradeAverage,
+                'folders'            => $folders,
+                'aggregateMarkbook'  => $aggregateMarkbook,
+                'canSeeGraph'        => $canSeeGraph,
+                'graph'              => $graph,
+                'returnUrlSuffix'    => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
+//            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term),
+
+            ])->getAsString(),
+        ]));
+
+    }
+
+
+    /**
+     * Fetch the set of folders where the specified user has submitted responses or received feedback.
+     *
+     * @param User $student
+     * @param null|Term\Model $term
+     * @return GenericCollection|Folder\Model[] Sorted by name, indexed by ID
+     * @throws DefinitionException If specified mapper join is not defined
+     */
+    private function findFoldersWithStudentInteractions(User $student, Term\Model $term = null)
+    {
+        /** @var GenericCollection|Folder\Model[] $involvedFolders */
+        $involvedFolders = $this->folderMapper->createCollection()
+                                              ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($student, $term), 'id')
+                                              ->mergeUnique($this->folderMapper->findFoldersWithResponses($student, $term), 'id')
+                                              ->indexBy('id')
+                                              ->sortBy('name', 'ASC', null, true);
+        return $involvedFolders;
+    }
+
+
+    /**
+     * Builds an array of data used by twig to render the assessment box-and-whiskers graph
+     *
+     * @param bool     $canSeeGraph
+     * @param Markbook $markbook
+     * @param User     $viewee
+     * @return mixed[][] $graph
+     * @var string $graph['info']         json encoded    // TODO Replace w/ object
+     * @var string $graph['assessments']  json encoded
+     * @var string $graph['data']         json encoded
+     * @var string $graph['scatter']      json encoded
+     */
+    private function buildGraph($canSeeGraph, Markbook $markbook, User $viewee)
+    {
+        if(!$canSeeGraph){
+            return [];
+        }
 
         // Get the data for the graph
         $graphInfo        = [];
         $graphAssessments = [];
         $graphData        = [];
         $graphScatter     = [];
-        $graphFeedback    = [];
-        $quizzes          = [];
 
-        foreach ($assessments as $assessment) {
 
-            // If this is a quiz we need to find out if the student has made any attempts so we can display a link to view them
+        $statistics = $markbook->getAssessmentStatistics();
 
-            if ($assessment instanceof AssessmentQuiz) {
-                try {
-                    $quiz     = $this->quizMapper->findOneByColumn('assessment_id', $assessment->getId());
-                    $attempts = $this->quizAttemptMapper->findByColumnList([
-                        'assess_id' => $quiz->getId(),
-                        'user_id'   => $viewee->getId(),
-                    ]);
-
-                    if ($attempts->count() > 0) {
-                        $quizzes[$assessment->getId()] = $quiz;
-                    }
-                } catch (MapperException $e) {
-                }
-            }
+        foreach ($markbook->getAssessments() as $assessment) {
 
             $graphAssessments[] = $assessment->getTitle();
 
-            $feedback = null;
-            if ($assessment->isParticipant($viewee)) {
-                $feedback = $assessment->getParticipant($viewee)->findMostRecentVisibleFeedback($this->getUser());
-            }
+            $participant = $assessment->getParticipantIfExtant($viewee);
+            $feedback    = $participant ? $participant->findMostRecentVisibleFeedback($this->getUser()) : null;
 
             if ($feedback) {
                 $graphScatter[] = (float)$feedback->getNormalisedMark();
@@ -337,7 +534,7 @@ class Controller extends Base
 
             $hasStats = $statistics[$assessment->getId()]['count'] > 0 && $assessment->getMarkScheme()->isQuantitative();
 
-            if ($hasStats && $canSeeGraph) {
+            if ($hasStats) {
                 $graphData[] = [
                     // Minimum
                     [
@@ -376,57 +573,32 @@ class Controller extends Base
                 $graphData[] = [];
             }
         }
-
-        // Keep a collection of all folders student has an assessment in for use in the dropdown
-
-        $folders = $this->folderMapper
-            ->findFoldersWithFeedbackToStudent($viewee, $term)
-            ->mergeUnique($this->folderMapper->findFoldersWithResponses($viewee, $term), 'id');
-
-        // Grab the students conversation history (this also implicitly loads teachers)
-        $conversation = new Conversation($this->getConfigLoader(), $viewee, $subject);
-
-        // Squeeze it on out
-
-        $returnUrlSuffix = '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']);
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/gradesSubject.twig', [
-            'student'            => $viewee,
-            'term'               => $term,
-            'terms'              => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
-            'folders'            => $folders,
-            'subject'            => $subject,
-            'markbook'           => $markbook,
-            'graphShow'          => $canSeeGraph,
-            'graphInfo'          => json_encode($graphInfo),
-            'graphAssessments'   => json_encode($graphAssessments),
-            'graphData'          => json_encode($graphData),
-            'graphScatter'       => json_encode($graphScatter),
-            'graphFeedback'      => $graphFeedback,
-            'canComment'         => $conversation->canComment($this->getUser()),
-            'comments'           => $conversation->getVisibleComments($this->getUser()),
-            'quizzes'            => $quizzes,
-            'returnUrlSuffix'    => $returnUrlSuffix,
-            'longitudinalRubric' => $this->getLongitudinalRubricData($subject, $viewee, $term),
-            'canSeeGradeAverage' => $canSeeGradeAverage,
-        ]));
+        return [
+            'info'        => json_encode($graphInfo),
+            'assessments' => json_encode($graphAssessments),
+            'data'        => json_encode($graphData),
+            'scatter'     => json_encode($graphScatter),
+        ];
     }
 
 
+
     /**
-     * @param Folder $subject
-     * @param User   $student
-     * @param Term   $term
+     * @param Folder\Model     $subject
+     * @param User       $student
+     * @param null|Alaress_Date_Format $start
+     * @param null|Alaress_Date_Format $end
      * @return array
+     * @todo rewrite this to take a set of terms to make it more efficient
      */
-    protected function getLongitudinalRubricData(Folder $subject, User $student, Term $term)
+    protected function getLongitudinalRubricData(Folder\Model $subject, User $student, Alaress_Date_Format $start = null, Alaress_Date_Format $end = null)
     {
         if (!$this->getConfigLoader()->get('enable_grades_criteria')) {
             // only populate this if we're actually allowed to see it
             return [];
         }
 
-        return $this->getRubricMapper()->getLongitudinal($subject, $student, $term->getStart(), $term->getActualFinish());
+        return $this->getRubricMapper()->getLongitudinal($subject, $student, $start, $end);
     }
 
 
@@ -474,7 +646,7 @@ class Controller extends Base
 
 
     /**
-     * @return TermMapper
+     * @return Term\Mapper
      */
     protected function getTermMapper()
     {
@@ -483,10 +655,10 @@ class Controller extends Base
 
 
     /**
-     * @param TermMapper $termMapper
+     * @param Term\Mapper $termMapper
      * @return static
      */
-    protected function setTermMapper(TermMapper $termMapper)
+    protected function setTermMapper(Term\Mapper $termMapper)
     {
         $this->termMapper = $termMapper;
         return $this;
@@ -494,7 +666,7 @@ class Controller extends Base
 
 
     /**
-     * @return FolderMapper
+     * @return Folder\Mapper
      */
     protected function getFolderMapper()
     {
@@ -503,10 +675,10 @@ class Controller extends Base
 
 
     /**
-     * @param FolderMapper $folderMapper
+     * @param Folder\Mapper $folderMapper
      * @return static
      */
-    protected function setFolderMapper(FolderMapper $folderMapper)
+    protected function setFolderMapper(Folder\Mapper $folderMapper)
     {
         $this->folderMapper = $folderMapper;
         return $this;

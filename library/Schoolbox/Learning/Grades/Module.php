@@ -6,25 +6,21 @@
  */
 namespace Schoolbox\Learning\Grades;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Eportfolio\ShowcaseMapper;
-use Schoolbox\Application\Exception as ApplicationException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Timetable_ColourMapper;
@@ -39,99 +35,65 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'learningGrades';
+    public function __construct(ContainerInterface $injector, $basename = '')
+    {
+        if('' === $basename){
+            $basename = 'learningGrades';
+        }
+        parent::__construct($injector, $basename);
+    }
+
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException If cannot find a specified mapper class
+     * @throws NotFound If the specified user is not found
      */
-    public function initRoutes(Router $router, $basePath)
+    public function registerRoutes()
     {
-        /** @var string[][] $routes */
-        $routes = [
-            'GET' => [
-                '/{userId}{/termCode}'             => 'getGrades',                    // student && term && subject
-                '/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',          // student && term && subject
-            ],
-            'POST' => [
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     * @throws \InvalidArgumentException
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        $this->addRoutePermission(
-                $authorizer,
-                '(?:getGrades|getGradesYear|getGradesForSubject)',
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUser('userId'),
-                    new Rule\All(
-                        new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),
-                        new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
-                    )
-                )
-            );
-    }
-
-    /**
-     * @inheritdoc
-     * @throws ApplicationException\Exception If Invalid user id specified
-     * @throws \InvalidArgumentException If mapper definition not found
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getGrades|getGradesYear|getGradesForSubject)',
-            function ($params) {
-                if (array_key_exists('userId', $params)) {
-                    try {
-                        $args['viewee'] = $this->getUserMapper()->findById($params['userId']);
-                    } catch (MapperException $e) {
-                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-                    }
-                }
-
-                try {
-                    if ($params['termCode']) {
-                        $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
-                    } else {
-                        $args['term'] = $this->getTermMapper()->findForToday();
-                    }
-
-                } catch (MapperException $e) {
-                    /* If nonexistent term is specified, 404
-                     */
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-                }
-
-                if (array_key_exists('subjectId', $params)) {
-                    try {
-                        $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
-                    } catch (MapperException $e) {
-
-                        /* If nonexistent subject is specified, 404
-                         */
-                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-                    }
-                }
-
-                return $args;
-            }
+        $permissions = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new Rule\IsUser('userId'),
+            new Rule\All(
+                new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),
+                new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+            )
         );
+
+        $loadViewee = function ($params) {
+            try {
+                return ['viewee' => $this->getUserMapper()->findById($params['userId'])];
+            } catch (Mapper\Exception $e) {
+                throw new NotFound("No user found for id: {$params['userId']}");
+            }
+        };
+
+        $loadTerm = function ($params) {
+            if(null === $params['termCode']){
+                return ['term' => $this->getTermMapper()->findForToday()];
+            }
+            try{
+                return ['term' => $this->getTermMapper()->findOneByColumn('code', $params['termCode'])];
+            } catch (Mapper\Exception $e){
+                throw new NotFound("No term found for code: {$params['termCode']}");
+            }
+        };
+
+        $loadTermAndViewee = function ($params) use($loadViewee, $loadTerm) {
+            return array_merge($loadViewee($params), $loadTerm($params));
+        };
+
+
+        // Display list of folders with interactions for specified (or current if null) term
+        $this->register('GET', '/summary/{userId:\d+}{/termCode}',        'getSummaryGrades',    $permissions, $loadTermAndViewee);
+
+        // Convenience redirects to filtered view:
+        $this->register('GET', '/{userId:\d+}/{subjectId:\d+}{/termCode}', 'getGradesForSubject', $permissions, $loadTerm);
+
+        // Filtered routes
+        $this->register('GET',  '/{userId:\d+}',                          'getGrades',           $permissions, $loadViewee);
+        $this->register('POST', '/{userId:\d+}',                          'postGrades',          $permissions, $loadViewee);  //AJAX in the report
     }
 
 
@@ -167,6 +129,9 @@ class Module extends BaseModule
             'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
             'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
             'filterMapper'               => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
+            'filterFactoryFactory'       => $injector->lazy(function(){
+                return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+            }),
             'assessmentIdFinder'         => $injector->lazy(function(){
                 /** @var Filter\Mapper $filterMapper */
                 $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
