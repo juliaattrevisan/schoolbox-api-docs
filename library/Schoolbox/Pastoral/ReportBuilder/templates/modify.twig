@@ -150,21 +150,37 @@
                 }
             }
 
+            // Title is required
+
+            $('#name_error').hide();
+
+            if ($('#name').val().trim().length == 0) {
+                $('#name_error').show();
+                $('#name').focus();
+                error = true;
+            }
+
             // At least one record type has to be selected
 
             $('#type_error').hide();
 
             if ($('[data-check-type]:checked').length == 0) {
                 $('#type_error').show();
+                if (!error) {
+                    $('[data-check-type]').focus();
+                }
                 error = true;
             }
 
-            {# At least one year has to be selected
-             #}
+            {# At least one year has to be selected #}
+
             $('#year_error').hide();
 
             if ($('[data-check-year]:checked').length == 0) {
                 $('#year_error').show();
+                if (!error) {
+                    $('[data-check-year]').focus();
+                }
                 error = true;
             }
 
@@ -209,7 +225,10 @@
                     <div class="small-12 columns">
                         <label for="name">
                             Report Name
-                            <input type="text" class="required" name="name" value="{{ report.name }}"/>
+                            <input id="name" type="text" class="required" name="name" value="{{ report.name }}"/>
+                        </label>
+                        <label id="name_error" for="name" class="error" style="display:none;">
+                            Invalid date range specified
                         </label>
                     </div>
                 </fieldset>
