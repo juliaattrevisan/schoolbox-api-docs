@@ -241,7 +241,7 @@ $(function() {
     form.alaressValidate({
         ignore: ':disabled',
         rules: {
-            'start_datetime[date]': {
+            'startDate': {
                 required: true,
                 datepickerDate: true,
                 'remote.invalidStart': true,
@@ -250,41 +250,13 @@ $(function() {
                 'remote.conflict': true,
                 'remote.timetabledClass': true
             },
-            'end_datetime[date]': {
+            'endDate': {
                 required: true,
                 datepickerDate: true,
                 'remote.invalidEnd': true,
                 'remote.beforeStart': true,
                 'remote.tooShort': true,
                 'remote.tooLong': true
-            },
-            'start_datetime[hour]': {
-                required: true,
-                digits: true,
-                range: [1, 12]
-            },
-            'end_datetime[hour]': {
-                required: true,
-                digits: true,
-                range: [1, 12]
-            },
-            'start_datetime[minute]': {
-                required: true,
-                digits: true,
-                range: [0, 59]
-            },
-            'end_datetime[minute]': {
-                required: true,
-                digits: true,
-                range: [0, 59]
-            },
-            'start_datetime[meridien]': {
-                required: true,
-                pattern:  /^(?:am|pm)$/i
-            },
-            'end_datetime[meridien]': {
-                required: true,
-                pattern:  /^(?:am|pm)$/i
             },
             'repeat_until': {
                 'afterStart': true
@@ -308,20 +280,14 @@ $(function() {
             }
         },
         messages: {
-            'start_datetime[date]': {
+            'startDate': {
                 required:       'Please enter a valid date.',
                 datepickerDate: 'Please enter a valid date.'
             },
-            'end_datetime[date]': {
+            'endDate': {
                 required:       'Please enter a valid date.',
                 datepickerDate: 'Please enter a valid date.'
             },
-            'start_datetime[hour]':     "Please enter a valid hour value.",
-            'end_datetime[hour]':       "Please enter a valid hour value.",
-            'start_datetime[minute]':   "Please enter a valid minute value.",
-            'end_datetime[minute]':     "Please enter a valid minute value.",
-            'start_datetime[meridien]': "Please select AM or PM.",
-            'end_datetime[meridien]':   "Please select AM or PM.",
             'repeat_until': {
                 'afterStart': "Repeat-until date must be after start date"
             }
