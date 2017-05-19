@@ -10,7 +10,6 @@ namespace Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter\Selection;
-use Schoolbox\Mapper;
 use Schoolbox\Filter\Option;
 
 /**
@@ -69,7 +68,7 @@ abstract class AbstractComponent implements IComponent
         Selection\Mapper $filterSelectionMapper
     ) {
         // Ensure we have either saved user selections (even if empty) or override selections
-        if(null === $savedSelections && null === $overrides){
+        if (null === $savedSelections && null === $overrides) {
             throw new \DomainException('saved selections and override selections cannot both be null');
         }
 
@@ -200,7 +199,6 @@ abstract class AbstractComponent implements IComponent
 
     /**
      * @inheritdoc
-     * @throws Mapper\Exception
      */
     public function toContext()
     {
@@ -242,6 +240,7 @@ abstract class AbstractComponent implements IComponent
     {
         return $this->user;
     }
+
 
     /**
      * @return string
