@@ -121,7 +121,7 @@ class Controller extends Base
         }
         return array(
             'id'     => $nodeId,
-            'parent' => (int)$node->getParent()->getId() ?: '#',
+            'parent' => is_object($node->getParent()) ? (int)$node->getParent()->getId() : '#',
             'text'   => $name,
             'a_attr' => array(
                 'href' => $this->getRouter()->generate(
