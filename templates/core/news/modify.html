@@ -164,7 +164,7 @@
                             <label for="item_datetime_published">
                                 Publish Date
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this news item will become available">?</span>
-                                <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" data-datepicker='true' data-datepicker-sync data-datepicker-sync-enddate="#item_datetime_expires" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
+                                <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" data-datepicker data-datepicker-time data-datepicker-sync data-datepicker-sync-enddate="#item_datetime_expires" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
                             </label>
                         </div>
                         <div class="large-6 columns">
@@ -172,7 +172,7 @@
                                 Expiry Date
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this item will expire">?</span>
                             </label>
-                            <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
+                            <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" data-datepicker data-datepicker-time maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
                         </div>
                 </fieldset>
             </section>
