@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Leave\HostType;
 
 /**
  * Online house report as found in the Schoolbox
@@ -125,9 +126,13 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
 
             $combined[$key]['request_id'][$request->getId()]          = $request->getId();
             $combined[$key]['request_status'][$request->getId()]      = $request->getStatus(true);
-            $combined[$key]['request_host_type'][$request->getId()]   = $request->getHostType()->getName();
+            $combined[$key]['request_host_type'][$request->getId()]   = $request->getHostType() instanceof HostType
+                                                                        ? $request->getHostType()->getName()
+                                                                        : '';
             $combined[$key]['request_description'][$request->getId()] = $request->getDescription();
-            $combined[$key]['request_travel_type'][$request->getId()] = $request->getTravelType()->getName();
+            $combined[$key]['request_travel_type'][$request->getId()] = $request->getTravelType() instanceof Leave_Request_TravelType
+                                                                        ? $request->getTravelType()->getName()
+                                                                        : '';
 
             /* Pending leave requests get a css class for the row
              * (used to decorate the spans)
@@ -172,7 +177,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
             $nightEnd->addHours($this->offsets['nightEnd']);
 
             $nextMorningStart = Alaress_Date_Format::newLocalShort($this->getReportStart());
-            $nextMorningStart->addHours($this->offsets['morningStart'])->addDays(1);;
+            $nextMorningStart->addHours($this->offsets['morningStart'])->addDays(1);
 
             // For each day in our timespan
             for ($j = 0; $j < $this->getRange(); $j++) {

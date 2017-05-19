@@ -1,21 +1,11 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.warning-length.js"></script>
 <script type="text/javascript">
 	$(function() {
-
-        // TODO make datepickery generic
-		$('input[data-datepicker]').datepicker({
-			constrainInput: false,
-			minDate: new Date(),
-			onClose: function (string) {
-				var input = $(this);
-				$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-					input.val(data.time);
-				})
-			}
-		});
 
 		$('form[data-validate]').alaressValidate();
 
@@ -96,39 +86,18 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <legend>Leaving</legend>
+                    <legend>Date</legend>
                     <div class="small-6 columns">
                         <label for="startDate">
-                            Date
-                            <input name="request[start][date]" id="startDate" type="text" required data-datepicker />
+                            Leaving
+                            <input name="request[start][date]" id="startDate" type="text" required data-datepicker data-datepicker-time data-datepicker-sync data-datepicker-sync-enddate="#finishDate" size="15" maxlength="30" />
                         </label>
                     </div>
                     <div class="small-6 columns">
-                        <label for="startTime">
-                            Time
-                            <select name='request[start][time]' id="startTime">
-                                <!-- BEGIN request_start_time -->
-                                <option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
-                                <!-- END request_start_time -->
-                            </select>
+                        <label for="finishDate">
+                            Returning
                         </label>
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <legend>Returning</legend>
-
-                    <div class="small-6 columns">
-                        <label for="finishDate">Date</label>
-                        <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker />
-                    </div>
-                    <div class="small-6 columns">
-                        <label for="finishTime">Time</label>
-                        <select name='request[finish][time]' id="finishTime">
-                            <!-- BEGIN request_finish_time -->
-                            <option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
-                            <!-- END request_finish_time -->
-                        </select>
+                        <input name="request[finish][date]" id="finishDate" type="text" required data-datepicker data-datepicker-time size="15" maxlength="30" />
                     </div>
                 </fieldset>
 

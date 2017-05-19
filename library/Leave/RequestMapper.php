@@ -626,8 +626,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		if (empty($callback)) {
 			$callback = function ($mapper, $request, $row) {
 				/** @var self $mapper */
-				/** @var Leave_Request $request */
 				/* Hydrate user */
+				if (!$request instanceof Leave_Request) {
+					$request = $mapper->createModel();
+				}
 				if (!empty($row['u.id'])) {
 					$request->setUser($mapper->getUserMapper()->hydrate($row, 'u'));
 				}
