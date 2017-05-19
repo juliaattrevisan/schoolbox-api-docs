@@ -411,8 +411,8 @@ class Leave_Controller extends Controller
            */
         $request = new Leave_Request();
 
-        $this->renderStartTimeDropdown();
-        $this->renderFinishTimeDropdown();
+//        $this->renderStartTimeDropdown();
+//        $this->renderFinishTimeDropdown();
         $this->renderHostTypeDropdown($request);
 
         $this->getPage()->setVar($data);
