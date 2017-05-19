@@ -251,7 +251,7 @@
                                 <select id="filterSeverity" name="severity">
                                     <option value="">Show All Severity Levels</option>
                                     {% for severity in severities %}
-                                        <option {% if severity.id == report.severity %}selected{% endif %} value="{{ severity.order }}">
+                                        <option {% if severity.id == report.severity.id %}selected{% endif %} value="{{ severity.order }}">
                                             {{ severity.name }}
                                         </option>
                                     {% endfor %}
