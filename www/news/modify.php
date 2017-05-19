@@ -49,14 +49,8 @@ if (is_numeric($this->arg[0])) {
         'NEWS_IMAGE'              => $news['item_image'],
 		'BODY'                    => Scrub::text($news['item_body']),
 		'BLURB'                   => Scrub::text($news['item_blurb']),
-		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
-        'PUBLISH_HOUR'            => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->get12Hour(),
-        'PUBLISH_MIN'             => $publishedDate->isAtStartOfDay() ? '' : $publishedDate->getMinute(true),
-        'PUBLISH_PM'              => !$publishedDate->isAtStartOfDay() && $publishedDate->isPM() ? 'selected="selected"' : '',
-		'ITEM_DATETIME_EXPIRES'   => $expiryDate->getLocalShort(),
-        'EXPIRES_HOUR'            => $expiryDate->isAtEndOfDay() ? '' : $expiryDate->get12Hour(),
-        'EXPIRES_MIN'             => $expiryDate->isAtEndOfDay() ? '' : $expiryDate->getMinute(true),
-        'EXPIRES_PM'              => !$expiryDate->isAtEndOfDay() && $expiryDate->isPM() ? 'selected="selected"' : '',
+		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocal(),
+		'ITEM_DATETIME_EXPIRES'   => $expiryDate->getLocal(),
         'SHOW_ADVANCED'           => ' style="display:none"',
         'OPAC_ADVANCED'           => '',
         'ADV_OFF'                 => '',
@@ -116,11 +110,8 @@ if (is_numeric($this->arg[0])) {
 else {
 	$this->setTitle('Add News');
 
-    $pubTime = time();
-    $expTime = strtotime(Cfg::get('news_default_expiry'));
-
-    $publishedDate = new Alaress_Date_Format($pubTime, 'U');
-	$expiryDate = new Alaress_Date_Format($expTime >= $pubTime ? $expTime : $pubTime, 'U');
+    $publishedDate = Alaress_Date_Format::now()->startOfDay();
+	$expiryDate    = Alaress_Date_Format::now()->modify(Config::get('news_default_expiry'))->endOfDay();
 
 	$output = array(
 		'ACTION' => 'Add',
@@ -129,14 +120,8 @@ else {
 		'BODY' => '',
 		'BLURB' => '',
         'current_users_block' => '',
-		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
-        'PUBLISH_HOUR'          => '',
-        'PUBLISH_MIN'           => '',
-        'PUBLISH_PM'            => '',
-		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
-        'EXPIRES_HOUR'          => '',
-        'EXPIRES_MIN'           => '',
-        'EXPIRES_PM'            =>'',
+		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocal(),
+		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocal(),
 	);
 
 	$this->setVar($output);
