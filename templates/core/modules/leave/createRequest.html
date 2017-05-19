@@ -5,18 +5,6 @@
 <script type="text/javascript">
 	$(function() {
 
-        // TODO make datepickery generic
-		$('input[data-datepicker]').datepicker({
-			constrainInput: false,
-			minDate: new Date(),
-			onClose: function (string) {
-				var input = $(this);
-				$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-					input.val(data.time);
-				})
-			}
-		});
-
 		$('form[data-validate]').alaressValidate();
 
         // Hide host details if "self" is selected
