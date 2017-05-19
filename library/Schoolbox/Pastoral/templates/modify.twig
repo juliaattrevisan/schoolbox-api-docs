@@ -401,7 +401,10 @@
             ajax: {
                 url: '/ajax/user.php',
                 type: 'GET',
-                data: {roleTypeID: 'student'},
+                data: {
+                    roleTypeID: 'student',
+                    excludeID: '{{ record.student.id }}'
+                },
                 dataType: 'json'
             }
         });

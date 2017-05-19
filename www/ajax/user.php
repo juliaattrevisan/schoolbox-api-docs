@@ -10,6 +10,7 @@ $userMapper = \Schoolbox\UserMapper::getInstance();
 
 $result = $suggestions = $data = $return = array();
 
+$excludeID          = $_GET['excludeID'];
 $keyword            = $_GET['query'];
 $groupID            = $_GET['groupID'];
 $roleTypeID         = $_GET['roleTypeID'];
@@ -83,6 +84,10 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
 
     if (is_array($userList)) {
         foreach ($userList as $user) {
+
+            if ($user['uid'] == $excludeID) {
+                continue;
+            }
 
             // If required, filter to parents of the selected child
 
