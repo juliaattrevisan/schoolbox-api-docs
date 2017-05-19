@@ -310,7 +310,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessment'            => $assessment,
             'folder'                => $context->getFolder(),
             'assessmentType'        => AssessmentType::objectToString($assessment),
-            'visibility'            => $assessment->getMarkVisibility(),
+            'markVisibility'            => $assessment->getMarkVisibility(),
             'availableVisibilities' => $this->getAvailableVisibilities(),
             'allWorkTypes'          => $this->workTypeMapper->findAll(),
         ];
