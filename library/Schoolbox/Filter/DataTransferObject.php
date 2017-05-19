@@ -15,19 +15,9 @@ use Schoolbox\Collection;
  * Indexed by both filter.id and filter.class to bridge the internal vs external divide
  *
  * @todo Consider changing this name to something more informative
- *
- * @todo Consider if this class is even needed. If always called as getByClass(), then the transformed can just
- * @todo     return an array indexed by class. It is the codec's responsibility to convert between Selection models and GET url param strings
  */
 class DataTransferObject
 {
-    /**
-     * Indexed by filter.id
-     *
-     * @var Collection[] $selectionsPerId (can also be null[], but storm doesn't like that type-hint)
-     */
-    private $selectionsPerId;
-
     /**
      * Indexed by filter.class
      *
@@ -36,22 +26,24 @@ class DataTransferObject
     private $selectionsPerClass;
 
 
+    /**
+     * Inject selections, overriding any that already exist for this filter.
+     *
+     * @param Model           $filter
+     * @param Collection|null $selections
+     * @return $this
+     */
     public function setSelections(Model $filter, Collection $selections = null)
     {
         $this->selectionsPerClass[$filter->getClass()] = $selections;
-        $this->selectionsPerId[$filter->getId()] = $selections;
+
+        return $this;
     }
 
 
     /**
-     * @return Collection[]
-     * @todo is this required?
+     * @return \null[]|Collection[]
      */
-    public function getById()
-    {
-        return $this->selectionsPerId;
-    }
-
     public function getByClass()
     {
         return $this->selectionsPerClass;
