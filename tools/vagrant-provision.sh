@@ -42,16 +42,25 @@ then
     a2enmod php7.1;
 fi
 
-if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ];
+if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ] || [ `php -m | grep ibm_db2 | wc -l` -lt 1 ];
 then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
+    apt-get update;
     apt-get install -y libgss3;
-    wget -c https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/php7.1-pdo_sqlsrv-package-trusty.tar.gz;
-    tar xzf php7.1-pdo_sqlsrv-package-trusty.tar.gz;
-    wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb;
-    wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb;
-    dpkg -i package-artifacts/*.deb;
-    phpenmod pdo_sqlsrv;
+    if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ];
+    then
+        echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
+        wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb;
+        wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb;
+        dpkg -i package-artifacts/*.deb;
+        apt-get install -y php7.1-pdosqlsrv;
+        phpenmod pdo_sqlsrv;
+    fi
+    if [ `php -m | grep ibm_db2 | wc -l` -lt 1 ];
+    then
+        echo "[SB][`date +%Y-%m-%d\ %X`] Installing IBM_DB2";
+        apt-get install -u php7.1-ibmdb2;
+        phpenmod ibm_db2;
+    fi
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
