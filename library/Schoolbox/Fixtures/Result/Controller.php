@@ -263,7 +263,7 @@ class Controller extends AbstractController
         /* Find faceless home team, ram it into a Team instance
          * This saves endless shenanigans in front-end land
          */
-        if (!$match->getHomeTeam()->getId()) {
+        if (!$match->getHomeTeam()) {
 
             $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getHomeSchool()->getName());
 
@@ -273,7 +273,7 @@ class Controller extends AbstractController
         /* Find faceless away team, ram it into a Team instance
          * This saves endless shenanigans in front-end land
          */
-        if (!$match->getAwayTeam()->getId()) {
+        if (!$match->getAwayTeam()) {
 
             $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getAwaySchool()->getName());
 

@@ -121,7 +121,14 @@ class Model implements ISoftDeletable
      */
     public function hasTeam(Team $team)
     {
-        return in_array($team->getId(), [$this->getHomeTeam()->getId(), $this->getAwayTeam()->getId()]);
+        $teamIds = [];
+        if ($this->getHomeTeam() instanceof Team) {
+            $teamIds[] = $this->getHomeTeam()->getId();
+        }
+        if ($this->getAwayTeam() instanceof Team) {
+            $teamIds[] = $this->getAwayTeam()->getId();
+        }
+        return in_array($team->getId(), $teamIds);
     }
 
     /* Getters/Setters
