@@ -108,7 +108,7 @@ class Leave_Request
     public function getCreated($datetime = false)
     {
         if ($datetime) {
-            return new Alaress_Date_Format($this->created, 'Y-m-d');
+            return new Alaress_Date_Format($this->created, Alaress_Date_Format::DATABASE_FORMAT);
         } else {
             return $this->created;
         }
@@ -419,7 +419,7 @@ class Leave_Request
     public function getAuthorisationDatetime($datetime = false)
     {
         if ($datetime) {
-            return new Alaress_Date_Format($this->authorisationDatetime, 'Y-m-d');
+            return new Alaress_Date_Format($this->authorisationDatetime, Alaress_Date_Format::DATABASE_FORMAT);
         } else {
             return $this->authorisationDatetime;
         }
