@@ -19,6 +19,7 @@ use Schoolbox\GenericCollection;
  * Assessments will match this filter if their ultimate/indirect folder matches that selected.
  *
  * eg, Assessment_A lives in project_B which lives in folder_C, if folder_C is selected, Assessment_A will be fetched.
+ * @todo rename to 'TeacherFolder' or similar to disamibuate from 'StudentFolder', then factor out commononalities into abstract
  */
 class Definition extends AbstractDefinition
 {
