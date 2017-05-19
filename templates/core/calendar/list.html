@@ -71,40 +71,14 @@
             event.preventDefault();
 
             var id = $('[data-type=calendar-controls]').find('input[name=userKey]').val();
-            var start_date = $('[data-type=calendar-controls]').find('input[name=start_date]').val();
-            var finish_date = $('[data-type=calendar-controls]').find('input[name=finish_date]').val();
+            var start_date = moment($('[data-type=calendar-controls]').find('input[name=start_date]').val(), dateDisplayFormats.momentJs).format('DD-MM-YYYY');
+            var finish_date = moment($('[data-type=calendar-controls]').find('input[name=finish_date]').val(), dateDisplayFormats.momentJs).format('DD-MM-YYYY');
 
             var url = '/calendar/list/' + id + '/' + start_date + '/' + finish_date;
 
             window.location.href = url;
         });
 
-		/* date picker */
-		$('#start_date').datepicker({
-			constrainInput: false,
-            altField: '#start_date_alt',
-            altFormat: 'dd-mm-yy',
-			onClose: function (string) {
-				var input = $(this);
-				$.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-					input.val(data.time);
-				})
-			}
-		});
-        
-        /* date picker */
-        $('#finish_date').datepicker({
-            constrainInput: false,
-            altField: '#finish_date_alt',
-            altFormat: 'dd-mm-yy',
-            onClose: function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-        
 		$('#start_date').syncDates({
 			endDate: $('#finish_date')
 		});
@@ -283,12 +257,10 @@
                     <div class="small-12 large-6 column">
                         <div class="row">
                             <div class="small-4 columns">
-                                <input id="start_date_alt" type="hidden" name='start_date' value="{SELECTED_FORMATTED_START}" />
-                                <input id='start_date' type="text" size="9" value="{SELECTED_START}" />
+                                <input id="start_date" name='start_date' value="{SELECTED_FORMATTED_START}" data-datepicker />
                             </div>
                             <div class="small-4 columns">
-                                <input id="finish_date_alt" name='finish_date' type="hidden" value="{SELECTED_FORMATTED_FINISH}" />
-                                <input id='finish_date' type="text" size="9" value="{SELECTED_FINISH}" />
+                                <input id="finish_date" name='finish_date' value="{SELECTED_FORMATTED_FINISH}" data-datepicker />
                             </div>
                             <div class="small-4 columns">
                                 <input type="submit" value="Update" />
