@@ -1,5 +1,5 @@
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
-
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript">
     $(function() {
         $('#seasonForm').alaressValidate({
@@ -22,14 +22,6 @@
                 start: 'Please select a season start date.',
                 end:   'Please select a season end date.'
             }
-        });
-
-        // Create date-pickers
-        $('#seasonForm').find('[data-datepicker]').datepicker();
-
-        // Ensure season ends on or after it begins
-        $('#start').syncDates({
-            endDate: $('#end')
         });
     });
 </script>
@@ -72,7 +64,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Start Date
-                            <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker value="{{ season.start.getLocalShort }}">
+                            <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker data-datepicker-sync data-datepicker-sync-enddate="#end" value="{{ season.start.getLocalShort }}">
                         </label>
                     </div>
 
