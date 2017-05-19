@@ -57,9 +57,9 @@ class Factory extends AbstractFactory
     private function getTemporalStates()
     {
         return new Collection([
+            Definition::KEY_UNPUBLISHED,
             Definition::KEY_UPCOMING,
-            Definition::KEY_PREVIEW,
-            Definition::KEY_DUE,
+            Definition::KEY_OPEN,
             Definition::KEY_OVERDUE,
             Definition::KEY_CLOSED,
         ]);

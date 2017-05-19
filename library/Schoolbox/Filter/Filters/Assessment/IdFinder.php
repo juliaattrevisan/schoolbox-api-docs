@@ -678,11 +678,11 @@ class IdFinder extends Filter\AbstractIdFinder
         $now = \Alaress_Date_Format::now()->getDatabase();
         $orParts = [];
         foreach($temporalStates as $temporalState){
-            if(TemporalState\Definition::KEY_UPCOMING === $temporalState){
+            if(TemporalState\Definition::KEY_UNPUBLISHED === $temporalState){
                 $orParts[] = '(:now < a.publish_date)';
-            } elseif (TemporalState\Definition::KEY_PREVIEW === $temporalState){
+            } elseif (TemporalState\Definition::KEY_UPCOMING === $temporalState){
                 $orParts[] = '(a.publish_date <= :now AND :now < a.open_date)';
-            } elseif (TemporalState\Definition::KEY_DUE === $temporalState){
+            } elseif (TemporalState\Definition::KEY_OPEN === $temporalState){
                 $orParts[] = '(a.open_date <= :now AND :now < a.due_date)';
             } elseif (TemporalState\Definition::KEY_OVERDUE === $temporalState){
                 $orParts[] = '(a.due_date <= :now AND :now < a.close_date)';
