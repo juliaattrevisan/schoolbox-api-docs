@@ -21,7 +21,7 @@ use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -231,12 +231,12 @@ class RubricMapper
     /**
      * Given a DueWork, return the rubric assigned to it, if any
      *
-     * @param DueWork $dueWork
+     * @param DueWork\Model $dueWork
      * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
      * @param bool          $editMode          - whether to include criteria not in use on box
      * @return Rubric
      */
-    public function findByDueWork(DueWork $dueWork, $getParentCriteria = false, $editMode = false)
+    public function findByDueWork(DueWork\Model $dueWork, $getParentCriteria = false, $editMode = false)
     {
         /** @var SubmissionBox $box */
         $box = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $dueWork->getId());
