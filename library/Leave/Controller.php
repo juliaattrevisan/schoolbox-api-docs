@@ -755,8 +755,8 @@ class Leave_Controller extends Controller
 
         /* Render dropdowns
          */
-        $this->renderStartTimeDropdown($request->getStart()->getDatabaseTime());
-        $this->renderFinishTimeDropdown($request->getFinish()->getDatabaseTime());
+//        $this->renderStartTimeDropdown($request->getStart()->getDatabaseTime());
+//        $this->renderFinishTimeDropdown($request->getFinish()->getDatabaseTime());
         $this->renderHostTypeDropdown($request);
         $this->renderConfirmedByCheckboxes($request);
 
@@ -770,8 +770,8 @@ class Leave_Controller extends Controller
             'REQUEST_USER_YEAR' => $user->getYear(),
             'REQUEST_USER_HOUSE' => Scrub::text($house->getHouse()),
             'REQUEST_USER_HOUSE_ID' => $house->getId(),
-            'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
-            'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
+            'REQUEST_START_DATE' => $request->getStart()->getLocal(),
+            'REQUEST_FINISH_DATE' => $request->getFinish()->getLocal(),
             'REQUEST_HOST_NAME' => $request->getHostName(),
             'REQUEST_HOST_PHONE' => $request->getHostPhone(),
             'REQUEST_HOST_MOBILE' => $request->getHostMobile(),
