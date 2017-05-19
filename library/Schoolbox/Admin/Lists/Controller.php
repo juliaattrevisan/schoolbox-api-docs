@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Lists;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -20,6 +21,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
+use Schoolbox\WebDav\Mapper as WebDavMapper;
 
 class Controller extends Base
 {
@@ -186,6 +188,36 @@ class Controller extends Base
      */
     private function getTableData()
     {
+        $luEmpty = [
+            ['key' => '', 'value' => ''],
+        ];
+        $luRoleType = [
+            ['key' => Role::GUEST,   'value' => 'Guest'],
+            ['key' => Role::STAFF,   'value' => 'Staff'],
+            ['key' => Role::STUDENT, 'value' => 'Student'],
+            ['key' => Role::PARENT,  'value' => 'Parent'],
+        ];
+
+        $luRole = [];
+        $roles = RoleMapper::getInstance()->findAll();
+
+        foreach ($roles as $role) {
+            $luRole[] = [
+                'key' => $role->getId(),
+                'value' => $role->getName()
+            ];
+        }
+
+        $luCampus = [];
+        $campuses = CampusMapper::getInstance()->findAll();
+
+        foreach ($campuses as $campus) {
+            $luCampus[] = [
+                'key' => $campus->getId(),
+                'value' => $campus->getName()
+            ];
+        }
+
         // This array defines the tables that can be updated
         // Note that they are NOT indexed by actual table name, but by an arbitrary key.
 
@@ -209,12 +241,7 @@ class Controller extends Base
                         //'nullable'  => '1'                                    // If defined the column will have a checkbox that can be ticked to select NULL as a value
                         //'getter'    => 'getTimetableColourId',                // Can be used to override getter if it has some weird name
                         'caption'   => 'Role Type',
-                        'lookup'    => [                                        // If defined the column will appear as a select box
-                            ['key' => 'guest', 'value' => 'Guest'],
-                            ['key' => 'staff', 'value' => 'Staff'],
-                            ['key' => 'student', 'value' => 'Student'],
-                            ['key' => 'parent', 'value' => 'Parent'],
-                        ],
+                        'lookup'    => $luRoleType,                             // If defined the column will appear as a select box
                         'width'     => 3,
                     ],
                     'canChangePassword' => [
@@ -246,6 +273,58 @@ class Controller extends Base
                         'caption'   => 'Name',
                         'width'     => 12,
                     ]
+                ]
+            ],
+            'webdav' => [
+                'title'             => 'WebDav',
+                'delete'            => true,
+                'mapper'            => WebDavMapper::class,
+                'fields'            => [
+                    'uri'           => [
+                        'caption'   => 'Base URI',
+                        'width'     => 2,
+                    ],
+                    'path'           => [
+                        'caption'   => 'Path',
+                        'width'     => 3,
+                        'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
+                    ],
+                    'usernamePrefix' => [
+                        'tooltip'   => 'String will be placed infront of username when authenticating, commonly a domain string like "domain/"',
+                        'caption'   => 'User Prefix',
+                        'width'     => 1,
+                    ],
+                    'usernameSuffix' => [
+                        'tooltip'   => 'String will be placed at the end of username when authenticating, commonly a domain string like "@domain.edu"',
+                        'caption'   => 'User Suffix',
+                        'width'     => 1,
+                    ],
+                    'campus'        => [
+                        'caption'   => 'Campus',
+                        'tooltip'   => 'Drive will only display to users of this type, can be left blank',
+                        'width'     => 1,
+                        'lookup'    => array_merge($luEmpty, $luCampus),
+                    ],
+                    'roleType'      => [
+                        'caption'   => 'Role Type',
+                        'tooltip'   => 'Drive will only display to users of this type, can be left blank',
+                        'width'     => 1,
+                        'lookup'    => array_merge($luEmpty, $luRoleType),
+                    ],
+                    'role'        => [
+                        'caption'   => 'Role',
+                        'tooltip'   => 'Drive will only display to users of this type, can be left blank',
+                        'width'     => 1,
+                        'lookup'    => array_merge($luEmpty, $luRole),
+                    ],
+                    'enabled' => [
+                        'caption'   => 'Enabled',
+                        'width'     => 1,
+                        'lookup'    => [
+                            ['key' => 1, 'value' => 'Yes'],
+                            ['key' => 0, 'value' => 'No'],
+                        ],
+                    ],
                 ]
             ],
             'campus'    => [
@@ -517,7 +596,11 @@ class Controller extends Base
                             if (!isset($records[$id]))
                                 $records[$id] = [];
 
-                            $records[$id][$prop->getName()] = $row->$getter();
+                            if (method_exists($row->$getter(), 'getId')) {
+                                $records[$id][$prop->getName()] = $row->$getter()->getId();
+                            } else {
+                                $records[$id][$prop->getName()] = $row->$getter();
+                            }
                         }
                     }
                 }

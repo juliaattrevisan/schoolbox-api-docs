@@ -197,7 +197,6 @@
 
                                                 <select name="value-{{ field_key }}[]">
                                                     {% for option in field.lookup %}
-
                                                         <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
                                                     {% endfor %}
                                                 </select>
@@ -248,7 +247,7 @@
 {# Draw cloneable row for use when adding new rows#}
 
 <div data-clone class="hide">
-    <li class="row">
+    <li class="row {% if tables[table].delete %}actions-small-1{% endif %}">
         <input type="hidden" name="id[]" value="#ID#">
 
         {# The first non-hidden input field needs to have the data-focus attribute set, this variable keeps track of that #}
@@ -313,5 +312,10 @@
                 </div>
             {% endif %}
         {% endfor %}
+        {%  if tables[table].delete %}
+            <nav class="hide-for-small-down">
+
+            </nav>
+        {% endif %}
     </li>
 </div>
