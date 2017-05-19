@@ -23,7 +23,7 @@ $alert-function-factor: 89%;
 $alert-border-style: solid;
 $alert-border-width: 0px;
 //$alert-border-color: scale-color($primary-color, $lightness: $alert-function-factor);
-$alert-bottom-margin: rem-calc(($base-font-size + 4));
+$alert-bottom-margin: $base-font-size;
 
 // We use these to style the close buttons
 //$alert-close-color: $primary-color;

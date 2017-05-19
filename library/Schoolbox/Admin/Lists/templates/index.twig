@@ -149,7 +149,7 @@
 
                     {# Heading row #}
 
-                    <li class="show-for-medium-up no-border">
+                    <li class="show-for-medium-up">
                         <div class="list-item">
 
                             {# If the data is sortable need to add a blank column for drag handle #}
@@ -180,7 +180,7 @@
 
                     {% for key,record in records %}
 
-                        <li class="no-border {% if tables[table].delete %}actions-small-1{% endif %}">
+                        <li class="{% if tables[table].delete %}actions-small-1{% endif %}">
                             <input type="hidden" name="id[]" value="{{ key }}">
 
                             {% set recordIndex = loop.index %}
