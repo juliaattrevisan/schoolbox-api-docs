@@ -292,11 +292,11 @@ class CohortAnalysis
     {
         if ($left->getSequence() < $right->getSequence()) {
             return -1;
-        } elseif ($left->getSequence() > $right->getSequence()) {
-            return +1;
-        } else {
-            return strcasecmp($left->getTitle(), $right->getTitle());
         }
+        if ($left->getSequence() > $right->getSequence()) {
+            return +1;
+        }
+        return strcasecmp($left->getTitle(), $right->getTitle());
     }
 
 
