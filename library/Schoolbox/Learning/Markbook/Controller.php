@@ -269,7 +269,7 @@ class Controller extends Base
 
         // Convert Selection models to Filters
         $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersTODO          = $selectionTransformer->getFiltersDto();
+        $filtersTODO          = $selectionTransformer->buildFiltersDto();
 
         // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
         // regardless of any filter selections send by user
