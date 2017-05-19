@@ -24,7 +24,7 @@ use Schoolbox\Resource\Folder\Log\Model as FolderLog;
 use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType as SubmissionType;
+use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
@@ -132,7 +132,7 @@ class CohortAnalysis
     /**
      * If non-null, filter results for box-plot of DueWork that does not match this type
      *
-     * @var null|SubmissionType
+     * @var null|WorkType\Model
      */
     private $submissionTypeResultFilter;
 
@@ -149,11 +149,11 @@ class CohortAnalysis
      *
      * @param Collection|IAssessable[] $dueAssessments IAssessable implementations due in selected Term and cohort/class
      * @param null|Folder              $classFolder
-     * @param null|SubmissionType      $resultFilter   If supplied, filter results for box-plot of DueWork that does not match this type
+     * @param null|WorkType\Model      $resultFilter   If supplied, filter results for box-plot of DueWork that does not match this type
      * @throws \DomainException
      * @todo inject mapper dependencies
      */
-    public function __construct(Collection $dueAssessments, Folder $classFolder = null, SubmissionType $resultFilter = null)
+    public function __construct(Collection $dueAssessments, Folder $classFolder = null, WorkType\Model $resultFilter = null)
     {
         $this->submissionTypeResultFilter = $resultFilter;
         $this->classFolder                = $classFolder;
@@ -292,11 +292,11 @@ class CohortAnalysis
     {
         if ($left->getSequence() < $right->getSequence()) {
             return -1;
-        } elseif ($left->getSequence() > $right->getSequence()) {
-            return +1;
-        } else {
-            return strcasecmp($left->getTitle(), $right->getTitle());
         }
+        if ($left->getSequence() > $right->getSequence()) {
+            return +1;
+        }
+        return strcasecmp($left->getTitle(), $right->getTitle());
     }
 
 

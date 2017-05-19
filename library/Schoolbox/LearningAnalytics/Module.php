@@ -18,7 +18,6 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -39,8 +38,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper as SubmissionTypeMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 
 class Module extends BaseModule
 {
@@ -152,7 +150,7 @@ class Module extends BaseModule
         $submissionType = null;
         if (isset($params['submissionTypeId'])) {
             try {
-                $submissionType = $this->getSubmissionTypeMapper()->findById($params['submissionTypeId']);
+                $submissionType = $this->getWorkTypeMapper()->findById($params['submissionTypeId']);
             } catch (MapperException $e) {
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
             }
@@ -281,7 +279,7 @@ class Module extends BaseModule
             $injector->lazyNew(Controller::class, [
                 'termMapper'           => $this->getMapperFactory()->getLazy(TermMapper::class),
                 'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'submissionTypeMapper' => $this->getMapperFactory()->getLazy(SubmissionTypeMapper::class),
+                'workTypeMapper' => $this->getMapperFactory()->getLazy(WorkTypeMapper::class),
             ])
         );
     }
@@ -360,12 +358,12 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|SubmissionTypeMapper
+     * @return Mapper|WorkTypeMapper
      * @throws \InvalidArgumentException
      */
-    protected function getSubmissionTypeMapper()
+    protected function getWorkTypeMapper()
     {
-        return $this->getMapperFactory()->get(SubmissionTypeMapper::class);
+        return $this->getMapperFactory()->get(WorkTypeMapper::class);
     }
 
 
