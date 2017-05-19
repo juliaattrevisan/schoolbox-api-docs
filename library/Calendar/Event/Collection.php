@@ -18,6 +18,7 @@
 
 namespace Calendar\Event;
 use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\EventInterface;
 
 class Collection implements \Iterator, \Countable {
 
@@ -63,9 +64,9 @@ class Collection implements \Iterator, \Countable {
 	/**
 	 * Add an Calendar_Event_Abstract-typed element to the stack
 	 *
-	 * @param EventBase $element
+	 * @param EventInterface $element
 	 */
-	public function add(EventBase $element) {
+	public function add(EventInterface $element) {
 		$this->stack[] = $element;
 	}
 
@@ -92,11 +93,12 @@ class Collection implements \Iterator, \Countable {
 	public function mergeWithoutDuplicates(Collection $collection) {
 		$id_list = array();
 		foreach ($this as $event) {
-			/** @var Calendar_Event_Type_Abstract $event */
+			/** @var EventInterface $event */
 			$id_list[$event->getEventId()] = true;
 		}
+
+        /** @var EventInterface $event */
 		foreach ($collection as $event) {
-			/** @var Calendar_Event_Type_Abstract $event */
 			$id = $event->getEventId();
 			//
 			// No ID for this event? it can't be identified as a duplicate or

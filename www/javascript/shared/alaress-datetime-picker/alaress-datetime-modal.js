@@ -23,6 +23,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
 
     };
+
     function hasTime(value) {
         var v = moment(value);
         if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
@@ -403,7 +404,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         showPeriod();
         revealTimetable();
         // On first load request data by date for the timetable
-        requestDataByDate(encodeURIComponent( twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate() ), 'timetable');
+        requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'timetable');
 
         // Update cycles on Campus or Term change
         $timetable.campus.change(function () {
@@ -515,7 +516,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         onChange: function (selectedDates, dateStr, instance) {
 
             // Put the display date onto the calendar div so we can capture it when the modal is closed
-            if(dateStr.length > 0) {
+            if (dateStr.length > 0) {
                 var dateSplit = dateStr.split(' ');
                 $('#pickerCalendar' + twigVars.id)
                     .attr('data-date', dateSplit[0])

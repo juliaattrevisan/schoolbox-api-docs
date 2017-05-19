@@ -1,4 +1,4 @@
-{% if type == 'event' or type =='duework' %}
+{% if type == 'event' or type == 'duework' %}
     {% set width = 6 %}
 {% else %}
     {% set width = 12 %}
@@ -112,7 +112,7 @@
 </div>
 
 <script>
-    var twigVars = {
+    $.fn.alaressDateTimeModal({
         date: new Date('{{ value }}'),
         element: '{{ element }}',
         id: '{{ id }}',
@@ -145,7 +145,5 @@
             getByDate: '{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'
         },
         weekStartDay: {{ weekStartDay }}
-    };
-    $.fn.alaressDateTimeModal(twigVars);
-
+    });
 </script>

@@ -18,7 +18,8 @@ use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\ResourceBooking\Booking;
 
-class EventConverter {
+class EventConverter
+{
 
     /**
      * The event type for bookings.
@@ -28,22 +29,23 @@ class EventConverter {
     protected $bookingEventType;
 
     /**
-     * Converts an instance of Schoolbox\Calendar\Event into Calendar_Event_Type_Abstract
+     * Converts an instance of Schoolbox\Calendar\Event into an EventInterface descendant
      *
-     * @param Event         $eventItem
+     * @param Event $eventItem
      * @param Booking\Model $booking
      *
      * @return ResourceBookingEvent
      */
-    public function convertEventToCalendarEvent(Event $eventItem, Booking\Model $booking) {
+    public function convertEventToCalendarEvent(Event $eventItem, Booking\Model $booking)
+    {
 
-        /* Translate a \Schoolbox\Event type into a
-         * Calendar_Event_Type_Abstract type
-         */
+        /* Translate a \Schoolbox\Event type into an EventInterface descendant */
+
         $event = new ResourceBookingEvent();
         $event->setBooking($booking);
-        // Should be able to set owner ID too, but for now that has to be
-        // referenced from the booking object.
+
+        // Should be able to set owner ID too, but for now that has to be referenced from the booking object.
+
         $event->setAuthorName($eventItem->getAuthor()->formatName());
         $event->setAuthorId($eventItem->getAuthor()->getId());
         $event->setEventId($eventItem->getId());
@@ -55,17 +57,21 @@ class EventConverter {
         $event->setAccess($eventItem->getAccess());
 
         // Set the event's type and color if there's a type for bookings
-        if($booking->getStatus()->isApproved()) {
+
+        if ($booking->getStatus()->isApproved()) {
             $event->setColour('#e7f5e0');
         }
-        if($booking->getStatus()->isPending()) {
+
+        if ($booking->getStatus()->isPending()) {
             $event->setColour('#ffffe5');
         }
 
         $event->setDetail($booking->getNotes());
         $event->setLocation($eventItem->getLocation());
         $event->setAllDay($eventItem->getAllDay());
+
         // Resource booking events: not editable in the conventional way
+
         $event->setIsEditable(false);
         return $event;
     }
@@ -74,7 +80,8 @@ class EventConverter {
      * @param  EventType $bookingEventType
      * @return $this
      */
-    public function setBookingEventType($bookingEventType) {
+    public function setBookingEventType($bookingEventType)
+    {
         $this->bookingEventType = $bookingEventType;
         return $this;
     }
@@ -82,8 +89,8 @@ class EventConverter {
     /**
      * @return EventType
      */
-    public function getBookingEventType() {
+    public function getBookingEventType()
+    {
         return $this->bookingEventType;
     }
-
 }

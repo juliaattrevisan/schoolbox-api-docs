@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_EventType_Interface
  *
@@ -12,8 +13,9 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-interface Calendar_Api_EventType_Interface {
+interface Calendar_Api_EventType_Interface
+{
     public function getEvents($startTimestamp, $endTimestamp);
-	public function getEvent($eventId);
-	//public function getgroupevent();
+
+    public function getEvent($eventId);
 }
