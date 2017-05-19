@@ -650,6 +650,7 @@ class Mapper extends BaseMapper
                 case 'severity':    $orderSql .= "`sv`.order"; break;
                 case 'date':        $orderSql .= "`pastoral`.created_at"; break;
                 case 'category':    $orderSql .= "`c`.name"; break;
+                case 'year':        $orderSql .= "`s`.year"; break;
                 case 'author':      $orderSql .= "`o`.lastname, `o`.firstname"; break;
             }
         }

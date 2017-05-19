@@ -184,7 +184,8 @@ class Controller extends Base
             'student',
             'date',
             'category',
-            'author'
+            'author',
+            'year'
         ];
 
         // Only show severity if it is enabled by policy
