@@ -16,25 +16,18 @@
                         <h3>{{ record.heading }}</h3>
                     {% endif %}
 
-                    {# Display name of poster #}
-
-                    <p class="spaced meta">
-                        Posted by <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a> {{ record.createdAt.short }}
-                    </p>
-
                 {% else %}
 
-                    <a href="{{ _self.userProfileLink(record.owner) }}">
-                        <h3>{{ record.owner.fullName }}</h3>
-                    </a>
+                    {{ profile.imageSquare64(record.owner) }}
+                    <h3>{{ record.heading }}</h3>
 
                 {% endif %}
 
-                {# Display tags #}
+                {# Display name of poster #}
 
-                {% if showBody %}
-                    {% include '@pastoral/fragments/recordTags.twig' %}
-                {% endif %}
+                <p class="spaced meta">
+                    Posted by <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a> {{ record.createdAt.short }}
+                </p>
             </div>
             {% if showBody %}
                 <article>
@@ -62,6 +55,9 @@
                         {# Record metddata #}
 
                         {% include '@pastoral/fragments/recordMeta.twig' with {record: record, showBody: showBody} %}
+                        {# Display tags #}
+
+                        {% include '@pastoral/fragments/recordTags.twig' %}
 
                     {% endif %}
                 </article>
