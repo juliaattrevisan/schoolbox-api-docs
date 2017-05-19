@@ -856,7 +856,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         /** @var Model[] $categories */
         $categories = [];
 
-        $addedClassCodes      = [];
         $addedCurriculumNodes = [];
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -889,12 +888,16 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 }
             }
 
-            // Hydrate class codes (avoiding duplicates) and cache
-            $code = $code_mapper->hydrate($row, 'cc');
-
-            if ($code->getFolder() instanceof Model) {
-                $addedClassCodes[$folderId][$code->getCode()] = $code;
+            // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
+            $codeCollection = $categories[$folderId]->getCodes();
+            $code           = $row['cc.code'];
+            if ($code && !$codeCollection->offsetExists($code)) {
+                /** @var FolderCode $folderCode */
+                $folderCode            = $this->hydrateJoin($row, 'codes', 'cc');
+                $codeCollection[$code] = $folderCode;
+                $folderCode->setFolder($categories[$folderId]);
             }
+
 
             // Hydrate curriculum node codes (avoiding duplicates) and cache
             // BTW fetching multiple 1-M relations in a single query
@@ -910,11 +913,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // set n:1 and n:n objects
         foreach ($categories as $catId => $category) {
-            if (!empty($addedClassCodes[$catId])) {
-                foreach ($addedClassCodes[$catId] as $code) {
-                    $category->addCode($code);
-                }
-            }
             if (!empty($addedCurriculumNodes[$catId])) {
                 foreach ($addedCurriculumNodes[$catId] as $curriculumNode) {
                     $category->addCurriculumNode($curriculumNode);
