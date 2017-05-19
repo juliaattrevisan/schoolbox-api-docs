@@ -839,6 +839,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param  PDOStatement $statement
      * @throws MapperException if statement returned no category
      * @return Collection|Model[]
+     * @throws DefinitionException If specified join does is not defined
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
