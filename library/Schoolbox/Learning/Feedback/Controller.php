@@ -8,15 +8,13 @@ namespace Schoolbox\Learning\Feedback;
 
 use Alaress\Web\Controller\Base;
 use Aura\Web\Request\Values as RequestValues;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Factory as DueWorkFeedbackFactory;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
@@ -78,10 +76,10 @@ class Controller extends Base
      */
     protected function processRubric(Participant $participant, $post)
     {
-        if(!$participant->getAssessable() instanceof DueWork){
+        if(!$participant->getAssessable() instanceof DueWork\Model){
             return;
         }
-        /** @var DueWork $dueWork */
+        /** @var DueWork\Model $dueWork */
         $dueWork = $participant->getAssessable();
 
         $isDraft = !isset($post['publish']) || !$post['publish'];
@@ -140,7 +138,7 @@ class Controller extends Base
      */
     private function processFeedback(Participant $participant, IFeedback $mostRecentFeedback = null, $postVars, IResponse $response = null)
     {
-        $dueWorkFeedbackFactory = new DueWorkFeedbackFactory(
+        $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),
             $participant,
             $this->getUser(),
