@@ -17,6 +17,11 @@
  */
 
 (function() {
+    /**
+     * Draft-saving timeout
+     *
+     * @var {number} tt
+     */
     var tt;
 
     /**
