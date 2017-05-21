@@ -80,20 +80,30 @@ class Module extends BaseModule
             }
         };
 
-        $loadTermAndViewee = function ($params) use($loadViewee, $loadTerm) {
+        $loadFolder = function ($params) {
+            try {
+                return ['subjectId' => $this->getFolderMapper()->findById($params['subjectId'])];
+            } catch (Mapper\Exception $e) {
+                throw new NotFound("No folder found for id: {$params['subjectId']}");
+            }
+        };
+
+        $loadVieweeTerm = function ($params) use($loadViewee, $loadTerm) {
             return array_merge($loadViewee($params), $loadTerm($params));
         };
 
+        $loadVieweeTermFolder = function ($params) use($loadViewee, $loadTerm, $loadFolder) {
+            return array_merge($loadViewee($params), $loadTerm($params), $loadFolder($params));
+        };
 
-        // Display list of folders with interactions for specified (or current if null) term
-        $this->register('GET', '/summary/{userId:\d+}{/termCode}',        'getSummaryGrades',    $permissions, $loadTermAndViewee);
 
-        // Convenience redirects to filtered view:
-        $this->register('GET', '/{userId:\d+}/{subjectId:\d+}{/termCode}', 'getGradesForSubject', $permissions, $loadTerm);
+        // Overview and single class pages
+        $this->register('GET', '/{userId}{/termCode}',                             'getGrades',           $permissions, $loadVieweeTerm);
+        $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}',         'getGradesForSubject', $permissions, $loadVieweeTermFolder);
 
-        // Filtered routes
-        $this->register('GET',  '/{userId:\d+}',                          'getGrades',           $permissions, $loadViewee);
-        $this->register('POST', '/{userId:\d+}',                          'postGrades',          $permissions, $loadViewee);  //AJAX in the report
+        // Filtered routes (todo merge GET + POST and distinguish via sync vs. ajax)
+        $this->register('GET',  '/report/{userId:\d+}/{termCode}/{subjectId:\d+}', 'getReport',           $permissions, $loadViewee);
+        $this->register('POST', '/report/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport',          $permissions, $loadViewee);  //AJAX in the report
     }
 
 

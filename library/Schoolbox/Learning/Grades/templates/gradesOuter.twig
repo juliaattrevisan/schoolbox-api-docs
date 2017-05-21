@@ -8,7 +8,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
 {# Crumbs: Learning > Grades > Report #}
-{{ bread.crumbs(['Learning', '/learning/classes'], ['Grades', routeLookup('learningGrades.getSummaryGrades', {userId: viewee.id})], ['Report']) }}
+{{ bread.crumbs(['Learning', '/learning/classes'], ['Grades', routeLookup('learningGrades.getGrades', {userId: viewee.id, termCode: term.code})], ['Report']) }}
 
 <div class="row">
     <div class="small-12 columns">
