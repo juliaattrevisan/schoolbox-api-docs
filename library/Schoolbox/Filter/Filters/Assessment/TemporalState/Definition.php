@@ -71,7 +71,7 @@ class Definition extends AbstractDefinition
         return [
             Option\Model::PAGE_PENDING_ASSESSMENTS,
             Option\Model::PAGE_MARK_BOOK,
-            Option\Model::PAGE_GRADES,
+//            Option\Model::PAGE_GRADES,
         ];
     }
 

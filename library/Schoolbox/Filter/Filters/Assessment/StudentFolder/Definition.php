@@ -85,7 +85,7 @@ class Definition extends AbstractDefinition
     public static function getPages()
     {
         return [
-            Option\Model::PAGE_GRADES,
+//            Option\Model::PAGE_GRADES,
         ];
     }
 
