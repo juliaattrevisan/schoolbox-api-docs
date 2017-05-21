@@ -2,26 +2,197 @@
     Render the outside of the filterable Grades report page, into which we will AJAX a filtered Grade Report.
 
     Usage:
-        'viewee'                 User
+        'student'                User                Student whose grades we are viewing
         'filterPanel'            Filter\Panel
+        'term'                   Term\Model          Currently-displayed term model
+        'terms'                  Term\Model[]        All term models known to system
+        'subject'                Folder\Model        Currently-displayed folder
+        'folders'                Folder\Model[]      All folders where this student has interactions for current term
+        'markbook'               Markbook            Unfiltered markbook for student, term + folder
+        'conversation'           Conversation
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learning/macro/urgency.twig' as urgency %}
+
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.all-work.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // Set up comment abilities: post
+        $.fn.allWork.commentSetup({
+            data: {
+                studentId: '{{ student.id }}',
+                folderId: '{{ subject.id }}'
+            }
+        });
+    });
+</script>
 
 {# Crumbs: Learning > Grades > Report #}
-{{ bread.crumbs(['Learning', '/learning/classes'], ['Grades', routeLookup('learningGrades.getGrades', {userId: viewee.id, termCode: term.code})], ['Report']) }}
+{{ bread.crumbs(['Learning', '/learning/classes'], ['Grades', routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], ['Report']) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>{{ locale.grades.properPlural }} for {{ viewee.fullName }}</h1>
+        <h1>{{ locale.grades.properPlural }} for {{ subject.name }}</h1>
     </div>
 </div>
 
-{% set reportContentId = 'report_content' %}
+<div class="row">
+    <div class="small-12 medium-6 island">
+        <section>
+            <ul class="action-list">
+                <li>
+                    <div class="small-12 card">
+                        <a href="/search/user/{{ student.id }}" title="View Profile">
+                            <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="{{ student.fullName }}"/>
+                            <p>{{ student.fullName }}</p>
+                            <p class="meta">Year {{ student.year }} Student</p>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+    <div class="small-12 medium-6 columns">
+        <div class="content">
+            <div class="context-switch clearfix">
+                {% include 'sub/semesterSelector.twig' with {
+                    currentTerm: term,
+                    terms:       terms,
+                    route:       'learningGrades.getGradesForSubject',
+                    routeArgs:   {userId: student.id, subjectId: subject.id}
+                } only %}
+                {% include 'sub/subjectSelector.twig' with {
+                    currentSubject: subject,
+                    subjects:       folders,
+                    route:         'learningGrades.getGradesForSubject',
+                    routeArgs:      {userId: student.id, termCode: term.code}
+                } only %}
+            </div>
+        </div>
+    </div>
+</div>
 
-{% include filterPanel.template with {
-    contentId: reportContentId,
-    panel: filterPanel
-} only %}
+{% if markbook.assessments | length %}
+    <div class="row">
+        <div class="small-12 large-6 island">
+            <h2 class="subheader">Teachers</h2>
+            <section>
+                <ul class="action-list">
+                    {% for teacher in subject.teachers %}
+                        <li>
+                            <div class="small-12 card">
+                                <a href="/search/user/{{ teacher.id }}" title="View Profile">
+                                    <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
+                                         alt="{{ teacher.fullName }}">
+                                    <p>{{ teacher.fullName }}</p>
+                                </a>
+                                <p class="meta">Teacher</p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+        {% if canSeeGradeAverage %}
+            <div class="small-12 large-6 island">
+                <h2 class="subheader">Current {{ locale.grades.proper }} Average</h2>
+                <section class="content">
+                    <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}">
+                        <span>{{ markbook.studentStatistics[student.id].weightedMean }}</span>
+                    </div>
+                </section>
+            </div>
+        {% endif %}
+    </div>
+
+    {% set reportContentId = 'report_content' %}
+
+    {% include filterPanel.template with {
+        contentId: reportContentId,
+        panel: filterPanel
+    } only %}
 
 
-<div id="{{ reportContentId }}"></div>
+    <div id="{{ reportContentId }}"></div>
+
+    {% set comments   = conversation.getVisibleComments(USER) %}
+    {% set canComment = conversation.canComment(USER) %}
+
+    {% if comments|length or canComment %}
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Comments</h2>
+            </div>
+
+            {% if canComment %}
+                <div class="small-12 columns">
+                    <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
+                        <input type="hidden" name="studentId" value="{{ student.id }}"/>
+                        <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
+                        <textarea title="TODO" name="comment" rows="3"></textarea>
+                        <div class="row">
+                            <div class="small-6 medium-offset-6 medium-3 column">
+                                <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
+                                <label for="vis-student" class="checkbox-label">Visible To Student</label>
+                            </div>
+                            <div class="small-6 medium-3 column">
+                                <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
+                                <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
+                            </div>
+                        </div>
+                        <a class="button expand submit" data-comment-post="new">Post</a>
+                    </form>
+                </div>
+            {% endif %}
+            <div class="small-12 island">
+                <section>
+                    <ul class="action-list" data-comment-list>
+                        {% for comment in comments %}
+                            <li class="actions-small-2" data-id="{{ comment.id }}">
+                                <div class="list-item">
+                                    <div class="small-10 card">
+                                        <a href="/search/user/{{ comment.commenter.id }}" title="View Profile">
+                                            <img src="/portrait.php?userId={{ comment.commenter.externalId }}&size=square64" alt="{{ comment.commenter.fullName }}" />
+                                            <p>{{ comment.commenter.fullName }}</p>
+                                        </a>
+                                        <p class="meta">{{ comment.commenter.role.name }}</p>
+                                        <p class="meta">{{ comment.createdAt.relativeTime }}</p>
+                                    </div>
+                                    <div class="small-2 column content">
+                                    <span class="icon-staff-students {% if comment.studentVisibility %}on{% else %}off{% endif %}"
+                                          title="{% if comment.studentVisibility %}Visible to {% else %}Hidden from {% endif %}student"></span>
+                                        <span class="icon-staff {% if comment.parentVisibility %}on{% else %}off{% endif %}"
+                                              title="{% if comment.parentVisibility %}Visible to {% else %}Hidden from {% endif %}parents"></span>
+                                    </div>
+                                </div>
+                                <nav>
+                                    {% if canComment %}
+                                        <a class="icon-delete" title="Delete" data-comment-delete></a>
+                                        <a class="icon-modify" title="Modify" data-comment-modify></a>
+                                    {% endif %}
+                                </nav>
+                                <article>
+                                    <p>
+                                        {{ comment.body | purify }}
+                                    </p>
+                                </article>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
+        </div>
+    {% endif %}
+
+{% else %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>No {{ locale.grades.plural }} are available for this subject.</p>
+            </div>
+        </div>
+    </div>
+
+{% endif %}

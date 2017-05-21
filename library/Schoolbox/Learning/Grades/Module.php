@@ -10,22 +10,17 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
-use Eportfolio\ShowcaseMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term;
 use Schoolbox\UserMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use \Timetable_ColourMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Error;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -82,7 +77,7 @@ class Module extends BaseModule
 
         $loadFolder = function ($params) {
             try {
-                return ['subjectId' => $this->getFolderMapper()->findById($params['subjectId'])];
+                return ['subject' => $this->getFolderMapper()->findById($params['subjectId'])];
             } catch (Mapper\Exception $e) {
                 throw new NotFound("No folder found for id: {$params['subjectId']}");
             }
@@ -98,12 +93,11 @@ class Module extends BaseModule
 
 
         // Overview and single class pages
-        $this->register('GET', '/{userId}{/termCode}',                             'getGrades',           $permissions, $loadVieweeTerm);
+        $this->register('GET', '/{userId:\d+}{/termCode}',                         'getGrades',           $permissions, $loadVieweeTerm);
         $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}',         'getGradesForSubject', $permissions, $loadVieweeTermFolder);
 
         // Filtered routes (todo merge GET + POST and distinguish via sync vs. ajax)
-        $this->register('GET',  '/report/{userId:\d+}/{termCode}/{subjectId:\d+}', 'getReport',           $permissions, $loadViewee);
-        $this->register('POST', '/report/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport',          $permissions, $loadViewee);  //AJAX in the report
+        $this->register('POST', '/report/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport',          $permissions, $loadVieweeTermFolder);
     }
 
 
@@ -125,23 +119,17 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'errorMapper'                => $this->getMapperFactory()->getLazy(Error\Mapper::class),
             'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
-            'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
+            'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
-            'showcaseMapper'             => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
             'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
-            'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
-            'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
-            'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-            'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-            'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-            'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'filterMapper'               => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
+            'access'                     => $this->getMapperFactory()->getLazy(Access::class),
             'filterFactoryFactory'       => $injector->lazy(function(){
                 return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
             }),
+            'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
             'assessmentIdFinder'         => $injector->lazy(function(){
                 /** @var Filter\Mapper $filterMapper */
                 $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
@@ -173,29 +161,29 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper|FolderMapper
+     * @return Mapper|Folder\Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getFolderMapper()
     {
-        return $this->getMapperFactory()->get(FolderMapper::class);
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 
     /**
-     * @return Mapper|TermMapper
+     * @return Mapper|Term\Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getTermMapper()
     {
-        return $this->getMapperFactory()->get(TermMapper::class);
+        return $this->getMapperFactory()->get(Term\Mapper::class);
     }
 
     /**
-     * @return Mapper|ErrorMapper
+     * @return Mapper|Error\Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getErrorMapper()
     {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
+        return $this->getMapperFactory()->get(Error\Mapper::class);
     }
 }
