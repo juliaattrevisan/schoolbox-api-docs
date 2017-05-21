@@ -94,7 +94,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $params = array_merge($folderParams, $projectParams, $unitImplParams, $unitSpecParams, $uImpSpcParams, $temporalParams, $weightingParams, $workTypeParams);
 
         $subQueries = [];
-        if($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $projectIds, $unitImplIds, $unitSpecIds)){
+        if($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $studentFolderIds, $projectIds, $unitImplIds, $unitSpecIds)){
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
                 {$aTypeJoin}
@@ -191,24 +191,27 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * This will only be true if no context filters are specified
      *
-     * @param null|Collection|int[] $uImpSpcIds
-     * @param null|Collection|int[] $folderIds
-     * @param null|Collection|int[] $projectIds
-     * @param null|Collection|int[] $unitImplIds
-     * @param null|Collection|int[] $unitSpecIds
+     * @param null|Collection|int[]  $uImpSpcIds
+     * @param null|Collection|int[]  $teacherFolderIds
+     *  @param null|Collection|int[] $studentFolderIds
+     * @param null|Collection|int[]  $projectIds
+     * @param null|Collection|int[]  $unitImplIds
+     * @param null|Collection|int[]  $unitSpecIds
      * @return bool
      */
     private function subQueryBase(
         Collection $uImpSpcIds = null,
-        Collection $folderIds = null,
+        Collection $teacherFolderIds = null,
+        Collection $studentFolderIds = null,
         Collection $projectIds = null,
         Collection $unitImplIds = null,
         Collection $unitSpecIds = null)
     {
         return
-            null === $uImpSpcIds  &&
-            null === $folderIds   &&
-            null === $projectIds  &&
+            null === $uImpSpcIds &&
+            null === $teacherFolderIds &&
+            null === $studentFolderIds &&
+            null === $projectIds &&
             null === $unitImplIds &&
             null === $unitSpecIds;
     }
