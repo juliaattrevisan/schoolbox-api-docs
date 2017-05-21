@@ -281,7 +281,6 @@ ALTER TABLE pastoral_import_log MODIFY student_name varchar(500) CHARACTER SET u
 ALTER TABLE pastoral_import_log MODIFY creator_name varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE pastoral_import_log MODIFY heading varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE pastoral_import_log MODIFY result varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE pastoral_upload_queue MODIFY type varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE pastoral_upload_queue MODIFY status varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE pastoral_upload_queue MODIFY message text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE plagscan_document MODIFY html mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

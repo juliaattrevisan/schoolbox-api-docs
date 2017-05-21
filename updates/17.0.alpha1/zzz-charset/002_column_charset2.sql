@@ -19,5 +19,5 @@ ALTER TABLE filter_selection MODIFY `key` varchar(255) CHARACTER SET utf8mb4 COL
 ALTER TABLE filter_selection MODIFY page enum('pending','grades','markbook','analytics','dueWorkCal') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE localisation MODIFY indefinite_article varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE localisation MODIFY title varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE pastoral_tag MODIFY name varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE lu_pastoral_tag MODIFY name varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE plagscan_document MODIFY interactive_url varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
