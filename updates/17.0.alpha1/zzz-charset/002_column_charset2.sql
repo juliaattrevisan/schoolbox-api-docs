@@ -21,3 +21,24 @@ ALTER TABLE localisation MODIFY indefinite_article varchar(8) CHARACTER SET utf8
 ALTER TABLE localisation MODIFY title varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE lu_pastoral_tag MODIFY name varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE plagscan_document MODIFY interactive_url varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+ALTER TABLE lu_pastoral_document_classification MODIFY external_code varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE lu_pastoral_document_classification MODIFY name varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_audit MODIFY search varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_audit MODIFY search_result text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_group MODIFY name varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_report MODIFY authors text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_report MODIFY description varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_report MODIFY name varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_report MODIFY `order` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_report MODIFY students text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_report MODIFY tags text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_report MODIFY types text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_report MODIFY years text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_revision MODIFY body text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE pastoral_revision MODIFY heading varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE webdav MODIFY path varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE webdav MODIFY role_type enum('guest','student','parent','staff') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE webdav MODIFY uri varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE webdav MODIFY username_prefix varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE webdav MODIFY username_suffix varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
