@@ -114,7 +114,7 @@
                 .on('keydown paste keypress', 'textarea', timeoutUpdate)
                 .on('change', ':input', timeoutUpdate)
                 .on('change', '[data-rubric-descriptor]', timeoutUpdate)
-                .on('blur', ':input', doASaveActionNao)
+                .on('blur', ':input:not([data-rubric-descriptor])', doASaveActionNao)
                 .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
         }
