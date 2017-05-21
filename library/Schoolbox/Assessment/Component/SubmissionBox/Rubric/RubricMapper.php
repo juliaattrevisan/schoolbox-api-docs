@@ -966,7 +966,7 @@ class RubricMapper
             JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
             JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
             JOIN (
-                SELECT a.id AS 'a.id', rd.criterion_id AS 'rc.id', max(rm.published_at) AS 'rm.max_published_at'
+                SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(rm.published_at) AS 'rm.max_published_at'
                 FROM rubric_mark       rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
                 JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
