@@ -899,48 +899,51 @@ class Controller extends Base
 
         // Update group based permissions
 
-        foreach ($post["group"] as $group_id => $checked) {
+        if (is_array($post["group"])) {
 
-            if ($checked) {
+            foreach ($post["group"] as $group_id => $checked) {
 
-                // Add this access if it doesn't already exist
+                if ($checked) {
 
-                $found = false;
+                    // Add this access if it doesn't already exist
 
-                /** @var PastoralAccessModel $accessRecord */
-                foreach ($accessRecords as $accessRecord) {
-                    if ($accessRecord->getGroup() instanceof Group) {
-                        if ($accessRecord->getGroup()->getId() == $group_id) {
-                            $found = true;
-                            break;
+                    $found = false;
+
+                    /** @var PastoralAccessModel $accessRecord */
+                    foreach ($accessRecords as $accessRecord) {
+                        if ($accessRecord->getGroup() instanceof Group) {
+                            if ($accessRecord->getGroup()->getId() == $group_id) {
+                                $found = true;
+                                break;
+                            }
                         }
                     }
+
+                    try {
+                        /** @var Group $group */
+                        $group = $this->pastoralGroupMapper->findById($group_id);
+                    } catch (MapperException $e) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    }
+
+                    if (!$found) {
+                        $access = $this->pastoralAccessMapper->createModel();
+                        $access->setPastoral($record);
+                        $access->setGroup($group);
+                        $this->pastoralAccessMapper->save($access);
+                    }
+
+                } else {
+
+                    // Delete this access if it exists because its no longer ticked
+
+                    $this->pastoralAccessMapper->deleteByColumnList([
+                        'pastoral_id' => $record->getId(),
+                        'group_id' => $group_id
+                    ]);
                 }
-
-                try {
-                    /** @var Group $group */
-                    $group = $this->pastoralGroupMapper->findById($group_id);
-                } catch (MapperException $e) {
-                    throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-                }
-
-                if (!$found) {
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setPastoral($record);
-                    $access->setGroup($group);
-                    $this->pastoralAccessMapper->save($access);
-                }
-
-            } else {
-
-                // Delete this access if it exists because its no longer ticked
-
-                $this->pastoralAccessMapper->deleteByColumnList([
-                    'pastoral_id' => $record->getId(),
-                    'group_id' => $group_id
-                ]);
             }
-        }        
+        }
 
         // Update external record
 
