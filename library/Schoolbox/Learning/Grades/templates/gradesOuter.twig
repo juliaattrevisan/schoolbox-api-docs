@@ -98,7 +98,8 @@
                 <h2 class="subheader">Current {{ locale.grades.proper }} Average</h2>
                 <section class="content">
                     <div class="grade {{ urgency.marks(markbook.studentStatistics[student.id].meanNormalised) }}">
-                        <span>{{ markbook.studentStatistics[student.id].weightedMean }}</span>
+                        {% set weightedMean = markbook.studentStatistics[student.id].weightedMean %}
+                        <span>{% if weightedMean is null %}<span class="meta">-</span>{% else %}{{ weightedMean }}{% endif %}</span>
                     </div>
                 </section>
             </div>
