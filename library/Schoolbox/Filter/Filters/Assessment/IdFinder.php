@@ -531,7 +531,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 $andParts[] = "a.$dateColumn >= '{$start->getDatabaseDate()}' ";
             }
             if($finish && !$finish->isNull()){
-                $andPart[] = "a.$dateColumn <= '{$finish->getDatabaseDate()}' ";
+                $andParts[] = "a.$dateColumn <= '{$finish->getDatabaseDate()}' ";
             }
             $orParts[] = '(' . implode(' AND ', $andParts) . ')';
         }
