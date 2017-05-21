@@ -49,6 +49,7 @@ then
     if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ];
     then
         echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
+        mkdir package-artifacts;
         wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb;
         wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb;
         dpkg -i package-artifacts/*.deb;
