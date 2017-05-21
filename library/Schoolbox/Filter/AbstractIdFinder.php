@@ -131,27 +131,32 @@ abstract class AbstractIdFinder implements IdFinder
      *
      * @param array $sparseFilters
      * @return Collection[]|null[]|mixed[][]
+     * @throws BrokenFilterException If unable to normalise a filter value
      */
     protected function normaliseFilters(array $sparseFilters)
     {
         $completeFilters = [];
-        foreach ($this->registry as $filterClass) {
+        foreach($this->registry as $filterClass) {
             // Not in the passed filters? Set it explicitly to null.
-            if (!array_key_exists($filterClass, $sparseFilters)) {
+            if(!array_key_exists($filterClass, $sparseFilters)) {
                 $completeFilters[$filterClass] = null;
                 continue;
             }
+            $value = $sparseFilters[$filterClass];
+
             // Ensure it is either null, or a (potentially empty) Collection
-            if (is_array($sparseFilters[$filterClass])) {
-                $completeFilters[$filterClass] = new Collection($sparseFilters[$filterClass]);
-            }
-            if (null === $sparseFilters[$filterClass] || $sparseFilters[$filterClass] instanceof Collection) {
-                $completeFilters[$filterClass] = $sparseFilters[$filterClass];
+            if (is_array($value)) {
+                $completeFilters[$filterClass] = new Collection($value);
+            } elseif (null === $value || $value instanceof Collection) {
+                $completeFilters[$filterClass] = $value;
+            } elseif (is_object($value) || is_scalar($value)) {
+                // Enables caller to specify a inject a single object or scalar, and have it normalised here
+                $completeFilters[$filterClass] = new Collection([$value]);
             } else {
-                // Enables caller to specify a inject a single entity, or an array, and have it normalised here.
-                $completeFilters[$filterClass] = new Collection((array)$sparseFilters[$filterClass]);
+                throw new BrokenFilterException('Unrecognised filter value: ' . gettype($value));
             }
         }
+
         return $completeFilters;
     }
 
