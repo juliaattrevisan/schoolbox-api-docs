@@ -67,7 +67,7 @@
                         $(t).removeAttr('data-av-ignore');
 
                         // re-run form validation
-                        $(t).closest('form').valid();
+                        $(t).valid();
 
                     }).always(function () {
                         $(t).prop('readonly', false);
