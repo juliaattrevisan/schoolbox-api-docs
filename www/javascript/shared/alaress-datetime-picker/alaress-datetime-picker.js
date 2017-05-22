@@ -210,7 +210,7 @@ function checkAllDaySwitch (state, pickerId) {
 $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
-    var $datepickerButton = $(this).siblings('button');
+    var $datepickerButton = $(this).siblings('[data-adtp-btn]');
 
     // Build datepicker options form the element data attributes
     var options = getOptions(element);
@@ -229,7 +229,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     element.attr('data-datepicker-id', pickerId);
 
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
-    element.after('<div data-reveal id="picker' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
+    $('body').append('<div data-reveal id="picker' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
 
     // Create click event to open the modal for the element
 
