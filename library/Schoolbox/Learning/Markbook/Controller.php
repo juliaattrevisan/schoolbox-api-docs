@@ -115,7 +115,7 @@ class Controller extends Base
         foreach($filters as $filter){
             $selections[$filter->getId()] = $selectionMapper->createCollection();
 
-            if(Filter\Filters\Assessment\TeacherFolder\Definition::class === $filter->getClass()){
+            if(Filter\Filters\Assessment\Folder\TeacherInvolved\Definition::class === $filter->getClass()){
                 $selections[$filter->getId()][$folderId] = $this->createSelectionModel($selectionMapper, $filter, (string)$folderId);
             } elseif(Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()){
                 $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
