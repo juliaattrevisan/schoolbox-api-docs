@@ -168,10 +168,7 @@
             isWeekend: {{ timetableVars.isWeekend }},
             {% for campus in timetableVars.byCampus %}
             campus_{{ campus.id }}: {
-                termStartDay: {{ campus.termStartDay }},
-                termLastDay: {{ campus.termLastDay }},
                 selectedDay: {{ campus.selectedDay }},
-                timetableCycles: {{ campus.timetableCycles }},
                 //selectedCycle: {{ campus.selectedCycle }},
                 cycles: {{ campus.cycles|raw }}
             },

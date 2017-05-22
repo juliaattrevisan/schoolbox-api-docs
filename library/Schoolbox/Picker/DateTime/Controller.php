@@ -124,25 +124,14 @@ class Controller extends Base
             // Get all what we need to build proper timetable per campus
             foreach ($this->getUser()->getCampusCollection() as $campus) {
 
-                $termActualStart = $this->getFirstTimetableDayForTerm($campus, $term);
-
                 // Don't use $campus->getTimetableDay(), it will return number of days set in SB, rather than from External Timetable
 
                 $timetableDay = $timetable[$campus->getId()]['dayCount'];
-                $termStartDay = $termActualStart['day'];
 
-                // This is used to get the last term time table day.
-                // Alternatively we could have got the last date of term and if it was a weekend we'd gone backwards to get a date for Friday
-
-                $termLastDay = ($term->getDuration() - ($timetableDay + 1 - $termStartDay)) % $timetableDay;
                 $selectedDay = $this->getTimetableHandler()->getDayNumber($campus, $date->getUnixTimeStamp());
-                $timetableCycles = ceil(($term->getDuration() + $termStartDay - 1) / $timetableDay);
 
                 $timetableVars['byCampus'][$campus->getId()]['id'] = $campus->getId();
-                $timetableVars['byCampus'][$campus->getId()]['termStartDay'] = $termStartDay;
-                $timetableVars['byCampus'][$campus->getId()]['termLastDay'] = $termLastDay;
                 $timetableVars['byCampus'][$campus->getId()]['selectedDay'] = $selectedDay;
-                $timetableVars['byCampus'][$campus->getId()]['timetableCycles'] = $timetableCycles;
 
                 // Loop through terms and set cycle start and end dates
                 $cycles = [];
