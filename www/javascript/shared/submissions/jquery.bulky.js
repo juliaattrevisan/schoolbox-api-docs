@@ -72,7 +72,7 @@
 
             bulky.list.html(
 
-                opt.userList.find(opt.actionBarSelector + ':visible').closest(opt.labelSelector).map(function () {
+                opt.userList.find(opt.actionBarSelector + ':not([data-published=true])').closest(opt.labelSelector).map(function () {
 
                     var $item = bulky.template.clone(),
                         tag   = $item.prop("tagName").toLowerCase(),
