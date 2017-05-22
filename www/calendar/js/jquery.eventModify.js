@@ -427,38 +427,14 @@
 							depends: validateGroupSelected
 						}
 					},
-                    startHour: {
-                        required: {
-                            depends: validateNotAllDaySelected
-                        },
-                        '12hour': {
-                            depends: validateNotAllDaySelected
-                        }
-                    },
-                    startMinute: {
-                        required: {
-                            depends: validateNotAllDaySelected
-                        },
-                        minute: {
-                            depends: validateNotAllDaySelected
-                        }
-                    },
-                    endHour: {
-                        required: {
-                            depends: validateNotAllDaySelected
-                        },
-                        '12hour': {
-                            depends: validateNotAllDaySelected
-                        }
-                    },
-                    endMinute: {
-                        required: {
-                            depends: validateNotAllDaySelected
-                        },
-                        minute: {
-                            depends: validateNotAllDaySelected
-                        }
-                    }
+					startDate: {
+						required: true,
+						datepickerDate: true
+					},
+					endDate: {
+						required: true,
+						datepickerDate: true
+					}
 				},
 				submitHandler: function(form) {
 					var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
