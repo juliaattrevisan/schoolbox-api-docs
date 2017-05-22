@@ -16,6 +16,7 @@ stopservices() {
     service schoolbox-routed stop >/dev/null 2>&1;
     service schoolbox-digestd stop >/dev/null 2>&1;
     service schoolbox-scheduled stop >/dev/null 2>&1;
+    mv /etc/cron.d/vagrant /tmp/vagrant;
 }
 
 restartservices() {
@@ -27,6 +28,7 @@ restartservices() {
     service schoolbox-routed restart >/dev/null 2>&1;
     service schoolbox-digestd restart >/dev/null 2>&1;
     service schoolbox-scheduled restart >/dev/null 2>&1;
+    mv /tmp/vagrant /etc/cron.d/vagrant;
 }
 
 if [ -z $1 ];
