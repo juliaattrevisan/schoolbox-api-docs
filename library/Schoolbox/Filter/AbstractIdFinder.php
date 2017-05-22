@@ -103,7 +103,7 @@ abstract class AbstractIdFinder implements IdFinder
     protected function buildRegistry(Mapper $filterMapper, IMapper $entityMapper)
     {
         $filterInstances = $filterMapper->findForEntity(get_class($entityMapper));
-        $filterClasses = $filterInstances->getColumnValues('class');
+        $filterClasses   = $filterInstances->getColumnValues('class');
         $this->registry  = array_combine($filterClasses, $filterClasses);
     }
 
@@ -136,9 +136,9 @@ abstract class AbstractIdFinder implements IdFinder
     protected function normaliseFilters(array $sparseFilters)
     {
         $completeFilters = [];
-        foreach($this->registry as $filterClass) {
+        foreach ($this->registry as $filterClass) {
             // Not in the passed filters? Set it explicitly to null.
-            if(!array_key_exists($filterClass, $sparseFilters)) {
+            if (!array_key_exists($filterClass, $sparseFilters)) {
                 $completeFilters[$filterClass] = null;
                 continue;
             }
@@ -192,6 +192,7 @@ abstract class AbstractIdFinder implements IdFinder
     {
         return $this->mapper;
     }
+
 
     /**
      * @param string[] $registry

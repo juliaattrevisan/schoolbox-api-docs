@@ -142,9 +142,7 @@ class Controller extends Base
         $assessmentsPerFolder = $this->getAssessmentMapperProxy()
                                      ->findAllByStudent($viewee, $term)
                                      ->groupByCallback(function (IAssessable $assessment) {
-                                         return $assessment->getBaseContext()
-                                                           ->getFolder()
-                                                           ->getId();
+                                         return $assessment->getBaseContext()->getFolder()->getId();
                                      });
 
         $showOverallGrade = $this->getConfigLoader()
@@ -155,11 +153,8 @@ class Controller extends Base
         // Generate markbooks for these assessments
         foreach($assessmentsPerFolder as $folderId => $assessments) {
             $assessment = $assessments->first();
-            if($assessment instanceof IAssessable
-                && ($showOverallGrade
-                    || $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()
-                                                                                ->getFolder())
-                )
+            if($assessment instanceof IAssessable &&
+                ($showOverallGrade || $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder()))
             ) {
                 $markbooks->setOffset($folderId, new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()));
             }
@@ -169,15 +164,12 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
-            'terms'            => $this->termMapper->findAll()
-                                                   ->sortBy('start', 'desc'),
+            'terms'            => $this->termMapper->findAll()->sortBy('start', 'desc'),
             'folders'          => $folders,
             'markbooks'        => $markbooks,
             'showOverallGrade' => $showOverallGrade,
-            'mailHandle'       => $this->getSession()
-                                       ->get('mailhandle'),
-        ])
-                                                ->setTab('grade'));
+            'mailHandle'       => $this->getSession() ->get('mailhandle'),
+        ])->setTab('grade'));
     }
 
 
@@ -200,12 +192,11 @@ class Controller extends Base
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject)
     {
         $page        = FilterOption\Model::PAGE_GRADES;
-        $route       = $this->getRouter()
-                            ->generate('learningGrades.postReport', [
-                                'userId'    => $viewee->getId(),
-                                'termCode'  => $term->getCode(),
-                                'subjectId' => $subject->getId(),
-                            ]);
+        $route       = $this->getRouter()->generate('learningGrades.postReport', [
+            'userId'    => $viewee->getId(),
+            'termCode'  => $term->getCode(),
+            'subjectId' => $subject->getId(),
+        ]);
         $queryArgs   = $this->getRequest()->query->getArrayCopy();
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
 
@@ -247,16 +238,13 @@ class Controller extends Base
                 'student'            => $viewee,
                 'filterPanel'        => $filterPanel,
                 'term'               => $term,
-                'terms'              => $this->termMapper->findAll()
-                                                         ->sortBy('start', 'desc'),
+                'terms'              => $this->termMapper->findAll()->sortBy('start', 'desc'),
                 'subject'            => $subject,
                 'folders'            => $folders,
                 'canSeeGradeAverage' => $canSeeGradeAverage,
                 'markbook'           => $markbook,
                 'conversation'       => $conversation,
-            ])
-                 ->setTab('grade')
-                 ->setTitle("Grades for {$subject->getTitle()}")
+            ])->setTab('grade')->setTitle("Grades for {$subject->getTitle()}")
         );
     }
 
@@ -337,8 +325,7 @@ class Controller extends Base
                 'graph'              => $graph,
                 'longitudinalRubric' => $longitudinalRubric,
                 'returnUrlSuffix'    => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
-            ])
-                              ->getAsString(),
+            ])->getAsString(),
         ]));
 
     }
@@ -478,9 +465,7 @@ class Controller extends Base
      */
     protected function getLongitudinalRubricData(GenericCollection $assessments, User $student)
     {
-        if(!$this->getConfigLoader()
-                 ->get('enable_grades_criteria')
-        ) {
+        if(!$this->getConfigLoader()->get('enable_grades_criteria')) {
             // only populate this if we're actually allowed to see it
             return [];
         }
