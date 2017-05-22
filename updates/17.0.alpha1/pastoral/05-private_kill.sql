@@ -1,0 +1,1 @@
+DELETE FROM `config` WHERE name = 'pastoral_private_body';
