@@ -34,7 +34,7 @@
     $.fn.alaressValidate = function(options) {
         var defaults = {
             // Default to not ignoring validation on any fields, even if hidden
-            ignore: false,
+            ignore: "[data-av-ignore]",
             ignoreTitle: true,
             errorPlacement: $.alaressValidate.defaultErrorPlacement
         };

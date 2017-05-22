@@ -48,6 +48,9 @@
 
                 $dateinput.alaressDateTimePicker();
 
+                // Add jquery validate ignore data attr
+                $dateinput.attr('data-av-ignore', true);
+
                 // delegate blurs to text inputs
                 $dateinput.on('blur', function (e) {
                     var t = e.target;
@@ -60,6 +63,9 @@
 
                         $(t).val(data.time);
 
+                        // Remove validation ignore data attr
+                        $(t).removeAttr('data-av-ignore');
+
                         // re-run form validation
                         $(t).closest('form').valid();
 
@@ -67,6 +73,13 @@
                         $(t).prop('readonly', false);
                         $(t).prop('disabled', false);
                     })
+                });
+
+                $dateinput.on('focus', function() {
+
+                    // Add the ignore data attr again
+                    $dateinput.attr('data-av-ignore', true);
+
                 });
             }
         });
