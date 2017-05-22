@@ -60,7 +60,7 @@
                     </div>
                     <nav>
                         <a class="icon-modify no-text" href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id}) }}" title="Modify Report"></a>
-                        <a class="icon-delete no-text" href="#" title="Delete Report"></a>
+                        <a class="icon-delete no-text" data-delete="{{ report.id }}" href="#" title="Delete Report"></a>
                     </nav>
                 </li>
             {% endfor %}
@@ -68,14 +68,10 @@
             {% if found == 1 %}
                 </ul>
                 </section>
+                {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' with {hidden: 1} %}
+
             {% else %}
-
-                <div class="empty-state">
-                    <i class="icon-report"></i>
-                    <p>You do not have any saved pastoral care reports.</p>
-                    <p><a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" title="New Pastoral Report">Create your first report.</a></p>
-                </div>
-
+                {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' %}
             {% endif %}
 
             {% set found = 0 %}
@@ -117,12 +113,35 @@
 
         {% else %}
 
-            <div class="empty-state">
-                <i class="icon-report"></i>
-                <p>You do not have any saved pastoral care reports.</p>
-                <p><a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" title="New Pastoral Report">Create your first report.</a></p>
-            </div>
+            {% include '@pastoralReportBuilder/fragments/reportEmpty.twig' %}
 
         {% endif %}
     </div>
 </div>
+
+<script>
+    $(function() {
+        $('[data-delete]').click(function (e) {
+            e.preventDefault();
+
+            var reportId = $(this).attr('data-delete');
+            var li = $(this).closest('li');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this report?',
+                confirmEvent: function () {
+                    var route = '{{ routeLookup('pastoralReportBuilder.postReportDelete', {'reportId': '_reportId'}) }}';
+
+                    $.post(route.replace(/_reportId/g, reportId))
+                    .done(function () {
+                        li.remove();
+
+                        if ($('[data-delete]').length == 0) {
+                            $('.empty-state').removeClass('hide');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>

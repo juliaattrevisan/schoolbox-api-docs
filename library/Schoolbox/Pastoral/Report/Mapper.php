@@ -225,14 +225,14 @@ class Mapper extends BaseMapper
             LEFT JOIN   `pastoral_report_groups` ON 
                             `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND 
                             `pastoral_report_groups`.`deleted_at` IS NULL           
-            WHERE       `pastoral_report`.`owner_id` = :userId OR (
+            WHERE       (`pastoral_report`.`owner_id` = :userId OR (
                             `pastoral_report`.`id` IN (
                                 SELECT    `report_id` 
                                 FROM      `pastoral_report_groups` 
                                 WHERE     {$groupSql}
                                           `deleted_at` IS NULL
                             )
-                        ) AND
+                        )) AND
                         `pastoral_report`.`deleted_at` IS NULL
             GROUP BY    `pastoral_report`.`id`
         ";
