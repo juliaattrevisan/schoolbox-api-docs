@@ -23,6 +23,14 @@ interface IFeedback
     public function isPublished();
 
 
+    /**
+     * Has this feedback not yet been published?
+     *
+     * @return bool
+     */
+    public function isDraft();
+
+
     /* Getters/Setters
      */
 

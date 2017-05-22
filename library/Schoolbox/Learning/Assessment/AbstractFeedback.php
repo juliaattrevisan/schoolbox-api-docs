@@ -106,6 +106,15 @@ abstract class AbstractFeedback implements IFeedback
     }
 
 
+    /**
+     * @inheritdoc
+     */
+    public function isDraft()
+    {
+        return !$this->isPublished();
+    }
+
+
     /* Getters/Setters
      */
 
