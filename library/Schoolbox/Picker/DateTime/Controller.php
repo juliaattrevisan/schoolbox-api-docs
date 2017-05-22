@@ -85,7 +85,6 @@ class Controller extends Base
      */
     public function getPicker($type, $element, $id, $value)
     {
-        $timetableVars = [];
         $timetable = $this->getUserTimetable();
         $terms = $this->getTerms();
 
@@ -287,7 +286,7 @@ class Controller extends Base
     /**
      * Return all terms
      *
-     * @return Collection
+     * @return Collection|Term[]
      */
     public function getTerms()
     {
