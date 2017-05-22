@@ -2,9 +2,9 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
-[ record.student.fullName,            routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
-[ record.heading ]
+    ['Pastoral Care', routeLookup('pastoral.getIndex')],
+    [record.student.fullName, routeLookup('pastoral.getStudent', {studentId: record.student.id})],
+    [record.heading]
 ) }}
 
 {% import '@pastoral/macros/profile.twig' as profile %}
@@ -365,7 +365,7 @@
                             {{ profile.imageSquare64(record.owner) }}
                             <p>{{ record.owner.fullName }}</p>
                         </a>
-                        <p class="spaced meta">Visible To Individual User</p>
+                        <p class="meta">Visible To Individual User</p>
                     </div>
                 </li>
                 {% for access in record.access %}
@@ -374,7 +374,7 @@
                             <div class="small-12 card wrap-down">
                                 {{ profile.imageSquare64(related.student) }}
                                 <p>{{ access.group.name }}</p>
-                                <p class="spaced meta">Author Of Record</p>
+                                <p class="meta">Author Of Record</p>
                             </div>
                         </li>
                     {% elseif access.role is not empty %}
@@ -382,7 +382,7 @@
                             <div class="small-12 card wrap-down">
                                 {{ profile.imageSquare64(related.student) }}
                                 <p>{{ access.role.name }}</p>
-                                <p class="spaced meta">Visible To All Users In {{ access.role.name }} Role</p>
+                                <p class="meta">Visible To All Users In {{ access.role.name }} Role</p>
                             </div>
                         </li>
                     {% elseif access.user is not empty %}
@@ -392,7 +392,7 @@
                                     {{ profile.imageSquare64(access.user) }}
                                     <p>{{ access.user.fullName }}</p>
                                 </a>
-                                <p class="spaced meta">Visible To Individual User</p>
+                                <p class="meta">Visible To Individual User</p>
                             </div>
                         </li>
                     {% endif %}
@@ -418,7 +418,7 @@
                                         {{ related.getHeading }}
                                     </a>
                                 </p>
-                                <p class="spaced meta">{{ related.student.fullName }}</p>
+                                <p class="meta">{{ related.student.fullName }}</p>
                             </div>
                         </li>
                     {% endif %}
