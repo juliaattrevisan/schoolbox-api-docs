@@ -271,7 +271,6 @@ class Controller extends Base
                 'records'           => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
                 'student'           => $student,
                 'pageCurrent'       => $pageCurrent,
-                'resultsPerPage'    => $resultsPerPage,
                 'types'             => $this->pastoralTypeMapper->findAll(),
                 'linkedStudents'    => $this->pastoralMapper->getLinkedStudents($student),
                 'typeSelected'      => $get['type']

@@ -1,5 +1,8 @@
 {% macro text(pageCurrent, recordCount, resultsPerPage) %}
     {% spaceless %}
+        {% if resultsPerPage is empty %}
+            {% set resultsPerPage = config.pastoral_page_size %}
+        {% endif %}
         {% if recordCount > resultsPerPage %}
             Showing Records {{ ((pageCurrent - 1) * resultsPerPage) + 1 }} - {{ min(recordCount, ((pageCurrent - 1) * resultsPerPage) + resultsPerPage) }} Of {{ recordCount }}
         {% endif %}
