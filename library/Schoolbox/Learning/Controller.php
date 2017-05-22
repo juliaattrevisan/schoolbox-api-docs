@@ -187,7 +187,7 @@ class Controller extends Base
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
 
-            $content = $this->generatePendingAssessmentReport($viewee, $filterFactoryFactory, $postFilterSelections);
+            $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $postFilterSelections);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
@@ -206,7 +206,6 @@ class Controller extends Base
     /**
      * Generate a pending assessment report as HTML string
      *
-     * @param User $viewee
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @param string[][]                       $postFilterSelections - Indexed by filter.id, then concrete key
      * @return string
@@ -217,7 +216,6 @@ class Controller extends Base
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      */
     protected function generatePendingAssessmentReport(
-        User $viewee,
         AssessmentFilters\FactoryFactory $filterFactoryFactory,
         array $postFilterSelections
     ) {
@@ -227,12 +225,7 @@ class Controller extends Base
 
         // Convert Request to Selection models
         $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->filterSelectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
-
-        // Don't save selections if viewing someone else's pending assessments
-        // TODO Add ability to save per viewee. SA-3444
-        if($viewee->getId() === $this->getUser()->getId()){
-            $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
-        }
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
         // Convert Selection models to Filters
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);

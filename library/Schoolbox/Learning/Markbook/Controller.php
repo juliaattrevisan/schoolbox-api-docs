@@ -205,9 +205,7 @@ class Controller extends Base
              * @var Filter\Codec              $codec
              * @var Filter\Selection\Model[][]
              */
-            // TODO Add ability to save per viewee. SA-3444
-            $save = $viewee->getId() === $this->getUser()->getId();
-            list($filtersDto, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($postFilterSelections, $save);
+            list($filtersDto, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($postFilterSelections, true);
 
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filtersDto->getByClass());
             $markbook      = $this->buildMarkbook($assessmentIds);

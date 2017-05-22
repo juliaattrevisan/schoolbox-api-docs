@@ -283,14 +283,7 @@ class Controller extends Base
 
         // Convert Request to Selection models
         $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->selectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
-
-        // Don't save selections if viewing someone else's grades
-        // TODO Add ability to save per viewee. SA-3444
-        if($viewee->getId() === $this->getUser()
-                                     ->getId()
-        ) {
-            $this->selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
-        }
+        $this->selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
         // Convert Selection models to Filters
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
