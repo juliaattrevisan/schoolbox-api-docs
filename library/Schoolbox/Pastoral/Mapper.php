@@ -100,7 +100,7 @@ class Mapper extends BaseMapper
         );
 
 
-        $this->registerCallback(Mapper::CALLBACK_PRESAVE, [$this, 'saveRevision']);
+        $this->registerCallback(Mapper::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
         $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteReferences']);
     }
 
@@ -138,11 +138,9 @@ class Mapper extends BaseMapper
     {
         // Only save the revision if we are updating an existing record
 
-        if (!empty($model->getId())) {
-            $pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
-            $pastoralRevision = $pastoralRevisionMapper->createRevision($model);
-            $pastoralRevisionMapper->save($pastoralRevision);
-        }
+        $pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
+        $pastoralRevision = $pastoralRevisionMapper->createRevision($model);
+        $pastoralRevisionMapper->save($pastoralRevision);
     }
 
     /**
