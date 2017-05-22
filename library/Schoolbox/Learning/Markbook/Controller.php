@@ -13,10 +13,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
-use Schoolbox\Learning\MarkScheme\Completion;
-use Schoolbox\Learning\MarkScheme\None;
-use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
@@ -274,7 +270,7 @@ class Controller extends Base
         $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
         $filtersTODO          = $selectionTransformer->buildFiltersDto();
 
-        return [$filtersTODO->getByClass(), $codec, $selectionsPerFilter];
+        return [$filtersTODO, $codec, $selectionsPerFilter];
     }
 
 
