@@ -122,15 +122,15 @@
                 </fieldset>
             </section>
 
-            <h2 class="subheader">Visibility</h2>
+            <h2 class="subheader">Record Visibility</h2>
 
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
-                            Display Record To Users In These Roles
+                            User Roles
                             <span class="hint has-tip tip-top" data-tooltip
-                                  title="Select the user roles you would like to access this record and its contents.">?</span>
+                                  title="Select the user roles that can view this record.">?</span>
                             {% for role in roles if not role.isStudent and not role.isGuest %}
                                 {% if allowParents == 1 or not role.isParent %}
                                     <input type="hidden" name="role[{{ role.id }}]" value="0"/>
@@ -158,9 +158,9 @@
                     <div class="small-12 columns">
                         {% if groups | length %}
                             <label>
-                                Pastoral Group Access
+                                Pastoral Groups
                                 <span class="hint has-tip tip-top" data-tooltip
-                                      title="Select the pastoral groups you would like to have access to this record.">?</span>
+                                      title="Select the pastoral groups that can view this record.">?</span>
                                 {% for group in groups %}
                                     <input type="hidden" name="group[{{ group.id }}]" value="0"/>
                                     <input type="checkbox" name="group[{{ group.id }}]"
@@ -177,7 +177,7 @@
                                 {% endfor %}
                             </label>
                         {% else %}
-                            <label>Pastoral Group Access</label>
+                            <label>Pastoral Groups</label>
                             <p class="meta">
                                 No pastoral groups are currently defined, please contact your pastoral administrator
                                 to use the pastoral group functionality.
@@ -192,9 +192,9 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
-                                Individual User Access
+                                Individual Users
                                 <span class="hint has-tip tip-top" data-tooltip
-                                      title="Add individual users who you would like to access this record and its contents. These users will be able to see content marked as hidden.">?</span>
+                                      title="Select individual users that can view this record.">?</span>
                                 <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
                             </label>
                         </div>
