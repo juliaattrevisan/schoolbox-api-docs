@@ -40,11 +40,9 @@
         {% endif %}
 
         {# Modify record #}
-
-        {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
-            <a class="icon-modify no-text"
-               href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
-               title="Modify"></a>
+        {% set modifyRoute = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+        {% if modifyRoute %}
+            <a class="icon-modify no-text" href="{{ modifyRoute }}" title="Modify"></a>
         {% endif %}
     </nav>
 
