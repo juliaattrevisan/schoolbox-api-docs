@@ -216,10 +216,10 @@ class Controller extends Base
          * * Are not before their publish date (ie are not KEY_UNPUBLISHED)
          */
         $filters       = [
-            AssessmentFilters\StudentFolder\Definition::class            => $subject->getId(),
-            AssessmentFilters\Term\Due\Definition::class                 => $term,
-            AssessmentFilters\NullableContext\UnitSpec\Definition::class => [],
-            AssessmentFilters\TemporalState\Definition::class            => [
+            AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
+            AssessmentFilters\Term\Due\Definition::class                   => $term,
+            AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
+            AssessmentFilters\TemporalState\Definition::class              => [
                 AssessmentFilters\TemporalState\Definition::KEY_UPCOMING,
                 AssessmentFilters\TemporalState\Definition::KEY_OPEN,
                 AssessmentFilters\TemporalState\Definition::KEY_OVERDUE,
@@ -298,10 +298,10 @@ class Controller extends Base
          * * Are not before their publish date (ie are not KEY_UNPUBLISHED)
          */
         $filters = array_merge($filters, [
-            AssessmentFilters\StudentFolder\Definition::class            => $subject->getId(),
-            AssessmentFilters\Term\Due\Definition::class                 => $term,
-            AssessmentFilters\NullableContext\UnitSpec\Definition::class => [],
-            AssessmentFilters\TemporalState\Definition::class            => [
+            AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
+            AssessmentFilters\Term\Due\Definition::class                   => $term,
+            AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
+            AssessmentFilters\TemporalState\Definition::class              => [
                 AssessmentFilters\TemporalState\Definition::KEY_UPCOMING,
                 AssessmentFilters\TemporalState\Definition::KEY_OPEN,
                 AssessmentFilters\TemporalState\Definition::KEY_OVERDUE,

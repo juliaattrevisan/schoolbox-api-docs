@@ -59,8 +59,8 @@ class IdFinder extends Filter\AbstractIdFinder
     protected function buildQuery(array $completeFilters, $deleted)
     {
         // Filters which effect which sub-queries are required
-        $teacherFolderIds = $completeFilters[Folder\Definition::class];
-        $studentFolderIds = $completeFilters[StudentFolder\Definition::class];
+        $teacherFolderIds = $completeFilters[Folder\TeacherInvolved\Definition::class];
+        $studentFolderIds = $completeFilters[Folder\StudentInteractions\Definition::class];
         $projectIds       = $completeFilters[NullableContext\Project\Definition::class];
         $unitImplIds      = $completeFilters[NullableContext\UnitImpl\Definition::class];
         $unitSpecIds      = $completeFilters[NullableContext\UnitSpec\Definition::class];
@@ -780,7 +780,7 @@ class IdFinder extends Filter\AbstractIdFinder
     protected function doContextFiltersGuaranteeEmptySet(array $completeFilters){
 
         // Teacher folder (ie either direct or indirectly associated)
-        $teacherFolderIds = $completeFilters[Folder\Definition::class];
+        $teacherFolderIds = $completeFilters[Folder\TeacherInvolved\Definition::class];
 
         // Did call explicitly request assessments that do not have an teacher folder?
         if($teacherFolderIds instanceOf Collection && !$teacherFolderIds->count()){
@@ -789,7 +789,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Student folder (ie either direct or indirectly associated)
-        $studentFolderIds = $completeFilters[StudentFolder\Definition::class];
+        $studentFolderIds = $completeFilters[Folder\StudentInteractions\Definition::class];
 
         // Did call explicitly request assessments that do not have an student folder?
         if($studentFolderIds instanceOf Collection && !$studentFolderIds->count()){

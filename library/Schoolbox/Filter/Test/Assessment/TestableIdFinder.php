@@ -77,8 +77,8 @@ class TestableIdFinder extends IdFinder
     {
         $filterClasses = [
             AssessmentType\Definition::class,
-            Folder\Definition::class,
-            StudentFolder\Definition::class,
+            Folder\TeacherInvolved\Definition::class,
+            Folder\StudentInteractions\Definition::class,
             NullableContext\UnitImportSpec\Definition::class,
             NullableContext\Project\Definition::class,
             NullableContext\UnitImpl\Definition::class,

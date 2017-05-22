@@ -8,20 +8,18 @@
 namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Filter\AbstractDefinition;
-use Schoolbox\Filter\Option;
 use Schoolbox\GenericCollection;
 
 /**
- * Display a list of folders (either classes, groups or both)
- * Whether classes, groups or both are available for selection is configured by the admin
- * The list of folders is generated at run-time for the current user and page
+ * Display a list of folders (either classes, groups or both) where the student has submitted IResponses or received IFeedback.
+ *
+ * In contrast to the TeacherFolder filter, this filter does not permit insertion of arbitrary folders.
  *
  * Assessments will match this filter if their ultimate/indirect folder matches that selected.
  *
  * eg, Assessment_A lives in project_B which lives in folder_C, if folder_C is selected, Assessment_A will be fetched.
- * @todo rename to 'TeacherFolder' or similar to disamibuate from 'StudentFolder', then factor out commononalities into abstract
  */
-class Definition extends AbstractDefinition
+abstract class Definition extends AbstractDefinition
 {
 
     const KEY_CLASSES = 'classes';
@@ -83,18 +81,6 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages()
-    {
-        return [
-            Option\Model::PAGE_PENDING_ASSESSMENTS,
-            Option\Model::PAGE_MARK_BOOK,
-        ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getLabel($key)
     {
         switch ($key) {
@@ -104,14 +90,5 @@ class Definition extends AbstractDefinition
                 return 'Groups';
         }
         throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getTemplatesDir()
-    {
-        return '@filterDefinitions/Assessment/Folder/templates';
     }
 }

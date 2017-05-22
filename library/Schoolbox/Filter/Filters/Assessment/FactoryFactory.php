@@ -48,12 +48,12 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
         switch ($filterDefinitionClass) {
             case Filters\Assessment\AssessmentType\Definition::class:
                 return $this->buildFactory(Filters\Assessment\AssessmentType\Factory::class);
-            case Filters\Assessment\Folder\Definition::class:
-                return $this->buildFactory(Filters\Assessment\Folder\Factory::class, [
+            case Filters\Assessment\Folder\TeacherInvolved\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Folder\TeacherInvolved\Factory::class, [
                     'folderMapper' => $this->getMapperFactory()->get(Folder\Mapper::class),
                 ]);
-            case Filters\Assessment\StudentFolder\Definition::class:
-                return $this->buildFactory(Filters\Assessment\StudentFolder\Factory::class, [
+            case Filters\Assessment\Folder\StudentInteractions\Definition::class:
+                return $this->buildFactory(Filters\Assessment\Folder\StudentInteractions\Factory::class, [
                     'folderMapper' => $this->getMapperFactory()->get(Folder\Mapper::class),
                 ]);
             case Filters\Assessment\Term\Due\Definition::class:

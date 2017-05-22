@@ -43,7 +43,7 @@ class Transformer extends \Schoolbox\Filter\Transformer
 
         // If teacher page (pending, markbook), most likely the first, if student page (eg grades) will be the second.
         $this->isFolderFilterUsed =
-            $this->getSelectedItems(Folder\Definition::class) || $this->getSelectedItems(StudentFolder\Definition::class);
+            $this->getSelectedItems(Folder\TeacherInvolved\Definition::class) || $this->getSelectedItems(Folder\StudentInteractions\Definition::class);
     }
 
 
