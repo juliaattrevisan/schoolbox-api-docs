@@ -114,6 +114,7 @@ class Controller extends Base
 
         if (is_array($timetable)) {
 
+            // Current term
             $term = $this->termMapper->findForDate($date);
 
             $timetableVars['term'] = $term->getId();
@@ -121,7 +122,6 @@ class Controller extends Base
             $timetableVars['isWeekend'] = $date->isWeekend() ? 1 : 0;
 
             // Get all what we need to build proper timetable per campus
-
             foreach ($this->getUser()->getCampusCollection() as $campus) {
 
                 $termActualStart = $this->getFirstTimetableDayForTerm($campus, $term);
@@ -149,16 +149,20 @@ class Controller extends Base
 
                 foreach ($terms as $cycleTerm) {
 
-                    $termStartDate = $cycleTerm->getStart();
-                    $termEndDate = $cycleTerm->getDisplayFinish();
-                    $tempDate = clone $termStartDate;
-                    $tempDay = $termStartDay;
+                    $cycleTermActualStart = $this->getFirstTimetableDayForTerm($campus, $cycleTerm);
+
+                    $cycleTermStartDate = $cycleTermActualStart['date'];
+                    $cycleTermStartDay = $cycleTermActualStart['day'];
+
+                    $cycleTermEndDate = $cycleTerm->getDisplayFinish();
+
+                    $tempDate = clone $cycleTermStartDate;
+                    $tempDay = $cycleTermStartDay;
+
                     $cycleDays = $timetableDay;
                     $currentCycle = 1;
 
-                    //$cycles[$cycleTerm->getId()][1]['startDate'] = $tempDate->toIso8601String();
-
-                    while ($tempDate->compareDateOnly($termEndDate) <= 0) {
+                    while ($tempDate->compareDateOnly($cycleTermEndDate) <= 0) {
 
                         $cycles[$cycleTerm->getId()][$currentCycle][$tempDay] = $tempDate->toIso8601String();
 
