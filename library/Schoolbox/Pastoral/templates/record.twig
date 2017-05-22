@@ -200,155 +200,159 @@
             </section>
         {% endif %}
 
-        {# Parents cannot ever add/view comments or related records #}
+    </div>
 
-        {% if not user.role.isParent %}
+    {# Parents cannot ever add/view comments or related records #}
 
-            {# Show audience for record #}
+    {% if not user.role.isParent %}
 
-            <h2 class="subheader">Record Visibility</h2>
+    <div class="small-12 island">
+        {# Show comments #}
 
+        {% if record.comments | length %}
+            <h2 class="subheader">Comments</h2>
             <section>
-                <ul class="information-list">
-                    {% if record.access | length %}
-                        {% for access in record.access %}
-                            {% if access.group is not empty %}
-                                <li>
-                                    <div class="small-12 card wrap-down">
-                                        {{ profile.imageSquare64(related.student) }}
-                                        <p>
-                                            <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                                {{ access.group.name }}
-                                            </a>
-                                        </p>
-                                        <p class="spaced meta">Visible To All Users In {{ access.group.name }} Pastoral Group</p>
-                                    </div>
-                                </li>
-                            {% elseif access.role is not empty %}
-                                <li>
-                                    <div class="small-12 card wrap-down">
-                                        {{ profile.imageSquare64(related.student) }}
-                                        <p>
-                                            <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                                {{ access.role.name }}
-                                            </a>
-                                        </p>
-                                        <p class="spaced meta">Visible To All Users In {{ access.role.name }} Role</p>
-                                    </div>
-                                </li>
-                            {% elseif access.user is not empty %}
-                                <li>
-                                    <div class="small-12 card wrap-down">
-                                        <a href="{{ profile.link(access.user) }}">{{ profile.imageSquare64(access.user) }}</a>
-                                        <p>
-                                            <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                                {{ access.user.fullName }}
-                                            </a>
-                                        </p>
-                                        <p class="spaced meta">Visible To Individual User</p>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
+                <ul class="action-list">
 
-                    {% endif %}
+                    {# Show all comments for this record #}
+
+                    {% for comment in record.comments %}
+
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="small-12 card wrap-down">
+                                    {# Comment author photo #}
+                                    <a href="{{ profile.link(comment.owner) }}" title="View Profile">
+                                        {{ profile.imageSquare64(comment.owner) }}
+                                    </a>
+
+                                    {# Show comment author #}
+                                    <p class="meta">Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}</p>
+
+                                    {# Show comment body #}
+                                    <p class="spaced">
+                                        {{ comment.body | purify | nl2br }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
+
+                            {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
+                                <nav>
+                                    <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
+                                </nav>
+                            {% endif %}
+
+                        </li>
+                    {% endfor %}
                 </ul>
             </section>
-
-
-            {# Show related records #}
-
-            {% if record.relatedRecords | length > 1 %}
-
-                <h2 class="subheader">Other Students Involved</h2>
-                <section>
-                    <ul class="action-list">
-                        {% for related in record.relatedRecords %}
-                            {% if related.student.id != record.student.id %}
-                                <li>
-                                    <div class="small-12 card wrap-down">
-                                        <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
-                                        <p>
-                                            <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                                {{ related.getHeading }}
-                                            </a>
-                                        </p>
-                                        <p class="spaced meta">{{ related.student.fullName }}</p>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% endif %}
-
-            {# Show comments #}
-
-            {% if record.comments | length %}
-                <h2 class="subheader">Comments</h2>
-                <section>
-                    <ul class="action-list">
-
-                        {# Show all comments for this record #}
-
-                        {% for comment in record.comments %}
-
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="small-12 card wrap-down">
-                                        {# Comment author photo #}
-                                        <a href="{{ profile.link(comment.owner) }}" title="View Profile">
-                                            {{ profile.imageSquare64(comment.owner) }}
-                                        </a>
-
-                                        {# Show comment author #}
-                                        <p class="meta">Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}</p>
-
-                                        {# Show comment body #}
-                                        <p class="spaced">
-                                            {{ comment.body | purify | nl2br }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
-
-                                {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
-                                    <nav>
-                                        <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
-                                    </nav>
-                                {% endif %}
-
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% endif %}
-
-            {% if record.comments | length == 0%}
-                <h2 class="subheader">Comments</h2>
-            {% endif %}
-
-            {% if isRouteAuthorized('pastoral.postCommentInsert', {record: record}) %}
-
-                {# Show add comment box #}
-                <section>
-                    <div class="content">
-                        <form method="post" action="{{ routeLookup('pastoral.postCommentInsert', {'recordId': record.id}) }}">
-                            <input type="hidden" name="pastoral_id" value="{{ record.id }}">
-                            <input type="hidden" name="student_id" value="{{ record.student.id }}">
-                            <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
-                            <input disabled data-post type="submit" class="expand" value="Add Comment">
-                        </form>
-                    </div>
-                </section>
-
-            {% endif %}
-
         {% endif %}
 
+        {% if record.comments | length == 0%}
+            <h2 class="subheader">Comments</h2>
+        {% endif %}
+
+        {% if isRouteAuthorized('pastoral.postCommentInsert', {record: record}) %}
+
+            {# Show add comment box #}
+            <section>
+                <div class="content">
+                    <form method="post" action="{{ routeLookup('pastoral.postCommentInsert', {'recordId': record.id}) }}">
+                        <input type="hidden" name="pastoral_id" value="{{ record.id }}">
+                        <input type="hidden" name="student_id" value="{{ record.student.id }}">
+                        <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
+                        <input disabled data-post type="submit" class="expand" value="Add Comment">
+                    </form>
+                </div>
+            </section>
+
+        {% endif %}
     </div>
+    <div class="small-6 island">
+
+        {# Show audience for record #}
+
+        <h2 class="subheader">Record Visibility</h2>
+
+        <section>
+            <ul class="information-list">
+                <li>
+                    <div class="small-12 card wrap-down">
+                        <a href="{{ profile.link(record.owner) }}">
+                            {{ profile.imageSquare64(record.owner) }}
+                            <p>{{ record.owner.fullName }}</p>
+                        </a>
+                        <p class="spaced meta">Visible To Individual User</p>
+                    </div>
+                </li>
+                {% if record.access | length %}
+                    {% for access in record.access %}
+                        {% if access.group is not empty %}
+                            <li>
+                                <div class="small-12 card wrap-down">
+                                    {{ profile.imageSquare64(related.student) }}
+                                    <p>{{ access.group.name }}</p>
+                                    <p class="spaced meta">Author Of Record</p>
+                                </div>
+                            </li>
+                        {% elseif access.role is not empty %}
+                            <li>
+                                <div class="small-12 card wrap-down">
+                                    {{ profile.imageSquare64(related.student) }}
+                                    <p>{{ access.role.name }}</p>
+                                    <p class="spaced meta">Visible To All Users In {{ access.role.name }} Role</p>
+                                </div>
+                            </li>
+                        {% elseif access.user is not empty %}
+                            <li>
+                                <div class="small-12 card wrap-down">
+                                    <a href="{{ profile.link(access.user) }}">
+                                        {{ profile.imageSquare64(access.user) }}
+                                        <p>{{ access.user.fullName }}</p>
+                                    </a>
+                                    <p class="spaced meta">Visible To Individual User</p>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </section>
+    </div>
+
+        {# Show related records #}
+
+        {% if record.relatedRecords | length > 1 %}
+
+            <div class="small-6 island">
+            <h2 class="subheader">Other Students Involved</h2>
+            <section>
+                <ul class="action-list">
+                    {% for related in record.relatedRecords %}
+                        {% if related.student.id != record.student.id %}
+                            <li>
+                                <div class="small-12 card wrap-down">
+                                    <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
+                                    <p>
+                                        <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
+                                            {{ related.getHeading }}
+                                        </a>
+                                    </p>
+                                    <p class="spaced meta">{{ related.student.fullName }}</p>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </section>
+            </div>
+        {% endif %}
+
+
+    {% endif %}
+
 </div>
 
 {% if isRouteAuthorized('pastoral.postCommentInsert', {recordId: record.id}) %}
