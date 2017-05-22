@@ -233,13 +233,14 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             $.each(twigVars.timetableVars[selectedCampus].cycles[selectedTerm], function(index, value) {
 
-                var startDate = moment(value[Object.keys(value)[0]]);
-                var endDate = moment(value[Object.keys(value)[Object.keys(value).length-1]]);
+                var valueKeys = Object.keys(value);
+                var startDate = moment(value[valueKeys[0]]);
+                var endDate   = moment(value[valueKeys[valueKeys.length - 1]]);
                 var hideClass = 'hide';
 
                 // Show this week if the selected date is in this week
                 // Also check if the selected date is not in this term - in which case show the first week
-                if (!moment(twigVars.date).isBetween(termStart, termEnd) && index == 1 || moment(twigVars.date).isBetween(startDate, endDate)) {
+                if (!moment(twigVars.date).isBetween(termStart, termEnd, 'day') && index == 1 || moment(twigVars.date).isBetween(startDate, endDate, 'day')) {
                     hideClass = '';
                 }
 
@@ -584,7 +585,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function addDatesToDays() {
 
         // Change the date data attributes on each day
-        var cycleNumber = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle');
+        var cycleNumber = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle') || 1;
         var selectedCampus = 'campus_' + timetable.campus.find(':selected').val();
         var selectedTerm = timetable.term.find(':selected').val();
 
