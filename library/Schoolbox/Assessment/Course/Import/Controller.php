@@ -506,7 +506,7 @@ class Controller extends Base\Base
 
         foreach ($dto->getAssessmentPairs() as $assessmentPairs) {
             $this->recurseDueDates($assessmentPairs);
-        };
+        }
 
         // respond with stage 4: coursework list
         $this->tpl('course', 'unitImportResults', [
