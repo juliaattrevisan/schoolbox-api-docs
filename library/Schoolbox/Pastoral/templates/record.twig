@@ -109,8 +109,7 @@
     <div class="small-12 island">
         <section class="content">
             {% for tag in record.tags %}
-                {# TODO: Pastoral Tag Report Link #}
-                <a href="#" class="neutral label">{{ tag.name }}</a>
+                <a href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId:tag.id}) }}" class="neutral label">{{ tag.name }}</a>
             {% endfor %}
         </section>
     </div>
