@@ -32,7 +32,18 @@
                                 <a href="{{ profile.link(record.owner) }}">
                                     {{ profile.imageSquare64(record.student) }}
                                 </a>
-                                <h4>{{ record.student.fullName }} - {{ record.heading }}</h4>
+                                {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
+                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': record.student.id, 'recordId': record.id}) }}">
+                                        <h4>
+                                            {{ record.student.fullName }} - {{ record.heading }}
+                                        </h4>
+                                    </a>
+                                {% else %}
+                                    <h4>
+                                        {{ record.student.fullName }} - {{ record.heading }}
+                                    </h4>
+                                {% endif %}
+
                                 <p class="spaced meta">
                                     Posted by <a href="/search/user/{{ record.owner.id }}">{{ record.owner.fullName }}</a> {{  record.createdAt.short }}
                                 </p>
@@ -97,7 +108,9 @@
                             </div>
 
                             {% if record.comments | length %}
+
                                 {# Show all comments for this record #}
+
                                 {% for comment in record.comments %}
                                     <div class="content">
                                         <div class="small-12 card wrap-down">
