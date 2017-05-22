@@ -296,9 +296,6 @@ cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/vagrant.sql
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Applying UTF8 schema patch";
-/vagrant/tools/schema/collation.sh;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing existing apache vhosts";
 rm -f /etc/apache2/sites-enabled/*;
 

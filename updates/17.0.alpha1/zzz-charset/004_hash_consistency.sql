@@ -1,0 +1,25 @@
+-- All hash columns are VARCHAR(100), ascii encoding
+SET foreign_key_checks = 0;
+ALTER TABLE blog_image MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE dropbox MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE eportfolio_component_advancedlist_item MODIFY imagehash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE eportfolio_component_blog_image MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE eportfolio_coverphoto MODIFY imagehash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE file MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE folder MODIFY image_hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE myFile MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE news_items MODIFY item_image varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE pastoral_attachment MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE pastoral_upload_queue MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE resource MODIFY image_hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE socialstream_post MODIFY cache_hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE sportsfixtures_import_errors MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE storage MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE student_submission_file MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE submission_box_file MODIFY storage_id varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE submission_return_file MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE tile MODIFY background_image_hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE ups_log MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE user MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+ALTER TABLE video_queue MODIFY hash varchar(100) CHARACTER SET ascii COLLATE ascii_general_ci;
+SET foreign_key_checks = 1;

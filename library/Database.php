@@ -129,7 +129,7 @@ class Database implements IDatabase, Serializable, IQuoter
         try {
             $this->connection = new PDO($dsn, $username, $password, array(
                 PDO::ATTR_PERSISTENT => empty($options['debug']),
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4")
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $exception) {
