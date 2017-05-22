@@ -229,14 +229,14 @@ class Controller extends Base
 
         // Convert Selection models to Filters
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filters              = $selectionTransformer->buildFiltersDto();
+        $filtersDto           = $selectionTransformer->buildFiltersDto();
 
-        // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
-        // regardless of any filter selections sent by user
-        $unitSpecFilter = $this->filterMapper->findByClass(AssessmentFilters\NullableContext\UnitSpec\Definition::class)->first();
-        $filters->setSelections($unitSpecFilter, new Collection());
+        // Ensure that assessments are not Assessment Specs
+        $filters = array_merge($filtersDto->getByClass(), [
+            AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
+        ]);
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters->getByClass());
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);

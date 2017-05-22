@@ -289,15 +289,13 @@ class Controller extends Base
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
         $filtersDto           = $selectionTransformer->buildFiltersDto();
 
-        $filters = $filtersDto->getByClass();
-
         /* Merge filters to ensure that assessments:
          * * Belong to this folder
          * * Are due in the specified term
          * * Are not Assessment Specs
          * * Are not before their publish date (ie are not KEY_UNPUBLISHED)
          */
-        $filters = array_merge($filters, [
+        $filters = array_merge($filtersDto->getByClass(), [
             AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
             AssessmentFilters\Term\Due\Definition::class                   => $term,
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],

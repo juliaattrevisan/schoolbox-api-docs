@@ -207,7 +207,12 @@ class Controller extends Base
              */
             list($filtersDto, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($postFilterSelections, true);
 
-            $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filtersDto->getByClass());
+            // Ensure that assessments are not Assessment Specs
+            $filters = array_merge($filtersDto->getByClass(), [
+                AssessmentFilter\NullableContext\UnitSpec\Definition::class => [],
+            ]);
+
+            $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
@@ -247,7 +252,7 @@ class Controller extends Base
     /**
      * @param array $request
      * @param bool  $save Should we persist these selections to the DB ?
-     * @return null[]|Collection[]|mixed[][]
+     * @return array
      * @throws \InvalidArgumentException If unable to find the filter mapper class
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined what entity it is filtering
@@ -269,12 +274,7 @@ class Controller extends Base
         $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
         $filtersTODO          = $selectionTransformer->buildFiltersDto();
 
-        // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
-        // regardless of any filter selections send by user
-        $unitSpecFilter = Filter\Mapper::getInstance()->findByClass(AssessmentFilter\NullableContext\UnitSpec\Definition::class)->first();
-        $filtersTODO->setSelections($unitSpecFilter, new Collection());
-
-        return [$filtersTODO, $codec, $selectionsPerFilter];
+        return [$filtersTODO->getByClass(), $codec, $selectionsPerFilter];
     }
 
 
@@ -292,10 +292,15 @@ class Controller extends Base
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
 
-        /** @var Filter\DataTransferObject  $dto */
-        list($dto) = $this->convertRequestToFilters($filtersArray, false);
+        /** @var Filter\DataTransferObject $filtersDto */
+        list($filtersDto) = $this->convertRequestToFilters($filtersArray, false);
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($dto->getByClass());
+        // Ensure that assessments are not Assessment Specs
+        $filters = array_merge($filtersDto->getByClass(), [
+            AssessmentFilter\NullableContext\UnitSpec\Definition::class => [],
+        ]);
+
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds);
 
         $csvExporter = new Export\CSV();
