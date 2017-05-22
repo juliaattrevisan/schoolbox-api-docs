@@ -81,13 +81,13 @@ class Definition extends AbstractDefinition
     public function getLabel($key)
     {
         if (self::KEY_UPCOMING === $key) {
-            return 'Upcoming';
+            return 'Unpublished';
         }
         if (self::KEY_PREVIEW === $key) {
-            return 'Preview';
+            return 'Upcoming';
         }
         if (self::KEY_DUE === $key) {
-            return 'Due';
+            return 'Open';
         }
         if (self::KEY_OVERDUE === $key) {
             return 'Overdue';
