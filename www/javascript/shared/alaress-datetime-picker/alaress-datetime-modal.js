@@ -597,8 +597,21 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             var dayNumber = $(this).attr('data-tt-day');
 
             if (dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]) {
-                var dayDate = moment(twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]).format('YYYY-MM-DD');
+                var dayMoment = moment(twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]);
+                var dayDate   = dayMoment.format('YYYY-MM-DD');
+
+                var yr  = dayMoment.year();
+                var mo  = dayMoment.month() + 1;
+                var day = dayMoment.date();
+
                 $(this).attr('data-date', dayDate).removeClass('disabled');
+
+                if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
+                    $(this).attr('data-heat', parseInt(heatCache[yr][mo][day] / 20));
+                } else {
+                    $(this).attr('data-heat', '');
+                }
+
             } else {
                 $(this).removeAttr('data-date').addClass('disabled');
             }
