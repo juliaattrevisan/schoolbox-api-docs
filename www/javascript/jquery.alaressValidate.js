@@ -19,7 +19,7 @@
             element.parents('fieldset').find('div.error-placeholder').html(error);
         } else if (element.is('[type="checkbox"], [type="radio"]')) {
             error.insertBefore(element);
-        } else if (element.closest('.input-group')) {
+        } else if (element.closest('.input-group').length) {
             error.insertAfter(element.closest('.input-group'))
         } else {
             error.insertAfter(element);
