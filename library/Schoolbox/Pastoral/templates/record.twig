@@ -18,7 +18,7 @@
             <div class="content">
                 {{ record.body | purify }}
             </div>
-                {% if record.points != 0 or (record.tags | length) or record.private %}
+                {% if record.points != 0 or (record.tags | length) %}
                     <div class="content">
                         {% include '@pastoral/fragments/recordTags.twig' %}
                     </div>

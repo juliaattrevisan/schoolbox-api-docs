@@ -61,7 +61,6 @@ class Mapper extends BaseMapper
         $this->uses('external_id', self::TYPE_INTEGER);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('heading', self::TYPE_STRING);
-        $this->uses('private', self::TYPE_BOOLEAN);
         $this->uses('points', self::TYPE_DECIMAL);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -218,12 +217,6 @@ class Mapper extends BaseMapper
             return false;
         }
 
-        // Shortcut hydration if it is a private record and the user is a parent
-
-        if ($row['private'] && $this->getSessionUser()->getRole()->isParent()) {
-            return false;
-        }
-
         /** @var Model $model */
         $model = $this->hydrate($row);
 
@@ -271,41 +264,9 @@ class Mapper extends BaseMapper
             return false;
         }
 
-        // If the record is marked as private we may need to blank out its contents if the user does not have sufficent access
-
-        $accessGranted = false;
-
-        if ($model->getPrivate()) {
-
-            if ($model->getOwner()->getId() == $this->getSessionUser()->getId()) {
-
-                // Owners can see their own records
-
-                $accessGranted = true;
-
-            } else {
-
-                // Otherwise, only individually audienced users, or members of audienced groups get access
-                // to private records
-
-                foreach ($model->getAccess() as $access) {
-                    if ($access->hasAccess($this->getSessionUser(), false)) {
-                        $accessGranted = true;
-                        break;
-                    }
-                }
-            }
-        } else {
-            $accessGranted = true;
-        }
-
-        if ($accessGranted) {
-            $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
-            $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
-            $model->setAttachments($this->getJoinMapper('attachments')->findByColumn('pastoral_id', $model->getId()));
-        } else {
-            $model->setBody($this->getConfigLoader()->get('pastoral_private_body'));
-        }
+        $model->setTags(PastoralTagMapper::getInstance()->findForRecord($model));
+        $model->setComments($this->getJoinMapper('comments')->findByColumn('pastoral_id', $model->getId()));
+        $model->setAttachments($this->getJoinMapper('attachments')->findByColumn('pastoral_id', $model->getId()));
 
         // Only hydrate related records if we're specifically told to
 
@@ -313,7 +274,7 @@ class Mapper extends BaseMapper
             $model->setRelatedRecords($this->getRelatedRecords($model));
         }
 
-        // Reeturn hydrated model
+        // Return hydrated model
 
         return $model;
     }

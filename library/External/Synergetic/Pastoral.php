@@ -139,7 +139,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     ClassificationCode,
                     IsFollowUpFlag,
                     FollowUpDate,
-                    ConfidentialFlag,
                     CreatedDate,
                     CreatedByID,
                     ModifiedDate,
@@ -248,7 +247,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                           dbo.tPastoralCare.ClassificationCode, 
                           dbo.tPastoralCare.IsFollowUpFlag, 
                           dbo.tPastoralCare.FollowUpDate, 
-                          dbo.tPastoralCare.ConfidentialFlag,
                           dbo.tPastoralCare.CreatedDate, 
                           dbo.tPastoralCare.CreatedByID, 
                           dbo.tPastoralCare.ModifiedDate, 
@@ -316,6 +314,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
 
+                /** @var Pastoral $pastoralRecord */
                 $pastoralRecord = $this->getPastoralMapper()->createModel();
                 $pastoralRecord->setExternalId($record["PastoralCareSeq"]);
                 $pastoralRecord->setOwner($owner);
@@ -324,7 +323,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $pastoralRecord->setBody($record["Details"]);
                 $pastoralRecord->setType($this->getPastoralType($record));
                 $pastoralRecord->setCategory($this->getPastoralCategory($record));
-                $pastoralRecord->setPrivate($record["ConfidentialFlag"]);
 
                 if ($this->config->get('pastoral_severity')) {
                     $pastoralRecord->setSeverity($severity);
@@ -406,7 +404,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $pastoralRecord->setId(null);
                     $pastoralRecord->setHeading(substr(trim($record["PrivateDetails"]), 0, 50));
                     $pastoralRecord->setBody($record["PrivateDetails"]);
-                    $pastoralRecord->setPrivate(true);
                     $this->getPastoralMapper()->save($pastoralRecord);
 
                     /** @var PastoralAccess $accessRecord */

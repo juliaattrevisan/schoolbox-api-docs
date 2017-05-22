@@ -583,7 +583,6 @@ class Controller extends Base
             $record->setPoints($post["points"]);
             $record->setSeverity($severity);
             $record->setBody($post["body"]);
-            $record->setPrivate($post["private"]);
             $record->setOwner($this->getUser());
             $this->pastoralMapper->setSessionData($_SESSION);
             $this->pastoralMapper->save($record);
@@ -768,7 +767,6 @@ class Controller extends Base
         $record->setPoints($post["points"]);
         $record->setSeverity($severity);
         $record->setBody($post["body"]);
-        $record->setPrivate($post["private"]);
         $this->pastoralMapper->setSessionData($_SESSION);
         $this->pastoralMapper->save($record);
 
