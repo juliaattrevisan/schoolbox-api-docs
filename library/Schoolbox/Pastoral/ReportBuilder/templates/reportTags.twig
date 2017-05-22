@@ -1,0 +1,165 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<ul class="breadcrumb hide-on-print">
+    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
+    <li><a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Reports</a></li>
+    <li class="active"><a href="#">Records By Tag - {{ tag.name }}</a></li>
+</ul>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Records By Tag - {{ tag.name }}</h1>
+        </div>
+    </div>
+    <nav>
+        {% if results | length %}
+            <a href="#" data-print class="icon-print" title="Print Report Results"></a>
+        {% endif %}
+    </nav>
+</div>
+
+<div class="row">
+    {% if results | length > 0 %}
+
+        <div class="small-12 island">
+            {% for record in results %}
+                <section>
+                    <ul class="action-list">
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
+                                <a href="{{ profile.link(record.owner) }}">
+                                    {{ profile.imageSquare64(record.student) }}
+                                </a>
+                                {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
+                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': record.student.id, 'recordId': record.id}) }}">
+                                        <h4>
+                                            {{ record.student.fullName }} - {{ record.heading }}
+                                        </h4>
+                                    </a>
+                                {% else %}
+                                    <h4>
+                                        {{ record.student.fullName }} - {{ record.heading }}
+                                    </h4>
+                                {% endif %}
+
+                                <p class="spaced meta">
+                                    Posted by <a href="/search/user/{{ record.owner.id }}">{{ record.owner.fullName }}</a> {{  record.createdAt.short }}
+                                </p>
+
+                                {% if record.points != 0 or (record.tags | length) > 0 %}
+                                    <p class="spaced">
+                                        {% if record.points != 0 %}
+                                            {% if record.points < 0 %}
+                                                {% set labelClass='alert' %}
+                                            {% else %}
+                                                {% set labelClass='success' %}
+                                            {% endif %}
+                                            <span class="{{ labelClass }} label hide-on-print">{{ record.points }} Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
+                                            <b class="show-for-print"> {{ record.points }} Point{% if record.pointrs < -1 or record.points > 1 %}s{% endif %}</b>
+                                        {% endif %}
+                                        {% if record.tags | length > 0 %}
+                                            {% for tag in record.tags %}
+                                                <a class="neutral label hide-on-print" href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}" class="neutral label">
+                                                    {{ tag.name }}
+                                                </a>
+                                                <b class="show-for-print"> {{ tag.name }}</b>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </p>
+                                {% endif %}
+
+                                <p class="spaced meta">
+                                    {# Pastoral event type #}
+                                    {{ record.type.name }} {% if record.category.name != '' %}({{ record.category.name }}){% endif %} |
+
+                                    {% if showSeverity %}
+                                        {# Pastoral event severity #}
+                                        {{ record.severity.name }} |
+                                    {% endif %}
+
+                                    {# Indicate if record is private #}
+                                    {% if record.private %}Contents Private | {% endif %}
+
+                                    {# Indicate if not audience has been set #}
+                                    {% if record.access | length == 0 %}No Audience Set{% endif %}
+
+                                    {# Show audienced roles  #}
+                                    {% for access in record.access %}
+                                        {% if access.role.id != '' %}
+                                            {{ access.role.name }}{% if not loop.last %},{% endif %}
+                                        {% elseif access.user.id != '' %}
+                                            <a href="/search/user/{{ access.user.id }}">{{ access.user.fullName }}</a>{% if not loop.last %},{% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                            </div>
+
+                            <div class="clearfix no-margin"></div>
+
+                            {# Show article body #}
+                            <div class="content">
+                                {{ record.body | purify }}
+
+                                {# Show any file attachments #}
+                                {% if record.attachments | length %}
+                                    <p class="spaced meta">
+                                        {% for attachment in record.attachments %}
+                                            <a target="_blank" href="/storage/fetch.php?hash={{ attachment.storage.hash }}">{{  attachment.storage.filename }}</a><br>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            {% if record.comments | length %}
+
+                                {# Show all comments for this record #}
+
+                                {% for comment in record.comments %}
+                                    <div class="content">
+                                        <div class="small-12 card wrap-down">
+                                            {# Comment author photo #}
+                                            <a href="{{ profile.link(comment.owner) }}" title="View Profile">
+                                                {{ profile.imageSquare64(comment.owner) }}
+                                            </a>
+
+                                            {# Show comment author #}
+                                            <p class="meta">Comment By <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}</p>
+
+                                            {# Show comment body #}
+                                            <p class="spaced">
+                                                {{ comment.body | purify | nl2br }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                            {% endif %}
+                        </li>
+                    </ul>
+                </section>
+            {% endfor %}
+        </div>
+
+    {% else %}
+
+        <div class="small-12 column">
+            <div class="empty-state">
+                <i class="icon-pastoral"></i>
+                <p>No pastoral records matched your report criteria.</p>
+            </div>
+
+            <a class="button submit expand" href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Select Another Report</a>
+        </div>
+
+    {% endif %}
+</div>
+
+<script>
+    $(function() {
+        $('[data-print]').click(function() {
+            window.print();
+        });
+    })
+</script>
