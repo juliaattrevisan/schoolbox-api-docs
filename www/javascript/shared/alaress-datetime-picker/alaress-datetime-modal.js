@@ -238,9 +238,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 var endDate   = moment(value[valueKeys[valueKeys.length - 1]]);
                 var hideClass = 'hide';
 
-                // Show this week if the selected date is in this week
-                // Also check if the selected date is not in this term - in which case show the first week
-                if (!moment(twigVars.date).isBetween(termStart, termEnd, 'day') && index == 1 || moment(twigVars.date).isBetween(startDate, endDate, 'day')) {
+                if (index === 1 && !moment(twigVars.date).isBetween(termStart, termEnd, 'day', '[]')) {
+                    // if this date is outside the bounds of the term, display the first week
+                    hideClass = '';
+
+                } else if (moment(twigVars.date).isBetween(startDate, endDate, 'day', '[]')) {
+                    // show this week if the selected date is in this week
                     hideClass = '';
                 }
 
