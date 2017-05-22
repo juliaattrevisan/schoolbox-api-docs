@@ -320,27 +320,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         });
                     }
 
-
-                    // Update input mask
-                    var maskOptions;
-                    if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
-                        maskOptions = {
-                            mask: "1/2/y",
-                            placeholder: "dd/mm/yyyy",
-                            alias: "date",
-                            hourFormat: "12"
-                        };
-                    } else {
-                        maskOptions = {
-                            mask: "1/2/y h:s t\\m",
-                            placeholder: "dd/mm/yyyy hh:mm xm",
-                            alias: "datetime",
-                            hourFormat: "12"
-                        };
-                    }
-                    element.inputmask(maskOptions);
-
-
                     // Close modal
                     picker.foundation('reveal', 'close');
 
