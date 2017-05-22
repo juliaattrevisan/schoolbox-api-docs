@@ -828,9 +828,11 @@ class Controller extends Base
 
                         /** @var PastoralAccessModel $accessCurrent */
                         foreach ($existingAccess as $accessCurrent) {
-                            if ($accessCurrent->getUser()->getId() == $user_id) {
-                                $found = true;
-                                break;
+                            if ($accessCurrent->getUser() instanceof User) {
+                                if ($accessCurrent->getUser()->getId() == $user_id) {
+                                    $found = true;
+                                    break;
+                                }
                             }
                         }
                     }

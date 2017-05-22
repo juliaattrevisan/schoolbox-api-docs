@@ -211,7 +211,6 @@ class Mapper extends BaseMapper
 
         // This method gets called before checking authorization- so if the session timed out this might be blank
 
-
         if (!$this->getSessionUser() instanceof User) {
             return false;
         }
