@@ -211,6 +211,17 @@ class Controller extends Base
             }
         }
 
+        try {
+            $this->pastoralReportDashboardMapper->findOneByColumnList([
+                'user_id' => $report->getOwner()->getId(),
+                'report_id' => $report->getId()
+            ]);
+
+            $report->setDashboard(true);
+        } catch (MapperException $e) {
+            $report->setDashboard(false);
+        }
+
         // And render this thing out
 
         $this->getResponse()->content->set(
@@ -415,17 +426,24 @@ class Controller extends Base
 
         // Save groups the report is shared with
 
-        $groupsCollection = new Collection();
+        if (is_array($post['group'])) {
 
-        foreach ($post['group'] as $groupId => $checked) {
-            if ($checked) {
-                $groupsCollection->add($this->pastoralGroupMapper->createModel($groupId));
+            $groupsCollection = new Collection();
+
+            foreach ($post['group'] as $groupId => $checked) {
+                if ($checked) {
+                    $groupsCollection->add($this->pastoralGroupMapper->createModel($groupId));
+                }
             }
+
+            $pastoralReport->setGroups($groupsCollection);
         }
 
-        $pastoralReport->setGroups($groupsCollection);
-
         $this->pastoralReportMapper->save($pastoralReport);
+
+        // Update display on pastoral dashboard status
+
+        $this->updatePastoralDashboard($pastoralReport, isset($post['dashboard']));
 
         // Go back to the reports list
 
@@ -446,6 +464,26 @@ class Controller extends Base
         /** @var PastoralReport $report */
         $report = $this->pastoralReportMapper->createModel($post['reportId']);
 
+        $result = $this->updatePastoralDashboard($report, $post['display']);
+        
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => $this->buildJsonOutput([
+                'status' => 'OK',
+                'result' => $result
+            ])
+        ]);
+    }
+
+    /**
+     * Update pastoral dashboard record
+     *
+     * @param PastoralReport $report
+     * @param bool $display
+     * @return string
+     */
+    private function updatePastoralDashboard($report, $display)
+    {
         try {
 
             // Check if the report is already on the dashboard
@@ -457,7 +495,7 @@ class Controller extends Base
 
             // We found the report on the dashboard, check if we need to remove it
 
-            if (!$post['display']) {
+            if (!$display) {
 
                 // Report was being displayed on dashboard, delete it
 
@@ -470,7 +508,7 @@ class Controller extends Base
 
             // Report wasn't on the dashboard already, check if we need to add it
 
-            if ($post['display']) {
+            if ($display) {
 
                 // Add the report to the dashboard
 
@@ -483,13 +521,7 @@ class Controller extends Base
                 $result = 'No action, already not on dashboard';
             }
         }
-        
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => $this->buildJsonOutput([
-                'status' => 'OK',
-                'result' => $result
-            ])
-        ]);
+
+        return $result;
     }
 }
