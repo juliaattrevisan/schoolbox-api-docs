@@ -33,28 +33,45 @@
                 {% set bodyPrevious = '' %}
                 {% set headingPrevious = '' %}
                 {% for revision in record.revisions %}
-                    {# Only division revisions if they are different #}
+
+                    {# Only display revisions if they are different from the previous (fields not displayed might have changed and this will confuse users #}
+
                     {% if revision.body != bodyPrevious and revision.body != record.body or
                           revision.heading != headingPrevious and revision.heading != record.heading %}
                         {% if loop.first %}
-                            <h2 class="subheader" id="accordion">Revision History</h2>
-                            <dl class="accordion" data-accordion>
+                            <h2 class="subheader">Revision History</h2>
+                            <section>
+                                <ul class="information-list expandable-card">
                         {% endif %}
                         {% set bodyPrevious = revision.body %}
                         {% set headingPrevious = revision.heading %}
-                        <dd class="accordion-navigation">
-                            <a href="#revision-{{ loop.index }}">
-                                {{ revision.heading }}
-                                <span class="right">Edited by {{ revision.modifiedBy.fullName }} - {{ revision.updatedAt.long }}</span>
-                            </a>
-                            <div id="revision-{{ loop.index }}" class="content">
-                                {{ revision.body | purify }}
+
+                        <li>
+                            <div>
+                                <div class="expander icon-down-arrow" data-collapser="collap-{{ loop.index }}"></div>
+                                <div class="small-12 card">
+                                    <a href="/search/user/245">
+                                        <img src="/portrait.php?userId={{ revision.modifiedBy.externalId }}&size=square64">
+                                        <h3>{{ revision.heading }}</h3>
+                                        <p class="meta">Edited by {{ revision.modifiedBy.fullName }} - {{ revision.updatedAt.long }}</p>
+                                    </a>
+                                </div>
                             </div>
-                        </dd>
+                            <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{ loop.index }}">
+                                <p>{{ revision.body | purify }}</p>
+                            </div>
+                        </li>
+
                     {% endif %}
                 {% endfor %}
                 {% if bodyPrevious is not empty %}
-                    </dl>
+                        </ul>
+                        <script type="text/javascript">
+                            $(function () {
+                                $('[data-collapser]').collapsable();
+                            });
+                        </script>
+                    </section>
                 {% endif %}
             {% endif %}
         {% endif %}
