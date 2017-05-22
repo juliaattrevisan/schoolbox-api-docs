@@ -10,15 +10,12 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 <div class="row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Pastoral Record</h1>
-        </div>
+    <div class="small-12 column">
+        <h1>Pastoral Record</h1>
     </div>
 </div>
 
 <div class="row actions-small-2">
-
     <div class="list-item">
         <div class="small-12 island">
             <h2 class="subheader">
@@ -59,9 +56,10 @@
             {% endfor %}
         </ul>
     {% endif %}
-
 </div>
 
+{# Profile pic and misc details
+ #}
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad">
@@ -104,47 +102,79 @@
     </div>
 </div>
 
+{# Conditionally show any tags that may exist
+ #}
+{% if record.tags|length %}
 <div class="row">
     <div class="small-12 island">
+        <section class="content">
+            {% for tag in record.tags %}
+                {# TODO: Pastoral Tag Report Link #}
+                <a href="#" class="neutral label">{{ tag.name }}</a>
+            {% endfor %}
+        </section>
+    </div>
+</div>
+{% endif %}
 
-        {% if record.tags | length %}
-            <section class="content">
-                {% for tag in record.tags %}
-                    {# TODO: Pastoral Tag Report Link #}
-                    <a href="#" class="neutral label">{{ tag.name }}</a>
-                {% endfor %}
-            </section>
-        {% endif %}
-
+{# Body content always exists
+ #}
+<div class="row">
+    <div class="small-12 island">
         <section>
             <div class="content">
                 {{ record.body | purify }}
             </div>
         </section>
+    </div>
+</div>
 
-        {# Show revision history to moderators #}
 
-        {% if moderator %}
-            {% if record.revisions | length > 0 %}
-                {% set bodyPrevious = '' %}
-                {% set headingPrevious = '' %}
-                {% for revision in record.revisions %}
+{# If you're a moderator and there's revisions to investigate
+ #}
+{% if moderator and (record.revisions|length) %}
+
+    {# Show revision history to moderators
+     # Current record contents exist as a revision
+     #}
+    {% set headingPrevious = record.heading %}
+    {% set bodyPrevious = record.body %}
+
+    {# Lookahead to see if there was any meaningfully-changed revisions to show
+     # and exit early once we determine there's something to show
+     #}
+    {% set hasItems = false %}
+
+    {% for revision in record.revisions if not hasItems %}
+        {% if ((headingPrevious != revision.heading) or (bodyPrevious != revision.body)) %}
+            {% set hasItems = true %}
+        {% endif %}
+
+        {% set headingPrevious = revision.heading %}
+        {% set bodyPrevious = revision.body %}
+    {% endfor %}
+
+    {# If at least one item was worthy of showing, render revision history
+     #}
+    {% if hasItems %}
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Revision History</h2>
+
+            <section>
+                <ul class="information-list expandable-card">
 
                     {# Only display revisions if they are different from the previous (fields not displayed might have changed and this will confuse users #}
+                    {% set headingPrevious = record.heading %}
+                    {% set bodyPrevious = record.body %}
 
-                    {% if revision.body != bodyPrevious and revision.body != record.body or revision.heading != headingPrevious and revision.heading != record.heading %}
+                    {% for revision in record.revisions %}
 
-                        {% if loop.first %}
-                            <h2 class="subheader">Revision History</h2>
-                            <section>
-                                <ul class="information-list expandable-card">
-                        {% endif %}
-
-                        {% set bodyPrevious = revision.body %}
-                        {% set headingPrevious = revision.heading %}
-
+                        {# In the set of revisions, the previous revision is somehow different to the current revision
+                         # in a meaningful way (heading/body changed). This logic always skips the current record
+                         #}
+                        {% if ((headingPrevious != revision.heading) or (bodyPrevious != revision.body)) %}
                         <li>
-
                             <div>
                                 <div class="expander icon-down-arrow" data-collapser="collap-{{ loop.index }}"></div>
                                 <div class="small-12 card">
@@ -164,22 +194,29 @@
                             <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{ loop.index }}">
                                 {{ revision.body | purify }}
                             </div>
-
                         </li>
+                        {% endif %}
 
-                    {% endif %}
-                {% endfor %}
-                {% if bodyPrevious is not empty %}
-                        </ul>
-                        <script type="text/javascript">
-                            $(function () {
-                                $('[data-collapser]').collapsable();
-                            });
-                        </script>
-                    </section>
-                {% endif %}
-            {% endif %}
-        {% endif %}
+                        {# Remember for next iteration
+                         #}
+                        {% set headingPrevious = revision.heading %}
+                        {% set bodyPrevious = revision.body %}
+                    {% endfor %}
+                </ul>
+                <script type="text/javascript">
+                    $(function () {
+                        $('[data-collapser]').collapsable();
+                    });
+                </script>
+            </section>
+        </div>
+    </div>
+    {% endif %}
+{% endif %}
+
+
+<div class="row">
+    <div class="small-12 island">
 
         {% if record.attachments| length %}
             <h2 class="subheader">Attached Files</h2>

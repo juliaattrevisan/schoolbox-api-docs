@@ -325,7 +325,7 @@ class Controller extends Base
         if ($moderator->count() > 0) {
             $record->setRevisions(
                 $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId(), ['order' => [
-                    'created_at' => 'desc'
+                    'updated_at' => 'desc'
                 ]])
             );
         }
@@ -578,11 +578,11 @@ class Controller extends Base
 
             $record->setModifiedBy($this->getUser());
             $record->setStudent($student);
-            $record->setHeading($post["heading"]);
+            $record->setHeading(trim($post["heading"]));
             $record->setType($type);
             $record->setPoints($post["points"]);
             $record->setSeverity($severity);
-            $record->setBody($post["body"]);
+            $record->setBody(trim($post["body"]));
             $record->setOwner($this->getUser());
             $this->pastoralMapper->setSessionData($_SESSION);
             $this->pastoralMapper->save($record);
@@ -761,12 +761,12 @@ class Controller extends Base
         }
 
         $record->setModifiedBy($this->getUser());
-        $record->setHeading($post["heading"]);
+        $record->setHeading(trim($post["heading"]));
         $record->setType($type);
         $record->setCategory($category);
         $record->setPoints($post["points"]);
         $record->setSeverity($severity);
-        $record->setBody($post["body"]);
+        $record->setBody(trim($post["body"]));
         $this->pastoralMapper->setSessionData($_SESSION);
         $this->pastoralMapper->save($record);
 
