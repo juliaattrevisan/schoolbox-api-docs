@@ -162,7 +162,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
 
-            requestHeat(instance, applyHeatToCalendar);
+            requestHeat(instance, applyHeatEverywhere);
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -183,13 +183,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
         },
         onMonthChange: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, applyHeatToCalendar);
+            requestHeat(instance, applyHeatEverywhere);
         },
         onYearChange: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, applyHeatToCalendar);
+            requestHeat(instance, applyHeatEverywhere);
         },
         onValueUpdate: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, applyHeatToCalendar);
+            requestHeat(instance, applyHeatEverywhere);
         }
 
     });
@@ -576,6 +576,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $newCycle.removeClass('hide');
 
             addDatesToDays();
+            applyHeatToTimetable();
             resetTimetable();
 
         }
@@ -586,34 +587,55 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Add date data attributes to day selectors on timetable picker
      */
     function addDatesToDays() {
+        iterateVisibleTimetableDays(
+            function (dayMoment) {
+                $(this).attr('data-date', dayMoment.format('YYYY-MM-DD')).removeClass('disabled');
+            },
+            function () {
+                $(this).removeAttr('data-date').addClass('disabled');
+            }
+        );
+    }
 
+
+    /**
+     * Iterate the timetable days and apply the given callbacks to them accordingly
+     *
+     * @param {Function} ifDate
+     * @param {Function} ifNotDate
+     */
+    function iterateVisibleTimetableDays(ifDate, ifNotDate) {
         // Change the date data attributes on each day
-        var cycleNumber = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle') || 1;
+        var cycleNumber    = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle') || 1;
         var selectedCampus = 'campus_' + timetable.campus.find(':selected').val();
-        var selectedTerm = timetable.term.find(':selected').val();
+        var selectedTerm   = timetable.term.find(':selected').val();
 
-        $byTimetable.find('[data-tt-days] > div').each(function() {
+        $byTimetable.find('[data-tt-days] > div').each(function () {
 
             var dayNumber = $(this).attr('data-tt-day');
 
             if (dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]) {
                 var dayMoment = moment(twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]);
-                var dayDate   = dayMoment.format('YYYY-MM-DD');
-
-                var yr  = dayMoment.year();
-                var mo  = dayMoment.month() + 1;
-                var day = dayMoment.date();
-
-                $(this).attr('data-date', dayDate).removeClass('disabled');
-
-                applyHeatToDay($(this), yr, mo, day);
+                ifDate.call(this, dayMoment);
 
             } else {
-                $(this).removeAttr('data-date').addClass('disabled');
+                ifNotDate.call(this);
             }
-
         });
+    }
 
+
+    /**
+     * Whichever dates are visible in the timetable, apply heat to them
+     */
+    function applyHeatToTimetable() {
+        iterateVisibleTimetableDays(function (dayMoment) {
+            var yr  = dayMoment.year();
+            var mo  = dayMoment.month() + 1;
+            var day = dayMoment.date();
+
+            applyHeatToDay($(this), yr, mo, day);
+        });
     }
 
 
@@ -636,6 +658,26 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         });
     }
 
+
+    /**
+     * Ergh... the fact that this function even exists.....
+     *
+     * @param {Flatpickr} instance
+     */
+    function applyHeatEverywhere(instance)
+    {
+        applyHeatToCalendar(instance);
+        applyHeatToTimetable();
+    }
+
+    /**
+     * What it says on the tin.
+     *
+     * @param {jQuery}  element
+     * @param {Integer} yr
+     * @param {Integer} mo
+     * @param {Integer} day
+     */
     function applyHeatToDay(element, yr, mo, day) {
         if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
             element.attr('data-heat', parseInt(heatCache[yr][mo][day] / 20));
@@ -677,6 +719,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
 
     /**
+     * Retrieve heat data from they server, then apply it according to the onSuccess callback
      *
      * @param {Integer} yr
      * @param {Integer} mo
