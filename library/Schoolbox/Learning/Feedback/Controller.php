@@ -49,7 +49,7 @@ class Controller extends Base
     public function postParticipantFeedback(Participant $participant)
     {
         $mostRecentFeedback = $participant->findMostRecentFeedback();
-        $post = $this->getRequest()->post;
+        $post = $this->getRequest()->post->getArrayCopy();
 
         try {
             $this->processFeedback($participant, $mostRecentFeedback, $post);
@@ -138,6 +138,8 @@ class Controller extends Base
      */
     private function processFeedback(Participant $participant, IFeedback $mostRecentFeedback = null, $postVars, IResponse $response = null)
     {
+        $hasRubric = array_key_exists('rubric', $postVars);
+
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),
             $participant,
@@ -147,6 +149,7 @@ class Controller extends Base
             $postVars['comment'],
             $postVars['publish'],
             $postVars['attachment'],
+            $hasRubric,
             $response
         );
 
