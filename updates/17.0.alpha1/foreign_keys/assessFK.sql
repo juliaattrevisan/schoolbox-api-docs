@@ -19,3 +19,10 @@ REFERENCES `course_unit_specification` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+ALTER TABLE `course_unit_implementation`
+  DROP COLUMN `unit_category_id`,
+  DROP COLUMN `category_id`,
+  DROP COLUMN `component_id`,
+  DROP INDEX `course_unit_implementation_category_id` ,
+  DROP INDEX `course_unit_implementation_unit_category_id` ,
+  DROP INDEX `course_unit_implementation_component_id` ;
