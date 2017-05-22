@@ -18,6 +18,7 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
+use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -223,6 +224,86 @@ class Controller extends Base
                 ]
             )
         );
+    }
+
+    /**
+     * Retrieve report of all pastoral records with the selected tag
+     * @param PastoralTag $tag
+     */
+    public function getReportTags($tag)
+    {
+        $records = $this->pastoralMapper->findByTag($tag);
+
+        // Restrict results based on pagination
+
+        if (!isset($query["pageCurrent"])) {
+            $pageCurrent = 1;
+        } else {
+            $pageCurrent = (int)$query["pageCurrent"] == 0 ? 1 : (int)$query["pageCurrent"];
+        }
+
+        // This is the number of pages the user is allowed to select from at any one time (Must be even)
+
+        $pagesToDisplay = $this->getConfigLoader()->get('pastoral_page_visible');
+
+        // This is the number of records before we force them to browse to another page
+
+        $resultsPerPage = $this->getConfigLoader()->get('pastoral_page_size');
+        $totalPages = ceil($records->count() / $resultsPerPage);
+
+        // Put some limit checks on page numbers
+
+        if ($pageCurrent < 1) {
+            $pageCurrent = 1;
+        } else {
+            if ($pageCurrent > $totalPages) {
+                $pageCurrent = $totalPages;
+            }
+        }
+
+        // Grab the records we're going to render
+
+        $paginatedRecords = new Collection;
+
+        for ($i = ($pageCurrent - 1) * $resultsPerPage; $i < $pageCurrent * $resultsPerPage; $i++) {
+            if ($records[$i] != null) {
+                $paginatedRecords[] = $records[$i];
+            }
+        }
+
+        // And spit this thing out
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@pastoralReportBuilder/reportTags.twig',
+                'data' => array(
+                    'tag'               => $tag,
+                    'results'           => $paginatedRecords,
+                    'resultsPerPage'    => $resultsPerPage,
+                    'pagesToDisplay'    => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
+                    'totalPages'        => $totalPages,
+                    'totalResults'      => $records->count(),
+                    'pageCurrent'       => $pageCurrent
+                ),
+            )
+        );
+
+        // And spit this thing out
+
+//        $this->getResponse()->content->set(
+//            array(
+//                'template' => '@pastoralReportBuilder/reportResults.twig',
+//                'data' => array(
+//                    'results'           => $paginatedRecords,
+//                    'resultsPerPage'    => $resultsPerPage,
+//                    'pagesToDisplay'    => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
+//                    'totalPages'        => $totalPages,
+//                    'totalResults'      => $records->count(),
+//                    'pageCurrent'       => $pageCurrent,
+//                    'report'            => $report
+//                ),
+//            )
+//        );
     }
 
     /**

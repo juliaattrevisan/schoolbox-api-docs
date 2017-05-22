@@ -46,6 +46,7 @@ class Module extends BaseModule
                 '/insert'                       => ['getReportInsert' => $permissionStaff],
                 '/update/{reportId:\d+}'        => ['getReportUpdate' => $permissionStaff],
                 '/results/{reportId:\d+}'       => ['getReportResults' => $permissionStaff],
+                '/results/tag/{tagId:\d+}'      => ['getReportTags' => $permissionStaff],
                 '/results/{reportId:\d+}/print' => ['getReportResultsPrint' => $permissionStaff],
             ],
             'POST' => [
@@ -91,6 +92,15 @@ class Module extends BaseModule
                     /** @var PastoralReportMapper $pastoralReportMapper */
                     $pastoralReportMapper = $this->getMapperFactory()->get(PastoralReportMapper::class);
                     $injectedValues['report'] = $pastoralReportMapper->findById($params['reportId']);
+                } catch (MapperException $e) {
+                }
+            }
+
+            if (array_key_exists('tagId', $params)) {
+                try {
+                    /** @var PastoralTagMapper $pastoralTagMapper */
+                    $pastoralTagMapper = $this->getMapperFactory()->get(PastoralTagMapper::class);
+                    $injectedValues['tag'] = $pastoralTagMapper->findById($params['tagId']);
                 } catch (MapperException $e) {
                 }
             }

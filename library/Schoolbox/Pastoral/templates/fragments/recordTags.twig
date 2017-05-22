@@ -5,6 +5,7 @@
         {% if record.severity.dashboard and showSeverity %}
             <span class="alert label">{{ record.severity.name }}</span>
         {% endif %}
+
         {% if record.points != 0 %}
             {% if record.points < 0 %}
                 {% set labelClass='alert' %}
@@ -15,9 +16,12 @@
             <span class="{{ labelClass }} label">{{ record.points }}
                 Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
         {% endif %}
+
         {% if record.tags | length > 0 %}
             {% for tag in record.tags %}
-                <span class="neutral label">{{ tag.name }}</span>
+                <a href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}" class="neutral label">
+                    {{ tag.name }}
+                </a>
             {% endfor %}
         {% endif %}
 
