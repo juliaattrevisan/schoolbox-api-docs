@@ -7,7 +7,7 @@
 -- A list of filters available in the system
 CREATE TABLE filter (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `entity` INT(11) NOT NULL,
+  `entity` VARCHAR(255) NOT NULL,
   `class` VARCHAR(255) NOT NULL
 ) ENGINE=INNODB;
 
