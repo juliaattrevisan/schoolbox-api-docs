@@ -164,12 +164,8 @@
         timetable: {{ timetable ? true : false }},
         {% if timetableVars %}
         timetableVars: {
-            daysUntilDate: {{ timetableVars.daysUntilDate }},
-            isWeekend: {{ timetableVars.isWeekend }},
             {% for campus in timetableVars.byCampus %}
             campus_{{ campus.id }}: {
-                selectedDay: {{ campus.selectedDay }},
-                //selectedCycle: {{ campus.selectedCycle }},
                 cycles: {{ campus.cycles|raw }}
             },
             {% endfor %}

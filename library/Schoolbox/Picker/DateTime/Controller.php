@@ -118,20 +118,14 @@ class Controller extends Base
             $term = $this->termMapper->findForDate($date);
 
             $timetableVars['term'] = $term->getId();
-            $timetableVars['daysUntilDate'] = $term->getDuration($date);
             $timetableVars['isWeekend'] = $date->isWeekend() ? 1 : 0;
 
             // Get all what we need to build proper timetable per campus
             foreach ($this->getUser()->getCampusCollection() as $campus) {
 
-                // Don't use $campus->getTimetableDay(), it will return number of days set in SB, rather than from External Timetable
-
                 $timetableDay = $timetable[$campus->getId()]['dayCount'];
 
-                $selectedDay = $this->getTimetableHandler()->getDayNumber($campus, $date->getUnixTimeStamp());
-
                 $timetableVars['byCampus'][$campus->getId()]['id'] = $campus->getId();
-                $timetableVars['byCampus'][$campus->getId()]['selectedDay'] = $selectedDay;
 
                 // Loop through terms and set cycle start and end dates
                 $cycles = [];
