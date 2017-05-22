@@ -20,6 +20,8 @@ use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Role;
+use Schoolbox\Mapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Twig_Loader_Chain;
 
 // These mappers are injected into controllers where required
@@ -93,6 +95,7 @@ class Module extends BaseModule
                     $pastoralReportMapper = $this->getMapperFactory()->get(PastoralReportMapper::class);
                     $injectedValues['report'] = $pastoralReportMapper->findById($params['reportId']);
                 } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                 }
             }
 
@@ -102,10 +105,20 @@ class Module extends BaseModule
                     $pastoralTagMapper = $this->getMapperFactory()->get(PastoralTagMapper::class);
                     $injectedValues['tag'] = $pastoralTagMapper->findById($params['tagId']);
                 } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                 }
             }
 
             return $injectedValues;
         });
+    }
+
+    /**
+     * @return Mapper|ErrorMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }
