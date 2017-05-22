@@ -63,12 +63,6 @@ $pickr-month-padding: 5px;
     }
 
     .flatpickr-day {
-
-        z-index: 50;
-        border-radius: 0;
-        max-width: none;
-
-
         &.inRange,
         &.prevMonthDay.inRange,
         &.nextMonthDay.inRange,
@@ -94,15 +88,31 @@ $pickr-month-padding: 5px;
             border-color: #0066b0;
         }
 
-        .flatpickr-day-heat {
+        &[data-heat]:before {
+            content: "";
             display: block;
             position: absolute;
-            bottom: 0;
-            width: 100%;
+            bottom: rem-calc(-1);
+            left: rem-calc(-4);
+            width: rem-calc(45);
             border-top: solid 1px rgba(0, 102, 176, 0.5);
             background: rgba(209, 236, 255, 0.3);
-            z-index: -50;
-            pointer-events: none;
+        }
+
+        &[data-heat="5"]:before {
+            height: rem-calc(35);
+        }
+        &[data-heat="4"]:before {
+            height: rem-calc(28);
+        }
+        &[data-heat="3"]:before {
+            height: rem-calc(21);
+        }
+        &[data-heat="2"]:before {
+            height: rem-calc(14);
+        }
+        &[data-heat="1"]:before {
+            height: rem-calc(7);
         }
     }
 

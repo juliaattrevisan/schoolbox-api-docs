@@ -624,7 +624,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 yr  = dt.getUTCFullYear();
 
             if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
-                $(this).append('<span class="flatpickr-day-heat" style="height:' + heatCache[yr][mo][day] + '%;"></span>');
+                $(this).attr('data-heat', parseInt(heatCache[yr][mo][day] / 20));
+            } else {
+                $(this).attr('data-heat', '');
             }
         });
     }
