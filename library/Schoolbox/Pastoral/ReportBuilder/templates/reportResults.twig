@@ -44,31 +44,9 @@
                                     </h4>
                                 {% endif %}
 
-                                <p class="spaced meta">
+                                <p class="meta">
                                     Posted by <a href="/search/user/{{ record.owner.id }}">{{ record.owner.fullName }}</a> {{  record.createdAt.short }}
                                 </p>
-
-                                {% if record.points != 0 or (record.tags | length) > 0 %}
-                                    <p class="spaced">
-                                        {% if record.points != 0 %}
-                                            {% if record.points < 0 %}
-                                                {% set labelClass='alert' %}
-                                            {% else %}
-                                                {% set labelClass='success' %}
-                                            {% endif %}
-                                            <span class="{{ labelClass }} label hide-on-print">{{ record.points }} Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
-                                            <b class="show-for-print"> {{ record.points }} Point{% if record.pointrs < -1 or record.points > 1 %}s{% endif %}</b>
-                                        {% endif %}
-                                        {% if record.tags | length > 0 %}
-                                            {% for tag in record.tags %}
-                                                <a class="neutral label hide-on-print" href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}" class="neutral label">
-                                                    {{ tag.name }}
-                                                </a>
-                                                <b class="show-for-print"> {{ tag.name }}</b>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </p>
-                                {% endif %}
 
                                 <p class="spaced meta">
                                     {# Pastoral event type #}
@@ -93,8 +71,6 @@
                                 </p>
                             </div>
 
-                            <div class="clearfix no-margin"></div>
-
                             {# Show article body #}
                             <div class="content">
                                 {{ record.body | purify }}
@@ -105,6 +81,28 @@
                                         {% for attachment in record.attachments %}
                                             <a target="_blank" href="/storage/fetch.php?hash={{ attachment.storage.hash }}">{{  attachment.storage.filename }}</a><br>
                                         {% endfor %}
+                                    </p>
+                                {% endif %}
+
+                                {% if record.points != 0 or (record.tags | length) > 0 %}
+                                    <p class="spaced">
+                                        {% if record.points != 0 %}
+                                            {% if record.points < 0 %}
+                                                {% set labelClass='alert' %}
+                                            {% else %}
+                                                {% set labelClass='success' %}
+                                            {% endif %}
+                                            <span class="{{ labelClass }} label hide-on-print">{{ record.points }} Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
+                                            <b class="show-for-print"> {{ record.points }} Point{% if record.pointrs < -1 or record.points > 1 %}s{% endif %}</b>
+                                        {% endif %}
+                                        {% if record.tags | length > 0 %}
+                                            {% for tag in record.tags %}
+                                                <a class="neutral label hide-on-print" href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}" class="neutral label">
+                                                    {{ tag.name }}
+                                                </a>
+                                                <b class="show-for-print"> {{ tag.name }}</b>
+                                            {% endfor %}
+                                        {% endif %}
                                     </p>
                                 {% endif %}
                             </div>
