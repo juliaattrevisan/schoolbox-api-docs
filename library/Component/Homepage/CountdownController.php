@@ -35,6 +35,7 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
         $showEmpty = false;
         $invalidDate = false;
 
+        $deadline = null;
         if (strlen($datetime) === 0) {
             $showEmpty = true;
         } else {
@@ -76,6 +77,10 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
 
             $this->setVar('empty_state_block', '');
 
+            // shut up storm
+            if (!$deadline instanceof Alaress_Date_Format) {
+                $deadline = Alaress_Date_Format::now();
+            }
             $this->setVar([
                 'DEADLINE_YEAR'  => $deadline->getYear(),
                 'DEADLINE_MONTH' => $deadline->getMonth(),
