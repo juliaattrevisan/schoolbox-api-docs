@@ -48,13 +48,13 @@ class Module extends BaseModule
             'GET' => [
                 ''                              => ['getIndex' => $permissionStaff],
                 '/insert'                       => ['getReportInsert' => $permissionStaff],
-                '/update/{reportId:\d+}'        => ['getReportUpdate' => $permissionStaff],
+                '/update/{reportId:\d+}'        => ['getReportUpdate' => $permissionReportOwner],
                 '/results/{reportId:\d+}'       => ['getReportResults' => $permissionStaff],
                 '/results/tag/{tagId:\d+}'      => ['getReportTags' => $permissionStaff],
                 '/results/{reportId:\d+}/print' => ['getReportResultsPrint' => $permissionStaff],
             ],
             'POST' => [
-                '/modify'                       => ['postReportModify' => $permissionStaff],
+                '/modify'                       => ['postReportModify' => $permissionReportOwner],
                 '/delete/{reportId:\d+}'        => ['postReportDelete' => $permissionReportOwner],
             ]
         ]);
