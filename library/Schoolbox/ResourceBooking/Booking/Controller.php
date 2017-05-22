@@ -140,8 +140,8 @@ class Controller extends Base
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
-            $event->setStartDateTime(new Alaress_Date_Format($this->getDateFromForm('start_datetime')));
-            $event->setEndDateTime(new Alaress_Date_Format($this->getDateFromForm('end_datetime')));
+            $event->setStartDateTime(Alaress_Date_Format::newLocal($this->getRequest()->post['startDate']));
+            $event->setEndDateTime(Alaress_Date_Format::newLocal($this->getRequest()->post['endDate']));
             $event->setTitle("Booking: " . $item->getName());
             $event->setDetail($this->getRequest()->post['notes']);
 
@@ -159,7 +159,7 @@ class Controller extends Base
                 $bookingList = $this->saveBookingsForRecurrences(
                     $bookingList,
                     $this->getRequest()->post['repeat'],
-                    DateTime::createFromFormat('d/m/Y', $this->getRequest()->post['repeat_until']),
+                    Alaress_Date_Format::newLocalShort($this->getRequest()->post['repeat_until'])->getDateTimeObject(),
                     $this->getRequest()->post['timetable']['campus']
                 );
             } else {
@@ -242,8 +242,8 @@ class Controller extends Base
             ;
             $series = $this->getUpdatedSeries(
                 $item,
-                $this->getDateFromForm('start_datetime'),
-                $this->getDateFromForm('end_datetime'),
+                Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
+                Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
                 $this->request->post['efficacy'],
                 $isTimeChanged
@@ -512,17 +512,18 @@ class Controller extends Base
         // Check:
         // Beginning and end of booking are valid datetime
         // (These checks can't be overridden.)
+        // TODO rewrite start/end checks to use Alaress_Date_Format directly
         $errors    = array();
         $startDate = null;
         $endDate   = null;
         try {
-            $startDate = $this->getDateFromForm('start_datetime');
-        } catch (\UnexpectedValueException $e) {
+            $startDate = Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject();
+        } catch (\Exception $e) {
             $errors['start_datetime'][] = 'invalid';
         }
         try {
-            $endDate = $this->getDateFromForm('end_datetime');
-        } catch (\UnexpectedValueException $e) {
+            $endDate = Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject();
+        } catch (\Exception $e) {
             $errors['end_datetime'][] = 'invalid';
         }
 
@@ -771,30 +772,6 @@ class Controller extends Base
         }
 
         return $errors;
-    }
-
-    /**
-     * Creates a date object out of the datepicker and inputs.
-     *
-     * @param  string $paramName
-     *
-     * @return DateTime
-     * @throws \UnexpectedValueException if creating the date doesn't work
-     */
-    protected function getDateFromForm($paramName)
-    {
-        try {
-            $dateObject = Alaress_Date_Format::newLocalShort($this->getRequest()->post[$paramName]['date'])
-                ->set12Hour(
-                    $this->getRequest()->post[$paramName]['hour'],
-                    $this->getRequest()->post[$paramName]['meridien']
-                )
-                ->setMinute($this->getRequest()->post[$paramName]['minute'])
-            ;
-        } catch (\Exception $e) {
-            throw new \UnexpectedValueException('Could not build date out of form inputs', 0, $e);
-        }
-        return $dateObject->getDateTimeObject();
     }
 
     /**
