@@ -162,7 +162,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
 
-            addHeatmap(instance, addHeatmap);
+            requestHeat(instance, addHeatmap);
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -183,13 +183,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
         },
         onMonthChange: function(selectedDates, dateStr, instance) {
-            addHeatmap(instance, addHeatmap);
+            requestHeat(instance, addHeatmap);
         },
         onYearChange: function(selectedDates, dateStr, instance) {
-            addHeatmap(instance, addHeatmap);
+            requestHeat(instance, addHeatmap);
         },
         onValueUpdate: function(selectedDates, dateStr, instance) {
-            addHeatmap(instance, addHeatmap);
+            requestHeat(instance, addHeatmap);
         }
 
     });
