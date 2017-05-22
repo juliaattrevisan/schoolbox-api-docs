@@ -27,7 +27,7 @@
         </div>
     </div>
     <script>
-        $(function() {
+        $(function () {
             $('[data-type-filter]').change(function () {
                 window.location.href = "?type=" + $(this).val();
             });
@@ -46,7 +46,8 @@
             {% if isRouteAuthorized('pastoral.getStudentRecordInsertForm') %}
                 <p>
                     You can <a href="{{ routeLookup('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) }}">create a new
-                    pastoral record</a> now{% if typeSelected is not empty %} or <a href="{{ routeLookup('pastoral.getStudent', {'studentId': student.id}) }}">remove your pastoral type filter</a>{% endif %}.</a>
+                        pastoral record</a> now{% if typeSelected is not empty %} or <a
+                            href="{{ routeLookup('pastoral.getStudent', {'studentId': student.id}) }}">remove your pastoral type filter</a>{% endif %}.</a>
                 </p>
             {% endif %}
         </div>
@@ -69,11 +70,51 @@
                 </span>
             </h2>
 
-            {% for record in records %}
-                <section>
-                    {% include '@pastoral/fragments/pastoralCard.twig' with {record: record, showBody: true} %}
-                </section>
-            {% endfor %}
+            <section>
+                <ul class="information-list">
+                    {% for record in records %}
+
+                        <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
+                            <div class="list-item">
+                                <div class="card small-12">
+
+                                    {# Only display link if the user is authorzied to view the record #}
+
+                                    {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
+                                        <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
+                                            {{ profile.imageSquare64(record.owner) }}
+                                            <h3>{{ record.heading }}</h3>
+                                        </a>
+                                    {% endif %}
+
+                                    {# Display name of poster #}
+
+                                    <p class="meta">
+                                        Posted by
+                                        <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
+                                        {{ record.createdAt.short }}
+                                    </p>
+                                </div>
+                            </div>
+                            <nav>
+                                {# Modify record #}
+
+                                {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
+                                    <a class="icon-modify no-text"
+                                       href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
+                                       title="Modify"></a>
+                                {% endif %}
+
+                                {# Delete record #}
+
+                                {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
+                                    <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                                {% endif %}
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
 
             <div class="right">
                 {{ paginator.buttons(pageCurrent, recordCount) }}
