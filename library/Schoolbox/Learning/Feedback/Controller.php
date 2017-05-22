@@ -134,6 +134,7 @@ class Controller extends Base
      * @param IFeedback|null      $mostRecentFeedback
      * @param RequestValues|array $postVars
      * @param IResponse|null      $response
+     * @return DueWork\Feedback\Model
      * @throws \Alaress\Web\Controller\Exception
      */
     private function processFeedback(Participant $participant, IFeedback $mostRecentFeedback = null, $postVars, IResponse $response = null)
@@ -163,6 +164,7 @@ class Controller extends Base
         ];
 
         $this->respond('', $data);
+        return $feedback;
     }
 
     /**
