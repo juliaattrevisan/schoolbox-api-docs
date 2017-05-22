@@ -94,13 +94,6 @@ ALTER TABLE eotc_event MODIFY title varchar(250) CHARACTER SET utf8mb4 COLLATE u
 ALTER TABLE eotc_metadata MODIFY comment text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eotc_status MODIFY name varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolioTemplate MODIFY name varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_comp MODIFY method varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_comp MODIFY name varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_comp MODIFY description mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_comp MODIFY filename varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_comp MODIFY config mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_comp MODIFY invisible enum('true','false') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_comp MODIFY allowMultiple enum('true','false') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_component_advancedlist_item MODIFY title varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_component_advancedlist_item MODIFY content text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_component_basiclist_item MODIFY content text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
@@ -110,32 +103,8 @@ ALTER TABLE eportfolio_component_blog_comment MODIFY body text CHARACTER SET utf
 ALTER TABLE eportfolio_component_linklist_item MODIFY title varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_component_linklist_item MODIFY content text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_component_textbox_item MODIFY content text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY left_head_font char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY left_head_bg char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY left_font char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY left_bg_primary char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY left_bg_secondary char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY left_link char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY left_hover char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY right_head_font char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY right_head_bg char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY right_font char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY right_bg_primary char(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY right_bg_secondary char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY right_link char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY right_hover char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY top_head_font char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY top_head_bg char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY top_font char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY top_bg_primary char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY top_bg_secondary char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY top_link char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_config MODIFY top_hover char(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_import MODIFY status varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_import_log MODIFY result text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE eportfolio_link MODIFY url varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
- MODIFY description varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
- MODIFY comment mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_page MODIFY page_title varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_page MODIFY left_head_font varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE eportfolio_page MODIFY left_head_bg varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
@@ -363,6 +332,8 @@ ALTER TABLE submission_return_file MODIFY uuid varchar(255) CHARACTER SET utf8mb
 ALTER TABLE task MODIFY link varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE textBox MODIFY heading varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
                     MODIFY body text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE term MODIFY title varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE term MODIFY `code` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE tile MODIFY title_text varchar(250) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE tile MODIFY title_color varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE tile MODIFY title_background_color varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
