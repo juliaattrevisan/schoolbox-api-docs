@@ -21,13 +21,13 @@
         {# This is the maximum number of pages to display- this must be an even number#}
 
         {% if pagesToDisplay is empty %}
-            {% set pagesToDisplay = 8 %}
+            {% set pagesToDisplay = config.pastoral_page_visible %}
         {% endif %}
 
         {# This is the number of records to display per page #}
 
         {% if resultsPerPage is empty %}
-            {% set resultsPerPage = 15 %}
+            {% set resultsPerPage = config.pastoral_page_size %}
         {% endif %}
 
         {# Pagination is only relevant if we've got records to display #}
@@ -60,9 +60,35 @@
                                 </a>
                             </li>
 
-                            {% for i in range (max(1, pageCurrent - ( pagesToDisplay - (min(totalPages, pageCurrent +  pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2) ))) - pageCurrent))), min(totalPages, pageCurrent + pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2))))) %}
-                                <li {% if i == pageCurrent %} class='active' {% endif %}>
-                                    <a href="?pageCurrent={{ i }}">{{ i }}</a>
+                            {% for i in range (
+                                max
+                                (
+                                    1,
+                                    pageCurrent - (
+                                        pagesToDisplay - (
+                                            min(totalPages, pageCurrent +  pagesToDisplay - (
+                                                    pageCurrent - max(
+                                                        1,
+                                                        (pageCurrent - (pagesToDisplay / 2)) | round(0, 'ceil')
+                                                    )
+                                                )
+                                            ) - pageCurrent
+                                        )
+                                    )
+                                ),
+                                min
+                                (
+                                    totalPages,
+                                    pageCurrent + pagesToDisplay - (
+                                        pageCurrent - max(
+                                            1,
+                                            (pageCurrent - (pagesToDisplay / 2)) | round(0, 'ceil')
+                                        )
+                                    ) - 1
+                                )
+                            ) %}
+                                <li {% if i | round(0, 'ceil') == pageCurrent %} class='active' {% endif %}>
+                                    <a href="?pageCurrent={{ i | round(0, 'ceil') }}">{{ i | round(0, 'ceil') }}</a>
                                 </li>
                             {% endfor %}
 
