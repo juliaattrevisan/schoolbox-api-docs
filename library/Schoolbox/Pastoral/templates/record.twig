@@ -295,15 +295,13 @@
 {% endif %}
 
 <div class="row">
-    <div class="small-12 island">
 
-
-    <div class="small-6 island">
-
-        {# Show audience for record #}
-
+    {# Show audience for record
+     # Conditionally show the other column if it has existent content
+     # Otherwise span full-width
+     #}
+    <div class="small-12 {% if record.relatedRecords | length > 1 %}medium-6{% endif %} island">
         <h2 class="subheader">Record Visibility</h2>
-
         <section>
             <ul class="information-list">
                 <li>
@@ -315,69 +313,65 @@
                         <p class="spaced meta">Visible To Individual User</p>
                     </div>
                 </li>
-                {% if record.access | length %}
-                    {% for access in record.access %}
-                        {% if access.group is not empty %}
-                            <li>
-                                <div class="small-12 card wrap-down">
-                                    {{ profile.imageSquare64(related.student) }}
-                                    <p>{{ access.group.name }}</p>
-                                    <p class="spaced meta">Author Of Record</p>
-                                </div>
-                            </li>
-                        {% elseif access.role is not empty %}
-                            <li>
-                                <div class="small-12 card wrap-down">
-                                    {{ profile.imageSquare64(related.student) }}
-                                    <p>{{ access.role.name }}</p>
-                                    <p class="spaced meta">Visible To All Users In {{ access.role.name }} Role</p>
-                                </div>
-                            </li>
-                        {% elseif access.user is not empty %}
-                            <li>
-                                <div class="small-12 card wrap-down">
-                                    <a href="{{ profile.link(access.user) }}">
-                                        {{ profile.imageSquare64(access.user) }}
-                                        <p>{{ access.user.fullName }}</p>
-                                    </a>
-                                    <p class="spaced meta">Visible To Individual User</p>
-                                </div>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
+                {% for access in record.access %}
+                    {% if access.group is not empty %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                {{ profile.imageSquare64(related.student) }}
+                                <p>{{ access.group.name }}</p>
+                                <p class="spaced meta">Author Of Record</p>
+                            </div>
+                        </li>
+                    {% elseif access.role is not empty %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                {{ profile.imageSquare64(related.student) }}
+                                <p>{{ access.role.name }}</p>
+                                <p class="spaced meta">Visible To All Users In {{ access.role.name }} Role</p>
+                            </div>
+                        </li>
+                    {% elseif access.user is not empty %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                <a href="{{ profile.link(access.user) }}">
+                                    {{ profile.imageSquare64(access.user) }}
+                                    <p>{{ access.user.fullName }}</p>
+                                </a>
+                                <p class="spaced meta">Visible To Individual User</p>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
             </ul>
         </section>
     </div>
 
-        {# Show related records #}
-
-        {% if record.relatedRecords | length > 1 %}
-
-            <div class="small-6 island">
-            <h2 class="subheader">Other Students Involved</h2>
-            <section>
-                <ul class="action-list">
-                    {% for related in record.relatedRecords %}
-                        {% if related.student.id != record.student.id %}
-                            <li>
-                                <div class="small-12 card wrap-down">
-                                    <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
-                                    <p>
-                                        <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                            {{ related.getHeading }}
-                                        </a>
-                                    </p>
-                                    <p class="spaced meta">{{ related.student.fullName }}</p>
-                                </div>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </section>
-            </div>
-        {% endif %}
-
+    {# Show related records when they exist
+     #}
+    {% if record.relatedRecords|length %}
+    <div class="small-12 medium-6 island">
+        <h2 class="subheader">Other Students Involved</h2>
+        <section>
+            <ul class="action-list">
+                {% for related in record.relatedRecords %}
+                    {% if related.student.id != record.student.id %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
+                                <p>
+                                    <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
+                                        {{ related.getHeading }}
+                                    </a>
+                                </p>
+                                <p class="spaced meta">{{ related.student.fullName }}</p>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+    {% endif %}
 </div>
 
 {% if isRouteAuthorized('pastoral.postCommentInsert', {recordId: record.id}) %}
