@@ -136,6 +136,7 @@ class Factory
             $feedback = $this->dueWorkFeedbackDataSource->createModel($this->participant->getAssessable())
                 ->setReviewee($this->participant->getUser())
                 ->setCreatedAt(\Alaress_Date_Format::now());
+            $this->participant->getAllFeedbacks()->add($feedback);
         } else {
             // most recent is draft, use that
             $feedback = $this->mostRecentFeedback;
