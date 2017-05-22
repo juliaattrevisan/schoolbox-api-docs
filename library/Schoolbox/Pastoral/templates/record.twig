@@ -401,9 +401,12 @@
         </section>
     </div>
 
-    {# Show related records when they exist
+    {# Show other related records when they exist
+     #
+     # Current record always exists in this collection, so
+     # any truly linked records have > 1 in the collection
      #}
-    {% if record.relatedRecords|length %}
+    {% if record.relatedRecords|length > 1 %}
     <div class="small-12 medium-6 island">
         <h2 class="subheader">Other Students Involved</h2>
         <section>
