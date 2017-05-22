@@ -186,6 +186,7 @@ $(function() {
                 'remote.tooLong': true
             },
             'repeat_until': {
+                datepickerDate: true,
                 'afterStart': true
             }
         },
@@ -208,15 +209,16 @@ $(function() {
         },
         messages: {
             'startDate': {
-                required:       'Please enter a valid date.',
-                datepickerDate: 'Please enter a valid date.'
+                required:       'Please enter a valid date',
+                datepickerDate: 'Please enter a valid date'
             },
             'endDate': {
-                required:       'Please enter a valid date.',
-                datepickerDate: 'Please enter a valid date.'
+                required:       'Please enter a valid date',
+                datepickerDate: 'Please enter a valid date'
             },
             'repeat_until': {
-                'afterStart': "Repeat-until date must be after start date"
+                datepickerDate: 'Please enter a valid date',
+                'afterStart':   'Repeat-until date must be after start date'
             }
         }
     });
