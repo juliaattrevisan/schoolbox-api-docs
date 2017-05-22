@@ -162,7 +162,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
 
-            requestHeat(instance, addHeatmap);
+            requestHeat(instance, applyHeatToCalendar);
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -183,13 +183,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
         },
         onMonthChange: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, addHeatmap);
+            requestHeat(instance, applyHeatToCalendar);
         },
         onYearChange: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, addHeatmap);
+            requestHeat(instance, applyHeatToCalendar);
         },
         onValueUpdate: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, addHeatmap);
+            requestHeat(instance, applyHeatToCalendar);
         }
 
     });
@@ -606,11 +606,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
                 $(this).attr('data-date', dayDate).removeClass('disabled');
 
-                if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
-                    $(this).attr('data-heat', parseInt(heatCache[yr][mo][day] / 20));
-                } else {
-                    $(this).attr('data-heat', '');
-                }
+                applyHeatToDay($(this), yr, mo, day);
 
             } else {
                 $(this).removeAttr('data-date').addClass('disabled');
@@ -627,7 +623,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param {Flatpickr} instance
      * @param {object}     heatData
      */
-    function addHeatmap(instance) {
+    function applyHeatToCalendar(instance) {
         // loop through all days and set a heatmap height
         $(instance.days.childNodes).each(function() {
             var dt = $(this)[0].dateObj;
@@ -636,12 +632,16 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 mo  = dt.getMonth() + 1,
                 yr  = dt.getUTCFullYear();
 
-            if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
-                $(this).attr('data-heat', parseInt(heatCache[yr][mo][day] / 20));
-            } else {
-                $(this).attr('data-heat', '');
-            }
+            applyHeatToDay($(this), yr, mo, day);
         });
+    }
+
+    function applyHeatToDay(element, yr, mo, day) {
+        if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
+            element.attr('data-heat', parseInt(heatCache[yr][mo][day] / 20));
+        } else {
+            element.attr('data-heat', '');
+        }
     }
 
     /**
