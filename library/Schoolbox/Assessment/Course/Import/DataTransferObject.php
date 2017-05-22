@@ -17,15 +17,6 @@ use Alaress_Date_Format;
 /**
  * Provides a consistent interface to transfer import data from DB all the way to twig.
  *
- * The reason we need this is because although the DB maintains a link between AssessmentImpls and AssessmentSpecs,
- * no such property is exposed in the domain models.
- *
- * We have two alternatives:
- * 1. Pass around an array with AssessmentImpl and AssessmentSpec as a pair, or
- * 2. Pass around an object that stores the pair, but provides a consistent interface via methods
- *
- * This class is the manifestation of the latter approach
- *
  * Objects of this class should be immutable after initial construction.
  */
 class DataTransferObject
@@ -53,11 +44,9 @@ class DataTransferObject
     private $unitSpecAssessments;
 
     /**
-     * Maps the IDs of AssessmentImpls to AssessmentSpecs ID.
+     * Maps AssessmentImpl IDs to AssessmentSpecs ID.
      *
      * AssessmentSpec ID will be null if AssessmentImpl was created directly in UnitImpl
-     *
-     * We need this as this relationship is only in the DB, not exposed at Domain level.
      *
      * @var int[]
      */
@@ -228,7 +217,7 @@ class DataTransferObject
             /** @var UnitImplementation $unitImpl */
             $unitImpl = $this->unitImplementations->getOffset($unitSpecId);
             $nextAvailable = clone $unitImpl->getOpenDate();
-            $unitOpen = clone $unitImpl->getOpenDate();;
+            $unitOpen = clone $unitImpl->getOpenDate();
             $limit = clone $unitImpl->getDueDate();
             $this->addAssessmentSpecDates($unitImpl, $assessmentPairs, $nextAvailable, $limit, $unitOpen);
         }
