@@ -236,77 +236,68 @@
 </div>
 {% endif %}
 
+{# Parents cannot ever add/view comments or related records
+ # Only staff can view comments/related records
+ #}
+{% if user.role.isStaff %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Comments</h2>
+
+        {# Show all comments for this record #}
+        {% if record.comments|length %}
+        <section>
+            <ul class="action-list">
+                {% for comment in record.comments %}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 card wrap-down">
+                            {# Comment author photo #}
+                            <a href="{{ profile.link(comment.owner) }}" title="View Profile">
+                                {{ profile.imageSquare64(comment.owner) }}
+                            </a>
+
+                            {# Show comment author #}
+                            <p class="meta">Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}</p>
+
+                            {# Show comment body #}
+                            <p>{{ comment.body | purify | nl2br }}</p>
+                        </div>
+                    </div>
+
+                    {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
+
+                    {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
+                    <nav>
+                        <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
+                    </nav>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        {# Show add comment box if you're allowed to participate
+         #}
+        {% if isRouteAuthorized('pastoral.postCommentInsert', {record: record}) %}
+        <section class="content">
+            <form method="post" action="{{ routeLookup('pastoral.postCommentInsert', {'recordId': record.id}) }}">
+                <input type="hidden" name="pastoral_id" value="{{ record.id }}">
+                <input type="hidden" name="student_id" value="{{ record.student.id }}">
+                <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
+                <input disabled data-post type="submit" class="expand" value="Add Comment">
+            </form>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 <div class="row">
     <div class="small-12 island">
 
-    {# Parents cannot ever add/view comments or related records #}
 
-    {% if not user.role.isParent %}
-
-    <div class="small-12 island">
-        {# Show comments #}
-
-        {% if record.comments | length %}
-            <h2 class="subheader">Comments</h2>
-            <section>
-                <ul class="action-list">
-
-                    {# Show all comments for this record #}
-
-                    {% for comment in record.comments %}
-
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="small-12 card wrap-down">
-                                    {# Comment author photo #}
-                                    <a href="{{ profile.link(comment.owner) }}" title="View Profile">
-                                        {{ profile.imageSquare64(comment.owner) }}
-                                    </a>
-
-                                    {# Show comment author #}
-                                    <p class="meta">Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}</p>
-
-                                    {# Show comment body #}
-                                    <p class="spaced">
-                                        {{ comment.body | purify | nl2br }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
-
-                            {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
-                                <nav>
-                                    <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
-                                </nav>
-                            {% endif %}
-
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% endif %}
-
-        {% if record.comments | length == 0%}
-            <h2 class="subheader">Comments</h2>
-        {% endif %}
-
-        {% if isRouteAuthorized('pastoral.postCommentInsert', {record: record}) %}
-
-            {# Show add comment box #}
-            <section>
-                <div class="content">
-                    <form method="post" action="{{ routeLookup('pastoral.postCommentInsert', {'recordId': record.id}) }}">
-                        <input type="hidden" name="pastoral_id" value="{{ record.id }}">
-                        <input type="hidden" name="student_id" value="{{ record.student.id }}">
-                        <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
-                        <input disabled data-post type="submit" class="expand" value="Add Comment">
-                    </form>
-                </div>
-            </section>
-
-        {% endif %}
-    </div>
     <div class="small-6 island">
 
         {# Show audience for record #}
@@ -386,9 +377,6 @@
             </section>
             </div>
         {% endif %}
-
-
-    {% endif %}
 
 </div>
 
