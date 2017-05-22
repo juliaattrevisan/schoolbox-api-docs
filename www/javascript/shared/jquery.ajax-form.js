@@ -64,7 +64,7 @@
             '<div class="reveal-modal" id="retry-modal" data-reveal aria-hidden="true" role="dialog">' +
             '<h2>Save failed</h2>' +
             '<p>Do you wish to retry?</p>' +
-            '<ul class="flex-list">' +
+            '<ul class="flex-list buttons">' +
             '<li><a href="#" class="button submit" data-action="retry">Retry</a></li>' +
             '<li><a href="#" class="button" data-action="abort">Cancel</a></li>' +
             '</ul>' +
