@@ -439,7 +439,6 @@ class Controller extends Base
      */
     public function postReportDashboardModify()
     {
-        $result = '';
         $post = $this->getRequest()->post;
 
         // Create bare minimum report object
@@ -489,7 +488,7 @@ class Controller extends Base
             'format' => 'json',
             'data' => $this->buildJsonOutput([
                 'status' => 'OK',
-                'result' => empty($result) ? 'No Action' : $result
+                'result' => $result
             ])
         ]);
     }
