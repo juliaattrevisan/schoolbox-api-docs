@@ -383,8 +383,8 @@ class Mapper extends BaseMapper
     public function findRecentDashboard($count = 5)
     {
         $records = $this->findByColumnList([
-                'sv.dashboard' => 1
-            ], [
+            'sv.dashboard' => 1
+        ], [
             'limit' => $count,
             ['order' => ['created_at' => 'DESC']]
         ]);
@@ -408,6 +408,36 @@ class Mapper extends BaseMapper
         }
 
         return $displayed;
+    }
+
+    /**
+     * Display the most recent records that are tagged for display on dashboard based on their severity
+     *
+     * @param PastoralTag $tag
+     * @return Collection
+     */
+    public function findByTag($tag)
+    {
+        $tagId = $this->getDatabase()->quote($tagId = $tag->getId());
+
+        $sql = $this->getSelectString();
+
+        $sql .= "
+        
+            JOIN `pastoral_tags` ON 
+                `pastoral_tags`.`pastoral_id` = `pastoral`.`id` AND 
+                `pastoral_tags`.`tag_id` = {$tagId} AND
+                `pastoral_tags`.`deleted_at` IS NULL
+        ";
+
+        // Bind the parameters
+
+        $statement = $this->database->prepare($sql);
+        $statement->execute();
+
+        $results = $this->hydrateSelect($statement);
+
+        return $results;
     }
 
     /**

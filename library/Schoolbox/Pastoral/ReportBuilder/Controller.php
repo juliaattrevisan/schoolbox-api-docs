@@ -18,6 +18,7 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
+use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -223,6 +224,44 @@ class Controller extends Base
                 ]
             )
         );
+    }
+
+    /**
+     * Retrieve report of all pastoral records with the selected tag
+     * @param PastoralTag $tag
+     */
+    public function getReportTags($tag)
+    {
+        $records = $this->pastoralMapper->findByTag($tag);
+
+        // And spit this thing out
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@pastoralReportBuilder/reportTags.twig',
+                'data' => array(
+                    'tag'               => $tag,
+                    'results'           => $records
+                ),
+            )
+        );
+
+        // And spit this thing out
+
+//        $this->getResponse()->content->set(
+//            array(
+//                'template' => '@pastoralReportBuilder/reportResults.twig',
+//                'data' => array(
+//                    'results'           => $paginatedRecords,
+//                    'resultsPerPage'    => $resultsPerPage,
+//                    'pagesToDisplay'    => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
+//                    'totalPages'        => $totalPages,
+//                    'totalResults'      => $records->count(),
+//                    'pageCurrent'       => $pageCurrent,
+//                    'report'            => $report
+//                ),
+//            )
+//        );
     }
 
     /**
