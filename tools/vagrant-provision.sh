@@ -30,6 +30,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
+# Remove old repo
+rm /etc/apt/sources.list.d/ondrej-php5-trusty.list*;
+
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
 if [ "$phpversion" != "7.1" ];
@@ -44,15 +47,15 @@ fi
 
 if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ] || [ `php -m | grep ibm_db2 | wc -l` -lt 1 ];
 then
+    echo "# This file is managed by Puppet. DO NOT EDIT.
+# schoolbox-deps
+deb http://schoolbox:4verrm9z@deb.alaress.com.au/ubuntu trustybackports main
+deb-src http://schoolbox:4verrm9z@deb.alaress.com.au/ubuntu trustybackports main" > /etc/apt/sources.list.d/schoolbox-deps2.list;
     apt-get update;
-    apt-get install -y libgss3;
+    apt-get install -y libgss3 gcc-6-base libstdc++6;
     if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ];
     then
         echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
-        mkdir package-artifacts;
-        wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/gcc-6-base_6.2.0-3ubuntu11~14.04_amd64.deb;
-        wget -c http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu/pool/main/g/gcc-6/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb -O package-artifacts/libstdc++6_6.2.0-3ubuntu11~14.04_amd64.deb;
-        dpkg -i package-artifacts/*.deb;
         apt-get install -y php7.1-pdosqlsrv;
         phpenmod pdo_sqlsrv;
     fi
