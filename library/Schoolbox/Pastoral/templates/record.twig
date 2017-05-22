@@ -210,30 +210,34 @@
     {% endif %}
 {% endif %}
 
+{# Conditionally show attachments if any exist
+ #}
+{% if record.attachments|length %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Attached Files</h2>
+        <section>
+            {% for attachment in record.attachments %}
+                <div class="card small-12">
+                    <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
+                        {% if attachment.storage.mimetype.isImage %}
+                        <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
+                        {% else %}
+                        <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
+                        {% endif %}
+
+                        {{ attachment.storage.filename }}
+                    </a>
+                    <p class="meta">{{ attachment.storage.size | bytes}}</p>
+                </div>
+            {% endfor %}
+        </section>
+    </div>
+</div>
+{% endif %}
 
 <div class="row">
     <div class="small-12 island">
-
-        {% if record.attachments| length %}
-            <h2 class="subheader">Attached Files</h2>
-            <section>
-                {% for attachment in record.attachments %}
-                    <div class="card small-12">
-                        <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
-		            {% if attachment.storage.mimetype.isImage %}
-		                <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
-		                {% else %}
-		                <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
-		            {% endif %}
-                            {{ attachment.storage.filename }}
-                        </a>
-                        <p class="meta">{{ attachment.storage.size | bytes}}</p>
-                    </div>
-                {% endfor %}
-            </section>
-        {% endif %}
-
-    </div>
 
     {# Parents cannot ever add/view comments or related records #}
 
