@@ -324,7 +324,9 @@ class Controller extends Base
 
         if ($moderator->count() > 0) {
             $record->setRevisions(
-                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId())
+                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId(), ['order' => [
+                    'created_at' => 'desc'
+                ]])
             );
         }
 

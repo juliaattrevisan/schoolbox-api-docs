@@ -107,19 +107,19 @@
 <div class="row">
     <div class="small-12 island">
 
+        {% if record.tags | length %}
+            <section class="content">
+                {% for tag in record.tags %}
+                    {# TODO: Pastoral Tag Report Link #}
+                    <a href="#" class="neutral label">{{ tag.name }}</a>
+                {% endfor %}
+            </section>
+        {% endif %}
+
         <section>
             <div class="content">
                 {{ record.body | purify }}
             </div>
-        </section>
-
-        <h2 class="subheader">Tags</h2>
-        <section class="content">
-            {% if record.tags | length %}
-                {% for tag in record.tags %}
-                    <span class="neutral label">{{ tag.name }}</span>
-                {% endfor %}
-            {% endif %}
         </section>
 
         {# Show revision history to moderators #}
@@ -133,34 +133,38 @@
                     {# Only display revisions if they are different from the previous (fields not displayed might have changed and this will confuse users #}
 
                     {% if revision.body != bodyPrevious and revision.body != record.body or revision.heading != headingPrevious and revision.heading != record.heading %}
+
                         {% if loop.first %}
                             <h2 class="subheader">Revision History</h2>
                             <section>
                                 <ul class="information-list expandable-card">
                         {% endif %}
+
                         {% set bodyPrevious = revision.body %}
                         {% set headingPrevious = revision.heading %}
 
                         <li>
+
                             <div>
                                 <div class="expander icon-down-arrow" data-collapser="collap-{{ loop.index }}"></div>
                                 <div class="small-12 card">
-                                    <a href="/search/user/{{ revision.modifiedBy.externalId }}">
-                                        <img src="/portrait.php?userId={{ revision.modifiedBy.externalId }}&size=square64">
-                                        <h3>{{ revision.heading }}</h3>
-                                        <p class="meta">
-                                            {% if revision.updatedAt.long is empty %}
-                                                Record Created by {{ revision.modifiedBy.fullName }} - {{ record.createdAt.long }}
-                                            {% else %}
-                                                Record Edited by {{ revision.modifiedBy.fullName }} - {{ revision.updatedAt.long }}
-                                            {% endif %}
-                                        </p>
-                                    </a>
+                                    <img src="/portrait.php?userId={{ revision.modifiedBy.externalId }}&size=square64">
+                                    <h3>{{ revision.heading }}</h3>
+                                    <p class="meta">
+                                        Edited by {{ revision.modifiedBy.fullName }} -
+                                        {% if revision.updatedAt.long is empty %}
+                                            {{ record.createdAt.long }}
+                                        {% else %}
+                                            {{ revision.updatedAt.long }}
+                                        {% endif %}
+                                    </p>
                                 </div>
                             </div>
+
                             <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{ loop.index }}">
-                                <p>{{ revision.body | purify }}</p>
+                                {{ revision.body | purify }}
                             </div>
+
                         </li>
 
                     {% endif %}
