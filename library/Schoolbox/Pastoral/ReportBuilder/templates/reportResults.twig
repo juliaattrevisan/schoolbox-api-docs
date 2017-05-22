@@ -61,7 +61,9 @@
                                         {% endif %}
                                         {% if record.tags | length > 0 %}
                                             {% for tag in record.tags %}
-                                                <span class="neutral label hide-on-print">{{ tag.name }}</span>
+                                                <a class="neutral label hide-on-print" href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}" class="neutral label">
+                                                    {{ tag.name }}
+                                                </a>
                                                 <b class="show-for-print"> {{ tag.name }}</b>
                                             {% endfor %}
                                         {% endif %}
