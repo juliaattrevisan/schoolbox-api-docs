@@ -39,7 +39,7 @@
         {% include '@learningGrades/fragments/longitudinalRubric.twig' with {
             longitudinalRubric: longitudinalRubric,
             student:            student,
-            markbook:           markbook,
+            assessments:        markbook.assessments,
             returnUrlSuffix:    returnUrlSuffix
         } only %}
     {% endif %}
