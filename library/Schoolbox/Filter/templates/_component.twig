@@ -13,7 +13,7 @@
     {# Concrete component template to define #}
     {% set filterName = filterName ?: 'undefined' %}
 
-    <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 20px; min-width: 150px;">
+    <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 15px; min-width: 100px;">
         <h4 data-filter-name>{{ filterName }}</h4>
         {% for selection in userSelections %}
             {% include '@filters/_selectionCheckbox.twig' with {

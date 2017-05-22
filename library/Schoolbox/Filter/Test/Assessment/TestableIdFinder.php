@@ -82,6 +82,7 @@ class TestableIdFinder extends IdFinder
             NullableContext\Project\Definition::class,
             NullableContext\UnitImpl\Definition::class,
             NullableContext\UnitSpec\Definition::class,
+            TemporalState\Definition::class,
             Term\Due\Definition::class,
             Term\Close\Definition::class,
             WeightingType\Definition::class,

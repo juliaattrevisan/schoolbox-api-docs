@@ -7,19 +7,16 @@
 
 namespace Schoolbox\Learning;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Eportfolio\ShowcaseMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Mark;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Statistics;
@@ -40,7 +37,6 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use \Alaress_Date_Format;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Option as FilterOption;
@@ -104,21 +100,21 @@ class Controller extends Base
     /** @var CourseSpecificationMapper */
     private $courseSpecificationMapper;
 
-    /** @var  \External_ClassInterface */
-    private $externalClass;
-
     /**
      * @var Access
      */
     private $access;
 
-    /**
-     * @var IConnector
-     */
-    private $database;
+    /** @var Filter\Mapper */
+    private $filterMapper;
+
 
     /** @var FilterSelection\Mapper */
     private $filterSelectionMapper;
+
+
+    /** @var AssessmentFilters\IdFinder */
+    private $assessmentIdFinder;
 
 
     /**
@@ -135,9 +131,9 @@ class Controller extends Base
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param CourseSpecificationMapper  $courseSpecificationMapper
      * @param FilterSelection\Mapper     $filterSelectionMapper
-     * @param \External_ClassInterface   $externalClass
-     * @param IConnector                 $database
      * @param Access                     $access
+     * @param Filter\Mapper              $filterMapper
+     * @param AssessmentFilters\IdFinder $assessmentIdFinder
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -153,9 +149,9 @@ class Controller extends Base
         CourseImplementationMapper $courseImplementationMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
         FilterSelection\Mapper $filterSelectionMapper,
-        \External_ClassInterface $externalClass,
-        IConnector $database,
-        Access $access
+        Access $access,
+        Filter\Mapper $filterMapper,
+        AssessmentFilters\IdFinder $assessmentIdFinder
     ) {
         $this->errorMapper                = $errorMapper;
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
@@ -170,9 +166,9 @@ class Controller extends Base
         $this->courseImplementationMapper = $courseImplementationMapper;
         $this->courseSpecificationMapper  = $courseSpecificationMapper;
         $this->filterSelectionMapper      = $filterSelectionMapper;
-        $this->externalClass              = $externalClass;
-        $this->database                   = $database;
         $this->access                     = $access;
+        $this->filterMapper               = $filterMapper;
+        $this->assessmentIdFinder         = $assessmentIdFinder;
     }
 
 
@@ -213,8 +209,7 @@ class Controller extends Base
      * @throws \InvalidArgumentException
      * @throws Mapper\Exception
      * @throws \ReflectionException If unable to find the class for a filter registered on this page
-     * @throws \DomainException If filter definition class not set
-     * @todo  split pending assessments into own controller
+     * @throws \DomainException If filter factoryFactory has not defined the entity it is filtering
      */
     public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
     {
@@ -224,11 +219,16 @@ class Controller extends Base
 
         $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
 
+        $title = 'Pending Assessments';
+        if($viewee->getId() !== $this->getUser()->getId()){
+            $title .= " for {$viewee->getFullName()}";
+        }
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learning/pendingAssessmentsOuter.twig', [
                 'viewee'      => $viewee,
                 'filterPanel' => $filterPanel,
-            ])->setTab('submission')->setTitle('Pending Assessments')
+            ])->setTab('submission')->setTitle($title)
         );
     }
 
@@ -238,7 +238,7 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User                             $viewee The user whose pending assessments we are viewing.
+     * @param User                             $viewee The user whose pending assessments we are viewing. TODO not used, but will be when GET + POST routes merge
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @var  string[][]                        $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
      * @throws \LogicException
@@ -272,7 +272,7 @@ class Controller extends Base
     /**
      * Generate a pending assessment report as HTML string
      *
-     * @param User                             $viewee
+     * @param User $viewee
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @param string[][]                       $postFilterSelections - Indexed by filter.id, then concrete key
      * @return string
@@ -280,55 +280,41 @@ class Controller extends Base
      * @throws \DomainException
      * @throws \LogicException
      * @throws \ReflectionException If the specified class does not exist
+     * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      */
     protected function generatePendingAssessmentReport(
         User $viewee,
         AssessmentFilters\FactoryFactory $filterFactoryFactory,
         array $postFilterSelections
     ) {
-
-        $selectionMapper     = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
-        $page                = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
-        $keyConverters       = $filterFactoryFactory->buildKeyConverters($page);
-        $codec               = new Filter\Codec();
+        $page          = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
+        $keyConverters = $filterFactoryFactory->buildKeyConverters($page);
+        $codec         = new Filter\Codec();
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelectionModels($selectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
-        $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+        $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->filterSelectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
 
-        // Convert Selection models to Filters
-        $selectionTransformer = new Filter\Transformer($keyConverters, $selectionsPerFilter);
-
-        // Get selections, defaulting to full possible set if filter not present in panel (ie if disabled by admin)
-        $selectedTerms           = $selectionTransformer->getSelectedItems(AssessmentFilters\Term\Due\Definition::class);
-        $selectedWorkTypes       = $selectionTransformer->getSelectedItems(AssessmentFilters\WorkType\Definition::class);
-        $selectedAssessmentTypes = $selectionTransformer->getSelectedItems(AssessmentFilters\AssessmentType\Definition::class);
-        $selectedFolderIds       = $selectionTransformer->getSelectedItems(AssessmentFilters\Folder\Definition::class);
-        $selectedWeightings      = $selectionTransformer->getSelectedItems(AssessmentFilters\WeightingType\Definition::class);
-        $selectedUnitIds         = $selectionTransformer->getSelectedItems(AssessmentFilters\NullableContext\UnitImportSpec\Definition::class);
-
-        // If currentUser == viewee, use currentUser as it may already have class codes
-        // attached and avoid the need for an external DB call.
-        if ($this->getUser()->getId() === $viewee->getId()) {
-            $viewee = $this->getUser();
+        // Don't save selections if viewing someone else's pending assessments
+        if($viewee->getId() === $this->getUser()->getId()){
+            $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
-        $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
+        // Convert Selection models to Filters
+        $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
+        $filters              = $selectionTransformer->getFiltersDto();
 
-        $factory     = new PendingFactory(
-            $viewee,
-            $this->database,
-            $this->externalClass,
-            $toChaseLimit,
-            $this->folderMapper,
-            $selectedAssessmentTypes,
-            $selectedFolderIds,
-            $selectedTerms,
-            $selectedUnitIds,
-            $selectedWeightings,
-            $selectedWorkTypes
-        );
-        $assessments = $factory->getPendingAssessments();
+        // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
+        // regardless of any filter selections sent by user
+        $unitSpecFilter = $this->filterMapper->findByClass(AssessmentFilters\NullableContext\UnitSpec\Definition::class)->first();
+        $filters->setSelections($unitSpecFilter, new Collection());
+
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters->getByClass());
+
+        // Fetch assessments & participants
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+
+        $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
 
         /**
          * Indexed by assessment.id

@@ -7,7 +7,7 @@
 -- A list of filters available in the system
 CREATE TABLE filter (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `entity` INT(11) NOT NULL,
+  `entity` VARCHAR(255) NOT NULL,
   `class` VARCHAR(255) NOT NULL
 ) ENGINE=INNODB;
 
@@ -75,6 +75,7 @@ INSERT INTO filter (`entity`, `class`) VALUES
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImpl\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitImportSpec\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\UnitSpec\\Definition'),
+  ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\TemporalState\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\WeightingType\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\WorkType\\Definition')
 ;

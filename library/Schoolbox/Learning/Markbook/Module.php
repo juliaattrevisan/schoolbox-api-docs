@@ -104,9 +104,11 @@ class Module extends BaseModule
                 'dueWorkErrorMapper'         => $this->getMapperFactory()->getLazy(DueWork_ErrorMapper::class),
                 'access'                     => $this->getMapperFactory()->getLazy(Access::class), // Has a static 'getInstance()' method
                 'assessmentIdFinder'         => $injector->lazy(function(){
-                    return AssessmentFilter\IdFinder::getInstance(
-                        $this->getMapperFactory()->get(Filter\Mapper::class),
-                        $this->getMapperFactory()->get(Assessment\Mapper::class));
+                    /** @var Filter\Mapper $filterMapper */
+                    $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                    return Filter\Filters\Assessment\IdFinder::getInstance(
+                        $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
+                    );
                 }),
                 'filterFactoryFactory'       => $injector->lazy(function(){
                     return new AssessmentFilter\FactoryFactory($this->getMapperFactory());
