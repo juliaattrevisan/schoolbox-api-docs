@@ -72,9 +72,9 @@ class Controller extends Base
      * Process any rubric data attached to the Feedback
      *
      * @param Participant $participant
-     * @param $post
+     * @param array       $post
      */
-    protected function processRubric(Participant $participant, $post)
+    protected function processRubric(Participant $participant, array $post)
     {
         if(!$participant->getAssessable() instanceof DueWork\Model){
             return;
