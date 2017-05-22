@@ -40,14 +40,6 @@
         $acceptOnlineToggle.change(function() {
             toggleDates($(this));
         });
-
-        // init form validation
-        var $form = $('#assessmentForm');
-        $form.alaressValidate();
-        if ('beforeSubmit' in window) {
-            beforeSubmit();
-        }
-        $form.valid();
     });
 </script>
 
