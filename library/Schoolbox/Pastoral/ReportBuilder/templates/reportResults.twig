@@ -66,9 +66,6 @@
                                         {{ record.severity.name }} |
                                     {% endif %}
 
-                                    {# Indicate if record is private #}
-                                    {% if record.private %}Contents Private | {% endif %}
-
                                     {# Indicate if not audience has been set #}
                                     {% if record.access | length == 0 %}No Audience Set{% endif %}
 

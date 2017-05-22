@@ -52,9 +52,6 @@ class Model implements ISoftDeletable
     /** @var float */
     protected $points;
 
-    /** @var bool */
-    protected $private;
-
     /** @var User */
     protected $owner;
 
@@ -113,24 +110,6 @@ class Model implements ISoftDeletable
     public function getTags()
     {
         return $this->tags;
-    }
-
-    /**
-     * @param boolean $private
-     * @return self
-     */
-    public function setPrivate($private)
-    {
-        $this->private = $private;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getPrivate()
-    {
-        return $this->private;
     }
 
     /**

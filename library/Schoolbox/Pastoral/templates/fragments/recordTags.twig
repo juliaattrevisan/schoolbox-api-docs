@@ -1,10 +1,7 @@
 {% if not user.role.isParent %}
 
-    {% if record.points != 0 or (record.tags | length) or record.private %}
+    {% if record.points != 0 or (record.tags | length) %}
 
-        {% if record.private %}
-            <span class="alert label">Private</span>
-        {% endif %}
         {% if record.severity.dashboard and showSeverity %}
             <span class="alert label">{{ record.severity.name }}</span>
         {% endif %}

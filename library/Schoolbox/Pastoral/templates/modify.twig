@@ -55,10 +55,6 @@
                             Title
                             <input type="text" class="required" name="heading" size="35" maxlength="100" value="{{ record.heading }}"/>
                         </label>
-                        <div class="alert-box warning icon-info">
-                            Important Note: The title of a pastoral record will remain visible on pastoral records listed as private.
-                            Please do not include confidential information in the title of the record.
-                        </div>
                     </div>
                 </fieldset>
             </section>
@@ -155,25 +151,6 @@
                         </label>
                     </div>
                 </fieldset>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <legend>
-                            <label for="private">
-                                Hide Record Contents
-                                <span class="hint has-tip tip-top"
-                                      data-tooltip
-                                      title="If this is enabled users in these roles will only be able to see the title of the pastoral record.">?</span>
-                            </label>
-                        </legend>
-                        <div class="switch">
-                            <input id="private" name="private" {% if record.getPrivate %}checked{% endif %} value="1" type="checkbox">
-                            <label for="private">
-                                <span>Yes</span>
-                                <span>No</span>
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
             </section>
 
             <section>
@@ -199,7 +176,6 @@
                                     <label for="group[{{ group.id }}]" class="checkbox-label">{{ group.name }}</label>
                                 {% endfor %}
                             </label>
-                            <div class="alert-box warning icon-info">Important Note: Users that are members of these groups can view the contents of private records.</div>
                         {% else %}
                             <label>Pastoral Group Access</label>
                             <p class="meta">
@@ -221,7 +197,6 @@
                                       title="Add individual users who you would like to access this record and its contents. These users will be able to see content marked as hidden.">?</span>
                                 <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
                             </label>
-                            <div class="alert-box warning icon-info">Important Note: Staff members granted individual access can view the contents of private records. Under no circumstances will parents see records that have 'Hide Record Contents' enabled.</div>
                         </div>
                     </fieldset>
                     {% set found = 0 %}
@@ -408,14 +383,6 @@
                 dataType: 'json'
             }
         });
-
-        $('#private').change(function (event) {
-            $('[data-role-parent]')
-                .prop('checked', false)
-                .prop('disabled', $('#private').prop('checked'));
-        });
-
-        $('[data-role-parent]').prop('disabled', $('#private').prop('checked'));
 
         $('[data-submit]').click(function (event) {
             form.alaressValidate({

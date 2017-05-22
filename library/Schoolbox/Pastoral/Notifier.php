@@ -96,39 +96,15 @@ class Notifier extends AbstractModuleNotifier
                 } catch (MapperException $e) {
                 }
             } else {
-                // Sending to individual users
-
-                $skip = false;
-
-                // If its private, and the selected user is a parent, don't notify them
-
-                // Get hydrated user so we can work out their role
-
                 try {
-                    /** @var \Schoolbox\User $user */
-                    $user = $this->getUserMapper()->findOneByColumn("id", $accessModel->getUser()->getId());
-
-                    /** @var Role $role */
-                    $role = $this->getRoleMapper()->findOneByColumn("id", $user->getRole()->getId());
-
-                    if ($role->isParent() && $pastoral->getPrivate()) {
-                        $skip = true;
-                    }
-
-                    // Otherwise, send it to the user
-
-                    if (!$skip) {
-                        $envelope->targetToUser($accessModel->getUser()->getId(), $message);
-                    }
+                    $envelope->targetToUser($accessModel->getUser()->getId(), $message);
                 } catch (MapperException $e) {
 
                 }
             }
         }
 
-        // Just make sure parents don't ever get private notifications
-
-        if ($sendToParents && !$pastoral->getPrivate()) {
+        if ($sendToParents) {
             $envelope->targetToParent($model->getStudent()->getId(), $message);
         }
 
