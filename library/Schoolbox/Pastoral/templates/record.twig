@@ -280,20 +280,75 @@
 
         {# Show add comment box if you're allowed to participate
          #}
-        {% if isRouteAuthorized('pastoral.postCommentInsert', {record: record}) %}
+        {% set commentRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id})  %}
+        {% if commentRoute %}
         <section class="content">
-            <form method="post" action="{{ routeLookup('pastoral.postCommentInsert', {'recordId': record.id}) }}">
+            <form method="post" action="{{ commentRoute }}">
                 <input type="hidden" name="pastoral_id" value="{{ record.id }}">
                 <input type="hidden" name="student_id" value="{{ record.student.id }}">
                 <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
                 <input disabled data-post type="submit" class="expand" value="Add Comment">
             </form>
+
+            <script type="text/javascript">
+                $(function () {
+
+                    // Disable post comment button if there is no comment
+
+                    $('#body').on('change keyup paste', function() {
+                        $('[data-post]').prop('disabled', $('#body').val().trim() === '');
+                    });
+
+                    // Delete pastoral record
+
+                    $('[data-delete]').click(function(event) {
+                        event.preventDefault();
+
+                        $(this).confirmDialog({
+                            text: 'Are you sure you want to delete this record?',
+                            confirmEvent: function() {
+                                $.post('{{ routeLookup('pastoral.postRecordDelete', {studentId: record.student.id, recordId: record.id}) }}')
+                                    .done(function() {
+                                        window.location.href = '{{ routeLookup('pastoral.getIndex', {studentId: record.student.id}) }}';
+                                    });
+                            }
+                        });
+                    });
+
+                    // Delete comment
+
+                    $('[data-delete-comment]').click(function(event) {
+                        event.preventDefault();
+
+                        deleteCommentRoute = '{{ routeLookup('pastoral.postCommentDelete', {
+                            'recordId': 'recordId',
+                            'commentId': 'commentId'
+                        })
+                        }}';
+
+                        $(this).confirmDialog({
+                            text: 'Are you sure you want to delete this comment?',
+                            confirmEvent: function() {
+                                $.post(
+                                    deleteCommentRoute
+                                        .replace(/recordId/g, {{ record.id }})
+                                        .replace(/commentId/g, $(event.target).attr('data-delete-comment'))
+                                ).success(function() {
+                                    $(event.target).closest('li').remove();
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
         </section>
         {% endif %}
     </div>
 </div>
 {% endif %}
 
+{# Visibility and Linked Records (Other Students Involved)
+ #}
 <div class="row">
 
     {# Show audience for record
@@ -373,59 +428,3 @@
     </div>
     {% endif %}
 </div>
-
-{% if isRouteAuthorized('pastoral.postCommentInsert', {recordId: record.id}) %}
-
-    <script type="text/javascript">
-        $(function () {
-
-            // Disable post comment button if there is no comment
-
-            $('#body').on('change keyup paste', function() {
-                $('[data-post]').prop('disabled', $('#body').val().trim() === '');
-            });
-
-            // Delete pastoral record
-
-            $('[data-delete]').click(function(event) {
-                event.preventDefault();
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this record?',
-                    confirmEvent: function() {
-                        $.post('{{ routeLookup('pastoral.postRecordDelete', {studentId: record.student.id, recordId: record.id}) }}')
-                            .done(function() {
-                                window.location.href = '{{ routeLookup('pastoral.getIndex', {studentId: record.student.id}) }}';
-                            });
-                    }
-                });
-            });
-
-            // Delete comment
-
-            $('[data-delete-comment]').click(function(event) {
-                event.preventDefault();
-
-                deleteCommentRoute = '{{ routeLookup('pastoral.postCommentDelete', {
-                        'recordId': 'recordId',
-                        'commentId': 'commentId'
-                    })
-                }}';
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this comment?',
-                    confirmEvent: function() {
-                        $.post(
-                            deleteCommentRoute
-                                .replace(/recordId/g, {{ record.id }})
-                                .replace(/commentId/g, $(event.target).attr('data-delete-comment'))
-                        ).success(function() {
-                            $(event.target).closest('li').remove();
-                        });
-                    }
-                });
-            });
-        });
-    </script>
-
-{% endif %}
