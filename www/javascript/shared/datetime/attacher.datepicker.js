@@ -26,7 +26,7 @@
                     // rearrange the DOM to install the button
                     var $label = $dateinput.closest('label');
 
-                    if ($label) {
+                    if ($label.length) {
                         // in this case, the DOM needs to be rearranged so that the flex button is adjacent tot he label, not inside
                         $label.attr('for', $dateinput.attr('id'));
                         $dateinput.detach();
