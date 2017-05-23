@@ -142,6 +142,8 @@ class Controller extends Base
     {
         /** @var PastoralReport $report */
         $report = $this->pastoralReportMapper->createModel();
+        $report->setOwner($this->getUser());
+
         $this->getReportUpdate($report);
     }
 
