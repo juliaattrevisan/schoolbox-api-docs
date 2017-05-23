@@ -23,6 +23,10 @@ class IsReportOwner implements IAuthorizationRule
      */
     public function authorize(array $params = array(), User $user = null)
     {
+        if (empty($params['report']) && empty($params['reportId'])) {
+            return true;
+        }
+
         if (!isset($params['report'])) {
             if (!isset($params['reportId'])) {
                 throw new Unauthorized();
