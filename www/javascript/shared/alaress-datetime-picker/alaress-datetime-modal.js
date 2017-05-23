@@ -392,9 +392,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $.get((twigVars.routeLookup.getDueByDate).replace(/{folderId}/g, folder).replace(/{date}/g, date))
 
                 .done(function (data) {
-
                     appendResponse(data, 'duework', target);
-
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
@@ -403,9 +401,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // Pull in events as well
             $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
                 .done(function (data) {
-
                     appendResponse(data, 'events', target);
-
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
@@ -417,9 +413,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
                 .done(function (data) {
-
                     appendResponse(data, 'events', target);
-
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
@@ -454,6 +448,15 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 })
                 .fail(function () {
                     console.log('Failed to retrieve student work for specified day');
+                });
+
+            // Pull in events as well
+            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
+                .done(function (data) {
+                    appendResponse(data, 'events', 'timetable');
+                })
+                .fail(function () {
+                    console.log('Failed to retrieve appointments for specified date');
                 });
         }
         else if (twigVars.type == 'event') { // Fetch events
@@ -536,7 +539,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 // Create a full list of students, hidden by default
                 html += '<div id="due-work-list-' + moment(data.date).format('Y-m-d') + '" class="row hide">';
                 html += '<div class="small-12 medium-12 columns">';
-                //html += '<h2>Work due on ' + displayDate + '</h2>';
                 html += '<ul class="small-12 information-list expandable-card">';
 
                 html += '<li><a data-hide-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '"><span class="compact card small-12 icon-previous">Back</span></a></li>';
