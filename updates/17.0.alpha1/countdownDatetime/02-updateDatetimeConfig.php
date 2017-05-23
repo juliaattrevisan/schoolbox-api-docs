@@ -1,14 +1,11 @@
 <?php
-
 /**
- * We have an issue where assessments do not have a context (folder, project, unit-impl, or unit-spec)
+ * Merge the date and time component config options into a single datetime option.
  *
- * These assessments are orphans and need to be removed from the DB so we can ensure referential integrity
+ * Only the countdown component has either a date or time option.
  *
- * We need to also delete all sub-entities linked to these orphaned assessments
- *
- * @author    Andy Ryan <andy.ryan@alaress.com.au>
- * @copyright Copyright 2016, Alaress Pty Ltd
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
