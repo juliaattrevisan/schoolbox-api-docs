@@ -103,13 +103,13 @@ class Factory
             // MySQL
 
             case 'schoolbox':
+                return $this->getInternalDatabase();
+                break;
             case 'denbigh':
-
                 $connectorExternal = $this->factory->createMysql();
                 break;
 
             // IBM DB2
-
             case 'edumate':
 
                 $connectorExternal = $this->factory->createDb2();
