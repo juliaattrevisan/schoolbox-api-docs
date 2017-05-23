@@ -10,8 +10,8 @@ namespace Schoolbox\Filter\Filters\Assessment;
 use Schoolbox\Collection;
 
 /**
- * The Assessment Transformer is specialised because assessments have a coupling between the 'folder' filter
- * and the 'nullable-context' filters.
+ * The Assessment Transformer is specialised because assessments have a coupling between
+ * the 'folder' filters and the 'nullable-context' filters.
  *
  * When the folder selections are present, we must alter the behaviour of the 'nullable-context' filters when they have nothing selected.
  *
@@ -25,11 +25,12 @@ class Transformer extends \Schoolbox\Filter\Transformer
 {
 
     /**
-     * Either 'null', meaning the filter is not being used, or a Collection of integers representing folder IDS
+     * Is a folder filter is use? If so, we need to modify the behaviour of the nullable context
+     * filters, which have a coupling to the folder filters.
      *
-     * @var |null|Collection|int[]
+     * @var bool
      */
-    private $folderSelections;
+    private $isFolderFilterUsed;
 
 
     /**
@@ -39,7 +40,10 @@ class Transformer extends \Schoolbox\Filter\Transformer
     public function __construct($keyConverters, $selectionsPerFilter)
     {
         parent::__construct($keyConverters, $selectionsPerFilter);
-        $this->folderSelections = $this->getSelectedItems(Folder\Definition::class);
+
+        // If teacher page (pending, markbook), most likely the first, if student page (eg grades) will be the second.
+        $this->isFolderFilterUsed =
+            $this->getSelectedItems(Folder\TeacherInvolved\Definition::class) || $this->getSelectedItems(Folder\StudentInteractions\Definition::class);
     }
 
 
@@ -48,12 +52,12 @@ class Transformer extends \Schoolbox\Filter\Transformer
      *
      * @param string $filterClass
      * @return null|Collection|mixed[]
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If any selection key is invalid
      */
     public function getSelectedItems($filterClass)
     {
         if (!$this->getFiltersByClass()->offsetExists($filterClass)) {
-            throw new \InvalidArgumentException("No KeyConverter found for filter class: $filterClass");
+            return null;
         }
         $instance = $this->getFiltersByClass()[$filterClass];
         $keyConverter = $this->getKeyConverters()[$instance->getId()];
@@ -66,9 +70,8 @@ class Transformer extends \Schoolbox\Filter\Transformer
             NullableContext\UnitSpec\Definition::class,
         ];
         if(in_array($filterClass, $nullableContexts, true)){
-            $foldersFiltered = null !== $this->folderSelections;
             /** @var NullableContext\KeyConverter $keyConverter */
-            return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()], $foldersFiltered);
+            return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()], $this->isFolderFilterUsed);
         }
         return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()]);
     }

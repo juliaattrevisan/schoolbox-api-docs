@@ -13,10 +13,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
-use Schoolbox\Learning\MarkScheme\Completion;
-use Schoolbox\Learning\MarkScheme\None;
-use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
@@ -115,7 +111,7 @@ class Controller extends Base
         foreach($filters as $filter){
             $selections[$filter->getId()] = $selectionMapper->createCollection();
 
-            if(Filter\Filters\Assessment\Folder\Definition::class === $filter->getClass()){
+            if(Filter\Filters\Assessment\Folder\TeacherInvolved\Definition::class === $filter->getClass()){
                 $selections[$filter->getId()][$folderId] = $this->createSelectionModel($selectionMapper, $filter, (string)$folderId);
             } elseif(Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()){
                 $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
@@ -207,7 +203,12 @@ class Controller extends Base
              */
             list($filtersDto, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($postFilterSelections, true);
 
-            $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filtersDto->getByClass());
+            // Ensure that assessments are not Assessment Specs
+            $filters = array_merge($filtersDto->getByClass(), [
+                AssessmentFilter\NullableContext\UnitSpec\Definition::class => [],
+            ]);
+
+            $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
@@ -247,7 +248,7 @@ class Controller extends Base
     /**
      * @param array $request
      * @param bool  $save Should we persist these selections to the DB ?
-     * @return null[]|Collection[]|mixed[][]
+     * @return array
      * @throws \InvalidArgumentException If unable to find the filter mapper class
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined what entity it is filtering
@@ -267,12 +268,7 @@ class Controller extends Base
 
         // Convert Selection models to Filters
         $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersTODO          = $selectionTransformer->getFiltersDto();
-
-        // Explicitly inject filter to ensure we don't get assessments that live directly in UnitSpecs,
-        // regardless of any filter selections send by user
-        $unitSpecFilter = Filter\Mapper::getInstance()->findByClass(AssessmentFilter\NullableContext\UnitSpec\Definition::class)->first();
-        $filtersTODO->setSelections($unitSpecFilter, new Collection());
+        $filtersTODO          = $selectionTransformer->buildFiltersDto();
 
         return [$filtersTODO, $codec, $selectionsPerFilter];
     }
@@ -292,10 +288,15 @@ class Controller extends Base
         $filtersArray = $this->request->query->getArrayCopy();
         unset($filtersArray['page']);
 
-        /** @var Filter\DataTransferObject  $dto */
-        list($dto) = $this->convertRequestToFilters($filtersArray, false);
+        /** @var Filter\DataTransferObject $filtersDto */
+        list($filtersDto) = $this->convertRequestToFilters($filtersArray, false);
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($dto->getByClass());
+        // Ensure that assessments are not Assessment Specs
+        $filters = array_merge($filtersDto->getByClass(), [
+            AssessmentFilter\NullableContext\UnitSpec\Definition::class => [],
+        ]);
+
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds);
 
         $csvExporter = new Export\CSV();

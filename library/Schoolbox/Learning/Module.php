@@ -52,8 +52,6 @@ class Module extends BaseModule
                 '/pending'                                => 'getPendingAssessments',        // (no preload)
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
                 '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
-                '/grades/{userId}{/termCode}'             => 'getGrades',                    // student && term && subject
-                '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',          // student && term && subject
             ],
             'POST' => [
                 '/pending/{userId}'                       => 'postPendingAssessmentsForUser', // viewee
@@ -89,20 +87,6 @@ class Module extends BaseModule
                     )
                 )
             );
-
-        $this->addRoutePermission(
-                $authorizer,
-                '(?:getGrades|getGradesYear|getGradesForSubject)',
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUser('userId'),
-                    new Rule\All(
-                        new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),
-                        new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
-                    )
-                )
-            );
     }
 
     /**
@@ -124,7 +108,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser|getClasses|getGrades|getGradesYear|getGradesForSubject)',
+            '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser|getClasses)',
             function ($params) {
                 if (array_key_exists('userId', $params)) {
                     try {
@@ -182,15 +166,9 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
             'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
             'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
-            'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
-            'showcaseMapper'             => $this->getMapperFactory()->getLazy(ShowcaseMapper::class),
-            'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
-            'quizMapper'                 => $this->getMapperFactory()->getLazy(QuizMapper::class),
-            'quizAttemptMapper'          => $this->getMapperFactory()->getLazy(QuizAttemptMapper::class),
             'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
             'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
             'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),

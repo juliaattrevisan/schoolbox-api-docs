@@ -36,7 +36,7 @@
             </ul>
         {% endif %}
 
-        {% set gradesRoute = routeLookupIfAuthorized('learning.getGradesForSubject', { viewee: USER, userId: USER.id, term: term, termCode: term.code, subject: class, subjectId: class.id }) %}
+        {% set gradesRoute = routeLookupIfAuthorized('learningGrades.getGradesForSubject', { viewee: USER, userId: USER.id, term: term, termCode: term.code, subject: class, subjectId: class.id }) %}
         {% if USER.getRole.isStudent == true and gradesRoute %}
             <nav>
                 <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>

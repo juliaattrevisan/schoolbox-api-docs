@@ -16,10 +16,8 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Filter\Option;
 
-/**
- * @method Definition getDefinition()
- */
-class Component extends AbstractComponent
+
+abstract class Component extends AbstractComponent
 {
 
     /**

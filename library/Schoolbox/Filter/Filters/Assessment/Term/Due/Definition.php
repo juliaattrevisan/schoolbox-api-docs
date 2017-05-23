@@ -30,7 +30,7 @@ class Definition extends AssessmentTermFilter\Definition
     {
         return [
             FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
-            FilterOption\Model::PAGE_GRADES,
+//            FilterOption\Model::PAGE_GRADES,
             FilterOption\Model::PAGE_MARK_BOOK,
         ];
     }

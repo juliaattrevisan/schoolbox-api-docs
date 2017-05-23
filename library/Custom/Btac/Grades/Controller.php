@@ -11,7 +11,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term;
 
-class Controller extends \Schoolbox\Learning\Controller
+class Controller extends \Schoolbox\Learning\Grades\Controller
 {
 
     /**
@@ -107,7 +107,7 @@ class Controller extends \Schoolbox\Learning\Controller
 
         // Squish this mess out
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/grades.twig', [
             'student'         => $viewee,
             'term'            => $term,
             'year'            => $year,

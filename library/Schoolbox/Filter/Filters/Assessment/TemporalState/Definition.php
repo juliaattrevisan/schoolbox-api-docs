@@ -19,19 +19,19 @@ use Schoolbox\GenericCollection;
  * Filters assessments by their publish, open, due and close dates.
  *
  * Available options:
- * □ Upcoming (           now < publish)
- * □ Preview  (publish <= now < open)
- * □ Due      (open    <= now < late)
- * □ Overdue  (late    <= now < close)
- * □ Closed   (close   <= now )
+ * □ Unpublished (           now < publish)
+ * □ Upcoming    (publish <= now < open)
+ * □ Open        (open    <= now < late)
+ * □ Overdue     (late    <= now < close)
+ * □ Closed      (close   <= now )
  */
 class Definition extends AbstractDefinition
 {
-    const KEY_UPCOMING = 'upcoming';
-    const KEY_PREVIEW  = 'preview';
-    const KEY_DUE      = 'due';
-    const KEY_OVERDUE  = 'overdue';
-    const KEY_CLOSED   = 'closed';
+    const KEY_UNPUBLISHED = 'unpublished';
+    const KEY_UPCOMING    = 'upcoming';
+    const KEY_OPEN        = 'open';
+    const KEY_OVERDUE     = 'overdue';
+    const KEY_CLOSED      = 'closed';
 
 
     /** @var Collection|string[] */
@@ -71,6 +71,7 @@ class Definition extends AbstractDefinition
         return [
             Option\Model::PAGE_PENDING_ASSESSMENTS,
             Option\Model::PAGE_MARK_BOOK,
+//            Option\Model::PAGE_GRADES,
         ];
     }
 
@@ -80,13 +81,13 @@ class Definition extends AbstractDefinition
      */
     public function getLabel($key)
     {
-        if (self::KEY_UPCOMING === $key) {
+        if (self::KEY_UNPUBLISHED === $key) {
             return 'Unpublished';
         }
-        if (self::KEY_PREVIEW === $key) {
+        if (self::KEY_UPCOMING === $key) {
             return 'Upcoming';
         }
-        if (self::KEY_DUE === $key) {
+        if (self::KEY_OPEN === $key) {
             return 'Open';
         }
         if (self::KEY_OVERDUE === $key) {
@@ -113,7 +114,12 @@ class Definition extends AbstractDefinition
      */
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
-        // noop - TemporalStates are purely hard-coded.
+        foreach ($pageOptions as $idx => $option) {
+            // Do not permit 'upcoming' on the 'grades' page
+            if (self::KEY_UNPUBLISHED === $option->getKey() && Option\Model::PAGE_GRADES === $option->getPage()) {
+                $pageOptions->offsetUnset($idx);
+            }
+        }
         return $pageOptions;
     }
 

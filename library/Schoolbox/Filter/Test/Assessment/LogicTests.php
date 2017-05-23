@@ -32,7 +32,7 @@ class LogicTests extends \PHPUnit_Framework_TestCase
 
         $message =
             AssessmentFilters\NullableContext\UnitImportSpec\Definition::class . ': ' . $this->toStr($uis).
-            AssessmentFilters\Folder\Definition::class                         . ': ' . $this->toStr($f).
+            AssessmentFilters\Folder\TeacherInvolved\Definition::class         . ': ' . $this->toStr($f).
             AssessmentFilters\NullableContext\Project\Definition::class        . ': ' . $this->toStr($p).
             AssessmentFilters\NullableContext\UnitImpl\Definition::class       . ': ' . $this->toStr($ui).
             AssessmentFilters\NullableContext\UnitSpec\Definition::class       . ': ' . $this->toStr($us).
@@ -158,7 +158,7 @@ class LogicTests extends \PHPUnit_Framework_TestCase
     {
         return [
             AssessmentFilters\NullableContext\UnitImportSpec\Definition::class => null === $uis ? null : new Collection($uis),
-            AssessmentFilters\Folder\Definition::class                         => null === $f   ? null : new Collection($f),
+            AssessmentFilters\Folder\TeacherInvolved\Definition::class         => null === $f   ? null : new Collection($f),
             AssessmentFilters\NullableContext\Project\Definition::class        => null === $p   ? null : new Collection($p),
             AssessmentFilters\NullableContext\UnitImpl\Definition::class       => null === $ui  ? null : new Collection($ui),
             AssessmentFilters\NullableContext\UnitSpec\Definition::class       => null === $us  ? null : new Collection($us),

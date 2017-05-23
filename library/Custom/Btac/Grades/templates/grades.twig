@@ -32,13 +32,13 @@
     <div class="small-12 medium-7 columns">
         <div class="content">
             <div class="context-switch clearfix">
-                {% include '@learning/Btac/semesterSelector.twig' with {
-                currentTerm: term,
-                terms:       terms,
-                termRoute:   'learning.getGrades',
-                yearRoute:   'learning.getCustomGradesYear',
-                routeArgs:   {viewee: student, userId: student.id},
-                year:        year
+                {% include '@learningGrades/semesterSelector.twig' with {
+                    currentTerm: term,
+                    terms:       terms,
+                    termRoute:   'learningGrades.getGrades',
+                    yearRoute:   'learningGrades.getCustomGradesYear',
+                    routeArgs:   {viewee: student, userId: student.id},
+                    year:        year
                 } only %}
             </div>
         </div>
@@ -61,7 +61,7 @@
                 <div class="row">
                     <div class="small-12 medium-8 columns">
                         <h2 class="subheader no-margin">
-                            <a href="{{ routeLookup('learning.getGradesForSubject', {student: student, userId: student.id, term: term, termCode: term.code, subject: subject, subjectId: folder.id}) }}"
+                            <a href="{{ routeLookup('learningGrades.getGradesForSubject', {student: student, userId: student.id, term: term, termCode: term.code, subject: subject, subjectId: folder.id}) }}"
                                title="View {{ locale.grades.properPlural }}">
                                 {{ folder.name }}
                             </a>

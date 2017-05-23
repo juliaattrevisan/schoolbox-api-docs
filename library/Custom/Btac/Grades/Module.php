@@ -16,7 +16,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Twig_Loader_Chain;
 
-class Module extends \Schoolbox\Learning\Module
+class Module extends \Schoolbox\Learning\Grades\Module
 {
     /**
      * @inheritdoc

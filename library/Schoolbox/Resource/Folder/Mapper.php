@@ -1670,19 +1670,25 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Return a list of folders that the student has submitted work to in a given term
      * @param User $student
-     * @param Term $term
+     * @param null|Term $term
      * @return Collection|Model[]
      * @throws DefinitionException
-     * @throws MapperException
      */
-    public function findFoldersWithResponses(User $student, Term $term)
+    public function findFoldersWithResponses(User $student, Term $term = null)
     {
         $codeMapper           = $this->getJoinMapper('codes');
 
         $whereParams = [
             ':studentId' => $student->getId(),
         ];
-        $whereParams += $this->buildWhereParamsForTerm($term);
+
+        // Are we limiting assessments to those due in some term ?
+        $termWhere = '';
+        if($term instanceof Term){
+            $whereParams += $this->buildWhereParamsForTerm($term);
+            $termWhere = $this->buildWherePartForTerm($term);
+        }
+
 
         $query = "
             SELECT
@@ -1706,7 +1712,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               LEFT JOIN `student_submission`                    AS `ss`   ON `ss`.`box_id`   = `d`.id
               WHERE 
                 (`tc`.`student_id` = :studentId OR `ss`.`owner` = :studentId OR `qa`.`user_id` = :studentId)
-                {$this->buildWherePartForTerm($term)}
+                {$termWhere}
             )
             ORDER BY f.name
         ";

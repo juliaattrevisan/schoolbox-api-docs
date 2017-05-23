@@ -16,7 +16,7 @@ use Schoolbox\GenericCollection;
  * No conversion. A int is converted to the same int (representing a folder.id)
  * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
-class KeyConverter extends AbstractKeyConverter
+abstract class KeyConverter extends AbstractKeyConverter
 {
 
     /**

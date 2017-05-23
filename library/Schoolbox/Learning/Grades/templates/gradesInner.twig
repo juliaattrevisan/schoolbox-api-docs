@@ -1,0 +1,124 @@
+{#
+    Displays aggregate grade data for a set of assessments.
+
+    Also renders the teacher + comment section for each student-involved folder selected in the filter panel.
+
+    Usage:
+        'student'                User
+        'folders'                Folder[]         All folders available in filter panel
+        'markbook'               Markbook         Filtered markbook
+        'canSeeGraph'            bool
+        'graph'                  array
+        'returnUrlSuffix'        string
+        'conversationsPerFolder' Conversation[]   Conversations of selected folders, indexed by folder.id
+        'longitudinalRubric'     array TODO either define array structure, or upgrade to object
+#}
+
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/reportCardBoxplot.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
+<script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('[data-collapser="true"]').collapsable({
+            container: '[data-collapse-container]'
+        });
+    });
+</script>
+{% if markbook.assessments | length %}
+    {% if canSeeGraph %}
+        {% include '@learningGrades/fragments/graph.twig' with {graph: graph} only %}
+    {% endif %}
+
+    {% if longitudinalRubric %}
+        {% include '@learningGrades/fragments/longitudinalRubric.twig' with {
+            longitudinalRubric: longitudinalRubric,
+            student:            student,
+            assessments:        markbook.assessments,
+            returnUrlSuffix:    returnUrlSuffix
+        } only %}
+    {% endif %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Assessments</h2>
+            <section>
+                <ul class="action-list">
+                    {% for assessment in markbook.assessments %}
+                        {% set participant = assessment.participantIfExtant(student) %}
+                        {% if participant %}
+                            {% set folder = assessment.baseContext.folder %}
+                            <li class="actions-small-2">
+                                <div class="list-item clearfix content">
+                                    <div class="row">
+                                        <div class="small-12 large-5 card column xl">
+                                            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
+                                                <h3>{{ assessment.title }}</h3>
+                                            </a>
+                                            <p class="meta">
+                                                <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a> {{ assessment.typeName }}
+                                            </p>
+                                        </div>
+
+                                        <div class="small-12 large-4 columns grade">
+                                            {% set feedback = participant.findMostRecentVisibleFeedback(USER) %}
+                                            {% if feedback %}
+                                                <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
+                                                <p class="comment">{{ feedback.comment | nl2br  }}</p>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="small-12 large-3 columns">
+                                            {{ dueDate.dueDate(assessment, student) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <nav>
+                                    {% if assessment is quiz and participant.allResponses | length %}
+                                        <a class="icon-view" href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: assessment.id, userId: student.id}) }}" title="View Attempts"></a>
+                                    {% endif %}
+                                    {% if assessment.getFamilyName == 'dueWork' and feedback %}
+                                        {# TODO convert this to AJAX #}
+                                        <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
+                                        <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
+                                            <input type="hidden" name="action" value="publish">
+                                            <input type="hidden" name="userId" value="{{ student.id }}">
+                                            <input type="hidden" name="assessmentId" value="{{ assessment.id }}">
+                                        </form>
+                                        <script type="text/javascript">
+                                            $(function() {
+                                                {# Publish to ePortfolio #}
+                                                $('[data-publish-to-eportfolio-form="{{ assessment.id }}"]').eportfolio_publish({
+                                                    activator: '[data-publish-to-eportfolio="{{ assessment.id }}"]'
+                                                });
+                                            });
+                                        </script>
+                                    {% endif %}
+                                </nav>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <div class="toast" data-alert="" id="publish-to-eportfolio-label">Activity showcased</div>
+            </section>
+        </div>
+    </div>
+{% else %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>No activities match your filter selections.</p>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+

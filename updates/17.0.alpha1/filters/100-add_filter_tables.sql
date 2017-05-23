@@ -68,7 +68,8 @@ DELETE FROM config WHERE `name` = 'pending_assessment_types';
 -- Add Filters
 INSERT INTO filter (`entity`, `class`) VALUES
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\AssessmentType\\Definition'),
-  ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\Folder\\Definition'),
+  ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\Folder\\TeacherInvolved\\Definition'),
+  ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\Folder\\StudentInteractions\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\Project\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\Term\\Due\\Definition'),
   ('Schoolbox\\Learning\\Assessment\\DataModel\\Mapper', 'Schoolbox\\Filter\\Filters\\Assessment\\Term\\Close\\Definition'),

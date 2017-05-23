@@ -2,15 +2,15 @@
     terms:      GenericCollection|Term\Model[]   - All terms known to system
     term:       Term\Model                       - Current visible term
     student:    User                             - The visible student
-    folders:    GenericCollection|Folder\Model[] - Classes/Groups that student is enrolled in or has feedback or responses in the current term
-    markbooks:  GenericCollection|MarkBook[]     - Indexed by folder.id, each composed of the assessments for that folder
+    folders:    GenericCollection|Folder\Model[] - Classes/Groups where the current student has responses or feedback for the current term
+    markbooks:  GenericCollection|MarkBook[]     - Indexed by folder.id, each composed of the assessments for that folder and term
     mailHandle: string                           - Prefix for sending mail
 #}
 
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural, '#']) }}
+{{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural]) }}
 
 <div class="row">
     <div class="small-12 columns">
@@ -40,13 +40,13 @@
                 {% include 'sub/semesterSelector.twig' with {
                     terms:       terms,
                     currentTerm: term,
-                    route:       'learning.getGrades',
+                    route:       'learningGrades.getGrades',
                     routeArgs:   {viewee: student, userId: student.id}
                 } only %}
 
                 {% include 'sub/subjectSelector.twig' with {
                     subjects:       folders,
-                    route:          'learning.getGradesForSubject',
+                    route:          'learningGrades.getGradesForSubject',
                     routeArgs:      {viewee: user, userId: student.id, term: term, termCode: term.code}
                 } only %}
             </div>
@@ -62,7 +62,7 @@
             <ul class="information-list">
                 {% for folder in folders %}
                     <li>
-                        <a href="{{ routeLookup('learning.getGradesForSubject', {student: student, userId: student.id, term: term, termCode: term.code, subject: subject, subjectId: folder.id}) }}" class="link-row" title="View {{ locale.grades.properPlural }}">
+                        <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}" class="link-row" title="View {{ locale.grades.properPlural }}">
                         <div class="medium-10 small-8 card">
                                 <span class="icon-home size-32" title="{{ folder.name }}"></span>
                                 <p>{{ folder.name }}</p>

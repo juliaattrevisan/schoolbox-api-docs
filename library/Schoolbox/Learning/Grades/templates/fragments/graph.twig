@@ -1,0 +1,95 @@
+{#
+    Render a box-and-whiskers plot of a single student's assessment results
+
+    Usage:
+        graph: Grades\Graph
+#}
+
+<script type="text/javascript">
+    $(function() {
+
+        var infoIndex = {{ graph.info | purify }};
+        /**
+         *  Boxplots for each Task in the Unit
+         */
+        $.fn.reportCardBoxplotRender({
+            element: '#subject-graph',
+            /* Title of the graph
+             */
+            title: '',
+            /* Orientation of the box plots
+             */
+            orientation: 'vertical',
+            /* A list of all the assessment names that are being graphed
+             * These correspond to a series of data and their respective
+             * five-point summaries
+             */
+
+            allAssessments: {{ graph.assessments | purify }},
+            /* All the raw data
+             */
+            allData: $.fn.reportCardBoxplotCalculateAllSeriesData({{ graph.data | purify }}),
+            /* You
+             */
+            additionalSeries: [
+                {
+                    type: 'scatter',
+                    name: 'You',
+                    color: 'rgb(255, 87, 87)',
+                    marker: {
+                        radius: 6
+                    },
+                    data: {{ graph.scatter | purify }},
+                    tooltip: {
+                        headerFormat: '',
+                        borderColor: '#000000',
+                        pointFormatter: function () {
+                            /* Basic template for each outlier
+                             */
+                            var template =
+                                '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+                                '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
+                                '<p class="comment">{INFO}</p>' +
+                                '</div>';
+                            /* Concatenate everything
+                             */
+                            if (typeof infoIndex[this.x].displayMark !== 'undefined') {
+                                var tooltipContent = template;
+
+                                if (infoIndex[this.x].displayMark !== null) {
+                                    tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
+                                    tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
+                                }
+                                else {
+                                    tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
+                                    tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '');
+                                }
+                                tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
+
+                                /* Show tooltip
+                                 */
+                                $('.highcharts-tooltip').show();
+
+                                return tooltipContent;
+                            }
+                            else {
+
+                                /* Hide tooltip when no data
+                                 */
+                                $('.highcharts-tooltip').hide();
+                            }
+                        }
+                    }
+                }
+            ]
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div id="subject-graph"></div>
+        </section>
+    </div>
+</div>

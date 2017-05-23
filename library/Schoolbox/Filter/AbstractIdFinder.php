@@ -103,7 +103,7 @@ abstract class AbstractIdFinder implements IdFinder
     protected function buildRegistry(Mapper $filterMapper, IMapper $entityMapper)
     {
         $filterInstances = $filterMapper->findForEntity(get_class($entityMapper));
-        $filterClasses = $filterInstances->getColumnValues('class');
+        $filterClasses   = $filterInstances->getColumnValues('class');
         $this->registry  = array_combine($filterClasses, $filterClasses);
     }
 
@@ -131,6 +131,7 @@ abstract class AbstractIdFinder implements IdFinder
      *
      * @param array $sparseFilters
      * @return Collection[]|null[]|mixed[][]
+     * @throws BrokenFilterException If unable to normalise a filter value
      */
     protected function normaliseFilters(array $sparseFilters)
     {
@@ -141,17 +142,21 @@ abstract class AbstractIdFinder implements IdFinder
                 $completeFilters[$filterClass] = null;
                 continue;
             }
+            $value = $sparseFilters[$filterClass];
+
             // Ensure it is either null, or a (potentially empty) Collection
-            if (is_array($sparseFilters[$filterClass])) {
-                $completeFilters[$filterClass] = new Collection($sparseFilters[$filterClass]);
-            }
-            if (null === $sparseFilters[$filterClass] || $sparseFilters[$filterClass] instanceof Collection) {
-                $completeFilters[$filterClass] = $sparseFilters[$filterClass];
+            if (is_array($value)) {
+                $completeFilters[$filterClass] = new Collection($value);
+            } elseif (null === $value || $value instanceof Collection) {
+                $completeFilters[$filterClass] = $value;
+            } elseif (is_object($value) || is_scalar($value)) {
+                // Enables caller to specify a inject a single object or scalar, and have it normalised here
+                $completeFilters[$filterClass] = new Collection([$value]);
             } else {
-                // Enables caller to specify a inject a single entity, or an array, and have it normalised here.
-                $completeFilters[$filterClass] = new Collection((array)$sparseFilters[$filterClass]);
+                throw new BrokenFilterException('Unrecognised filter value: ' . gettype($value));
             }
         }
+
         return $completeFilters;
     }
 
@@ -187,6 +192,7 @@ abstract class AbstractIdFinder implements IdFinder
     {
         return $this->mapper;
     }
+
 
     /**
      * @param string[] $registry

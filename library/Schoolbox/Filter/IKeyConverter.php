@@ -61,7 +61,6 @@ interface IKeyConverter
      *
      * @param null|GenericCollection|Selection\Model[] $availableSelections Indexed by setting.key
      * @return null|Collection (intentionally not GenericCollection)
-     * @throws \InvalidArgumentException
      */
     public function getSelectedItems(GenericCollection $availableSelections = null);
 

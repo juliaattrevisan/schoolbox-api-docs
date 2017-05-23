@@ -136,7 +136,7 @@ class MapperProxy
      *
      * @param int[] $ids
      * @param array $options
-     * @return Collection|IAssessable[]
+     * @return GenericCollection|IAssessable[]
      */
     public function findAllByIds($ids, array $options = [])
     {
