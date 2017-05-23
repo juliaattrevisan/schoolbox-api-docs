@@ -134,37 +134,29 @@
 
                         <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
                             <div class="list-item">
-                                <div class="card small-12">
-
-                                    {# Only display link if the user is authorzied to view the record #}
-
-                                    {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
-
-                                        {# Display linked students to staff #}
-
-                                        {% if record.relatedRecords | length and user.role.isStaff %}
-                                            <div class="right" style="padding-left:35px;">
-                                                {% for relatedRecord in record.relatedRecords %}
-                                                    <a href="{{ routeLookup('pastoral.getStudent', {studentId: relatedRecord.student.id}) }}">
-                                                        {{ profile.imageSquare64(relatedRecord.student) }}
-                                                    </a>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-
-                                        <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
-                                            {{ profile.imageSquare64(record.owner) }}
-                                            <h3>{{ record.heading }}</h3>
-                                        </a>
-                                    {% endif %}
+                                <div class="card small-12 wrap-down">
+                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
+                                        {{ profile.imageSquare64(record.owner) }}
+                                        <h3>{{ record.heading }}</h3>
+                                    </a>
 
                                     {# Display name of poster #}
-
                                     <p class="meta">
                                         Posted by
                                         <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
                                         {{ record.createdAt.short }}
                                     </p>
+
+                                    {# Display linked students to staff #}
+                                    {% if user.role.isStaff and record.relatedRecords|length%}
+                                    <p class="meta">
+                                        Linked Records:
+                                        {% for relatedRecord in record.relatedRecords %}
+                                            {% set relatedRecordRoute = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
+                                            <a href="{{ relatedRecordRoute }}">{{ relatedRecord.student.fullName }}</a>{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    {% endif %}
                                 </div>
                             </div>
                             <nav>
