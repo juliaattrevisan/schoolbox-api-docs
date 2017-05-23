@@ -353,7 +353,7 @@
                         <label>Date only:
                             <input type="text"
                                    id="datepicker-date"
-                                   data-datepicker placeholder="Date">
+                                   data-datepicker>
                         </label>
                     </div>
 
@@ -362,23 +362,66 @@
                             <input type="text"
                                    id="datepicker-datetime"
                                    data-datepicker
-                                   data-datepicker-time
-                                   placeholder="Date and time">
+                                   data-datepicker-time>
                         </label>
                     </div>
 
                     <div class="column small-12 medium-4">
-                        <label>Date and time with all-day switch
+                        <label>Date and time with all-day switch:
                             <input type="text"
                                    id="datepicker-datetime-allday"
                                    data-datepicker
                                    data-datepicker-time
                                    data-datepicker-alldayswitch
-                                   data-datepicker-alldayinput="datepicker-datetime-allday-switch"
-                                   placeholder="Date and time">
+                                   data-datepicker-alldayinput="datepicker-datetime-allday-switch">
                         </label>
-                        <label>This field gets updated with the all-day value from the datepicker
-                            <input id="datepicker-datetime-allday-switch" type="text" placeholder="All day?" readonly />
+                        <input type="checkbox" value="1" id="datepicker-datetime-allday-switch" checked="checked">
+                        <label for="datepicker-datetime-allday-switch" class="checkbox-label">This should be checked if all-day is on, and not if off</label>
+
+                        <!--<label>This field gets updated with the all-day value from the datepicker-->
+                            <!--<input id="datepicker-datetime-allday-switch" type="text" placeholder="All day?" readonly />-->
+                        <!--</label>-->
+                    </div>
+
+                    <div class="column small-12 medium-4">
+                        <label>Show events in picker:
+                            <input type="text"
+                                   id="datepicker-events"
+                                   data-datepicker
+                                   data-datepicker-call="event">
+                        </label>
+
+                    </div>
+
+                    <div class="column small-12 medium-4">
+                        <label>Show due work in picker:
+                            <input type="text"
+                                   id="datepicker-duework"
+                                   data-datepicker
+                                   data-datepicker-call="duework">
+                        </label>
+
+                        <label>
+                            The show due work picker requires a folderId input to fetch due works from.
+                            <input name="folderId" value="1">
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-4">
+                        <label>Syncable date - start:
+                            <input type="text"
+                                   id="datepicker-date-sync-start"
+                                   data-datepicker
+                                   data-datepicker-sync
+                                   data-datepicker-sync-enddate="#datepicker-date-sync-end">
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-4">
+                        <label>Syncable date - end:
+                            <input type="text"
+                                   id="datepicker-date-sync-end"
+                                   data-datepicker>
                         </label>
                     </div>
 
