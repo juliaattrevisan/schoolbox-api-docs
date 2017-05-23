@@ -340,7 +340,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             var folder = $('*[name = "folderId"]').val();
 
-            $.get((twigVars.routeLookup.getDueByDate).replace(/{folder}/g, folder).replace(/{date}/g, date))
+            $.get((twigVars.routeLookup.getDueByDate).replace(/{folderId}/g, folder).replace(/{date}/g, date))
 
                 .done(function (data) {
 
@@ -388,7 +388,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // Show loader
             loadingResponse('timetable');
 
-            $.get((twigVars.routeLookup.getDueByDate).replace(/{date}/g, date).replace(/{folder}/g, folder))
+            $.get((twigVars.routeLookup.getDueByDate).replace(/{date}/g, date).replace(/{folderId}/g, folder))
                 .done(function (data) {
                     appendResponse(data, 'duework', 'timetable');
                 })

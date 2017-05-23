@@ -52,7 +52,7 @@ class Module extends BaseModule
                 $campusRoute => 'getEventsByTimetableDay',
                 $campusRoute.'/date' => 'getTimetableDate',
                 $campusRoute.'/folder/{folder}' => 'getByTimetableDay',
-                '/date/{date}/folder/{folder}' => 'getDueByDate',
+                '/date/{date}/folder/{folderId}' => 'getDueByDate',
             ],
             'POST' => [
             ]
@@ -88,6 +88,9 @@ class Module extends BaseModule
                 $returnedParams = [];
                 if (array_key_exists('date', $params)) {
                     $returnedParams['date'] = new \Alaress_Date_Format($params['date'], 'Y-m-d');
+                }
+                if (array_key_exists('folderId', $params)) {
+                    $returnedParams['folder'] = $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']);
                 }
                 return $returnedParams;
             }

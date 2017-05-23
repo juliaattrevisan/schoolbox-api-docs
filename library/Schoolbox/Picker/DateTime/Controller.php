@@ -23,7 +23,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -35,9 +34,6 @@ class Controller extends Base
 
     /** @var TermMapper */
     private $termMapper;
-
-    /** @var FolderMapper */
-    private $folderMapper;
 
     /** @var UserAccessMapper */
     private $userAccessMapper;
@@ -63,20 +59,17 @@ class Controller extends Base
      *
      * @param UserMapper $userMapper
      * @param TermMapper $termMapper
-     * @param FolderMapper $folderMapper
      * @param UserAccessMapper $userAccessMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
      */
     public function __construct(
         UserMapper $userMapper,
         TermMapper $termMapper,
-        FolderMapper $folderMapper,
         UserAccessMapper $userAccessMapper,
         AssessmentMapperProxy $assessmentMapperProxy
     ) {
         $this->setUserMapper($userMapper);
         $this->setTermMapper($termMapper);
-        $this->setFolderMapper($folderMapper);
         $this->setUserAccessMapper($userAccessMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setTimetableHandler(new External_Timetable());
@@ -435,9 +428,9 @@ class Controller extends Base
      * Return JSON list of students and how much due work that have for a given date and class code(s)
      *
      * @param Alaress_Date_Format $date (Date we are interested in)
-     * @param int $folderId
+     * @param Folder $folder
      */
-    public function getDueByDate(Alaress_Date_Format $date, $folderId)
+    public function getDueByDate(Alaress_Date_Format $date, $folder)
     {
         $data = [];
 
@@ -451,9 +444,8 @@ class Controller extends Base
 
             // Get all students for the class or the group
 
-            $folderModel = $this->getFolderMapper()->findById($folderId);
             $externalStudents = $this->getUserAccessMapper()->findUsersInCategory(
-                $folderModel,
+                $folder,
                 Role::STUDENT,
                 UserAccess::ACCESS_READ,
                 true
@@ -564,24 +556,6 @@ class Controller extends Base
     public function getTermMapper()
     {
         return $this->termMapper;
-    }
-
-    /**
-     * @param FolderMapper $mapper
-     * @return mixed $this
-     */
-    public function setFolderMapper($mapper)
-    {
-        $this->folderMapper = $mapper;
-        return $this;
-    }
-
-    /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
     }
 
     /**
