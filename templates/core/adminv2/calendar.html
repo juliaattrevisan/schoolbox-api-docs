@@ -165,13 +165,13 @@
                             <div class="medium-6 columns">
                                 <label>
                                     From
-                                    <input type="text" data-date='start_date' name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
+                                    <input type="text" data-date='start_date' data-datepicker name="cleanupFrom" value="{CLEANUP_HAS_DATES_FROM}" />
                                 </label>
                             </div>
                             <div class="medium-6 columns">
                                 <label>
                                     Until
-                                    <input type="text" data-date='finish_date' name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
+                                    <input type="text" data-date='finish_date' data-datepicker name="cleanupTo" size="15" maxlength="30" value="{CLEANUP_HAS_DATES_TO}" />
                                 </label>
                             </div>
                         </fieldset>
@@ -305,17 +305,6 @@
                 .on('selectize.item_remove', function() {
                     $('#userid').val('')
                 })
-
-        /* date picker */
-        $('[data-date=start_date], [data-date=finish_date]').datepicker({
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
 
         $('[data-date=start_date]').syncDates({
             endDate: $('[data-date=finish_date]')

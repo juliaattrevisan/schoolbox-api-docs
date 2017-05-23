@@ -3,20 +3,15 @@
 <script type="text/javascript">
     $(function() {
 
-        $('[data-datepicker]').datepicker({  dateFormat: 'dd-mm-yy' });
-
-
         /* Calendar controls
          */
         $('[data-type=calendar-controls]').submit(function(event) {
             event.preventDefault();
 
             var id = $('[data-type=calendar-controls]').find('input[name=userKey]').val();
-            var start_date = $('[data-type=calendar-controls]').find('input[name=start_date]').val();
-            var finish_date = $('[data-type=calendar-controls]').find('input[name=finish_date]').val();
-
+            var start_date = moment($('[data-type=calendar-controls]').find('input[name=start_date]').val(), dateDisplayFormats.momentJs).format('DD-MM-YYYY');
+            var finish_date = moment($('[data-type=calendar-controls]').find('input[name=finish_date]').val(), dateDisplayFormats.momentJs).format('DD-MM-YYYY');
             var url = '/adminv2/engagement/index/{CURRENT_PAGE}/' + start_date + '/' + finish_date;
-
             window.location.href = url;
         });
 
@@ -58,10 +53,10 @@
                 <fieldset>
                     <legend>Report Range</legend>
                     <div class="column small-12 medium-6">
-                        <input id="start_date" data-datepicker placeholder="Start Date" name='start_date' value="{SELECTED_FORMATTED_START}" />
+                        <input id="start_date" data-datepicker placeholder="Start Date" name='start_date' value="{SELECTED_START}" />
                     </div>
                     <div class="column small-12 medium-6">
-                        <input id="finish_date" data-datepicker placeholder="End Date" name='finish_date'  value="{SELECTED_FORMATTED_FINISH}" />
+                        <input id="finish_date" data-datepicker placeholder="End Date" name='finish_date'  value="{SELECTED_FINISH}" />
                     </div>
                 </fieldset>
             </section>

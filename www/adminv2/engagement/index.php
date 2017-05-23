@@ -1,13 +1,11 @@
 <?php
 
-
 if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 
 $this->setFile(TEMPLATE_content, 'adminv2/engagement/index.html');
 $this->setTitle('Admin - Engagement');
-
 
 // include the admin navigation
 $nav = new AdminV2_Nav();
@@ -25,7 +23,7 @@ else {
 }
 $start = $start->startOfMonth();
 
-if($this->arg[1]) {
+if($this->arg[2]) {
     $end = \Alaress_Date_Format::newUrlDate($this->arg[2]);
 }
 else {
@@ -39,7 +37,6 @@ if(in_array($this->arg[0],$validPages)) {
 else {
     $page = 'login';
 }
-
 
 $this->setVar(array(
     'CURRENT_PAGE'              => $page,
