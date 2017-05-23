@@ -138,7 +138,7 @@ class ImportFactory
 
         // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
         $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, []);
-        $dto = new DataTransferObject([], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
+        $dto = new DataTransferObject(false, [], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
 
         return $dto;
     }
@@ -361,7 +361,7 @@ class ImportFactory
         $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, $assessmentImplToSpecMap);
         $assessmentImpls = $this->loadProjectImplAssessables($assessmentImpls, $assessmentImplToSpecMap);
         $assessmentPairs = $this->loadProjectPairAssessables($assessmentPairs, $assessmentImplToSpecMap);
-        $dto = new DataTransferObject($assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
+        $dto = new DataTransferObject(true, $assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
         return $dto;
     }
 
