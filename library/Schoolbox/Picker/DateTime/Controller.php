@@ -23,9 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -35,9 +33,6 @@ class Controller extends Base
 
     /** @var TermMapper */
     private $termMapper;
-
-    /** @var FolderMapper */
-    private $folderMapper;
 
     /** @var UserAccessMapper */
     private $userAccessMapper;
@@ -63,20 +58,17 @@ class Controller extends Base
      *
      * @param UserMapper $userMapper
      * @param TermMapper $termMapper
-     * @param FolderMapper $folderMapper
      * @param UserAccessMapper $userAccessMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
      */
     public function __construct(
         UserMapper $userMapper,
         TermMapper $termMapper,
-        FolderMapper $folderMapper,
         UserAccessMapper $userAccessMapper,
         AssessmentMapperProxy $assessmentMapperProxy
     ) {
         $this->setUserMapper($userMapper);
         $this->setTermMapper($termMapper);
-        $this->setFolderMapper($folderMapper);
         $this->setUserAccessMapper($userAccessMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
         $this->setTimetableHandler(new External_Timetable());
@@ -302,99 +294,6 @@ class Controller extends Base
     }
 
     /**
-     * Call getByTimetableDay to return events for timetable day
-     *
-     * @param int $campusId
-     * @param int $termId
-     * @param int $cycle timetable cycle or week (calculated from the beginning of the term)
-     * @param int $day timetable day number
-     * @return Collection
-     */
-    public function getEventsByTimetableDay($campusId, $termId, $cycle, $day)
-    {
-        return $this->getByTimetableDay($campusId, $termId, $cycle, $day);
-    }
-
-    /**
-     * Return a list of events or assessments due for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
-     *
-     * @param int $campusId
-     * @param int $termId
-     * @param int $cycle timetable cycle or week (calculated from the beginning of the term)
-     * @param int $day timetable day number
-     * @param int $folderId
-     * @param bool $dateOnly just returns date
-     * @return Collection
-     */
-    public function getByTimetableDay($campusId, $termId, $cycle, $day, $folderId = 0, $dateOnly = false)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        /** @var Campus $campus */
-        $campus = $user->getCampusCollection()->getBy('id', $campusId);
-
-        /** @var Term $term */
-        $term = $this->getTerms()->getBy('id', $termId);
-
-        $date = $this->getDateForTimetableDay($campus, $term, $cycle, $day);
-
-        // Return due work
-
-        if ($folderId > 0) {
-            return $this->getDueByDate($date, $folderId);
-        }
-
-        if ($dateOnly == true) {
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => [
-                    'date' => $date->toIso8601String()
-                ]
-            ]);
-        }
-
-        // Return events
-        return $this->getByDate($date);
-    }
-
-    /**
-     * Get a date for a timetable day
-     *
-     * @param $campusId
-     * @param $termId
-     * @param $cycle
-     * @param $day
-     * @return Collection
-     */
-    public function getTimetableDate($campusId, $termId, $cycle, $day)
-    {
-        return $this->getByTimetableDay($campusId, $termId, $cycle, $day, '', true);
-    }
-
-    /**
-     * Converting timetable cycle and day into a calendar date
-     *
-     * @param Campus $campus
-     * @param Term $term
-     * @param int $cycle
-     * @param int $day
-     * @return Alaress_Date_Format
-     */
-    public function getDateForTimetableDay($campus, $term, $cycle, $day)
-    {
-        $campusTimetable = $this->getTimetableHandler()->getTimetableDefinition(null, $campus);
-        $daysInCycle = $campusTimetable['dayCount'];
-
-        $termActualStart = $this->getFirstTimetableDayForTerm($campus, $term);
-
-        // Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
-        $shiftTimetableDays = $daysInCycle * ($cycle - 1) + $day - $termActualStart['day'];
-        $date = $termActualStart['date']->addWeekdays($shiftTimetableDays);
-        return $date;
-    }
-
-    /**
      * Return JSON list of all appointments for a given date
      *
      * @param Alaress_Date_Format $date
@@ -435,9 +334,9 @@ class Controller extends Base
      * Return JSON list of students and how much due work that have for a given date and class code(s)
      *
      * @param Alaress_Date_Format $date (Date we are interested in)
-     * @param int $folderId
+     * @param Folder $folder
      */
-    public function getDueByDate(Alaress_Date_Format $date, $folderId)
+    public function getDueByDate(Alaress_Date_Format $date, $folder)
     {
         $data = [];
 
@@ -451,9 +350,8 @@ class Controller extends Base
 
             // Get all students for the class or the group
 
-            $folderModel = $this->getFolderMapper()->findById($folderId);
             $externalStudents = $this->getUserAccessMapper()->findUsersInCategory(
-                $folderModel,
+                $folder,
                 Role::STUDENT,
                 UserAccess::ACCESS_READ,
                 true
@@ -564,24 +462,6 @@ class Controller extends Base
     public function getTermMapper()
     {
         return $this->termMapper;
-    }
-
-    /**
-     * @param FolderMapper $mapper
-     * @return mixed $this
-     */
-    public function setFolderMapper($mapper)
-    {
-        $this->folderMapper = $mapper;
-        return $this;
-    }
-
-    /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
     }
 
     /**
