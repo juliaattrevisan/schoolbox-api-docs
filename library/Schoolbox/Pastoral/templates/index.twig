@@ -14,20 +14,15 @@
 </div>
 
 <div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h2 class="subheader">Dashboard</h2>
-        </div>
-    </div>
     <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="Pastoral Report Builder"></a>
+        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="Manage reports"></a>
 
         {# Pastoral moderators can manage pastoral groups #}
 
         {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
 
         {% if routeGetGroups %}
-            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage Pastoral Groups"></a>
+            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage pastoral groups"></a>
         {% endif %}
     </nav>
 </div>
@@ -109,7 +104,7 @@
         {% endif %}
 
         {% if groups|length %}
-        <h2 class="subheader">Pastoral Group Memberships</h2>
+        <h2 class="subheader">Group Memberships</h2>
         <section>
             <ul class="information-list">
                 {% for membership in groups %}
