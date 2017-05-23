@@ -82,6 +82,8 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         } else {
             $newValue = $config['date'] . ' ' . $config['time'];
         }
+
+        $log->notice(sprintf('Setting component #%d datetime to "%s"', $componentId, $newValue));
         $insertCountdownConfigQ->execute([
             'configId'    => $newConfigId,
             'componentId' => $componentId,
