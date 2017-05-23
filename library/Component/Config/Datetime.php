@@ -29,7 +29,7 @@ class Component_Config_Datetime extends Component_Config_Abstract
         } catch (Exception $e) {
             return '';
         }
-        return $dateObject->getDatabaseDate();
+        return $dateObject->getDatabase();
     }
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
