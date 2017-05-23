@@ -84,7 +84,7 @@
                 {% for student in recentStudents %}
                 <li>
                     <div class="card small-12">
-                        <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
+                        <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}' title="View Profile">
                             {{ profile.imageSquare64(student) }}
                             <h3>{{ student.fullName }}</h3>
                         </a>
