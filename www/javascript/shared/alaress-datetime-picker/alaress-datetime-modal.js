@@ -244,7 +244,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             termDuration = timetable.term.find(':selected').attr('data-duration'),
             selectedTerm = timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
-            termEnd = timetable.term.find(':selected').attr('data-end-date');
+            termEnd = timetable.term.find(':selected').attr('data-end-date'),
+            monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
 
         // Don't try to divide by zero
         if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
@@ -277,6 +278,14 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $byTimetable.find('[data-tt-weeks]').html(optionsHtml);
 
             addDatesToDays();
+
+            // trigger a fetch for any heat data that might be absent
+            for (var year in monthsToFetch) {
+                for (var monthIndex in monthsToFetch[year]) {
+                    requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
+                }
+            }
+
             revealTimetable();
 
         }
@@ -783,6 +792,39 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         var $monthDiv = $('#picker' + twigVars.id).find('.flatpickr-current-month');
         $monthDiv.append($('<a class="icon-help" />').attr('title', tt));
+    }
+
+
+    function interpolateMonths(startMoment, endMoment) {
+        var i,
+            monthsToFetch = {},
+            startYear  = startMoment.year(),
+            startMonth = startMoment.month() + 1,
+            endYear    = endMoment.year(),
+            endMonth   = endMoment.month() + 1
+        ;
+
+        // these are likely the same, but not a guarantee
+        monthsToFetch[startYear] = [];
+        monthsToFetch[endYear]   = [];
+
+        if (endMonth < startMonth) {
+            // compensate for year-wrapping
+            for (i = startMonth; i <= 12; ++i) {
+                monthsToFetch[startYear].push(i);
+            }
+            for (i = 1; i <= endMonth; ++i) {
+                monthsToFetch[endYear].push(i);
+            }
+
+        } else {
+            // the simple case
+            for (i = startMonth; i <= endMonth; ++i) {
+                monthsToFetch[startYear].push(i);
+            }
+        }
+
+        return monthsToFetch;
     }
 
 };
