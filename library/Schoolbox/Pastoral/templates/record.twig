@@ -211,7 +211,7 @@
         <section>
             {% for attachment in record.attachments %}
                 <div class="card small-12">
-                    <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
+                    <a href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}" target="_blank">
                         {% if attachment.storage.mimetype.isImage %}
                         <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
                         {% else %}

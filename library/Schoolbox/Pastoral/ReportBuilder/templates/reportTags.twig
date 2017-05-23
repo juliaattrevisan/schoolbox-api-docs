@@ -71,7 +71,7 @@
                                 {% if record.attachments | length %}
                                     <p class="spaced meta">
                                         {% for attachment in record.attachments %}
-                                            <a target="_blank" href="/storage/fetch.php?hash={{ attachment.storage.hash }}">{{  attachment.storage.filename }}</a><br>
+                                            <a target="_blank" href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}">{{  attachment.storage.filename }}</a><br>
                                         {% endfor %}
                                     </p>
                                 {% endif %}

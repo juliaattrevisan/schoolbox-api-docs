@@ -186,9 +186,9 @@ class Controller extends Base
             'template' => '@pastoral/index.twig',
             'data' => [
                 'user' => $this->getUser(),
-                'recentStudents'    => $this->pastoralAuditMapper->findRecentStudents(),
-                'recentDashboard'   => $this->pastoralMapper->findRecentDashboard(),
-                'groups'            => $this->pastoralGroupMemberMapper->findByColumn('user_id', $this->getUser()->getId())
+                'recentStudents' => $this->pastoralAuditMapper->findRecentStudents(),
+                'recentDashboard' => $this->pastoralMapper->findRecentDashboard(),
+                'groups' => $this->pastoralGroupMemberMapper->findByColumn('user_id', $this->getUser()->getId())
             ]
         ]);
     }
@@ -203,9 +203,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoral/search.twig',
             'data' => [
-                'search'            => trim($get['keyword']),
-                'results'           => $this->pastoralMapper->getSearchResults($get['keyword']),
-                'students'          => $this->userMapper->findStudents($get['keyword']),
+                'search' => trim($get['keyword']),
+                'results' => $this->pastoralMapper->getSearchResults($get['keyword']),
+                'students' => $this->userMapper->findStudents($get['keyword']),
                 'minimumSearchLength' => Results::MIN_SEARCH_LENGTH
             ]
         ]);
@@ -233,9 +233,11 @@ class Controller extends Base
 
             // Retrieve all of the students pastoral records
 
-            $records = $this->pastoralMapper->findByColumn('student_id', $student->getId(), ['order' => [
-                'created_at' => 'desc'
-            ]]);
+            $records = $this->pastoralMapper->findByColumn('student_id', $student->getId(), [
+                'order' => [
+                    'created_at' => 'desc'
+                ]
+            ]);
 
         } else {
 
@@ -244,9 +246,11 @@ class Controller extends Base
             $records = $this->pastoralMapper->findByColumnList([
                 'student_id' => $student->getId(),
                 'type_id' => $get['type']
-            ], ['order' => [
-                'created_at' => 'desc'
-            ]]);
+            ], [
+                'order' => [
+                    'created_at' => 'desc'
+                ]
+            ]);
         }
 
         // Limit the number of pastoral records to display on each page of pastoral records
@@ -259,8 +263,10 @@ class Controller extends Base
 
         if ($pageCurrent > ceil($records->count() / $resultsPerPage)) {
             $pageCurrent = ceil($records->count() / $resultsPerPage);
-        } else if ($pageCurrent < 1) {
-            $pageCurrent = 1;
+        } else {
+            if ($pageCurrent < 1) {
+                $pageCurrent = 1;
+            }
         }
 
         $this->getResponse()->content->set([
@@ -837,7 +843,7 @@ class Controller extends Base
         foreach ($individualAccessIds as $currentAccessId) {
             $this->pastoralAccessMapper->deleteByColumnList([
                 'pastoral_id' => $record->getId(),
-                'user_id'     => $currentAccessId
+                'user_id' => $currentAccessId
             ]);
         }
 
@@ -1082,7 +1088,8 @@ class Controller extends Base
      * @var PastoralModel $record
      * @var IStorage $storageObject
      */
-    private function attachmentSave($record, $storageObject) {
+    private function attachmentSave($record, $storageObject)
+    {
 
         // Only add attachments which don't already exist on the record
 
@@ -1155,6 +1162,39 @@ class Controller extends Base
         }
 
         return $zone->getTwigContext();
+    }
+
+    /**
+     * Download an attachment from file system, permissions are applied via routing system
+     *
+     * @param PastoralAttachmentModel $attachment
+     */
+    public function getStudentRecordAttachment($attachment)
+    {
+        if (!$attachment->getStorage()->getMimetype()->getInline()) {
+            $attach = "attachment;";
+        } else {
+            $attach = "";
+        }
+
+        // Send headers
+
+        if ($attachment->getStorage()->getMime()) {
+            header("Content-Type: {$attachment->getStorage()->getMime()}");
+        } else {
+            header("Content-Type: application/octet-stream");
+        }
+
+        $basename = $attachment->getStorage()->getBasename();
+
+        header("Pragma: ");
+        header("Cache-control: private");
+        header("Content-Ranges: none");
+        header("Content-Disposition: $attach filename=\"$basename\"");
+        header("Content-Length: " . $attachment->getStorage()->getSize());
+        fpassthru($attachment->getStorage()->readStream());
+
+        exit;
     }
 }
 

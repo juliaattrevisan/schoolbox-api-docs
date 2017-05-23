@@ -69,6 +69,8 @@ class Module extends BaseModule
         $permissionRecordUpdate = new Rule\All(new Rule\Any($permissionPastoralModeratorWrite, $permissionRecordOwner));
         $permissionRecordDelete = new Rule\All(new Rule\Any($permissionPastoralModeratorWrite, $permissionRecordOwner));
 
+        $permissionAttachmentView = new Rule\Any($permissionPastoralModerator, new Rule\All($permissionStaff, $permissionInRecordAudience), new Rule\All($permissionParentOfStudent, $permissionInRecordAudience, $permissionStaff));
+
         // Permissions required to insert/delete a pastoral comment
 
         $permissionCommentOwner = new Rule\All(new IsCommentOwner(), $permissionStaff);
@@ -79,21 +81,22 @@ class Module extends BaseModule
 
         $this->registerRoutesArray([
             'GET' => [
-                ''                                                          => ['getIndex' => $permissionStaff],
-                '/groups'                                                   => ['getGroups' => $permissionPastoralModerator],
-                '/search'                                                   => ['getSearch' => $permissionStaff],
-                '/student/{studentId:\d+}'                                  => ['getStudent' => $permissionStudentView],
-                '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'     => ['getLinked' => $permissionStudentView],
-                '/student/{studentId:\d+}/record/{recordId:\d+}'            => ['getStudentRecord' => $permissionRecordView],
-                '/student/{studentId:\d+}/record/insert'                    => ['getStudentRecordInsertForm' => $permissionStaff],
-                '/student/{studentId:\d+}/record/{recordId:\d+}/update'     => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
+                ''                                                                              => ['getIndex' => $permissionStaff],
+                '/groups'                                                                       => ['getGroups' => $permissionPastoralModerator],
+                '/search'                                                                       => ['getSearch' => $permissionStaff],
+                '/student/{studentId:\d+}'                                                      => ['getStudent' => $permissionStudentView],
+                '/student/{studentId:\d+}/record/{recordId:\d+}'                                => ['getStudentRecord' => $permissionRecordView],
+                '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                         => ['getLinked' => $permissionStudentView],
+                '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}'  => ['getStudentRecordAttachment' => $permissionAttachmentView],
+                '/student/{studentId:\d+}/record/insert'                                        => ['getStudentRecordInsertForm' => $permissionStaff],
+                '/student/{studentId:\d+}/record/{recordId:\d+}/update'                         => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
             ],
             'POST' => [
-                '/record/insert'                                            => ['postRecordInsert' => $permissionStaff],
-                '/record/{recordId:\d+}/update'                             => ['postRecordUpdate' => $permissionRecordUpdate],
-                '/record/{recordId:\d+}/delete'                             => ['postRecordDelete' => $permissionRecordDelete],
-                '/record/{recordId:\d+}/comment/insert'                     => ['postCommentInsert' => $permissionCommentInsert],
-                '/record/{recordId:\d+}/comment/{commentId:\d+}/delete'     => ['postCommentDelete' => $permissionCommentDelete],
+                '/record/insert'                                                                => ['postRecordInsert' => $permissionStaff],
+                '/record/{recordId:\d+}/update'                                                 => ['postRecordUpdate' => $permissionRecordUpdate],
+                '/record/{recordId:\d+}/delete'                                                 => ['postRecordDelete' => $permissionRecordDelete],
+                '/record/{recordId:\d+}/comment/insert'                                         => ['postCommentInsert' => $permissionCommentInsert],
+                '/record/{recordId:\d+}/comment/{commentId:\d+}/delete'                         => ['postCommentDelete' => $permissionCommentDelete],
             ]
         ]);
     }
@@ -191,6 +194,18 @@ class Module extends BaseModule
                     $pastoralCommentMapper = $this->getMapperFactory()->get(PastoralCommentMapper::class);
 
                     $injectedValues['comment'] = $pastoralCommentMapper->findById($params['commentId']);
+                } catch (MapperException $e) {
+                }
+            }
+
+            // Load attachment
+
+            if (array_key_exists('attachmentId', $params)) {
+                try {
+                    /** @var PastoralAttachmentMapper $pastoralAttachmentMapper */
+                    $pastoralAttachmentMapper = $this->getMapperFactory()->get(PastoralAttachmentMapper::class);
+
+                    $injectedValues['attachment'] = $pastoralAttachmentMapper->findById($params['attachmentId']);
                 } catch (MapperException $e) {
                 }
             }
