@@ -514,7 +514,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             html = '<h2 class="mini">Due Work (<span data-due-work-title>' + dictMostLoaded + '</span>)</h2>';
 
             if (data.students === undefined) {
-                html = 'Error loading data';
+                html += 'Error loading data';
             }
             else if (data.students.length == 0) {
                 html += '<p class="no-margin">' + dictNoWorkToday + '</p>';
@@ -631,8 +631,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             });
         }
 
-
-        $pickerResponse.append(html);
         if (template == 'duework' && data.students.length > 0) {
             $('#picker'+twigVars.id).find('[data-collapser]').collapsable();
         }
@@ -664,7 +662,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $newCycle.removeClass('hide');
 
             addDatesToDays();
-            applyHeatToTimetable();
             resetTimetable();
 
         }
