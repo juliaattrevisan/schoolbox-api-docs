@@ -1,0 +1,851 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+<script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
+<script type="text/javascript">
+
+    // provide page-wide access to the calendar object so the callbacks can actually use it
+    var c;
+
+    /**
+     * Update event method:
+     *
+     * * Gives event a "loading" style
+     * * Removes that style when update finishes
+     *
+     * @param event      The event to update
+     * @param data       The data to send to the update script
+     * @param revertFunc called if update failed for whatever reason.
+     *                   Sets event back to original state.
+     */
+    var updateWrapper = function(event, data, revertFunc) {
+        event.className.push('loading');
+        c.cupdate(data, function (returnData) {
+            event.className = event.className.filter(function (value) {
+                return value != 'loading';
+            });
+            if (!returnData) {
+                revertFunc();
+            }
+            c.dom.fullCalendar('rerenderEvents');
+        });
+    };
+
+    // once the DOM has loaded, punch a fancy calendar into it
+    $(function() {
+
+        // Allow checking of anchor for view to display
+        var anchor = '';
+        var parts  = location.href.split('#');
+
+        if (parts.length > 1) {
+            anchor = parts[1];
+            switch (anchor) {
+                case 'month':
+                    anchor = 'month';
+                    break;
+                case 'week':
+                case 'agendaWeek':
+                    anchor = 'agendaWeek';
+                    break;
+                case 'day':
+                case 'agendaDay':
+                    anchor = 'agendaDay';
+                    break;
+                case 'basicWeek':
+                    anchor = 'basicWeek';
+                    break;
+                case 'basicDay':
+                    anchor = 'basicDay';
+                    break;
+                default:
+                    anchor = '';
+                    break;
+            }
+        }
+
+        var height = null;
+
+        if (isSmallDevice()) {
+            height = 'auto';
+        }
+        c = new Calendar('calendar', 'calendar-bubble', {
+			userId: '{CALENDAR_USER_ID}',
+
+            // overrides and callbacks
+            taskTypeId: '{TASK_TYPE_ID}',
+            crud: {
+                c: '/calendar/ajax/create',
+             // r: don't need it
+                u: '/calendar/ajax/update',
+                d: '/calendar/ajax/delete'
+            },
+            filter: {
+                ajax: '/calendar/ajax/filter'
+            },
+            fullCalendar: {
+                defaultDate: moment('{SELECTED_DATE}'),
+                height: height,
+                defaultView: anchor || '{CALENDAR_VIEW}',
+                // Event limit: could be configured from session but leave global for now
+                eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+                firstDay: Number('{CALENDAR_START_DAY}'),
+
+                /**
+                 * When an event is drawn on the calendar
+                 * @param calEvent
+                 * @param jsEvent
+                 * @param view
+                 */
+                eventRender: function(calEvent, jsEvent, view) {
+                    // Always render placeholders in the most basic manner
+                    if (calEvent.id === 'placeholder') {
+                        return true;
+                    }
+
+                    // Ignore the phantom event that the API puts there
+                    if (!calEvent.data) {
+                        return false;
+                    }
+
+                    // Don't render me if I'm marked as do not render
+                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                        return false;
+                    }
+
+                    var inner = jsEvent.find('.fc-content')
+                    var title = jsEvent.find('.fc-title')
+
+                    // We no longer escape title
+                    title.text(calEvent.title);
+
+                    // If appropriate, indicate this event can be attended
+                    var span = '<span class="att">(A)</span>';
+
+                    if (calEvent.data.attendance.icon.toString() == 'true') {
+                        if((content = jsEvent.find('.fc-event-content')).length == 1) {
+                            content.append(span)
+                        }
+                        else {
+                            inner.append(span)
+                        }
+                    }
+
+                    // If this event is a task, alter the state of the checkbox accordingly
+                    if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
+                        inner.prepend(
+                                $('<input type="checkbox" name="completed" class="plain" />')
+                                        .attr('id', 't'+ calEvent.data.meta.eventId)
+                        );
+                        if (calEvent.data.meta.completed == '1') {
+                            title.addClass('strike')
+                            inner.find(':checkbox').prop('checked', true)
+                        }
+                    }
+
+                    $(jsEvent).addClass(calEvent.data.styles.visible);
+
+                },
+
+                /**
+                 * When you finish resizing an event, update it
+                 * Note the difference between eventResize() and eventResizeStop()
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventResize: function(event, delta, revertFunc) {
+                    var data = {
+                        eventId: event.data.meta.eventId,
+                        resize: true,
+                        start: event.start.format(),
+                        end: event.end.format()
+                    };
+                    updateWrapper(event, data, revertFunc);
+                },
+
+                /**
+                 * When you finish dragging an event to its new home
+                 * @param event
+                 * @param delta
+                 * @param revertFunc
+                 */
+                eventDrop: function(event, delta, revertFunc) {
+                    var data = {
+                        eventId: event.data.meta.eventId,
+                        minuteDelta: delta.asMinutes(),
+                        allDay: !event.start.hasTime()
+                    };
+                    updateWrapper(event, data, revertFunc);
+                },
+
+                /**
+                 * When you click on a day to add a new event
+                 * @param date
+                 * @param jsEvent
+                 * @param view
+                 */
+                dayClick: function(date, jsEvent, view) {
+                    var allDay = !date.hasTime();
+                    var eventData = { allDay: allDay ? 1 : 0 };
+                    if (allDay) {
+                        eventData.date        = date.format('DD-MM-YYYY');
+                        eventData.displayDate = date.format('ddd, Do MMMM')
+                    } else {
+                        eventData.date        = date.format('DD-MM-YYYY HH:mm');
+                        eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
+                    }
+
+                    $('#calendar-create').foundation('reveal','open');
+
+
+                    c.bubble.display('create', eventData, jsEvent, this);
+
+                    // Apply whether the submit button is enabled or not
+                    toggleFormState(c.getForm('createEvent'));
+                },
+
+                /**
+                 * When the window is resized
+                 * @param view
+                 */
+                windowResize: function(view) {
+                    var wHeight = $(window).height()
+                    var calTop = c.dom.offset().top
+                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
+                },
+
+                /**
+                 * When external data is being fetched
+                 * @param isLoading
+                 * @param view
+                 */
+                loading: function(isLoading, view) {
+                    /* Show loading div right in the middle
+                     */
+                    if (isLoading === true) {
+                        $.magnificPopup.open({
+                            showCloseBtn: false,
+                            items: {
+                                src: "<div class='preview loader'></div>",
+                                type: 'inline'
+                            }
+                        });
+                    }
+                    /* Has finished loading
+                     */
+                    else {
+                        /* Hide loading div
+                         */
+                        $.magnificPopup.close();
+
+                        // update any tasks that have been completed by strikethrough-ing them
+                        $(this).find('input[type=checkbox]').each(function() {
+                            var self = $(this)
+
+                            if(self.prop('checked')) {
+                                self.siblings('.fc-title').addClass('strike')
+                            }
+                        })
+
+                        // reapply filters
+                        c.filters.organise(c, ["campus", "groups", "sources"], false)
+
+                        // update datepicker
+                        var d = c.dom.fullCalendar('getDate')
+
+                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'))
+                    }
+                },
+
+                /**
+                 * Whenever the view is changes
+                 * @param view
+                 */
+                viewDisplay: function(view) {
+                    // apply filters, which will also ajax the change of view to store in the db
+                    if(c !== undefined) {
+                        c.filters.organise(c, ["campus", "groups", "sources"])
+                    }
+                },
+
+                // Stream location
+                events: function(start, end, timezone, callback) {
+                    $.ajax({
+                        dataType: 'json',
+                        url:      '/calendar/ajax/full',
+                        data: {
+                            start: Calendar.reOffsetTimestamp(start.unix()),
+                            end:   Calendar.reOffsetTimestamp(end.unix()),
+                            userId: {CALENDAR_USER_ID}
+                        },
+                        success: function(data) {
+                            callback(data.filter(function(v) {
+                                return 'start' in v;
+                            }));
+                        },
+                        cache: false
+                    });
+                }
+            },
+
+            x: false
+        }).init()
+
+
+        /* LISTENERS */
+
+        /**
+         * Change event for create task and event title.
+         * Prevent creation of a calendar event if the input is empty.
+         *
+         * @param form  jQuery wrapped form element
+         */
+        var toggleFormState = function(form) {
+            var trimmedTitle = form.find('input[name="title"]').val().replace(/^\s+|\s+$/g, '');
+            var submit       = form.find(':submit');
+            submit.prop('disabled', trimmedTitle === '');
+        };
+        var toggleCreateButtonState = function(event) {
+            toggleFormState($(this).closest('form'));
+        };
+        c.getForm('createEvent').find('input[name="title"]')
+            .on('change', toggleCreateButtonState)
+            .on('keyup', toggleCreateButtonState)
+        ;
+        c.getForm('createTask').find('input[name="title"]')
+            .on('change', toggleCreateButtonState)
+            .on('keyup', toggleCreateButtonState)
+        ;
+
+        /* When you switch panels, preserve some data
+         */
+        $('[data-tab]').on('toggled', function (event, tab) {
+
+            /* Copy from task panel to event panel
+             */
+            if ($(tab).attr('id') == 'createTaskPanel') {
+                cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
+            }
+            /* Copy from event panel to task panel
+             */
+            else {
+                cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
+            }
+
+            /* Update button state when switching tabs
+             */
+            toggleFormState(c.getForm('createEvent'));
+            toggleFormState(c.getForm('createTask'));
+        });
+
+        // click 'Edit Event' and push data through to main form page
+        $('#edit-full').click(function(e) {
+            var getstring = $(this).closest('form').serialize();
+            window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
+        })
+
+        // hide bubbles if any header buttons are clicked
+        $('#calendar .fc-header').on('click', 'span.fc-button', function(e) {
+            c.bubble.hide()
+        });
+
+        /* Process attendances
+         * NB May not be necessary to use custom getFormData();
+         */
+        $('#editEvent').calendarAttendance({
+            getFormData: function() {
+                return {
+                    event: {
+                        id: c.getForm('editEvent').find('input[name="eventId"]').val()
+                    }
+                }
+            }
+        });
+
+        // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
+        c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
+            var self = $(this)
+            var eventId = self.closest('form').find('input[name=eventId]').val()
+            var chk = c.dom.find('#t'+eventId)
+            chk.prop('checked', self.prop('checked'))
+            chk.trigger('change')
+        })
+
+        c.getForm('editTask').on('click', '[data-interaction="delete"]', function(e) {
+            var id = $(this).siblings('input[name=eventId]').val();
+            c.cdelete(
+                {eventId: id},
+                function() {
+                    // Remove this event from the calendar
+                    c.dom.fullCalendar(
+                        'removeEvents',
+                        function(thisEvent) {
+                            try {
+                                return thisEvent.data.meta.eventId == id;
+                            } catch (e) {
+                                return false;
+                            }
+                        }
+                    );
+                }
+            );
+            c.bubble.hide()
+            e.preventDefault()
+        })
+
+        // Dialog for use when clicking an item that is in a series
+        var updateSeriesDialog = $('#dialog-booking-bulk-update');
+        updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
+            e.preventDefault();
+            updateSeriesDialog.foundation('reveal', 'close');
+        });
+
+        $('#download-calendar-export').click(function(event) {
+            event.preventDefault();
+            var form = $(event.target).closest('form');
+            window.location = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+        });
+
+        /* Export calendar
+         */
+        $.fn.clipboardSelector({
+            exportActivator: '#open-calendar-export-dialog',
+            onReady: function() {
+                var form = $('#calendar-export-form');
+                var url = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
+
+                var dialog = $('#calendar-export-dialog');
+                var dialogUrl = $('#calendar-export-dialog-url');
+
+                /* Bypass foundation bug
+                 * https://github.com/zurb/foundation/issues/4746
+                 */
+                dialogUrl.text(url);
+                dialog.foundation('reveal', 'open');
+
+                dialog.on('opened.fndtn.reveal', function() {
+                    dialogUrl.select();
+                });
+            },
+            onZeroClipboardReady: function() {
+                $('#copy-button').show();
+            }
+        });
+
+        // Copypasted code for updating booking in series
+        var editEventForm = $('#calendar-bubble').find('#editEvent');
+        editEventForm.on(
+            'click',
+            '[data-booking-button=booking-approve], [data-booking-button=booking-reject], [data-booking-button=booking-cancel]',
+            function(event) {
+                event.preventDefault()
+                var href     = this.href
+                var callback = function(data) {
+                    $.ajax(href, {data: data}).done(function() {
+                        c.dom.fullCalendar('refetchEvents')
+                    })
+                }
+                var seriesId = $(this).data('seriesId')
+                if (seriesId) {
+                    // Remove all previous change status events, and reapply to this
+                    // dialog box.
+                    updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
+                    updateSeriesDialog.foundation('reveal', 'open');
+                    updateSeriesDialog.off('click', '[data-efficacy="self"]');
+                    updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
+                        e.preventDefault();
+                        updateSeriesDialog.foundation('reveal', 'close');
+                        callback({efficacy: 'self'});
+                    });
+                    updateSeriesDialog.off('click', '[data-efficacy="series"]');
+                    updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
+                        e.preventDefault();
+                        updateSeriesDialog.foundation('reveal', 'close');
+                        callback({efficacy: 'series', seriesId: seriesId});
+                    });
+                }
+                else {
+                    c.bubble.hide()
+                    callback()
+                }
+            }
+        );
+        editEventForm.on(
+            'click',
+            '[data-interaction="delete"]',
+            function(event) {
+                // Do delete stuff
+                var href    = this.href;
+                var element = $(this);
+                event.preventDefault();
+                editEventForm.closest('[data-reveal]')
+                    .one('closed.fndtn.reveal', function() {
+                        var eventId  = editEventForm.find('input[name="eventId"]').val();
+                        var seriesId = editEventForm.find('input[name="seriesId"]').val();
+                        if (seriesId) {
+                            // triple treat!
+                            updateSeriesDialog.find('[data-booking-action-text]').text('delete');
+                            updateSeriesDialog.foundation('reveal', 'open');
+                            updateSeriesDialog.off('click', '[data-efficacy="self"]');
+                            updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
+                                e.preventDefault();
+                                updateSeriesDialog.foundation('reveal', 'close');
+                                window.location.href = href + '&efficacy=self';
+                            });
+                            updateSeriesDialog.off('click', '[data-efficacy="series"]');
+                            updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
+                                e.preventDefault();
+                                updateSeriesDialog.foundation('reveal', 'close');
+                                window.location.href = href + '&efficacy=series&seriesId='+seriesId;
+                            });
+                        } else {
+                            // confirmy-dialogy
+                            element.confirmDialog({
+                                text: 'Are you sure you wish to delete this event?',
+                            });
+                        }
+                        c.bubble.hide();
+                    })
+                    .foundation('reveal', 'close');
+
+            }
+        );
+
+        // if a checkbox on the calendar is interacted, ajax
+        c.dom.on('change', 'input[type=checkbox]', function(e) {
+
+            var self = $(this)
+            var ttl = self.siblings('.fc-title')
+            if(self.prop('checked')) {
+                ttl.addClass('strike')
+            }
+            else {
+                ttl.removeClass('strike')
+            }
+            data = {
+                eventId: self.attr('id').slice(1),
+                completed: self.prop('checked') ? 1 : 0
+            }
+            c.cupdate(data)
+            c.bubble.hide()
+            c.suppressOne()
+            e.stopPropagation()
+            e.preventDefault()
+            return false
+        })
+
+        //select all clicked
+        $('#calendar-controls').on('change','.select_all', function(e) {
+            $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
+        })
+
+        //$('#calendar').foundation('reveal','reflow'); this should work but foundation is buggy
+        $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
+        $('#fc-button-export').click(function() { $('#calendar-export').foundation('reveal','open') });
+    })
+</script>
+<!-- END custom_head -->
+
+<div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-create" >
+    <!-- Create Event Form-->
+    <dl class="tabs" data-tab>
+        <dd class="active"><a href="#createEventPanel">Create Event</a></dd>
+        <dd><a href="#createTaskPanel">Create Task</a></dd>
+    </dl>
+    <div class="tabs-content">
+        <div class="content active" id="createEventPanel" aria-hidden="false">
+            <form id="createEvent" method="post" action="#" class="top">
+                <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
+                <input name="allDay" type="hidden" value="" />
+                <input name="date" type="hidden" value="" />
+
+                <section>
+                    <h3>On <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span></h3>
+
+                    <label>
+                        Event Title
+                        <input name="title" type="text" value="" />
+                    </label>
+
+                    <label>
+                        Event Type
+                        <select name="type">
+                            <!-- BEGIN event_type -->
+                            <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
+                            <!-- END event_type -->
+                        </select>
+                    </label>
+                </section>
+                <div class="row">
+                    <div class="small-12 columns no-pad">
+                        <input type="submit" disabled value="Create Event" />
+                        <a href="#" id="edit-full" class="button icon-modify">Edit Event</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
+            <form id="createTask" method="post" action="#">
+                <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
+                <input name="date" type="hidden" value="" />
+                <input name="allDay" type="hidden" value="" />
+                <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
+
+                <section>
+                    <h3>Due <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span></h3>
+
+                    <label>
+                        Task
+                        <input name="title" type="text" value="" />
+                    </label>
+
+                    <label class="detail">
+                        Note
+                        <textarea name="detail"></textarea>
+                    </label>
+                </section>
+                <div class="row">
+                    <div class="small-12 columns no-pad">
+                        <input type="submit" disabled value="Create Task" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
+    <!-- Edit Event Form -->
+    <form id="editEvent">
+        <input type="hidden" name="eventId" />
+        <input type="hidden" name="seriesId" />
+
+        <div class="row">
+            <div class="small-12">
+                <h3 class="note"></h3>
+                <ul class="meta">
+                    <li class="icon-resource-booking" data-event-modal-field="bookingStatus"></li>
+                    <li class="icon-calendar date"></li>
+                    <li class="icon-location" data-event-modal-field="location"></li>
+                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
+                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
+                </ul>
+
+                <article class="detail" data-is-html="1"></article>
+
+                <ul class="relatedBookings"></ul>
+
+                <div class="attendance">
+                    <dl>
+                        <dd><p class="attendanceIcon"></p></dd>
+                        <dd class="rm"><p class="attendanceStatus"></p></dd>
+                    </dl>
+                </div>
+                <div>
+                    <dl>
+                        <dd>
+                            <span class="homepageLink" data-is-html="1"></span>
+                            <span class="moreDetailsLink" data-is-html="1"></span>
+                            <span class="modifyLink" data-is-html="1"></span>
+                            <span class="deleteLink" data-is-html="1"></span>
+                            <span class="attendanceListButton" data-is-html="1"></span>
+                            <span class="attendanceRequestButton" data-is-html="1"></span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="bookingActions" data-is-html="1"></div>
+            </div>
+        </div>
+    </form>
+
+    <form id="editTask">
+        <input type="hidden" name="eventId" />
+
+        <h3>Task</h3>
+
+        <label>
+            Due
+            <span class="date"><!-- Date gets shoved in here --></span>
+        </label>
+
+        <input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" />
+
+        <label for="modifyTaskBubbleCompleted" class="checkbox-label">
+            Complete
+        </label>
+
+        <label>
+            Task
+            <input id="modifyTaskBubbleNote" name="title" type="text" value="" />
+        </label>
+
+        <label class="detail">
+            Note
+            <textarea id="modifyTaskBubbleDetail" name="detail"></textarea>
+        </label>
+
+        <input type="submit" value="Update Task" />
+        <a href="#" class="button icon-delete" data-interaction="delete">Delete</a>
+    </form>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{TPL_LOCAL_CALENDAR_PC} for {USER_FULLNAME}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div id="calendar"></div>
+        </section>
+    </div>
+</div>
+
+<div id="calendar-controls" class="reveal-modal large" data-reveal aria-hidden="true" role="dialog">
+    <form>
+        <section>
+            <fieldset class="content filter-list">
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist sources">
+                        <legend>Sources</legend>
+                        <input type="checkbox" class="select_all" id="sourceSelectAll" checked />
+                        <label for="sourceSelectAll">Select all</label>
+                        <!-- BEGIN filter_source -->
+                        <input type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
+                        <label for="source{SOURCE_ID}">{SOURCE_NAME}</label>
+                        <!-- END filter_source -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist groups">
+                        <legend>Groups</legend>
+                        <input type="checkbox" class="select_all" id="groupsSelectAll" checked />
+                        <label for="groupsSelectAll">Select all</label>
+                        <!-- BEGIN filter_group -->
+                        <input type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="applyFilters"/>
+                        <label for="group{GROUP_ID}">{GROUP_NAME}</label>
+                        <!-- END filter_group -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist campus">
+                        <legend>Campus</legend>
+                        <input type="checkbox" class="select_all"  id="campusSelectAll" checked />
+                        <label for="campusSelectAll">Select all</label>
+                        <!-- BEGIN filter_campus -->
+                        <input type="checkbox" name="campus" id="campus{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="applyFilters"/>
+                        <label for="campus{CAMPUS_ID}">{CAMPUS_NAME}</label>
+                        <!-- END filter_campus -->
+                    </fieldset>
+                </div>
+                <div class="small-6 large-3 columns">
+                    <fieldset class="checklist events">
+                        <legend>Event</legend>
+                        <input type="checkbox" id="eventTypeSelectAll" class="select_all" checked />
+                        <label for="eventTypeSelectAll">Select all</label>
+                        <!-- BEGIN filter_event_type -->
+                        <input type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="applyFilters"/>
+                        <label for="eventType{EVENT_TYPE_ID}" style="background-color:{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</label>
+                        <!-- END filter_event_type -->
+                    </fieldset>
+                </div>
+            </fieldset>
+        </section>
+    </form>
+    <a href="#" id="applyFilters" class="button icon-tick">Apply Filters</a>
+    <!--/filter-drop-->
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="calendar-export" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
+    <h1>Subscribe</h1>
+    <p>You can subscribe to the school events calendar using the following links:</p>
+    <h2>Junior School Events</h2>
+    <div> <code><a href="webcal://go.stpauls.nsw.edu.au/calendars/Junior.ics">webcal://go.stpauls.nsw.edu.au/calendars/Junior.ics</a></code></div>
+    <br />
+    <h2>Secondary School Events</h2>
+    <div><code><a href="webcal://go.stpauls.nsw.edu.au/calendars/Secondary.ics">webcal://go.stpauls.nsw.edu.au/calendars/Secondary.ics</a></code></div>
+    <br />
+    <h1>Export Events</h1>
+    <p>You can export my.stpauls events such as Due Work using the options below.</p>
+    <form class="top" action="#" id="calendar-export-form">
+        <section>
+            <fieldset class="content radiolist">
+                <input type="radio" name="export" value="all" id="export-all" checked />
+                <label for="export-all" class="c">All events</label>
+                <input type="radio" name="export" value="personal" id="export-personal" />
+                <label for="export-personal">Personal events only</label>
+                <input type="radio" name="export" value="timetable" id="export-timetable" />
+                <label for="export-timetable">Timetable classes</label>
+                <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
+                <label for="export-timetableday">Timetable days</label>
+                <input type="radio" name="export" value="duework" id="export-duework" />
+                <label for="export-duework">Due Work</label>
+                <input type="radio" name="export" value="resources" id="export-resources" />
+                <label for="export-resources">Resource Booking</label>
+                <input type="radio" name="export" value="external" id="export-external" />
+                <label for="export-external">External events</label>
+                <input type="radio" name="export" value="campus" id="export-campus" />
+                <label for="export-campus">Events for campus:
+                    <select name="campus">
+                        <option value="">-- select --</option>
+                        <!-- BEGIN export_campus -->
+                        <option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
+                        <!-- END export_campus -->
+                    </select>
+                </label>
+                <input type="radio" name="export" value="group" id="export-group" />
+                <label for="export-group">Events for group:
+                    <select name="group">
+                        <option value="">-- select --</option>
+                        <!-- BEGIN export_group -->
+                        <option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
+                        <!-- END export_group -->
+                    </select>
+                </label>
+                <input type="radio" name="export" value="event_type" id="export-type" />
+                <label for="export-type">Events by type:
+                    <select name="event_type">
+                        <option value="">-- select --</option>
+                        <!-- BEGIN export_type -->
+                        <option label="{EXPORT_TYPE_NAME}" value="{EXPORT_TYPE_ID}">{EXPORT_TYPE_NAME}</option>
+                        <!-- END export_type -->
+                    </select>
+                </label>
+            </fieldset>
+        </section>
+        <input type="submit" id="open-calendar-export-dialog" value="Generate URL"  />
+        <input type="submit" id="download-calendar-export" value="Download CSV"/>
+    </form>
+   
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div class="reveal-modal" data-reveal aria-labelledby="calendar-export-dialog-text" aria-hidden="true" role="dialog" id="calendar-export-dialog">
+	<h2 id="calendar-export-dialog-text">Live Feed URL</h2>
+    <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
+    <div id="calendar-export-dialog-url" class="alert-box"></div>
+    <button id="copy-button" data-clipboard-target="calendar-export-dialog-url" class="button icon-copy">Copy to Clipboard</button>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div class="reveal-modal" data-reveal aria-labelledby="dialog-booking-bulk-update-title" aria-hidden="true" role="dialog" id="dialog-booking-bulk-update">
+    <h2 id="dialog-booking-bulk-update-title">This event is part of a series</h2>
+    <p>Would you like to <span data-booking-action-text></span> only this booking, or all in the series?</p>
+    <ul class="flex-list buttons">
+        <li><a href="#" class="button" data-efficacy="self">Only this event</a></li>
+        <li><a href="#" class="button" data-efficacy="series">All events in the series</a></li>
+        <li><a href="#" class="button" data-interaction="close">Cancel</a></li>
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
