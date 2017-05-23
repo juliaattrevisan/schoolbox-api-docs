@@ -73,11 +73,10 @@
 {% if count > 0 %}
 
 <div class="row">
+
     {# Display recently searched student records #}
-
+    {% if recentStudents is not empty %}
     <div class="small-12 medium-{{ 12 / count }} island">
-
-        {% if recentStudents is not empty %}
         <h2 class="subheader">Recently Viewed Students</h2>
         <section>
             <ul class="information-list">
@@ -94,71 +93,68 @@
                 {% endfor %}
             </ul>
         </section>
-        {% endif %}
     </div>
-
-    {# Display high priority records #}
-
-    {% if recentDashboard is not empty %}
-
-        <div class="small-12 medium-{{ 12 / count }} island">
-            <h2 class="subheader">Important Records</h2>
-            <section>
-                <ul class="information-list">
-                    {% for record in recentDashboard %}
-                    <li>
-                        <div class="card small-12">
-                            <a href='{{ routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) }}' title="View Profile">
-                                {{ profile.imageSquare64(record.student) }}
-                                <h3>{{ record.student.fullName }}</h3>
-                            </a>
-                            <p class="meta">{{ record.heading }}</p>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </div>
-
     {% endif %}
 
+    {# Display high priority records #}
+    {% if recentDashboard is not empty %}
+    <div class="small-12 medium-{{ 12 / count }} island">
+        <h2 class="subheader">Important Records</h2>
+        <section>
+            <ul class="information-list">
+                {% for record in recentDashboard %}
+                <li>
+                    <div class="card small-12">
+                        <a href='{{ routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) }}' title="View Profile">
+                            {{ profile.imageSquare64(record.student) }}
+                            <h3>{{ record.student.fullName }}</h3>
+                        </a>
+                        <p class="meta">{{ record.heading }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+    {% endif %}
+
+    {# Pastoral groups memberships #}
     {% if groups | length %}
-        <div class="small-12 medium-{{ 12 / count }} island">
-            <h2 class="subheader">Pastoral Group Memberships</h2>
-            <p class="meta">You are a member of the following pastoral groups.</p>
-            <section>
-                <ul class="information-list">
-                    {% for membership in groups %}
-                    <li>
-                        <div class="card small-12">
-                            {{ profile.imageSquare64(membership.group.user) }}
-                            {% if membership.group.user.id == user.id %}
+    <div class="small-12 medium-{{ 12 / count }} island">
+        <h2 class="subheader">Pastoral Group Memberships</h2>
+        <p class="meta">You are a member of the following pastoral groups.</p>
+        <section>
+            <ul class="information-list">
+                {% for membership in groups %}
+                <li>
+                    <div class="card small-12">
+                        {{ profile.imageSquare64(membership.group.user) }}
+                        {% if membership.group.user.id == user.id %}
 
-                                {% set routeGetGroupsModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
-                                {% if routeGetGroupsModify %}
-                                    <a href="{{ routeGetGroupsModify }}" title="Modify Pastoral Group">
-                                {% endif %}
+                            {% set routeGetGroupsModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
+                            {% if routeGetGroupsModify %}
+                                <a href="{{ routeGetGroupsModify }}" title="Modify Pastoral Group">
                             {% endif %}
-                                <h3>{{ membership.group.name }}</h3>
+                        {% endif %}
+                            <h3>{{ membership.group.name }}</h3>
+                        {% if membership.group.user.id == user.id %}
+                            {% if routeGetGroupsModify %}
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        <p class="meta">Group managed by
                             {% if membership.group.user.id == user.id %}
-                                {% if routeGetGroupsModify %}
-                                    </a>
-                                {% endif %}
+                                you
+                            {% else %}
+                                {{ membership.group.user.fullName }}
                             {% endif %}
-                            <p class="meta">Group managed by
-                                {% if membership.group.user.id == user.id %}
-                                    you
-                                {% else %}
-                                    {{ membership.group.user.fullName }}
-                                {% endif %}
-                            </p>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </div>
-
+                        </p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
     {% endif %}
 </div>
 
