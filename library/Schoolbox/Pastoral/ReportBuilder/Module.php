@@ -56,6 +56,7 @@ class Module extends BaseModule
             'POST' => [
                 '/modify'                       => ['postReportModify' => $permissionReportOwner],
                 '/delete/{reportId:\d+}'        => ['postReportDelete' => $permissionReportOwner],
+                '/dashboard/modify'             => ['postReportDashboardModify' => $permissionStaff],
             ]
         ]);
     }

@@ -156,6 +156,10 @@ class Mapper extends BaseMapper
                 }
             }
 
+            if (!empty($row['dashboard_id'])) {
+                $model->setDashboard(true);
+            }
+
             $model->setInvolved($row['involved'] == 1);
 
             // Should probably be storing report criteria as a bunch of pivot tables, but this will do for now.
@@ -201,6 +205,8 @@ class Mapper extends BaseMapper
      */
     public function findForUser(User $user)
     {
+        $userId = $this->getDatabase()->quote($user->getId());
+
         $groupSql = '';
         $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
 
@@ -213,8 +219,67 @@ class Mapper extends BaseMapper
 
         $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
 
-	    if (!empty($bindings['placeholders'])) {
-    	    $groupSql = "`group_id` IN ({$bindings['placeholders']}) AND";
+        if (!empty($bindings['placeholders'])) {
+            $groupSql = "`group_id` IN ({$bindings['placeholders']}) AND";
+        }
+
+        $sql = "
+
+            SELECT      {$this->getColumnString()},
+                        GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`,
+                        `pastoral_report_dashboard`.`id` as `dashboard_id`
+            FROM        {$this->getTable()}
+            LEFT JOIN   `pastoral_report_groups` ON 
+                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND 
+                            `pastoral_report_groups`.`deleted_at` IS NULL           
+            LEFT JOIN   `pastoral_report_dashboard` ON
+                            `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
+                            `pastoral_report_dashboard`.`user_id` = {$userId} AND
+                            `pastoral_report_dashboard`.`deleted_at` IS NULL
+            WHERE       (`pastoral_report`.`owner_id` = :userId OR (
+                            `pastoral_report`.`id` IN (
+                                SELECT    `report_id` 
+                                FROM      `pastoral_report_groups` 
+                                WHERE     {$groupSql}
+                                          `deleted_at` IS NULL
+                            )
+                        )) AND
+                        `pastoral_report`.`deleted_at` IS NULL
+            GROUP BY    `pastoral_report`.`id`
+        ";
+
+        $statement = $this->getDatabase()->prepare($sql);
+        $statement->execute(array_merge($bindings['bindings'], [
+            'userId' => $user->getId()
+        ]));
+
+        return $this->hydrateSelect($statement);
+    }
+
+    /**
+     * Retreive all report definitions that should display on users dashboard
+     *
+     * @param User $user
+     * @return Collection|\Schoolbox\GenericCollection
+     */
+    public function findForUserDashboard(User $user)
+    {
+        $userId = $this->getDatabase()->quote($user->getId());
+
+        $groupSql = '';
+        $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
+
+        $groupIds = [];
+
+        /** @var PastoralGroupMember $groupMember */
+        foreach ($groupsMembership as $groupMember) {
+            $groupIds[] = $groupMember->getGroup()->getId();
+        }
+
+        $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
+
+        if (!empty($bindings['placeholders'])) {
+            $groupSql = "`group_id` IN ({$bindings['placeholders']}) AND";
         }
 
         $sql = "
@@ -225,14 +290,18 @@ class Mapper extends BaseMapper
             LEFT JOIN   `pastoral_report_groups` ON 
                             `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND 
                             `pastoral_report_groups`.`deleted_at` IS NULL           
-            WHERE       (`pastoral_report`.`owner_id` = :userId OR (
+            JOIN        `pastoral_report_dashboard` ON
+                            `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
+                            `pastoral_report_dashboard`.`user_id` = {$userId} AND
+                            `pastoral_report_dashboard`.`deleted_at` IS NULL
+            WHERE       `pastoral_report`.`owner_id` = :userId OR (
                             `pastoral_report`.`id` IN (
                                 SELECT    `report_id` 
                                 FROM      `pastoral_report_groups` 
                                 WHERE     {$groupSql}
                                           `deleted_at` IS NULL
                             )
-                        )) AND
+                        ) AND
                         `pastoral_report`.`deleted_at` IS NULL
             GROUP BY    `pastoral_report`.`id`
         ";
