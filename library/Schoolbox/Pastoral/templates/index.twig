@@ -24,8 +24,10 @@
 
         {# Pastoral moderators can manage pastoral groups #}
 
-        {% if isRouteAuthorized('pastoralManagement.getGroups') %}
-            <a href="{{ routeLookup('pastoralManagement.getGroups') }}" class="icon-group" title="Manage Pastoral Groups"></a>
+        {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
+
+        {% if routeGetGroups %}
+            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage Pastoral Groups"></a>
         {% endif %}
     </nav>
 </div>
@@ -141,13 +143,15 @@
                                 <div class="card small-12">
                                     {{ profile.imageSquare64(membership.group.user) }}
                                     {% if membership.group.user.id == user.id %}
-                                        {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
-                                            <a href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) }}" title="Modify Pastoral Group">
+
+                                        {% set routeGetGroupsModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
+                                        {% if routeGetGroupsModify %}
+                                            <a href="{{ routeGetGroupsModify }}" title="Modify Pastoral Group">
                                         {% endif %}
                                     {% endif %}
                                         <h3>{{ membership.group.name }}</h3>
                                     {% if membership.group.user.id == user.id %}
-                                        {% if isRouteAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
+                                        {% if routeGetGroupsModify %}
                                             </a>
                                         {% endif %}
                                     {% endif %}

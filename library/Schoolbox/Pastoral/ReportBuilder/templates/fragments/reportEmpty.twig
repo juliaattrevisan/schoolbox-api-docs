@@ -1,0 +1,15 @@
+<div class="empty-state {% if hidden %}hide{% endif %}">
+    <i class="icon-report"></i>
+    <p>
+        You do not have any saved pastoral care reports.
+    </p>
+    <p>
+        Pastoral care reports allow you to build custom views of student pastoral records. You can save
+        these and they will be stored for future reference.
+    </p>
+    <p>
+        <a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" title="New Pastoral Report">
+            To get started, build your first report.
+        </a>
+    </p>
+</div>

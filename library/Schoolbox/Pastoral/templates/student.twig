@@ -9,6 +9,62 @@
 [ student.fullName ]
 ) }}
 
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ student.fullName }}</h1>
+    </div>
+</div>
+
+<div class="row actions-small-2">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h2 class="subheader">Pastoral Profile</h2>
+        </div>
+    </div>
+    <nav>
+        {# Display linked student records #}
+
+        {% if linkedStudents | length %}
+            <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
+        {% endif %}
+
+        {# Delete record #}
+
+        {% if record is not empty %}
+            {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
+                <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+            {% endif %}
+        {% endif %}
+
+        {# Display link to insert pastoral record if the logged in user is authorized to do so #}
+
+        {% set routeGetStudentRecordInsertForm = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
+        {% if routeGetStudentRecordInsertForm %}
+            <a href="{{ routeGetStudentRecordInsertForm }}" class="icon-add" title="Add Pastoral Record"></a>
+        {% endif %}
+
+        {# Modify record #}
+
+        {% set routeGetStudentRecordUpdateForm = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+        {% if routeGetStudentRecordUpdateForm %}
+            <a class="icon-modify no-text" href="{{ routeGetStudentRecordUpdateForm }}" title="Modify"></a>
+        {% endif %}
+    </nav>
+
+    {% if linkedStudents | length %}
+        <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
+            <li class="separator">Students With Linked Records</li>
+            {% for linkedStudent in linkedStudents %}
+                <li>
+                    <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}" class="icon-user">
+                        {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
 {% include '@pastoral/fragments/studentDetails.twig' with { student: student } %}
 
 {# Pastoral Type Filter Box #}
@@ -27,7 +83,7 @@
         </div>
     </div>
     <script>
-        $(function() {
+        $(function () {
             $('[data-type-filter]').change(function () {
                 window.location.href = "?type=" + $(this).val();
             });
@@ -43,10 +99,13 @@
         <div class="empty-state">
             <i class="icon-pastoral"></i>
             <p>There are no pastoral records {% if typeSelected is not empty %}of this type{% endif %} available for {{ student.fullName }}.</p>
-            {% if isRouteAuthorized('pastoral.getStudentRecordInsertForm') %}
+            {% set routeGetStudentRecordInsertForm = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
+            {% if routeGetStudentRecordInsertForm %}
                 <p>
-                    You can <a href="{{ routeLookup('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) }}">create a new
-                    pastoral record</a> now{% if typeSelected is not empty %} or <a href="{{ routeLookup('pastoral.getStudent', {'studentId': student.id}) }}">remove your pastoral type filter</a>{% endif %}.</a>
+                    You can <a href="{{ routeGetStudentRecordInsertForm }}">create a new pastoral record</a> now
+                    {% if typeSelected is not empty %}
+                        or <a href="{{ routeLookup('pastoral.getStudent', {'studentId': student.id}) }}">remove your pastoral type filter</a>
+                    {% endif %}
                 </p>
             {% endif %}
         </div>
@@ -69,11 +128,55 @@
                 </span>
             </h2>
 
-            {% for record in records %}
-                <section>
-                    {% include '@pastoral/fragments/pastoralCard.twig' with {record: record, showBody: true} %}
-                </section>
-            {% endfor %}
+            <section>
+                <ul class="information-list">
+                    {% for record in records %}
+
+                        <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
+                            <div class="list-item">
+                                <div class="card small-12 wrap-down">
+                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
+                                        {{ profile.imageSquare64(record.owner) }}
+                                        <h3>{{ record.heading }}</h3>
+                                    </a>
+
+                                    {# Display name of poster #}
+                                    <p class="meta">
+                                        Posted by
+                                        <a href="{{ _self.userProfileLink(record.owner) }}">{{ record.owner.fullName }}</a>
+                                        {{ record.createdAt.short }}
+                                    </p>
+
+                                    {# Display linked students to staff #}
+                                    {% if user.role.isStaff and record.relatedRecords|length%}
+                                    <p class="meta">
+                                        Linked Records:
+                                        {% for relatedRecord in record.relatedRecords %}
+                                            {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
+                                            <a href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }}</a>{% if not loop.last %},{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <nav>
+                                {# Modify record #}
+
+                                {% set routeGetStudentRecordUpdateForm = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+                                {% if routeGetStudentRecordUpdateForm %}
+                                    <a class="icon-modify no-text" href="{{ routeGetStudentRecordUpdateForm }}" title="Modify"></a>
+                                {% endif %}
+
+                                {# Delete record #}
+
+                                {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
+                                    <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                                {% endif %}
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
 
             <div class="right">
                 {{ paginator.buttons(pageCurrent, recordCount) }}

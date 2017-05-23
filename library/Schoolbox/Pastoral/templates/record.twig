@@ -2,232 +2,420 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
-[ record.student.fullName,            routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
-[ record.heading ]
+    ['Pastoral Care', routeLookup('pastoral.getIndex')],
+    [record.student.fullName, routeLookup('pastoral.getStudent', {studentId: record.student.id})],
+    [record.heading]
 ) }}
 
-{% include '@pastoral/fragments/studentDetails.twig' with { student: record.student } %}
+{% import '@pastoral/macros/profile.twig' as profile %}
 
 <div class="row">
-    <div class="small-12 island">
-
-        <section>
-            {% include '@pastoral/fragments/pastoralCard.twig' with {record: record, showBody: false} %}
-
-            <div class="content">
-                {{ record.body | purify }}
-            </div>
-                {% if record.points != 0 or (record.tags | length) %}
-                    <div class="content">
-                        {% include '@pastoral/fragments/recordTags.twig' %}
-                    </div>
-                {% endif %}
-
-        </section>
-
-        {# Show revision history to moderators #}
-
-        {% if moderator %}
-            {% if record.revisions | length > 0 %}
-                {% set bodyPrevious = '' %}
-                {% set headingPrevious = '' %}
-                {% for revision in record.revisions %}
-                    {# Only division revisions if they are different #}
-                    {% if revision.body != bodyPrevious and revision.body != record.body or
-                          revision.heading != headingPrevious and revision.heading != record.heading %}
-                        {% if loop.first %}
-                            <h2 class="subheader" id="accordion">Revision History</h2>
-                            <dl class="accordion" data-accordion>
-                        {% endif %}
-                        {% set bodyPrevious = revision.body %}
-                        {% set headingPrevious = revision.heading %}
-                        <dd class="accordion-navigation">
-                            <a href="#revision-{{ loop.index }}">
-                                {{ revision.heading }}
-                                <span class="right">Edited by {{ revision.modifiedBy.fullName }} - {{ revision.updatedAt.long }}</span>
-                            </a>
-                            <div id="revision-{{ loop.index }}" class="content">
-                                {{ revision.body | purify }}
-                            </div>
-                        </dd>
-                    {% endif %}
-                {% endfor %}
-                {% if bodyPrevious is not empty %}
-                    </dl>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-
-        {% if record.attachments| length %}
-            <h2 class="subheader">Attached Files</h2>
-            <section>
-                {% for attachment in record.attachments %}
-                    <div class="card small-12">
-                        <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
-		            {% if attachment.storage.mimetype.isImage %}
-		                <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
-		                {% else %}
-		                <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
-		            {% endif %}
-                            {{ attachment.storage.filename }}
-                        </a>
-                        <p class="meta">{{ attachment.storage.size | bytes}}</p>
-                    </div>
-                {% endfor %}
-            </section>
-        {% endif %}
-
-        {# Parents cannot ever add/view comments or related records #}
-
-        {% if not user.role.isParent %}
-
-            {# Show related records #}
-
-            {% if record.relatedRecords | length > 1 %}
-
-                <h2 class="subheader">Other Students Involved</h2>
-                <section>
-                    <ul class="action-list">
-                        {% for related in record.relatedRecords %}
-                            {% if related.student.id != record.student.id %}
-                                <li>
-                                    <div class="small-12 card wrap-down">
-                                        <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
-                                        <p>
-                                            <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                                {{ related.getHeading }}
-                                            </a>
-                                        </p>
-                                        <p class="spaced meta">{{ related.student.fullName }}</p>
-                                    </div>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% endif %}
-
-            {# Show comments #}
-
-            {% if record.comments | length %}
-                <h2 class="subheader">Comments</h2>
-                <section>
-                    <ul class="action-list">
-
-                        {# Show all comments for this record #}
-
-                        {% for comment in record.comments %}
-
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="small-12 card wrap-down">
-                                        {# Comment author photo #}
-                                        <a href="{{ profile.link(comment.owner) }}" title="View Profile">
-                                            {{ profile.imageSquare64(comment.owner) }}
-                                        </a>
-
-                                        {# Show comment author #}
-                                        <p class="meta">Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}</p>
-
-                                        {# Show comment body #}
-                                        <p class="spaced">
-                                            {{ comment.body | purify | nl2br }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
-
-                                {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
-                                    <nav>
-                                        <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
-                                    </nav>
-                                {% endif %}
-
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% endif %}
-
-            {% if record.comments | length == 0%}
-                <h2 class="subheader">Comments</h2>
-            {% endif %}
-
-            {% if isRouteAuthorized('pastoral.postCommentInsert', {record: record}) %}
-
-                {# Show add comment box #}
-                <section>
-                    <div class="content">
-                        <form method="post" action="{{ routeLookup('pastoral.postCommentInsert', {'recordId': record.id}) }}">
-                            <input type="hidden" name="pastoral_id" value="{{ record.id }}">
-                            <input type="hidden" name="student_id" value="{{ record.student.id }}">
-                            <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
-                            <input disabled data-post type="submit" class="expand" value="Add Comment">
-                        </form>
-                    </div>
-                </section>
-
-            {% endif %}
-
-        {% endif %}
-
+    <div class="small-12 column">
+        <h1>Pastoral Record</h1>
     </div>
 </div>
 
-{% if isRouteAuthorized('pastoral.postCommentInsert', {recordId: record.id}) %}
+<div class="row actions-small-2">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h2 class="subheader">
+                {{ record.heading }}
+            </h2>
+        </div>
+    </div>
 
-    <script type="text/javascript">
-        $(function () {
+    <nav>
+        {# Display linked student records #}
 
-            // Disable post comment button if there is no comment
+        {% if linkedStudents | length %}
+            <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
+        {% endif %}
 
-            $('#body').on('change keyup paste', function() {
-                $('[data-post]').prop('disabled', $('#body').val().trim() === '');
-            });
+        {# Delete record #}
 
-            // Delete pastoral record
+        {% if record is not empty %}
+            {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
+                <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+            {% endif %}
+        {% endif %}
 
-            $('[data-delete]').click(function(event) {
-                event.preventDefault();
+        {# Modify record #}
+        {% set modifyRoute = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+        {% if modifyRoute %}
+            <a class="icon-modify no-text" href="{{ modifyRoute }}" title="Modify"></a>
+        {% endif %}
+    </nav>
 
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this record?',
-                    confirmEvent: function() {
-                        $.post('{{ routeLookup('pastoral.postRecordDelete', {studentId: record.student.id, recordId: record.id}) }}')
-                            .done(function() {
-                                window.location.href = '{{ routeLookup('pastoral.getIndex', {studentId: record.student.id}) }}';
-                            });
-                    }
-                });
-            });
+    {% if linkedStudents | length %}
+        <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
+            <li class="separator">Students With Linked Records</li>
+            {% for student in linkedStudents %}
+                <li><a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}" class="icon-user">{{ student.first_name }} {{ student.last_name }} ({{ student.count }})</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
 
-            // Delete comment
+{# Profile pic and misc details
+ #}
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="profile content">
+                <div class="row no-margin">
+                    <div class="small-12 medium-2 columns no-pad">
+                        {{ profile.imageSquare200(record.student) }}
+                    </div>
+                    <div class="small-12 medium-10 columns">
+                        <dl class="profile">
+                            <dt class="small-12 medium-3">Record Created:</dt>
+                            <dd class="small-12 medium-9">
+                                {{ record.createdAt.short }}
+                            </dd>
+                            <dt class="small-12 medium-3">Author:</dt>
+                            <dd class="small-12 medium-9">
+                                <a href="{{ profile.link(record.owner) }}">
+                                    {{ record.owner.fullName }}
+                                </a>
+                            </dd>
+                            {% if record.severity.name is not empty and config.pastoral_severity %}
+                                <dt class="small-12 medium-3">Severity:</dt>
+                                <dd class="small-12 medium-9">{{ record.severity.name }}</dd>
+                            {% endif %}
+                            <dt class="small-12 medium-3">Category:</dt>
+                            <dd class="small-12 medium-9">{{ record.category.name }}</dd>
+                            {% if record.type.name is not empty %}
+                                <dt class="small-12 medium-3">Sub Category:</dt>
+                                <dd class="small-12 medium-9">{{ record.type.name }}</dd>
+                            {% endif %}
+                            {% if record.points is not empty %}
+                                <dt class="small-12 medium-3">Points:</dt>
+                                <dd class="small-12 medium-9">{{ record.points }}</dd>
+                            {% endif %}
+                        </dl>
+                        {% if record.tags | length %}
+                            <div class="content">
+                                {% for tag in record.tags %}
+                                    <a href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId:tag.id}) }}" class="neutral label">{{ tag.name }}</a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
 
-            $('[data-delete-comment]').click(function(event) {
-                event.preventDefault();
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
 
-                deleteCommentRoute = '{{ routeLookup('pastoral.postCommentDelete', {
-                        'recordId': 'recordId',
-                        'commentId': 'commentId'
-                    })
-                }}';
+{# Body content always exists
+ #}
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            {{ record.body | purify }}
+        </section>
+    </div>
+</div>
 
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this comment?',
-                    confirmEvent: function() {
-                        $.post(
-                            deleteCommentRoute
-                                .replace(/recordId/g, {{ record.id }})
-                                .replace(/commentId/g, $(event.target).attr('data-delete-comment'))
-                        ).success(function() {
-                            $(event.target).closest('li').remove();
-                        });
-                    }
-                });
-            });
-        });
-    </script>
+{# If you're a moderator and there's revisions to investigate
+ #}
+{% if moderator and (record.revisions|length) %}
 
+    {# Show revision history to moderators
+     # Current record contents exist as a revision
+     #}
+    {% set headingPrevious = record.heading %}
+    {% set bodyPrevious = record.body %}
+
+    {# Lookahead to see if there was any meaningfully-changed revisions to show
+     # and exit early once we determine there's something to show
+     #}
+    {% set hasItems = false %}
+
+    {% for revision in record.revisions if not hasItems %}
+        {% if ((headingPrevious != revision.heading) or (bodyPrevious != revision.body)) %}
+            {% set hasItems = true %}
+        {% endif %}
+
+        {% set headingPrevious = revision.heading %}
+        {% set bodyPrevious = revision.body %}
+    {% endfor %}
+
+    {# If at least one item was worthy of showing, render revision history
+     #}
+    {% if hasItems %}
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Revision History</h2>
+
+            <section>
+                <ul class="information-list expandable-card">
+
+                    {# Only display revisions if they are different from the previous (fields not displayed might have changed and this will confuse users #}
+                    {% set headingPrevious = record.heading %}
+                    {% set bodyPrevious = record.body %}
+
+                    {% for revision in record.revisions %}
+
+                        {# In the set of revisions, the previous revision is somehow different to the current revision
+                         # in a meaningful way (heading/body changed). This logic always skips the current record
+                         #}
+                        {% if ((headingPrevious != revision.heading) or (bodyPrevious != revision.body)) %}
+                        <li>
+                            <div>
+                                <div class="expander icon-down-arrow" data-collapser="collap-{{ loop.index }}"></div>
+                                <div class="small-12 card">
+                                    <img src="/portrait.php?userId={{ revision.modifiedBy.externalId }}&size=square64">
+                                    <h3>{{ revision.heading }}</h3>
+                                    <p class="meta">
+                                        Edited by {{ revision.modifiedBy.fullName }} -
+                                        {% if revision.updatedAt.long is empty %}
+                                            {{ record.createdAt.long }}
+                                        {% else %}
+                                            {{ revision.updatedAt.long }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="collap-{{ loop.index }}">
+                                {{ revision.body | purify }}
+                            </div>
+                        </li>
+                        {% endif %}
+
+                        {# Remember for next iteration
+                         #}
+                        {% set headingPrevious = revision.heading %}
+                        {% set bodyPrevious = revision.body %}
+                    {% endfor %}
+                </ul>
+                <script type="text/javascript">
+                    $(function () {
+                        $('[data-collapser]').collapsable();
+                    });
+                </script>
+            </section>
+        </div>
+    </div>
+    {% endif %}
 {% endif %}
+
+{# Conditionally show attachments if any exist
+ #}
+{% if record.attachments|length %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Attached Files</h2>
+        <section>
+            {% for attachment in record.attachments %}
+                <div class="card small-12">
+                    <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
+                        {% if attachment.storage.mimetype.isImage %}
+                        <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
+                        {% else %}
+                        <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
+                        {% endif %}
+
+                        {{ attachment.storage.filename }}
+                    </a>
+                    <p class="meta">{{ attachment.storage.size | bytes}}</p>
+                </div>
+            {% endfor %}
+        </section>
+    </div>
+</div>
+{% endif %}
+
+{# Parents cannot ever add/view comments or related records
+ # Only staff can view comments/related records
+ #}
+{% if user.role.isStaff %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Comments</h2>
+
+        {# Show all comments for this record #}
+        {% if record.comments|length %}
+        <section>
+            <ul class="action-list">
+                {% for comment in record.comments %}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 card wrap-down">
+                            {# Comment author photo #}
+                            <a href="{{ profile.link(comment.owner) }}" title="View Profile">
+                                {{ profile.imageSquare64(comment.owner) }}
+                            </a>
+
+                            {# Show comment author #}
+                            <p class="meta">Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a> {{ comment.createdAt.short }}</p>
+
+                            {# Show comment body #}
+                            <p>{{ comment.body | purify | nl2br }}</p>
+                        </div>
+                    </div>
+
+                    {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
+
+                    {% if isRouteAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
+                    <nav>
+                        <a data-delete-comment="{{ comment.id }}" class="icon-delete" href="#" title="Delete Comment"></a>
+                    </nav>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        {# Show add comment box if you're allowed to participate
+         #}
+        {% set commentRoute = routeLookupIfAuthorized('pastoral.postCommentInsert', {'recordId': record.id})  %}
+        {% if commentRoute %}
+        <section class="content">
+            <form method="post" action="{{ commentRoute }}">
+                <input type="hidden" name="pastoral_id" value="{{ record.id }}">
+                <input type="hidden" name="student_id" value="{{ record.student.id }}">
+                <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
+                <input disabled data-post type="submit" class="expand" value="Add Comment">
+            </form>
+
+            <script type="text/javascript">
+                $(function () {
+
+                    // Disable post comment button if there is no comment
+
+                    $('#body').on('change keyup paste', function() {
+                        $('[data-post]').prop('disabled', $('#body').val().trim() === '');
+                    });
+
+                    // Delete pastoral record
+
+                    $('[data-delete]').click(function(event) {
+                        event.preventDefault();
+
+                        $(this).confirmDialog({
+                            text: 'Are you sure you want to delete this record?',
+                            confirmEvent: function() {
+                                $.post('{{ routeLookup('pastoral.postRecordDelete', {studentId: record.student.id, recordId: record.id}) }}')
+                                    .done(function() {
+                                        window.location.href = '{{ routeLookup('pastoral.getIndex', {studentId: record.student.id}) }}';
+                                    });
+                            }
+                        });
+                    });
+
+                    // Delete comment
+
+                    $('[data-delete-comment]').click(function(event) {
+                        event.preventDefault();
+
+                        deleteCommentRoute = '{{ routeLookup('pastoral.postCommentDelete', {
+                            'recordId': 'recordId',
+                            'commentId': 'commentId'
+                        })
+                        }}';
+
+                        $(this).confirmDialog({
+                            text: 'Are you sure you want to delete this comment?',
+                            confirmEvent: function() {
+                                $.post(
+                                    deleteCommentRoute
+                                        .replace(/recordId/g, {{ record.id }})
+                                        .replace(/commentId/g, $(event.target).attr('data-delete-comment'))
+                                ).success(function() {
+                                    $(event.target).closest('li').remove();
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{# Visibility and Linked Records (Other Students Involved)
+ #}
+<div class="row">
+
+    {# Show audience for record
+     # Conditionally show the other column if it has existent content
+     # Otherwise span full-width
+     #}
+    <div class="small-12 {% if record.relatedRecords | length %}medium-6{% endif %} island">
+        <h2 class="subheader">Record Visibility</h2>
+        <section>
+            <ul class="information-list">
+                <li>
+                    <div class="small-12 card wrap-down">
+                        <a href="{{ profile.link(record.owner) }}">
+                            {{ profile.imageSquare64(record.owner) }}
+                            <p>{{ record.owner.fullName }}</p>
+                        </a>
+                        <p class="meta">Visible To Individual User</p>
+                    </div>
+                </li>
+                {% for access in record.access %}
+                    {% if access.group is not empty %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                <div class="icon-teacher size-48"></div>
+                                <p>{{ access.group.name }}</p>
+                                <p class="meta">Author Of Record</p>
+                            </div>
+                        </li>
+                    {% elseif access.role is not empty %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                <div class="icon-group size-48"></div>
+                                <p>{{ access.role.name }}</p>
+                                <p class="meta">Visible To All Users In {{ access.role.name }} Role</p>
+                            </div>
+                        </li>
+                    {% elseif access.user is not empty %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                <a href="{{ profile.link(access.user) }}">
+                                    {{ profile.imageSquare64(access.user) }}
+                                    <p>{{ access.user.fullName }}</p>
+                                </a>
+                                <p class="meta">Visible To Individual User</p>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+
+    {# Show other related records when they exist #}
+    {% if record.relatedRecords | length %}
+    <div class="small-12 medium-6 island">
+        <h2 class="subheader">Other Students Involved</h2>
+        <section>
+            <ul class="action-list">
+                {% for related in record.relatedRecords %}
+                    {% if related.student.id != record.student.id %}
+                        <li>
+                            <div class="small-12 card wrap-down">
+                                <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
+                                <p>
+                                    <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
+                                        {{ related.getHeading }}
+                                    </a>
+                                </p>
+                                <p class="meta">{{ related.student.fullName }}</p>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+    {% endif %}
+</div>

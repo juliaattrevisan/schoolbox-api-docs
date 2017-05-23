@@ -19,6 +19,7 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Pastoral\Access\Model as Access;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
+use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\Results;
@@ -100,7 +101,7 @@ class Mapper extends BaseMapper
         );
 
 
-        $this->registerCallback(Mapper::CALLBACK_PRESAVE, [$this, 'saveRevision']);
+        $this->registerCallback(Mapper::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
         $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteReferences']);
     }
 
@@ -138,11 +139,9 @@ class Mapper extends BaseMapper
     {
         // Only save the revision if we are updating an existing record
 
-        if (!empty($model->getId())) {
-            $pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
-            $pastoralRevision = $pastoralRevisionMapper->createRevision($model);
-            $pastoralRevisionMapper->save($pastoralRevision);
-        }
+        $pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
+        $pastoralRevision = $pastoralRevisionMapper->createRevision($model);
+        $pastoralRevisionMapper->save($pastoralRevision);
     }
 
     /**
@@ -211,7 +210,6 @@ class Mapper extends BaseMapper
     protected function hydrateRow($row, $hydrateRelatedRecords) {
 
         // This method gets called before checking authorization- so if the session timed out this might be blank
-
 
         if (!$this->getSessionUser() instanceof User) {
             return false;
@@ -287,20 +285,34 @@ class Mapper extends BaseMapper
      */
     public function getRelatedRecords(Model $record)
     {
-        $bindings = [];
         $query = $this->getSelectString();
 
         if ($record->getParent() instanceof Model) {
 
             // This is a child item, find its parent and its other siblings
 
-            $query .= "                
-                WHERE   `pastoral`.`id` = :parent_id_0 AND
-                        `pastoral`.`parent_id` = :parent_id_1 AND
-                        `pastoral`.`id` <> :id
-            ";
+            if ($record instanceof PastoralRevision) {
+                $query .= "                
+                    WHERE (
+                        `pastoral_revision`.`parent_id` = :parent_id_0 OR 
+                        `pastoral_revision`.`id` = :parent_id_1 OR 
+                        `pastoral_revision`.`parent_id` = :id_0
+                    ) AND
+                       `pastoral_revision`.`id` <> :id_1
+                ";
+            } else {
+                $query .= "                
+                    WHERE (
+                        `pastoral`.`parent_id` = :parent_id_0 OR 
+                        `pastoral`.`id` = :parent_id_1 OR 
+                        `pastoral`.`parent_id` = :id_0
+                    ) AND
+                        `pastoral`.`id` <> :id_1
+                ";
+            }
 
-            $bindings['id'] = $record->getId();
+            $bindings['id_0'] = $record->getId();
+            $bindings['id_1'] = $record->getId();
             $bindings['parent_id_0'] = $record->getParent()->getId();
             $bindings['parent_id_1'] = $record->getParent()->getId();
 
@@ -430,9 +442,51 @@ class Mapper extends BaseMapper
                 `pastoral_tags`.`deleted_at` IS NULL
         ";
 
-        // Bind the parameters
+        $statement = $this->database->prepare($sql);
+        $statement->execute();
+
+        $results = $this->hydrateSelect($statement);
+
+        return $results;
+    }
+
+    /**
+     * Display the most recent records that are tagged for display on dashboard based on their severity
+     *
+     * @param User $student
+     * @param User $linkedStudent
+     * @param int|null $typeId
+     * @return Collection
+     */
+    public function findLinked($student, $linkedStudent, $typeId = null)
+    {
+        $studentId = $this->getDatabase()->quote($student->getId());
+        $linkedStudentId = $this->getDatabase()->quote($linkedStudent->getId());
+
+        $sql = $this->getSelectString();
+
+        $sql .= "
+            WHERE `pastoral`.`student_id` = {$studentId} AND `pastoral`.`id` IN (
+                SELECT      `parent_id` 
+                FROM        `pastoral` `pastoralLinked` 
+                WHERE       `pastoralLinked`.`student_id` = {$linkedStudentId}
+            )
+        ";
+
+        if (!empty($typeId)) {
+            $sql .= " AND type_id = :typeId";
+        }
+
+        $sql .= "
+            ORDER BY `pastoral`.`created_at` DESC
+        ";
 
         $statement = $this->database->prepare($sql);
+
+        if (!empty($typeId)) {
+            $statement->bindValue('typeId', $typeId);
+        }
+
         $statement->execute();
 
         $results = $this->hydrateSelect($statement);

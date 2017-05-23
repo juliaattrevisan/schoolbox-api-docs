@@ -32,22 +32,14 @@
                                 <a href="{{ profile.link(record.owner) }}">
                                     {{ profile.imageSquare64(record.student) }}
                                 </a>
-                                {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
-                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': record.student.id, 'recordId': record.id}) }}">
-                                        <h4>
-                                            {{ record.student.fullName }} - {{ record.heading }}
-                                        </h4>
-                                    </a>
-                                {% else %}
+                                <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': record.student.id, 'recordId': record.id}) }}">
                                     <h4>
                                         {{ record.student.fullName }} - {{ record.heading }}
                                     </h4>
-                                {% endif %}
-
+                                </a>
                                 <p class="meta">
                                     Posted by <a href="/search/user/{{ record.owner.id }}">{{ record.owner.fullName }}</a> {{  record.createdAt.short }}
                                 </p>
-
                                 <p class="spaced meta">
                                     {# Pastoral event type #}
                                     {{ record.type.name }} {% if record.category.name != '' %}({{ record.category.name }}){% endif %} |

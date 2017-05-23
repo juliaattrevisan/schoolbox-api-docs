@@ -32,21 +32,49 @@
                                 <a href="{{ profile.link(record.owner) }}">
                                     {{ profile.imageSquare64(record.student) }}
                                 </a>
-                                {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
-                                    <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': record.student.id, 'recordId': record.id}) }}">
-                                        <h4>
-                                            {{ record.student.fullName }} - {{ record.heading }}
-                                        </h4>
-                                    </a>
-                                {% else %}
+                                <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': record.student.id, 'recordId': record.id}) }}">
                                     <h4>
                                         {{ record.student.fullName }} - {{ record.heading }}
                                     </h4>
-                                {% endif %}
-
-                                <p class="spaced meta">
+                                </a>
+                                <p class="meta">
                                     Posted by <a href="/search/user/{{ record.owner.id }}">{{ record.owner.fullName }}</a> {{  record.createdAt.short }}
                                 </p>
+                                <p class="spaced meta">
+                                    {# Pastoral event type #}
+                                    {{ record.type.name }} {% if record.category.name != '' %}({{ record.category.name }}){% endif %} |
+
+                                    {% if showSeverity %}
+                                        {# Pastoral event severity #}
+                                        {{ record.severity.name }} |
+                                    {% endif %}
+
+                                    {# Indicate if not audience has been set #}
+                                    {% if record.access | length == 0 %}No Audience Set{% endif %}
+
+                                    {# Show audienced roles  #}
+                                    {% for access in record.access %}
+                                        {% if access.role.id != '' %}
+                                            {{ access.role.name }}{% if not loop.last %},{% endif %}
+                                        {% elseif access.user.id != '' %}
+                                            <a href="/search/user/{{ access.user.id }}">{{ access.user.fullName }}</a>{% if not loop.last %},{% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                            </div>
+
+                            {# Show article body #}
+                            <div class="content">
+                                {{ record.body | purify }}
+
+                                {# Show any file attachments #}
+                                {% if record.attachments | length %}
+                                    <p class="spaced meta">
+                                        {% for attachment in record.attachments %}
+                                            <a target="_blank" href="/storage/fetch.php?hash={{ attachment.storage.hash }}">{{  attachment.storage.filename }}</a><br>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
 
                                 {% if record.points != 0 or (record.tags | length) > 0 %}
                                     <p class="spaced">
@@ -67,47 +95,6 @@
                                                 <b class="show-for-print"> {{ tag.name }}</b>
                                             {% endfor %}
                                         {% endif %}
-                                    </p>
-                                {% endif %}
-
-                                <p class="spaced meta">
-                                    {# Pastoral event type #}
-                                    {{ record.type.name }} {% if record.category.name != '' %}({{ record.category.name }}){% endif %} |
-
-                                    {% if showSeverity %}
-                                        {# Pastoral event severity #}
-                                        {{ record.severity.name }} |
-                                    {% endif %}
-
-                                    {# Indicate if record is private #}
-                                    {% if record.private %}Contents Private | {% endif %}
-
-                                    {# Indicate if not audience has been set #}
-                                    {% if record.access | length == 0 %}No Audience Set{% endif %}
-
-                                    {# Show audienced roles  #}
-                                    {% for access in record.access %}
-                                        {% if access.role.id != '' %}
-                                            {{ access.role.name }}{% if not loop.last %},{% endif %}
-                                        {% elseif access.user.id != '' %}
-                                            <a href="/search/user/{{ access.user.id }}">{{ access.user.fullName }}</a>{% if not loop.last %},{% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                </p>
-                            </div>
-
-                            <div class="clearfix no-margin"></div>
-
-                            {# Show article body #}
-                            <div class="content">
-                                {{ record.body | purify }}
-
-                                {# Show any file attachments #}
-                                {% if record.attachments | length %}
-                                    <p class="spaced meta">
-                                        {% for attachment in record.attachments %}
-                                            <a target="_blank" href="/storage/fetch.php?hash={{ attachment.storage.hash }}">{{  attachment.storage.filename }}</a><br>
-                                        {% endfor %}
                                     </p>
                                 {% endif %}
                             </div>

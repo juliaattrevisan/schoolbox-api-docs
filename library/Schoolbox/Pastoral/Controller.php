@@ -37,7 +37,6 @@ use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Search\Results;
@@ -267,9 +266,70 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoral/student.twig',
             'data' => [
+                'user'              => $this->getUser(),
                 'recordCount'       => $records->count(),
                 'records'           => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
                 'student'           => $student,
+                'pageCurrent'       => $pageCurrent,
+                'types'             => $this->pastoralTypeMapper->findAll(),
+                'linkedStudents'    => $this->pastoralMapper->getLinkedStudents($student),
+                'typeSelected'      => $get['type']
+            ]
+        ]);
+    }
+
+
+    /**
+     * Display linked records between two students
+     *
+     * @param User $student
+     * @param User $linkedStudent
+     * @throws SchoolboxException
+     */
+    public function getLinked($student, $linkedStudent)
+    {
+        $get = $this->getRequest()->query;
+
+        // Create an audit record of anyone viewing a student record
+
+        /** @var PastoralAudit $auditRecord */
+        $auditRecord = $this->pastoralAuditMapper->createModel();
+        $auditRecord->setStudent($student);
+        $auditRecord->setUser($this->getUser());
+        $this->pastoralAuditMapper->save($auditRecord);
+
+        /** @var PastoralAudit $auditRecord */
+        $auditRecord = $this->pastoralAuditMapper->createModel();
+        $auditRecord->setStudent($linkedStudent);
+        $auditRecord->setUser($this->getUser());
+        $this->pastoralAuditMapper->save($auditRecord);
+
+        // Retrieve all of the students pastoral records
+
+        $records = $this->pastoralMapper->findLinked($student, $linkedStudent, $get['type']);
+
+        // Limit the number of pastoral records to display on each page of pastoral records
+
+        $resultsPerPage = $this->config->get('pastoral_page_size');
+
+        // Set the current page number
+
+        $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? $get['pageCurrent'] : 1;
+
+        if ($pageCurrent > ceil($records->count() / $resultsPerPage)) {
+            $pageCurrent = ceil($records->count() / $resultsPerPage);
+        } else if ($pageCurrent < 1) {
+            $pageCurrent = 1;
+        }
+
+        $this->getResponse()->content->set([
+            'template' => '@pastoral/linked.twig',
+            'data' => [
+                'user'              => $this->getUser(),
+                'recordCount'       => $records->count(),
+                'records'           => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
+                'student'           => $student,
+                'linkedStudent'     => $linkedStudent,
                 'pageCurrent'       => $pageCurrent,
                 'types'             => $this->pastoralTypeMapper->findAll(),
                 'linkedStudents'    => $this->pastoralMapper->getLinkedStudents($student),
@@ -302,30 +362,15 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $this->pastoralAuditMapper->save($auditRecord);
 
-        // Load the details of any related records (I would love to find a way to do this in the mapper,
-        // however recursion is a thing)...
-
-        $relatedRecords = new Collection();
-
-        if ($record->getParent() instanceof Model) {
-            $relatedRecords = $relatedRecords
-                ->merge($this->pastoralMapper->findByColumn('parent_id', $record->getParent()->getId()))
-                ->add($this->pastoralMapper->findById($record->getParent()->getId()));
-        } else {
-            $relatedRecords = $relatedRecords
-                ->merge($this->pastoralMapper->findByColumn('parent_id', $record->getId()))
-                ->add($record);
-        }
-
-        $record->setRelatedRecords($relatedRecords);
-
         // Moderators can wee revision history
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
 
         if ($moderator->count() > 0) {
             $record->setRevisions(
-                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId())
+                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId(), ['order' => [
+                    'updated_at' => 'desc'
+                ]])
             );
         }
 
@@ -577,11 +622,11 @@ class Controller extends Base
 
             $record->setModifiedBy($this->getUser());
             $record->setStudent($student);
-            $record->setHeading($post["heading"]);
+            $record->setHeading(trim($post["heading"]));
             $record->setType($type);
             $record->setPoints($post["points"]);
             $record->setSeverity($severity);
-            $record->setBody($post["body"]);
+            $record->setBody(trim($post["body"]));
             $record->setOwner($this->getUser());
             $this->pastoralMapper->setSessionData($_SESSION);
             $this->pastoralMapper->save($record);
@@ -760,12 +805,12 @@ class Controller extends Base
         }
 
         $record->setModifiedBy($this->getUser());
-        $record->setHeading($post["heading"]);
+        $record->setHeading(trim($post["heading"]));
         $record->setType($type);
         $record->setCategory($category);
         $record->setPoints($post["points"]);
         $record->setSeverity($severity);
-        $record->setBody($post["body"]);
+        $record->setBody(trim($post["body"]));
         $this->pastoralMapper->setSessionData($_SESSION);
         $this->pastoralMapper->save($record);
 
@@ -827,9 +872,11 @@ class Controller extends Base
 
                         /** @var PastoralAccessModel $accessCurrent */
                         foreach ($existingAccess as $accessCurrent) {
-                            if ($accessCurrent->getUser()->getId() == $user_id) {
-                                $found = true;
-                                break;
+                            if ($accessCurrent->getUser() instanceof User) {
+                                if ($accessCurrent->getUser()->getId() == $user_id) {
+                                    $found = true;
+                                    break;
+                                }
                             }
                         }
                     }
