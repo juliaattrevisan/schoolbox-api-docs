@@ -45,27 +45,18 @@ then
     a2enmod php7.1;
 fi
 
-if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ] || [ `php -m | grep ibm_db2 | wc -l` -lt 1 ];
-then
-    echo "# This file is managed by Puppet. DO NOT EDIT.
+echo "# This file is managed by Puppet. DO NOT EDIT.
 # schoolbox-deps
 deb http://schoolbox:4verrm9z@deb.alaress.com.au/ubuntu trustybackports main
 deb-src http://schoolbox:4verrm9z@deb.alaress.com.au/ubuntu trustybackports main" > /etc/apt/sources.list.d/schoolbox-deps2.list;
-    apt-get update;
-    apt-get install -y libgss3 gcc-6-base libstdc++6;
-    if [ `php -m | grep pdo_sqlsrv | wc -l` -lt 1 ];
-    then
-        echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
-        apt-get install -y php7.1-pdosqlsrv;
-        phpenmod pdo_sqlsrv;
-    fi
-    if [ `php -m | grep ibm_db2 | wc -l` -lt 1 ];
-    then
-        echo "[SB][`date +%Y-%m-%d\ %X`] Installing IBM_DB2";
-        apt-get install -u php7.1-ibmdb2;
-        phpenmod ibm_db2;
-    fi
-fi
+apt-get update;
+apt-get install -y libgss3 gcc-6-base libstdc++6;
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
+apt-get install -y php7.1-pdosqlsrv;
+phpenmod pdo_sqlsrv;
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing IBM_DB2";
+apt-get install -u php7.1-ibmdb2;
+phpenmod ibm_db2;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
