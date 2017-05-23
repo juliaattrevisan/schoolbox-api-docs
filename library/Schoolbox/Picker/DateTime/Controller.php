@@ -24,7 +24,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -292,99 +291,6 @@ class Controller extends Base
         $termActualStart['day'] = $timetableDay;
 
         return $termActualStart;
-    }
-
-    /**
-     * Call getByTimetableDay to return events for timetable day
-     *
-     * @param int $campusId
-     * @param int $termId
-     * @param int $cycle timetable cycle or week (calculated from the beginning of the term)
-     * @param int $day timetable day number
-     * @return Collection
-     */
-    public function getEventsByTimetableDay($campusId, $termId, $cycle, $day)
-    {
-        return $this->getByTimetableDay($campusId, $termId, $cycle, $day);
-    }
-
-    /**
-     * Return a list of events or assessments due for a given timetable cycle and day (e.g. Day 5 of 2nd cycle)
-     *
-     * @param int $campusId
-     * @param int $termId
-     * @param int $cycle timetable cycle or week (calculated from the beginning of the term)
-     * @param int $day timetable day number
-     * @param int $folderId
-     * @param bool $dateOnly just returns date
-     * @return Collection
-     */
-    public function getByTimetableDay($campusId, $termId, $cycle, $day, $folderId = 0, $dateOnly = false)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        /** @var Campus $campus */
-        $campus = $user->getCampusCollection()->getBy('id', $campusId);
-
-        /** @var Term $term */
-        $term = $this->getTerms()->getBy('id', $termId);
-
-        $date = $this->getDateForTimetableDay($campus, $term, $cycle, $day);
-
-        // Return due work
-
-        if ($folderId > 0) {
-            return $this->getDueByDate($date, $folderId);
-        }
-
-        if ($dateOnly == true) {
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data' => [
-                    'date' => $date->toIso8601String()
-                ]
-            ]);
-        }
-
-        // Return events
-        return $this->getByDate($date);
-    }
-
-    /**
-     * Get a date for a timetable day
-     *
-     * @param $campusId
-     * @param $termId
-     * @param $cycle
-     * @param $day
-     * @return Collection
-     */
-    public function getTimetableDate($campusId, $termId, $cycle, $day)
-    {
-        return $this->getByTimetableDay($campusId, $termId, $cycle, $day, '', true);
-    }
-
-    /**
-     * Converting timetable cycle and day into a calendar date
-     *
-     * @param Campus $campus
-     * @param Term $term
-     * @param int $cycle
-     * @param int $day
-     * @return Alaress_Date_Format
-     */
-    public function getDateForTimetableDay($campus, $term, $cycle, $day)
-    {
-        $campusTimetable = $this->getTimetableHandler()->getTimetableDefinition(null, $campus);
-        $daysInCycle = $campusTimetable['dayCount'];
-
-        $termActualStart = $this->getFirstTimetableDayForTerm($campus, $term);
-
-        // Knowing the term start date, it's timetable day and timetable cycle length, figure out which date is the given timetable day
-        $shiftTimetableDays = $daysInCycle * ($cycle - 1) + $day - $termActualStart['day'];
-        $date = $termActualStart['date']->addWeekdays($shiftTimetableDays);
-        return $date;
     }
 
     /**

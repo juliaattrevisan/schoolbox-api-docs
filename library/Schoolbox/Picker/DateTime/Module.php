@@ -44,14 +44,10 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $campusRoute = '/campus/{campusId}/term/{termId}/cycle/{cycle}/day/{day}';
         $routes = [
             'GET' => [
                 '/type/{type}/element/{element}/id/{id}/value/{value}' => 'getPicker',
                 '/date/{date}' => 'getByDate',
-                $campusRoute => 'getEventsByTimetableDay',
-                $campusRoute.'/date' => 'getTimetableDate',
-                $campusRoute.'/folder/{folder}' => 'getByTimetableDay',
                 '/date/{date}/folder/{folderId}' => 'getDueByDate',
             ],
             'POST' => [

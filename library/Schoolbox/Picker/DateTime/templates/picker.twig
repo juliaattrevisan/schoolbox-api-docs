@@ -179,11 +179,6 @@
         },
         {% endif %}
         routeLookup: {
-            {% if timetable %}
-            getByTimetableDay: '{{ routeLookup('pickerDatetime.getByTimetableDay') }}',
-            getEventsByTimetableDay: '{{ routeLookup('pickerDatetime.getEventsByTimetableDay') }}',
-            getTimetableDate: '{{ routeLookup('pickerDatetime.getTimetableDate') }}',
-            {% endif %}
             getDueByDate: '{{ routeLookup('pickerDatetime.getDueByDate') }}',
             getByDate: '{{ routeLookup('pickerDatetime.getByDate', {date: '_date_'}) }}'
         },
