@@ -88,6 +88,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         });
 
+        // trigger the pre-loaded day
+        $byTimetable.find('[data-tt-day].active').trigger('click');
+
         // Catch period select change
         $byTimetable.find('[data-tt-period]').change(function() {
 
@@ -631,6 +634,17 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 height: 270,
                 defaultDate: moment(data.date)
             });
+
+            // the div is hidden - render it when it comes into view
+            if ($calendarDiv.not(':visible')) {
+                // `one`, not `on`
+                $('#picker'+twigVars.id).find('[data-tab]').one('click', ':not(.active)', function () {
+                    setTimeout(function () {
+                        $calendarDiv.fullCalendar('render');
+                    }, 80);
+                });
+            }
+
         }
 
         if (template == 'duework' && data.students.length > 0) {
