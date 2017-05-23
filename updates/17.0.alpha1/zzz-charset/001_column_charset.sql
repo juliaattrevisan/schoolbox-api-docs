@@ -53,7 +53,6 @@ ALTER TABLE component_config_definition MODIFY label varchar(64) CHARACTER SET u
 ALTER TABLE component_config_definition MODIFY description varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE component_config_instance MODIFY value varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE component_definition MODIFY name varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE component_definition MODIFY class varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE component_definition MODIFY description varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE component_definition MODIFY module enum('dashboard','homepage','eportfolio') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE component_definition MODIFY visible enum('true','false') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
