@@ -9,6 +9,64 @@
 [ student.fullName ]
 ) }}
 
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ student.fullName }}</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row actions-small-2">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h2 class="subheader">Pastoral Profile</h2>
+        </div>
+    </div>
+    <nav>
+        {# Display linked student records #}
+
+        {% if linkedStudents | length %}
+            <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
+        {% endif %}
+
+        {# Delete record #}
+
+        {% if record is not empty %}
+            {% if isRouteAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
+                <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+            {% endif %}
+        {% endif %}
+
+        {# Display link to insert pastoral record if the logged in user is authorized to do so #}
+
+        {% if isRouteAuthorized('pastoral.getStudentRecordInsertForm') %}
+            <a href="{{ routeLookup('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) }}" class="icon-add" title="Add Pastoral Record"></a>
+        {% endif %}
+
+        {# Modify record #}
+
+        {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
+            <a class="icon-modify no-text"
+               href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
+               title="Modify"></a>
+        {% endif %}
+    </nav>
+
+    {% if linkedStudents | length %}
+        <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
+            <li class="separator">Students With Linked Records</li>
+            {% for linkedStudent in linkedStudents %}
+                <li>
+                    <a href="{{ routeLookup('pastoral.getLinked', {studentId: student.id, linkedStudentId: linkedStudent.student_id }) }}" class="icon-user">
+                        {{ linkedStudent.first_name }} {{ linkedStudent.last_name }} ({{ linkedStudent.count }})
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
 {% include '@pastoral/fragments/studentDetails.twig' with { student: student } %}
 
 {# Pastoral Type Filter Box #}
@@ -81,6 +139,19 @@
                                     {# Only display link if the user is authorzied to view the record #}
 
                                     {% if isRouteAuthorized('pastoral.getStudentRecord', {'record': record}) %}
+
+                                        {# Display linked students to staff #}
+
+                                        {% if record.relatedRecords | length and user.role.isStaff %}
+                                            <div class="right" style="padding-left:35px;">
+                                                {% for relatedRecord in record.relatedRecords %}
+                                                    <a href="{{ routeLookup('pastoral.getStudent', {studentId: relatedRecord.student.id}) }}">
+                                                        {{ profile.imageSquare64(relatedRecord.student) }}
+                                                    </a>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+
                                         <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': student.id, 'recordId': record.id}) }}">
                                             {{ profile.imageSquare64(record.owner) }}
                                             <h3>{{ record.heading }}</h3>

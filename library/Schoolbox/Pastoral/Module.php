@@ -83,6 +83,7 @@ class Module extends BaseModule
                 '/groups'                                                   => ['getGroups' => $permissionPastoralModerator],
                 '/search'                                                   => ['getSearch' => $permissionStaff],
                 '/student/{studentId:\d+}'                                  => ['getStudent' => $permissionStudentView],
+                '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'     => ['getLinked' => $permissionStudentView],
                 '/student/{studentId:\d+}/record/{recordId:\d+}'            => ['getStudentRecord' => $permissionRecordView],
                 '/student/{studentId:\d+}/record/insert'                    => ['getStudentRecordInsertForm' => $permissionStaff],
                 '/student/{studentId:\d+}/record/{recordId:\d+}/update'     => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
@@ -154,6 +155,24 @@ class Module extends BaseModule
                     $student->loadParents();
 
                     $injectedValues['student'] = $student;
+                } catch (MapperException $e) {
+                }
+            }
+
+            // Load student record
+
+            if (array_key_exists('linkedStudentId', $params)) {
+                try {
+                    if (!isset($userMapper)) {
+                        /** @var UserMapper $userMapper */
+                        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+                    }
+
+                    $student = $userMapper->findWithSubjects($params['linkedStudentId']);
+                    $student->loadTeachers();
+                    $student->loadParents();
+
+                    $injectedValues['linkedStudent'] = $student;
                 } catch (MapperException $e) {
                 }
             }

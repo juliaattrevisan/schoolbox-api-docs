@@ -266,9 +266,70 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoral/student.twig',
             'data' => [
+                'user'              => $this->getUser(),
                 'recordCount'       => $records->count(),
                 'records'           => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
                 'student'           => $student,
+                'pageCurrent'       => $pageCurrent,
+                'types'             => $this->pastoralTypeMapper->findAll(),
+                'linkedStudents'    => $this->pastoralMapper->getLinkedStudents($student),
+                'typeSelected'      => $get['type']
+            ]
+        ]);
+    }
+
+
+    /**
+     * Display linked records between two students
+     *
+     * @param User $student
+     * @param User $linkedStudent
+     * @throws SchoolboxException
+     */
+    public function getLinked($student, $linkedStudent)
+    {
+        $get = $this->getRequest()->query;
+
+        // Create an audit record of anyone viewing a student record
+
+        /** @var PastoralAudit $auditRecord */
+        $auditRecord = $this->pastoralAuditMapper->createModel();
+        $auditRecord->setStudent($student);
+        $auditRecord->setUser($this->getUser());
+        $this->pastoralAuditMapper->save($auditRecord);
+
+        /** @var PastoralAudit $auditRecord */
+        $auditRecord = $this->pastoralAuditMapper->createModel();
+        $auditRecord->setStudent($linkedStudent);
+        $auditRecord->setUser($this->getUser());
+        $this->pastoralAuditMapper->save($auditRecord);
+
+        // Retrieve all of the students pastoral records
+
+        $records = $this->pastoralMapper->findLinked($student, $linkedStudent, $get['type']);
+
+        // Limit the number of pastoral records to display on each page of pastoral records
+
+        $resultsPerPage = $this->config->get('pastoral_page_size');
+
+        // Set the current page number
+
+        $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? $get['pageCurrent'] : 1;
+
+        if ($pageCurrent > ceil($records->count() / $resultsPerPage)) {
+            $pageCurrent = ceil($records->count() / $resultsPerPage);
+        } else if ($pageCurrent < 1) {
+            $pageCurrent = 1;
+        }
+
+        $this->getResponse()->content->set([
+            'template' => '@pastoral/linked.twig',
+            'data' => [
+                'user'              => $this->getUser(),
+                'recordCount'       => $records->count(),
+                'records'           => $records->slice(($pageCurrent - 1) * $resultsPerPage, $resultsPerPage),
+                'student'           => $student,
+                'linkedStudent'     => $linkedStudent,
                 'pageCurrent'       => $pageCurrent,
                 'types'             => $this->pastoralTypeMapper->findAll(),
                 'linkedStudents'    => $this->pastoralMapper->getLinkedStudents($student),

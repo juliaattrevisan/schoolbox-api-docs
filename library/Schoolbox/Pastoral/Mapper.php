@@ -435,9 +435,51 @@ class Mapper extends BaseMapper
                 `pastoral_tags`.`deleted_at` IS NULL
         ";
 
-        // Bind the parameters
+        $statement = $this->database->prepare($sql);
+        $statement->execute();
+
+        $results = $this->hydrateSelect($statement);
+
+        return $results;
+    }
+
+    /**
+     * Display the most recent records that are tagged for display on dashboard based on their severity
+     *
+     * @param User $student
+     * @param User $linkedStudent
+     * @param int|null $typeId
+     * @return Collection
+     */
+    public function findLinked($student, $linkedStudent, $typeId = null)
+    {
+        $studentId = $this->getDatabase()->quote($student->getId());
+        $linkedStudentId = $this->getDatabase()->quote($linkedStudent->getId());
+
+        $sql = $this->getSelectString();
+
+        $sql .= "
+            WHERE `pastoral`.`student_id` = {$studentId} AND `pastoral`.`id` IN (
+                SELECT      `parent_id` 
+                FROM        `pastoral` `pastoralLinked` 
+                WHERE       `pastoralLinked`.`student_id` = {$linkedStudentId}
+            )
+        ";
+
+        if (!empty($typeId)) {
+            $sql .= " AND type_id = :typeId";
+        }
+
+        $sql .= "
+            ORDER BY `pastoral`.`created_at` DESC
+        ";
 
         $statement = $this->database->prepare($sql);
+
+        if (!empty($typeId)) {
+            $statement->bindValue('typeId', $typeId);
+        }
+
         $statement->execute();
 
         $results = $this->hydrateSelect($statement);

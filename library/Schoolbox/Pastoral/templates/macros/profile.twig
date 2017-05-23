@@ -7,15 +7,23 @@
         Have hardcoded the image size, and defaulted it to the placeholder image so things
         don't appear to 'pop' in so obviously
     #}
-    <img src="/portrait.php?userId={{ user.externalId }}&size=square64" style="background-color:#c6c6c6;width:64px;height:64px;" alt="#NAME#">
+    <img src="/portrait.php?userId={{ user.externalId }}&size=square64"
+         style="background-color:#c6c6c6;width:64px;height:64px;"
+         alt="{{ user.fullName }}"
+         title="{{ user.fullName }}">
 {%- endmacro %}
 
 {% macro imagePortrait(user) -%}
-    <img class="full-width" src="/portrait.php?userId={{ user.externalId }}&size=profile" alt="{{ user.fullName }}" title="{{ user.fullName }}">
+    <img class="full-width" src="/portrait.php?userId={{ user.externalId }}&size=profile"
+         alt="{{ user.fullName }}"
+         title="{{ user.fullName }}">
 {%- endmacro %}
 
 {% macro imageSquare200(user) -%}
-    <img class="full-width" src="/portrait.php?userId={{ user.externalId }}&size=constrain200" alt="{{ user.fullName }}" title="{{ user.fullName }}">
+    <img class="full-width"
+         src="/portrait.php?userId={{ user.externalId }}&size=constrain200"
+         alt="{{ user.fullName }}"
+         title="{{ user.fullName }}">
 {%- endmacro %}
 
 {% macro link(user) -%}
