@@ -38,16 +38,16 @@
 
         {# Display link to insert pastoral record if the logged in user is authorized to do so #}
 
-        {% if isRouteAuthorized('pastoral.getStudentRecordInsertForm') %}
-            <a href="{{ routeLookup('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) }}" class="icon-add" title="Add Pastoral Record"></a>
+        {% set routeGetStudentRecordInsertForm = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
+        {% if routeGetStudentRecordInsertForm %}
+            <a href="{{ routeGetStudentRecordInsertForm }}" class="icon-add" title="Add Pastoral Record"></a>
         {% endif %}
 
         {# Modify record #}
 
-        {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
-            <a class="icon-modify no-text"
-               href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
-               title="Modify"></a>
+        {% set routeGetStudentRecordUpdateForm = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+        {% if routeGetStudentRecordUpdateForm %}
+            <a class="icon-modify no-text" href="{{ routeGetStudentRecordUpdateForm }}" title="Modify"></a>
         {% endif %}
     </nav>
 
@@ -99,11 +99,13 @@
         <div class="empty-state">
             <i class="icon-pastoral"></i>
             <p>There are no pastoral records {% if typeSelected is not empty %}of this type{% endif %} available for {{ student.fullName }}.</p>
-            {% if isRouteAuthorized('pastoral.getStudentRecordInsertForm') %}
+            {% set routeGetStudentRecordInsertForm = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
+            {% if routeGetStudentRecordInsertForm %}
                 <p>
-                    You can <a href="{{ routeLookup('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) }}">create a new
-                        pastoral record</a> now{% if typeSelected is not empty %} or <a
-                            href="{{ routeLookup('pastoral.getStudent', {'studentId': student.id}) }}">remove your pastoral type filter</a>{% endif %}.</a>
+                    You can <a href="{{ routeGetStudentRecordInsertForm }}">create a new pastoral record</a> now
+                    {% if typeSelected is not empty %}
+                        or <a href="{{ routeLookup('pastoral.getStudent', {'studentId': student.id}) }}">remove your pastoral type filter</a>
+                    {% endif %}
                 </p>
             {% endif %}
         </div>
@@ -150,8 +152,8 @@
                                     <p class="meta">
                                         Linked Records:
                                         {% for relatedRecord in record.relatedRecords %}
-                                            {% set relatedRecordRoute = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
-                                            <a href="{{ relatedRecordRoute }}">{{ relatedRecord.student.fullName }}</a>{% if not loop.last %},{% endif %}
+                                            {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
+                                            <a href="{{ getStudentRecord }}">{{ relatedRecord.student.fullName }}</a>{% if not loop.last %},{% endif %}
                                         {% endfor %}
                                     </p>
                                     {% endif %}
@@ -160,10 +162,9 @@
                             <nav>
                                 {# Modify record #}
 
-                                {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
-                                    <a class="icon-modify no-text"
-                                       href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
-                                       title="Modify"></a>
+                                {% set routeGetStudentRecordUpdateForm = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
+                                {% if routeGetStudentRecordUpdateForm %}
+                                    <a class="icon-modify no-text" href="{{ routeGetStudentRecordUpdateForm }}" title="Modify"></a>
                                 {% endif %}
 
                                 {# Delete record #}
