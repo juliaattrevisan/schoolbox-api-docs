@@ -166,18 +166,16 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
                 $user = $log->getUser();
                 $time = $log->getTimestamp()->getUnixTimeStamp();
 
-                if ($user instanceof User) {
-                    switch ($log->getAction()) {
-                        case LogMapper::ACTION_CREATE:
-                            $c = $c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll($time)));
-                            break;
-                        case LogMapper::ACTION_UPDATE:
-                            $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time)));
-                            break;
-                        case LogMapper::ACTION_DELETE:
-                            $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
-                            break;
-                    }
+                switch ($log->getAction()) {
+                    case LogMapper::ACTION_CREATE:
+                        $c = $c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll($time)));
+                        break;
+                    case LogMapper::ACTION_UPDATE:
+                        $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time)));
+                        break;
+                    case LogMapper::ACTION_DELETE:
+                        $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
+                        break;
                 }
             } catch(Mapper\Exception $e) {
                 // mute failures where things were logged about resources that no longer exist

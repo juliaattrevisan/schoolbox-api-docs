@@ -213,8 +213,11 @@ class LogMapper extends Mapper {
 		$collection = new Collection();
 
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			/** @var Log $log */
-			$collection->add($this->hydrate($r, 'log')->setUser($this->hydrateJoin($r, 'user', 'u')));
+		    $user = $this->hydrateJoin($r, 'user', 'u');
+
+		    if ($user instanceof User) {
+                $collection->add($this->hydrate($r, 'log')->setUser($user));
+            }
 		}
 
 		return $collection;
