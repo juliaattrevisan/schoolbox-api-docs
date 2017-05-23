@@ -80,7 +80,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this->addRoutePreload($matcher,
-            '(getByDate|getDueByDate|getHeat)',
+            '(getByDate|getDueByDate)',
             function ($params) {
                 $returnedParams = [];
                 if (array_key_exists('date', $params)) {
@@ -92,6 +92,15 @@ class Module extends BaseModule
                 return $returnedParams;
             }
         );
+
+        $this->addRoutePreload($matcher, 'getHeat', function ($params) {
+            if (array_key_exists('folderId', $params)) {
+                // tweak and pass through
+                $params['folder'] = $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']);
+                unset ($params['folderId']);
+            }
+            return $params;
+        });
     }
 
     /**
