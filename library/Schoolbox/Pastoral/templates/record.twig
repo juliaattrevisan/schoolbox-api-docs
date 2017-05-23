@@ -353,7 +353,7 @@
      # Conditionally show the other column if it has existent content
      # Otherwise span full-width
      #}
-    <div class="small-12 {% if record.relatedRecords | length > 1 %}medium-6{% endif %} island">
+    <div class="small-12 {% if record.relatedRecords | length %}medium-6{% endif %} island">
         <h2 class="subheader">Record Visibility</h2>
         <section>
             <ul class="information-list">
@@ -399,12 +399,8 @@
         </section>
     </div>
 
-    {# Show other related records when they exist
-     #
-     # Current record always exists in this collection, so
-     # any truly linked records have > 1 in the collection
-     #}
-    {% if record.relatedRecords|length > 1 %}
+    {# Show other related records when they exist #}
+    {% if record.relatedRecords | length %}
     <div class="small-12 medium-6 island">
         <h2 class="subheader">Other Students Involved</h2>
         <section>

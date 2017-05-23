@@ -301,23 +301,6 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $this->pastoralAuditMapper->save($auditRecord);
 
-        // Load the details of any related records (I would love to find a way to do this in the mapper,
-        // however recursion is a thing)...
-
-        $relatedRecords = new Collection();
-
-        if ($record->getParent() instanceof Model) {
-            $relatedRecords = $relatedRecords
-                ->merge($this->pastoralMapper->findByColumn('parent_id', $record->getParent()->getId()))
-                ->add($this->pastoralMapper->findById($record->getParent()->getId()));
-        } else {
-            $relatedRecords = $relatedRecords
-                ->merge($this->pastoralMapper->findByColumn('parent_id', $record->getId()))
-                ->add($record);
-        }
-
-        $record->setRelatedRecords($relatedRecords);
-
         // Moderators can wee revision history
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
