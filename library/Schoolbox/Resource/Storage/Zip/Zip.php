@@ -92,7 +92,13 @@ class Zip
      */
     public function addStream($stream, $zipPath = '')
     {
-        $this->zipFilesystem->getAdapter()->writeStream($zipPath, $stream, $this->zipFilesystem->getConfig());
+        // Writing a stream is memory-inefficient, so find and add its file if possible.
+        $metadata = stream_get_meta_data($stream);
+        if (file_exists($metadata['uri'])) {
+            $this->addFile($metadata['uri'], $zipPath);
+        } else {
+            $this->zipFilesystem->getAdapter()->writeStream($zipPath, $stream, $this->zipFilesystem->getConfig());
+        }
     }
 
     /**
