@@ -162,7 +162,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
 
-            requestHeat(instance, applyHeatEverywhere);
+            var mo = instance.currentMonth + 1,
+                yr = instance.currentYear;
+
+            requestHeat(mo, yr, function () {
+                applyHeatEverywhere(instance);
+            });
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -183,13 +188,28 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
         },
         onMonthChange: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, applyHeatEverywhere);
+            var mo = instance.currentMonth + 1,
+                yr = instance.currentYear;
+
+            requestHeat(mo, yr, function () {
+                applyHeatEverywhere(instance);
+            });
         },
         onYearChange: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, applyHeatEverywhere);
+            var mo = instance.currentMonth + 1,
+                yr = instance.currentYear;
+
+            requestHeat(mo, yr, function () {
+                applyHeatEverywhere(instance);
+            });
         },
         onValueUpdate: function(selectedDates, dateStr, instance) {
-            requestHeat(instance, applyHeatEverywhere);
+            var mo = instance.currentMonth + 1,
+                yr = instance.currentYear;
+
+            requestHeat(mo, yr, function () {
+                applyHeatEverywhere(instance);
+            });
         }
 
     });
@@ -693,27 +713,25 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param {Flatpickr} instance
      * @param {Callable}   onSuccess
      */
-    function requestHeat(instance, onSuccess) {
-        var folderId = $('*[name = "folderId"]').val(),
-            mo = instance.currentMonth + 1,
-            yr = instance.currentYear;
+    function requestHeat(mo, yr, onSuccess) {
+        var folderId = $('*[name = "folderId"]').val();
 
-        fetchHeat(yr, mo, folderId, instance, onSuccess);
+        fetchHeat(yr, mo, folderId, onSuccess);
 
         // TODO: very open to a better way of handling the month/year wraparound
 
         // also process previous month
         if (mo === 1) {
-            fetchHeat(yr - 1, 12, folderId, instance, onSuccess);
+            fetchHeat(yr - 1, 12, folderId, onSuccess);
         } else {
-            fetchHeat(yr, mo - 1, folderId, instance, onSuccess);
+            fetchHeat(yr, mo - 1, folderId, onSuccess);
         }
 
         // also also process next month
         if (mo === 12) {
-            fetchHeat(yr + 1, 1, folderId, instance, onSuccess);
+            fetchHeat(yr + 1, 1, folderId, onSuccess);
         } else {
-            fetchHeat(yr, mo + 1, folderId, instance, onSuccess);
+            fetchHeat(yr, mo + 1, folderId, onSuccess);
         }
     }
 
@@ -724,10 +742,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param {Integer} yr
      * @param {Integer} mo
      * @param {Integer} folderId
-     * @param {Flatpickr} instance
      * @param {Callable} onSuccess
      */
-    function fetchHeat(yr, mo, folderId, instance, onSuccess) {
+    function fetchHeat(yr, mo, folderId, onSuccess) {
         if ('undefined' === typeof heatCache[yr]) {
             heatCache[yr] = {};
         }
@@ -746,12 +763,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
 
                 // do this async the first time (cold cache)
-                onSuccess(instance);
+                onSuccess();
             }).fail(function () { console.error(arguments); });
 
         } else {
             // do it sync if the cache is hot
-            onSuccess(instance);
+            onSuccess();
         }
 
     }
