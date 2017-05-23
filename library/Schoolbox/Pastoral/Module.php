@@ -69,7 +69,7 @@ class Module extends BaseModule
         $permissionRecordUpdate = new Rule\All(new Rule\Any($permissionPastoralModeratorWrite, $permissionRecordOwner));
         $permissionRecordDelete = new Rule\All(new Rule\Any($permissionPastoralModeratorWrite, $permissionRecordOwner));
 
-        $permissionAttachmentView = new Rule\Any($permissionPastoralModerator, new Rule\All($permissionStaff, $permissionInRecordAudience), new Rule\All($permissionParentOfStudent, $permissionInRecordAudience, $permissionStaff));
+        $permissionAttachmentView = new Rule\Any($permissionPastoralModerator, new Rule\All($permissionStaff, $permissionInRecordAudience), new Rule\All($permissionParentOfStudent, $permissionInRecordAudience));
 
         // Permissions required to insert/delete a pastoral comment
 
