@@ -170,7 +170,20 @@ class Mapper extends Schoolbox\Mapper implements Receiver
             return true;
         }
 
-        return $this->getManager()->save($storage);
+        /* Ram media files into Video Queue table for transcoding
+         */
+        $saveResult = $this->getManager()->save($storage);
+
+        if ($storage->getMimetype()->isVideo() || $storage->getMimetype()->isAudio()) {
+            $mapper = QueueMapper::getInstance();
+            $videoQ = $mapper->createModel();
+            $videoQ->setStorage($storage);
+            $videoQ->setStatus(QueueMapper::STATUS_PENDING);
+
+            $mapper->save($videoQ);
+        }
+
+        return $saveResult;
     }
 
     /**

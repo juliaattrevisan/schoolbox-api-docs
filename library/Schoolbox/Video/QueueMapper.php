@@ -17,9 +17,12 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\File;
-use Schoolbox\Mapper\Exception as MapperException;
 
+/**
+ * Mapper for queued video processes.
+ *
+ * @method Queue createModel($id = null)
+ */
 class QueueMapper extends Mapper {
 
     /* Possible video states */
@@ -46,8 +49,8 @@ class QueueMapper extends Mapper {
         $this->uses('status', self::TYPE_STRING);
         $this->uses('message', self::TYPE_STRING);
         $this->uses('duration', self::TYPE_INTEGER);
-        $this->uses('createdOn', self::TYPE_DATETIME, null, 'createdAt');
-        $this->uses('modifiedOn', self::TYPE_DATETIME, null, 'updatedAt');
+        $this->uses('createdOn', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('modifiedOn', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
     }
 
     /**
