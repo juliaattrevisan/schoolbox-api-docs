@@ -75,7 +75,7 @@
 <div class="row">
     {# Display recently searched student records #}
 
-    <div class="small-{{ 12 / count }} island">
+    <div class="small-12 medium-{{ 12 / count }} island">
 
         {% if recentStudents is not empty %}
         <h2 class="subheader">Recently Viewed Students</h2>
@@ -101,7 +101,7 @@
 
     {% if recentDashboard is not empty %}
 
-        <div class="small-{{ 12 / count }} island">
+        <div class="small-12 medium-{{ 12 / count }} island">
             <h2 class="subheader">Important Records</h2>
             <section>
                 <ul class="action-list">
@@ -125,7 +125,7 @@
     {% endif %}
 
     {% if groups | length %}
-        <div class="small-{{ 12 / count }} island">
+        <div class="small-12 medium-{{ 12 / count }} island">
             <h2 class="subheader">Pastoral Group Memberships</h2>
             <p class="meta">You are a member of the following pastoral groups.</p>
             <section>
