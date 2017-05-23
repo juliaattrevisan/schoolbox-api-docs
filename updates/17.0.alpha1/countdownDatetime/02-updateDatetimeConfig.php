@@ -20,10 +20,12 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Update countdown component co
 ]);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
-    // Find all countdown components
-    $db                    = Database::getInstance();
 
-    $newConfigId           = $db->query("
+    $db = Database::getInstance();
+
+
+    // Find new config ID
+    $newConfigId = $db->query("
         SELECT ccd.id
         FROM   component_config_definition ccd
         INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
@@ -31,19 +33,15 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         AND   ccd.`key` = 'datetime'
         LIMIT 1
     ")->fetchColumn();
+    if (!empty($newConfigId)) {
+        $log->notice(sprintf('Datetime config option found for countdown option (ID: #%d)', $newConfigId));
+    } else {
+        $log->error('No datetime config option found for countdown component - did previous update run?');
+        exit(1);
+    }
 
-    $insertCountdownConfigQ = $db->prepare("
-        INSERT INTO component_config_instance (
-            component_config_definition_id,
-            component_instance_id,
-            `value`
-        ) VALUES (
-            :configId,
-            :componentId,
-            :newValue
-        )
-    ");
 
+    // Find all countdown components
     $countdownConfigs       = [];
     $selectCountdownConfigQ = $db->query("
         SELECT
@@ -59,6 +57,21 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     foreach ($selectCountdownConfigQ as $row) {
         $countdownConfigs[$row['id']][$row['key']] = $row['value'];
     }
+    $log->notice(sprintf('%d countdown components found', count($countdownConfigs)));
+
+
+    // Start inserting components
+    $insertCountdownConfigQ = $db->prepare("
+        INSERT INTO component_config_instance (
+            component_config_definition_id,
+            component_instance_id,
+            `value`
+        ) VALUES (
+            :configId,
+            :componentId,
+            :newValue
+        )
+    ");
 
     // If date not set: insert blank
     // If date set and time is not: assume start of day
