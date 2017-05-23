@@ -340,6 +340,7 @@
                         {AFFIX_TWIG_LABEL_HERE}
                     </div>
                 </fieldset>
+
                 <fieldset class="content">
                     <legend>Dates and Times</legend>
 
@@ -382,8 +383,12 @@
                             <!--<input id="datepicker-datetime-allday-switch" type="text" placeholder="All day?" readonly />-->
                         <!--</label>-->
                     </div>
+                </fieldset>
 
-                    <div class="column small-12 medium-4">
+                <fieldset class="content">
+                    <legend>Event visibility in date and time selectors</legend>
+
+                    <div class="column small-12 medium-6">
                         <label>Show events in picker:
                             <input type="text"
                                    id="datepicker-events"
@@ -393,21 +398,34 @@
 
                     </div>
 
-                    <div class="column small-12 medium-4">
-                        <label>Show due work in picker:
-                            <input type="text"
-                                   id="datepicker-duework"
-                                   data-datepicker
-                                   data-datepicker-call="duework">
-                        </label>
+                    <div class="column small-12 medium-6">
+                        <label for="datepicker-duework">Show due work in picker:</label>
+                        <input type="text"
+                               id="datepicker-duework"
+                               data-datepicker
+                               data-datepicker-call="duework">
 
-                        <label>
-                            The show due work picker requires a folderId input to fetch due works from.
-                            <input name="folderId" value="1">
-                        </label>
+                        <p>
+                            The show due work picker searches for a form input with <code>name="folderId"</code>;
+                            it fetches assessments from a folder with ID that matches that input's value.
+                        </p>
+                        <label for="folderId">Folder ID</label>
+                        <input id="folderId" name="folderId" value="1">
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Syncable dates</legend>
+                    <div class="column small-12">
+                        <p>
+                            When two date or datetime inputs that are synced,
+                            the start value cannot be after the end value.
+                            (If the end is set before the start, the start will automatically
+                             update to the end value, and vice versa.)
+                        </p>
                     </div>
 
-                    <div class="column small-12 medium-4">
+                    <div class="column small-12 medium-6">
                         <label>Syncable date - start:
                             <input type="text"
                                    id="datepicker-date-sync-start"
@@ -417,11 +435,31 @@
                         </label>
                     </div>
 
-                    <div class="column small-12 medium-4">
+                    <div class="column small-12 medium-6">
                         <label>Syncable date - end:
                             <input type="text"
                                    id="datepicker-date-sync-end"
                                    data-datepicker>
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Syncable date and time - start:
+                            <input type="text"
+                                   id="datepicker-datetime-sync-start"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-sync
+                                   data-datepicker-sync-enddate="#datepicker-datetime-sync-end">
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Syncable date and time - end:
+                            <input type="text"
+                                   id="datepicker-datetime-sync-end"
+                                   data-datepicker
+                                   data-datepicker-time>
                         </label>
                     </div>
 
