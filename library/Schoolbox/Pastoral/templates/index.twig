@@ -80,19 +80,17 @@
         {% if recentStudents is not empty %}
         <h2 class="subheader">Recently Viewed Students</h2>
         <section>
-            <ul class="action-list">
+            <ul class="information-list">
                 {% for student in recentStudents %}
-                    <li>
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
-                                    {{ profile.imageSquare64(student) }}
-                                    <h3>{{ student.fullName }}</h3>
-                                </a>
-                                <p class="meta">{{ student.role.name }}</p>
-                            </div>
-                        </div>
-                    </li>
+                <li>
+                    <div class="card small-12">
+                        <a href='{{ routeLookup('pastoral.getStudent', {studentId: student.id}) }}'>
+                            {{ profile.imageSquare64(student) }}
+                            <h3>{{ student.fullName }}</h3>
+                        </a>
+                        <p class="meta">{{ student.role.name }}</p>
+                    </div>
+                </li>
                 {% endfor %}
             </ul>
         </section>
