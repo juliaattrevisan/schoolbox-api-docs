@@ -158,7 +158,7 @@ class Module extends BaseModule
                 } catch (MapperException $e) {
                     /** @var ErrorMapper $errorMapper */
                     $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
-                    $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                    throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
             }
 
@@ -179,7 +179,7 @@ class Module extends BaseModule
                 } catch (MapperException $e) {
                     /** @var ErrorMapper $errorMapper */
                     $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
-                    $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                    throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
             }
 
@@ -210,7 +210,7 @@ class Module extends BaseModule
                 } catch (MapperException $e) {
                     /** @var ErrorMapper $errorMapper */
                     $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
-                    $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    throw $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }
             }
 
