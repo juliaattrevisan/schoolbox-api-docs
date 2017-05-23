@@ -156,6 +156,9 @@ class Module extends BaseModule
 
                     $injectedValues['student'] = $student;
                 } catch (MapperException $e) {
+                    /** @var ErrorMapper $errorMapper */
+                    $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+                    $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
             }
 
@@ -174,6 +177,9 @@ class Module extends BaseModule
 
                     $injectedValues['linkedStudent'] = $student;
                 } catch (MapperException $e) {
+                    /** @var ErrorMapper $errorMapper */
+                    $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+                    $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                 }
             }
 
@@ -202,6 +208,9 @@ class Module extends BaseModule
                     $injectedValues['record'] = $pastoralMapper->findById($params['recordId']);
                     $injectedValues['access'] = $pastoralAccessMapper->findByColumn('pastoral_id', $params['recordId']);
                 } catch (MapperException $e) {
+                    /** @var ErrorMapper $errorMapper */
+                    $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
+                    $errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }
             }
 
