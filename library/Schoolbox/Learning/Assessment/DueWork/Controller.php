@@ -343,7 +343,7 @@ class Controller extends Assessment\Controller
                     {
                         $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
                         $zipFilename = sprintf("%s/%s", $directory, $filenameSanitized);
-                        $zip->addStream($file->readStream(), $zipFilename);
+                        $zip->addFile(stream_get_meta_data($file->readStream())['uri'], $zipFilename);
                     }
                 }
             }
