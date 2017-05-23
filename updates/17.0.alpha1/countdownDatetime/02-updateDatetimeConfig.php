@@ -33,9 +33,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         AND   ccd.`key` = 'datetime'
         LIMIT 1
     ")->fetchColumn();
-    if (!empty($newConfigId)) {
-        $log->notice(sprintf('Datetime config option found for countdown option (ID: #%d)', $newConfigId));
-    } else {
+    if (empty($newConfigId)) {
         $log->error('No datetime config option found for countdown component - did previous update run?');
         exit(1);
     }
