@@ -258,7 +258,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 var endDate   = moment(value[valueKeys[valueKeys.length - 1]]);
                 var hideClass = 'hide';
 
-                if (index === 1 && !moment(twigVars.date).isBetween(termStart, termEnd, 'day', '[]')) {
+                if (index == 1 && !moment(twigVars.date).isBetween(termStart, termEnd, 'day', '[]')) {
                     // if this date is outside the bounds of the term, display the first week
                     hideClass = '';
 
@@ -636,9 +636,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             if (dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]) {
                 var dayMoment = moment(twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]);
-                ifDate.call(this, dayMoment);
 
-            } else {
+                if (ifDate) {
+                    ifDate.call(this, dayMoment);
+                }
+
+            } else if (ifNotDate) {
                 ifNotDate.call(this);
             }
         });
