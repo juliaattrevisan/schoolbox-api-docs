@@ -57,8 +57,6 @@
                         </label>
                     </div>
                 </fieldset>
-            </section>
-            <section>
                 <fieldset class="content">
                     <div class="small-12 medium-6 columns">
                         <label>
@@ -110,8 +108,6 @@
 
                     </div>
                 </fieldset>
-            </section>
-            <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <section>
@@ -123,7 +119,6 @@
             </section>
 
             <h2 class="subheader">Record Visibility</h2>
-
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -151,9 +146,6 @@
                         </label>
                     </div>
                 </fieldset>
-            </section>
-
-            <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         {% if groups | length %}
@@ -185,10 +177,7 @@
                         {% endif %}
                     </div>
                 </fieldset>
-            </section>
-
             {% if allowIndividual %}
-                <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
@@ -229,20 +218,16 @@
                             </div>
                         </fieldset>
                     {% endif %}
-                </section>
             {% endif %}
-
             {# Show linked pastoral records #}
-
+            </section>
             {% if not record.id %}
-
-            <h2 class="subheader">Link Pastoral Record To Other Students</h2>
-
+            <h2 class="subheader">Include Additional Students</h2>
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
-                            Other Students
+                            Students
                             <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
                             <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
                         </label>
