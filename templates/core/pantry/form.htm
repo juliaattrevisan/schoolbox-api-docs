@@ -345,33 +345,43 @@
 
                     <div class="column small-12">
                         <p>
-                            When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>&lt;label/&gt;</code>
-                            which should have a class of <code>.timepick</code>. That way, the picker dropdown can adopt a width to match the input, which
-                            will be 100% of its container.
+                            Currently, datepickers require an <code>id</code> attribute to work.
                         </p>
                     </div>
 
                     <div class="column small-12 medium-4">
-                        <label>Date:
-                            <input type="text" data-datepicker placeholder="Date">
+                        <label>Date only:
+                            <input type="text"
+                                   id="datepicker-date"
+                                   data-datepicker placeholder="Date">
                         </label>
                     </div>
 
-                    <div class="column small-6 medium-4">
-                        <div class="timepick">
-                            <label>Select start:
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Start Time" />
-                            </label>
-                        </div>
+                    <div class="column small-12 medium-4">
+                        <label>Date and time:
+                            <input type="text"
+                                   id="datepicker-datetime"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   placeholder="Date and time">
+                        </label>
                     </div>
 
-                    <div class="column small-6 medium-4">
-                        <div class="timepick">
-                            <label>Select end:
-                                <input data-timepicker type="text" autocomplete="off" placeholder="End Time" />
-                            </label>
-                        </div>
+                    <div class="column small-12 medium-4">
+                        <label>Date and time with all-day switch
+                            <input type="text"
+                                   id="datepicker-datetime-allday"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-alldayswitch
+                                   data-datepicker-alldayinput="datepicker-datetime-allday-switch"
+                                   placeholder="Date and time">
+                        </label>
+                        <label>This field gets updated with the all-day value from the datepicker
+                            <input id="datepicker-datetime-allday-switch" type="text" placeholder="All day?" readonly />
+                        </label>
                     </div>
+
                 </fieldset>
             </section>
             <div class="row">
