@@ -19,6 +19,8 @@
             element.parents('fieldset').find('div.error-placeholder').html(error);
         } else if (element.is('[type="checkbox"], [type="radio"]')) {
             error.insertBefore(element);
+        } else if (element.closest('.input-group').length) {
+            error.insertAfter(element.closest('.input-group'))
         } else {
             error.insertAfter(element);
         }
@@ -32,7 +34,7 @@
     $.fn.alaressValidate = function(options) {
         var defaults = {
             // Default to not ignoring validation on any fields, even if hidden
-            ignore: false,
+            ignore: "[data-av-ignore]",
             ignoreTitle: true,
             errorPlacement: $.alaressValidate.defaultErrorPlacement
         };

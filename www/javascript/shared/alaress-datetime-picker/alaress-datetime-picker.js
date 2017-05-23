@@ -86,11 +86,11 @@ function getPickerFormats(allDayState, options) {
     var from, to;
     // Format is always date or datetime
     if (options.altFormat !== false) {
-        if (options.altFormat == 'date') {
+        if (options.altFormat === 'date') {
             from = options.displayFormatDate;
             to = options.displayFormatDate;
         }
-        else if (options.altFormat == 'datetime') {
+        else if (options.altFormat === 'datetime') {
             from = options.displayFormat;
             to = options.displayFormat;
         }
@@ -210,6 +210,7 @@ function checkAllDaySwitch (state, pickerId) {
 $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
+    var $datepickerButton = $(this).siblings('[data-adtp-btn]');
 
     // Build datepicker options form the element data attributes
     var options = getOptions(element);
@@ -228,7 +229,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     element.attr('data-datepicker-id', pickerId);
 
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
-    element.after('<div data-reveal id="picker' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
+    $('body').append('<div data-reveal id="picker' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
 
     // Create click event to open the modal for the element
 
@@ -238,7 +239,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         }
     });
 
-    element.click(function () {
+    $datepickerButton.click(function () {
 
         var originalValue;
 
@@ -319,6 +320,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         });
                     }
 
+                    // Close modal
                     picker.foundation('reveal', 'close');
 
                 });
@@ -361,7 +363,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             });
 
-        } else if (picker.data('status') == 'loaded') {
+        } else if (picker.data('status') === 'loaded') {
 
             // Update picker values, in case element field value has changed
             window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
