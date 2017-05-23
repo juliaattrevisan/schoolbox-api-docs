@@ -14,6 +14,10 @@
     <img class="full-width" src="/portrait.php?userId={{ user.externalId }}&size=profile" alt="{{ user.fullName }}" title="{{ user.fullName }}">
 {%- endmacro %}
 
+{% macro imageSquare200(user) -%}
+    <img class="full-width" src="/portrait.php?userId={{ user.externalId }}&size=constrain200" alt="{{ user.fullName }}" title="{{ user.fullName }}">
+{%- endmacro %}
+
 {% macro link(user) -%}
     /search/user/{{ user.id }}
 {%- endmacro %}

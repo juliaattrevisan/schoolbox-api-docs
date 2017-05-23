@@ -330,6 +330,15 @@ class Controller extends Base
     }
 
     /**
+     * Delete pastoral report
+     * @param PastoralReport $report
+     */
+    public function postReportDelete($report)
+    {
+        $this->pastoralReportMapper->delete($report);
+    }
+
+    /**
      * Insert/update pastoral report
      */
     public function postReportModify()

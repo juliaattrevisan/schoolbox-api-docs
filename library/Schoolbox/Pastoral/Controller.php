@@ -37,7 +37,6 @@ use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Search\Results;
@@ -325,7 +324,9 @@ class Controller extends Base
 
         if ($moderator->count() > 0) {
             $record->setRevisions(
-                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId())
+                $this->pastoralRevisionMapper->findByColumn('root_id', $record->getId(), ['order' => [
+                    'updated_at' => 'desc'
+                ]])
             );
         }
 
@@ -577,11 +578,11 @@ class Controller extends Base
 
             $record->setModifiedBy($this->getUser());
             $record->setStudent($student);
-            $record->setHeading($post["heading"]);
+            $record->setHeading(trim($post["heading"]));
             $record->setType($type);
             $record->setPoints($post["points"]);
             $record->setSeverity($severity);
-            $record->setBody($post["body"]);
+            $record->setBody(trim($post["body"]));
             $record->setOwner($this->getUser());
             $this->pastoralMapper->setSessionData($_SESSION);
             $this->pastoralMapper->save($record);
@@ -760,12 +761,12 @@ class Controller extends Base
         }
 
         $record->setModifiedBy($this->getUser());
-        $record->setHeading($post["heading"]);
+        $record->setHeading(trim($post["heading"]));
         $record->setType($type);
         $record->setCategory($category);
         $record->setPoints($post["points"]);
         $record->setSeverity($severity);
-        $record->setBody($post["body"]);
+        $record->setBody(trim($post["body"]));
         $this->pastoralMapper->setSessionData($_SESSION);
         $this->pastoralMapper->save($record);
 
@@ -827,9 +828,11 @@ class Controller extends Base
 
                         /** @var PastoralAccessModel $accessCurrent */
                         foreach ($existingAccess as $accessCurrent) {
-                            if ($accessCurrent->getUser()->getId() == $user_id) {
-                                $found = true;
-                                break;
+                            if ($accessCurrent->getUser() instanceof User) {
+                                if ($accessCurrent->getUser()->getId() == $user_id) {
+                                    $found = true;
+                                    break;
+                                }
                             }
                         }
                     }

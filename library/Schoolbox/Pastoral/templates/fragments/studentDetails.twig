@@ -39,12 +39,10 @@
 
         {# Modify record #}
 
-        {% if not showBody and record is not empty %}
-            {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
-                <a class="icon-modify no-text"
-                   href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
-                   title="Modify"></a>
-            {% endif %}
+        {% if isRouteAuthorized('pastoral.getStudentRecordUpdateForm', {record: record}) %}
+            <a class="icon-modify no-text"
+               href="{{ routeLookup('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) }}"
+               title="Modify"></a>
         {% endif %}
     </nav>
     {% if linkedStudents | length %}
@@ -62,10 +60,10 @@
         <section class="no-pad">
             <div class="profile content">
                 <div class="row no-margin">
-                    <div class="small-12 medium-3 columns no-pad">
-                        {{ profile.imagePortrait(student) }}
+                    <div class="small-12 medium-2 columns no-pad">
+                        {{ profile.imageSquare200(student) }}
                     </div>
-                    <div class="small-12 medium-9 columns no-pad">
+                    <div class="small-12 medium-10 columns no-pad">
                         <dl>
                             {# Display student name #}
 
@@ -73,6 +71,9 @@
                             <dd class="small-12 medium-9">
                                 <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
                             </dd>
+
+                            <dt class="small-12 medium-3">Year Level</dt>
+                            <dd class="small-12 medium-9">{{ student.year | default('Unknown') }}</dd>
 
                             {# Display links to students parents #}
 
@@ -88,11 +89,6 @@
                                     <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a>
                                 </dd>
                             {% endfor %}
-
-                            {# Display student year level #}
-
-                            <dt class="small-12 medium-3">Student Year Level</dt>
-                            <dd class="small-12 medium-9">{{ student.year | default('Unknown') }}</dd>
 
                             {% if relatedStudents | length %}
                                 <dt class="small-12 medium-3">

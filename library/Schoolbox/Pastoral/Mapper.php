@@ -19,6 +19,7 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Pastoral\Access\Model as Access;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
+use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\Results;
@@ -100,7 +101,7 @@ class Mapper extends BaseMapper
         );
 
 
-        $this->registerCallback(Mapper::CALLBACK_PRESAVE, [$this, 'saveRevision']);
+        $this->registerCallback(Mapper::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
         $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteReferences']);
     }
 
@@ -138,11 +139,9 @@ class Mapper extends BaseMapper
     {
         // Only save the revision if we are updating an existing record
 
-        if (!empty($model->getId())) {
-            $pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
-            $pastoralRevision = $pastoralRevisionMapper->createRevision($model);
-            $pastoralRevisionMapper->save($pastoralRevision);
-        }
+        $pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
+        $pastoralRevision = $pastoralRevisionMapper->createRevision($model);
+        $pastoralRevisionMapper->save($pastoralRevision);
     }
 
     /**
@@ -211,7 +210,6 @@ class Mapper extends BaseMapper
     protected function hydrateRow($row, $hydrateRelatedRecords) {
 
         // This method gets called before checking authorization- so if the session timed out this might be blank
-
 
         if (!$this->getSessionUser() instanceof User) {
             return false;
@@ -287,18 +285,25 @@ class Mapper extends BaseMapper
      */
     public function getRelatedRecords(Model $record)
     {
-        $bindings = [];
         $query = $this->getSelectString();
 
         if ($record->getParent() instanceof Model) {
 
             // This is a child item, find its parent and its other siblings
 
-            $query .= "                
-                WHERE   `pastoral`.`id` = :parent_id_0 AND
-                        `pastoral`.`parent_id` = :parent_id_1 AND
-                        `pastoral`.`id` <> :id
-            ";
+            if ($record instanceof PastoralRevision) {
+                $query .= "                
+                    WHERE   `pastoral_revision`.`id` = :parent_id_0 AND
+                            `pastoral_revision`.`parent_id` = :parent_id_1 AND
+                            `pastoral_revision`.`id` <> :id
+                ";
+            } else {
+                $query .= "                
+                    WHERE   `pastoral`.`id` = :parent_id_0 AND
+                            `pastoral`.`parent_id` = :parent_id_1 AND
+                            `pastoral`.`id` <> :id
+                ";
+            }
 
             $bindings['id'] = $record->getId();
             $bindings['parent_id_0'] = $record->getParent()->getId();

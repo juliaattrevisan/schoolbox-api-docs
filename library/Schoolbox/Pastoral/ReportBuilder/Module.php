@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Authorizer\Rule\IsReportOwner;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
@@ -41,18 +42,20 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $permissionStaff = new Rule\HasRole(Role::STAFF);
+        $permissionReportOwner = new Rule\All(new IsReportOwner(), $permissionStaff);
 
         $this->registerRoutesArray([
             'GET' => [
                 ''                              => ['getIndex' => $permissionStaff],
                 '/insert'                       => ['getReportInsert' => $permissionStaff],
-                '/update/{reportId:\d+}'        => ['getReportUpdate' => $permissionStaff],
+                '/update/{reportId:\d+}'        => ['getReportUpdate' => $permissionReportOwner],
                 '/results/{reportId:\d+}'       => ['getReportResults' => $permissionStaff],
                 '/results/tag/{tagId:\d+}'      => ['getReportTags' => $permissionStaff],
                 '/results/{reportId:\d+}/print' => ['getReportResultsPrint' => $permissionStaff],
             ],
             'POST' => [
-                '/modify'                       => ['postReportModify' => $permissionStaff],
+                '/modify'                       => ['postReportModify' => $permissionReportOwner],
+                '/delete/{reportId:\d+}'        => ['postReportDelete' => $permissionReportOwner],
             ]
         ]);
     }
