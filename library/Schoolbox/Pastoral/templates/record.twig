@@ -93,26 +93,20 @@
                                 <dd class="small-12 medium-9">{{ record.points }}</dd>
                             {% endif %}
                         </dl>
+                        {% if record.tags | length %}
+                            <div class="content">
+                                {% for tag in record.tags %}
+                                    <a href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId:tag.id}) }}" class="neutral label">{{ tag.name }}</a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>
         </section>
     </div>
 </div>
-
-{# Conditionally show any tags that may exist
- #}
-{% if record.tags|length %}
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            {% for tag in record.tags %}
-                <a href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId:tag.id}) }}" class="neutral label">{{ tag.name }}</a>
-            {% endfor %}
-        </section>
-    </div>
-</div>
-{% endif %}
 
 {# Body content always exists
  #}
@@ -370,7 +364,7 @@
                     {% if access.group is not empty %}
                         <li>
                             <div class="small-12 card wrap-down">
-                                {{ profile.imageSquare64(related.student) }}
+                                <div class="icon-teacher size-48"></div>
                                 <p>{{ access.group.name }}</p>
                                 <p class="meta">Author Of Record</p>
                             </div>
@@ -378,7 +372,7 @@
                     {% elseif access.role is not empty %}
                         <li>
                             <div class="small-12 card wrap-down">
-                                {{ profile.imageSquare64(related.student) }}
+                                <div class="icon-group size-48"></div>
                                 <p>{{ access.role.name }}</p>
                                 <p class="meta">Visible To All Users In {{ access.role.name }} Role</p>
                             </div>
