@@ -293,19 +293,26 @@ class Mapper extends BaseMapper
 
             if ($record instanceof PastoralRevision) {
                 $query .= "                
-                    WHERE   `pastoral_revision`.`id` = :parent_id_0 AND
-                            `pastoral_revision`.`parent_id` = :parent_id_1 AND
-                            `pastoral_revision`.`id` <> :id
+                    WHERE (
+                        `pastoral_revision`.`parent_id` = :parent_id_0 OR 
+                        `pastoral_revision`.`id` = :parent_id_1 OR 
+                        `pastoral_revision`.`parent_id` = :id_0
+                    ) AND
+                       `pastoral_revision`.`id` <> :id_1
                 ";
             } else {
                 $query .= "                
-                    WHERE   `pastoral`.`id` = :parent_id_0 AND
-                            `pastoral`.`parent_id` = :parent_id_1 AND
-                            `pastoral`.`id` <> :id
+                    WHERE (
+                        `pastoral`.`parent_id` = :parent_id_0 OR 
+                        `pastoral`.`id` = :parent_id_1 OR 
+                        `pastoral`.`parent_id` = :id_0
+                    ) AND
+                        `pastoral`.`id` <> :id_1
                 ";
             }
 
-            $bindings['id'] = $record->getId();
+            $bindings['id_0'] = $record->getId();
+            $bindings['id_1'] = $record->getId();
             $bindings['parent_id_0'] = $record->getParent()->getId();
             $bindings['parent_id_1'] = $record->getParent()->getId();
 
