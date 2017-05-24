@@ -87,15 +87,15 @@ class External_Markbook implements External_MarkbookInterface
     }
 
     /**
-     * @param mixed $database
+     * @param External_MarkbookInterface $database
      */
-    public function setDatabase($database)
+    public function setDatabase(External_MarkbookInterface $database)
     {
         $this->database = $database;
     }
 
     /**
-     * @return mixed
+     * @return External_MarkbookInterface
      */
     public function getDatabase()
     {
@@ -113,9 +113,9 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @param External_Offline_Markbook $offline
      */
-    public function setOffline($offline)
+    public function setOffline(External_Offline_Markbook $offline)
     {
         $this->offline = $offline;
     }
 
-} 
+}
