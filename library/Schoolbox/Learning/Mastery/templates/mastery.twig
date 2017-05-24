@@ -119,7 +119,7 @@
                                     {% else %}
                                         {% if assessment is task %}
                                             {% set mostRecentResponse = participant.findMostRecentResponse %}
-                                            {% if mostRecentResponse and not mostRecentResponse.isSelfAssessed %}
+                                            {% if mostRecentResponse and not mostRecentResponse.selfAssessed %}
                                                 {% set colorClass = mostRecentResponse.markedComplete ? classMastered : classFailed %}
                                             {% else %}
                                                 {% set colorClass = '' %}
