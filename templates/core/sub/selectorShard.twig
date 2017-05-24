@@ -20,7 +20,7 @@
  # Form label, for presentation purposes
  #}
 {% if not formLabel|length %}
-    {% set formLabel = "Faculty / Subject" %}
+    {% set formLabel = "{{ locale.faculty.proper }} / Subject" %}
 {% endif %}
 
 {# Manufacture input id attribute
@@ -41,7 +41,7 @@
  # Anchor title
  #}
 {% if not title|length %}
-    {% set title = 'Click to change the faculty / subject this course belongs to' %}
+    {% set title = 'Click to change the {{ locale.faculty }} / subject this course belongs to' %}
 {% endif %}
 
 <label>
