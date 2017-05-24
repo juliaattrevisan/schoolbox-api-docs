@@ -25,35 +25,55 @@ class ConfigMapper extends Mapper implements IConfigLoader
     /** @var array */
     protected $consts;
 
-    /**
-     * Build the Mapper
-     */
-    public function __construct()
+//    /**
+//     * Build the Mapper
+//     */
+//    public function __construct()
+//    {
+//        // Load database only on request, so this can be tested
+//        $this->map = new MappingCollection();
+//
+//        $this->initCaches();
+//        // Switch on the cache if this is a web request: otherwise switch off
+//        if (self::isWithinWebRequest()) {
+//            $this->enableCache();
+//        } else {
+//            $this->disableCache();
+//        }
+//
+//        $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
+//        $this->setMonitor( new LiveMonitor());
+//        $this->setConfigLoader($this); // this line will possibly blow up in my face
+//        $this->setColumnFactory(new ColumnFactory());
+//
+//        $w = realpath(__DIR__ . "/../../..");
+//        $this->consts = array(
+//            'siteRoot' => $w,
+//            'webRoot'  => "$w/www",
+//            'webBase'  => ''
+//        );
+//
+//        $this->mapping();
+//    }
+
+
+    protected function setupDatabase()
     {
-        // Load database only on request, so this can be tested
-        $this->map = new MappingCollection();
+    }
 
-        $this->initCaches();
-        // Switch on the cache if this is a web request: otherwise switch off
-        if (self::isWithinWebRequest()) {
-            $this->enableCache();
-        } else {
-            $this->disableCache();
-        }
+    protected function buildConfigLoader()
+    {
+        return $this;
+    }
 
-        $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
-        $this->setMonitor( new LiveMonitor());
-        $this->setConfigLoader($this); // this line will possibly blow up in my face
-        $this->setColumnFactory(new ColumnFactory());
-
+    protected function setup()
+    {
         $w = realpath(__DIR__ . "/../../..");
         $this->consts = array(
             'siteRoot' => $w,
             'webRoot'  => "$w/www",
             'webBase'  => ''
         );
-
-        $this->mapping();
     }
 
 
