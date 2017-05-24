@@ -14,7 +14,6 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
@@ -38,11 +37,6 @@ class Controller extends Base
     private $defaultGradeGroup;
 
     /**
-     * @var CourseImplementation\Mapper
-     */
-    private $courseImplementationMapper;
-
-    /**
      * @var Term\Mapper
      */
     private $termMapper;
@@ -52,21 +46,18 @@ class Controller extends Base
      *
      * @param Error\Mapper                $errorMapper
      * @param Assessment\MapperProxy      $assessmentMapperProxy
-     * @param GradeGroup\Model                 $defaultGradeGroup
-     * @param CourseImplementation\Mapper $courseImplementationMapper
+     * @param GradeGroup\Model            $defaultGradeGroup
      * @param Term\Mapper                 $termMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
         GradeGroup\Model $defaultGradeGroup,
-        CourseImplementation\Mapper $courseImplementationMapper,
         Term\Mapper $termMapper
     ) {
         $this->errorMapper                = $errorMapper;
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
         $this->defaultGradeGroup          = $defaultGradeGroup;
-        $this->courseImplementationMapper = $courseImplementationMapper;
         $this->termMapper                 = $termMapper;
     }
 
