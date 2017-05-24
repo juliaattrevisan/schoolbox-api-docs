@@ -8,15 +8,13 @@ namespace Schoolbox\Learning\Feedback;
 
 use Alaress\Web\Controller\Base;
 use Aura\Web\Request\Values as RequestValues;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Factory as DueWorkFeedbackFactory;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
@@ -51,7 +49,7 @@ class Controller extends Base
     public function postParticipantFeedback(Participant $participant)
     {
         $mostRecentFeedback = $participant->findMostRecentFeedback();
-        $post = $this->getRequest()->post;
+        $post = $this->getRequest()->post->getArrayCopy();
 
         try {
             $this->processFeedback($participant, $mostRecentFeedback, $post);
@@ -74,14 +72,14 @@ class Controller extends Base
      * Process any rubric data attached to the Feedback
      *
      * @param Participant $participant
-     * @param $post
+     * @param array       $post
      */
-    protected function processRubric(Participant $participant, $post)
+    protected function processRubric(Participant $participant, array $post)
     {
-        if(!$participant->getAssessable() instanceof DueWork){
+        if(!$participant->getAssessable() instanceof DueWork\Model){
             return;
         }
-        /** @var DueWork $dueWork */
+        /** @var DueWork\Model $dueWork */
         $dueWork = $participant->getAssessable();
 
         $isDraft = !isset($post['publish']) || !$post['publish'];
@@ -136,11 +134,14 @@ class Controller extends Base
      * @param IFeedback|null      $mostRecentFeedback
      * @param RequestValues|array $postVars
      * @param IResponse|null      $response
+     * @return DueWork\Feedback\Model
      * @throws \Alaress\Web\Controller\Exception
      */
     private function processFeedback(Participant $participant, IFeedback $mostRecentFeedback = null, $postVars, IResponse $response = null)
     {
-        $dueWorkFeedbackFactory = new DueWorkFeedbackFactory(
+        $hasRubric = array_key_exists('rubric', $postVars);
+
+        $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),
             $participant,
             $this->getUser(),
@@ -149,6 +150,7 @@ class Controller extends Base
             $postVars['comment'],
             $postVars['publish'],
             $postVars['attachment'],
+            $hasRubric,
             $response
         );
 
@@ -162,6 +164,7 @@ class Controller extends Base
         ];
 
         $this->respond('', $data);
+        return $feedback;
     }
 
     /**

@@ -71,6 +71,13 @@ class Factory
     private $files;
 
     /**
+     * Does this feedback have associated rubric marks ?
+     *
+     * @var bool
+     */
+    private $hasRubric;
+
+    /**
      * @var DueWorkResponse
      */
     private $response;
@@ -86,12 +93,19 @@ class Factory
      * @param string                                        $comment
      * @param string                                        $publish   one of ['0'|'1']
      * @param array                                         $files
+     * @param bool                                          $hasRubric
      * @param DueWorkResponse|null                          $response
      */
     public function __construct(
         IFeedbackDataSource $dueWorkFeedbackDataSource,
-        Participant $participant, User $currentUser, IFeedback $mostRecentFeedback = null,
-        $mark, $comment, $publish, $files,
+        Participant $participant,
+        User $currentUser,
+        IFeedback $mostRecentFeedback = null,
+        $mark,
+        $comment,
+        $publish,
+        $files,
+        $hasRubric,
         DueWorkResponse $response = null
     ) {
         $this->dueWorkFeedbackDataSource = $dueWorkFeedbackDataSource;
@@ -102,6 +116,7 @@ class Factory
         $this->comment = $comment;
         $this->publish = $publish;
         $this->files = $files;
+        $this->hasRubric = $hasRubric;
         $this->response = $response;
     }
 
@@ -121,6 +136,7 @@ class Factory
             $feedback = $this->dueWorkFeedbackDataSource->createModel($this->participant->getAssessable())
                 ->setReviewee($this->participant->getUser())
                 ->setCreatedAt(\Alaress_Date_Format::now());
+            $this->participant->getAllFeedbacks()->add($feedback);
         } else {
             // most recent is draft, use that
             $feedback = $this->mostRecentFeedback;
@@ -135,7 +151,7 @@ class Factory
          * Check if there's any content to this feedback
          */
         $hasContent = false;
-        if (strlen($postMark) || strlen($postComment) || !empty($this->files)) {
+        if (strlen($postMark) || strlen($postComment) || !empty($this->files) || $this->hasRubric) {
             $hasContent = true;
         }
 
