@@ -674,91 +674,27 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param string $keyword
      * @param bool $userGroupsOnly
-     * @param bool $getCourseSpec   Whether to hydrate and attach any associated CourseSpec
-     * @param bool $getUnitSpec     Whether to hydrate and attach any associated UnitSpec
      * @return Collection|Model[]
      */
-    public function searchByName($keyword, $userGroupsOnly = false, $getCourseSpec = false, $getUnitSpec = false)
+    public function searchByName($keyword, $userGroupsOnly = false)
     {
-        $code_mapper      = $this->getJoinMapper('codes');
-        $group_mapper     = $this->getJoinMapper('groups');
-        $courseSpecMapper = $this->getJoinMapper('course_specification');
-        $unitSpecMapper   = $this->getJoinMapper('unit_specification');
+        $builder = $this->getPredicateBuilder();
 
-        $selectClause = "
-            {$this->getColumnString('c')},
-            {$code_mapper->getColumnString('cc')}";
-        $joinClause = "
-            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}";
-
-        /* Filter result set further by only returning records that are also
-         * in the userGroups table
-         */
+        // Filter result set further by only returning records that are also in the userGroups table
         if($userGroupsOnly){
-            $selectClause .= ",\n{$group_mapper->getColumnString('ug')} ";
-            $joinClause .= "\nRIGHT JOIN {$this->getJoinSql('groups', 'c', 'ug')} ";
-        }
-        if($getCourseSpec){
-            $selectClause .= ",\n{$courseSpecMapper->getColumnString('cs')} ";
-            $joinClause .= "\nLEFT JOIN {$this->getJoinSql('course_specification', 'c', 'cs')} ";
-        }
-        if($getUnitSpec){
-            $selectClause .= ",\n{$unitSpecMapper->getColumnString('us')} ";
-            $joinClause .= "\nLEFT JOIN {$this->getJoinSql('unit_specification', 'c', 'us')} ";
+            $builder->notNull('ug.cid');
         }
 
-        $query = "
-            SELECT $selectClause
-            FROM {$this->getTable()} c
-            $joinClause
-            WHERE (
-                c.name LIKE :nameLike
-                OR cc.code LIKE :codeLike
-            ) AND c.deleted_at IS NULL
-        ";
+        $subBuilder = $this->getPredicateBuilder();
+            $subBuilder
+            ->like(" {$this->getTable()} .name ", "%{$this->database->escapeForLike($keyword)}%")
+			    ->like(' cc.code ', "%{$this->database->escapeForLike($keyword)}%
+        ");
 
-        /* Don't know why codeLike contained / and not a trailing %
-         */
-        $params = array(
-            'nameLike' => "%{$this->database->escapeForLike($keyword)}%",
-            'codeLike' => "%{$this->database->escapeForLike($keyword)}%",
-        );
+        $builder->any($subBuilder);
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        /** @var Model[] $folderCache */
-        $folderCache = $this->createCollection();
-
-        // No need to hydrate groups
-        foreach ($statement as $row) {
-            $folderId = $row['c.id'];
-            if (!$folderCache[$folderId] instanceof Model) {
-                $folder = $this->hydrate($row, 'c');
-
-                if ($getCourseSpec) {
-                    $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
-                    if ($courseSpec instanceof CourseSpecification) {
-                        $folder->setCourseSpecification($courseSpec);
-                    }
-                }
-
-                if ($getUnitSpec){
-                    $unitSpec = $unitSpecMapper->hydrate($row, 'us');
-                    if ($unitSpec instanceof UnitSpecification) {
-                        $folder->setUnitSpecification($unitSpec);
-                    }
-                }
-                $folderCache[$folderId] = $folder;
-            }
-            $folder = $folderCache[$folderId];
-
-            $folderCode = $code_mapper->hydrate($row, 'cc');
-            $folderCode->setFolder($folder);
-            $folder->getCodes()->add($folderCode);
-        }
-
-        return $folderCache->sortBy('name', 'ASC');
+        $options = ['order' => ["{$this->getTable()}.name" => 'ASC']];
+        return $this->findByPredicates($builder, $options);
     }
 
     /**
