@@ -2,3 +2,5 @@ INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_fi
 VALUES ('dueWork', 'Due Work', 'due work', 'due work', 1, 'a');
 INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_first, indefinite_article)
 VALUES ('project', 'Project', 'project', 'projects', 1, 'a');
+INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_first, indefinite_article)
+VALUES ('submissionHistory', 'Submission History', 'submission history', 'submission histories', 1, 'a');
