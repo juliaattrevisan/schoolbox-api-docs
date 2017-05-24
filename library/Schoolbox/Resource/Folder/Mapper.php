@@ -846,9 +846,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         /** @var HomepageConfigMapper $homepageConfig_mapper */
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
-        $group_mapper = $this->getJoinMapper('groups');
-        $courseSpecMapper = $this->getJoinMapper('course_specification');
-        $unitSpecMapper = $this->getJoinMapper('unit_specification');
+        $group_mapper          = $this->getJoinMapper('groups');
+        $courseSpecMapper      = $this->getJoinMapper('course_specification');
+        $unitSpecMapper        = $this->getJoinMapper('unit_specification');
 
 
         /** @var Model[] $categories */
