@@ -465,8 +465,10 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function syncToMarkbook(ReturnedWork $object, $previous = null)
     {
-        $externalMarkbook = new \External_Markbook();
-        $externalMarkbook->setMark($object);
+        if (!$object->isDraft()) {
+            $externalMarkbook = new \External_Markbook();
+            $externalMarkbook->setMark($object);
+        }
     }
 
     /**
