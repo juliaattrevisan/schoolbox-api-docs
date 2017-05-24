@@ -83,7 +83,7 @@
 
     <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme>
         <label>
-            Grading Scheme
+            {{ locale.grading.proper }} Scheme
             <select name="gradingScheme">
                 {% for scheme in allGradeSchemes %}
                     <option value="{{ scheme.id }}"{% if scheme.id == assessment.gradeGroup.id %} selected{% endif %}>{{ scheme.name }}</option>

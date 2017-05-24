@@ -134,7 +134,7 @@
     {% include '@learningAssessment/fragments/dates.twig' %}
 {% endif %}
 
-<legend>Grading</legend>
+<legend>{{ locale.grading.proper }}</legend>
 <label>
     Weight
     <input type="number" name="weight" value="{{ assessment.weight }}">

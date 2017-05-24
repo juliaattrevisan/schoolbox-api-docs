@@ -130,7 +130,7 @@
 
 <div class="row actions-small-1">
     <div class="list-item small-12 column">
-        <h1>Grading {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
+        <h1>{TPL_LOCAL_GRADING_PC} {INLINE_GRADING_SUBMISSION_BOX_NAME}</h1>
         <ul class="meta">
             <li class="icon-calendar">Due <span class="gradient-{BOX_GRADIENT}">{DUEWORK_DUEDATE}</span></li>
             <li class="icon-due-work"><a href="/homepage/{FOLDER_ID}">{FOLDER_NAME}</a> {DUEWORK_TYPE}</li>
@@ -184,7 +184,7 @@
 <div class="row">
     <div class="small-12 island" data-interaction="crocodoc-frame">
         <div id="inline-grading-error-container" class="hide">
-            There were errors downloading document for inline grading:
+            There were errors downloading document for inline {TPL_LOCAL_GRADING}:
         </div>
 
         {INJECTED_INTERFACE_TEMPLATE}
