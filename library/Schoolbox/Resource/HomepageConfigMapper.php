@@ -24,6 +24,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
  *
  * @package Schoolbox\Resource
  * @method HomepageConfig createModel($idValue = null)
+ * @method HomepageConfig hydrate(array $row, $alias = '', $callback = null)
  */
 class HomepageConfigMapper extends Mapper
 {
