@@ -13,7 +13,7 @@
 {% for entity, filters in filtersPerEntity %}
     <h2>
         {%- if ENTITY_ASSESSMENTS == entity -%}
-            Assessments
+            {{ locale.assessment.proper }}
         {%- else -%}
             {# Graceful degradation #}
             Entity Type: {{ entity }}

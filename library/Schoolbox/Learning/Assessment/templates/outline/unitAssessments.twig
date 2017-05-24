@@ -100,11 +100,11 @@
                         <li><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
 
                         {% if assessment is quiz %}
-                            <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify this assessment">Modify</a></li>
+                            <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>
                         {% else %}
-                            <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this assessment">Modify</a></li>
+                            <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" data-interaction="open_edit_task_form" title="Modify this {{ locale.assessment }}">Modify</a></li>
                         {% endif %}
-                        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" class="icon-delete" data-action="delete" title="Delete this assessment">Delete</a></li>
+                        <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>
                     </ul>
                 {% endif %}
             </div>
