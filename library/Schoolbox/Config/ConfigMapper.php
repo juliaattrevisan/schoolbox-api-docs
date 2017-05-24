@@ -10,10 +10,8 @@
 namespace Schoolbox\Config;
 
 
-use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use Schoolbox\MappingCollection;
 
 class ConfigMapper extends Mapper implements IConfigLoader
 {
@@ -25,25 +23,35 @@ class ConfigMapper extends Mapper implements IConfigLoader
     protected $consts;
 
     /**
-     * Build the Mapper
+     * This mapper has no database by default.
+     * (It can be installed later?)
      */
-    public function __construct()
+    protected function setupDatabase()
     {
-        // Load database only on request, so this can be tested
-        $this->map = new MappingCollection();
-        $this->setup();
-        $this->initCaches();
-        $this->setConfigLoader($this); // this line will possibly blow up in my face
-        $this->setColumnFactory(new ColumnFactory());
+    }
 
+    /**
+     * This object IS a config loader, so the method for building it returns itself.
+     *
+     * @return $this
+     */
+    protected function buildConfigLoader()
+    {
+        // this line will possibly blow up in the Doctor's face
+        return $this;
+    }
+
+    /**
+     * Set up required constants.
+     */
+    protected function setup()
+    {
         $w = realpath(__DIR__ . "/../../..");
         $this->consts = array(
             'siteRoot' => $w,
             'webRoot'  => "$w/www",
             'webBase'  => ''
         );
-
-        $this->mapping();
     }
 
 
@@ -129,6 +137,19 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public function dropCache()
     {
         $this->cache = array();
+    }
+
+    /**
+     * Override notifications to silence them
+     *
+     * @param object $object
+     * @param string $verb
+     * @param null $previous
+     * @return void
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        //Silence notifications
     }
 
 }

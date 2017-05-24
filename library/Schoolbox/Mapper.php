@@ -315,8 +315,8 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function __construct()
     {
-        $this->database = \Database::getInstance();
-        $this->map      = new MappingCollection();
+        $this->setupDatabase();
+        $this->map = new MappingCollection();
 
         $this->initCaches();
         // Switch on the cache if this is a web request: otherwise switch off
@@ -325,15 +325,28 @@ abstract class Mapper implements IMapper, Serializable
         } else {
             $this->disableCache();
         }
-        $this->setConfigLoader(new ConfigLoader());
+        $this->setConfigLoader($this->buildConfigLoader());
         $this->setup();
-        $this->setColumnFactory(self::$columnFactory);
-        $this->setMonitor(self::$perfmon);
-        $this->setEventPropagator(self::$prop);
+
+        // If for some reason self::di() wasn't called before this constructor:
+        $this->setColumnFactory(self::$columnFactory ?: new ColumnFactory());
+        $this->setMonitor(self::$perfmon ?: new LiveMonitor());
+        $this->setEventPropagator(self::$prop ?: new MockPropagator());
+
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
 
         $this->monitor->cacheIndices($this);
+    }
+
+    /**
+     * Helper method for building a config loader.
+     *
+     * @return IConfigLoader
+     */
+    protected function buildConfigLoader()
+    {
+        return new ConfigLoader();
     }
 
     /**
@@ -356,6 +369,16 @@ abstract class Mapper implements IMapper, Serializable
      * @var mixed
      */
     protected $soft_delete_undeleted_value = null;
+
+    /**
+     * Installs a database into this mapper.
+     *
+     * Override with a blank method for mappers which don't have databases?
+     */
+    protected function setupDatabase()
+    {
+        $this->database = \Database::getInstance();
+    }
 
     /**
      * Default setup for any other objects which compose the mapper.
