@@ -12,3 +12,5 @@ INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_fi
 VALUES ('unit', 'Unit', 'unit', 'units', 1, 'a');
 INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_first, indefinite_article)
 VALUES ('grading', 'Grading', 'grading', 'gradings', 1, 'a');
+INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_first, indefinite_article)
+VALUES ('assessment', 'Assessment', 'assessment', 'assessments', 1, 'an');

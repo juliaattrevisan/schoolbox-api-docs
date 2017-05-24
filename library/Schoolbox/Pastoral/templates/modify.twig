@@ -82,7 +82,7 @@
                     <div class="small-12 medium-6 columns">
                         {% if severities | length %}
                             <label>
-                                Severity
+                                {{ locale.severity.proper }}
                                 <select class="required" name="severityId">
                                     {% for severity in severities %}
                                         <option {% if severity.id == record.severity.id %}selected{% endif %}

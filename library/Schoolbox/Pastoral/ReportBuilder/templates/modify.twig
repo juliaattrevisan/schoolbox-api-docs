@@ -252,9 +252,9 @@
                         </label>
                         {% if severities | length %}
                             <label>
-                                Minimum Severity Level
+                                Minimum {{ locale.severity.proper }} Level
                                 <select id="filterSeverity" name="severity">
-                                    <option value="">Show All Severity Levels</option>
+                                    <option value="">Show All {{ locale.severity.proper }} Levels</option>
                                     {% for severity in severities %}
                                         <option {% if severity.id == report.severity.id %}selected{% endif %} value="{{ severity.order }}">
                                             {{ severity.name }}
@@ -427,7 +427,7 @@
                                     <div class="grip"></div>
                                     <div class="card small-12 wrap-down">
                                         <p>
-                                            Severity
+                                            {{ locale.severity.proper }}
                                             <span class="meta"> ({% for severity in severities %}{{ severity.name }}{% if not loop.last %}, {% endif %}{% endfor %})</span>
                                         </p>
                                     </div>
