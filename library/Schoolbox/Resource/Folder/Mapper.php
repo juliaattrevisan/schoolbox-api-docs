@@ -26,10 +26,9 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
@@ -160,7 +159,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'course_specification', array(
                 'multiple'  => false,
-                'mapper'    => CourseSpecificationMapper::class,
+                'mapper'    => CourseSpecification\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'folder_id',
             )
@@ -169,7 +168,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->hasJoin(
             'unit_specification', array(
                 'multiple'  => false,
-                'mapper'    => UnitSpecificationMapper::class,
+                'mapper'    => UnitSpecification\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'folder_id',
             )
@@ -215,7 +214,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function softDeleteCourseSpecification(Model $folder)
     {
-        /** @var CourseSpecificationMapper $courseSpecMapper */
+        /** @var CourseSpecification\Mapper $courseSpecMapper */
         $courseSpecMapper = $this->getJoinMapper('course_specification');
         $courseSpec = $courseSpecMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
         $courseSpecMapper->delete($courseSpec);
@@ -232,8 +231,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function softDeleteCourseImplementations(Model $folder)
     {
-        /** @var CourseSpecificationMapper $courseImplMapper */
-        $courseImplMapper = CourseImplementationMapper::getInstance();
+        /** @var CourseImplementation\Mapper $courseImplMapper */
+        $courseImplMapper = CourseImplementation\Mapper::getInstance();
         $courseImpls = $courseImplMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
         $courseImplMapper->delete($courseImpls);
         return true;
@@ -249,7 +248,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function softDeleteUnitSpecification(Model $folder)
     {
-        /** @var UnitSpecificationMapper $unitSpecMapper */
+        /** @var UnitSpecification\Mapper $unitSpecMapper */
         $unitSpecMapper = $this->getJoinMapper('unit_specification');
         $unitSpec = $unitSpecMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
         $unitSpecMapper->delete($unitSpec);
@@ -850,7 +849,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $groupMapper          = $this->getJoinMapper('groups');
         /** @var CourseSpecification\Mapper $courseSpecMapper */
         $courseSpecMapper     = $this->getJoinMapper('course_specification');
-        /** @var UnitSpecificationMapper $unitSpecMapper */
+        /** @var UnitSpecification\Mapper $unitSpecMapper */
         $unitSpecMapper       = $this->getJoinMapper('unit_specification');
         /** @var FolderCode\Mapper $codeMapper */
         $codeMapper           = $this->getJoinMapper('codes');
