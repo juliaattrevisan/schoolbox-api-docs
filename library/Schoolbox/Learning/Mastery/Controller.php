@@ -10,60 +10,58 @@ namespace Schoolbox\Learning\Mastery;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Markbook\Markbook;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
+use Schoolbox\Assessment\Term;
 
 class Controller extends Base
 {
     /**
-     * @var ErrorMapper
+     * @var Error\Mapper
      */
     private $errorMapper;
 
     /**
-     * @var AssessmentMapperProxy
+     * @var Assessment\MapperProxy
      */
     private $assessmentMapperProxy;
 
     /**
-     * @var GradeGroup
+     * @var GradeGroup\Model
      */
     private $defaultGradeGroup;
 
     /**
-     * @var CourseImplementationMapper
+     * @var CourseImplementation\Mapper
      */
     private $courseImplementationMapper;
 
     /**
-     * @var TermMapper
+     * @var Term\Mapper
      */
     private $termMapper;
 
     /**
      * Constructor
      *
-     * @param ErrorMapper                $errorMapper
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param GradeGroup                 $defaultGradeGroup
-     * @param CourseImplementationMapper $courseImplementationMapper
-     * @param TermMapper                 $termMapper
+     * @param Error\Mapper                $errorMapper
+     * @param Assessment\MapperProxy      $assessmentMapperProxy
+     * @param GradeGroup\Model                 $defaultGradeGroup
+     * @param CourseImplementation\Mapper $courseImplementationMapper
+     * @param Term\Mapper                 $termMapper
      */
     public function __construct(
-        ErrorMapper $errorMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
-        GradeGroup $defaultGradeGroup,
-        CourseImplementationMapper $courseImplementationMapper,
-        TermMapper $termMapper
+        Error\Mapper $errorMapper,
+        Assessment\MapperProxy $assessmentMapperProxy,
+        GradeGroup\Model $defaultGradeGroup,
+        CourseImplementation\Mapper $courseImplementationMapper,
+        Term\Mapper $termMapper
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setAssessmentMapperProxy($assessmentMapperProxy);
@@ -74,7 +72,7 @@ class Controller extends Base
 
     /**
      * @api /learning/mastery/{classId}
-     * @param Folder $class
+     * @param Folder\Model $class
      * @throws ApplicationException
      */
     public function getMastery($class)
@@ -84,15 +82,15 @@ class Controller extends Base
 
     /**
      * @api /learning/mastery/{classId}/term/{termCode}
-     * @param Folder $class
-     * @param Term $term
+     * @param Folder\Model $class
+     * @param Term\Model $term
      * @throws ApplicationException
      */
     public function getMasteryForTerm($class, $term)
     {
         // Does this class exist ?
         if (!$class->getId()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
         // Generate data: assessments and their Participants
@@ -144,7 +142,7 @@ class Controller extends Base
      */
 
     /**
-     * @return ErrorMapper
+     * @return Error\Mapper
      */
     protected function getErrorMapper()
     {
@@ -152,17 +150,17 @@ class Controller extends Base
     }
 
     /**
-     * @param ErrorMapper $errorMapper
+     * @param Error\Mapper $errorMapper
      * @return static
      */
-    protected function setErrorMapper(ErrorMapper $errorMapper)
+    protected function setErrorMapper(Error\Mapper $errorMapper)
     {
         $this->errorMapper = $errorMapper;
         return $this;
     }
 
     /**
-     * @return AssessmentMapperProxy
+     * @return Assessment\MapperProxy
      */
     protected function getAssessmentMapperProxy()
     {
@@ -170,17 +168,17 @@ class Controller extends Base
     }
 
     /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param Assessment\MapperProxy $assessmentMapperProxy
      * @return static
      */
-    protected function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
+    protected function setAssessmentMapperProxy(Assessment\MapperProxy $assessmentMapperProxy)
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         return $this;
     }
 
     /**
-     * @return GradeGroup
+     * @return GradeGroup\Model
      */
     public function getDefaultGradeGroup()
     {
@@ -188,17 +186,17 @@ class Controller extends Base
     }
 
     /**
-     * @param GradeGroup $defaultGradeGroup
+     * @param GradeGroup\Model $defaultGradeGroup
      * @return static
      */
-    public function setDefaultGradeGroup(GradeGroup $defaultGradeGroup)
+    public function setDefaultGradeGroup(GradeGroup\Model $defaultGradeGroup)
     {
         $this->defaultGradeGroup = $defaultGradeGroup;
         return $this;
     }
 
     /**
-     * @return CourseImplementationMapper
+     * @return CourseImplementation\Mapper
      */
     public function getCourseImplementationMapper()
     {
@@ -206,17 +204,17 @@ class Controller extends Base
     }
 
     /**
-     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param CourseImplementation\Mapper $courseImplementationMapper
      * @return static
      */
-    public function setCourseImplementationMapper(CourseImplementationMapper $courseImplementationMapper)
+    public function setCourseImplementationMapper(CourseImplementation\Mapper $courseImplementationMapper)
     {
         $this->courseImplementationMapper = $courseImplementationMapper;
         return $this;
     }
 
     /**
-     * @return TermMapper
+     * @return Term\Mapper
      */
     public function getTermMapper()
     {
@@ -224,10 +222,10 @@ class Controller extends Base
     }
 
     /**
-     * @param TermMapper $termMapper
+     * @param Term\Mapper $termMapper
      * @return static
      */
-    public function setTermMapper(TermMapper $termMapper)
+    public function setTermMapper(Term\Mapper $termMapper)
     {
         $this->termMapper = $termMapper;
         return $this;
