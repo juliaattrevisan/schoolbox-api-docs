@@ -135,7 +135,7 @@
 
                                     {# Determine title #}
                                     {% if feedbackRequired %}
-                                        {% set title = 'Awaiting Teacher Assessment' %}
+                                        {% set title = 'Awaiting Teacher ' ~ (assessment is task ? 'Confirmation' : 'Assessment') %}
                                     {% elseif isNextUpcoming %}
                                         {% set title = 'Next Assessment' %}
                                     {% elseif responseRequired and not assessment is task %}
