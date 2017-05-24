@@ -64,7 +64,7 @@ Usage:
     {% elseif parentHasUnit %}
 
         <p>This component works on unit pages to create activities to import to your class. This page has been created underneath a unit page not a course page so the component doesn't work here.</p>
-        <p>To create a sub-unit to your unit page, <a href="{{ routeLookup('course.courseList') }}">go to Manage Courses</a> and create a project in your unit.</p>
+        <p>To create a sub-unit to your unit page, <a href="{{ routeLookup('course.courseList') }}">go to Manage Courses</a> and create a {{ locale.project }} in your unit.</p>
 
     {% elseif folderHasClass %}
 

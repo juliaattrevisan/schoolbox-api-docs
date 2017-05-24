@@ -56,9 +56,9 @@ Usage:
         <ul class="flex-list buttons">
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=project&returnUrl={{ encodedReturnUrl }}"
-                   title="Create a new Project"
+                   title="Create a new {{ locale.project.proper }}"
                    class="button icon-project"
-                >New Project</a></li>
+                >New {{ locale.project.proper }}</a></li>
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=task&returnUrl={{ encodedReturnUrl }}"
                    title="Create a new Task"
