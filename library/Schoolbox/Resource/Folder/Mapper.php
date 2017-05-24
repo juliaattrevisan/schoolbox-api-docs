@@ -333,7 +333,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         if ($collisions->count()) {
-            error(136);
+            error(ErrorMapper::ERROR_CLASS_CODE_EXISTS);
         }
 
         // persist Model object
