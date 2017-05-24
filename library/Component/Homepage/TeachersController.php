@@ -7,7 +7,8 @@
  * @version     SVN: $Id$
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Role;
 
 class Component_Homepage_TeachersController extends Component_Homepage_ControllerAbstract
 {
@@ -118,47 +119,45 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
 
                 if (is_array($listSyns)) {
                     foreach ($listSyns as $synid) {
-
                         try {
-                            $teacher = $userMapper->findByExternalId($synid);
+                            $teacher = $userMapper->findByExternalId($synid, Role::STAFF);
 
-                            if ($teacher->getRole()->isStaff()) {
+                            $this->setVar([
+                                'PERSON_UID'         => $teacher->getId(),
+                                'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
+                                'PERSON_EXTERNAL_ID' => $synid,
+                                'PERSON_GROUP'       => Scrub::text($teacher->getPreferredTitle()),
+                            ]);
 
+                            /* Don't display images in list view
+                             */
+                            if ($this->getConfig('displayPortraits') == 'grid') {
                                 $this->setVar([
-                                    'PERSON_UID'         => $teacher->getId(),
-                                    'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
-                                    'PERSON_EXTERNAL_ID' => $synid,
-                                    'PERSON_GROUP'       => Scrub::text($teacher->getPreferredTitle()),
+                                    'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
                                 ]);
 
-                                /* Don't display images in list view
-                                 */
-                                if ($this->getConfig('displayPortraits') == 'grid') {
-                                    $this->setVar(array(
-                                        'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                                    ));
-
-                                    $this->parse('has_thumbnail_block', 'has_thumbnail');
-                                    $this->setVar('has_icon_block', '');
-                                } else {
-                                    $this->setVar(array(
-                                        'GRID_VIEW_CLASSES' => ''
-                                    ));
-
-                                    $this->setVar('has_thumbnail_block', '');
-                                    $this->parse('has_icon_block', 'has_icon');
-                                }
-
-                                $this->parse('person_block', 'person', true);
-
-                                /* Clear children after parsing out the parent
-                                 */
-                                $this->setVar('has_thumbnail_block', '');
+                                $this->parse('has_thumbnail_block', 'has_thumbnail');
                                 $this->setVar('has_icon_block', '');
+                            } else {
+                                $this->setVar([
+                                    'GRID_VIEW_CLASSES' => ''
+                                ]);
+
+                                $this->setVar('has_thumbnail_block', '');
+                                $this->parse('has_icon_block', 'has_icon');
                             }
 
+                            $this->parse('person_block', 'person', true);
+
+                            /* Clear children after parsing out the parent
+                             */
+                            $this->setVar('has_thumbnail_block', '');
+                            $this->setVar('has_icon_block', '');
+
                         } catch (\Schoolbox\Mapper\Exception $e) {
-                            //noop
+
+                            /* $teacher not found, nothing to show
+                             */
                         }
                     }
                 }
