@@ -675,7 +675,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Adds heatmap to a month view of flatpickr
      *
      * @param {Flatpickr} instance
-     * @param {object}     heatData
      */
     function applyHeatToCalendar(instance) {
         // loop through all days and set a heatmap height
@@ -722,8 +721,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Places a request for heat from the server, then caches the response. On repeat requests, cached values
      * will be returned immediately.
      *
-     * @param {Flatpickr} instance
-     * @param {Callable}   onSuccess
+     * @param {Integer} mo
+     * @param {Integer} yr
+     * @param {Callable} onSuccess
      */
     function requestHeat(mo, yr, onSuccess) {
         var folderId = $('*[name = "folderId"]').val();
@@ -785,6 +785,10 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     }
 
+
+    /**
+     * Append a tool tip regarding heatmap
+     */
     function renderHeatMapHelp() {
 
         // TODO allow this to be injected by construction
@@ -795,6 +799,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     }
 
 
+    /**
+     * Return a collection of years & months for given start and end dates (usually term start and end)
+     *
+     * @param startMoment
+     * @param endMoment
+     * @returns {{}}
+     */
     function interpolateMonths(startMoment, endMoment) {
         var i,
             monthsToFetch = {},
