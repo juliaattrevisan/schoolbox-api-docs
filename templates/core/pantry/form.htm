@@ -396,7 +396,7 @@
                                    data-datepicker-alldayswitch
                                    data-datepicker-alldayinput="datepicker-datetime-allday-switch">
                         </label>
-                        <p>This should be a hidden field (type="hidden"). Datepicker of either of the associated fields above will set a value of "0" or "1" to it</p>
+                        <p>This should be a hidden field (type="hidden"). Datepicker of either of the associated fields above will set a value of "0" or "1" to it.</p>
                         <label>All-day hidden field</label>
                         <input id="datepicker-datetime-allday-switch" value="0">
 
@@ -493,6 +493,46 @@
                         </label>
                     </div>
 
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Button</legend>
+
+                    <div class="column small-12">
+                        <p>
+                            Datepicker buttons
+                        </p>
+                    </div>
+
+                    <div class="column small-12 medium-4">
+                        <label>Default button
+                            <input type="text"
+                                   id="datepicker-date-button"
+                                   data-datepicker>
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-4">
+                        <label>No button
+                            <input type="text"
+                                   id="datepicker-datetime-nobutton"
+                                   data-datepicker
+                                   data-datepicker-nobutton>
+                        </label>
+                        <p>
+                            Currently, datepickers won't open without a button.
+                            You should add your own functionality to be able to use this option
+                        </p>
+                    </div>
+
+                    <div class="column small-12 medium-4">
+                        <label>Custom text on a button:
+                            <input type="text"
+                                   id="datepicker-datetime-allday-custom-button"
+                                   data-datepicker
+                                   data-datepicker-buttontext="Pick a Date">
+                        </label>
+                    </div>
                 </fieldset>
             </section>
             <div class="row">
