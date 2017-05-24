@@ -83,13 +83,21 @@
 
                             {% for assessment in assessments %}
 
-                                {# Is this assessment the first assessment encountered for this student that requires a response ? #}
-                                {% set isNextUpcoming = false %}
+                                {% set participant    = assessment.getParticipantIfExtant(student) %}
 
                                 {# is student a participant ? #}
-                                {% if assessment.isParticipant(student) %}
+                                {% if not participant %}
 
-                                    {% set participant      = assessment.getParticipant(student) %}
+                                    {% set colorClass     = '' %}
+                                    {% set title          = student.fullName ~ ' is not a participant of ' ~ assessment.title %}
+                                    {% set text           = '–' %}
+                                    {% set url            = '' %}
+
+                                {% else %}
+
+                                    {# Is this assessment the first assessment encountered for this student that requires a response ? #}
+                                    {% set isNextUpcoming   = false %}
+
                                     {% set humanMark        = assessment.getHumanReadableMark(student, true) %}
                                     {% set normalisedMark   = assessment.getNormalisedMark(student, true) %}
 
@@ -177,12 +185,6 @@
                                         {% set url = '' %}
                                     {% endif %}
 
-                                {% else %}
-
-                                    {% set colorClass     = '' %}
-                                    {% set title          = student.fullName ~ ' is not a participant of ' ~ assessment.title %}
-                                    {% set text           = '–' %}
-                                    {% set url            = '' %}
 
                                 {% endif %}
 
