@@ -546,8 +546,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         $builder = $this->getPredicateBuilder();
         $builder->equals("{$this->getTable()}.parent", $id);
-
-        $options = ['order' => ["{$this->getTable()}.name" => 'DESC']];
+        $options = ['order' => ["{$this->getTable()}.name" => 'ASC']];
 
         return $this->findByPredicates($builder, $options);
     }
