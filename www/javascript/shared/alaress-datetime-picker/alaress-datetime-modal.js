@@ -23,6 +23,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
     };
 
+    var heatCache = {};
 
     // Timetable picker
     if (twigVars.timetable) {
@@ -72,9 +73,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             var selectedDate = moment($(this).attr('data-date')).format('dddd, MMM D, Y');
 
-            // Add active class & remove others with the class
-            $(this).parents('.day-picker').find('[data-tt-day]').removeClass('active');
-            $(this).addClass('active');
+            // Add selected class & remove others with the class
+            $(this).parents('.day-picker').find('[data-tt-day]').removeClass('selected');
+            $(this).addClass('selected');
 
             // Update the selected date
             $(this).closest('[data-adtp]').find('[data-tt-selected-date]').text(selectedDate);
@@ -127,6 +128,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         onReady: function (selectedDates, dateStr, instance) {
             renderAllDaySwitch();
+            renderHeatMapHelp();
 
             // Hide time picker if allday hidden field is set to 1
             if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 1) {
@@ -159,6 +161,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
+
+            var mo = instance.currentMonth + 1,
+                yr = instance.currentYear;
+
+            requestHeat(mo, yr, function () {
+                applyHeatEverywhere(instance);
+            });
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -177,6 +186,30 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
                 latestDate = newDate;
             }
+        },
+        onMonthChange: function(selectedDates, dateStr, instance) {
+            var mo = instance.currentMonth + 1,
+                yr = instance.currentYear;
+
+            requestHeat(mo, yr, function () {
+                applyHeatEverywhere(instance);
+            });
+        },
+        onYearChange: function(selectedDates, dateStr, instance) {
+            var mo = instance.currentMonth + 1,
+                yr = instance.currentYear;
+
+            requestHeat(mo, yr, function () {
+                applyHeatEverywhere(instance);
+            });
+        },
+        onValueUpdate: function(selectedDates, dateStr, instance) {
+            var mo = instance.currentMonth + 1,
+                yr = instance.currentYear;
+
+            requestHeat(mo, yr, function () {
+                applyHeatEverywhere(instance);
+            });
         }
 
     });
@@ -211,7 +244,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             termDuration = timetable.term.find(':selected').attr('data-duration'),
             selectedTerm = timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
-            termEnd = timetable.term.find(':selected').attr('data-end-date');
+            termEnd = timetable.term.find(':selected').attr('data-end-date'),
+            monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
 
         // Don't try to divide by zero
         if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
@@ -220,13 +254,17 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             $.each(twigVars.timetableVars[selectedCampus].cycles[selectedTerm], function(index, value) {
 
-                var startDate = moment(value[Object.keys(value)[0]]);
-                var endDate = moment(value[Object.keys(value)[Object.keys(value).length-1]]);
+                var valueKeys = Object.keys(value);
+                var startDate = moment(value[valueKeys[0]]);
+                var endDate   = moment(value[valueKeys[valueKeys.length - 1]]);
                 var hideClass = 'hide';
 
-                // Show this week if the selected date is in this week
-                // Also check if the selected date is not in this term - in which case show the first week
-                if (!moment(twigVars.date).isBetween(termStart, termEnd) && index == 1 || moment(twigVars.date).isBetween(startDate, endDate)) {
+                if (index == 1 && !moment(twigVars.date).isBetween(termStart, termEnd, 'day', '[]')) {
+                    // if this date is outside the bounds of the term, display the first week
+                    hideClass = '';
+
+                } else if (moment(twigVars.date).isBetween(startDate, endDate, 'day', '[]')) {
+                    // show this week if the selected date is in this week
                     hideClass = '';
                 }
 
@@ -240,6 +278,14 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $byTimetable.find('[data-tt-weeks]').html(optionsHtml);
 
             addDatesToDays();
+
+            // trigger a fetch for any heat data that might be absent
+            for (var year in monthsToFetch) {
+                for (var monthIndex in monthsToFetch[year]) {
+                    requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
+                }
+            }
+
             revealTimetable();
 
         }
@@ -296,13 +342,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         var selectedDate = moment(timetable.submit.attr('data-timetable-value')).format('YYYY-MM-DD'); // The currently selected date
 
-        // Remove active on all days for a blank slate
-        $byTimetable.find('[data-tt-day].active').removeClass('active');
+        // Remove selected on all days for a blank slate
+        $byTimetable.find('[data-tt-day].selected').removeClass('selected');
 
         // Loop through cycle days and check if currently set date matches
         $byTimetable.find('[data-tt-day]').each(function() {
             if (selectedDate == $(this).attr('data-date')) {
-                $(this).addClass('active');
+                $(this).addClass('selected');
             }
         });
     }
@@ -559,6 +605,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $newCycle.removeClass('hide');
 
             addDatesToDays();
+            applyHeatToTimetable();
             resetTimetable();
 
         }
@@ -569,25 +616,226 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Add date data attributes to day selectors on timetable picker
      */
     function addDatesToDays() {
+        iterateVisibleTimetableDays(
+            function (dayMoment) {
+                $(this).attr('data-date', dayMoment.format('YYYY-MM-DD')).removeClass('disabled');
+            },
+            function () {
+                $(this).removeAttr('data-date').addClass('disabled');
+            }
+        );
+    }
 
+
+    /**
+     * Iterate the timetable days and apply the given callbacks to them accordingly
+     *
+     * @param {Function} ifDate
+     * @param {Function} ifNotDate
+     */
+    function iterateVisibleTimetableDays(ifDate, ifNotDate) {
         // Change the date data attributes on each day
-        var cycleNumber = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle');
+        var cycleNumber    = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle') || 1;
         var selectedCampus = 'campus_' + timetable.campus.find(':selected').val();
-        var selectedTerm = timetable.term.find(':selected').val();
+        var selectedTerm   = timetable.term.find(':selected').val();
 
-        $byTimetable.find('[data-tt-days] > div').each(function() {
+        $byTimetable.find('[data-tt-days] > div').each(function () {
 
             var dayNumber = $(this).attr('data-tt-day');
 
-           if (dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]) {
-                var dayDate = moment(twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]).format('YYYY-MM-DD');
-                $(this).attr('data-date', dayDate).removeClass('disabled');
-            } else {
-               $(this).removeAttr('data-date').addClass('disabled');
+            if (dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]) {
+                var dayMoment = moment(twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]);
+
+                if (ifDate) {
+                    ifDate.call(this, dayMoment);
+                }
+
+            } else if (ifNotDate) {
+                ifNotDate.call(this);
+            }
+        });
+    }
+
+
+    /**
+     * Whichever dates are visible in the timetable, apply heat to them
+     */
+    function applyHeatToTimetable() {
+        iterateVisibleTimetableDays(function (dayMoment) {
+            var yr  = dayMoment.year();
+            var mo  = dayMoment.month() + 1;
+            var day = dayMoment.date();
+
+            applyHeatToDay($(this), yr, mo, day);
+        });
+    }
+
+
+    /**
+     * Adds heatmap to a month view of flatpickr
+     *
+     * @param {Flatpickr} instance
+     */
+    function applyHeatToCalendar(instance) {
+        // loop through all days and set a heatmap height
+        $(instance.days.childNodes).each(function() {
+            var dt = $(this)[0].dateObj;
+
+            var day = dt.getDate(),
+                mo  = dt.getMonth() + 1,
+                yr  = dt.getUTCFullYear();
+
+            applyHeatToDay($(this), yr, mo, day);
+        });
+    }
+
+
+    /**
+     * Ergh... the fact that this function even exists.....
+     *
+     * @param {Flatpickr} instance
+     */
+    function applyHeatEverywhere(instance)
+    {
+        applyHeatToCalendar(instance);
+        applyHeatToTimetable();
+    }
+
+    /**
+     * What it says on the tin.
+     *
+     * @param {jQuery}  element
+     * @param {Integer} yr
+     * @param {Integer} mo
+     * @param {Integer} day
+     */
+    function applyHeatToDay(element, yr, mo, day) {
+        if (yr in heatCache && mo in heatCache[yr] && day in heatCache[yr][mo]) {
+            element.attr('data-heat', parseInt(heatCache[yr][mo][day] / 20));
+        } else {
+            element.attr('data-heat', '');
+        }
+    }
+
+    /**
+     * Places a request for heat from the server, then caches the response. On repeat requests, cached values
+     * will be returned immediately.
+     *
+     * @param {Integer} mo
+     * @param {Integer} yr
+     * @param {Callable} onSuccess
+     */
+    function requestHeat(mo, yr, onSuccess) {
+        var folderId = $('*[name = "folderId"]').val();
+
+        fetchHeat(yr, mo, folderId, onSuccess);
+
+        // TODO: very open to a better way of handling the month/year wraparound
+
+        // also process previous month
+        if (mo === 1) {
+            fetchHeat(parseInt(yr) - 1, 12, folderId, onSuccess);
+        } else {
+            fetchHeat(yr, parseInt(mo) - 1, folderId, onSuccess);
+        }
+
+        // also also process next month
+        if (mo === 12) {
+            fetchHeat(parseInt(yr) + 1, 1, folderId, onSuccess);
+        } else {
+            fetchHeat(yr, parseInt(mo) + 1, folderId, onSuccess);
+        }
+    }
+
+
+    /**
+     * Retrieve heat data from they server, then apply it according to the onSuccess callback
+     *
+     * @param {Integer} yr
+     * @param {Integer} mo
+     * @param {Integer} folderId
+     * @param {Callable} onSuccess
+     */
+    function fetchHeat(yr, mo, folderId, onSuccess) {
+        if ('undefined' === typeof heatCache[yr]) {
+            heatCache[yr] = {};
+        }
+
+        if ('undefined' === typeof heatCache[yr][mo]) {
+            heatCache[yr][mo] = {};
+
+            var promise = $.get((twigVars.routeLookup.getHeat
+                .replace(/{folderId}/g, folderId))
+                .replace(/{year}/g, yr)
+                .replace(/{month}/g, mo));
+
+            promise.done(function (data) {
+                for (var day in data) {
+                    heatCache[yr][mo][day] = data[day];
+                }
+
+                // do this async the first time (cold cache)
+                onSuccess();
+            }).fail(function () { console.error(arguments); });
+
+        } else {
+            // do it sync if the cache is hot
+            onSuccess();
+        }
+
+    }
+
+
+    /**
+     * Append a tool tip regarding heatmap
+     */
+    function renderHeatMapHelp() {
+
+        // TODO allow this to be injected by construction
+        var tt = 'The "heat" of a day represents the largest number of assessments any of your students has due that day, capped at 5.';
+
+        var $monthDiv = $('#picker' + twigVars.id).find('.flatpickr-current-month');
+        $monthDiv.append($('<a class="icon-help" />').attr('title', tt));
+    }
+
+
+    /**
+     * Return a collection of years & months for given start and end dates (usually term start and end)
+     *
+     * @param startMoment
+     * @param endMoment
+     * @returns {{}}
+     */
+    function interpolateMonths(startMoment, endMoment) {
+        var i,
+            monthsToFetch = {},
+            startYear  = startMoment.year(),
+            startMonth = startMoment.month() + 1,
+            endYear    = endMoment.year(),
+            endMonth   = endMoment.month() + 1
+        ;
+
+        // these are likely the same, but not a guarantee
+        monthsToFetch[startYear] = [];
+        monthsToFetch[endYear]   = [];
+
+        if (endMonth < startMonth) {
+            // compensate for year-wrapping
+            for (i = startMonth; i <= 12; ++i) {
+                monthsToFetch[startYear].push(i);
+            }
+            for (i = 1; i <= endMonth; ++i) {
+                monthsToFetch[endYear].push(i);
             }
 
-        });
+        } else {
+            // the simple case
+            for (i = startMonth; i <= endMonth; ++i) {
+                monthsToFetch[startYear].push(i);
+            }
+        }
 
+        return monthsToFetch;
     }
 
 };

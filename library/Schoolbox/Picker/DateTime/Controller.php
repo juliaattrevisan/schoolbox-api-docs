@@ -10,21 +10,21 @@
 namespace Schoolbox\Picker\DateTime;
 
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
 use Calendar_Api_Factory;
 use External_Timetable;
+use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\UserMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
-use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -78,14 +78,13 @@ class Controller extends Base
     /**
      * Return the HTML picker for injecting into modal
      *
-     * @param string $type event or duework
+     * @param string $type    event or duework
      * @param string $element input field that calls a datepicker
-     * @param int $id The ID number of the javascript picker
-     * @param string $value Default date to display
+     * @param int    $id      The ID number of the javascript picker
+     * @param string $value   Default date to display
      */
     public function getPicker($type, $element, $id, $value)
     {
-        $timetableVars = [];
         $timetable = $this->getUserTimetable();
         $terms = $this->getTerms();
 
@@ -102,6 +101,8 @@ class Controller extends Base
             }
         }
 
+        $timetableVars = [];
+
         // Don't bother calculating if the timetable is offline, we'll only display the calendar
 
         if (is_array($timetable)) {
@@ -109,15 +110,23 @@ class Controller extends Base
             // Current term
             $term = $this->termMapper->findForDate($date);
 
-            $timetableVars['term'] = $term->getId();
-            $timetableVars['isWeekend'] = $date->isWeekend() ? 1 : 0;
+            $timetableVars = [
+                'term'          => $term->getId(),
+                'isWeekend'     => $date->isWeekend() ? 1 : 0
+            ];
 
             // Get all what we need to build proper timetable per campus
             foreach ($this->getUser()->getCampusCollection() as $campus) {
+                $campusId = $campus->getId();
 
-                $timetableDay = $timetable[$campus->getId()]['dayCount'];
+                $timetableDay = $timetable[$campusId]['dayCount'];
 
-                $timetableVars['byCampus'][$campus->getId()]['id'] = $campus->getId();
+                if (!$timetableDay) {
+                    // if there are no days, don't attempt to
+                    continue;
+                }
+
+                $timetableVars['byCampus'][$campusId]['id'] = $campusId;
 
                 // Loop through terms and set cycle start and end dates
                 $cycles = [];
@@ -183,6 +192,36 @@ class Controller extends Base
         ]);
     }
 
+
+    /**
+     * @param int $year
+     * @param int $month
+     * @param Folder $folder
+     * @return void
+     */
+    public function getHeat($year, $month, Folder $folder)
+    {
+        $heat = [];
+
+        $start = new Alaress_Date_Format("$year-$month-1 00:00:00", 'Y-m-d H:i:s');
+
+        $end = clone $start;
+        $end = $end->endOfMonth();
+
+        $students = $this->studentsDueWithinRange($start, $end, $folder);
+
+        foreach ($students as $student) {
+            foreach ($student['assessmentList'] as $assessment) {
+                $heat[$assessment['duedate']][$assessment['id']] = true;
+            }
+        }
+
+        $heat = array_map(function ($v) { return min(count($v), 5) * 20; }, $heat);
+
+        $this->getResponse()->content->set($this->buildJsonOutput($heat));
+    }
+
+
     /**
      * Converts schoolbox config date and time formats info flatpickr friendly
      *
@@ -209,6 +248,7 @@ class Controller extends Base
             'i' => 'i', // minutes leading zero
             's' => 'S', // 00 - 59 seconds
         ]);
+
     }
 
     /**
@@ -218,7 +258,7 @@ class Controller extends Base
      */
     public function getUserTimetable()
     {
-        $timetable = [];
+        $timetable  = [];
         $campusInfo = [];
 
         $user = $this->getUser();
@@ -228,29 +268,29 @@ class Controller extends Base
             $campusTimetable = $this->getTimetableHandler()->getTimetableDefinition(null, $campus);
 
             if ($campusTimetable) {
-                $campusInfo['campusId'] = $campus->getId();
+                $campusInfo['campusId']   = $campus->getId();
                 $campusInfo['campusName'] = $campus->getName();
                 $campusInfo['campusCode'] = $campus->getExtTimetableCode();
 
                 //Return campus and it's timetable in one array
                 $timetable[$campus->getId()] = array_merge($campusInfo, $campusTimetable);
+
             } else {
                 $timetable = false;
             }
-
         }
+
         return $timetable;
     }
 
     /**
      * Return all terms
      *
-     * @return Collection
+     * @return Collection|Term[]
      */
     public function getTerms()
     {
-        $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
-        return $terms;
+        return $this->getTermMapper()->findAll([ 'order' => [ 'start' => 'desc' ] ]);
     }
 
     /**
@@ -260,18 +300,25 @@ class Controller extends Base
      * @param Term $term
      * @return array
      */
-    public function getFirstTimetableDayForTerm($campus, $term)
+    public function getFirstTimetableDayForTerm(Campus $campus, Term $term)
     {
         $date = new Alaress_Date_Format($term->getStart());
 
         // We can't base calculations on a date that falls on a weekend
         // We'll get return a timetable day number for the following Monday
-
         $termActualStart = [];
 
         // Skip 1 day if Sunday, 2 days if Saturday
-
         $dateOffset = !$date->isWeekend() ? 0 : (8 % $date->getWeekDayNumber());
+
+        if ($date->isWeekend()) {
+            // It is Sunday
+            $dateOffset = 1;
+            // Or maybe Saturday
+            if ($date->getWeekDayNumber() === 6) {
+                $dateOffset = 2;
+            }
+        }
 
         $timetableDay = $this->getTimetableHandler()->getDayNumber($campus, $date->addDays($dateOffset)->getUnixTimeStamp());
         $termActualStart['date'] = $date;
@@ -284,6 +331,9 @@ class Controller extends Base
      * Return JSON list of all appointments for a given date
      *
      * @param Alaress_Date_Format $date
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     * @return void
      */
     public function getByDate(Alaress_Date_Format $date)
     {
@@ -317,25 +367,52 @@ class Controller extends Base
         ]);
     }
 
+
+
     /**
      * Return JSON list of students and how much due work that have for a given date and class code(s)
      *
      * @param Alaress_Date_Format $date (Date we are interested in)
-     * @param Folder $folder
+     * @param Folder              $folder
+     * @return void
      */
     public function getDueByDate(Alaress_Date_Format $date, $folder)
     {
-        $data = [];
+        // Don't show other students' due work to anyone but staff
+        if (!$this->getUser()->getRole()->isStaff()) {
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data' => []
+            ]);
 
-        // Only show results to staff
+            return;
+        }
 
-        if ($this->getUser()->getRole()->isStaff()) {
+        $date = clone $date;
+        $start = $date->startOfDay();
+        $end = clone $start;
+        $end = $end->endOfDay();
 
-            $start = $date->startOfDay();
-            $end = clone $start;
-            $end = $end->endOfDay();
+        // Spit this out in a JSON array
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => [
+                'students' => $this->studentsDueWithinRange($start, $end, $folder),
+                'date' => $date->toIso8601String()
+            ]
+        ]);
+    }
 
-            // Get all students for the class or the group
+
+    /**
+     * @param Alaress_Date_Format $start
+     * @param Alaress_Date_Format $end
+     * @param Folder              $folder
+     * @return array
+     */
+    private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, $folder)
+    {
+        // Get all students for the class or the group
 
             $externalStudents = $this->getUserAccessMapper()->findUsersInCategory(
                 $folder,
@@ -344,71 +421,59 @@ class Controller extends Base
                 true
             );
 
-            // Get a lookup array of external IDs for the students in this class
+        // Get a lookup array of external IDs for the students in this class
 
-            $externalIds = [];
+        $externalIds = [];
 
-            foreach ($externalStudents as $studentCurrent) {
-                $externalIds[] = $studentCurrent->getExternalId();
-            }
-
-            // Iterate each student in the class
-
-            $students = [];
-            $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
-
-            foreach ($studentList as $studentCurrent) {
-
-                // Create a mock user object and find all assessments for this student
-                $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $start, $end);
-                // Count how many assessments are due on the specified date
-                $assessmentsDue = count($assessments);
-                $assessmentList = [];
-                foreach ($assessments as $assessment) {
-                    $assessmentList[] = [
-                        'id' => $assessment->getId(),
-                        'title' => $assessment->getTitle(),
-                        'duetime' => $assessment->getDueAt()->getTimeOnly(),
-                        'context' => $assessment->getBaseContext()->getFolder()->getName()
-                    ];
-                }
-                if ($assessmentsDue > 0) {
-                    $students[] = [
-                        'id' => $studentCurrent->getId(),                      // Required for link to student profile
-                        'externalId' => $studentCurrent->getExternalId(),      // Required for rendering student photo
-                        'firstname' => $studentCurrent->getFirstname(),
-                        'lastname' => $studentCurrent->getLastname(),
-                        'assessmentList' => $assessmentList,
-                        'assessmentsDue' => $assessmentsDue                    // Number of assessments they have due on the date
-                    ];
-                }
-            }
-
-            // Sort by the number of assignments due
-
-            $assessmentsDue = [];
-
-            foreach ($students as $key => $row) {
-                $assessmentsDue[$key] = $row['assessmentsDue'];
-            }
-
-            array_multisort($assessmentsDue, SORT_DESC, $students);
-            $students = array_slice($students, 0, 5);
-
-            // Spit this out in a JSON array
-
-            $data = [
-                'students' => $students,
-                'date' => $date->toIso8601String()
-            ];
+        foreach ($externalStudents as $studentCurrent) {
+            $externalIds[] = $studentCurrent->getExternalId();
         }
 
-        // Return results, if any
+        $studentList = $this->getUserMapper()->findByColumn('synergy_id', $externalIds);
+        // Iterate each student in the class
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => $data
-        ]);
+        $students = [];
+
+        foreach ($studentList as $studentCurrent) {
+
+            // Create a mock user object and find all assessments for this student
+            $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($studentCurrent, $start, $end);
+            // Count how many assessments are due on the specified date
+            $assessmentsDue = count($assessments);
+            $assessmentList = [];
+            foreach ($assessments as $assessment) {
+                $assessmentList[] = [
+                    'id'      => $assessment->getId(),
+                    'title'   => $assessment->getTitle(),
+                    'duedate' => $assessment->getDueAt()->getDay(),
+                    'duetime' => $assessment->getDueAt()->getTimeOnly(),
+                    'context' => $assessment->getBaseContext()->getFolder()->getName()
+                ];
+            }
+            if ($assessmentsDue > 0) {
+                $students[] = [
+                    'id'             => $studentCurrent->getId(),                      // Required for link to student profile
+                    'externalId'     => $studentCurrent->getExternalId(),      // Required for rendering student photo
+                    'firstname'      => $studentCurrent->getFirstname(),
+                    'lastname'       => $studentCurrent->getLastname(),
+                    'assessmentList' => $assessmentList,
+                    'assessmentsDue' => $assessmentsDue                    // Number of assessments they have due on the date
+                ];
+            }
+        }
+
+        // Sort by the number of assignments due
+
+        $assessmentsDue = [];
+
+        foreach ($students as $key => $row) {
+            $assessmentsDue[$key] = $row['assessmentsDue'];
+        }
+
+        array_multisort($assessmentsDue, SORT_DESC, $students);
+        $students = array_slice($students, 0, 5);
+
+        return $students;
     }
 
     /**
@@ -425,6 +490,7 @@ class Controller extends Base
         return $this;
     }
 
+
     /**
      * @return UserMapper
      */
@@ -432,6 +498,7 @@ class Controller extends Base
     {
         return $this->userMapper;
     }
+
 
     /**
      * @param TermMapper $mapper
@@ -442,6 +509,7 @@ class Controller extends Base
         $this->termMapper = $mapper;
         return $this;
     }
+
 
     /**
      * @return TermMapper
@@ -461,6 +529,7 @@ class Controller extends Base
         return $this;
     }
 
+
     /**
      * @return UserAccessMapper
      */
@@ -468,6 +537,7 @@ class Controller extends Base
     {
         return $this->userAccessMapper;
     }
+
 
     /**
      * @param AssessmentMapperProxy $mapper
@@ -478,6 +548,7 @@ class Controller extends Base
         $this->assessmentMapperProxy = $mapper;
         return $this;
     }
+
 
     /**
      * @return AssessmentMapperProxy
@@ -504,6 +575,7 @@ class Controller extends Base
         $this->timetableHandler = $timetableHandler;
         return $this;
     }
+
 
     /**
      * @return ConfigLoader
