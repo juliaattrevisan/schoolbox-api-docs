@@ -124,3 +124,22 @@ FOREIGN KEY (`owner_id`)
 REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+ALTER TABLE `lu_pastoral_category`
+  ADD INDEX `fk_lu_pastoral_category_pastoral_type_id_idx` (`pastoral_type_id` ASC);
+ALTER TABLE `lu_pastoral_category`
+  ADD CONSTRAINT `fk_lu_pastoral_category_pastoral_type_id`
+FOREIGN KEY (`pastoral_type_id`)
+REFERENCES `lu_pastoral_type` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `lu_pastoral_type`
+  ADD INDEX `fk_lu_pastoral_type_pastoral_document_classification_id_idx` (`pastoral_document_classification_id` ASC);
+ALTER TABLE `lu_pastoral_type`
+  ADD CONSTRAINT `fk_lu_pastoral_type_pastoral_document_classification_id`
+FOREIGN KEY (`pastoral_document_classification_id`)
+REFERENCES `lu_pastoral_document_classification` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
