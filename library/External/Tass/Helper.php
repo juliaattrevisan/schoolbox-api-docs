@@ -58,9 +58,7 @@ class External_Tass_Helper
     public function getAddNumMother()
     {
         $addnum = '';
-        $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum_mother'))));
-
-        $addnum = $this->getDatabase()->smartQuote(trim($value));
+        $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_mother')));
         if (strlen($addnum) < 1 ) {
             $addnum = "'4'"; // TASS default
         }
@@ -74,9 +72,7 @@ class External_Tass_Helper
     public function getAddNumFather()
     {
         $addnum = '';
-        $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum_father'))));
-
-        $addnum = $this->getDatabase()->smartQuote(trim($value));
+        $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_mother')));
         if (strlen($addnum) < 1 ) {
             $addnum = "'5'"; // TASS default
         }
