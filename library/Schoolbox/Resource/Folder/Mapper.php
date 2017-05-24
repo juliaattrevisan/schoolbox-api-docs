@@ -851,8 +851,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $unitSpecMapper        = $this->getJoinMapper('unit_specification');
 
 
-        /** @var Model[] $categories */
-        $categories = [];
+        /** @var Model[] $folders */
+        $folders = [];
 
         $addedCurriculumNodes = [];
 
@@ -861,8 +861,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $folderId = $row['id'];
 
             // create if not exists
-            if (!array_key_exists($folderId, $categories)) {
-                $category = $categories[$folderId] = $this->hydrate($row);
+            if (!array_key_exists($folderId, $folders)) {
+                $folder = $folders[$folderId] = $this->hydrate($row);
 
                 /** @var HomepageConfig $homepageConfig */
                 $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
@@ -871,29 +871,29 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $group = $group_mapper->hydrate($row, 'ug');
 
                 // set 1:1 objects
-                $category->setHomepage($homepageConfig);
-                $category->setGroup($group);
+                $folder->setHomepage($homepageConfig);
+                $folder->setGroup($group);
 
                 /** @var CourseSpecification\Model $courseSpec */
                 $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
                 if($courseSpec){
-                    $category->setCourseSpecification($courseSpec);
+                    $folder->setCourseSpecification($courseSpec);
                 }
 
                 $unitSpec = $unitSpecMapper->hydrate($row, 'us');
                 if($unitSpec){
-                    $category->setUnitSpecification($unitSpec);
+                    $folder->setUnitSpecification($unitSpec);
                 }
             }
 
             // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
-            $codeCollection = $categories[$folderId]->getCodes();
+            $codeCollection = $folders[$folderId]->getCodes();
             $code           = $row['cc.code'];
             if ($code && !$codeCollection->offsetExists($code)) {
                 /** @var FolderCode $folderCode */
                 $folderCode            = $this->hydrateJoin($row, 'codes', 'cc');
                 $codeCollection[$code] = $folderCode;
-                $folderCode->setFolder($categories[$folderId]);
+                $folderCode->setFolder($folders[$folderId]);
             }
 
 
@@ -910,15 +910,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // set n:1 and n:n objects
-        foreach ($categories as $catId => $category) {
+        foreach ($folders as $catId => $folder) {
             if (!empty($addedCurriculumNodes[$catId])) {
                 foreach ($addedCurriculumNodes[$catId] as $curriculumNode) {
-                    $category->addCurriculumNode($curriculumNode);
+                    $folder->addCurriculumNode($curriculumNode);
                 }
             }
         }
 
-        return $this->createCollection($categories);
+        return $this->createCollection($folders);
     }
 
     /**
