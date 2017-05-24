@@ -75,7 +75,7 @@ class Controller extends Base
      * @param Folder\Model $class
      * @throws ApplicationException
      */
-    public function getMastery($class)
+    public function getMastery(Folder\Model $class)
     {
         $this->getMasteryForTerm($class, $this->getTermMapper()->findForToday());
     }
@@ -86,7 +86,7 @@ class Controller extends Base
      * @param Term\Model $term
      * @throws ApplicationException
      */
-    public function getMasteryForTerm($class, $term)
+    public function getMasteryForTerm(Folder\Model $class, Term\Model $term)
     {
         // Does this class exist ?
         if (!$class->getId()) {
