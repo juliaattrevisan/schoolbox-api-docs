@@ -228,8 +228,15 @@
                         <label id="name_error" for="name" class="error" style="display:none;">
                             This field is required.
                         </label>
+                        <div class="checklist">
+                            <input id="dashboard" name="dashboard" value="1" type="checkbox" {% if report.dashboard %}checked{% endif %}>
+                            <label for="dashboard">
+                                Show this report on my pastoral dashboard
+                            </label>
+                        </div>
                     </div>
                 </fieldset>
+
             </section>
 
             <section>

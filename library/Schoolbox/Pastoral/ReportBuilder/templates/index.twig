@@ -6,6 +6,17 @@
 [ 'Reports' ]
 ) }}
 
+<script>
+    $(function() {
+        $('[data-report-dashboard]').click(function() {
+            $.post('{{ routeLookup('pastoralReportBuilder.postReportDashboardModify') }}', {
+                reportId: $(this).attr('data-report-dashboard'),
+                display: $(this).prop('checked') === true ? 1 : 0
+            })
+        });
+    });
+</script>
+
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
@@ -17,11 +28,11 @@
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 island">
-            <h2 class="subheader">Your Saved Reports</h2>
+            <h2 class="subheader">Your Reports</h2>
         </div>
     </div>
     <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" class="icon-add" title="New Pastoral Report"></a>
+        <a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" class="icon-add" title="Add new report"></a>
     </nav>
 </div>
 
@@ -36,10 +47,9 @@
                     <section>
                     <ul id="studentsList" class="information-list">
                 {% endif %}
-                <li class="actions-small-2">
+                <li class="actions-small-3">
                     <div class="list-item">
                         <div class="card small-12">
-
                             <a href="{{ profile.link(user) }}">
                                 {{ profile.imageSquare64(user) }}
                             </a>
@@ -59,6 +69,13 @@
                         </div>
                     </div>
                     <nav>
+                        <input id="report-dashboard-{{ report.id }}"
+                               {% if report.dashboard %}checked{% endif %}
+                               data-report-dashboard="{{ report.id }}"
+                               type="checkbox">
+                        <label for="report-dashboard-{{ report.id }}" class="input-toggle" title="Show report on dashboard">
+                            <span class="icon-star alert"></span>
+                        </label>
                         <a class="icon-modify no-text" href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id}) }}" title="Modify Report"></a>
                         <a class="icon-delete no-text" data-delete="{{ report.id }}" href="#" title="Delete Report"></a>
                     </nav>
@@ -81,14 +98,14 @@
                 {% if loop.first %}
 
                     {% set found = 1 %}
-                    <h2 class="subheader">Shared Pastoral Reports</h2>
-                    <p class="meta">These reports have been shared with you based on your pastoral group membership.</p>
+                    <h2 class="subheader">Shared Reports<span data-tooltip title="These reports have been shared with you based on your pastoral group membership" class="hint has-tip tip-top">?</span></h2>
+
                     <section>
                     <ul id="studentsList" class="information-list">
 
                 {% endif %}
 
-                <li>
+                <li class="actions-small-3">
                     <div class="card small-12">
                         <a href="{{ profile.link(report.owner) }}">
                             {{ profile.imageSquare64(report.owner) }}
@@ -103,6 +120,15 @@
                             {% endfor %}
                         </p>
                     </div>
+                    <nav>
+                        <input id="report-dashboard-{{ report.id }}"
+                               {% if report.dashboard %}checked{% endif %}
+                               data-report-dashboard="{{ report.id }}"
+                               type="checkbox">
+                        <label for="report-dashboard-{{ report.id }}" class="input-toggle" title="Show report on dashboard">
+                            <span class="icon-star alert"></span>
+                        </label>
+                    </nav>
                 </li>
             {% endfor %}
 

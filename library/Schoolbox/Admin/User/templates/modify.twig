@@ -50,10 +50,10 @@
 {# User detail section #}
 
 <div class="row">
+    <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
     <div class="small-12 island">
         <section class="content">
             <div class="row">
-                <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
                     <input type="hidden" name="type" value="modify"/>
                     <input type="hidden" name="userID" value="{{ user.id }}"/>
 
@@ -169,13 +169,14 @@
                         {% endif %}
                     </div>
 
-                    <div class="small-12 columns">
-                        <input type="submit" value="{{ method }} User"/>
-                    </div>
-                </form>
+
             </div>
         </section>
     </div>
+    <div class="small-12 columns">
+        <input type="submit" value="{{ method }} User"/>
+    </div>
+</form>
 </div>
 
 {% if user %}
@@ -186,12 +187,12 @@
         <div class="row">
             <div class="small-12 island">
                 <h3 class="subheader">Synergetic Info</h3>
-                <section>
-                    <dl class="profile">
-                        <dt>Year:</dt>
-                        <dd>{{ fileYear }}</dd>
-                        <dt>Semester:</dt>
-                        <dd>{{ fileSemester }}</dd>
+                <section class="profile content">
+                    <dl>
+                        <dt class="small-12 medium-3">Year:</dt>
+                        <dd class="small-12 medium-9">{{ fileYear }}</dd>
+                        <dt class="small-12 medium-3">Semester:</dt>
+                        <dd class="small-12 medium-9">{{ fileSemester }}</dd>
                     </dl>
                 </section>
             </div>
@@ -201,6 +202,7 @@
     {# Group Access #}
 
     <div class="row">
+        <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
         <div class="small-12 island">
             <h3 class="subheader" id="groups">Groups</h3>
             <section>
@@ -255,7 +257,6 @@
                     {% endfor %}
 
                     <li class="actions-small-1">
-                        <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
                             <div class="card small-7">
                                 <select required name="sid" id="groupSelect" form="groupAdd" class="required">
                                     <option value="">Select a Group</option>

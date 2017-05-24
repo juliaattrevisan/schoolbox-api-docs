@@ -52,6 +52,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
+use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 
 class Controller extends Base
 {
@@ -112,6 +113,9 @@ class Controller extends Base
     /** @var UserAccessMapper $userAccessMapper */
     protected $userAccessMapper;
 
+    /** @var PastoralReportMapper $pastoralReportMapper */
+    private $pastoralReportMapper;
+
     /**
      * Constructor
      *
@@ -134,6 +138,7 @@ class Controller extends Base
      * @param UserMapper $userMapper
      * @param PastoralAccessMapper $pastoralAccessMapper
      * @param ErrorMapper $errorMapper
+     * @param PastoralReportMapper $pastoralReportMapper
      */
     public function __construct(
         IConfigLoader $config,
@@ -154,7 +159,8 @@ class Controller extends Base
         PastoralAccessMapper $pastoralAccessMapper,
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralGroupMemberMapper $pastoralGroupMemberMapper,
-        ErrorMapper $errorMapper
+        ErrorMapper $errorMapper,
+        PastoralReportMapper $pastoralReportMapper
     ) {
         $this->config = $config;
         $this->errorMapper = $errorMapper;
@@ -175,6 +181,7 @@ class Controller extends Base
         $this->roleMapper = $roleMapper;
         $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
+        $this->pastoralReportMapper = $pastoralReportMapper;
     }
 
     /**
@@ -188,6 +195,7 @@ class Controller extends Base
                 'user' => $this->getUser(),
                 'recentStudents' => $this->pastoralAuditMapper->findRecentStudents(),
                 'recentDashboard' => $this->pastoralMapper->findRecentDashboard(),
+                'reportsDashboard'  => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
                 'groups' => $this->pastoralGroupMemberMapper->findByColumn('user_id', $this->getUser()->getId())
             ]
         ]);

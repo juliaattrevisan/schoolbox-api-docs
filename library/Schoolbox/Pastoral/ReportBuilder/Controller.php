@@ -21,6 +21,7 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
+use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
@@ -48,6 +49,9 @@ class Controller extends Base
 
     /** @var PastoralReportMapper $pastoralReportMapper */
     private $pastoralReportMapper;
+    
+    /** @var PastoralReportDashboardMapper $pastoralReportDashboardMapper */
+    private $pastoralReportDashboardMapper;
 
     /** @var PastoralGroupMapper $pastoralGroupMapper */
     private $pastoralGroupMapper;
@@ -70,6 +74,7 @@ class Controller extends Base
      * @param PastoralGroupMapper $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
      * @param PastoralReportMapper $pastoralReportMapper
+     * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -81,7 +86,8 @@ class Controller extends Base
         UserMapper $userMapper,
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralGroupMemberMapper $pastoralGroupMemberMapper,
-        PastoralReportMapper $pastoralReportMapper
+        PastoralReportMapper $pastoralReportMapper,
+        PastoralReportDashboardMapper $pastoralReportDashboardMapper
     ) {
         $this->errorMapper = $errorMapper;
         $this->pastoralMapper = $pastoralMapper;
@@ -93,6 +99,7 @@ class Controller extends Base
         $this->pastoralGroupMapper = $pastoralGroupMapper;
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
         $this->pastoralReportMapper = $pastoralReportMapper;
+        $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
     }
 
     /**
@@ -128,7 +135,6 @@ class Controller extends Base
         );
     }
 
-
     /**
      * Create new pastoral report
      */
@@ -136,6 +142,8 @@ class Controller extends Base
     {
         /** @var PastoralReport $report */
         $report = $this->pastoralReportMapper->createModel();
+        $report->setOwner($this->getUser());
+
         $this->getReportUpdate($report);
     }
 
@@ -203,6 +211,17 @@ class Controller extends Base
             if (!in_array($orderCurrent, $report->getOrder()->getAll())) {
                 $report->getOrder()->add($orderCurrent);
             }
+        }
+
+        try {
+            $this->pastoralReportDashboardMapper->findOneByColumnList([
+                'user_id' => $report->getOwner()->getId(),
+                'report_id' => $report->getId()
+            ]);
+
+            $report->setDashboard(true);
+        } catch (MapperException $e) {
+            $report->setDashboard(false);
         }
 
         // And render this thing out
@@ -409,22 +428,102 @@ class Controller extends Base
 
         // Save groups the report is shared with
 
-        $groupsCollection = new Collection();
+        if (is_array($post['group'])) {
 
-        foreach ($post['group'] as $groupId => $checked) {
-            if ($checked) {
-                $groupsCollection->add($this->pastoralGroupMapper->createModel($groupId));
+            $groupsCollection = new Collection();
+
+            foreach ($post['group'] as $groupId => $checked) {
+                if ($checked) {
+                    $groupsCollection->add($this->pastoralGroupMapper->createModel($groupId));
+                }
             }
+
+            $pastoralReport->setGroups($groupsCollection);
         }
 
-        $pastoralReport->setGroups($groupsCollection);
-
         $this->pastoralReportMapper->save($pastoralReport);
+
+        // Update display on pastoral dashboard status
+
+        $this->updatePastoralDashboard($pastoralReport, isset($post['dashboard']));
 
         // Go back to the reports list
 
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('pastoralReportBuilder.getIndex')
         );
+    }
+
+    /**
+     * Update the display status of a report on the current users dashboard
+     */
+    public function postReportDashboardModify()
+    {
+        $post = $this->getRequest()->post;
+
+        // Create bare minimum report object
+
+        /** @var PastoralReport $report */
+        $report = $this->pastoralReportMapper->createModel($post['reportId']);
+
+        $result = $this->updatePastoralDashboard($report, $post['display']);
+        
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => $this->buildJsonOutput([
+                'status' => 'OK',
+                'result' => $result
+            ])
+        ]);
+    }
+
+    /**
+     * Update pastoral dashboard record
+     *
+     * @param PastoralReport $report
+     * @param bool $display
+     * @return string
+     */
+    private function updatePastoralDashboard($report, $display)
+    {
+        try {
+
+            // Check if the report is already on the dashboard
+
+            $pastoralReportDashboard = $this->pastoralReportDashboardMapper->findOneByColumnList([
+                'user_id' => $this->getUser()->getId(),
+                'report_id' => $report->getId()
+            ]);
+
+            // We found the report on the dashboard, check if we need to remove it
+
+            if (!$display) {
+
+                // Report was being displayed on dashboard, delete it
+
+                $this->pastoralReportDashboardMapper->delete($pastoralReportDashboard);
+                $result = 'Removed from dashboard';
+            } else {
+                $result = 'No action, already on dashboard';
+            }
+        } catch (MapperException $e) {
+
+            // Report wasn't on the dashboard already, check if we need to add it
+
+            if ($display) {
+
+                // Add the report to the dashboard
+
+                $pastoralReportDashboard = $this->pastoralReportDashboardMapper->createModel();
+                $pastoralReportDashboard->setUser($this->getUser());
+                $pastoralReportDashboard->setReport($report);
+                $this->pastoralReportDashboardMapper->save($pastoralReportDashboard);
+                $result = 'Added to dashboard';
+            } else {
+                $result = 'No action, already not on dashboard';
+            }
+        }
+
+        return $result;
     }
 }

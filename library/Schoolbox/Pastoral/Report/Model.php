@@ -24,6 +24,9 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
+    /** @var bool $dashboard */
+    protected $dashboard;
+    
     /** @var string $name */
     protected $name;
 
@@ -447,5 +450,23 @@ class Model implements ISoftDeletable
     public function getGroups()
     {
         return $this->groups;
+    }
+
+    /**
+     * @param bool $dashboard
+     * @return self
+     */
+    public function setDashboard($dashboard)
+    {
+        $this->dashboard = $dashboard;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDashboard()
+    {
+        return $this->dashboard;
     }    
 }

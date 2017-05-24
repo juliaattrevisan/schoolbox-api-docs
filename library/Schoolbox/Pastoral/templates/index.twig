@@ -14,20 +14,15 @@
 </div>
 
 <div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h2 class="subheader">Dashboard</h2>
-        </div>
-    </div>
     <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="Pastoral Report Builder"></a>
+        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="Manage reports"></a>
 
         {# Pastoral moderators can manage pastoral groups #}
 
         {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
 
         {% if routeGetGroups %}
-            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage Pastoral Groups"></a>
+            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage pastoral groups"></a>
         {% endif %}
     </nav>
 </div>
@@ -66,13 +61,84 @@
     {% set count = count + 1 %}
 {% endif %}
 
-{% if groups is not empty %}
+{% if groups is not empty or reportsDashboard is not empty %}
     {% set count = count + 1 %}
 {% endif %}
 
 {% if count > 0 %}
-
 <div class="row">
+    {# Pastoral groups memberships and reports dashboard items
+     # get grouped up for space utilisation
+     #}
+    {% if groups|length or reportsDashboard|length%}
+    <div class="small-12 medium-{{ 12 / count }} island">
+
+        {% if reportsDashboard|length %}
+        <h2 class="subheader">Quick Report Links</h2>
+        <section>
+            <ul class="information-list">
+                {% for report in reportsDashboard %}
+                    <li>
+                        <div class="card small-12">
+                            <a href="{{ profile.link(user) }}">
+                                {{ profile.imageSquare64(user) }}
+                            </a>
+                            <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
+                                <h3>{{ report.name }}</h3>
+                            </a>
+                            <p class="meta">
+                                <i title="Pastoral Groups" class="icon-group"></i>
+                                {% if report.groups | length %}
+                                    {% for group in report.groups %}
+                                        {{ group.name }}{% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    This report has not been shared with any groups
+                                {% endif %}
+                            </p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        {% if groups|length %}
+        <h2 class="subheader">Group Memberships</h2>
+        <section>
+            <ul class="information-list">
+                {% for membership in groups %}
+                    <li>
+                        <div class="card small-12">
+                            {{ profile.imageSquare64(membership.group.user) }}
+                            {% if membership.group.user.id == user.id %}
+
+                            {% set routeGetGroupsModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
+                            {% if routeGetGroupsModify %}
+                            <a href="{{ routeGetGroupsModify }}" title="Modify Pastoral Group">
+                                {% endif %}
+                                {% endif %}
+                                <h3>{{ membership.group.name }}</h3>
+                                {% if membership.group.user.id == user.id %}
+                                {% if routeGetGroupsModify %}
+                            </a>
+                            {% endif %}
+                            {% endif %}
+                            <p class="meta">Group managed by
+                                {% if membership.group.user.id == user.id %}
+                                    you
+                                {% else %}
+                                    {{ membership.group.user.fullName }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+    </div>
+    {% endif %}
 
     {# Display recently searched student records #}
     {% if recentStudents is not empty %}
@@ -110,44 +176,6 @@
                             <h3>{{ record.student.fullName }}</h3>
                         </a>
                         <p class="meta">{{ record.heading }}</p>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        </section>
-    </div>
-    {% endif %}
-
-    {# Pastoral groups memberships #}
-    {% if groups | length %}
-    <div class="small-12 medium-{{ 12 / count }} island">
-        <h2 class="subheader">Pastoral Group Memberships</h2>
-        <section>
-            <ul class="information-list">
-                {% for membership in groups %}
-                <li>
-                    <div class="card small-12">
-                        {{ profile.imageSquare64(membership.group.user) }}
-                        {% if membership.group.user.id == user.id %}
-
-                            {% set routeGetGroupsModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
-                            {% if routeGetGroupsModify %}
-                                <a href="{{ routeGetGroupsModify }}" title="Modify Pastoral Group">
-                            {% endif %}
-                        {% endif %}
-                            <h3>{{ membership.group.name }}</h3>
-                        {% if membership.group.user.id == user.id %}
-                            {% if routeGetGroupsModify %}
-                                </a>
-                            {% endif %}
-                        {% endif %}
-                        <p class="meta">Group managed by
-                            {% if membership.group.user.id == user.id %}
-                                you
-                            {% else %}
-                                {{ membership.group.user.fullName }}
-                            {% endif %}
-                        </p>
                     </div>
                 </li>
                 {% endfor %}
