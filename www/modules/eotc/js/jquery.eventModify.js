@@ -196,44 +196,14 @@
 				return (ticValue == '[]' || ticValue == '');
 			};
 
-			var allday = $('input[name=allday]').val();
-
-			var dateFormat = allday?dateDisplayFormats.localDateTime:dateDisplayFormats.localDate;
-
-				/* Ensure you don't have a 0 duration event
-			 */
-			$.validator.addMethod("validateDatetimesDifferent", function(value, element) {
-				var settings = {
-					startDatetime: $('input[name=startDate]').val(),
-					endDatetime: $('input[name=endDate]').val(),
-				}
-
-				var start = settings.startDate;
-				var end = settings.endDate;
-
-				var startDatetime = moment(start, dateFormat);
-				var endDatetime   = moment(end, dateFormat);
-
-				if (startDatetime !== endDatetime) {
-					return true;
-				}
-
-				return false;
-			}, "Start and End datetimes must differ");
-
 			/* Ensure start date occurs before end date
 			 */
 			$.validator.addMethod("validateDatetimesCorrect", function(value, element) {
-				var settings = {
-					startDate: $('input[name=startDate]').val(),
-					endDate: $('input[name=endDate]').val(),
-				};
 
-				var start = settings.startDate;
-				var end = settings.endDate;
-
-				var startDatetime = moment(start, dateFormat);
-				var endDatetime   = moment(end, dateFormat);
+				var allday = $('input[name=allday]').val(),
+					dateFormat = allday?dateDisplayFormats.momentJs:dateDisplayFormats.momentJsDatetime,
+					startDatetime = moment($('input[name=startDate]').val(), dateFormat),
+					endDatetime   = moment($('input[name=endDate]').val(), dateFormat);
 
 				/* If both dates are valid and end date occurs before start
 				 */
@@ -243,6 +213,7 @@
 
 				return false;
 			}, "Start date and time must occur before end date and time");
+
 
 			return {
 				'campus[]': {
@@ -272,12 +243,10 @@
 				},
 				startDate: {
 					required: true,
-					validateDatetimesDifferent: true,
 					validateDatetimesCorrect: true
 				},
 				endDate: {
 					required: true,
-					validateDatetimesDifferent: true,
 					validateDatetimesCorrect: true
 				},
 			}
