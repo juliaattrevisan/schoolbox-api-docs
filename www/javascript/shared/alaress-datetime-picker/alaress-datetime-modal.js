@@ -734,16 +734,16 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         // also process previous month
         if (mo === 1) {
-            fetchHeat(yr - 1, 12, folderId, onSuccess);
+            fetchHeat(parseInt(yr) - 1, 12, folderId, onSuccess);
         } else {
-            fetchHeat(yr, mo - 1, folderId, onSuccess);
+            fetchHeat(yr, parseInt(mo) - 1, folderId, onSuccess);
         }
 
         // also also process next month
         if (mo === 12) {
-            fetchHeat(yr + 1, 1, folderId, onSuccess);
+            fetchHeat(parseInt(yr) + 1, 1, folderId, onSuccess);
         } else {
-            fetchHeat(yr, mo + 1, folderId, onSuccess);
+            fetchHeat(yr, parseInt(mo) + 1, folderId, onSuccess);
         }
     }
 
