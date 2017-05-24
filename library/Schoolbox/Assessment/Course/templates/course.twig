@@ -42,14 +42,14 @@ Usage:
             $(this).rules('add', {
                 required: true,
                 messages: {
-                    required: "Please enter a name for this unit."
+                    required: "Please enter a name for this {{ locale.unit }}."
                 }
             });
         });
 
         $.validator.addMethod('oneUnit', function() {
             return $('input[data-unit-name]').length;
-        }, 'Please create at least one unit for this course.');
+        }, 'Please create at least one {{ locale.unit }} for this course.');
 
 
         // Mage Buttons
@@ -65,7 +65,7 @@ Usage:
             var $button = $(this);
 
             $(this).confirmDialog({
-                text: 'Are you sure you wish to delete this unit? This will also delete all Activities in the Unit.',
+                text: 'Are you sure you wish to delete this {{ locale.unit }}? This will also delete all Activities in the {{ locale.unit }}.',
                 confirmEvent: function () {
                     $.post($button.attr('href'))
                         .done(function () {
@@ -182,7 +182,7 @@ Usage:
                     newUnitName: "required"
                 },
                 messages: {
-                    newUnitName: "Please enter a name for your new unit"
+                    newUnitName: "Please enter a name for your new {{ locale.unit }}"
                 }
             }
         });
@@ -278,7 +278,7 @@ Usage:
                     {% endif %}
                 </fieldset>
                 <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not courseSpec.id %} disabled="disabled"{% endif %}>
-                    <legend>Units</legend>
+                    <legend>{{ locale.unit.properPlural }}</legend>
                     {# Don't delete the inline style, it's needed -#}
                     <div class="small-12 column no-pad"{% if not courseSpec.id %} style="display:none;"{% endif %} data-mage-collapsed>
                         <ul class="information-list">
@@ -313,7 +313,7 @@ Usage:
                                             <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
                                         </div>
                                         <div class="small-12 medium-4 column">
-                                            <input type="submit" class="button" value="Create Unit"
+                                            <input type="submit" class="button" value="Create {{ locale.unit.proper }}"
                                                    data-mage-next="spawn-unit" data-mage-working="Working..."
                                                    formaction="{{ routeLookup('course.newUnit', { id: courseSpec.Id }) }}"/>
                                         </div>
