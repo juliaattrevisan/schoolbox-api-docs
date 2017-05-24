@@ -32,30 +32,30 @@
             {% if url %}
             <a href="{{ url }}" title="{{ tooltip }}">
             {% endif %}
-                <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
-                <h3>
+                <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
+                <p>
                     {% if currentFeedback.published %}
                         Feedback
                     {% else %}
                         Draft Feedback
                     {% endif %}
-                </h3>
+                    |
+                    <span class="meta">
+                        {{ currentFeedback.reviewer.fullname }}
 
-                <p class="meta">
-                    {{ currentFeedback.reviewer.fullname }}
-
-                    {% if currentFeedback.published %}
-                        on {{ currentFeedback.publishedAt.short }}
-                    {% else %}
-                        on {{ currentFeedback.updatedAt.short }}
-                    {% endif %}
+                        {% if currentFeedback.published %}
+                            on {{ currentFeedback.publishedAt.short }}
+                        {% else %}
+                            on {{ currentFeedback.updatedAt.short }}
+                        {% endif %}
+                    </span>
                 </p>
             {% if url %}
             </a>
             {% endif %}
         </div>
-        <div class="small-12 medium-4 columns text-right">
-            <div class="grade content">
+        <div class="small-12 medium-2 columns text-right">
+            <div class="grade">
                 <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
             </div>
         </div>
