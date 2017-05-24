@@ -67,6 +67,8 @@ function getOptions(element) {
 
     // Build datepicker options form the element data attributes
     var elementOptions = {
+        noButton: getValue(element, 'data-datepicker-nobutton'),
+        buttonText: getValue(element, 'data-datepicker-buttontext') || 'Select Date',
         displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
         displayFormatDate: dateDisplayFormats.localDate, //Default display date format
         databaseFormat: 'Y-m-d H:i:s',
@@ -210,7 +212,6 @@ function checkAllDaySwitch (state, pickerId) {
 $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
-    var $datepickerButton = $(this).siblings('[data-adtp-btn]');
 
     // Build datepicker options form the element data attributes
     var options = getOptions(element);
@@ -219,6 +220,36 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     for (var attribute in optionsOverride) {
         options[attribute] = optionsOverride[attribute];
     }
+
+    if (!options.noButton && !element.data('dateButton')) {
+        // install button (no more than once)
+
+        // rearrange the DOM to install the button
+        var $label = element.closest('label');
+
+        if ($label.length) {
+            // in this case, the DOM needs to be rearranged so that the flex button is adjacent tot he label, not inside
+            $label.attr('for', element.attr('id'));
+            element.detach();
+            $label.after(element);
+        }
+
+        element.wrap($('<div class="input-group" />'));
+
+        var $datebtn = $('<a class="button icon-calendar" data-adtp-btn />');
+
+        if (options.buttonText) {
+            $datebtn.text(options.buttonText);
+        } else {
+            $datebtn.addClass('no-text');
+        }
+
+        element
+            .data('dateButton', $datebtn)
+            .after($datebtn.append($('<span class="splash animate"/>')));
+    }
+
+    var $datepickerButton = $(this).siblings('[data-adtp-btn]');
 
     window.pickerInstance = [];
 
