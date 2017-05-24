@@ -89,7 +89,7 @@
                                     <div class="day-picker" data-tt-days>
                                         {% for campus in timetable %}
                                             {% for i in 1..timetable[campus.campusId].dayCount %}
-                                                <div class="day-cell flatpickr-day {{ activeClass }}" data-tt-day="{{ i }}">{{ i }}</div>
+                                                <div class="flatpickr-day {{ activeClass }}" data-tt-day="{{ i }}">{{ i }}</div>
                                             {% endfor %}
                                         {% endfor %}
                                     </div>

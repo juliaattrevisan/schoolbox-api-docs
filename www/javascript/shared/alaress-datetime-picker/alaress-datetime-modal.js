@@ -73,9 +73,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             var selectedDate = moment($(this).attr('data-date')).format('dddd, MMM D, Y');
 
-            // Add active class & remove others with the class
-            $(this).parents('.day-picker').find('[data-tt-day]').removeClass('active');
-            $(this).addClass('active');
+            // Add selected class & remove others with the class
+            $(this).parents('.day-picker').find('[data-tt-day]').removeClass('selected');
+            $(this).addClass('selected');
 
             // Update the selected date
             $(this).closest('[data-adtp]').find('[data-tt-selected-date]').text(selectedDate);
@@ -342,13 +342,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         var selectedDate = moment(timetable.submit.attr('data-timetable-value')).format('YYYY-MM-DD'); // The currently selected date
 
-        // Remove active on all days for a blank slate
-        $byTimetable.find('[data-tt-day].active').removeClass('active');
+        // Remove selected on all days for a blank slate
+        $byTimetable.find('[data-tt-day].selected').removeClass('selected');
 
         // Loop through cycle days and check if currently set date matches
         $byTimetable.find('[data-tt-day]').each(function() {
             if (selectedDate == $(this).attr('data-date')) {
-                $(this).addClass('active');
+                $(this).addClass('selected');
             }
         });
     }
