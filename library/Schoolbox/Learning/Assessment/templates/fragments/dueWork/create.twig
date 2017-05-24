@@ -218,7 +218,7 @@
 </script>
 
 
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: 'Due Work'} %}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.dueWork.proper} %}
 
 
 {{ mage.submitRow(actionLabel ?: 'Create', 'part-2', 'end') }}

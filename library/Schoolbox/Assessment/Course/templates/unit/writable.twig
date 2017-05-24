@@ -66,9 +66,9 @@ Usage:
                 >New Task</a></li>
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=dueWork&returnUrl={{ encodedReturnUrl }}"
-                   title="Create a new Due Work"
+                   title="Create a new {{ locale.dueWork.proper }}"
                    class="button icon-due-work"
-                >New Due Work</a></li>
+                >New {{ locale.dueWork.proper }}</a></li>
             <li>
                 <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=quiz&returnUrl={{ encodedReturnUrl }}"
                    title="Create a new Quiz"
