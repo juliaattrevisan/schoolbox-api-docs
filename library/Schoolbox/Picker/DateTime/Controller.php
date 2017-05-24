@@ -106,51 +106,38 @@ class Controller extends Base
 
         if (is_array($timetable)) {
 
+            // Current term
             $term = $this->termMapper->findForDate($date);
 
             $timetableVars['term'] = $term->getId();
-            $timetableVars['daysUntilDate'] = $term->getDuration($date);
             $timetableVars['isWeekend'] = $date->isWeekend() ? 1 : 0;
 
             // Get all what we need to build proper timetable per campus
-
             foreach ($this->getUser()->getCampusCollection() as $campus) {
 
-                $termActualStart = $this->getFirstTimetableDayForTerm($campus, $term);
-
-                // Don't use $campus->getTimetableDay(), it will return number of days set in SB, rather than from External Timetable
-
                 $timetableDay = $timetable[$campus->getId()]['dayCount'];
-                $termStartDay = $termActualStart['day'];
-
-                // This is used to get the last term time table day.
-                // Alternatively we could have got the last date of term and if it was a weekend we'd gone backwards to get a date for Friday
-
-                $termLastDay = ($term->getDuration() - ($timetableDay + 1 - $termStartDay)) % $timetableDay;
-                $selectedDay = $this->getTimetableHandler()->getDayNumber($campus, $date->getUnixTimeStamp());
-                $timetableCycles = ceil(($term->getDuration() + $termStartDay - 1) / $timetableDay);
 
                 $timetableVars['byCampus'][$campus->getId()]['id'] = $campus->getId();
-                $timetableVars['byCampus'][$campus->getId()]['termStartDay'] = $termStartDay;
-                $timetableVars['byCampus'][$campus->getId()]['termLastDay'] = $termLastDay;
-                $timetableVars['byCampus'][$campus->getId()]['selectedDay'] = $selectedDay;
-                $timetableVars['byCampus'][$campus->getId()]['timetableCycles'] = $timetableCycles;
 
                 // Loop through terms and set cycle start and end dates
                 $cycles = [];
 
                 foreach ($terms as $cycleTerm) {
 
-                    $termStartDate = $cycleTerm->getStart();
-                    $termEndDate = $cycleTerm->getDisplayFinish();
-                    $tempDate = clone $termStartDate;
-                    $tempDay = $termStartDay;
+                    $cycleTermActualStart = $this->getFirstTimetableDayForTerm($campus, $cycleTerm);
+
+                    $cycleTermStartDate = $cycleTermActualStart['date'];
+                    $cycleTermStartDay = $cycleTermActualStart['day'];
+
+                    $cycleTermEndDate = $cycleTerm->getDisplayFinish();
+
+                    $tempDate = clone $cycleTermStartDate;
+                    $tempDay = $cycleTermStartDay;
+
                     $cycleDays = $timetableDay;
                     $currentCycle = 1;
 
-                    //$cycles[$cycleTerm->getId()][1]['startDate'] = $tempDate->toIso8601String();
-
-                    while ($tempDate->compareDateOnly($termEndDate) <= 0) {
+                    while ($tempDate->compareDateOnly($cycleTermEndDate) <= 0) {
 
                         $cycles[$cycleTerm->getId()][$currentCycle][$tempDay] = $tempDate->toIso8601String();
 
