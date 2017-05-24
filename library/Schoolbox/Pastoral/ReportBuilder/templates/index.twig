@@ -2,7 +2,7 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ 'Pastoral Care',    routeLookup('pastoral.getIndex') ],
+[ locale.pastoralCare.proper,    routeLookup('pastoral.getIndex') ],
 [ 'Reports' ]
 ) }}
 
@@ -20,7 +20,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>Pastoral Care Reports</h1>
+            <h1>{{ locale.pastoralCare.proper }} Reports</h1>
         </div>
     </div>
 </div>
@@ -32,7 +32,7 @@
         </div>
     </div>
     <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" class="icon-add" title="Add new report"></a>
+        <a href="{{ routeLookup('pastoralReportBuilder.getReportInsert') }}" class="icon-add" title="New {{ locale.pastoral.proper }} Report"></a>
     </nav>
 </div>
 
@@ -57,7 +57,7 @@
                                 <h3>{{ report.name }}</h3>
                             </a>
                             <p class="meta">
-                                <i title="Pastoral Groups" class="icon-group"></i>
+                                <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
                                 {% if report.groups | length %}
                                     {% for group in report.groups %}
                                         {{ group.name }}{% if not loop.last %},{% endif %}
@@ -98,7 +98,7 @@
                 {% if loop.first %}
 
                     {% set found = 1 %}
-                    <h2 class="subheader">Shared Reports<span data-tooltip title="These reports have been shared with you based on your pastoral group membership" class="hint has-tip tip-top">?</span></h2>
+                    <h2 class="subheader">Shared Reports<span data-tooltip title="These reports have been shared with you based on your {{ locale.pastoral }} group membership" class="hint has-tip tip-top">?</span></h2>
 
                     <section>
                     <ul id="studentsList" class="information-list">
@@ -114,7 +114,7 @@
                             <h3>{{ report.name }}</h3>
                         </a>
                         <p class="meta">
-                            <i title="Pastoral Groups" class="icon-group"></i>
+                            <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
                             {% for group in report.groups %}
                                 {{ group.name }}{% if not loop.last %},{% endif %}
                             {% endfor %}

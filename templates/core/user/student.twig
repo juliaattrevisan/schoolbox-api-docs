@@ -254,7 +254,7 @@
                             {% if isStaff or isParentOfStudent %}
                                 <li>
                                     <a href="{{ routeLookup('pastoral.getStudent', {studentId: user.id}) }}"
-                                       class="icon-pastoral">Pastoral Care</a>
+                                       class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
                                 </li>
                             {% endif %}
                         {% endif %}

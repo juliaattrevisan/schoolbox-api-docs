@@ -5,7 +5,7 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ 'Pastoral Care',              routeLookup('pastoral.getIndex') ],
+[ locale.pastoralCare.proper,              routeLookup('pastoral.getIndex') ],
 [ student.fullName,      routeLookup('pastoral.getStudent', {studentId: student.id}) ],
 [ 'Linked Records - ' ~ linkedStudent.fullName ]
 ) }}
@@ -21,7 +21,7 @@
 <div class="row actions-small-2">
     <div class="list-item">
         <div class="small-12 island">
-            <h2 class="subheader">Pastoral Profile</h2>
+            <h2 class="subheader">{{ locale.pastoral.proper }} Profile</h2>
         </div>
     </div>
     <nav>
@@ -35,7 +35,7 @@
 
         {% set routeGetStudentRecordInsertForm = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
         {% if routeGetStudentRecordInsertForm %}
-            <a href="{{ routeGetStudentRecordInsertForm }}" class="icon-add" title="Add Pastoral Record To {{ student.fullName }}"></a>
+            <a href="{{ routeGetStudentRecordInsertForm }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record To {{ student.fullName }}"></a>
         {% endif %}
 
         {# Modify record #}
@@ -67,9 +67,9 @@
 
     <div id="typeSelector">
         <div class="small-12 island">
-            <label>Filter Pastoral Records By Type</label>
+            <label>Filter {{ locale.pastoral.proper }} Records By Type</label>
             <select data-type-filter>
-                <option value="">Show All Pastoral Record Types</option>
+                <option value="">Show All {{ locale.pastoral.proper }} Record Types</option>
                 {% for type in types %}
                     <option value="{{ type.id }}" {% if typeSelected == type.id %}selected{% endif %}>{{ type.name }}</option>
                 {% endfor %}
@@ -92,15 +92,15 @@
     <div class="small-12 column">
         <div class="empty-state">
             <i class="icon-pastoral"></i>
-            <p>There are linked pastoral records {% if typeSelected is not empty %}of this type{% endif %} available for {{ student.fullName }} and {{ linkedStudent.fullName }}.</p>
+            <p>There are linked {{ locale.pastoral }} records {% if typeSelected is not empty %}of this type{% endif %} available for {{ student.fullName }} and {{ linkedStudent.fullName }}.</p>
             {% set routeGetStudentRecordInsertForm = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
             {% if routeGetStudentRecordInsertForm %}
                 <p>
-                    You can <a href="{{ routeGetStudentRecordInsertForm }}">create a new pastoral record</a> now
+                    You can <a href="{{ routeGetStudentRecordInsertForm }}">create a new {{ locale.pastoral }} record</a> now
                     {% if typeSelected is not empty %}
                         or
                         <a href="{{ routeLookup('pastoral.getLinked', {'studentId': student.id, 'linkedStudentId': linkedStudent.id}) }}">
-                            remove your pastoral type filter
+                            remove your {{ locale.pastoral }} type filter
                         </a>
                     {% endif %}
                 </p>
@@ -119,7 +119,7 @@
         <div class="small-12 island">
 
             <h2 class="subheader">
-                Pastoral Care Records Linked With {{ linkedStudent.fullName }}
+                {{ locale.pastoralCare.proper }} Records Linked With {{ linkedStudent.fullName }}
                 <span class="hide-for-medium-down right">
                     {{ paginator.text(pageCurrent, recordCount) }}
                 </span>

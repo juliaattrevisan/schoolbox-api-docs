@@ -13,7 +13,7 @@
 
 <div class="row">
     <div class="small-12 island collapse">
-        <h1>Pastoral Care Records</h1>
+        <h1>{{ locale.pastoralCare.proper }} Records</h1>
         <dl class="sub-nav">
             <dd>
                 <a href="/adminv2/import/user">User</a>
@@ -31,7 +31,7 @@
                 <a href="/adminv2/photos/upload">User Photos</a>
             </dd>
             <dd class="active">
-                <a href="/adminv2/import-pastoral">Pastoral Care Records</a>
+                <a href="/adminv2/import-pastoral">{{ locale.pastoralCare.proper }} Records</a>
             </dd>
         </dl>
     </div>
@@ -39,7 +39,7 @@
 
 <div class="small-12 island">
     {% if log | length > 0 %}
-        <h2 class="subheader">Pastoral Care Log</h2>
+        <h2 class="subheader">{{ locale.pastoralCare.proper }} Log</h2>
         <table>
             <thead>
                 <tr>

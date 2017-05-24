@@ -2,7 +2,7 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    ['Pastoral Care', routeLookup('pastoral.getIndex')],
+    [locale.pastoralCare.proper, routeLookup('pastoral.getIndex')],
     [record.student.fullName, routeLookup('pastoral.getStudent', {studentId: record.student.id})],
     [record.heading]
 ) }}
@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="small-12 column">
-        <h1>Pastoral Record</h1>
+        <h1>{{ locale.pastoral.proper }} Record</h1>
     </div>
 </div>
 

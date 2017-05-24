@@ -2,7 +2,7 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ 'Pastoral Care',              routeLookup('pastoral.getIndex') ],
+[ locale.pastoralCare.proper,              routeLookup('pastoral.getIndex') ],
 [ 'Search Results - ' ~ search ]
 ) }}
 
@@ -10,7 +10,7 @@
     <div class="list-item">
         <div class="small-12 island">
 
-            <h1>Search Pastoral Records</h1>
+            <h1>Search {{ locale.pastoral.proper }} Records</h1>
             <h2 class="subheader">Search Results</h2>
 
             {% include '@pastoral/fragments/search.twig' with {'search': search} %}
@@ -19,7 +19,7 @@
 
                 {% if results | length %}
 
-                    <h2 class="subheader">Matching Pastoral Records</h2>
+                    <h2 class="subheader">Matching {{ locale.pastoral.proper }} Records</h2>
                     <section>
                         <ul class="action-list">
                             {% for record in results %}
@@ -46,10 +46,10 @@
 
                 {% else %}
 
-                    <h2 class="subheader">No Matching Pastoral Records Found</h2>
+                    <h2 class="subheader">No Matching {{ locale.pastoral.proper }} Records Found</h2>
                     <div class="empty-state">
                         <i class="icon-pastoral"></i>
-                        <p>No pastoral records were found that matched your search.</p>
+                        <p>No {{ locale.pastoral }} records were found that matched your search.</p>
                         <p>Did you want to try <a href="/search?keyword={{ search }}">searching the whole system?</a>.</p>
                     </div>
 

@@ -2,27 +2,27 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ 'Pastoral Care' ]
+[ locale.pastoralCare.proper ]
 ) }}
 
 <div class="row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>Pastoral Care</h1>
+            <h1>{{ locale.pastoralCare.proper }}</h1>
         </div>
     </div>
 </div>
 
 <div class="row actions-small-1">
     <nav>
-        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="Manage reports"></a>
+        <a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>
 
         {# Pastoral moderators can manage pastoral groups #}
 
         {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
 
         {% if routeGetGroups %}
-            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage pastoral groups"></a>
+            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
         {% endif %}
     </nav>
 </div>
@@ -35,12 +35,12 @@
         <div class="small-12 island">
             <section class="content">
                 <h2>
-                    Welcome to the Pastoral Care Dashboard!
+                    Welcome to the {{ locale.pastoralCare.proper }} Dashboard!
                 </h2>
                 <i class="icon-pastoral size-64 left"></i>
                 <p>
-                    It looks like this is the first time you have used the pastoral care system. Begin by searching for a students
-                    name, or the details of a pastoral record in the search box below. Once you start using the system this page will
+                    It looks like this is the first time you have used {{ locale.pastoralCare }}. Begin by searching for a students
+                    name, or the details of a {{ locale.pastoral }} record in the search box below. Once you start using the system this page will
                     display your recently viewed students and any items which have been flagged by yourself and other staff as important.
                 </p>
             </section>
@@ -115,7 +115,7 @@
 
                             {% set routeGetGroupsModify = routeLookupIfAuthorized('pastoralManagement.getGroupsModify', {groupId: membership.group.id}) %}
                             {% if routeGetGroupsModify %}
-                            <a href="{{ routeGetGroupsModify }}" title="Modify Pastoral Group">
+                            <a href="{{ routeGetGroupsModify }}" title="Modify {{ locale.pastoral.proper }} Group">
                                 {% endif %}
                                 {% endif %}
                                 <h3>{{ membership.group.name }}</h3>
