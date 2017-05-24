@@ -350,10 +350,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             return false;
         }
 
-        if ($this->getConfigLoader()->get('restrict_parent_duework_access')) {
-            return false;
-        }
-
         // parents are limited to their own children (this is expensive so definitely do this last!)
         $student->loadParents();
         if ($student->isChildOf($user)) {

@@ -198,8 +198,6 @@ class Controller extends Assessment\Controller
      */
     public function getSummary(Participant $participant)
     {
-        $this->assertParticipantAccess($participant);
-
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
