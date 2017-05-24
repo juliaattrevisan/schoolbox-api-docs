@@ -97,7 +97,7 @@
                 </nav>
                 {% if canWrite  %}
                     <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
-                        <li><a href="{{ routeLookup('learningAssessment.getAssessment', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
+                        <li><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}" class="icon-progress">View Status</a></li>
 
                         {% if assessment is quiz %}
                             <li><a href="{{ routeLookup('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) }}" class="icon-modify" title="Modify this assessment">Modify</a></li>
