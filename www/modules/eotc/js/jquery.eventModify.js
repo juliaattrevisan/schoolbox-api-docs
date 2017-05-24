@@ -196,27 +196,26 @@
 				return (ticValue == '[]' || ticValue == '');
 			};
 
-			/* Ensure you don't have a 0 duration event
+			var allday = $('input[name=allday]').val();
+
+			var dateFormat = allday?dateDisplayFormats.localDateTime:dateDisplayFormats.localDate;
+
+				/* Ensure you don't have a 0 duration event
 			 */
 			$.validator.addMethod("validateDatetimesDifferent", function(value, element) {
-				var startDatetime = [
-					$('input[name=startDate]').val(),
-					$('input[name=startHour]').val(),
-					$('input[name=startMinute]').val(),
-					$('select[name=startPeriod]').val()
-				];
+				var settings = {
+					startDatetime: $('input[name=startDate]').val(),
+					endDatetime: $('input[name=endDate]').val(),
+				}
 
-				var endDatetime = [
-					$('input[name=endDate]').val(),
-					$('input[name=endHour]').val(),
-					$('input[name=endMinute]').val(),
-					$('select[name=endPeriod]').val()
-				];
+				var start = settings.startDate;
+				var end = settings.endDate;
 
-				for (var i = 0; i < startDatetime.length; i++) {
-					if (startDatetime[i] != endDatetime[i]) {
-						return true;
-					}
+				var startDatetime = moment(start, dateFormat);
+				var endDatetime   = moment(end, dateFormat);
+
+				if (startDatetime !== endDatetime) {
+					return true;
 				}
 
 				return false;
@@ -226,22 +225,15 @@
 			 */
 			$.validator.addMethod("validateDatetimesCorrect", function(value, element) {
 				var settings = {
-					dateFormat: 'DD/MM/YYYY h:mm a',
 					startDate: $('input[name=startDate]').val(),
-					startHour: $('input[name=startHour]').val(),
-					startMinute: $('input[name=startMinute]').val(),
-					startPeriod: $('select[name=startPeriod]').val().toString().toLowerCase(),
 					endDate: $('input[name=endDate]').val(),
-					endHour: $('input[name=endHour]').val(),
-					endMinute: $('input[name=endMinute]').val(),
-					endPeriod: $('select[name=endPeriod]').val().toString().toLowerCase()
 				};
 
-				var start = settings.startDate + ' ' + settings.startHour + ':' + settings.startMinute + ' ' + settings.startPeriod;
-				var end = settings.endDate + ' ' + settings.endHour + ':' + settings.endMinute + ' ' + settings.endPeriod;
+				var start = settings.startDate;
+				var end = settings.endDate;
 
-				var startDatetime = moment(start, settings.dateFormat);
-				var endDatetime   = moment(end, settings.dateFormat);
+				var startDatetime = moment(start, dateFormat);
+				var endDatetime   = moment(end, dateFormat);
 
 				/* If both dates are valid and end date occurs before start
 				 */
@@ -283,41 +275,11 @@
 					validateDatetimesDifferent: true,
 					validateDatetimesCorrect: true
 				},
-				startHour: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				startMinute: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				startPeriod: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
 				endDate: {
 					required: true,
 					validateDatetimesDifferent: true,
 					validateDatetimesCorrect: true
 				},
-				endHour: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				endMinute: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				endPeriod: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				}
 			}
 		}
 
