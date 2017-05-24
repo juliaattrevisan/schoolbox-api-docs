@@ -203,7 +203,7 @@
                 doASaveActionNao.apply(input);
             }, 600);
 
-            if ($(this).val() === $(this).data('preval')) {
+            if ($(this).val() == $(this).data('preval')) {
                 return;
             }
 
@@ -219,7 +219,7 @@
             // do a preval comparison to find out if we can skip AJAX
             // (Do not skip attachzones)
             var $this = $(this);
-            if ((! ($this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 ))) && $this.val() === $this.data('preval')) {
+            if ((! ($this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 ))) && $this.val() == $this.data('preval')) {
                 return;
             }
 
