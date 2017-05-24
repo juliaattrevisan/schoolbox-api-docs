@@ -103,6 +103,8 @@
                                     {% set humanMark        = assessment.getHumanReadableMark(student, true) %}
                                     {% set normalisedMark   = assessment.getNormalisedMark(student, true) %}
 
+                                    {% set mostRecentResponse = participant.findMostRecentResponse %}
+
                                     {% set responseRequired = participant.responseRequired %}
                                     {% set feedbackRequired = participant.feedbackRequired %}
                                     {% set reviewComplete   = participant.reviewComplete %}
@@ -118,7 +120,6 @@
                                         {% set colorClass = classFeedbackRequired %}
                                     {% else %}
                                         {% if assessment is task %}
-                                            {% set mostRecentResponse = participant.findMostRecentResponse %}
                                             {% if mostRecentResponse and not mostRecentResponse.selfAssessed %}
                                                 {% set colorClass = mostRecentResponse.markedComplete ? classMastered : classFailed %}
                                             {% else %}
@@ -138,7 +139,8 @@
                                         {% set title = 'Awaiting Teacher ' ~ (assessment is task ? 'Confirmation' : 'Assessment') %}
                                     {% elseif isNextUpcoming %}
                                         {% set title = 'Next Assessment' %}
-                                    {% elseif responseRequired and not assessment is task %}
+                                    {# Response required, and not a task marked by the teacher (as incomplete) ? #}
+                                    {% elseif responseRequired and not (assessment is task and mostRecentResponse and not mostRecentResponse.selfAssessed ) %}
                                         {% set title = 'Response Required.' %}
                                         {% if assessment.dueAt.isPast %}
                                             {% set title = title ~ ' Past Due Date.' %}
@@ -152,12 +154,15 @@
                                     {% endif %}
 
                                     {# Determine text #}
-                                    {% if participant.hasMark %}
+                                    {% if isNextUpcoming %}
+                                        {# Cannot have a mark if is 'nextUpcoming' #}
+                                        {% set text = '<i class="icon-eye">' %}
+                                    {% elseif reviewComplete %}
+                                        {% set text = assessment is task ? 'Mastered' : humanMark %}
+                                    {% elseif participant.hasMark and not assessment is task %}
                                         {% set text = humanMark %}
                                     {% elseif feedbackRequired %}
                                         {% set text = '<i class="icon-pause">' %}
-                                    {% elseif isNextUpcoming %}
-                                        {% set text = '<i class="icon-eye">' %}
                                     {% elseif assessment.dueAt.isPast %}
                                         {% set text = '<i class="icon-close">' %}
                                     {% else %}
