@@ -11,7 +11,7 @@
 
                 {# Display name of poster #}
 
-                <p class="spaced meta">
+                <p class="meta">
                     Posted by
                     <a href="{{ _self.userProfileLink(record.owner) }}">
                         {{ record.owner.fullName }}
@@ -28,12 +28,12 @@
 {% if record.attachments | length and showBody %}
     {% for attachment in record.attachments %}
         <div class="card small-12">
-            <a href="/storage/fetch.php?hash={{ attachment.storage.hash }}" target="_blank">
-                {% if attachment.storage.mimetype.isImage %}
+            <a href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}" target="_blank">
+		        {% if attachment.storage.mimetype.isImage %}
                     <img src="/storage/image.php?hash={{attachment.storage.hash}}&size=square64">
-                {% else %}
+		        {% else %}
                     <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
-                {% endif %}
+		        {% endif %}
                 {{ attachment.storage.filename }}
             </a>
             <p class="meta">{{ attachment.storage.size | bytes }}</p>
