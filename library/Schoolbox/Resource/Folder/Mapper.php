@@ -539,7 +539,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * It should only get the children of $id and probably should be
      * established in Ancestry
      *
-     * @param int $id
+     * @param int|int[] $id
      * @return GenericCollection|Model[]
      */
     public function findByParent($id)
@@ -582,24 +582,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // Return what we got
 
         return $collection;
-    }
-
-    /**
-     * Get a hydrated category
-     *
-     * @param $column
-     * @param $value
-     * @return Collection
-     */
-    public function findByColumnWithCodes($column, $value)
-    {
-        $categories = $this->findByColumn($column, $value);
-
-        foreach ($categories as $category) {
-            $category->setCodes($this->getJoinMapper('codes')->findByColumn('folder_id', $category->getId()));
-        }
-
-        return $categories;
     }
 
 
