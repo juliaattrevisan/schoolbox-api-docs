@@ -78,19 +78,31 @@ class Controller extends Component_Dashboard_ControllerAbstract
          */
         $this->headlineList = [];
 
+        /* Find out if we have any news items to display
+         * If none, just...not render the component at all
+         */
+        $hasItems = false;
+
         /** @var Topic $currentTopic */
         foreach ($this->getAllTopics() as $currentTopic) {
             $topicItems = $this->news->getNewsListing($archive, $currentTopic->getName(), $year, $month, $index, $this->getLimit(), $orderByDate);
 
             if ($topicItems) {
                 $this->headlineList[$currentTopic->getId()] = $topicItems;
+                $hasItems = true;
             }
             else {
                 $this->headlineList[$currentTopic->getId()] = [];
             }
         }
 
-        return count($this->headlineList) > 0;
+        /* Only render component if items exist
+         */
+        if ($hasItems) {
+            return count($this->headlineList) > 0;
+        }
+
+        return false;
     }
 
     /**
@@ -189,6 +201,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     protected function getLimit()
     {
+
         return $this->limit;
     }
 
