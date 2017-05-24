@@ -373,15 +373,45 @@
                                    id="datepicker-datetime-allday"
                                    data-datepicker
                                    data-datepicker-time
+                                   data-datepicker-alldayswitch >
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>All-day sync</legend>
+
+                    <div class="column small-12">
+                        <p>
+                           This is a pair of input fields synced by the all-day hidden field
+                        </p>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Date and time - start:
+                            <input type="text"
+                                   id="datepicker-datetime-allday-start"
+                                   data-datepicker
+                                   data-datepicker-time
                                    data-datepicker-alldayswitch
                                    data-datepicker-alldayinput="datepicker-datetime-allday-switch">
                         </label>
-                        <input type="checkbox" value="1" id="datepicker-datetime-allday-switch" checked="checked">
-                        <label for="datepicker-datetime-allday-switch" class="checkbox-label">This should be checked if all-day is on, and not if off</label>
+                        <p>This should be a hidden field (type="hidden"). Datepicker of either of the associated fields above will set a value of "0" or "1" to it</p>
+                        <label>All-day hidden field</label>
+                        <input id="datepicker-datetime-allday-switch" value="0">
 
-                        <!--<label>This field gets updated with the all-day value from the datepicker-->
-                            <!--<input id="datepicker-datetime-allday-switch" type="text" placeholder="All day?" readonly />-->
-                        <!--</label>-->
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Date and time - end:
+                            <input type="text"
+                                   id="datepicker-datetime-allday-finish"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-alldayswitch
+                                   data-datepicker-alldayinput="datepicker-datetime-allday-switch">
+                        </label>
+
                     </div>
                 </fieldset>
 
