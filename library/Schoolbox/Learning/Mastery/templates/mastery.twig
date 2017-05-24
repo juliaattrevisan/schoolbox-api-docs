@@ -107,10 +107,8 @@
 
                                     {# Have we not encountered an assessment that requires a response yet, and this assessment requires a resposne ? #}
                                     {% if not nextUpcomingFound and responseRequired and assessment.dueAt.isFuture %}
-                                        {% if not (assessment is task and participant.hasMark) %}
-                                            {% set isNextUpcoming = true %}
-                                            {% set nextUpcomingFound = true %}
-                                        {% endif %}
+                                        {% set isNextUpcoming    = true %}
+                                        {% set nextUpcomingFound = true %}
                                     {% endif %}
 
                                     {# Determine background color #}
