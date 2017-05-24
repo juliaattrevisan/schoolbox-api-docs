@@ -30,7 +30,7 @@ Usage:
             },
             messages: {
                 name: "Please enter a name for this course.",
-                parent: "Please select a {{ locale.faculty }} or subject for this course."
+                parent: "Please select a {{ locale.faculty }} or {{ locale.subject }} for this course."
             },
             onfocusout: false,
             onkeyup: false
@@ -150,7 +150,7 @@ Usage:
                 },
                 messages: {
                     name: "Please enter a name for this course",
-                    parent: "Please select a {{ locale.faculty }} or subject for this course"
+                    parent: "Please select a {{ locale.faculty }} or {{ locale.subject }} for this course"
                 }
             }
         });
@@ -240,10 +240,10 @@ Usage:
                     </div>
                     <div class="small-12 column">
                         <label>
-                            {{ locale.faculty.proper }} / Subject
+                            {{ locale.faculty.proper }} / {{ locale.subject.proper }}
 
                             <a data-course-parent-selector data-source="parent"
-                               title="Click to change the {{ locale.faculty }} / subject this course belongs to"
+                               title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
                                class="source-select icon-folder"
                                href="#" >
                                 {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}

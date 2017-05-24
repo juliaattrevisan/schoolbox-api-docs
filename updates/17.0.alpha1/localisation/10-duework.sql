@@ -6,3 +6,5 @@ INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_fi
 VALUES ('submissionHistory', 'Submission History', 'submission history', 'submission histories', 1, 'a');
 INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_first, indefinite_article)
 VALUES ('faculty', 'Faculty', 'faculty', 'faculties', 1, 'a');
+INSERT INTO localisation (term, title, singular_form, plural_form, capitalise_first, indefinite_article)
+VALUES ('subject', 'Subject', 'subject', 'subjects', 1, 'a');
