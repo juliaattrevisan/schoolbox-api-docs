@@ -85,9 +85,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
             if ($topicItems) {
                 $this->headlineList[$currentTopic->getId()] = $topicItems;
             }
-            else {
-                $this->headlineList[$currentTopic->getId()] = [];
-            }
         }
 
         return count($this->headlineList) > 0;
@@ -189,6 +186,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     protected function getLimit()
     {
+
         return $this->limit;
     }
 

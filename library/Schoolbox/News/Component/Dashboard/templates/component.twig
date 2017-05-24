@@ -13,7 +13,7 @@
 
                 {# Only display topic if there is actually news in it #}
 
-                {% if news[topic.id] | length %}
+                {% if news[topic.id] is defined %}
                     <dd {% if not active and not allDefault %}class="active"{% set active = true %}{% endif %}>
                         <a href="#component{{ componentInstanceId }}-{{ topic.id }}">{{ topic.name }}</a>
                     </dd>
@@ -38,33 +38,35 @@
                 {% set active = false %}
 
                 {% for topic in topics %}
-                    <ul class="news-list content {% if not active and news[topic.id] | length  and not allDefault %}active{% set active = true %}{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
-                        {% for item in news[topic.id] %}
-                            <li>
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        {% if item.showLink %}
-                                            <a href="/news/item/{{ item.id }}" title="{{ item.heading }}">
-                                        {% endif %}
-
-                                            {% if item.image %}
-                                                <img src="/storage/image.php?hash={{ item.image }}&size=square64">
+                    {% if news[topic.id] is defined %}
+                        <ul class="news-list content {% if not active and not allDefault %}active{% set active = true %}{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
+                            {% for item in news[topic.id] %}
+                                <li>
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                            {% if item.showLink %}
+                                                <a href="/news/item/{{ item.id }}" title="{{ item.heading }}">
                                             {% endif %}
-                                            <h3>{{ item.heading }}</h3>
 
-                                        {% if item.showLink %}
-                                            </a>
-                                        {% endif %}
+                                                {% if item.image %}
+                                                    <img src="/storage/image.php?hash={{ item.image }}&size=square64">
+                                                {% endif %}
+                                                <h3>{{ item.heading }}</h3>
 
-                                        <p class="meta">
-                                            Posted by <a href="/search/user/{{ item.uid }}">{{ item.author }}</a> {{ item.date.getRelativeTime }}
-                                        </p>
+                                            {% if item.showLink %}
+                                                </a>
+                                            {% endif %}
+
+                                            <p class="meta">
+                                                Posted by <a href="/search/user/{{ item.uid }}">{{ item.author }}</a> {{ item.date.getRelativeTime }}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                                <article>{{ item.blurb | raw }}</article>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                                    <article>{{ item.blurb | raw }}</article>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 {% endfor %}
 
                 {# Special 'All' grouping with every article #}
