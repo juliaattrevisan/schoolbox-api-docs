@@ -211,6 +211,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param Model $folder
      * @return bool
+     * @throws DefinitionException If specified join not defined
      */
     public function softDeleteCourseSpecification(Model $folder)
     {
@@ -245,6 +246,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param Model $folder
      * @return bool
+     * @throws DefinitionException If specified join not defined
      */
     public function softDeleteUnitSpecification(Model $folder)
     {
@@ -290,6 +292,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param Model $folder
      * @param int $limit
      * @return File\Model[]|Collection
+     * @throws DefinitionException If specified join not defined
      */
     public function findImages(Model $folder, $limit = 0)
     {
@@ -311,6 +314,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Pre-save callback to ensure a folder's codes are valid
      * @param Model $model
      * @return bool
+     * @throws DefinitionException If specified join not defined
      */
     public function validateFolderCodes($model)
     {
@@ -389,6 +393,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param Model $model
      * @param Model $previous
      * @return bool
+     * @throws DefinitionException If specified join not defined
      */
     public function updateInheritedPermissions($model, $previous = null)
     {
@@ -406,6 +411,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param Model $model
      * @param Model $previous
      * @return bool
+     * @throws DefinitionException If specified join not defined
      */
     public function updateFolderCodes($model, $previous = null)
     {
@@ -457,6 +463,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param Model $model
      * @param Model $previous
      * @return bool
+     * @throws DefinitionException If specified join not defined
      */
     public function saveHomepageConfig($model, $previous = null)
     {
@@ -476,6 +483,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Called as a post delete callback.
      *
      * @param Model $object
+     * @throws DefinitionException If specified join not defined
      */
     public function hardDeleteCategoryCodes(Model $object)
     {
@@ -489,6 +497,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Called as a post soft-delete callback.
      *
      * @param Model $object
+     * @throws DefinitionException If specified join not defined
      */
     public function softDeleteCategoryCodes(Model $object)
     {
