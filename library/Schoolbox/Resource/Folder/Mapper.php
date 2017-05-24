@@ -35,7 +35,6 @@ use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\GroupMapper;
-use Schoolbox\Resource\Group;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\LinkMapper;
