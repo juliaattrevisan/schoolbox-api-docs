@@ -561,11 +561,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findAllChildren($id, $recurse = false)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         // Find all children of this node
 
-        $children = $this->findByColumn("parent", $id);
+        $children = $this->findByColumn('parent', $id);
 
         foreach ($children as $child) {
             $collection->add($child);
@@ -574,8 +574,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             if ($recurse) {
                 $kids = $this->findAllChildren($child->getId(), true);
-                foreach ($kids as $kid)
+                foreach ($kids as $kid) {
                     $collection->add($kid);
+                }
             }
         }
 
