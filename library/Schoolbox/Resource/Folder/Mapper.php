@@ -535,84 +535,22 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * Get a list of categorys which belong to a particular parent
+     * Get a list of folders which belong to a particular parent
      *
      * It should only get the children of $id and probably should be
      * established in Ancestry
      *
      * @param int $id
-     * @return Collection|Model[]
-     * @throws MapperException
+     * @return GenericCollection|Model[]
      */
     public function findByParent($id)
     {
-        $code_mapper = $this->getJoinMapper('codes');
-        $homepageConfig_mapper = $this->getJoinMapper('homepages');
-        $group_mapper = $this->getJoinMapper('groups');
-        $courseSpecMapper = $this->getJoinMapper('course_specification');
-        $unitSpecMapper = $this->getJoinMapper('unit_specification');
+        $builder = $this->getPredicateBuilder();
+        $builder->equals("{$this->getTable()}.parent", $id);
 
+        $options = ['order' => ["{$this->getTable()}.name" => 'DESC']];
 
-
-        $query = "
-            SELECT
-                {$this->getColumnString('c')},
-                {$code_mapper->getColumnString('cc')},
-                {$homepageConfig_mapper->getColumnString('hp')},
-                {$group_mapper->getColumnString('ug')},
-                {$courseSpecMapper->getColumnString('cs')},
-                {$unitSpecMapper->getColumnString('us')}
-            FROM {$this->getTable()} c
-            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
-            LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
-            LEFT JOIN {$this->getJoinSql('course_specification', 'c', 'cs')}
-            LEFT JOIN {$this->getJoinSql('unit_specification', 'c', 'us')}
-            WHERE c.deleted_at IS NULL AND c.parent=?
-            ORDER BY c.name
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute(array($id));
-
-        $collection = new Collection();
-        $category = null;
-
-        foreach ($statement as $row) {
-            $existingCat = $collection->filterBy('id', $row['c.id']);
-            if ($existingCat->count()) {
-                //Folder already exists in collection
-                $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getFolder()->getId()) {
-                    $existingCat->first()->addCode($code);
-                }
-            } else {
-                $category = $this->hydrate($row, 'c');
-
-                /** @var HomepageConfig $homepageConfig */
-                $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
-                $category->setHomepage($homepageConfig);
-
-                /** @var \Schoolbox\Resource\Group $group */
-                $group = $group_mapper->hydrate($row, 'ug');
-                $category->setGroup($group);
-
-                /** @var \Schoolbox\Resource\Folder\Code\Model $code */
-                $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getFolder() instanceof Model) {
-                    $category->addCode($code);
-                }
-                $collection->add($category);
-
-                $courseSpec = $courseSpecMapper->hydrate($row, 'cs');
-                $category->setCourseSpecification($courseSpec);
-
-                $unitSpec = $unitSpecMapper->hydrate($row, 'us');
-                $category->setUnitSpecification($unitSpec);
-            }
-        }
-
-        return $collection;
+        return $this->findByPredicates($builder, $options);
     }
 
     /**
