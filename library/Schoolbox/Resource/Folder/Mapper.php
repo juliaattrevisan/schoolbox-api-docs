@@ -750,21 +750,17 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
 
             // Folder Codes: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
-            $codeCollection = $folders[$folderId]->getCodes();
-            $code           = $row['cc.code'];
-            if ($code && !$codeCollection->offsetExists($code)) {
-                $folderCode            = $codeMapper->hydrate($row, 'cc');
-                $codeCollection[$code] = $folderCode;
-                $folderCode->setFolder($folders[$folderId]);
+            $folderCode = $codeMapper->hydrate($row, 'cc');
+            if ($folderCode) {
+                $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
             }
 
             // Hydrate curriculum node codes (avoiding duplicates)
             // BTW fetching multiple 1-M relations in a single query
             // is how you get ants!
-            $nodeCollection = $folders[$folderId]->getCurriculumNodes();
             $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
-            if($curriculumNode && !$nodeCollection->offsetExists($curriculumNode->getId())){
-                $nodeCollection[$curriculumNode->getId()] = $curriculumNode;
+            if($curriculumNode){
+                $folders[$folderId]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
             }
         }
 
