@@ -1,5 +1,9 @@
-$pickr-month-height: 40px;
-$pickr-month-padding: 5px;
+$pickr-month-height: rem-calc(40);
+$pickr-month-padding: rem-calc(5);
+
+$pickr-border-color: #e6e6e6;
+$pickr-border: rem-calc(1) solid $pickr-border-color;
+$pickr-hover-background: lighten($accent-foreground, 60%);
 
 .adtp {
 
@@ -12,7 +16,7 @@ $pickr-month-padding: 5px;
     .flatpickr-calendar {
         border-radius: 0;
         margin: 0 auto;
-        border: 1px solid #e6e6e6;
+        border: $pickr-border;
         box-shadow: none;
 
         &.arrowTop:before,
@@ -22,7 +26,7 @@ $pickr-month-padding: 5px;
     }
 
     .flatpickr-innerContainer {
-        border-bottom: 1px solid #e6e6e6;
+        border-bottom: $pickr-border;
     }
 
     .flatpickr-month {
@@ -50,11 +54,11 @@ $pickr-month-padding: 5px;
         top: $pickr-month-padding;
 
         input.cur-year {
-            font-weight: 400;
+            font-weight: $font-weight-normal;
         }
 
         .numInputWrapper {
-            width: 70px;
+            width: rem-calc(70);
         }
 
         span.cur-month:hover {
@@ -75,8 +79,8 @@ $pickr-month-padding: 5px;
         &:focus,
         &.prevMonthDay:focus,
         &.nextMonthDay:focus {
-            background: #e5f4ff;
-            border-color: #e5f4ff;
+            background: $pickr-hover-background;
+            border-color: $pickr-hover-background;
         }
 
         &.selected,
@@ -84,8 +88,8 @@ $pickr-month-padding: 5px;
         &.selected:hover,
         &.selected.prevMonthDay,
         &.selected.nextMonthDay {
-            background: #0066b0;
-            border-color: #0066b0;
+            background: $accent-foreground;
+            border-color: $accent-foreground;
         }
 
         &[data-heat]:before {
@@ -118,12 +122,12 @@ $pickr-month-padding: 5px;
 
     .dateIsPicked .flatpickr-innerContainer + .flatpickr-time {
         border-top: none;
-        border-bottom: 1px solid #e6e6e6;
+        border-bottom: $pickr-border;
     }
 
     .flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {
         border-top: none;
-        border-bottom: 1px solid #e6e6e6;
+        border-bottom: $pickr-border;
     }
 
     .flatpickr-time {
@@ -167,7 +171,7 @@ $pickr-month-padding: 5px;
      * Timetable picker
      */
     .adtp-tt-container {
-        border: 1px solid #e6e6e6;
+        border: $pickr-border;
         padding: 0.75rem;
         margin-bottom: .25rem;
 
@@ -211,7 +215,7 @@ $pickr-month-padding: 5px;
 
     .adtp-tt-week-next,
     .adtp-tt-week-prev:hover {
-        color: #959ea9;
+        color: $aluminum;
     }
 
     .adtp-tt-date {
@@ -226,11 +230,11 @@ $pickr-month-padding: 5px;
     }
 
     span.displayDate {
-        color: #333;
+        color: #oil;
     }
 
     .adtp-tt-week-bold {
-        font-weight: 700;
+        font-weight: $font-weight-bold;
     }
 
 
@@ -239,11 +243,27 @@ $pickr-month-padding: 5px;
      */
     .adtp-response {
         margin-top: 1rem;
+
+        .top-due-work {
+            display:flex;
+            margin-bottom:.5rem;
+
+            .icon-next {
+                @extend .cursor-pointer;
+                line-height: rem-calc(44);
+            }
+        }
+    }
+
+    .adtp-response-duework {
+        .icon-previous {
+            color: $accent-foreground;
+        }
     }
 
     table.assessment-list td {
         border: 0;
-        line-height: 1em;
+        line-height: 1rem;
         padding: 0.325rem;
     }
 

@@ -133,6 +133,16 @@ h1{
 	text-transform: uppercase;
 }
 
+h1, h2, h3, h4, h5, h6 {
+	&.mini {
+		@extend .subheader;
+		font-size: 0.75rem;
+		margin-top: .3rem;
+		margin-bottom: .25rem;
+		font-weight: $font-weight-bold;
+	}
+}
+
 p{
 	@media #{$small-only} {
 		margin-bottom: rem-calc(($base-font-size - 8));
