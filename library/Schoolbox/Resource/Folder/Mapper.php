@@ -1034,7 +1034,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if (isset($code)) {
                 /** @var FolderCode\Model $codeModel */
                 $codeModel = $this->hydrateJoin($row, 'codes', 'cc');
-                $collection[$id][$codeModel->getCode()] = $codeModel;
+                $collection[$id]->getCodes()[$codeModel->getCode()] = $codeModel;
                 $codeModel->setFolder($collection[$id]);
             }
         }
