@@ -350,7 +350,7 @@
                         </p>
                     </div>
 
-                    <div class="column small-12 medium-4">
+                    <div class="column small-12 medium-6">
                         <label>Date only:
                             <input type="text"
                                    id="datepicker-date"
@@ -358,7 +358,7 @@
                         </label>
                     </div>
 
-                    <div class="column small-12 medium-4">
+                    <div class="column small-12 medium-6">
                         <label>Date and time:
                             <input type="text"
                                    id="datepicker-datetime"
@@ -366,14 +366,28 @@
                                    data-datepicker-time>
                         </label>
                     </div>
+                </fieldset>
 
-                    <div class="column small-12 medium-4">
+                <fieldset class="content">
+                    <div class="column small-12 medium-6">
                         <label>Date and time with all-day switch:
                             <input type="text"
                                    id="datepicker-datetime-allday"
                                    data-datepicker
                                    data-datepicker-time
-                                   data-datepicker-alldayswitch >
+                                   data-datepicker-alldayswitch>
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Time is set to the end of the day when all-day is checked:
+                            <input type="text"
+                                   id="datepicker-datetime-endofday"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-alldayswitch
+                                   data-datepicker-format="datetime"
+                                   data-datepicker-endofday>
                         </label>
                     </div>
                 </fieldset>
