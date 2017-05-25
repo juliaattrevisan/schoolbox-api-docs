@@ -196,52 +196,14 @@
 				return (ticValue == '[]' || ticValue == '');
 			};
 
-			/* Ensure you don't have a 0 duration event
-			 */
-			$.validator.addMethod("validateDatetimesDifferent", function(value, element) {
-				var startDatetime = [
-					$('input[name=startDate]').val(),
-					$('input[name=startHour]').val(),
-					$('input[name=startMinute]').val(),
-					$('select[name=startPeriod]').val()
-				];
-
-				var endDatetime = [
-					$('input[name=endDate]').val(),
-					$('input[name=endHour]').val(),
-					$('input[name=endMinute]').val(),
-					$('select[name=endPeriod]').val()
-				];
-
-				for (var i = 0; i < startDatetime.length; i++) {
-					if (startDatetime[i] != endDatetime[i]) {
-						return true;
-					}
-				}
-
-				return false;
-			}, "Start and End datetimes must differ");
-
 			/* Ensure start date occurs before end date
 			 */
 			$.validator.addMethod("validateDatetimesCorrect", function(value, element) {
-				var settings = {
-					dateFormat: 'DD/MM/YYYY h:mm a',
-					startDate: $('input[name=startDate]').val(),
-					startHour: $('input[name=startHour]').val(),
-					startMinute: $('input[name=startMinute]').val(),
-					startPeriod: $('select[name=startPeriod]').val().toString().toLowerCase(),
-					endDate: $('input[name=endDate]').val(),
-					endHour: $('input[name=endHour]').val(),
-					endMinute: $('input[name=endMinute]').val(),
-					endPeriod: $('select[name=endPeriod]').val().toString().toLowerCase()
-				};
 
-				var start = settings.startDate + ' ' + settings.startHour + ':' + settings.startMinute + ' ' + settings.startPeriod;
-				var end = settings.endDate + ' ' + settings.endHour + ':' + settings.endMinute + ' ' + settings.endPeriod;
-
-				var startDatetime = moment(start, settings.dateFormat);
-				var endDatetime   = moment(end, settings.dateFormat);
+				var allday = $('input[name=allday]').val(),
+					dateFormat = allday ? dateDisplayFormats.momentJs : dateDisplayFormats.momentJsDatetime,
+					startDatetime = moment($('input[name=startDate]').val(), dateFormat),
+					endDatetime   = moment($('input[name=endDate]').val(), dateFormat);
 
 				/* If both dates are valid and end date occurs before start
 				 */
@@ -251,6 +213,7 @@
 
 				return false;
 			}, "Start date and time must occur before end date and time");
+
 
 			return {
 				'campus[]': {
@@ -280,44 +243,12 @@
 				},
 				startDate: {
 					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				startHour: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				startMinute: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				startPeriod: {
-					required: true,
-					validateDatetimesDifferent: true,
 					validateDatetimesCorrect: true
 				},
 				endDate: {
 					required: true,
-					validateDatetimesDifferent: true,
 					validateDatetimesCorrect: true
 				},
-				endHour: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				endMinute: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				},
-				endPeriod: {
-					required: true,
-					validateDatetimesDifferent: true,
-					validateDatetimesCorrect: true
-				}
 			}
 		}
 

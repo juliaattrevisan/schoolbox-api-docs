@@ -3,10 +3,7 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/modules/eotc/js/jquery.eventModify.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
@@ -72,22 +69,6 @@
             }
         });
 
-        /* https://bugs.jqueryui.com/ticket/7451
-         */
-        $('input[name=startDate]').datepicker({
-            onClose: function() {
-                $('input[name=startDate]').valid();
-            }
-        });
-
-        /* https://bugs.jqueryui.com/ticket/7451
-         */
-        $('input[name=endDate]').datepicker({
-            onClose: function() {
-                $('input[name=endDate]').valid();
-            }
-        });
-
         $('[data-form=event]').eventModify({
             functionLabel: "{FUNCTION}"
         });
@@ -140,7 +121,7 @@
     <input id="efficacy" name="efficacy" type="hidden" value="self" />
     <input id="action" name="action" type="hidden" value="{FUNCTION}" />
     <input id="redirect" name="redirect" type="hidden" value="" />
-    <input type="hidden" name="allday" value="0" />
+    <input id="allday" type="hidden" name="allday" value="{EVENT_ALLDAY_CHECKED}" />
 
     <fieldset class="small-12 island">
         <section>
@@ -157,80 +138,17 @@
                 <div class="small-12 columns no-pad">
 
                     <div class="row">
-                        <div class="small-12 large-6 columns">
+                        <div class="small-6 columns">
                             <label>
                                 From
-                                <input name="startDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+                                <input name="startDate" id="startDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-sync data-datepicker-sync-enddate="#endDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                             </label>
                         </div>
-
-                        <div class="small-12 large-6 columns no-pad">
-                            <div data-timeinputs>
-                                <div class="small-6 large-4 columns">
-                                    <label>
-                                        Hour
-                                        <div class="timepick">
-                                            <input name="startHour" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="small-6 large-4 columns">
-                                    <label>
-                                        Minute
-                                        <div class="timepick">
-                                            <input name="startMinute" data-timepicker="minute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="small-12 large-4 columns">
-                                    <label>
-                                        Period
-                                        <select name="startPeriod">
-                                            <option value="am" {EVENT_START_AM}>AM</option>
-                                            <option value="pm" {EVENT_START_PM}>PM</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="small-12 large-6 columns">
+                        <div class="small-6 columns">
                             <label>
-                                To
-                                <input name="endDate" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+                                Until
+                                <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allday" data-datepicker-call="event" data-datepicker-endofperiod type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
                             </label>
-                        </div>
-
-                        <div class="small-12 large-6 columns no-pad">
-                            <div data-timeinputs>
-                                <div class="small-6 large-4 columns">
-                                    <label>
-                                        Hour
-                                        <div class="timepick">
-                                            <input name="endHour" data-timepicker="hour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="small-6 large-4 columns">
-                                    <label>
-                                        Minute
-                                        <div class="timepick">
-                                            <input name="endMinute" data-timepicker="minute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="small-12 large-4 columns">
-                                    <label>
-                                        Period
-                                        <select name="endPeriod">
-                                            <option value="am" {EVENT_END_AM}>AM</option>
-                                            <option value="pm" {EVENT_END_PM}>PM</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

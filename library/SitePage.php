@@ -373,6 +373,7 @@ class SitePage extends Page
             'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true',
             'DATEPICKER_FORMAT' => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
             'MOMENTJS_FORMAT' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
+            'MOMENTJS_FORMAT_DATETIME' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateTimeFormat)),
             'LOCAL_DATE_FORMAT' => $dateFormat,
             'LOCAL_DATETIME_FORMAT' => $dateTimeFormat,
             'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
