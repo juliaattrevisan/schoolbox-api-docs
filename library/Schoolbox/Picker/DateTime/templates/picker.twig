@@ -44,118 +44,118 @@
         {% if timetable %}
             <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
 
-                <div class="row">
-                    <div class="small-12 medium-{{ width }} columns">
+                <div class="small-12 medium-{{ width }} columns">
 
-                        {# Placeholder for timetable ot be rendered in #}
-                        <div id="timetable{{ id }}">
+                    {# Placeholder for timetable ot be rendered in #}
+                    <div id="timetable{{ id }}">
 
-                            <div class="row">
-                                <div class="column small-6">
-                                    <label for="">
-                                        Campus:
-                                        <select name="campus" data-adtp-tt-campus>
-                                            {% for campus in timetable %}
-                                                <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </label>
-                                </div>
-
-                                <div class="column small-6">
-                                    <label>
-                                        Term/Semester:
-                                        <select name="term" data-adtp-tt-term>
-                                            {% for term in terms %}
-                                                <option value="{{ term.id }}" data-duration="{{ term.duration }}" data-start-date="{{ term.start }}" data-end-date="{{ term.displayFinish }}" {% if term.id == timetableVars.term %} selected {% endif %}>{{ term.title }} </option>
-                                            {% endfor %}
-                                        </select>
-                                    </label>
-                                </div>
+                        <div class="row">
+                            <div class="column small-6">
+                                <label for="">
+                                    Campus:
+                                    <select name="campus" data-adtp-tt-campus>
+                                        {% for campus in timetable %}
+                                            <option value="{{ campus.campusId }}" data-days="{{ campus.dayCount }}" >{{ campus.campusName }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
                             </div>
 
-                            <div data-alert data-adtp-tt-error class="alert-box alert hide">Not enough data to build a timetable <br /> for the selected campus and term.<a href="#" class="close">×</a></div>
-
-                            <div data-adtp-tt-picker>
-                                <div class="adtp-tt-container">
-
-                                    <div data-tt-week-selector class="adtp-tt-week-selector">
-                                        <span class="icon-previous adtp-tt-week-prev" data-tt-prev></span>
-                                        <div class="adtp-tt-weeks" data-tt-weeks>{# via ajax #}</div>
-                                        <span class="icon-next adtp-tt-week-next" data-tt-next></span>
-                                    </div>
-
-
-                                    <label>
-                                        Day:
-                                    </label>
-
-                                    <div class="day-picker" data-tt-days>
-                                        {% for campus in timetable %}
-                                            {% for i in 1..timetable[campus.campusId].dayCount %}
-                                                <div class="flatpickr-day {{ activeClass }}" data-tt-day="{{ i }}">{{ i }}</div>
-                                            {% endfor %}
+                            <div class="column small-6">
+                                <label>
+                                    Term/Semester:
+                                    <select name="term" data-adtp-tt-term>
+                                        {% for term in terms %}
+                                            <option value="{{ term.id }}" data-duration="{{ term.duration }}" data-start-date="{{ term.start }}" data-end-date="{{ term.displayFinish }}" {% if term.id == timetableVars.term %} selected {% endif %}>{{ term.title }} </option>
                                         {% endfor %}
-                                    </div>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
 
+                        <div data-alert data-adtp-tt-error class="alert-box alert hide">Not enough data to build a timetable <br /> for the selected campus and term.<a href="#" class="close">×</a></div>
+
+                        <div data-adtp-tt-picker>
+                            <div class="adtp-tt-container">
+
+                                <div data-tt-week-selector class="adtp-tt-week-selector">
+                                    <span class="icon-previous adtp-tt-week-prev" data-tt-prev></span>
+                                    <div class="adtp-tt-weeks" data-tt-weeks>{# via ajax #}</div>
+                                    <span class="icon-next adtp-tt-week-next" data-tt-next></span>
                                 </div>
 
-                                <div>
 
-                                    <p class="meta adtp-tt-date">
-                                        Selected date:
-                                        <span class="displayDate" data-tt-selected-date>{# via ajax #}</span>
-                                    </p>
+                                <label>
+                                    Day:
+                                </label>
 
-                                    <div data-adtp-tt-time-controls>
-
-                                        <label>
-                                            Period:
-                                        </label>
-
-                                        {% for campus in timetable %}
-                                            <select data-tt-period>
-                                                <option value="allday">All Day</option>
-                                                {% for description in timetable[campus.campusId].desc %}
-                                                    <option value="" data-start-time="{{ timetable[campus.campusId].start[loop.index0] }}" data-end-time="{{ timetable[campus.campusId].end[loop.index0] }}">{{ description }}</option>
-                                                {% endfor %}
-                                            </select>
+                                <div class="day-picker" data-tt-days>
+                                    {% for campus in timetable %}
+                                        {% for i in 1..timetable[campus.campusId].dayCount %}
+                                            <div class="flatpickr-day {{ activeClass }}" data-tt-day="{{ i }}">{{ i }}</div>
                                         {% endfor %}
-                                    </div>
-
+                                    {% endfor %}
                                 </div>
+
+                            </div>
+
+                            <div>
+
+                                <p class="meta adtp-tt-date">
+                                    Selected date:
+                                    <span class="displayDate" data-tt-selected-date>{# via ajax #}</span>
+                                </p>
 
                                 <div data-adtp-tt-time-controls>
-                                    <div class="radiolist hide" data-adtp-tt-time>
-                                        <label>Time:</label>
-                                        <input type="radio" name="periodTime{{ id }}" value="start" id="periodStart{{ id }}" checked>
-                                        <label for="periodStart{{ id }}">Period start (<span data-start-time></span>)</label>
-                                        <input type="radio" name="periodTime{{ id }}" value="end" id="periodEnd{{ id }}">
-                                        <label for="periodEnd{{ id }}">Period end (<span data-end-time></span>)</label>
-                                    </div>
+
+                                    <label>
+                                        Period:
+                                    </label>
+
+                                    {% for campus in timetable %}
+                                        <select data-tt-period>
+                                            <option value="allday">All Day</option>
+                                            {% for description in timetable[campus.campusId].desc %}
+                                                <option value="" data-start-time="{{ timetable[campus.campusId].start[loop.index0] }}" data-end-time="{{ timetable[campus.campusId].end[loop.index0] }}">{{ description }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% endfor %}
                                 </div>
 
                             </div>
 
-                        </div>
-                    </div>
-
-                    {% if type == 'event' or type =='duework' %}
-                        <div class="small-12 medium-{{ width }} columns">
-
-                            {# Placeholder for appointments to be rendered in #}
-                            <div id="timetableResponse{{ id }}" class="adtp-response">
-                                <div class="loader hide"></div>
-                                <div id="timetableResponse{{ id }}-duework" class="adtp-response-duework"></div>
-                                <div id="timetableResponse{{ id }}-events"></div>
+                            <div data-adtp-tt-time-controls>
+                                <div class="radiolist hide" data-adtp-tt-time>
+                                    <label>Time:</label>
+                                    <input type="radio" name="periodTime{{ id }}" value="start" id="periodStart{{ id }}" checked>
+                                    <label for="periodStart{{ id }}">Period start (<span data-start-time></span>)</label>
+                                    <input type="radio" name="periodTime{{ id }}" value="end" id="periodEnd{{ id }}">
+                                    <label for="periodEnd{{ id }}">Period end (<span data-end-time></span>)</label>
+                                </div>
                             </div>
 
                         </div>
-                    {% endif %}
+
+                    </div>
                 </div>
+
+                {% if type == 'event' or type =='duework' %}
+                    <div class="small-12 medium-{{ width }} columns">
+
+                        {# Placeholder for appointments to be rendered in #}
+                        <div id="timetableResponse{{ id }}" class="adtp-response">
+                            <div class="loader hide"></div>
+                            <div id="timetableResponse{{ id }}-duework" class="adtp-response-duework"></div>
+                            <div id="timetableResponse{{ id }}-events"></div>
+                        </div>
+
+                    </div>
+                {% endif %}
+
                 <div class="small-12 medium-12 columns">
                     <a class="button submit timetable-submit" data-adtp-tt-submit data-timetable-value="{{ value }}">Update</a>
                 </div>
+                
             </div>
         {% endif %}
     </div>
