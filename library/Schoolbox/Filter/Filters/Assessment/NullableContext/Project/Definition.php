@@ -22,6 +22,8 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
  */
 class Definition extends NullableContext\Definition
 {
+    // The name to expose in the UI
+    const NAME = 'Project';
 
     // Where does the project reside?
     const KEY_ON_CLASS_FOLDER = 'on_class_folder';     // created directly on a class folder

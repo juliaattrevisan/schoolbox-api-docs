@@ -26,6 +26,8 @@ use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
  */
 class Definition extends AssessmentTermFilter\Definition
 {
+    // The name to expose in the UI
+    const NAME = 'Term Closed';
 
     /**
      * @inheritdoc

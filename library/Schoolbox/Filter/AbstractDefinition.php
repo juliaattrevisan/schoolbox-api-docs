@@ -19,6 +19,8 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 abstract class AbstractDefinition implements IDefinition
 {
+    // The name to expose in the UI
+    const NAME = '';
 
     /** @var Filter\Model */
     private $filter;
@@ -40,6 +42,20 @@ abstract class AbstractDefinition implements IDefinition
         $this->filter              = $filter;
         $this->filterOptionMapper  = $filterOptionMapper;
         $this->filterDefaultMapper = $filterDefaultMapper;
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws \DomainException If NAME constant not defined
+     */
+    public static function getName()
+    {
+        $name = static::NAME;
+        if(!$name){
+            throw new \DomainException('Concrete classes must implement the NAME constant');
+        }
+        return $name;
     }
 
 

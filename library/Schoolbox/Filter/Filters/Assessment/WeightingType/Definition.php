@@ -23,6 +23,8 @@ use Schoolbox\GenericCollection;
  */
 class Definition extends AbstractDefinition
 {
+    // The name to expose in the UI
+    const NAME = 'Weighting';
 
     const KEY_WEIGHTED = 'weighted';
     const KEY_UNWEIGHTED = 'unweighted';

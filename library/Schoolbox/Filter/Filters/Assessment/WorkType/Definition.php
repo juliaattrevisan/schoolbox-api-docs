@@ -23,6 +23,8 @@ use Schoolbox\Learning\Assessment\WorkType;
  */
 class Definition extends AbstractDefinition
 {
+    // The name to expose in the UI
+    const NAME = 'Work Type';
 
     // If assessment does not have a WorkType at all
     const KEY_NONE = ' none';

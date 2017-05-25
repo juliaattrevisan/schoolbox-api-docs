@@ -25,6 +25,8 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
  */
 class Definition extends NullableContext\Definition
 {
+    // The name to expose in the UI
+    const NAME = 'Unit Implementation';
 
     /**
      * @inheritdoc

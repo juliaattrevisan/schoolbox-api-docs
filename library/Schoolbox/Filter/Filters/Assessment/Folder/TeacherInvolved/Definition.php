@@ -21,6 +21,8 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
  */
 class Definition extends FolderFilter\Definition
 {
+    // The name to expose in the UI
+    const NAME = 'Teacher Folders';
 
     /**
      * @inheritdoc

@@ -29,6 +29,13 @@ interface IDefinition
 {
 
     /**
+     * Return the name of the filter to expose in the UI
+     * @return string
+     */
+    public static function getName();
+
+
+    /**
      * @return Filter\Model
      */
     public function getFilter();

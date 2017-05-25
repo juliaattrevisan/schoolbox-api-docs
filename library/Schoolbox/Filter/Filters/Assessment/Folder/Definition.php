@@ -21,7 +21,6 @@ use Schoolbox\GenericCollection;
  */
 abstract class Definition extends AbstractDefinition
 {
-
     const KEY_CLASSES = 'classes';
     const KEY_GROUPS = 'groups';
 

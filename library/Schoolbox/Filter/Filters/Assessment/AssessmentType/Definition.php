@@ -28,6 +28,8 @@ use Schoolbox\Learning\Assessment\AssessmentType;
  */
 class Definition extends AbstractDefinition
 {
+    // The name to expose in the UI
+    const NAME = 'Assessment Type';
 
     const KEY_PROJECT = AssessmentType::TYPE_PROJECT;
     const KEY_QUIZ = AssessmentType::TYPE_QUIZ;

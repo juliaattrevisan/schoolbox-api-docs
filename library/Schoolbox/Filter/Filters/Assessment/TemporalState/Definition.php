@@ -27,6 +27,9 @@ use Schoolbox\GenericCollection;
  */
 class Definition extends AbstractDefinition
 {
+    // The name to expose in the UI
+    const NAME = 'Activity State';
+
     const KEY_UNPUBLISHED = 'unpublished';
     const KEY_UPCOMING    = 'upcoming';
     const KEY_OPEN        = 'open';
