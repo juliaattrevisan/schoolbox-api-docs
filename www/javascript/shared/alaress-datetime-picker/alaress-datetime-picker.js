@@ -186,6 +186,7 @@ function setValue(element, options, state, trigger, date) {
     }
     if (trigger === true) {
         element.trigger('change');
+        element.trigger('blur');
     }
     if (options.allDayInput !== false) {
         $('#' + options.allDayInput).val(state ? 1 : 0);
