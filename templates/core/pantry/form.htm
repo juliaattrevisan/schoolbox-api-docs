@@ -1,5 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript">
     Dropzone.autoDiscover = false;
 </script>
@@ -340,51 +342,218 @@
                         {AFFIX_TWIG_LABEL_HERE}
                     </div>
                 </fieldset>
+
                 <fieldset class="content">
                     <legend>Dates and Times</legend>
 
                     <div class="column small-12">
                         <p>
-                            When invoking <code>$.timepicker()</code>, use the <code>appendTo</code> option to attach to the parent of the <code>&lt;label/&gt;</code>
-                            which should have a class of <code>.timepick</code>. That way, the picker dropdown can adopt a width to match the input, which
-                            will be 100% of its container.
+                            Currently, datepickers require an <code>id</code> attribute to work.
+                        </p>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Date only:
+                            <input type="text"
+                                   id="datepicker-date"
+                                   data-datepicker>
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Date and time:
+                            <input type="text"
+                                   id="datepicker-datetime"
+                                   data-datepicker
+                                   data-datepicker-time>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="column small-12 medium-6">
+                        <label>Date and time with all-day switch:
+                            <input type="text"
+                                   id="datepicker-datetime-allday"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-alldayswitch>
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Time is set to the end of the day when all-day is checked:
+                            <input type="text"
+                                   id="datepicker-datetime-endofday"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-alldayswitch
+                                   data-datepicker-format="datetime"
+                                   data-datepicker-endofday>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>All-day sync</legend>
+
+                    <div class="column small-12">
+                        <p>
+                           This is a pair of input fields synced by the all-day hidden field
+                        </p>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Date and time - start:
+                            <input type="text"
+                                   id="datepicker-datetime-allday-start"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-alldayswitch
+                                   data-datepicker-alldayinput="datepicker-datetime-allday-switch">
+                        </label>
+                        <p>This should be a hidden field (type="hidden"). Datepicker of either of the associated fields above will set a value of "0" or "1" to it.</p>
+                        <label>All-day hidden field</label>
+                        <input id="datepicker-datetime-allday-switch" value="0">
+
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Date and time - end:
+                            <input type="text"
+                                   id="datepicker-datetime-allday-finish"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-alldayswitch
+                                   data-datepicker-alldayinput="datepicker-datetime-allday-switch">
+                        </label>
+
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Event visibility in date and time selectors</legend>
+
+                    <div class="column small-12 medium-6">
+                        <label>Show events in picker:
+                            <input type="text"
+                                   id="datepicker-events"
+                                   data-datepicker
+                                   data-datepicker-call="event">
+                        </label>
+
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label for="datepicker-duework">Show due work in picker:</label>
+                        <input type="text"
+                               id="datepicker-duework"
+                               data-datepicker
+                               data-datepicker-call="duework">
+
+                        <p>
+                            The show due work picker searches for a form input with <code>name="folderId"</code>;
+                            it fetches assessments from a folder with ID that matches that input's value.
+                        </p>
+                        <label for="folderId">Folder ID</label>
+                        <input id="folderId" name="folderId" value="1">
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Syncable dates</legend>
+                    <div class="column small-12">
+                        <p>
+                            When two date or datetime inputs that are synced,
+                            the start value cannot be after the end value.
+                            (If the end is set before the start, the start will automatically
+                             update to the end value, and vice versa.)
+                        </p>
+                        <p>
+                            Make sure these two scripts are added to the page <br/>
+                            <code>/javascript/shared/datetime/jquery.sync-dates.js</code><br/>
+                            <code>/javascript/shared/datetime/attacher.datepicker-sync.js</code>
+                        </p>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Syncable date - start:
+                            <input type="text"
+                                   id="datepicker-date-sync-start"
+                                   data-datepicker
+                                   data-datepicker-sync
+                                   data-datepicker-sync-enddate="#datepicker-date-sync-end">
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Syncable date - end:
+                            <input type="text"
+                                   id="datepicker-date-sync-end"
+                                   data-datepicker>
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Syncable date and time - start:
+                            <input type="text"
+                                   id="datepicker-datetime-sync-start"
+                                   data-datepicker
+                                   data-datepicker-time
+                                   data-datepicker-sync
+                                   data-datepicker-sync-enddate="#datepicker-datetime-sync-end">
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>Syncable date and time - end:
+                            <input type="text"
+                                   id="datepicker-datetime-sync-end"
+                                   data-datepicker
+                                   data-datepicker-time>
+                        </label>
+                    </div>
+
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Button</legend>
+
+                    <div class="column small-12">
+                        <p>
+                            Datepicker buttons
                         </p>
                     </div>
 
                     <div class="column small-12 medium-4">
-                        <label>Date:
-                            <input type="text" data-datepicker placeholder="Date">
+                        <label>Default button
+                            <input type="text"
+                                   id="datepicker-date-button"
+                                   data-datepicker>
                         </label>
                     </div>
 
-                    <div class="column small-6 medium-4">
-                        <div class="timepick">
-                            <label>Select start:
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Start Time" />
-                            </label>
-                        </div>
+                    <div class="column small-12 medium-4">
+                        <label>No button
+                            <input type="text"
+                                   id="datepicker-datetime-nobutton"
+                                   data-datepicker
+                                   data-datepicker-nobutton>
+                        </label>
+                        <p>
+                            Currently, datepickers won't open without a button.
+                            You should add your own functionality to be able to use this option
+                        </p>
                     </div>
 
-                    <div class="column small-6 medium-4">
-                        <div class="timepick">
-                            <label>Select end:
-                                <input data-timepicker type="text" autocomplete="off" placeholder="End Time" />
-                            </label>
-                        </div>
+                    <div class="column small-12 medium-4">
+                        <label>Custom text on a button:
+                            <input type="text"
+                                   id="datepicker-datetime-allday-custom-button"
+                                   data-datepicker
+                                   data-datepicker-buttontext="Pick a Date">
+                        </label>
                     </div>
-                    <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-                    <script type="text/javascript">
-                        $(function () {
-                            $('[data-datepicker]').datepicker();
-
-                            $('[data-timepicker]').timepicker({
-                                appendTo: function ($input) {
-                                    return $input.closest('.timepick');
-                                }
-                            });
-                        });
-                    </script>
-
                 </fieldset>
             </section>
             <div class="row">
