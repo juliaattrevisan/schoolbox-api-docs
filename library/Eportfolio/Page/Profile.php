@@ -195,6 +195,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentBox->getCategory()->getName(),
                     'SHOWCASED_WORK_BOX_CATEGORY_ID' => $currentBox->getCategory()->getId(),
                     'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
+                    'SHOWCASED_WORK_ASSESSMENT_ID' => $currentBox->getAssessmentId(),
                     'SHOWCASED_WORK_BOX_TYPE' => $workType ? $workType->getName() : '',
                 ));
 

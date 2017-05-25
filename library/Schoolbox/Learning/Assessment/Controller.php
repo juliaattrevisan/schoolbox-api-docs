@@ -243,27 +243,26 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $folder = $assessment->getBaseContext()->getFolder();
 
         $perms = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
-
         /* If you're a staff, get redirected to a Status overview
          */
         if ($perms >= UserAccess::ACCESS_WRITE) {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]));
-            return;
+            $redirect = $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]);
         }
-        /* If you're a student, get redirected to the summary
-         */
+        else if ($assessment->isParticipant($this->getUser())) {
+            // If you're a student, get redirected to the summary
+            $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
+        }
         else if ($perms >= UserAccess::ACCESS_READ) {
-            if ($assessment->isParticipant($this->getUser())) {
-                $redirect = $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $this->getUser()->getId()]);
-            }
-            else {
-                $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
-            }
+            $redirect = $this->getRouter()->generate('learningAssessment.getPreview', ['assessmentId' => $assessment->getId()]);
+        }
+
+        if($redirect) {
             $redirOverride = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
             if ($redirOverride) {
                 $redirect .= "?" . Redirect::RETURN_URL . "=" . $redirOverride;
             }
+
             $this->getResponse()->redirect->to($redirect);
             return;
         }
@@ -348,10 +347,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         // parent can see ... IF config allows
         if ($this->getConfigLoader()->get('restrict_student_submission')) {
-            return false;
-        }
-
-        if ($this->getConfigLoader()->get('restrict_parent_duework_access')) {
             return false;
         }
 
