@@ -23,6 +23,7 @@
            value="{% if assessmentDate.valid and not assessmentDate.isNull %}{{ assessmentDate.localShort }}{% else %}{{ unitDate.localShort }}{% endif %}"
            data-role="{{ dateProperty }}_date"
            data-datepicker
+           data-datepicker-time
            data-datepicker-buttontext=""
            data-assessment-id="{{ assessmentId }}"
            {% if dateSyncProperty %}
