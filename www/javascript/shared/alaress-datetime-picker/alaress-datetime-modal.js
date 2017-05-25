@@ -536,15 +536,15 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 html += '<h3>' + data.students[0].firstname + ' ' + data.students[0].lastname + '</h3>';
                 html += '<p class="meta">' + data.students[0].assessmentsDue + ' due' + '</p>';
                 html += '</div>';
-                html += '<div class="icon-next" data-show-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '" title="Show all students and work due"></div>';
+                html += '<div class="icon-next" data-show-full-due="due-work-list-' + target + '-' + moment(data.date).format('Y-m-d') + '" title="Show all students and work due"></div>';
                 html += '</div>';
 
                 // Create a full list of students, hidden by default
-                html += '<div id="due-work-list-' + moment(data.date).format('Y-m-d') + '" class="row hide">';
+                html += '<div id="due-work-list-' + target + '-' + moment(data.date).format('Y-m-d') + '" class="row hide">';
                 html += '<div class="small-12 medium-12 columns">';
                 html += '<ul class="small-12 information-list expandable-card">';
 
-                html += '<li><a data-hide-full-due="due-work-list-' + moment(data.date).format('Y-m-d') + '"><span class="compact card small-12 icon-previous">Back</span></a></li>';
+                html += '<li><a data-hide-full-due="due-work-list-' + target + '-' + moment(data.date).format('Y-m-d') + '"><span class="compact card small-12 icon-previous">Back</span></a></li>';
 
                 for (var i = 0; i < data.students.length; i++) {
 
@@ -582,7 +582,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             $pickerResponseDueWork.append(html);
 
-            $('[data-show-full-due]').click(function() {
+            $pickerResponse.find('[data-show-full-due]').click(function() {
                 var listDiv = $(this).data('show-full-due');
                 $(this).parents('[data-adtp-top-due]').addClass('hide');
                 $('#' + listDiv).removeClass('hide');
@@ -590,7 +590,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $('[data-due-work-title]').text(dictTop5Loaded);
             });
 
-            $('[data-hide-full-due]').click(function() {
+            $pickerResponse.find('[data-hide-full-due]').click(function() {
                 var listDiv = $(this).data('hide-full-due');
                 $pickerResponseDueWork.find('[data-adtp-top-due]').removeClass('hide');
                 $('#' + listDiv).addClass('hide');
