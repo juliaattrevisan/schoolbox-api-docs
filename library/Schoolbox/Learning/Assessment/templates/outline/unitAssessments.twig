@@ -47,7 +47,12 @@
                             {% endif %}
                         {% endif %}
 
-                        <a title="{{ assessment.typeName }}" href="{{ href }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
+                        <a title="{% if attribute(locale, assessment.typeName|lower) is defined %}
+                                    {{ attribute(locale, assessment.typeName|lower).proper }}
+                                  {% else %}
+                                    {{ assessment.typeName }}
+                                  {% endif %}"
+                           href="{{ href }}?{{ returnUrlName }}={{ encodedReturnUrl }}">
                             <span class="{{ icon.renderClass(assessment) }}"></span>
                             <p>{{ assessment.title }}</p>
                         </a>

@@ -70,7 +70,16 @@
  <div class="actions-small-1 row">
      <div class="list-item">
          <div class="small-12 column">
-             <h1>Create {% if assessment.typeName|length %}{{ assessment.typeName }}{% else %}Activity{% endif %}</h1>
+             <h1>Create
+                 {% if assessment.typeName|length %}
+                     {% if attribute(locale, assessment.typeName|lower) is defined %}
+                         {{ attribute(locale, assessment.typeName|lower).proper }}
+                     {% else %}
+                        {{ assessment.typeName }}
+                     {% endif %}
+                 {% else %}
+                     Activity
+                 {% endif %}</h1>
          </div>
      </div>
      {# TODO - Quiz fragment should extend this template, not be included. This template should not know about Quizzes #}

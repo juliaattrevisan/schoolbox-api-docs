@@ -94,7 +94,7 @@
                             <ul id='assessment-list' class="information-list sortable-card"
                                 data-sortable
                                 data-assessment-list
-                                data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: {{ locale.project.plural }}, contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+                                data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'projects', contextId: assessment.id, context: context}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                                 {% for assessable in assessment.assessables %}
                                     {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
@@ -159,7 +159,7 @@
 
                             <div id="assessment-actions" class="component-action">
                                 <section>
-                                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: locale.project.plural, contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button" title="Create a new activity">Create Activity</a>
+                                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button" title="Create a new activity">Create Activity</a>
                                 </section>
                             </div>
                         </section>
@@ -167,7 +167,7 @@
 
                     <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
                         <i class="icon-project"></i>
-                        <p>You {{ locale.project }} currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: locale.project.plural, contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an activity</a> next.</p>
+                        <p>You {{ locale.project }} currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an activity</a> next.</p>
                     </div>
                 </div>
 
@@ -227,3 +227,4 @@
             {% endif %}
         </div>
     </div>
+</div>
