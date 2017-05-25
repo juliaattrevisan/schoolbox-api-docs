@@ -11,6 +11,7 @@ namespace Schoolbox;
 
 use Alaress\Cache;
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use Aura\Di;
@@ -118,7 +119,7 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_SOFTDELETE        = 64;
 
     /**
-     * @var IDatabase
+     * @var IDatabase|IQuoter
      */
     protected $database;
 

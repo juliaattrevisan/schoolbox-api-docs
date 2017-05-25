@@ -26,10 +26,8 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\File;
@@ -685,10 +683,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         $subBuilder = $this->getPredicateBuilder();
-            $subBuilder
-            ->like(" {$this->getTable()} .name ", "%{$this->database->escapeForLike($keyword)}%")
-			    ->like(' cc.code ', "%{$this->database->escapeForLike($keyword)}%
-        ");
+        $subBuilder
+            ->like("{$this->getTable()}.name ", "%{$this->database->escapeForLike($keyword)}%")
+            ->like('cc.code', "%{$this->database->escapeForLike($keyword)}%");
 
         $builder->any($subBuilder);
         $folderIds = $this->findIdsByPredicates($builder);
