@@ -53,6 +53,8 @@ apt-get update;
 apt-get install -y libgss3 gcc-6-base libstdc++6;
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
 apt-get install -y php7.1-pdosqlsrv;
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing Tideways (PHP 7.1 fork of XHprof)";
+apt-get install php-tideways
 phpenmod pdo_sqlsrv;
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing IBM_DB2";
 apt-get install -u php7.1-ibmdb2;

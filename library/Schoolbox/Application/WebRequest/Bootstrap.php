@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\WebRequest;
 
+use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Twig\Method as TwigMethod;
@@ -81,8 +82,12 @@ class Bootstrap extends AbstractBootstrap {
         }
 
         // XHProf on the debug bar.
-        if($this->isDebugEnabled() && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
-            DebugBar::getInstance()->addCollector(new XhprofCollector());
+        if ($this->isDebugEnabled() && Config::get('debug_xhprof')) {
+            if (extension_loaded('xhprof')) {
+                DebugBar::getInstance()->addCollector(new XhprofCollector());
+            } elseif (extension_loaded('tideways')) {
+                DebugBar::getInstance()->addCollector(new TidewaysCollector());
+            }
         }
     }
 
