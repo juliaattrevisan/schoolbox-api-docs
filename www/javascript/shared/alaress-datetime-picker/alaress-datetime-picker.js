@@ -264,7 +264,7 @@ function massageDateValue(e) {
         }
 
         // Restore JS validation on the field
-        $(t).removeAttr('data-av-ignore');
+        enableValidation($(t));
 
     }).always(function () {
         $(t).prop('readonly', false);
@@ -273,11 +273,35 @@ function massageDateValue(e) {
 }
 
 
+/**
+ * Disables validation on this datepicker.
+ *
+ * @param element a datepicker
+ */
+function disableValidation(element) {
+    element.attr('data-av-ignore', true);
+}
+
+
+/**
+ * Enables validation on this datepicker.
+ *
+ * @param element a datepicker
+ */
+function enableValidation(element) {
+    element.removeAttr('data-av-ignore');
+}
+
+
 // Extend jQuery with our datepicker function
 
 $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
+
+    // Temporarily disable JS validation on this field so that it doesn't harass the user that
+    // things like 'today' aren't valid dates
+    disableValidation(element);
 
     // Build datepicker options form the element data attributes
     var options = getOptions(element);
@@ -336,7 +360,13 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         }
     });
 
-    $datepickerButton.on('blur', massageDateValue);
+    element
+        .on('blur', massageDateValue)
+        .on('focus', function() {
+            // Disable JS validation on the field again
+            disableValidation();
+        });
+
     $datepickerButton.click(function () {
 
         var originalValue;

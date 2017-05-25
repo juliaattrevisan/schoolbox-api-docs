@@ -21,16 +21,6 @@
 
                 $dateinput.alaressDateTimePicker();
 
-                // Temporarily disable JS validation on this field so that it doesn't harass the user that
-                // things like 'today' aren't valid dates
-                $dateinput.attr('data-av-ignore', true);
-
-                $dateinput.on('focus', function() {
-
-                    // Disable JS validation on the field again
-                    $dateinput.attr('data-av-ignore', true);
-
-                });
             }
         });
 
