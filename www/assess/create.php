@@ -260,7 +260,6 @@ else {
     $crumbs = array_merge($crumbs, [
         [
             'text' => 'New Quiz',
-            'text' => 'New Quiz',
             'href' => '',
             'class' => 'active',
         ]
