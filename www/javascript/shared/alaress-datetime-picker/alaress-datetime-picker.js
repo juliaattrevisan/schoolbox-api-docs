@@ -65,10 +65,12 @@ function getValue(input, attribute) {
 
 function getOptions(element) {
 
+    var buttonText = getValue(element, 'data-datepicker-buttontext');
+
     // Build datepicker options form the element data attributes
     var elementOptions = {
         noButton: getValue(element, 'data-datepicker-nobutton'),
-        buttonText: getValue(element, 'data-datepicker-buttontext') || 'Select Date',
+        buttonText: buttonText === true ? '' : (buttonText || 'Select Date'),
         displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
         displayFormatDate: dateDisplayFormats.localDate, //Default display date format
         databaseFormat: 'Y-m-d H:i:s',
