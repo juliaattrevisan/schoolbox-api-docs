@@ -90,7 +90,7 @@
              #}
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="small-12 card compact">
+                    <div class="card attachment small-12">
                         {# Crocodoc annotations have their own special url.
                          # responseId comes from the twig that includes this fragment
                          #}
@@ -99,13 +99,13 @@
 
                             {% if crocodocRoute %}
                                 <a href="{{ crocodocRoute }}">
-                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                                     <p>{{ currentFile.filename }}</p>
                                 </a>
                             {% endif %}
                         {% else %}
                             <a href="/storage/fetch.php?hash={{ currentFile.hash }}" rel="external" data-plugin="preview">
-                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                                 <p>{{ currentFile.filename }}</p>
                             </a>
                         {% endif %}

@@ -17,7 +17,7 @@
                     {% if url %}
                     <a href="{{ url }}" title="{{ tooltip }}">
                     {% endif %}
-                        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}" class="hide-for-small-only">
+                        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}">
                         <h3>
                             {% if currentInteraction.isSubmitted %}
                                 Submission
