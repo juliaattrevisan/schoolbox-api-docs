@@ -530,7 +530,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $pickerResponse.removeClass('meta');
 
                 // Show most loaded student
-                html += '<div class="top-due-work">';
+                html += '<div class="top-due-work" data-adtp-top-due>';
                 html += '<div class="compact card small-12">';
                 html += '<img src="/portrait.php?userId=' + data.students[0].externalId + '&amp;size=square80">';
                 html += '<h3>' + data.students[0].firstname + ' ' + data.students[0].lastname + '</h3>';
@@ -584,7 +584,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             $('[data-show-full-due]').click(function() {
                 var listDiv = $(this).data('show-full-due');
-                $(this).parents('.top-due-work').addClass('hide');
+                $(this).parents('[data-adtp-top-due]').addClass('hide');
                 $('#' + listDiv).removeClass('hide');
                 $pickerResponseEvents.addClass('hide');
                 $('[data-due-work-title]').text(dictTop5Loaded);
@@ -592,7 +592,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             $('[data-hide-full-due]').click(function() {
                 var listDiv = $(this).data('hide-full-due');
-                $pickerResponseDueWork.find('.top-due-work').removeClass('hide');
+                $pickerResponseDueWork.find('[data-adtp-top-due]').removeClass('hide');
                 $('#' + listDiv).addClass('hide');
                 $pickerResponseEvents.removeClass('hide');
                 $('[data-due-work-title]').text(dictMostLoaded);
