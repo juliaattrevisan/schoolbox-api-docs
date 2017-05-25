@@ -603,12 +603,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $builder = $this->getPredicateBuilder();
         $builder->equals('cn.code', $code);
 
-        // When matching folders by sub-object, we must first get the folderIds,
-        // then hydrate those folders to ensure all sub-objects of matched type are fetched.
-
-        $folderIds = $this->findIdsByPredicates($builder);
-        $column = "{$this->getTable()}.{$this->getIdentifierColumn()}";
-        return $this->findByColumn($column, $folderIds);
+        return $this->findByPredicates($builder);
     }
 
     /**
@@ -709,7 +704,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         foreach($codesPerFolder as $folderId => $codes){
             $folders[$folderId]->setCodes($codes);
         }
-
 
         return $folders;
     }
