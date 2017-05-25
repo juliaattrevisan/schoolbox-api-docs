@@ -452,7 +452,7 @@ class Marksheet
             }
         }
 
-        $contextSelector->setCategories($this->categoryMapper->findByParent($catIdList));
+        $contextSelector->setCategories($this->categoryMapper->findByColumn('id', $catIdList));
         $contextSelector->setTerms($this->termMapper->findAll());
         $contextSelector->render(
             $page,
