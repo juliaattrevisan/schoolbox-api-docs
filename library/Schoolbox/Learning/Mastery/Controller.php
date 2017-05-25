@@ -10,89 +10,78 @@ namespace Schoolbox\Learning\Mastery;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Markbook\Markbook;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
+use Schoolbox\Assessment\Term;
 
 class Controller extends Base
 {
     /**
-     * @var ErrorMapper
+     * @var Error\Mapper
      */
     private $errorMapper;
 
     /**
-     * @var AssessmentMapperProxy
+     * @var Assessment\MapperProxy
      */
     private $assessmentMapperProxy;
 
     /**
-     * @var GradeGroup
+     * @var GradeGroup\Model
      */
     private $defaultGradeGroup;
 
     /**
-     * @var CourseImplementationMapper
-     */
-    private $courseImplementationMapper;
-
-    /**
-     * @var TermMapper
+     * @var Term\Mapper
      */
     private $termMapper;
 
     /**
      * Constructor
      *
-     * @param ErrorMapper                $errorMapper
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param GradeGroup                 $defaultGradeGroup
-     * @param CourseImplementationMapper $courseImplementationMapper
-     * @param TermMapper                 $termMapper
+     * @param Error\Mapper                $errorMapper
+     * @param Assessment\MapperProxy      $assessmentMapperProxy
+     * @param GradeGroup\Model            $defaultGradeGroup
+     * @param Term\Mapper                 $termMapper
      */
     public function __construct(
-        ErrorMapper $errorMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
-        GradeGroup $defaultGradeGroup,
-        CourseImplementationMapper $courseImplementationMapper,
-        TermMapper $termMapper
+        Error\Mapper $errorMapper,
+        Assessment\MapperProxy $assessmentMapperProxy,
+        GradeGroup\Model $defaultGradeGroup,
+        Term\Mapper $termMapper
     ) {
-        $this->setErrorMapper($errorMapper);
-        $this->setAssessmentMapperProxy($assessmentMapperProxy);
-        $this->setDefaultGradeGroup($defaultGradeGroup);
-        $this->setCourseImplementationMapper($courseImplementationMapper);
-        $this->setTermMapper($termMapper);
+        $this->errorMapper                = $errorMapper;
+        $this->assessmentMapperProxy      = $assessmentMapperProxy;
+        $this->defaultGradeGroup          = $defaultGradeGroup;
+        $this->termMapper                 = $termMapper;
     }
 
     /**
      * @api /learning/mastery/{classId}
-     * @param Folder $class
+     * @param Folder\Model $class
      * @throws ApplicationException
      */
-    public function getMastery($class)
+    public function getMastery(Folder\Model $class)
     {
-        $this->getMasteryForTerm($class, $this->getTermMapper()->findForToday());
+        $this->getMasteryForTerm($class, $this->termMapper->findForToday());
     }
 
     /**
      * @api /learning/mastery/{classId}/term/{termCode}
-     * @param Folder $class
-     * @param Term $term
+     * @param Folder\Model $class
+     * @param Term\Model $term
      * @throws ApplicationException
      */
-    public function getMasteryForTerm($class, $term)
+    public function getMasteryForTerm(Folder\Model $class, Term\Model $term)
     {
         // Does this class exist ?
         if (!$class->getId()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            throw $this->errorMapper->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
         // Generate data: assessments and their Participants
@@ -101,16 +90,16 @@ class Controller extends Base
             'order' => ['due_date' => 'ASC'],
         ];
         /** @var Collection|IAssessable[] $assessments */
-        $assessments = $this->getAssessmentMapperProxy()->findAllByFolderIdForReview($class->getId(), null, $options)
+        $assessments = $this->assessmentMapperProxy->findAllByFolderIdForReview($class->getId(), null, $options)
                                                         ->filter(function (IAssessable $assessable) {
                                                             return !$assessable instanceof Project;
                                                         });
 
         // Build a markbook
-        $markbook = new Markbook($assessments, $this->getDefaultGradeGroup(), $this->getUser());
+        $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
         // And what is required for a context selector
-        $terms = $this->getTermMapper()->findAll(['order' => ['start' => 'desc']]);
+        $terms = $this->termMapper->findAll(['order' => ['start' => 'desc']]);
 
         // And the previous and next term
         $previousTerm = null;
@@ -142,94 +131,4 @@ class Controller extends Base
 
     /* Getters/Setters
      */
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     * @return static
-     */
-    protected function setErrorMapper(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
-    }
-
-    /**
-     * @return AssessmentMapperProxy
-     */
-    protected function getAssessmentMapperProxy()
-    {
-        return $this->assessmentMapperProxy;
-    }
-
-    /**
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @return static
-     */
-    protected function setAssessmentMapperProxy(AssessmentMapperProxy $assessmentMapperProxy)
-    {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        return $this;
-    }
-
-    /**
-     * @return GradeGroup
-     */
-    public function getDefaultGradeGroup()
-    {
-        return $this->defaultGradeGroup;
-    }
-
-    /**
-     * @param GradeGroup $defaultGradeGroup
-     * @return static
-     */
-    public function setDefaultGradeGroup(GradeGroup $defaultGradeGroup)
-    {
-        $this->defaultGradeGroup = $defaultGradeGroup;
-        return $this;
-    }
-
-    /**
-     * @return CourseImplementationMapper
-     */
-    public function getCourseImplementationMapper()
-    {
-        return $this->courseImplementationMapper;
-    }
-
-    /**
-     * @param CourseImplementationMapper $courseImplementationMapper
-     * @return static
-     */
-    public function setCourseImplementationMapper(CourseImplementationMapper $courseImplementationMapper)
-    {
-        $this->courseImplementationMapper = $courseImplementationMapper;
-        return $this;
-    }
-
-    /**
-     * @return TermMapper
-     */
-    public function getTermMapper()
-    {
-        return $this->termMapper;
-    }
-
-    /**
-     * @param TermMapper $termMapper
-     * @return static
-     */
-    public function setTermMapper(TermMapper $termMapper)
-    {
-        $this->termMapper = $termMapper;
-        return $this;
-    }
 }
