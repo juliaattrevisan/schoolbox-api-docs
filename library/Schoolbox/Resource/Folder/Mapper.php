@@ -1035,11 +1035,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $folder->setGroup($group);
             }
 
-            // Ensure the codes exists on the folder if present in row
-            $code           = $row['cc.code'];
-            $codeCollection = $collection[$id]->getCodes();
-            if (isset($code) && !isset($codeCollection[$code])) {
-                $codeCollection[$code] = $this->hydrateJoin($row, 'codes', 'cc');
+            // Add code only if it's not empty
+            $code = $row['cc.code'];
+            if (isset($code)) {
+                /** @var FolderCode\Model $codeModel */
+                $codeModel = $this->hydrateJoin($row, 'codes', 'cc');
+                $collection[$id][$codeModel->getCode()] = $codeModel;
+                $codeModel->setFolder($collection[$id]);
             }
         }
         $collection->reindex();
