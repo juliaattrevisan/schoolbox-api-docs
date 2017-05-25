@@ -375,34 +375,6 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $this->db->getRow($query);
     }
 
-    function getAllInCategory($categoryID, $config = false)
-    {
-
-        //event limit changed from posts to days
-        if ($config['days'] != 0 && $config['days'] != '') {
-            $where = " AND start_datetime < ADDDATE(CURDATE(), INTERVAL {$config['days']} DAY) ";
-        } else {
-            $where = "";
-        }
-
-        $query = "SELECT event.id, DATE_FORMAT(start_datetime, '%a %D %b') as outputDate,
-						start_datetime, end_datetime,
-						DATE_FORMAT(start_datetime, '%Y') as year, DATE_FORMAT(start_datetime, '%c') as month, DATE_FORMAT(start_datetime, '%e') as day,
-						type, title, location, detail,
-						user.id as uid, title, firstname, lastname,
-						eventType, eventColour,
-						attendance, allday
-				  FROM event
-				  LEFT JOIN user ON owner = user.id
-				  LEFT JOIN luEventType ON type = eventTypeID
-				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( start_datetime >= CURRENT_DATE() $where) ORDER BY start_datetime";
-        if (!empty($config['size'])) {
-            $query .= ' LIMIT ' . $config['size'];
-        }
-        return $this->db->getAll($query);
-    }
-
-
     function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc')
     {
         $keyword = $this->db->quote($keyword);
