@@ -617,14 +617,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * You can add a WHERE statement at the end if you want.
      *
      * @return string
+     * @throws DefinitionException If any specified join is not defined
      */
     protected function getSelectString()
     {
-        $code_mapper = $this->getJoinMapper('codes');
+        $code_mapper           = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
-        $group_mapper = $this->getJoinMapper('groups');
-        $courseSpecMapper = $this->getJoinMapper('course_specification');
-        $unitSpecMapper = $this->getJoinMapper('unit_specification');
+        $group_mapper          = $this->getJoinMapper('groups');
+        $courseSpecMapper      = $this->getJoinMapper('course_specification');
+        $unitSpecMapper        = $this->getJoinMapper('unit_specification');
 
 
         return "
