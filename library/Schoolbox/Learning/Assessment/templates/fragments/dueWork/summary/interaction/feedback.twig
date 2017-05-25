@@ -35,18 +35,15 @@
                 <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
                 <p>
                     {% if currentFeedback.published %}
-                        Feedback
+                        Feedback by {{ currentFeedback.reviewer.fullname }} |
                     {% else %}
-                        Draft Feedback
+                        Draft Feedback by {{ currentFeedback.reviewer.fullname }} |
                     {% endif %}
-                    |
                     <span class="meta">
-                        {{ currentFeedback.reviewer.fullname }}
-
                         {% if currentFeedback.published %}
-                            on {{ currentFeedback.publishedAt.short }}
+                            {{ currentFeedback.publishedAt.short }}
                         {% else %}
-                            on {{ currentFeedback.updatedAt.short }}
+                            {{ currentFeedback.updatedAt.short }}
                         {% endif %}
                     </span>
                 </p>
