@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Role;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 
 class Controller extends BaseController
@@ -30,13 +31,22 @@ class Controller extends BaseController
      */
     public function getIndex(GenericCollection $visibleFilters)
     {
-        // Group by entity type
-        $visibleFiltersPerEntity = $visibleFilters->groupByCallback(function (Model $filter) {
-            return $filter->getEntity();
-        });
+        // Group filters by which pages they appear on
+        $filtersPerPage = [];
+        foreach($visibleFilters as $instance){
+            $class = $instance->getClass();
+            foreach($class::getPages() as $page){
+                $filtersPerPage[$page][$class::getName()] = $instance;
+            }
+        }
+
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
-            'filtersPerEntity'   => $visibleFiltersPerEntity,
-            'ENTITY_ASSESSMENTS' => \Schoolbox\Learning\Assessment\DataModel\Mapper::class,
+            'filtersPerPage'           => $filtersPerPage,
+            'PAGE_PENDING_ASSESSMENTS' => Option\Model::PAGE_PENDING_ASSESSMENTS,
+            'PAGE_GRADES'              => Option\Model::PAGE_GRADES,
+            'PAGE_MARK_BOOK'           => Option\Model::PAGE_MARK_BOOK,
+            'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ]));
     }
 
@@ -44,13 +54,13 @@ class Controller extends BaseController
     /**
      * Display a page where admins can alter default filter selections
      *
-     * @api   GET /adminv2/filters/{$filter}/options
+     * @api   GET /adminv2/filters/{pageKey}
      * @level 17.0
-     * @param IDefinition $definition
+     * @param string $pageKey
      * @throws ServiceNotFound
      * @throws RouteNotFound
      */
-    public function getAvailableOptions(IDefinition $definition)
+    public function getPageSettings($pageKey)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput($definition->getOptionsTemplate(), [
             'filter'     => $definition->getFilter(),

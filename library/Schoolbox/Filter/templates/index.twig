@@ -1,36 +1,61 @@
 {#
-    Displays a list of all filters that are visible in the UI, grouped by filtered entity type
+    Displays a list of all pages in the system that contain filter panels
 
     Usage:
-        filtersPerEntity Filter[][]           Grouped by filtered entity
-        ENTITY_*         int                  All entity type constants known to system (@see Filter\Model)
+            filtersPerPage           Filter\Model[][] Indexed by page, then filter.class.name
+            PAGE_GRADES              string
+            PAGE_MARK_BOOK           string
+            PAGE_PENDING_ASSESSMENTS string
+            ENTITY_ASSESSMENTS       string
 #}
 
 <div class="row">
     {{ renderAdminNavigation(pageCurrent) }}
 </div>
 
-{% for entity, filters in filtersPerEntity %}
-    <h2>
-        {%- if ENTITY_ASSESSMENTS == entity -%}
-            {{ locale.assessment.proper }}
-        {%- else -%}
-            {# Graceful degradation #}
-            Entity Type: {{ entity }}
-        {%- endif -%}
-    </h2>
-    <table>
-        <tr>
-            <th>Filter</th>
-            <th>Option Availability</th>
-            <th>Default Selections</th>
-        </tr>
-        {% for filter in filters %}
-        <tr>
-            <td>{{ filter.name }}</td>
-            <td><a href="{{ routeLookup('filters.getAvailableOptions', { filter: filter.id }) }}">Options</a></td>
-            <td><a href="{{ routeLookup('filters.getDefaultsSelections', { filter: filter.id }) }}">Defaults</a></td>
-        </tr>
-        {% endfor %}
-    </table>
-{% endfor %}
+<h2 class="subheader">Filterable Pages</h2>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="information-list">
+                {% for pageKey, pageFilters in filtersPerPage %}
+                    {% if PAGE_GRADES == pageKey %}
+                        {% set pageName = 'Grades' %}
+                    {% elseif PAGE_MARK_BOOK == pageKey %}
+                        {% set pageName = 'Markbook' %}
+                    {% elseif PAGE_PENDING_ASSESSMENTS == pageKey %}
+                        {% set pageName = 'Pending ' ~ locale.assessment.proper %}
+                    {% else %}
+                        {# Graceful fallback if constant not injected into twig #}
+                        {% set pageName = pageKey %}
+                    {% endif %}
+
+                    {# Filters on a page are all for same entity type, so just inspect first #}
+                    {% set entity = (pageFilters | first).entity %}
+                    {%- if ENTITY_ASSESSMENTS == entity -%}
+                        {% set icon = 'due-work' %}
+                    {%- else -%}
+                     {# Graceful degradation to generic filter icon if constant not injected into twig #}
+                        {%- set icon = 'filter' -%}
+                    {%- endif -%}
+                    <li>
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href="{{ routeLookup('filters.getPageSettings', { pageKey: pageKey }) }}">
+                                    <h3><i class="icon-{{ icon }} size-24"></i>{{ pageName }}</h3>
+                                    <p class="meta">
+                                        {%- for className, filterInstance in pageFilters -%}
+                                            {%- if not loop.first -%}, {% endif -%}{{ className }}
+                                        {%- endfor -%}
+                                    </p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+

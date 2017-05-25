@@ -94,9 +94,9 @@ class Module extends AlaressModule
         };
 
 
-        $this->register('GET', '', 'getIndex', $isSuper, $loadFilters);
-        $this->register('GET', '/{filter:\d+}/options', 'getAvailableOptions', $isSuper, $loadDefinition);
-        $this->register('GET', '/{filter:\d+}/defaults', 'getDefaultsSelections', $isSuper, $loadDefinition);
+        $this->register('GET', '',           'getIndex',        $isSuper, $loadFilters);
+        $this->register('GET', '/{pageKey}', 'getPageSettings', $isSuper);
+//        $this->register('GET', '/{filter:\d+}', 'getDefaultsSelections', $isSuper, $loadDefinition);
 
         $this->register('POST', '/{filter:\d+}/options/save', 'postSaveOptions', $isSuper, $optionDependencies);
         $this->register('POST', '/{filter:\d+}/defaults/save', 'postSaveDefaults', $isSuper, $defaultDependencies);
