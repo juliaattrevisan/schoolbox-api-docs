@@ -19,7 +19,7 @@ ALTER TABLE `event`
   DROP INDEX `access` ,
   ADD INDEX `access` (`access` ASC);
 
-ALTER TABLE `schoolbox`.`eotc_event`
+ALTER TABLE `eotc_event`
   DROP COLUMN `endTime`,
   DROP COLUMN `endDate`,
   DROP COLUMN `startTime`,
