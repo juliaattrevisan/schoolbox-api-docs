@@ -364,7 +364,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         .on('blur', massageDateValue)
         .on('focus', function() {
             // Disable JS validation on the field again
-            disableValidation();
+            disableValidation($(this));
         });
 
     $datepickerButton.click(function () {
