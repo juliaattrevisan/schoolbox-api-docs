@@ -201,7 +201,7 @@
 			$.validator.addMethod("validateDatetimesCorrect", function(value, element) {
 
 				var allday = $('input[name=allday]').val(),
-					dateFormat = allday?dateDisplayFormats.momentJs:dateDisplayFormats.momentJsDatetime,
+					dateFormat = allday ? dateDisplayFormats.momentJs : dateDisplayFormats.momentJsDatetime,
 					startDatetime = moment($('input[name=startDate]').val(), dateFormat),
 					endDatetime   = moment($('input[name=endDate]').val(), dateFormat);
 
