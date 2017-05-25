@@ -69,14 +69,12 @@ $this->setVar(
 
 $this->setVar(
     array(
-        'CALENDAR_USER_ID'                   => $user->getId(),
-        'CALENDAR_USER_TOKEN'                => $user->getKey(),
-        'CALENDAR_USER_FULLNAME'             => $user->getFullname(),
-        'CALENDAR_PARAMS'           => "{$start->getURLDate()}/{$user->getId()}",
-        'SELECTED_START'            => $start->getLocalShort(),
-        'SELECTED_FINISH'           => $finish->getLocalShort(),
-        'SELECTED_FORMATTED_START'  => $start->getURLDate(),
-        'SELECTED_FORMATTED_FINISH' => $finish->getURLDate(),
+        'CALENDAR_USER_ID'       => $user->getId(),
+        'CALENDAR_USER_TOKEN'    => $user->getKey(),
+        'CALENDAR_USER_FULLNAME' => $user->getFullname(),
+        'CALENDAR_PARAMS'        => "{$start->getURLDate()}/{$user->getId()}",
+        'SELECTED_START'         => $start->getLocalShort(),
+        'SELECTED_FINISH'        => $finish->getLocalShort(),
     )
 );
 
