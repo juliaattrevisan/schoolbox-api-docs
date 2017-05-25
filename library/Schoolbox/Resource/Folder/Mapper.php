@@ -692,9 +692,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         ");
 
         $builder->any($subBuilder);
+        $folderIds = $this->findIdsByPredicates($builder);
 
+        $column = "{$this->getTable()}.{$this->getIdentifierColumn()}";
         $options = ['order' => ["{$this->getTable()}.name" => 'ASC']];
-        return $this->findByPredicates($builder, $options);
+        return $this->findByColumn($column, $folderIds, $options);
     }
 
     /**
