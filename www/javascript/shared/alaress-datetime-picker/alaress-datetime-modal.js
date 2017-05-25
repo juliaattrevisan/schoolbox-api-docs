@@ -523,7 +523,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 html += 'Error loading data';
             }
             else if (data.students.length == 0) {
-                html += '<p class="no-margin">' + dictNoWorkToday + '</p>';
+                html += '<p>' + dictNoWorkToday + '</p>';
                 $pickerResponseDueWork.addClass('meta');
             }
             else {
