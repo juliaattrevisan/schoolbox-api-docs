@@ -2318,11 +2318,11 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * @param PredicateBuilder $pb
+     * @param Builder $pb
      * @param array            $options
      * @return int[]
      */
-    public function findIdsByPredicates(PredicateBuilder $pb, array $options = [])
+    public function findIdsByPredicates(Builder $pb, array $options = [])
     {
         try{
             $selection = "{$this->getTable()}.{$this->getIdentifierColumn()}";

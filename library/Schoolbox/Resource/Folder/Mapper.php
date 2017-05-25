@@ -685,7 +685,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $subBuilder = $this->getPredicateBuilder();
         $subBuilder
-            ->like("{$this->getTable()}.name ", "%{$this->database->escapeForLike($keyword)}%")
+            ->like("{$this->getTable()}.name", "%{$this->database->escapeForLike($keyword)}%")
             ->like('cc.code', "%{$this->database->escapeForLike($keyword)}%");
 
         $builder->any($subBuilder);
