@@ -74,7 +74,7 @@ class Definition extends AbstractDefinition
             Option\Model::PAGE_PENDING_ASSESSMENTS,
             Option\Model::PAGE_GRADES,
             Option\Model::PAGE_MARK_BOOK,
-            Option\Model::PAGE_DUE_WORK_CALENDAR,
+//            Option\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }
 
