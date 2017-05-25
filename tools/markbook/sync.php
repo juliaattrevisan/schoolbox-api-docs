@@ -11,6 +11,7 @@
  */
 
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -180,7 +181,7 @@ foreach($categoryList as $category) {
  * @param $categoryId
  * @param Schoolbox\Resource\Folder\Mapper $folderMapper
  * @param array $catsWithCodes
- * @return array
+ * @return Folder[]
  */
 function traverse($categoryId, $folderMapper, $catsWithCodes = array())
 {

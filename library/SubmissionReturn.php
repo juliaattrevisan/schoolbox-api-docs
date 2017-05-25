@@ -90,7 +90,7 @@ class SubmissionReturn extends DeprecatedModel
         if ($box_id) {
             $query .= " AND r.box_id = $box_id";
         }
-        $query .= " ORDER BY returned DESC";
+        $query .= " ORDER BY published_at DESC";
         return $this->db->getRow($query);
     }
 
@@ -128,7 +128,7 @@ class SubmissionReturn extends DeprecatedModel
         if ($box_id) {
             $query .= " AND r.box_id = $box_id";
         }
-        $query .= " ORDER BY returned DESC";
+        $query .= " ORDER BY published_at DESC";
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }
@@ -173,7 +173,7 @@ class SubmissionReturn extends DeprecatedModel
                   LEFT JOIN submission_box sb ON sr.box_id = sb.id
                   LEFT JOIN submission_mark_type smt ON sb.mark_type = smt.mark_type_id
                   WHERE sr.owner = '$user_id'
-                  AND returned = '$timestamp'";
+                  AND published_at = '$timestamp'";
         return $this->db->getRow($query);
     }
 
@@ -191,19 +191,19 @@ class SubmissionReturn extends DeprecatedModel
         // Return whichever one is most recent.
         $errorResult = $this->db->getRow(
             "
-                        SELECT e.*, r.returned, r.mark, r.comment
+                        SELECT e.*, r.published_at as returned, r.mark, r.comment
                         FROM submission_return r
                         INNER JOIN submission_errors e ON r.mark = e.display_as
                         WHERE r.owner = " . $this->db->smartQuote($user_id) . "
             AND r.box_id = " . $this->db->smartQuote($box_id) . "
-            ORDER BY returned DESC
+            ORDER BY r.published_at DESC
             LIMIT 1
         "
         );
         $gradeResult = $this->db->getRow("
             SELECT
               g.*,
-              r.returned,
+              r.published_at as returned,
               r.mark,
               r.comment
             FROM submission_grade g
@@ -212,7 +212,7 @@ class SubmissionReturn extends DeprecatedModel
             WHERE r.owner = " . $this->db->smartQuote($user_id) . "
             AND r.box_id = " . $this->db->smartQuote($box_id) . "
             AND g.submission_grade_group_id = b.submission_grade_group_id
-            ORDER BY returned DESC, lower_bound DESC
+            ORDER BY r.published_at DESC, lower_bound DESC
             LIMIT 1
         ");
 

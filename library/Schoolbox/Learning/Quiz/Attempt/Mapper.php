@@ -146,9 +146,13 @@ class Mapper extends BaseMapper
      */
     protected function updateExternalMarkbook(Model $object, $previous = null)
     {
-        //Copy data to remote system
-        $externalMarkbook = new \External_Markbook();
-        $externalMarkbook->setMark($object);
+        // Only update markbook if attempt is reviewed
+        $reviewedTime = $object->getReviewed();
+        if ($reviewedTime instanceof Alaress_Date_Format && !$reviewedTime->isNull()) {
+            $externalMarkbook = new \External_Markbook();
+            $externalMarkbook->setMark($object);
+        }
+
         return true;
     }
 
