@@ -18,7 +18,6 @@
                         <a href="#component{{ componentInstanceId }}-{{ topic.id }}">{{ topic.name }}</a>
                     </dd>
                 {% endif %}
-w
             {% endfor %}
 
             {# Display special 'All' grouping #}
@@ -62,7 +61,7 @@ w
                                             </p>
                                         </div>
                                     </div>
-                                    <article>{{ item.blurb | raw }}</article>
+                                    <article>{{ item.blurb | purify }}</article>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -87,7 +86,7 @@ w
                                     </p>
                                 </div>
                             </div>
-                            <article>{{ item.blurb | raw }}</article>
+                            <article>{{ item.blurb | purify }}</article>
                         </li>
                     {% endfor %}
                 </ul>
