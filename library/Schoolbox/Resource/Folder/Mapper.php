@@ -22,6 +22,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
@@ -53,6 +54,7 @@ use \Schoolbox\Resource\Folder\Code as FolderCode;
  * @method Collection|Model[] findByColumnList($columnList, $options = []);
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] createCollection($contents = [])
+ * @method GenericCollection|Model[] findByPredicates(PredicateBuilder $pb, array $options = []) *
  */
 class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 {
@@ -673,6 +675,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param string $keyword
      * @param bool $userGroupsOnly
      * @return Collection|Model[]
+     * @throws DefinitionException if join $name isn't on this mapper
      */
     public function searchByName($keyword, $userGroupsOnly = false)
     {
@@ -689,11 +692,26 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ->like('cc.code', "%{$this->database->escapeForLike($keyword)}%");
 
         $builder->any($subBuilder);
-        $folderIds = $this->findIdsByPredicates($builder);
-
-        $column = "{$this->getTable()}.{$this->getIdentifierColumn()}";
         $options = ['order' => ["{$this->getTable()}.name" => 'ASC']];
-        return $this->findByColumn($column, $folderIds, $options);
+
+        $folders = $this->findByPredicates($builder, $options);
+
+        // Need to load folder codes again to ensure siblings of any matched code are inserted
+        /** @var FolderCode\Mapper $codeMapper */
+        $codeMapper = $this->getJoinMapper('codes');
+
+        $folderIds      = $folders->getColumnValues($this->getIdentifierColumn());
+        $folderCodes    = $codeMapper->findByColumn('folder_id', $folderIds);
+        $codesPerFolder = $folderCodes->groupByCallback(function(FolderCode\Model $code){
+            return $code->getFolder()->getId();
+        });
+
+        foreach($codesPerFolder as $folderId => $codes){
+            $folders[$folderId]->setCodes($codes);
+        }
+
+
+        return $folders;
     }
 
     /**
