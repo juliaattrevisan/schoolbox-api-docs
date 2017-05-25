@@ -588,7 +588,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Search for folders with the given curriculum code(s)
      *
-     * @param string|array $code
+     * @param string|string[] $code
      * @return Collection|Model[]
      * @throws MapperException
      */
@@ -599,17 +599,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             return $this->createCollection();
         }
 
-        // cast singular to plural
-        $code = (array)$code;
+        $builder = $this->getPredicateBuilder();
+        $builder->equals('cn.code', $code);
 
-        // generate prepare-param string
-        $qmarks = implode(', ', array_pad([], count($code), '?'));
+        // When matching folders by sub-object, we must first get the folderIds,
+        // then hydrate those folders to ensure all sub-objects of matched type are fetched.
 
-        // search on curriculum node code
-        $q = $this->getSelectString() . $this->getFromString() . "WHERE cn.code in ($qmarks)";
-
-        // search, hydrate, return
-        return $this->hydrateSelect($this->getDatabase()->query($q, $code));
+        $folderIds = $this->findIdsByPredicates($builder);
+        $column = "{$this->getTable()}.{$this->getIdentifierColumn()}";
+        return $this->findByColumn($column, $folderIds);
     }
 
     /**
