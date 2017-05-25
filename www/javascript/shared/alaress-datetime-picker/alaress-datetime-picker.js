@@ -209,6 +209,70 @@ function checkAllDaySwitch (state, pickerId) {
 
 }
 
+
+/**
+ * Massages the datetime picker's value into a valid format, or errors out if it cannot.
+ *
+ * This uses an AJAX call to /ajax/strtotime.php, which uses method strtotime()
+ * to convert the input's value to a recognisable date value.
+ *
+ * @param e a jQuery event
+ */
+function massageDateValue(e) {
+    var t = e.target;
+
+    $(t).prop('readonly', true);
+    $(t).prop('disabled', true);
+
+    $.get('/ajax/strtotime.php', { string: t.value, format: 'local_full' }, function (data) {
+
+        var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
+
+        $(t).prop('disabled', false);
+
+        // If it couldn't parse a date - show a validation error on the form
+        if (data.error) {
+
+            $(t).addClass('error');
+
+            if (!$fieldError.length) { // don't create multiple errors
+
+                var error = '<label id="' + $(t).attr('id') + '-error" class="error" for="' + $(t).attr('id') + '">Please enter a valid date</label>';
+
+                if ($(t).closest('.input-group').length) {
+                    $(t).closest('.input-group').after(error);
+                } else {
+                    $(t).after(error);
+                }
+
+            } else {
+
+                // It might be hidden - show
+                $fieldError.show();
+            }
+
+        } else {
+
+            // Add the parsed date into the field
+            $(t).val(data.time);
+
+            // Remove any error class on the field
+            $(t).removeClass('error');
+
+            // Hide any validation error
+            $fieldError.hide();
+        }
+
+        // Restore JS validation on the field
+        $(t).removeAttr('data-av-ignore');
+
+    }).always(function () {
+        $(t).prop('readonly', false);
+        $(t).prop('disabled', false);
+    });
+}
+
+
 // Extend jQuery with our datepicker function
 
 $.fn.alaressDateTimePicker = function (optionsOverride) {
@@ -272,6 +336,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         }
     });
 
+    $datepickerButton.on('blur', massageDateValue);
     $datepickerButton.click(function () {
 
         var originalValue;
