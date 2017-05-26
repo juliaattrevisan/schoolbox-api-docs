@@ -10,84 +10,47 @@
 // always JSON response
 header('Content-Type: application/json');
 
-$string = isset($_REQUEST['string']) ? $_REQUEST['string'] : '';
+$naturalLanguage = isset($_REQUEST['string']) ? $_REQUEST['string'] : '';
 
-if (empty($string)) {
+if (empty($naturalLanguage)) {
     // null is ok: failfast
     die(json_encode([ 'time' => null ]));
 }
 
-$format = isset($_REQUEST['format']) ? $_REQUEST['format'] : '';
-$full   = $format === 'local_full';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
-if (empty($format) || $full) {
-    // for performance, only include the boostrap if you *absolutely* must
-    require_once __DIR__ . '/../../library/Bootstrap.php';
+// booleans
+$enableTime = isset($_REQUEST['enableTime']) ? (bool)$_REQUEST['enableTime'] : false;
+$endDay = isset($_REQUEST['endDay']) ? (bool)$_REQUEST['endDay'] : false;
 
-    $format = Config::get('date_local');
 
-    // if we want a full datetime as localised, append the time
-    if ($full) {
-        $format .= ' ' . Config::get('date_time');
-    }
+if ($enableTime) {
+    $renderFormat = isset($_REQUEST['displayFormat'])
+        ? $_REQUEST['displayFormat']
+        : Config::get('date_local') . ' ' . Config::get('date_time');
+} else {
+    $renderFormat = isset($_REQUEST['displayFormatDate'])
+        ? $_REQUEST['displayFormatDate']
+        : Config::get('date_local');
 }
 
+try {
+    $adf = Alaress_Date_Format::newNaturalDate($naturalLanguage);
 
-
-////
-////  WARNING: no library code beyond this point - bootstrap is not guaranteed  ////
-////
-
-
-// compensate for natural language
-$parseable = denaturalise($string);
-
-$datetime = DateTime::createFromFormat($format, $parseable);
-
-if (!$datetime) {
-    try {
-        $datetime = new DateTime(str_replace('/','-', $parseable));
-
-    } catch (Exception $ex) {
-        // noop
-    }
+} catch (InvalidArgumentException $e) {
+    // Datetime wasn't able to be created? error out but preserve old error
+    // functionality (where time doesn't change at all)
+    die(json_encode([
+        'time'  => $naturalLanguage,
+        'error' => 'Could not parse date',
+    ]));
 }
 
-if ($datetime instanceof DateTime) {
-    die(json_encode([ 'time' => $datetime->format($format) ]));
+// the ADF successfully parsed into a datetime: coerce the final output according to the params given
+if ($endDay && $adf->isAtStartOfDay()) {
+    // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
+    // this causes a limitation that it is *not possible* to set a field of this nature to midnight
+    $adf = $adf->endOfDay();
 }
 
-// Datetime wasn't able to be created? error out but preserve old error
-// functionality (where time doesn't change at all)
-die(json_encode([
-    'time'  => $string,
-    'error' => 'Could not parse date',
-]));
-
-
-/**
- * Attempt to normalise natural language into what strtotime() will be able to understand
- *
- * @param string $string
- * @return string
- */
-function denaturalise($string)
-{
-
-    // normalise any whitespace
-    $string = preg_replace('`\s+`', ' ', trim($string));
-
-    // remove "^in " and " from now$"
-    $string = str_replace(['in ', ' from now', ' at ', ' on ', ', '], ' ', $string);
-
-    // replace all word-numbers with number-numbers
-    $words = [
-        'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'
-    ];
-
-    $string = str_replace($words, array_keys($words), $string);
-
-    // known limitation: 23:00am fails to parse
-
-    return $string;
-}
+die(json_encode([ 'time' => $adf->getUsingFormat($renderFormat) ]));
