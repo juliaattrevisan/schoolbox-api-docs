@@ -163,6 +163,7 @@ function setValue(element, options, state, trigger, date) {
     else {
         value = moment();
     }
+
     // All Day is on
     var v;
     if (state === true) {
@@ -184,13 +185,18 @@ function setValue(element, options, state, trigger, date) {
         }
         element.val(v);
     }
+
     if (trigger === true) {
         element.trigger('change');
-        element.trigger('blur');
     }
+
     if (options.allDayInput !== false) {
         $('#' + options.allDayInput).val(state ? 1 : 0);
     }
+
+    // Hide any possible validation error from the field
+    $('#' + element.attr('id') + '-error').hide();
+
 }
 
 function checkAllDaySwitch (state, pickerId) {
