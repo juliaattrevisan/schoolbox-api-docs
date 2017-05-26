@@ -232,7 +232,17 @@ function massageDateValue(e) {
    $(t).prop('readonly', true);
     $(t).prop('disabled', true);
 
-    $.get('/ajax/strtotime.php', { string: t.value, format: 'local_full' }, function (data) {
+    // set up params to guide server-side parsing
+    var opts = getOptions($(t));
+    var params = {
+        string: t.value,
+        displayFormat: opts.displayFormat,
+        displayFormatDate: opts.displayFormatDate,
+        enableTime: opts.enableTime ? 1 : 0, // these have to be made binary to survive transport
+        endDay: opts.endDay ? 1 : 0
+    };
+
+    $.get('/ajax/strtotime.php', params, function (data) {
 
         var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
 
