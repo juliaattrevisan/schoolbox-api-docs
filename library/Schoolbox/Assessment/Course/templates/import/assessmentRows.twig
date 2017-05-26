@@ -91,6 +91,7 @@
                 {% include '@course/import/date.twig' with {
                     assessmentDate: assessment.dueAt,
                     unitDate: displayEndDate,
+                    endOfDay: true,
                     inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                     dateProperty: 'due',
                     dateSyncProperty: 'close',
@@ -102,6 +103,7 @@
                     {% include '@course/import/date.twig' with {
                         assessmentDate: assessment.closeAt,
                         unitDate: displayEndDate,
+                        endOfDay: true,
                         inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                         dateProperty: 'close',
                         dateLabel: 'Late',
