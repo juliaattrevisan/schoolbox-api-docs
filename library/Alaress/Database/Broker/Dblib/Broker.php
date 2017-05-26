@@ -26,6 +26,14 @@ class Broker extends Base implements IBroker
     /**
      * @inheritdoc
      */
+    public static function isAvailable()
+    {
+        return in_array('dblib', PDO::getAvailableDrivers(), true);
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function buildQuoter()
     {
         return new DblibQuoter();
@@ -39,7 +47,7 @@ class Broker extends Base implements IBroker
         // Set MSSQL specific attributes
 
         /** @noinspection PhpUndefinedClassConstantInspection */
-        $this->databaseAttributes = [PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8];
+        $this->databaseAttributes = [];
 
         // Set MSSQL specific post-connect queries
 

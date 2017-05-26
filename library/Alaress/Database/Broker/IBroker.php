@@ -25,6 +25,13 @@ use PDOStatement;
 interface IBroker extends IQuoter
 {
     /**
+     * Is this broker available?
+     *
+     * @return bool
+     */
+    public static function isAvailable();
+
+    /**
      * Sets the connector that the broker will use
      *
      * @param IConnector $connector
