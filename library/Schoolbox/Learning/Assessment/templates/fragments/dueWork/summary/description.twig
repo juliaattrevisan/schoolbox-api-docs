@@ -12,7 +12,7 @@
             {% for currentFile in assessment.attachedFiles %}
                 <li>
                     <div class="card attachment small-12">
-                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" data-plugin="preview">
+                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
                             <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                             <p>{{ currentFile.filename }} | <span class="meta">Download</span></p>
                         </a>
