@@ -196,6 +196,7 @@ function setValue(element, options, state, trigger, date) {
 
     // Hide any possible validation error from the field
     $('#' + element.attr('id') + '-error').hide();
+    $(element).removeClass('error');
 
 }
 
@@ -228,7 +229,7 @@ function checkAllDaySwitch (state, pickerId) {
 function massageDateValue(e) {
     var t = e.target;
 
-    $(t).prop('readonly', true);
+   $(t).prop('readonly', true);
     $(t).prop('disabled', true);
 
     $.get('/ajax/strtotime.php', { string: t.value, format: 'local_full' }, function (data) {
@@ -306,10 +307,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
 
-    // Temporarily disable JS validation on this field so that it doesn't harass the user that
-    // things like 'today' aren't valid dates
-    disableValidation(element);
-
     // Build datepicker options form the element data attributes
     var options = getOptions(element);
 
@@ -370,8 +367,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     element
         .on('blur', massageDateValue)
         .on('focus', function() {
-            // Disable JS validation on the field again
-            disableValidation($(this));
+            // Temporarily disable JS validation on this field so that it doesn't harass the user that
+            // things like 'today' aren't valid dates
+            disableValidation(element);
         });
 
     $datepickerButton.click(function () {
