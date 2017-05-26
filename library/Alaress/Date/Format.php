@@ -213,6 +213,61 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         return new static($dateTime, $format.'|', $timezone, $locale);
     }
 
+
+    /**
+     * Static constructor: creates a new date parsed from natural language, if possible
+     *
+     * @param string $naturalLanguage
+     * @throws InvalidArgumentException
+     */
+    public static function newNaturalDate($naturalLanguage)
+    {
+        // compensate for natural language
+        $parseable = self::denaturalise($naturalLanguage);
+
+        $datetime = DateTime::createFromFormat('', $parseable);
+
+        if (!$datetime) {
+            try {
+                $datetime = new DateTime(str_replace('/','-', $parseable));
+
+            } catch (Exception $e) {
+                throw new InvalidArgumentException("Could not parse '$naturalLanguage' into a datetime", $e->getCode(), $e);
+            }
+        }
+
+        return new static($datetime);
+    }
+
+
+    /**
+     * Attempt to normalise natural language into what strtotime() will be able to understand
+     *
+     * @param string $string
+     * @return string
+     */
+    private statiC function denaturalise($string)
+    {
+
+        // normalise any whitespace
+        $string = preg_replace('`\s+`', ' ', trim($string));
+
+        // remove "^in " and " from now$"
+        $string = str_replace(['in ', ' from now', ' at ', ' on ', ', '], ' ', $string);
+
+        // replace all word-numbers with number-numbers
+        $words = [
+            'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'
+        ];
+
+        $string = str_replace($words, array_keys($words), $string);
+
+        // known limitation: 23:00am fails to parse
+
+        return $string;
+    }
+
+
     /**
      * Set up datetime data for processing. Choose your strategy here!
      * Choose your locale as well; this would probably come from the Config
