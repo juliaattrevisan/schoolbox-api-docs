@@ -27,8 +27,8 @@
 {% endif %}
 
 <li {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row class="actions-small-1">
-    <div class="list-item">
-        <div class="card small-12 medium-8">
+    <div class="list-item flex-grade">
+        <div class="card small-12">
             {% if url %}
             <a href="{{ url }}" title="{{ tooltip }}">
             {% endif %}
@@ -51,10 +51,8 @@
             </a>
             {% endif %}
         </div>
-        <div class="small-12 medium-2 columns text-right">
-            <div class="grade">
-                <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
-            </div>
+        <div class="grade">
+            <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
         </div>
     </div>
     {% set deleteRoute = routeLookupIfAuthorized(
@@ -97,7 +95,7 @@
                             {% if crocodocRoute %}
                                 <a href="{{ crocodocRoute }}">
                                     <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
-                                    <p>{{ currentFile.filename }}</p>
+                                    <p>{{ currentFile.filename }} | <span class="meta">Download</span></p>
                                 </a>
                             {% endif %}
                         {% else %}

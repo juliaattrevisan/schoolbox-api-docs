@@ -11,13 +11,11 @@
         <ul class="information-list">
             {% for currentFile in assessment.attachedFiles %}
                 <li>
-                    <div class="list-item">
-                        <div class="card attachment small-12">
-                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" data-plugin="preview">
-                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
-                                <p>{{ currentFile.filename }}</p>
-                            </a>
-                        </div>
+                    <div class="card attachment small-12">
+                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" data-plugin="preview">
+                            <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
+                            <p>{{ currentFile.filename }} | <span class="meta">Download</span></p>
+                        </a>
                     </div>
                 </li>
             {% endfor %}

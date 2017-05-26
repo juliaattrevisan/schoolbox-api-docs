@@ -295,7 +295,6 @@
 	/* Force same font size, regardless of hierarchy
 	 * On extra-large viewports, restore native typography sizes
 	 */
-
 	h1,h2,h3,h4,h5,h6 {
 		margin-top: 0;
 		margin-bottom: 0;
@@ -351,5 +350,18 @@
 	width: 100%;
 	&:hover{
 		background-color: $content-ui-hover;
+	}
+}
+
+// Grades that sit along side of cards
+.flex-grade{
+	display: flex;
+	align-items: center;
+	.grade{
+		flex: 1 0 auto;
+		padding: 0 1rem;
+	}
+	@media #{$small-only} {
+		flex-wrap: wrap;
 	}
 }
