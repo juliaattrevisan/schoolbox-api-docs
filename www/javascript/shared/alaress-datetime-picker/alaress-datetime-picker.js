@@ -65,8 +65,12 @@ function getValue(input, attribute) {
 
 function getOptions(element) {
 
+    var buttonText = getValue(element, 'data-datepicker-buttontext');
+
     // Build datepicker options form the element data attributes
     var elementOptions = {
+        noButton: getValue(element, 'data-datepicker-nobutton'),
+        buttonText: buttonText === true ? '' : (buttonText || 'Select Date'),
         displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
         displayFormatDate: dateDisplayFormats.localDate, //Default display date format
         databaseFormat: 'Y-m-d H:i:s',
@@ -159,6 +163,7 @@ function setValue(element, options, state, trigger, date) {
     else {
         value = moment();
     }
+
     // All Day is on
     var v;
     if (state === true) {
@@ -180,12 +185,19 @@ function setValue(element, options, state, trigger, date) {
         }
         element.val(v);
     }
+
     if (trigger === true) {
         element.trigger('change');
     }
+
     if (options.allDayInput !== false) {
         $('#' + options.allDayInput).val(state ? 1 : 0);
     }
+
+    // Hide any possible validation error from the field
+    $('#' + element.attr('id') + '-error').hide();
+    $(element).removeClass('error');
+
 }
 
 function checkAllDaySwitch (state, pickerId) {
@@ -205,12 +217,95 @@ function checkAllDaySwitch (state, pickerId) {
 
 }
 
+
+/**
+ * Massages the datetime picker's value into a valid format, or errors out if it cannot.
+ *
+ * This uses an AJAX call to /ajax/strtotime.php, which uses method strtotime()
+ * to convert the input's value to a recognisable date value.
+ *
+ * @param e a jQuery event
+ */
+function massageDateValue(e) {
+    var t = e.target;
+
+   $(t).prop('readonly', true);
+    $(t).prop('disabled', true);
+
+    $.get('/ajax/strtotime.php', { string: t.value, format: 'local_full' }, function (data) {
+
+        var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
+
+        $(t).prop('disabled', false);
+
+        // If it couldn't parse a date - show a validation error on the form
+        if (data.error) {
+
+            $(t).addClass('error');
+
+            if (!$fieldError.length) { // don't create multiple errors
+
+                var error = '<label id="' + $(t).attr('id') + '-error" class="error" for="' + $(t).attr('id') + '">Please enter a valid date</label>';
+
+                if ($(t).closest('.input-group').length) {
+                    $(t).closest('.input-group').after(error);
+                } else {
+                    $(t).after(error);
+                }
+
+            } else {
+
+                // It might be hidden - show
+                $fieldError.show();
+            }
+
+        } else {
+
+            // Add the parsed date into the field
+            $(t).val(data.time);
+
+            // Remove any error class on the field
+            $(t).removeClass('error');
+
+            // Hide any validation error
+            $fieldError.hide();
+        }
+
+        // Restore JS validation on the field
+        enableValidation($(t));
+
+    }).always(function () {
+        $(t).prop('readonly', false);
+        $(t).prop('disabled', false);
+    });
+}
+
+
+/**
+ * Disables validation on this datepicker.
+ *
+ * @param element a datepicker
+ */
+function disableValidation(element) {
+    element.attr('data-av-ignore', true);
+}
+
+
+/**
+ * Enables validation on this datepicker.
+ *
+ * @param element a datepicker
+ */
+function enableValidation(element) {
+    element.removeAttr('data-av-ignore');
+}
+
+
 // Extend jQuery with our datepicker function
 
 $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     var element = this;
-    var $datepickerButton = $(this).siblings('[data-adtp-btn]');
 
     // Build datepicker options form the element data attributes
     var options = getOptions(element);
@@ -219,6 +314,36 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     for (var attribute in optionsOverride) {
         options[attribute] = optionsOverride[attribute];
     }
+
+    if (!options.noButton && !element.data('dateButton')) {
+        // install button (no more than once)
+
+        // rearrange the DOM to install the button
+        var $label = element.closest('label');
+
+        if ($label.length) {
+            // in this case, the DOM needs to be rearranged so that the flex button is adjacent tot he label, not inside
+            $label.attr('for', element.attr('id'));
+            element.detach();
+            $label.after(element);
+        }
+
+        element.wrap($('<div class="input-group" />'));
+
+        var $datebtn = $('<a class="button icon-calendar" data-adtp-btn />');
+
+        if (options.buttonText) {
+            $datebtn.text(options.buttonText);
+        } else {
+            $datebtn.addClass('no-text');
+        }
+
+        element
+            .data('dateButton', $datebtn)
+            .after($datebtn.append($('<span class="splash animate"/>')));
+    }
+
+    var $datepickerButton = $(this).siblings('[data-adtp-btn]');
 
     window.pickerInstance = [];
 
@@ -238,6 +363,14 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
         }
     });
+
+    element
+        .on('blur', massageDateValue)
+        .on('focus', function() {
+            // Temporarily disable JS validation on this field so that it doesn't harass the user that
+            // things like 'today' aren't valid dates
+            disableValidation(element);
+        });
 
     $datepickerButton.click(function () {
 
