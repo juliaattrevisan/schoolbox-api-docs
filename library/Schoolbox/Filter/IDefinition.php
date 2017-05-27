@@ -70,30 +70,28 @@ interface IDefinition
 
 
     /**
-     * Get all possible filter options, grouped by option.key, then indexed by option.page
+     * Get all possible filter (abstract) options for the specified page, indexed by option.key
      *
      * Options may be pulled from:
      * * DB,
      * * Hard-coded, or
      * * Both
      *
-     * Must ensure inner collections are sorted the same as getPages()
-     *
-     * @param null|string $pageFilter If supplied, get options just for this page, otherwise get options for all available pages
-     * @return Collection|GenericCollection[]|FilterOption\Model[][]
+     * @param string $page Get options just for this page
+     * @return GenericCollection|FilterOption\Model[]
      */
-    public function getOptions($pageFilter = null);
+    public function getOptions($page);
 
 
     /**
-     * Returns sets of available abstract options, grouped by option.page, then indexed by option.key.
+     * Returns sets of available (abstract) options, indexed by option.key.
      * Each Option contains a set of Defaults, indexed by roleType
      *
-     * @param null|string $pageFilter     If supplied, get defaults just for this page
+     * @param string      $page           Get options for this page
      * @param null|string $roleTypeFilter If supplied, get defaults just for this roleType
-     * @return Collection|GenericCollection[]|FilterOption\Model[][]
+     * @return GenericCollection|FilterOption\Model[]
      */
-    public function getAvailableOptions($pageFilter = null, $roleTypeFilter = null);
+    public function getOptionsWithDefaults($page, $roleTypeFilter = null);
 
 
     /**
