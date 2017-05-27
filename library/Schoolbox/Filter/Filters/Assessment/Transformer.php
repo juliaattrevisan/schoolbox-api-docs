@@ -32,6 +32,18 @@ class Transformer extends \Schoolbox\Filter\Transformer
      */
     private $isFolderFilterUsed;
 
+    /**
+     * Indexed by the nullable context filters
+     *
+     * @var bool[]
+     */
+    private $nullableContexts = [
+        NullableContext\Project\Definition::class        => true,
+        NullableContext\UnitImpl\Definition::class       => true,
+        NullableContext\UnitImportSpec\Definition::class => true,
+        NullableContext\UnitSpec\Definition::class       => true,
+    ];
+
 
     /**
      * @inheritdoc
@@ -43,7 +55,8 @@ class Transformer extends \Schoolbox\Filter\Transformer
 
         // If teacher page (pending, markbook), most likely the first, if student page (eg grades) will be the second.
         $this->isFolderFilterUsed =
-            $this->getSelectedItems(Folder\TeacherInvolved\Definition::class) || $this->getSelectedItems(Folder\StudentInteractions\Definition::class);
+            $this->getSelectedItems(Folder\TeacherInvolved\Definition::class) ||
+            $this->getSelectedItems(Folder\StudentInteractions\Definition::class);
     }
 
 
@@ -63,13 +76,7 @@ class Transformer extends \Schoolbox\Filter\Transformer
         $keyConverter = $this->getKeyConverters()[$instance->getId()];
 
         // Is this a 'nullable-context' assessment filter
-        $nullableContexts = [
-            NullableContext\Project\Definition::class,
-            NullableContext\UnitImpl\Definition::class,
-            NullableContext\UnitImportSpec\Definition::class,
-            NullableContext\UnitSpec\Definition::class,
-        ];
-        if (in_array($filterClass, $nullableContexts, true)) {
+        if (array_key_exists($filterClass, $this->nullableContexts)) {
             /** @var NullableContext\KeyConverter $keyConverter */
             return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()], $this->isFolderFilterUsed);
         }
