@@ -49,10 +49,10 @@ class Role implements ValueLabelInterface, ISoftDeletable
     public static function getRoleTypes()
     {
         return [
-            self::GUEST,
-            self::STUDENT,
-            self::PARENT,
             self::STAFF,
+            self::PARENT,
+            self::STUDENT,
+            self::GUEST,
         ];
     }
 
