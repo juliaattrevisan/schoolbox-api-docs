@@ -32,5 +32,23 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('page', self::TYPE_STRING);
         $this->uses('key', self::TYPE_STRING);
         $this->uses('available', self::TYPE_BOOLEAN);
+
+        $this->registerCallback(self::CALLBACK_PREDELETE, [$this, 'hardDeleteRoleDefaults']);
+    }
+
+
+    /**
+     * Pre hard-delete callback to hard-delete any RoleDefaults for this option
+     *
+     * @param Model $option
+     * @return bool
+     */
+    public function hardDeleteRoleDefaults(Model $option)
+    {
+        /** @var Defaults\Mapper $defaultsMapper */
+        $defaultsMapper = Defaults\Mapper::getInstance();
+        $defaultsModels = $defaultsMapper->findByColumn('filter_option_id', $option->getId());
+        $defaultsMapper->delete($defaultsModels);
+        return true;
     }
 }
