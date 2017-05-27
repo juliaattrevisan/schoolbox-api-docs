@@ -19,16 +19,16 @@
     <div class="small-12 island">
         <section>
             <ul class="information-list">
-                {% for pageKey, pageFilters in filtersPerPage %}
-                    {% if PAGE_GRADES == pageKey %}
+                {% for page, pageFilters in filtersPerPage %}
+                    {% if PAGE_GRADES == page %}
                         {% set pageName = 'Grades' %}
-                    {% elseif PAGE_MARK_BOOK == pageKey %}
+                    {% elseif PAGE_MARK_BOOK == page %}
                         {% set pageName = 'Markbook' %}
-                    {% elseif PAGE_PENDING_ASSESSMENTS == pageKey %}
+                    {% elseif PAGE_PENDING_ASSESSMENTS == page %}
                         {% set pageName = 'Pending ' ~ locale.assessment.proper %}
                     {% else %}
                         {# Graceful fallback if constant not injected into twig #}
-                        {% set pageName = pageKey %}
+                        {% set pageName = page %}
                     {% endif %}
 
                     {# Filters on a page are all for same entity type, so just inspect first #}
@@ -42,7 +42,7 @@
                     <li>
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="{{ routeLookup('filters.getPageSettings', { pageKey: pageKey }) }}">
+                                <a href="{{ routeLookup('filters.getPageSettings', { page: page }) }}">
                                     <h3><i class="icon-{{ icon }} size-24"></i>{{ pageName }}</h3>
                                     <p class="meta">
                                         {%- for className, filterInstance in pageFilters -%}
