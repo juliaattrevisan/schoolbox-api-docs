@@ -206,7 +206,7 @@ abstract class AbstractComponent implements IComponent
         $roleType = $this->getUser()->getRole()->getType();
 
         /** @var GenericCollection|Option\Model[] $availableOptions */
-        $availableOptions = $this->getDefinition()->getAvailableOptions($this->page, $roleType)[$this->page];
+        $availableOptions = $this->getDefinition()->getOptionsWithDefaults($this->page, $roleType)[$this->page];
 
         $roleSelections = $this->getRoleSelections($availableOptions);
         $userSelections = $this->getUserSelections($availableOptions);
