@@ -269,24 +269,6 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @inheritdoc
      */
-    public function getOptionsTemplate()
-    {
-        return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'options.twig';
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getDefaultsTemplate()
-    {
-        return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'defaults.twig';
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getPanelComponentTemplate()
     {
         return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'component.twig';

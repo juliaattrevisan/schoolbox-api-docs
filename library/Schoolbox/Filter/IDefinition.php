@@ -42,26 +42,6 @@ interface IDefinition
 
 
     /**
-     * Returns the twig template to render this filter's available options
-     *
-     * Intended to be called in Controller
-     *
-     * @return string
-     */
-    public function getOptionsTemplate();
-
-
-    /**
-     * Returns the twig template to render this filters roleType default selections
-     *
-     * Intended to be called in Controller
-     *
-     * @return string
-     */
-    public function getDefaultsTemplate();
-
-
-    /**
      * Returns the twig template to render this filter's panel component into
      *
      * @return string
