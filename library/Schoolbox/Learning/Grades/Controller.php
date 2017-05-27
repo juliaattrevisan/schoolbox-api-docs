@@ -227,8 +227,7 @@ class Controller extends Base
 
         // Show the Current Grade Average for instructors and for students if the config var is on
         $isInstructor       = $this->access->isInstructor($this->getUser(), $subject);
-        $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()
-                                                    ->get('show_overall_grade');
+        $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Get folders for drop-down.
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
