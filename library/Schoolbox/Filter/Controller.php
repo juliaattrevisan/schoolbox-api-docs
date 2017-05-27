@@ -9,9 +9,7 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
-use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Role;
@@ -21,28 +19,47 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 class Controller extends BaseController
 {
 
+    /** @var Mapper $filterMapper */
+    private $filterMapper;
+
+    /** @var Option\Mapper $optionsMapper */
+    private $optionsMapper;
+
+    /** @var  Option\Defaults\Mapper $defaultsMapper */
+    private $defaultsMapper;
+
+
+    /**
+     * @param Mapper          $filterMapper
+     * @param Option\Mapper   $optionsMapper
+     * @param Defaults\Mapper $defaultsMapper
+     */
+    public function __construct(
+        Mapper $filterMapper,
+        Option\Mapper $optionsMapper,
+        Option\Defaults\Mapper $defaultsMapper
+    ) {
+        $this->filterMapper   = $filterMapper;
+        $this->optionsMapper  = $optionsMapper;
+        $this->defaultsMapper = $defaultsMapper;
+    }
+
+
     /**
      * Display a summary of filter configurations for Admins
      *
      * @api   GET /adminv2/filters
      * @level 17.0
-     * @param GenericCollection|Model[] $visibleFilters - Just the filters which are visible on screens
      * @throws ServiceNotFound
      */
-    public function getIndex(GenericCollection $visibleFilters)
+    public function getIndex()
     {
-        // Group filters by which pages they appear on
-        $filtersPerPage = [];
-        foreach($visibleFilters as $instance){
-            $class = $instance->getClass();
-            foreach($class::getPages() as $page){
-                $filtersPerPage[$page][$class::getName()] = $instance;
-            }
-        }
-
+        $filtersPerPage = $this->findVisibleFiltersPerPage();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
             'filtersPerPage'           => $filtersPerPage,
+
+            // Constants to enable presentation language delegation to TWIG
             'PAGE_PENDING_ASSESSMENTS' => Option\Model::PAGE_PENDING_ASSESSMENTS,
             'PAGE_GRADES'              => Option\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Option\Model::PAGE_MARK_BOOK,
@@ -56,137 +73,138 @@ class Controller extends BaseController
      *
      * @api   GET /adminv2/filters/{pageKey}
      * @level 17.0
-     * @param string $pageKey
+     * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
+     * @param string          $page
      * @throws ServiceNotFound
-     * @throws RouteNotFound
+     * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
+     * @throws \ReflectionException If a definition class does not exist
      */
-    public function getPageSettings($pageKey)
+    public function getPageSettings(IFactoryFactory $factoryFactory, $page)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput($definition->getOptionsTemplate(), [
-            'filter'     => $definition->getFilter(),
-            'definition' => $definition,
-            'options'    => $definition->getOptions(),
+        $pageFilters = $this->findVisibleFiltersPerPage()[$page];
+
+        /** @var GenericCollection|IDefinition[] $definitions */
+        $definitions = new GenericCollection(IDefinition::class);
+
+        foreach($pageFilters as $name => $instance){
+            $filterFactory      = $factoryFactory->buildFilterFactoryForFilter($instance->getClass());
+            $definitions[$name] = $filterFactory->buildDefinition($instance);
+        }
+
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
+            'pageKey'                  => $page,
+            'definitions'              => $definitions,
+            'roleTypes'                => Role::getRoleTypes(),
+
+            // Constants to enable presentation language delegation to TWIG
+            'PAGE_PENDING_ASSESSMENTS' => Option\Model::PAGE_PENDING_ASSESSMENTS,
+            'PAGE_GRADES'              => Option\Model::PAGE_GRADES,
+            'PAGE_MARK_BOOK'           => Option\Model::PAGE_MARK_BOOK,
+            'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ]));
     }
 
 
     /**
-     * Display a page where admins can alter default filter selections
+     * Load up all settings for this page, overlay new settings, and save
      *
-     * @api   GET /adminv2/filters/{$filter}/defaults
-     * @level 17.0
-     * @param IDefinition $definition
-     * @throws ServiceNotFound
+     * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
+     * @param string $page
+     * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
+     * @throws \ReflectionException If a definition class does not exist
      */
-    public function getDefaultsSelections(IDefinition $definition)
+    public function postSavePageSettings(IFactoryFactory $factoryFactory, $page)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput($definition->getDefaultsTemplate(), [
-            'filter'         => $definition->getFilter(),
-            'definition'     => $definition,
-            'optionsPerPage' => $definition->getAvailableOptions(),
-            'roleTypes'      => [
-                Role::STAFF,
-                Role::PARENT,
-                Role::STUDENT,
-                Role::GUEST,
-            ],
-        ]));
-    }
+        // Clean up any invalid roleType defaults
+        $this->deleteDefaultsForInvalidRoleTypes();
+
+        $optionsToSave  = $this->optionsMapper->createCollection();
+        $defaultsToSave = $this->defaultsMapper->createCollection();
+
+        $pageFilters = $this->findVisibleFiltersPerPage()[$page];
 
 
-    /**
-     * Saves which options should be available for each filter on each page
-     *
-     * @param IDefinition   $definition
-     * @param Option\Mapper $optionMapper
-     * @var string[][]      $_POST ['filter_option'] indexed by filterOption.key then page
-     * @throws MapperException
-     */
-    public function postSaveOptions(IDefinition $definition, Option\Mapper $optionMapper)
-    {
-        /** @var string[][] $postFilterOptions */
-        $postFilterOptions = $this->getRequest()->post->get('filter_option');
+        // Load current system options and defaults, and overlay with posted settings
+        /** @var string[][] $postOptions */
+        $postOptions  = $this->getRequest()->post->get('filter_options');
+        /** @var string[][][] $postDefaults */
+        $postDefaults = $this->getRequest()->post->get('filter_defaults');
+        foreach($pageFilters as $name => $instance){
+            $filterFactory = $factoryFactory->buildFilterFactoryForFilter($instance->getClass());
+            $definition    = $filterFactory->buildDefinition($instance);
+            $options       = $definition->getOptionsWithDefaults($page);
 
+            foreach($options as $option){
+                $option->setAvailable(isset($postOptions[$instance->getId()][$option->getKey()]));
 
-        // Delete any existing options that belong to invalid pages or abstract keys
-        $optionsToDelete = $optionMapper->createCollection();
-        $existingOptions = $optionMapper->findByColumn('filter_id', $definition->getFilter()->getId());
+                // Must add() instead of offsetSet($id) as $id will be null if not yet in DB
+                $optionsToSave->add($option);
 
-        foreach ($existingOptions as $option) {
-            if (!in_array($option->getPage(), $definition::getPages(), true) || !in_array($option->getKey(), $definition->getAbstractKeys(), true)) {
-                $optionsToDelete->add($option);
-            }
-        }
-        $optionMapper->delete($optionsToDelete);
-
-
-        // Save selections. We *do* save unchecked items. These are explicitly set to not-selected
-        $optionsToSave                = $optionMapper->createCollection();
-        $existingOptionsByKeyThenPage = $existingOptions->groupBy('key');
-        foreach ($existingOptionsByKeyThenPage as $key => $pageFilterOptions) {
-            $pageFilterOptions->indexBy('page');
-        }
-
-        // Examine all possible options
-        foreach ($definition->getAbstractKeys() as $key) {
-            foreach ($definition::getPages() as $page) {
-
-                // Does this option exist ?
-                $filterOption = $existingOptionsByKeyThenPage[$key][$page];
-
-                if (!$filterOption) {
-                    $filterOption = $optionMapper->createModel();
-                    $filterOption
-                        ->setFilter($definition->getFilter())
-                        ->setPage($page)
-                        ->setKey($key);
-                }
-                // Did user check this option?
-                $filterOption->setAvailable(isset($postFilterOptions[$key][$page]));
-                $optionsToSave->add($filterOption);
-            }
-        }
-        $optionMapper->save($optionsToSave);
-
-        $this->getResponse()->content->set($this->buildJsonOutput(['status' => 'OK']));
-    }
-
-
-    /**
-     * Saves which filter options should be selected by default per role and page
-     *
-     * @param IDefinition     $definition
-     * @param Option\Mapper   $optionMapper
-     * @param Defaults\Mapper $defaultMapper
-     * @var string[][][]      $_POST ['filter_defaults'] indexed by option.page, option.key, default.roleType
-     * @throws MapperException
-     */
-    public function postSaveDefaults(IDefinition $definition, Option\Mapper $optionMapper, Defaults\Mapper $defaultMapper)
-    {
-        /** @var string[][][] $postFilterDefaults */
-        $postFilterDefaults = $this->getRequest()->post->get('filter_defaults');
-
-        // Upgrade implicitly selectable options to explicitly selectable
-        $optionsToSave  = $optionMapper->createCollection();
-        $defaultsToSave = $defaultMapper->createCollection();
-
-        $optionsPerPageAndKey = $definition->getAvailableOptions();
-
-        foreach ($optionsPerPageAndKey as $page => $pageOptions) {
-            /** @var Option\Model[] $pageOptions */
-            foreach ($pageOptions as $key => $options) {
-                $optionsToSave->add($options);
-                foreach ($options->getDefaults() as $roleType => $default) {
+                foreach($option->getDefaults() as $default){
+                    $default->setSelected((bool)$postDefaults[$instance->getId()][$option->getKey()][$default->getRoleType()]);
                     $defaultsToSave->add($default);
-                    // Was this default selected?
-                    $default->setSelected(isset($postFilterDefaults[$page][$key][$roleType]));
                 }
             }
+
+            // Delete any invalid options. This can occur when:
+            // * a filter is configured to no longer be available for a page, or
+            // * a lookup list has an item removed
+            $optionsBuilder = $this->optionsMapper->getPredicateBuilder();
+            $keys = $options->getColumnValues('key');
+            $optionsBuilder
+                ->equals('filter_id', $instance->getId())
+                ->equals('page', $page)
+                ->notEquals('key', $options->getColumnValues('key'));
+            $count  = $this->optionsMapper->deleteByPredicates($optionsBuilder);
+            $todo = 1;
         }
 
-        $optionMapper->save($optionsToSave);
-        $defaultMapper->save($defaultsToSave);
 
-        $this->getResponse()->content->set($this->buildJsonOutput(['status' => 'OK']));
+        // Save new and updated options and defaults
+        $this->optionsMapper->save($optionsToSave);
+        $this->defaultsMapper->save($defaultsToSave);
+
+        $this->response->content->set($this->buildJsonOutput(['status' => 200]));
+    }
+
+
+    /**
+     * Hard-delete any roleType default selections if the roleType is no longer valid
+     *
+     * This would occur if a system roleType is removed.
+     *
+     * Returns the number of rows deleted
+     *
+     * @return bool
+     */
+    private function deleteDefaultsForInvalidRoleTypes()
+    {
+        $defaultsBuilder = $this->defaultsMapper->getPredicateBuilder();
+        $defaultsBuilder->notEquals('role_type', Role::getRoleTypes());
+        return $this->defaultsMapper->deleteByPredicates($defaultsBuilder);
+    }
+
+
+    /**
+     * @return GenericCollection[]|Model[][] $visibleFilters Indexed by page, then filterDefinition.class
+     */
+    private function findVisibleFiltersPerPage()
+    {
+        /** @var GenericCollection|Model[] $visibleFilters */
+        $visibleFilters = $this->filterMapper->findAll()->filter(function (Model $instance) {
+            $definitionClass = $instance->getClass();
+            return count($definitionClass::getPages()) > 0;
+        });
+
+        // Group filters by which pages they appear on
+        $filtersPerPage = [];
+        foreach($visibleFilters as $instance){
+            $class = $instance->getClass();
+            foreach($class::getPages() as $page){
+                $filtersPerPage[$page][$class::getName()] = $instance;
+            }
+        }
+        return $filtersPerPage;
     }
 }
