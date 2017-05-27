@@ -29,12 +29,11 @@ class Factory extends FolderFilter\Factory
     protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         // Should this role type see classes for this page?
-        /** @var Option\Model[][] $options */
         $options = $definition->getOptions($page);
 
-        $getSubjects = $options[Definition::KEY_CLASSES][$page]->getAvailable();
+        $getSubjects = $options[Definition::KEY_CLASSES]->getAvailable();
 
-        $groupAccessLevel = $options[Definition::KEY_GROUPS][$page]->getAvailable()
+        $groupAccessLevel = $options[Definition::KEY_GROUPS]->getAvailable()
             ? UserAccess::ACCESS_WRITE
             : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
 

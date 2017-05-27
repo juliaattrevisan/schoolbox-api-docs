@@ -36,11 +36,10 @@ class Factory extends FolderFilter\Factory
 
 
         // Should this role type see classes for this page?
-        /** @var Option\Model[][] $options */
         $options = $definition->getOptions($page);
 
-        $showClasses = $options[Definition::KEY_CLASSES][$page]->getAvailable();
-        $showGroups  = $options[Definition::KEY_GROUPS][$page]->getAvailable();
+        $showClasses = $options[Definition::KEY_CLASSES]->getAvailable();
+        $showGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
 
 
         // Divide folders into Classes and Groups (not mutually exclusive!)

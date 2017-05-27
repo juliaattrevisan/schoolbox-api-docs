@@ -70,10 +70,9 @@ class Factory extends AbstractFactory
     protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         // Should this role type see classes for this page?
-        /** @var Option\Model[][] $options */
         $options     = $definition->getOptions($page);
-        $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS][$page];
-        $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP][$page];
+        $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS];
+        $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP];
 
         $getSubjects = $classOption->getAvailable();
 

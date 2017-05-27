@@ -83,28 +83,27 @@ class Factory extends AbstractFactory
     protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
     {
         return [
-            'projects' => $this->getProjects($definition->getOptions($page), $page, $viewee),
+            'projects' => $this->getProjects($definition->getOptions($page), $viewee),
         ];
     }
 
 
     /**
      * @param Collection|GenericCollection[]|Option\Model[][] $options
-     * @param string                                          $page
      * @param User                                            $viewee
      * @return Collection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      */
-    private function getProjects(Collection $options, $page, User $viewee)
+    private function getProjects(Collection $options, User $viewee)
     {
         $projects = $this->projectMapper->createCollection();
 
         // Determine which folders we are ultimately interested in getting projects from:
-        $onClassFolder             = $options[Definition::KEY_ON_CLASS_FOLDER][$page]->getAvailable();
-        $onGroupFolder             = $options[Definition::KEY_ON_GROUP_FOLDER][$page]->getAvailable();
-        $inUnitImplImportedToClass = $options[Definition::KEY_ON_CLASS_UNIT_IMPL][$page]->getAvailable();
-        $inUnitImplImportedToGroup = $options[Definition::KEY_ON_GROUP_UNIT_IMPL][$page]->getAvailable();
+        $onClassFolder             = $options[Definition::KEY_ON_CLASS_FOLDER]->getAvailable();
+        $onGroupFolder             = $options[Definition::KEY_ON_GROUP_FOLDER]->getAvailable();
+        $inUnitImplImportedToClass = $options[Definition::KEY_ON_CLASS_UNIT_IMPL]->getAvailable();
+        $inUnitImplImportedToGroup = $options[Definition::KEY_ON_GROUP_UNIT_IMPL]->getAvailable();
 
         $getSubjects      = $onClassFolder || $inUnitImplImportedToClass;
         $groupAccessLevel = $onGroupFolder || $inUnitImplImportedToGroup ? UserAccess::ACCESS_WRITE : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!

@@ -72,8 +72,8 @@ abstract class AbstractFactory implements IFactory
         $definition = $this->buildDefinition($filter);
 
         // Don't bother building a component if it will be empty
-        $availableOptions = $definition->getOptions($page)->filter(function(GenericCollection $options) use ($page){
-            return $options[$page] && $options[$page]->getAvailable();
+        $availableOptions = $definition->getOptions($page)->filter(function(Option\Model $option){
+            return $option->getAvailable();
         });
         if(0 === $availableOptions->count()){
             return null;
