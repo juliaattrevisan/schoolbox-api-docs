@@ -22,8 +22,9 @@ CREATE TABLE filter_option (
       REFERENCES filter(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
   `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
-  `key` VARCHAR(255) NOT NULL COMMENT 'An abstract key - eg \'all\', \'future\', etc',
-  `available` BOOL NOT NULL
+  `key` VARCHAR(127) NOT NULL COMMENT 'An abstract key - eg \'all\', \'future\', etc',
+  `available` BOOL NOT NULL,
+  UNIQUE (`filter_id`, `page`, `key`)
 ) ENGINE=INNODB;
 
 
@@ -37,8 +38,9 @@ CREATE TABLE filter_default (
       FOREIGN KEY (`filter_option_id`)
       REFERENCES filter_option(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
-  `role_type` VARCHAR(255) NOT NULL,
-  `selected` BOOL
+  `role_type` VARCHAR(127) NOT NULL,
+  `selected` BOOL,
+  UNIQUE (`filter_option_id`, `role_type`)
 ) ENGINE=INNODB;
 
 -- User configured filter selections per user
@@ -58,8 +60,9 @@ CREATE TABLE filter_selection (
       REFERENCES user(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
   `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
-  `key` VARCHAR(255) NOT NULL COMMENT 'A concrete key - eg a Model ID',
-  `selected` BOOL
+  `key` VARCHAR(127) NOT NULL COMMENT 'A concrete key - eg a Model ID',
+  `selected` BOOL,
+  UNIQUE (`filter_id`, `user_id`, `page`, `key`)
 ) ENGINE=INNODB;
 
 -- We don't need this anymore - it's superseded by the 'AssessmentType' filter
