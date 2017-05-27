@@ -27,7 +27,7 @@ class Definition extends AbstractDefinition
     const NAME = 'Work Type';
 
     // If assessment does not have a WorkType at all
-    const KEY_NONE = ' none';
+    const KEY_NONE = 'none';
 
     /**
      * Intentionally not a GenericCollection so we can include null (ie assessment does not have a workType at all)
