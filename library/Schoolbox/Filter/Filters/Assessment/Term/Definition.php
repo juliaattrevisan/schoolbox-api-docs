@@ -95,20 +95,15 @@ abstract class Definition extends AbstractDefinition
         $isAvailable = false;
         switch ($customAbstractKey) {
             case self::KEY_ALL:
-                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
-                break;
+                return FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
             case self::KEY_FUTURE:
-                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
-                break;
+                return FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
             case self::KEY_CURRENT:
-                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
-                break;
+                return FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
             case self::KEY_PREVIOUS:
-                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
-                break;
+                return FilterOption\Model::PAGE_PENDING_ASSESSMENTS === $page;
             case self::KEY_PAST:
-                $isAvailable = FilterOption\Model::PAGE_PENDING_ASSESSMENTS !== $page;
-                break;
+                return false;
         }
         return $isAvailable;
     }
