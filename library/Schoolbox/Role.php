@@ -40,6 +40,22 @@ class Role implements ValueLabelInterface, ISoftDeletable
 
     const DIGEST_NEVER = '0';
 
+
+    /**
+     * Return the set of role types
+     *
+     * @return string[]
+     */
+    public static function getRoleTypes()
+    {
+        return [
+            self::GUEST,
+            self::STUDENT,
+            self::PARENT,
+            self::STAFF,
+        ];
+    }
+
     /**
      * True if role is guest
      *
