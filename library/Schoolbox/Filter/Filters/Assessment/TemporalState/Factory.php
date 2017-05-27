@@ -10,7 +10,6 @@ namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
 use Schoolbox\Filter;
 

@@ -90,14 +90,17 @@ class Definition extends AbstractDefinition
         return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
             $leftKey  = $left->getKey();
             $rightKey = $right->getKey();
-            if ($leftKey === self::KEY_NONE) {
-                return -1;
-            }
             if ($leftKey === $right) {
                 return 0;
             }
+            if (self::KEY_NONE === $leftKey) {
+                return -1;
+            }
+            if(self::KEY_NONE === $rightKey){
+                return +1;
+            }
             // Sort concrete items by workType.id
-            return $leftKey < $rightKey ? -1 : +1;
+            return $leftKey - $rightKey;
         }, true);
     }
 
@@ -143,22 +146,6 @@ class Definition extends AbstractDefinition
                     ->setPage($page)
                     ->setAvailable($this->getInitialAvailability($abstractKey, $page));
                 $pageOptions->setOffset($option->getKey(), $option);
-            }
-        }
-        return $pageOptions;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
-    {
-        foreach ($pageOptions as $filterOption) {
-            $abstractKey = $filterOption->getKey();
-            // Does option refer to a non-existent workType ? (eg if deleted)
-            if ($abstractKey !== self::KEY_NONE && !$this->workTypes->offsetExists($abstractKey)) {
-                $pageOptions->offsetUnset($filterOption->getKey());
             }
         }
         return $pageOptions;

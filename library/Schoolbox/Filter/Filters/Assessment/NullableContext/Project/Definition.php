@@ -38,16 +38,18 @@ class Definition extends NullableContext\Definition
      */
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
-        foreach ($pageOptions as $idx => $option) {
+        $cleanedPageOptions = parent::unsetInvalidOptions($pageOptions);
+
+        foreach ($cleanedPageOptions as $idx => $option) {
             // For now, no pages can have projects that reside in unitSpecs
             // This is because the list of projects is set to:
             // 1. Projects in folders taught by user, plus
             // 2. Projects in unit-impls on folders taught by user
             if (self::KEY_ON_UNIT_SPEC === $option->getKey()) {
-                $pageOptions->offsetUnset($idx);
+                $cleanedPageOptions->offsetUnset($idx);
             }
         }
-        return $pageOptions;
+        return $cleanedPageOptions;
     }
 
 

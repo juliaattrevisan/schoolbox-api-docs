@@ -56,16 +56,6 @@ abstract class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
-    {
-        // noop - abstract options are hard-coded, concrete options are run-time
-        return $pageOptions;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getInitialAvailability($customAbstractKey, $page)
     {
         // All available by default

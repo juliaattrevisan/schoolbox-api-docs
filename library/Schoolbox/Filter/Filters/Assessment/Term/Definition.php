@@ -149,25 +149,6 @@ abstract class Definition extends AbstractDefinition
         return $pageOptions;
     }
 
-
-    /**
-     * @param GenericCollection|FilterOption\Model[] $pageOptions
-     * @return GenericCollection|FilterOption\Model[]
-     */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
-    {
-        // Discard any options that refer to Terms that no longer exist (eg if deleted)
-        foreach ($pageOptions as $filterOption) {
-            // Does the filter refer to a specific Term instance?
-            $isForSpecificTerm = !in_array($filterOption->getKey(), $this->getCustomKeys(), true);
-            if ($isForSpecificTerm && !$this->terms->offsetExists($filterOption->getKey())) {
-                $pageOptions->offsetUnset($filterOption->getKey());
-            }
-        }
-        return $pageOptions;
-    }
-
-
     /**
      * @param GenericCollection|FilterOption\Model[] $options
      * @return GenericCollection
@@ -177,6 +158,15 @@ abstract class Definition extends AbstractDefinition
         return $options->sortByCallback(function (FilterOption\Model $left, FilterOption\Model $right) {
             $leftKey  = $left->getKey();
             $rightKey = $right->getKey();
+            if($leftKey === $rightKey){
+                return 0;
+            }
+            if(is_numeric($leftKey) && !is_numeric($rightKey)){
+                return 1;
+            }
+            if(!is_numeric($leftKey) && is_numeric($rightKey)){
+                return -1;
+            }
             if (self::KEY_ALL === $leftKey) {
                 return -1;
             }
@@ -192,10 +182,10 @@ abstract class Definition extends AbstractDefinition
             if (self::KEY_PAST === $leftKey) {
                 return in_array($rightKey, [self::KEY_ALL, self::KEY_FUTURE, self::KEY_CURRENT, self::KEY_PREVIOUS], true) ? +1 : -1;
             }
-            if (self::KEY_FUTURE === $rightKey || self::KEY_PAST === $rightKey) {
-                return +1;
+            if(in_array($rightKey, [self::KEY_ALL, self::KEY_FUTURE, self::KEY_CURRENT, self::KEY_PREVIOUS, self::KEY_PAST], true)){
+                return -1;
             }
-            return $this->terms[$right->getKey()]->compare($this->terms[$leftKey]);
+            return $this->terms[$rightKey]->compare($this->terms[$leftKey]);
         }, true);
     }
 

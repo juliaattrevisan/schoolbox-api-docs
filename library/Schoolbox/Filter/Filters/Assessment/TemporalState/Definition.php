@@ -117,13 +117,15 @@ class Definition extends AbstractDefinition
      */
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
-        foreach ($pageOptions as $idx => $option) {
+        $cleanedPageOptions = parent::unsetInvalidOptions($pageOptions);
+
+        foreach ($cleanedPageOptions as $idx => $option) {
             // Do not permit 'upcoming' on the 'grades' page
             if (self::KEY_UNPUBLISHED === $option->getKey() && Option\Model::PAGE_GRADES === $option->getPage()) {
-                $pageOptions->offsetUnset($idx);
+                $cleanedPageOptions->offsetUnset($idx);
             }
         }
-        return $pageOptions;
+        return $cleanedPageOptions;
     }
 
 

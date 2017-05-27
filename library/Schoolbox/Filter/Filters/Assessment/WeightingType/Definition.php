@@ -102,16 +102,6 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
-    {
-        // noop - WeightingTypes are purely hard-coded.
-        return $pageOptions;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
         // No options checked

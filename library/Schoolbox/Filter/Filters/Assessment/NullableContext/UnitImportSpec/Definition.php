@@ -87,7 +87,7 @@ class Definition extends NullableContext\Definition
     {
         switch ($key) {
             case self::KEY_NONE:
-                return 'No Unit';
+                return '(none)';
             case self::KEY_IMPORTED_TO_CLASS:
                 return 'Units imported to classes';
             case self::KEY_IMPORTED_TO_GROUP:

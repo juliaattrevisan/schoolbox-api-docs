@@ -126,13 +126,15 @@ class Definition extends AbstractDefinition
      */
     protected function unsetInvalidOptions(GenericCollection $pageOptions)
     {
-        foreach ($pageOptions as $idx => $option) {
+        $cleanPageOptions = parent::unsetInvalidOptions($pageOptions);
+
+        foreach ($cleanPageOptions as $idx => $option) {
             // Do not permit 'projects' on the 'pendingAssessments' page
             if (self::KEY_PROJECT === $option->getKey() && Option\Model::PAGE_PENDING_ASSESSMENTS === $option->getPage()) {
-                $pageOptions->offsetUnset($idx);
+                $cleanPageOptions->offsetUnset($idx);
             }
         }
-        return $pageOptions;
+        return $cleanPageOptions;
     }
 
 
