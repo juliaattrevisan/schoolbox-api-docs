@@ -196,7 +196,7 @@ abstract class Definition extends AbstractDefinition
                 return +1;
             }
             return $this->terms[$right->getKey()]->compare($this->terms[$leftKey]);
-        });
+        }, true);
     }
 
 

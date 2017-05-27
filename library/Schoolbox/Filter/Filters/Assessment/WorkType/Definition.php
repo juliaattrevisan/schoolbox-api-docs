@@ -98,7 +98,7 @@ class Definition extends AbstractDefinition
             }
             // Sort concrete items by workType.id
             return $leftKey < $rightKey ? -1 : +1;
-        });
+        }, true);
     }
 
 
