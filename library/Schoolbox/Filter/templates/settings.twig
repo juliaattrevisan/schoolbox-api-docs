@@ -1,0 +1,253 @@
+{#
+    Displays the filters available for a filterable page.
+
+    Enables the admin to
+
+    Usage:
+        pageKey                  string
+        definitions              IDefinition[]
+        PAGE_GRADES              string
+        PAGE_MARK_BOOK           string
+        PAGE_PENDING_ASSESSMENTS string
+        ENTITY_ASSESSMENTS       string
+
+#}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{% if PAGE_GRADES == pageKey %}
+    {% set pageName = 'Grades' %}
+{% elseif PAGE_MARK_BOOK == pageKey %}
+    {% set pageName = 'Markbook' %}
+{% elseif PAGE_PENDING_ASSESSMENTS == pageKey %}
+    {% set pageName = 'Pending Assessments' %}
+{% else %}
+    {# Graceful fallback if constant not injected into twig #}
+    {% set pageName = pageKey %}
+{% endif %}
+
+{% set entity = (definitions | first).filter.entity %}
+{%- if ENTITY_ASSESSMENTS == entity -%}
+    {%- set entityName = 'Activity' -%}
+    {%- set entityIcon = 'due-work' -%}
+{%- else -%}
+    {# Graceful degradation to generic filter icon if constant not injected into twig #}
+    {%- set entityName = 'Entity' -%}
+    {%- set entityIcon = 'filter' -%}
+{%- endif -%}
+
+{{ bread.crumbs(
+    [ 'Home', routeLookup('adminHome.getIndex') ],
+    [ 'Filters', routeLookup('filters.getIndex') ],
+    [ pageName ]
+) }}
+
+
+<script type="text/javascript">
+    $(function() {
+
+        var $tables           = $('[data-filter-table]');
+        var $checkboxDefaults = $('[type=checkbox][data-option-default]');
+        var $hiddenDefaults   = $('[type=hidden][data-option-default]');
+        var $alerts           = $('[data-alert-filter]');
+        var $saveButton       = $('#save_settings');
+        var $toast            = $('[data-toast]');
+
+        // If admin configures an option not to be available, disable role-default checkboxes.
+        // Also check if no options are available. If so, the filter is disabled
+        $tables.on('change', '[data-filter-option]', function(elem){
+            var $checkbox = $(elem.target);
+            var filterId  = $checkbox.data('filter-id');
+            var optionKey = $checkbox.data('option-key');
+
+            var $optionDefaults = $checkboxDefaults.filter('[data-filter-id='+filterId+'][data-option-key='+optionKey+']');
+            $optionDefaults.prop('disabled', !$checkbox.prop('checked'));
+
+            checkAllOptionsDisabled(filterId);
+        });
+
+        // If admin changes a roleDefault checkbox, sync the change to the hidden input equivalent, so disabled checkbox states
+        // are still saved. This essentially turns our disabled checkboxes into read-only checkboxes
+        $tables.on('change', '[type=checkbox][data-option-default]', function(elem){
+            var $checkbox = $(elem.target);
+            var filterId  = $checkbox.data('filter-id');
+            var optionKey = $checkbox.data('option-key');
+            var roleType  = $checkbox.data('role-type');
+
+            var $hidden = $hiddenDefaults.filter('[data-filter-id='+filterId+'][data-option-key='+optionKey+'][data-role-type='+roleType+']');
+            $hidden.val($checkbox.prop('checked') ? 1 : 0);
+        });
+
+
+        // User clicks 'Save'
+        $saveButton.on('click', function(event){
+            event.preventDefault();
+            $saveButton.attr('disabled', true);
+
+            var data = $tables.find('input').serialize();
+            var href = $saveButton.data('href');
+
+            $toast.toastActivate({text: 'Saving settings...'});
+
+            // Hack to fix current bug in plugin which shows previous return state when initiating repeated action
+            var duration = 2000;
+
+            $.post(href, data)
+                .success(function () {
+                    $toast.toastTimeout({text: 'Settings saved.', css: 'success', duration: duration});
+                })
+                .error(function(){
+                    $toast.toastTimeout({text: 'Unable to save.', css: 'alert', duration: duration});
+                })
+                .always(function() {
+                    $saveButton.attr('disabled', false);
+                    setTimeout(function(){
+                        $toast.removeClass('success alert');
+                    }, duration);
+
+                });
+        });
+
+
+        /**
+         * If admin deselects all options to be available for a page, update column header
+         *
+         * @param {int} filterId
+         */
+        function checkAllOptionsDisabled(filterId)
+        {
+            var $alert = $alerts.filter('[data-alert-filter='+filterId+']');
+            var $table = $tables.filter('[data-filter-table='+filterId+']');
+            var $checkedFilterOptions = $table.find(':checked[data-filter-option]');
+
+            if($checkedFilterOptions.length){
+                $alert.slideUp();
+                $table.css('opacity', 1.0);
+            } else {
+                $alert.slideDown();
+                $table.css('opacity', 0.75);
+            }
+        }
+    });
+</script>
+
+<style>
+    .column-options,
+    .column-on,
+    .column-role-type{
+        width: 120px;
+    }
+    .filter-name{
+        font-size: 120%;
+    }
+</style>
+
+<div class="row">
+    <div class="small-12">
+        <h1>{{ pageName }}</h1>
+
+        <ul class="meta">
+            <li class="icon-{{ entityIcon }}">Filtered entity: {{ entityName }}</li>
+        </ul>
+    </div>
+</div>
+
+{% for name, definition in definitions %}
+    {% set options = definition.optionsWithDefaults(pageKey) %}
+
+    {# Are any options available ? #}
+    {% set hasOptions = false %}
+    {% for option in options if not hasOptions %}
+        {% if option.available %}
+            {% set hasOptions = true %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="row" data-alert-filter="{{ definition.filter.id }}" {% if hasOptions %}style="display: none;"{% endif %}>
+        <div class="small-12">
+            <div data-alert class="alert-box warning" style="margin-bottom: 0;">
+                All options unchecked. Filter not applied to page.
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12">
+            <table data-filter-table="{{ definition.filter.id }}">
+                <col class="column-options">
+                <col>
+                <col class="column-on">
+                <col class="column-role-type" span="4">
+                <tr>
+                    <th colspan="2"><span class="filter-name">{{ name }}</span></th>
+                    <th>On</th>
+                    <th colspan="{{ roleTypes | length }}">Default state</th>
+                </tr>
+                <tr>
+                    <th colspan="3"></th>
+                    {% for roleType in roleTypes %}
+                        <th>{{ roleType | capitalize }}</th>
+                    {% endfor %}
+                </tr>
+                {% for option in options %}
+                    <tr>
+                        <th>{% if loop.first %}Options:{% endif %}</th>
+                        <th>{{ definition.label(option.key) | capitalize }}</th>
+                        <td>
+                            <input
+                                    id="checkbox_{{ definition.filter.id }}_{{ option.key }}"
+                                    type="checkbox"
+                                    name="filter_option[{{ definition.filter.id }}][{{ option.key }}]"
+                                    {% if option.available %}checked{% endif %}
+                                    data-filter-option
+                                    data-filter-id="{{ definition.filter.id }}"
+                                    data-option-key="{{ option.key }}"
+                            >
+                            <label for="checkbox_{{ definition.filter.id }}_{{ option.key }}" class="checkbox-label"></label>
+                        </td>
+                        {% for roleType in roleTypes %}
+                            <td>
+                            {% set default = option.defaults[roleType] %}
+                            {% if not default %}
+                                <span title="This role type does not have access to this page">NA</span>
+                            {% else %}
+                                {# If checkbox disabled, we still want to save its state. Need to sync checkbox state to hidden input #}
+                                <input
+                                        type="hidden"
+                                        name="filter_defaults[{{ definition.filter.id }}][{{ option.key }}][{{ roleType }}]"
+                                        value="{% if default.selected %}1{% else %}0{% endif %}"
+                                        data-option-default
+                                        data-filter-id="{{ definition.filter.id }}"
+                                        data-option-key="{{ option.key }}"
+                                        data-role-type="{{ roleType }}"
+                                >
+                                <input
+                                        id="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}"
+                                        type="checkbox"
+                                        name="filter_defaults[{{ definition.filter.id }}][{{ option.key }}][{{ roleType }}]"
+                                        {% if default.selected %}checked{% endif %}
+                                        {% if not option.available %}disabled{% endif %}
+                                        data-option-default
+                                        data-filter-id="{{ definition.filter.id }}"
+                                        data-option-key="{{ option.key }}"
+                                        data-role-type="{{ roleType }}"
+                                >
+                                <label readonly="true" for="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}" class="checkbox-label"></label>
+                            {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endfor %}
+
+
+<div class="row">
+    <div class="small-12">
+        <section class="content">
+            <input type="submit" id="save_settings" value="Save Settings" data-href="{{ routeLookup('filters.postSavePageSettings', { page: pageKey }) }}">
+            <div class="toast" data-toast></div>
+        </section>
+    </div>
+</div>
+
