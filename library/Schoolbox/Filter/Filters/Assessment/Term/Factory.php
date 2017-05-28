@@ -8,6 +8,7 @@
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Assessment\Term;
+use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -77,7 +78,7 @@ abstract class Factory extends AbstractFactory
     protected function buildKeyConverterArgs(Filter\Model $filter)
     {
         return array_merge(parent::buildKeyConverterArgs($filter), [
-            'terms' => $this->getSortedTerms(),
+            'terms' => new Collection($this->getSortedTerms()->getColumnValues('id')),
         ]);
     }
 

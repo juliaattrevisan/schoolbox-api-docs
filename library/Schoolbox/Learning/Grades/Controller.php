@@ -208,7 +208,7 @@ class Controller extends Base
          */
         $filters       = [
             AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
-            AssessmentFilters\Term\Due\Definition::class                   => $term,
+            AssessmentFilters\Term\Due\Definition::class                   => $term->getId(),
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
             AssessmentFilters\TemporalState\Definition::class              => [
                 AssessmentFilters\TemporalState\Definition::KEY_UPCOMING,
@@ -284,7 +284,7 @@ class Controller extends Base
          */
         $filters = array_merge($filters, [
             AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
-            AssessmentFilters\Term\Due\Definition::class                   => $term,
+            AssessmentFilters\Term\Due\Definition::class                   => $term->getId(),
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
             AssessmentFilters\TemporalState\Definition::class              => [
                 AssessmentFilters\TemporalState\Definition::KEY_UPCOMING,
