@@ -206,12 +206,12 @@ function checkAllDaySwitch (state, pickerId) {
 
     // All Day is on
     if (state === true) {
-        $timeDiv.addClass('hide');
+        $timeDiv.hide();
         $('#hideTime' + pickerId).prop('checked', true);
 
     }
     else {
-        $timeDiv.removeClass('hide');
+        $timeDiv.show();
         $('#hideTime' + pickerId).prop('checked', false);
     }
 
