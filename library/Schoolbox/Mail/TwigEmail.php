@@ -12,7 +12,6 @@ namespace Schoolbox\Mail;
 
 
 use Alaress\Mail\TwigMailer;
-use FM\CSSIN;
 use Schoolbox\UserMapper;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
