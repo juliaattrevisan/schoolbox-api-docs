@@ -22,7 +22,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
-use Schoolbox\Mapper\PredicateBuilder;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
