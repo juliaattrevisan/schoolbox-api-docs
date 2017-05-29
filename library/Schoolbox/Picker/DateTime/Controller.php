@@ -316,7 +316,7 @@ class Controller extends Base
             // It is Sunday
             $dateOffset = 1;
             // Or maybe Saturday
-            if ($date->getWeekDayNumber() === 6) {
+            if ($date->getWeekDayNumber() == 6) {
                 $dateOffset = 2;
             }
         }
