@@ -838,24 +838,35 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
 
         if ('undefined' === typeof heatCache[yr][mo]) {
-            heatCache[yr][mo] = {};
+            // you're the first here - do the work of warming the cache
+            var promise;
 
-            var promise = $.get((twigVars.routeLookup.getHeat
+            heatCache[yr][mo] = promise = $.get((twigVars.routeLookup.getHeat
                 .replace(/{folderId}/g, folderId))
                 .replace(/{year}/g, yr)
                 .replace(/{month}/g, mo));
 
-            promise.done(function (data) {
+            promise.fail(function () {
+                console.error(arguments);
+
+            }).then(function (data) {
+
+                // prepare for promise fulfilment
+                heatCache[yr][mo] = {};
+
                 for (var day in data) {
                     heatCache[yr][mo][day] = data[day];
                 }
+            });
 
-                // do this async the first time (cold cache)
-                onSuccess();
-            }).fail(function () { console.error(arguments); });
+            // do this async the first time (cold cache)
+            promise.then(onSuccess);
 
+        } else if ('then' in heatCache[yr][mo]) {
+            // the cache is still cold, but someone else is handling it: append our desired callback
+            heatCache[yr][mo].then(onSuccess);
         } else {
-            // do it sync if the cache is hot
+            // apply callback synchronously if the cache is hot
             onSuccess();
         }
 
