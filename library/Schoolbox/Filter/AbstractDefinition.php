@@ -11,7 +11,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Provides common filter definition behaviour
@@ -144,7 +144,7 @@ abstract class AbstractDefinition implements IDefinition
 
     /**
      * @inheritdoc
-     * @throws MapperException
+     * @throws BaseMapper\Exception
      */
     public function getOptionsWithDefaults($page, $roleTypeFilter = null)
     {
