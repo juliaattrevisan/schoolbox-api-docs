@@ -20,6 +20,7 @@
     </testsuite>
     <testsuite name="databaseTest">
       <directory suffix=".php">library/Alaress/Database/</directory>
+      <directory suffix=".php">library/Schoolbox/Database/Test</directory>
     </testsuite>
   </testsuites>
   <filter>
