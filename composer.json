@@ -6,23 +6,6 @@
         {
             "type": "package",
             "package": {
-                "name": "djfm/cssin",
-                "version": "0.1.0",
-                "source": {
-                    "url": "https://github.com/djfm/cssin",
-                    "type": "git",
-                    "reference": "1234181cea"
-                },
-                "autoload": {
-                    "psr-4": {
-                        "FM\\": "src/"
-                    }
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
                 "name": "gggeek/phpxmlrpc",
                 "version": "0.1.0",
                 "source": {
