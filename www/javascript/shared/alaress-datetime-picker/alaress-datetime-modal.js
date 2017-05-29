@@ -800,22 +800,26 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function requestHeat(mo, yr, onSuccess) {
         var folderId = $('*[name = "folderId"]').val();
 
+        // cast to ints
+        yr = parseInt(yr);
+        mo = parseInt(mo);
+
         fetchHeat(yr, mo, folderId, onSuccess);
 
         // TODO: very open to a better way of handling the month/year wraparound
 
         // also process previous month
         if (mo === 1) {
-            fetchHeat(parseInt(yr) - 1, 12, folderId, onSuccess);
+            fetchHeat(yr - 1, 12, folderId, onSuccess);
         } else {
-            fetchHeat(yr, parseInt(mo) - 1, folderId, onSuccess);
+            fetchHeat(yr, mo - 1, folderId, onSuccess);
         }
 
         // also also process next month
         if (mo === 12) {
-            fetchHeat(parseInt(yr) + 1, 1, folderId, onSuccess);
+            fetchHeat(yr + 1, 1, folderId, onSuccess);
         } else {
-            fetchHeat(yr, parseInt(mo) + 1, folderId, onSuccess);
+            fetchHeat(yr, mo + 1, folderId, onSuccess);
         }
     }
 
