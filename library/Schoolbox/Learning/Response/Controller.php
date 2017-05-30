@@ -341,8 +341,9 @@ class Controller extends Base
      * @param IAssessable $assessment
      * @param IResponse $response
      * @param Plagscan $plagscan
+     * @param Participant $participant
      */
-    public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan)
+    public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan, Participant $participant)
     {
         $interactiveAvailable = false;
 
@@ -376,6 +377,7 @@ class Controller extends Base
             'plagscan' => $plagscan,
             'assessment' => $assessment,
             'response' => $response,
+            'participant' => $participant,
             'interactiveAvailable' => $interactiveAvailable
         ];
 
