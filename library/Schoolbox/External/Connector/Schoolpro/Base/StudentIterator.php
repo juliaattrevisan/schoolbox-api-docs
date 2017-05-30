@@ -11,7 +11,7 @@
 
 namespace Schoolbox\External\Connector\Schoolpro\Base;
 
-use Schoolbox\External\Normalise\User;
+use Schoolbox\External\Normalise;
 use Schoolbox\Sync\Iterator\Student;
 
 class StudentIterator extends Student
@@ -19,12 +19,12 @@ class StudentIterator extends Student
     /**
      * Return the current element
      *
-     * @return User\Student
+     * @return Normalise\User\Student
      */
     public function current()
     {
         $currentResult = $this->getInnerIterator()->current();
-        $student       = new User\Student();
+        $student       = new Normalise\User\Student();
         $student
             ->setId($currentResult['ID'])
             ->setTitle($currentResult['Title'])
@@ -50,7 +50,7 @@ class StudentIterator extends Student
         /* Assign emails
          */
         if (strlen($currentResult['email'])) {
-            $email = new User\Common\Email();
+            $email = new Normalise\User\Common\Email();
             $email
                 ->setAddress($currentResult['email']);
 
@@ -63,7 +63,7 @@ class StudentIterator extends Student
          * It's really a Student Boarder Type, more than anything
          */
         if (strlen($currentResult['student_boarding_house'])) {
-            $boardingHouse = new User\Common\BoardingHouse();
+            $boardingHouse = new Normalise\User\Common\BoardingHouse();
             $boardingHouse
                 ->setCode($currentResult['student_boarding_house'])
             ;
@@ -75,7 +75,7 @@ class StudentIterator extends Student
 
         /* Campus
          */
-        $campus = new User\Common\Campus();
+        $campus = new Normalise\User\Common\Campus();
         $campus
             ->setCode($currentResult['CampusID'])
         ;

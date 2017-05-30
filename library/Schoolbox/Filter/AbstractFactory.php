@@ -12,7 +12,7 @@ use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
 
@@ -64,7 +64,7 @@ abstract class AbstractFactory implements IFactory
     /**
      * @inheritdoc
      * @throws \ReflectionException If unable to create an instance of the reflected class
-     * @throws Mapper\Exception If invalid columns names are used
+     * @throws MapperException If invalid columns names are used
      */
     public function buildComponent($definitionClass, User $user, $page, User $viewee = null, GenericCollection $selectionOverrides = null)
     {
@@ -169,7 +169,7 @@ abstract class AbstractFactory implements IFactory
      * @param User         $user
      * @param string       $page
      * @return GenericCollection|Selection\Model[]
-     * @throws Mapper\Exception If invalid columns names are used
+     * @throws MapperException If invalid columns names are used
      */
     private function getSavedSelections(Filter\Model $filter, User $user, $page)
     {

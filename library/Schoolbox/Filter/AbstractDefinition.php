@@ -12,7 +12,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Option;
 use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Provides common filter definition behaviour
@@ -163,7 +163,7 @@ abstract class AbstractDefinition implements IDefinition
 
     /**
      * @inheritdoc
-     * @throws Mapper\Exception
+     * @throws MapperException
      */
     public function getAvailableOptions($pageFilter = null, $roleTypeFilter = null)
     {
