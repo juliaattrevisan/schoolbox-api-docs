@@ -246,7 +246,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param string $string
      * @return string
      */
-    private statiC function denaturalise($string)
+    private static function denaturalise($string)
     {
 
         // normalise any whitespace
