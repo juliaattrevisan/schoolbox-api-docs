@@ -302,6 +302,8 @@
         {% for field_key, field in tables[table].fields %}
             {% if field.hidden is empty %}
 
+
+
                 <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
 
                     {% if field.readonly is not empty %}
@@ -319,14 +321,18 @@
                             <label for="{{ field_key }}-{{ recordIndex }}"></label>
                         </div>
 
-                    {% elseif field.lookup is not empty %}
+                    {% elseif field.lookup is iterable %}
 
                         {# Lookup select box #}
 
                         <select {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} name="value-{{ field_key }}[]">
-                            {% for option in field.lookup %}
-                                <option value="{{ option.key }}">{{ option.value }}</option>
-                            {% endfor %}
+                            {% if field.lookup is not empty %}
+                                {% for option in field.lookup %}
+                                    <option value="{{ option.key }}">{{ option.value }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="">None Available</option>
+                            {% endif %}
                         </select>
 
                     {% elseif field.colour is not empty %}
