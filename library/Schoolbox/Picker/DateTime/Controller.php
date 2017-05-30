@@ -342,7 +342,7 @@ class Controller extends Base
 
         // Get start/end of the date
 
-        $start = $date;
+        $start = $date->startOfDay();
         $end = clone $start;
         $end = $end->addDays(1);
 
