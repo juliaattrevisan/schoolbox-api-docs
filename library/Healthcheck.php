@@ -93,7 +93,8 @@ class Healthcheck
     {
         sort($objects);
 
-        $method = (explode(' ', trim($query)))[0];
+        $methods = (explode(' ', trim($query)));
+        $method  = $methods[0];
 
         foreach ($objects as $object) {
 
