@@ -58,7 +58,7 @@ class Chain {
 		 */
 		$opengraph = new OpenGraph($xml, $url);
 		$metatag = new MetaTag($xml, $url);
-		$null = new Null($xml, $url);
+		$null = new NullMetadata($xml, $url);
 
 		/* Try until one of them matches
 		 */

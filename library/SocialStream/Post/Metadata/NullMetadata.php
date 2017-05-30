@@ -14,7 +14,7 @@
 namespace SocialStream\Post\Metadata;
 
 
-class Null extends Metadata {
+class NullMetadata extends Metadata {
 
 	/**
 	 * Fetch information out of the meta tags
