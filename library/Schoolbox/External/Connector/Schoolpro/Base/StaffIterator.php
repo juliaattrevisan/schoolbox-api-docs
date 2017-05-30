@@ -11,7 +11,7 @@
 
 namespace Schoolbox\External\Connector\Schoolpro\Base;
 
-use Schoolbox\External\Normalise\User;
+use Schoolbox\External\Normalise;
 use Schoolbox\Sync\Iterator\Staff;
 
 class StaffIterator extends Staff
@@ -19,12 +19,12 @@ class StaffIterator extends Staff
     /**
      * Return the current element
      *
-     * @return User\Staff
+     * @return Normalise\User\Staff
      */
     public function current()
     {
         $currentResult = $this->getInnerIterator()->current();
-        $staff         = new User\Staff();
+        $staff         = new Normalise\User\Staff();
         $staff
             ->setId($currentResult['ID'])
             ->setTitle($currentResult['Title'])
@@ -49,7 +49,7 @@ class StaffIterator extends Staff
         /* Assign emails
          */
         if (strlen($currentResult['email'])) {
-            $email = new User\Common\Email();
+            $email = new Normalise\User\Common\Email();
             $email
                 ->setAddress($currentResult['email']);
 
@@ -58,7 +58,7 @@ class StaffIterator extends Staff
 
         /* Campus
          */
-        $campus = new User\Common\Campus();
+        $campus = new Normalise\User\Common\Campus();
         $campus
             ->setCode($currentResult['CampusID'])
         ;

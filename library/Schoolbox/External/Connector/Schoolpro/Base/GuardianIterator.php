@@ -12,20 +12,20 @@
 namespace Schoolbox\External\Connector\Schoolpro\Base;
 
 use IteratorIterator;
-use Schoolbox\External\Normalise\User;
+use Schoolbox\External\Normalise;
 
 class GuardianIterator extends IteratorIterator
 {
     /**
      * Return the current element
      *
-     * @return User\Guardian
+     * @return Normalise\User\Guardian
      */
     public function current()
     {
         $currentResult = $this->getInnerIterator()->current();
 
-        $guardian       = new User\Guardian();
+        $guardian       = new Normalise\User\Guardian();
         $guardian
             ->setId($currentResult['ID'])
             ->setTitle($currentResult['Title'])
@@ -42,7 +42,7 @@ class GuardianIterator extends IteratorIterator
 
         /* Email
          */
-        $email = new User\Common\Email();
+        $email = new Normalise\User\Common\Email();
         $email->setAddress($currentResult['email']);
         $guardian->addEmail($email);
 
