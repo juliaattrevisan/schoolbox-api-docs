@@ -138,6 +138,11 @@ class Controller extends Base
                 $model = new $model_name;
                 foreach ($fixed as $field => $value) {
                     $setter = "set" . $this->underscoreToCamelCase($field);
+
+                    if (empty(trim($value))) {
+                        $value = null;
+                    }
+
                     $model->$setter($value);
                 }
             }
@@ -147,7 +152,12 @@ class Controller extends Base
                 // Update values
 
                 $setter = "set" . $this->underscoreToCamelCase($field);
-                $model->$setter($value[$currentIndex]);
+
+                if (empty(trim($value[$currentIndex]))) {
+                    $model->$setter(null);
+                } else {
+                    $model->$setter($value[$currentIndex]);
+                }
 
                 // Override nullable fields where appropriate
 
