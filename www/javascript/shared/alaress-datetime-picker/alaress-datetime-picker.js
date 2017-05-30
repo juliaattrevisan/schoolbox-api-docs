@@ -340,7 +340,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
         element.wrap($('<div class="input-group" />'));
 
-        var $datebtn = $('<a class="button icon-calendar" data-adtp-btn />');
+        var $datebtn = $('<a class="adtp-btn icon-calendar" data-adtp-btn />');
 
         if (options.buttonText) {
             $datebtn.text(options.buttonText);
