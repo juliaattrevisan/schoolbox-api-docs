@@ -326,6 +326,9 @@
                         {# Lookup select box #}
 
                         <select {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} name="value-{{ field_key }}[]">
+                            {% if not field.mandatory %}
+                                <option value="">Not Selected</option>
+                            {% endif %}
                             {% if field.lookup is not empty %}
                                 {% for option in field.lookup %}
                                     <option value="{{ option.key }}">{{ option.value }}</option>
