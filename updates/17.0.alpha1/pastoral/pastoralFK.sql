@@ -136,3 +136,9 @@ REFERENCES `lu_pastoral_type` (`id`)
 
 ALTER TABLE `lu_pastoral_type`
   ADD INDEX `fk_lu_pastoral_type_pastoral_document_classification_id_idx` (`pastoral_document_classification_id` ASC);
+ALTER TABLE `lu_pastoral_type`
+  ADD CONSTRAINT `fk_lu_pastoral_type_pastoral_document_classification_id`
+FOREIGN KEY (`pastoral_document_classification_id`)
+REFERENCES `lu_pastoral_document_classification` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
