@@ -1,12 +1,15 @@
+-- Default create/update to epoch
 ALTER TABLE `event`
   ADD COLUMN `created_at` DATETIME NOT NULL AFTER `allday`,
   ADD COLUMN `updated_at` DATETIME NOT NULL AFTER `created_at`,
   ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL AFTER `updated_at`;
+UPDATE event SET created_at = FROM_UNIXTIME(0), updated_at = FROM_UNIXTIME(0);
 
 ALTER TABLE `eotc_event`
   ADD COLUMN `created_at` DATETIME NOT NULL AFTER `allday`,
   ADD COLUMN `updated_at` DATETIME NOT NULL AFTER `created_at`,
   ADD COLUMN `deleted_at` DATETIME NULL DEFAULT NULL AFTER `updated_at`;
+UPDATE eotc_event SET created_at = FROM_UNIXTIME(0), updated_at = FROM_UNIXTIME(0);
 
 /* Remove deprecated fields */
 ALTER TABLE `event`
