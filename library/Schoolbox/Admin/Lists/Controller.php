@@ -360,6 +360,7 @@ class Controller extends Base
                     'enabled' => [
                         'caption'   => 'Enabled',
                         'width'     => 1,
+                        'mandatory' => true,
                         'lookup'    => [
                             ['key' => 1, 'value' => 'Yes'],
                             ['key' => 0, 'value' => 'No'],
