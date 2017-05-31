@@ -20,19 +20,7 @@ if (empty($naturalLanguage)) {
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
 // booleans
-$enableTime = isset($_REQUEST['enableTime']) ? (bool)$_REQUEST['enableTime'] : false;
 $endDay = isset($_REQUEST['endDay']) ? (bool)$_REQUEST['endDay'] : false;
-
-
-if ($enableTime) {
-    $renderFormat = isset($_REQUEST['displayFormat'])
-        ? $_REQUEST['displayFormat']
-        : Config::get('date_local') . ' ' . Config::get('date_time');
-} else {
-    $renderFormat = isset($_REQUEST['displayFormatDate'])
-        ? $_REQUEST['displayFormatDate']
-        : Config::get('date_local');
-}
 
 try {
     $adf = Alaress_Date_Format::newNaturalDate($naturalLanguage);
@@ -53,4 +41,4 @@ if ($endDay && $adf->isAtStartOfDay()) {
     $adf = $adf->endOfDay();
 }
 
-die(json_encode([ 'time' => $adf->getUsingFormat($renderFormat) ]));
+die(json_encode([ 'time' => $adf->toIso8601String() ]));

@@ -236,9 +236,6 @@ function massageDateValue(e) {
     var opts = getOptions($(t));
     var params = {
         string: t.value,
-        displayFormat: opts.displayFormat,
-        displayFormatDate: opts.displayFormatDate,
-        enableTime: opts.enableTime ? 1 : 0, // these have to be made binary to survive transport
         endDay: opts.endDay ? 1 : 0
     };
 
@@ -272,7 +269,8 @@ function massageDateValue(e) {
         } else {
 
             // Add the parsed date into the field
-            $(t).val(data.time);
+            var options = getOptions($(t));
+            setValue($(t), options, false, true, data.time);
 
             // Remove any error class on the field
             $(t).removeClass('error');
