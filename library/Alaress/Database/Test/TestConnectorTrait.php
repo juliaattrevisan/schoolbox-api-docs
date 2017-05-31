@@ -22,8 +22,8 @@ trait TestConnectorTrait
     /** @var IConnector $synergetic68 */
     private $synergetic68;
 
-    /** @var IConnector $synergetic67 */
-    private $synergetic67;
+//    /** @var IConnector $synergetic67 */
+//    private $synergetic67;
 
     /** @var IConnector $db2Test */
     private $db2Test;
@@ -45,7 +45,7 @@ trait TestConnectorTrait
 
         $this->db2Test = $factory->createDb2();
         $this->db2Test->connect(
-            'ec2-13-54-248-74.ap-southeast-2.compute.amazonaws.com:50000',
+            'ec2-54-153-145-255.ap-southeast-2.compute.amazonaws.com:50000',
             'SBOXTEST',
             'sbox',
             'tnp879'
@@ -76,28 +76,28 @@ trait TestConnectorTrait
         );
     }
 
-    /**
-     * Connect to Synergetic V67 database
-     */
-    private function connectSynergetic67()
-    {
-        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-        // it tries to work out if we need to be in debug mode.
-        //
-        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
-        $factory = new Factory();
-        $this->synergetic67 = $factory->createMssql();
-        $this->synergetic67->connect(
-            '172.31.6.236',
-            'SynergyOne',
-            'sa',
-            'Synergetic#1'
-        );
-    }
+//    /**
+//     * Connect to Synergetic V67 database
+//     */
+//    private function connectSynergetic67()
+//    {
+//        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
+//        // it tries to work out if we need to be in debug mode.
+//        //
+//        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
+//
+//        $database = Database::getInstance();
+//        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
+//
+//        $factory = new Factory();
+//        $this->synergetic67 = $factory->createMssql();
+//        $this->synergetic67->connect(
+//            '172.31.6.236',
+//            'SynergyOne',
+//            'sa',
+//            'Synergetic#1'
+//        );
+//    }
 
     /**
      * Connect to Synergetic V68 database

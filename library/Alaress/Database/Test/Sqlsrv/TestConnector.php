@@ -32,15 +32,15 @@ class TestConnector extends PHPUnit_Framework_TestCase
 
         $factory = new Factory();
 
-        $synergetic67 = $factory->createMssql();
-        $result = $synergetic67->connect(
-            '172.31.6.236',
-            'SynergyOne',
-            'sa',
-            'Synergetic#1'
-        );
-
-        $this->assertTrue($result, "Failed to connect to Synergetic V67 database");
+//        $synergetic67 = $factory->createMssql();
+//        $result = $synergetic67->connect(
+//            '172.31.6.236',
+//            'SynergyOne',
+//            'sa',
+//            'Synergetic#1'
+//        );
+//
+//        $this->assertTrue($result, "Failed to connect to Synergetic V67 database");
 
         $synergetic68 = $factory->createMssql();
         $result = $synergetic68->connect(
