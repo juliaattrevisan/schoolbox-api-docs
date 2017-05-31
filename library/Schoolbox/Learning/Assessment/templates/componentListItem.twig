@@ -1,8 +1,8 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
-{% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
+{% set viewRoute = routeLookupIfAuthorized('learningAssessment.getAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
 {% if assessable is quiz %}
-    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id}) %}
+    {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
 {% else %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
 {% endif %}
