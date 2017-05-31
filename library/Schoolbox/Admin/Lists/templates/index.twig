@@ -266,8 +266,10 @@
 
                                                 {% if field.nullable is not empty %}
                                                     <div class="checklist">
-                                                        <input name="null-{{ field_key }}[]" value="{{ recordIndex - 1 }}"
-                                                               id="{{ field_key }}-{{ recordIndex }}" type="checkbox"
+                                                        <input name="null-{{ field_key }}[]"
+                                                               value="{{ recordIndex - 1 }}"
+                                                               id="{{ field_key }}-{{ recordIndex }}"
+                                                               type="checkbox"
                                                                {% if record[field_key] is null %}checked{% endif %}
                                                                data-nullcheck
                                                         >
@@ -294,7 +296,13 @@
 
                                                 {% if field.nullable is not empty %}
                                                     <div class="checklist">
-                                                        <input name="null-{{ field_key }}[]" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" type="checkbox" {% if record[field_key] == null %}checked{% endif %}>
+                                                        <input name="null-{{ field_key }}[]"
+                                                               value="{{ recordIndex - 1 }}"
+                                                               id="{{ field_key }}-{{ recordIndex }}"
+                                                               type="checkbox"
+                                                               {% if record[field_key] == null %}checked{% endif %}
+                                                               data-nullcheck
+                                                        >
                                                         <label for="{{ field_key }}-{{ recordIndex }}">
                                                             {{ field.nullable_label | default('Null') }}
                                                         </label>
