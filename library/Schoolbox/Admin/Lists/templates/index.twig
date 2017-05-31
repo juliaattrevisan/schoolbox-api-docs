@@ -261,25 +261,6 @@
 
                                                 {% endif %}
 
-
-                                                {# Nullable lookups get a tickbox as well #}
-
-                                                {% if field.nullable is not empty %}
-                                                    <div class="checklist">
-                                                        <input name="null-{{ field_key }}[]"
-                                                               value="{{ recordIndex - 1 }}"
-                                                               id="{{ field_key }}-{{ recordIndex }}"
-                                                               type="checkbox"
-                                                               {% if record[field_key] is null %}checked{% endif %}
-                                                               data-nullcheck
-                                                        >
-                                                        <label for="{{ field_key }}-{{ recordIndex }}">
-                                                            {{ field.nullable_label | default('Null') }}
-                                                        </label>
-                                                    </div>
-                                                {% endif %}
-
-
                                             {% elseif field.colour is not empty %}
 
                                                 {# Color picker #}
@@ -292,22 +273,22 @@
 
                                                 <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" maxlength="{{field.maxLength}}" {{ disabledAttr }} />
 
-                                                {# Nullable text boxes get a tickbox as well #}
+                                            {% endif %}
 
-                                                {% if field.nullable is not empty %}
-                                                    <div class="checklist">
-                                                        <input name="null-{{ field_key }}[]"
-                                                               value="{{ recordIndex - 1 }}"
-                                                               id="{{ field_key }}-{{ recordIndex }}"
-                                                               type="checkbox"
-                                                               {% if record[field_key] == null %}checked{% endif %}
-                                                               data-nullcheck
-                                                        >
-                                                        <label for="{{ field_key }}-{{ recordIndex }}">
-                                                            {{ field.nullable_label | default('Null') }}
-                                                        </label>
-                                                    </div>
-                                                {% endif %}
+                                            {# All nullable fields get a tickbox #}
+                                            {% if field.nullable is not empty %}
+                                                <div class="checklist">
+                                                    <input name="null-{{ field_key }}[]"
+                                                           value="{{ recordIndex - 1 }}"
+                                                           id="{{ field_key }}-{{ recordIndex }}"
+                                                           type="checkbox"
+                                                           {% if record[field_key] is null %}checked{% endif %}
+                                                           data-nullcheck
+                                                    >
+                                                    <label for="{{ field_key }}-{{ recordIndex }}">
+                                                        {{ field.nullable_label | default('Null') }}
+                                                    </label>
+                                                </div>
                                             {% endif %}
                                         </div>
                                     {% endif %}
