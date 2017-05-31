@@ -207,7 +207,7 @@ class Homepage
         $homepageCleanables = array(
             new Assess_Main(),
             new Blog(),
-            new Calendar(),
+//            new Calendar(),
             new CategoryNews(),
             new Chat(),
             new Forum(),
@@ -217,6 +217,7 @@ class Homepage
             new TextBox(),
             new Wiki(),
 
+            Schoolbox\Calendar\EventMapper::getInstance(),
             Resource\File\Mapper::getInstance(),
             Schoolbox\Dropbox\Mapper::getInstance(),
             \SocialStream\PostMapper::getInstance(),

@@ -561,4 +561,14 @@ class EventMapper extends Calendar\EventMapper {
 			'eventId' => $event->getId()
 		]);
 	}
+
+    /**
+     * Does nothing, EOTC events aren't associated with homepages
+     *
+     * @param int $cid
+     */
+    public function homepageClean($cid)
+    {
+        // noop
+    }
 }

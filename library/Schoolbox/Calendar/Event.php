@@ -15,11 +15,15 @@ use Alaress_Date_Format;
 use DateTime;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\ISoftDeletable;
 
-class Event
+class Event implements ISoftDeletable
 {
 
     const ACCESS_PERSONAL = 1;
@@ -194,6 +198,14 @@ class Event
      * @var Alaress_Date_Format
      */
     protected $endDateTime = null;
+
+    /**
+     * Implement soft delete traits
+     */
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+
 
     /**
      * Constructor

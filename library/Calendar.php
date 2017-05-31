@@ -3,7 +3,7 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 
-class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
+class Calendar extends DeprecatedModel
 {
 
     const ATTENDANCE_STATUS_PENDING = 1;
@@ -57,6 +57,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 			LEFT JOIN event_attendance ON event.id = event_attendance.event_id
 			LEFT JOIN `user` ON event.owner = user.id
 			WHERE attendance = 1
+			AND event.deleted_at IS NULL
 			AND publish_date < NOW()
 			GROUP BY event.id
 			ORDER BY event.start_datetime DESC
@@ -375,34 +376,6 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         return $this->db->getRow($query);
     }
 
-    function getAllInCategory($categoryID, $config = false)
-    {
-
-        //event limit changed from posts to days
-        if ($config['days'] != 0 && $config['days'] != '') {
-            $where = " AND start_datetime < ADDDATE(CURDATE(), INTERVAL {$config['days']} DAY) ";
-        } else {
-            $where = "";
-        }
-
-        $query = "SELECT event.id, DATE_FORMAT(start_datetime, '%a %D %b') as outputDate,
-						start_datetime, end_datetime,
-						DATE_FORMAT(start_datetime, '%Y') as year, DATE_FORMAT(start_datetime, '%c') as month, DATE_FORMAT(start_datetime, '%e') as day,
-						type, title, location, detail,
-						user.id as uid, title, firstname, lastname,
-						eventType, eventColour,
-						attendance, allday
-				  FROM event
-				  LEFT JOIN user ON owner = user.id
-				  LEFT JOIN luEventType ON type = eventTypeID
-				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( start_datetime >= CURRENT_DATE() $where) ORDER BY start_datetime";
-        if (!empty($config['size'])) {
-            $query .= ' LIMIT ' . $config['size'];
-        }
-        return $this->db->getAll($query);
-    }
-
-
     function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc')
     {
         $keyword = $this->db->quote($keyword);
@@ -469,12 +442,14 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                         LEFT JOIN event_campus ON event.id = event_campus.event_id
                         LEFT JOIN event_group ON event.id = event_group.event_id
                         LEFT JOIN event_category ON event.id = event_category.event_id
-                        WHERE (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
+                        WHERE 
+                             (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
                                   $groupQuery
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
                                 )
                             AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
                             AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
+                            AND event.deleted_at IS NULL
                         GROUP BY id
                         ORDER BY $sort_by $sort_dir
                         LIMIT $offset, $limit";
@@ -492,6 +467,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 							$groupQuery
 							OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
 						)
+						AND event.deleted_at IS NULL
 						AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
 						AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
 						";
@@ -667,6 +643,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 			LEFT JOIN event_group ON event.id = event_group.event_id
 			LEFT JOIN event_campus ON event.id = event_campus.event_id
 			WHERE
+			    event.deleted_at is NULL AND
 				resource_booking.id IS NULL
 				$access_query
 				$dateQuery
@@ -744,6 +721,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 						LEFT JOIN event_campus ON event.id = event_campus.event_id
 						LEFT JOIN event_group ON event.id = event_group.event_id
 						WHERE start_datetime = '" . date("Y-m-d", $currentDay) . "'
+						AND event.deleted_at IS NULL
 							AND (
 								  (access = '3' AND event_campus.campus_id IN(" . implode(',', $campusList)
             . ") AND event_group.group_id IN(" . implode(',', $groupList) . ") )
@@ -946,19 +924,5 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         parent::delete($eventID);
         $this->delPerms($eventID);
-    }
-
-    /**
-     * Removes content
-     *
-     * TODO: Refactor
-     *
-     * @param  $cid
-     *
-     * @return void
-     */
-    public function homepageClean($cid)
-    {
-        $this->db->delete($this->_table, 'sid', $cid);
     }
 }
