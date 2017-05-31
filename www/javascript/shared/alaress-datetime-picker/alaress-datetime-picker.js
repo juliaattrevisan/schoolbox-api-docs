@@ -235,8 +235,7 @@ function massageDateValue(e) {
     // set up params to guide server-side parsing
     var opts = getOptions($(t));
     var params = {
-        string: t.value,
-        endDay: opts.endDay ? 1 : 0
+        string: t.value
     };
 
     $.get('/ajax/strtotime.php', params, function (data) {
@@ -268,8 +267,12 @@ function massageDateValue(e) {
 
         } else {
 
+            // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
+            // this causes a limitation that it is *not possible* to set a field of this nature to midnight
+            var state = (moment(data.time).startOf('day')) ? true : false;
+
             // Add the parsed date into the field
-            setValue($(t), getOptions($(t)), false, true, data.time);
+            setValue($(t), getOptions($(t)), state, true, data.time);
 
             // Remove any error class on the field
             $(t).removeClass('error');
