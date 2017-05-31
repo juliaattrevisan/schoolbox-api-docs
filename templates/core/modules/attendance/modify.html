@@ -28,9 +28,22 @@
     </div>
 </div>
 
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h2 class="subheader">{ATTENDANCE_DATE_FORMATTED}</h2>
+        </div>
+    </div>
+    <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
+    <ul class="f-dropdown" data-dropdown-content id="overflow">
+        <li><a data-action="delete" href="/subject/classList/{CLASS_CODE}" class="icon-class-list">View Class List</a></li>
+    </ul>
+</div>
+
+
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{ATTENDANCE_DATE_FORMATTED}</h2>
+
         <form method='post' action='/modules/attendance/modifyForm'>
             <section>
                 <input name='classCode' type='hidden' value='{CLASS_CODE}' />
