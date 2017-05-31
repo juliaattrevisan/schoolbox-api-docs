@@ -200,7 +200,7 @@ function setValue(element, options, state, trigger, date) {
 
 }
 
-function checkAllDaySwitch (state, pickerId) {
+function checkAllDaySwitch(state, pickerId) {
 
     var $timeDiv = $('#pickerCalendar' + pickerId).closest('#picker' + pickerId).find('.flatpickr-time');
 
@@ -267,12 +267,22 @@ function massageDateValue(e) {
 
         } else {
 
+            var newDate = moment(data.time);
+
             // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
             // this causes a limitation that it is *not possible* to set a field of this nature to midnight
-            var state = (moment(data.time).startOf('day')) ? true : false;
+            var state = (newDate.format('HHmm') == 1200);
 
             // Add the parsed date into the field
-            setValue($(t), getOptions($(t)), state, true, data.time);
+            var options = getOptions($(t));
+            setValue($(t), options, state, true, data.time);
+
+            // Update the allday field
+            if (newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359') {
+                $('#' + options.allDayInput).val(1);
+            } else {
+                $('#' + options.allDayInput).val(0);
+            }
 
             // Remove any error class on the field
             $(t).removeClass('error');
