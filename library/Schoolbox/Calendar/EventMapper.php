@@ -19,8 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 /**
  * Class EventMapper
