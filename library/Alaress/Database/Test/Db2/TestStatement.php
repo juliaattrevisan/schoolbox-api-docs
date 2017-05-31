@@ -20,6 +20,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test plain old boring statements
+     *
+     * @requires extension ibm_db2
      */
     public function testStatement()
     {

@@ -19,6 +19,8 @@ class TestConnector extends PHPUnit_Framework_TestCase
 {
     /**
      * Ensure we can establish a connection to DB2 test database
+     *
+     * @requires extension ibm_db2
      */
     public function testConnect()
     {
@@ -45,6 +47,8 @@ class TestConnector extends PHPUnit_Framework_TestCase
 
     /**
      * Test serialization of MySQL database connection
+     *
+     * @requires extension ibm_db2
      */
     public function testSerialize()
     {
