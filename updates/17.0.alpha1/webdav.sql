@@ -2,7 +2,7 @@ CREATE TABLE `webdav`
 (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `uri` VARCHAR(1024) NOT NULL,
-  `path` VARCHAR(1024) NOT NULL,
+  `path` VARCHAR(1024) NULL,
   `username_prefix` VARCHAR(100) NULL,
   `username_suffix` VARCHAR(100) NULL,
   `campus_id` INT NULL DEFAULT NULL,
