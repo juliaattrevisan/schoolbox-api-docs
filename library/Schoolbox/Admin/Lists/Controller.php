@@ -322,11 +322,11 @@ class Controller extends Base
                 'fields'            => [
                     'uri'           => [
                         'caption'   => 'Base URI',
-                        'width'     => 2,
+                        'width'     => 3,
                     ],
                     'path'           => [
                         'caption'   => 'Path',
-                        'width'     => 3,
+                        'width'     => 2,
                         'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
                     ],
                     'usernamePrefix' => [
