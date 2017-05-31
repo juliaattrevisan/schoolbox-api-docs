@@ -205,6 +205,8 @@
 
                                 {% for field_key, field in tables[table].fields %}
 
+                                    {% set disabledAttr = record[field_key] is null ? 'disabled' : '' %}
+
                                     <div class="small-12 column hide-for-medium-up">
                                         <label>
                                             {{ field.caption }}
@@ -226,7 +228,13 @@
                                                 {# Radio field, shared between all rows #}
 
                                                 <div class="radiolist">
-                                                    <input type="radio" name="radio-{{ field_key }}" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" {% if (record[field_key] == 1) %} checked {% endif %}">
+                                                    <input type="radio"
+                                                           name="radio-{{ field_key }}"
+                                                           value="{{ recordIndex - 1 }}"
+                                                           id="{{ field_key }}-{{ recordIndex }}"
+                                                           {% if (record[field_key] == 1) %} checked {% endif %}"
+                                                           {{ disabledAttr }}
+                                                    >
                                                     <label for="{{ field_key }}-{{ recordIndex }}"></label>
                                                 </div>
 
@@ -242,7 +250,7 @@
 
                                                 {% else %}
 
-                                                    <select name="value-{{ field_key }}[]">
+                                                    <select name="value-{{ field_key }}[]" {{ disabledAttr }}>
                                                         {% if not field.mandatory %}
                                                             <option value="">Not Selected</option>
                                                         {% endif %}
@@ -260,7 +268,7 @@
                                                     <div class="checklist">
                                                         <input name="null-{{ field_key }}[]" value="{{ recordIndex - 1 }}"
                                                                id="{{ field_key }}-{{ recordIndex }}" type="checkbox"
-                                                               {% if record[field_key] == null %}checked{% endif %}
+                                                               {% if record[field_key] is null %}checked{% endif %}
                                                                data-nullcheck
                                                         >
                                                         <label for="{{ field_key }}-{{ recordIndex }}">
@@ -274,13 +282,13 @@
 
                                                 {# Color picker #}
 
-                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" data-colour-picker />
+                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" data-colour-picker {{ disabledAttr }} />
 
                                             {% else %}
 
                                                 {# All other fields are just text boxes #}
 
-                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" maxlength="{{field.maxLength}}" />
+                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" maxlength="{{field.maxLength}}" {{ disabledAttr }} />
 
                                                 {# Nullable text boxes get a tickbox as well #}
 
