@@ -147,8 +147,7 @@ class Mapper extends BaseMapper
     protected function updateExternalMarkbook(Model $object, $previous = null)
     {
         // Only update markbook if attempt is reviewed
-        $reviewedTime = $object->getReviewed();
-        if ($reviewedTime instanceof Alaress_Date_Format && !$reviewedTime->isNull()) {
+        if ($object->isReviewed()) {
             $externalMarkbook = new \External_Markbook();
             $externalMarkbook->setMark($object);
         }

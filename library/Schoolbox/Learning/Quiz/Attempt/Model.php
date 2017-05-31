@@ -146,6 +146,16 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Is this attempt reviewed?
+     *
+     * @return bool
+     */
+    public function isReviewed()
+    {
+        return ($this->getReviewed() instanceof \Alaress_Date_Format && !$this->getReviewed()->isNull());
+    }
+
+    /**
      * @param  Alaress_Date_Format $start
      *
      * @return $this
