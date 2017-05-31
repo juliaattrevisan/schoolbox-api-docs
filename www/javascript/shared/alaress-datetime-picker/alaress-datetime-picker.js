@@ -269,8 +269,7 @@ function massageDateValue(e) {
         } else {
 
             // Add the parsed date into the field
-            var options = getOptions($(t));
-            setValue($(t), options, false, true, data.time);
+            setValue($(t), getOptions($(t)), false, true, data.time);
 
             // Remove any error class on the field
             $(t).removeClass('error');
