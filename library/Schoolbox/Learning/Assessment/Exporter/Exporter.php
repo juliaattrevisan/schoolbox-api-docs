@@ -64,6 +64,7 @@ class Exporter
             LEFT JOIN       lu_work_type ON
                             lu_work_type.id = a.work_type_id
             WHERE           YEAR(sr.created_at) = :currentYear
+                            AND sr.id IN (SELECT MAX(id) FROM submission_return sr2 WHERE sr.owner=sr2.owner AND sr.box_id = sr2.box_id)
                             AND sr.deleted_at IS NULL
                             AND sr.mark != ''
                             AND sr.published_at IS NOT NULL
