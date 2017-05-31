@@ -13,10 +13,8 @@ use External_ClassInterface;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
-use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -29,6 +27,12 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
+
+    /**
+     * Limit of upcoming assessments shown in list
+     */
+    const UPCOMING_WORK_LIMIT = 20;
+
     /**
      * External Class data source
      *
@@ -204,7 +208,7 @@ class Controller extends Base
                     'mailHandle'   => $this->getSession()->get('mailhandle'),
                     'currentTerm'  => $term,
                     'children'     => $children,
-                    'upcomingWork' => $upcomingWork,
+                    'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯
