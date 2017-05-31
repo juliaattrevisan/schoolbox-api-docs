@@ -185,8 +185,6 @@
 
                             {% set recordIndex = loop.index %}
 
-                            <div>
-
                                 {% if tables[table].sortable %}
                                     <div class="small-1 column grip">&nbsp;</div>
                                 {% endif %}
@@ -241,6 +239,18 @@
 
                                                 </select>
 
+                                                {# Nullable lookups get a tickbox as well #}
+
+                                                {% if field.nullable is not empty %}
+                                                    <div class="checklist">
+                                                        <input name="null-{{ field_key }}[]" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" type="checkbox" {% if record[field_key] == null %}checked{% endif %}>
+                                                        <label for="{{ field_key }}-{{ recordIndex }}">
+                                                            {{ field.nullable_label | default('Null') }}
+                                                        </label>
+                                                    </div>
+                                                {% endif %}
+
+
                                             {% elseif field.colour is not empty %}
 
                                                 {# Color picker #}
@@ -258,15 +268,15 @@
                                                 {% if field.nullable is not empty %}
                                                     <div class="checklist">
                                                         <input name="null-{{ field_key }}[]" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" type="checkbox" {% if record[field_key] == null %}checked{% endif %}>
-                                                        <label for="{{ field_key }}-{{ recordIndex }}">Null</label>
+                                                        <label for="{{ field_key }}-{{ recordIndex }}">
+                                                            {{ field.nullable_label | default('Null') }}
+                                                        </label>
                                                     </div>
                                                 {% endif %}
                                             {% endif %}
                                         </div>
                                     {% endif %}
                                 {% endfor %}
-
-                            </div>
 
                             {% if tables[table].delete %}
                                 <nav class="hide-for-small-down">
@@ -302,8 +312,6 @@
         {% for field_key, field in tables[table].fields %}
             {% if field.hidden is empty %}
 
-
-
                 <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
 
                     {% if field.readonly is not empty %}
@@ -338,6 +346,17 @@
                             {% endif %}
                         </select>
 
+                        {# Nullable selects get a tickbox as well #}
+
+                        {% if field.nullable is not empty %}
+                            <div class="checklist">
+                                <input name="null-{{ field_key }}[]" id="{{ field_key }}-{{ recordIndex }}" value="#ID#" type="checkbox">
+                                <label for="{{ field_key }}-{{ recordIndex }}">
+                                    {{ field.nullable_label | default('Null') }}
+                                </label>
+                            </div>
+                        {% endif %}
+
                     {% elseif field.colour is not empty %}
 
                         {# Color picker #}
@@ -355,7 +374,9 @@
                         {% if field.nullable is not empty %}
                             <div class="checklist">
                                 <input name="null-{{ field_key }}[]" id="{{ field_key }}-{{ recordIndex }}" value="#ID#" type="checkbox">
-                                <label for="{{ field_key }}-{{ recordIndex }}">Null</label>
+                                <label for="{{ field_key }}-{{ recordIndex }}">
+                                    {{ field.nullable_label | default('Null') }}
+                                </label>
                             </div>
                         {% endif %}
                     {% endif %}
