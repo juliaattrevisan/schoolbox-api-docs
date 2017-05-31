@@ -17,12 +17,14 @@ case "$1" in
         # Ensure the alaress user exists
         useradd -m alaress 2> /dev/null || true;
         # Stop all daemons for consistency
-        service schoolbox-scheduled stop 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        service schoolbox-socketd stop 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        service schoolbox-digestd stop 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        service schoolbox-rerouted stop 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        service schoolbox-scheduled stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+        service schoolbox-socketd stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+        service schoolbox-digestd stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+        service schoolbox-routed stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
+        # Stop old pre-v17.0 rerouted daemon
+        service schoolbox-rerouted stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
         if [ -f /etc/init/schoolbox-belld.conf ]; then
-            service schoolbox-belld stop 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+            service schoolbox-belld stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
         fi
     ;;
 
