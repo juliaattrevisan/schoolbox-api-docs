@@ -274,7 +274,7 @@ function massageDateValue(e) {
             var state = (newDate.format('HHmm') == '0000');
 
             // Add the parsed date into the field
-            setValue($(t), opts, state, true, data.time);
+            setValue($(t), opts, state, true, newDate);
 
             // Update the allday field
             if (newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359') {
