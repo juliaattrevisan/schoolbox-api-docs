@@ -3,7 +3,7 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 
-class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
+class Calendar extends DeprecatedModel
 {
 
     const ATTENDANCE_STATUS_PENDING = 1;
@@ -924,19 +924,5 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         parent::delete($eventID);
         $this->delPerms($eventID);
-    }
-
-    /**
-     * Removes content
-     *
-     * TODO: Refactor
-     *
-     * @param  $cid
-     *
-     * @return void
-     */
-    public function homepageClean($cid)
-    {
-        $this->db->delete($this->_table, 'sid', $cid);
     }
 }

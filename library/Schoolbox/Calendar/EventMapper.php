@@ -27,7 +27,7 @@ use Schoolbox\UserMapper;
  * @package Schoolbox\Calendar
  * @method Event hydrate(array $row, $alias = '', $callback = null)
  */
-class EventMapper extends Schoolbox\Mapper
+class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanable
 {
     const ACCESS_PERSONAL = 1;
     const ACCESS_GROUP = 2;
@@ -503,5 +503,15 @@ class EventMapper extends Schoolbox\Mapper
     public function updateMetadata($metadata, $event)
     {
         // noop
+    }
+
+    /**
+     * Removes all events from this folder ID
+     *
+     * @param int $cid
+     */
+    public function homepageClean($cid)
+    {
+        $this->deleteByColumn('c.category_id', $cid);
     }
 }
