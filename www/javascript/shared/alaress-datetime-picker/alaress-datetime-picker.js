@@ -271,7 +271,7 @@ function massageDateValue(e) {
 
             // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
             // this causes a limitation that it is *not possible* to set a field of this nature to midnight
-            var state = (newDate.format('HHmm') == 1200);
+            var state = (newDate.format('HHmm') == '0000');
 
             // Add the parsed date into the field
             setValue($(t), opts, state, true, data.time);
