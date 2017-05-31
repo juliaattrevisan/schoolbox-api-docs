@@ -163,7 +163,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             // Fix Flatpickr display enableTime
             if (pickerOptions.enableTime) {
-                $('#picker' + twigVars.id).find('.flatpickr-time').css('display', 'block');
+                $('#picker' + twigVars.id).find('.flatpickr-time').show();
             }
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
