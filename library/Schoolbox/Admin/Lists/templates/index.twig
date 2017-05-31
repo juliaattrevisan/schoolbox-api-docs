@@ -205,7 +205,7 @@
 
                                 {% for field_key, field in tables[table].fields %}
 
-                                    {% set disabledAttr = record[field_key] is null ? 'disabled' : '' %}
+                                    {% set disabledAttr = (field.nullable is not empty and record[field_key] is null) ? 'disabled' : '' %}
 
                                     <div class="small-12 column hide-for-medium-up">
                                         <label>
