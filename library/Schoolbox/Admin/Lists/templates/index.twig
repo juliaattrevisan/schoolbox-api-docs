@@ -11,6 +11,20 @@
 
         var newId = -1;
 
+        var dataList = $('[data-list]');
+
+        dataList.on('change', '[data-nullcheck]', function() {
+            // Find closest input
+            // Enable/disable it
+            var $this = $(this);
+            var input = $this.closest('.column').find(':input').not($this);
+            if ($this.is(':checked')) {
+                input.prop('disabled', true);
+            } else {
+                input.prop('disabled', false);
+            }
+        });
+
         $('[data-button=add-row]').click(function(event) {
             event.preventDefault();
 
@@ -34,7 +48,7 @@
                     .replace(/#ID#/g, newId--)
                     .replace(/data-colour-picker-clone/g, 'data-colour-picker-new');
 
-            $('[data-list]')
+            dataList
                 .append(newRow)
                 .find('[data-focus]')
                 .last()
@@ -224,6 +238,7 @@
 
                                                     <select name="value-{{ field_key }}[]" disabled>
                                                         <option value="">None Available</option>
+                                                    </select>
 
                                                 {% else %}
 
@@ -234,16 +249,20 @@
                                                         {% for option in field.lookup %}
                                                             <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
                                                         {% endfor %}
+                                                    </select>
 
                                                 {% endif %}
 
-                                                </select>
 
                                                 {# Nullable lookups get a tickbox as well #}
 
                                                 {% if field.nullable is not empty %}
                                                     <div class="checklist">
-                                                        <input name="null-{{ field_key }}[]" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" type="checkbox" {% if record[field_key] == null %}checked{% endif %}>
+                                                        <input name="null-{{ field_key }}[]" value="{{ recordIndex - 1 }}"
+                                                               id="{{ field_key }}-{{ recordIndex }}" type="checkbox"
+                                                               {% if record[field_key] == null %}checked{% endif %}
+                                                               data-nullcheck
+                                                        >
                                                         <label for="{{ field_key }}-{{ recordIndex }}">
                                                             {{ field.nullable_label | default('Null') }}
                                                         </label>
@@ -350,7 +369,11 @@
 
                         {% if field.nullable is not empty %}
                             <div class="checklist">
-                                <input name="null-{{ field_key }}[]" id="{{ field_key }}-{{ recordIndex }}" value="#ID#" type="checkbox">
+                                <input name="null-{{ field_key }}[]"
+                                       id="{{ field_key }}-{{ recordIndex }}"
+                                       value="#ID#"
+                                       type="checkbox"
+                                       data-nullcheck>
                                 <label for="{{ field_key }}-{{ recordIndex }}">
                                     {{ field.nullable_label | default('Null') }}
                                 </label>
