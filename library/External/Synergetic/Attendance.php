@@ -39,9 +39,8 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
      * @param int $attendancePeriod
      * @param int $fileYear
      * @param int $fileSemester
-     * @param $database
      */
-    public function __construct($class, Alaress_Date_Format $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $database)
+    public function __construct($class, Alaress_Date_Format $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester)
     {
         // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
 

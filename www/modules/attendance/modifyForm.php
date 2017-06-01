@@ -69,8 +69,7 @@ try {
         $attendanceDay,
         $attendancePeriod,
         $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
-        $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
-        MSSQL::getInstance()
+        $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId())
     );
 } catch(Exception $e) {
     error(148); //Class does not exist
