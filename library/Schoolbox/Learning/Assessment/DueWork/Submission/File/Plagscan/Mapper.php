@@ -254,10 +254,12 @@ class Mapper extends \Schoolbox\Mapper
         return null;
     }
 
-
     /**
      * Find previous incarnations of $studentSubmissionFileId
      * that haven't already been privatised
+     *
+     * This identifies assessment/owner ids and finds all the plagscan
+     * ids relevant to anything authored by owner in assessment
      *
      * @param int $studentSubmissionFileId
      * @return array
@@ -312,6 +314,29 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return [];
+    }
+
+    /**
+     * Privatise a particular plagscan id
+     * in both our db and in plagscan's
+     *
+     * @param $plagscanId
+     *
+     * @throws \RuntimeException
+     */
+    public function privatise($plagscanId)
+    {
+        try {
+            $this->getConnector()->privatise($plagscanId);
+
+            /* TODO: Update in our db
+             */
+        }
+        catch (\RuntimeException $e) {
+
+            /* Noop - could not privatise in plagscan
+             */
+        }
     }
 
     /* Getters/Setters
