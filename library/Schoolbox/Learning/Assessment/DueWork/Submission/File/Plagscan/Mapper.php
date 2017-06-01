@@ -52,7 +52,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('score', self::TYPE_STRING);
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
-        $this->uses('privatised_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('privatised_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
@@ -338,7 +338,7 @@ class Mapper extends \Schoolbox\Mapper
             $this->save($plagscan);
         }
         catch (\RuntimeException $e) {
-
+print_r($e->getMessage());
             /* Noop - could not privatise in plagscan
              *
              * Leave unchanged if plagscan refuses to do it on their end (jleckie, 6:43pm @ June 1)
