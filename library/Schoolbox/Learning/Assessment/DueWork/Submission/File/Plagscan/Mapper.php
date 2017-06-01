@@ -291,7 +291,7 @@ class Mapper extends \Schoolbox\Mapper
                 WHERE plagscan_document.`privatised_at` IS NULL
                 AND student_submission.`owner` = :ownerId
                 AND student_submission.`box_id` = :boxId
-                AND student_submission.`id` != :submissionId
+                AND student_submission.`id` < :submissionId
             ";
 
             $statement = $this->getDatabase()->prepare($query);
