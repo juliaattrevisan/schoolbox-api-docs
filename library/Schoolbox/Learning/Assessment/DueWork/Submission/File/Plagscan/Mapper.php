@@ -11,13 +11,10 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
