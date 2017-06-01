@@ -335,7 +335,7 @@ class Mapper extends \Schoolbox\Mapper
             $this->save($plagscan);
         }
         catch (\RuntimeException $e) {
-print_r($e->getMessage());
+
             /* Noop - could not privatise in plagscan
              *
              * Leave unchanged if plagscan refuses to do it on their end (jleckie, 6:43pm @ June 1)
