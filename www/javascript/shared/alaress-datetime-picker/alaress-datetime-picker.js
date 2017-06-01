@@ -271,9 +271,8 @@ function massageDateValue(e) {
 
                 var newDate = moment(data.time);
 
-                // State of AllDay field
-                // Does the element have time?
-                var state = (newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359' || opts.allDaySwitch);
+                // If field has all day switch data param and is end or start of day - make all day
+                var state = ((newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359') && (opts.allDaySwitch));
 
                 // Does the linked element (if any) have time?
                 if (opts.allDayInput) {
@@ -282,12 +281,15 @@ function massageDateValue(e) {
                     linkedElements.forEach(function (item) {
                         var itemOptions = getOptions($(item));
                         var itemDate = moment(item.val(), convertFormat(itemOptions.displayFormat));
-                        state = (itemDate.format('HHmm') == '0000' || itemDate.format('HHmm') == '2359');
+                        var itemState = ((itemDate.format('HHmm') == '0000' || itemDate.format('HHmm') == '2359') && state);
 
-                        // Update the value of the linked field, if it has changed to all day
-                        if (state) {
-                            setValue($(item), itemOptions, state, true);
-                        }
+                        // Update the state of the linked field
+                        setValue($(item), itemOptions, itemState, true);
+
+                        // Update the original field's state to make consistent
+                        // Note: all fields in the group must be 0000 or 2359 in order for all day to be switched on
+                        state = itemState;
+
                     });
                 }
 
