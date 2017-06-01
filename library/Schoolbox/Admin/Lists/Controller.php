@@ -153,11 +153,7 @@ class Controller extends Base
 
                 $setter = "set" . $this->underscoreToCamelCase($field);
 
-                if (empty(trim($value[$currentIndex]))) {
-                    $model->$setter(null);
-                } else {
-                    $model->$setter($value[$currentIndex]);
-                }
+                $model->$setter($value[$currentIndex]);
 
                 // Override nullable fields where appropriate
 
@@ -322,11 +318,11 @@ class Controller extends Base
                 'fields'            => [
                     'uri'           => [
                         'caption'   => 'Base URI',
-                        'width'     => 2,
+                        'width'     => 3,
                     ],
                     'path'           => [
                         'caption'   => 'Path',
-                        'width'     => 3,
+                        'width'     => 2,
                         'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
                     ],
                     'usernamePrefix' => [
@@ -342,24 +338,35 @@ class Controller extends Base
                     'campus'        => [
                         'caption'   => 'Campus',
                         'tooltip'   => 'Drive will only display to users of this type, can be left blank',
+                        'mandatory' => true,
+                        'nullable'  => true,
+                        'nullable_label' => 'N/A',
                         'width'     => 1,
-                        'lookup'    => array_merge($luEmpty, $luCampus),
+                        'lookup'    => $luCampus,
                     ],
                     'roleType'      => [
                         'caption'   => 'Role Type',
                         'tooltip'   => 'Drive will only display to users of this type, can be left blank',
+                        'mandatory' => true,
+                        'nullable'  => true,
+                        'nullable_label' => 'N/A',
                         'width'     => 1,
-                        'lookup'    => array_merge($luEmpty, $luRoleType),
+                        'lookup'    => $luRoleType,
                     ],
                     'role'        => [
                         'caption'   => 'Role',
                         'tooltip'   => 'Drive will only display to users of this type, can be left blank',
+                        'mandatory' => true,
+                        'nullable'  => true,
+                        'nullable_label' => 'N/A',
                         'width'     => 1,
-                        'lookup'    => array_merge($luEmpty, $luRole),
+                        'lookup'    => $luRole,
                     ],
                     'enabled' => [
                         'caption'   => 'Enabled',
                         'width'     => 1,
+                        'mandatory' => true,
+                        'nullable_label' => 'N/A',
                         'lookup'    => [
                             ['key' => 1, 'value' => 'Yes'],
                             ['key' => 0, 'value' => 'No'],
@@ -504,7 +511,9 @@ class Controller extends Base
                         'getter'    => 'getDocumentClassification',
                         'caption'   => 'SIS Document Classification',
                         'lookup'    => $luDocumentClassifications,
-                        'mandatory' => false,
+                        'mandatory' => true,
+                        'nullable'  => true,
+                        'nullable_label' => 'No Document Classification',
                         'width'     => 3,
                         'tooltip'   => 'This is document classification code that will be assigned to uploaded documents in your SIS for records of this type. These are defined in the Pastoral Document Classifications list.',
                     ],
