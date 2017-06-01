@@ -1,5 +1,6 @@
 <?php
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
@@ -14,228 +15,134 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
  */
 class Attendance_Synergetic_AttendanceMaster
 {
+    /** @var IConnector $connector Database connector */
+    protected $connector;
 
-    /**
-     * The class
-     *
-     * @var null
-     */
-    protected $class = null;
-
-    /**
-     * The classCode whose attendances you are marking
-     *
-     * @var string
-     */
+    /* @var string $classCode The external class code whose attendances you are marking */
     protected $classCode = '';
 
-    /**
-     * The classCampus whose attendances you are marking
-     *
-     * @var string
-     */
+    /** @var string The external campus code whose attendances you are marking */
     protected $classCampus = '';
 
-    /**
-     * File type of class - usually "A" for "Academic" but provided in class data.
-     *
-     * @var string
-     */
+    /** @var string $classFileType The external file type of class (defined in SynergyOne.dbo.luFileYear) */
     protected $classFileType = 'A';
 
-    /**
-     * The date in Y-m-d of the class
-     *
-     * @var string
-     */
+    /** @var string $attendanceDate The date in `Y-m-d` of the class */
     protected $attendanceDate = '';
 
-    /**
-     * The day number of the class
-     *
-     * @var string
-     */
-    protected $attendanceDay = '';
-
-    /**
-     * The AttendancePeriod of the class
-     *
-     * @var int
-     */
+    /** @var int $attendancePeriod The attendance period of the class */
     protected $attendancePeriod = -1;
 
-    /**
-     * From the session, usually; but you can specify your own
-     *
-     * @var int
-     */
+    /** @var int $fileYear From the session, usually; but you can specify your own */
     protected $fileYear = -1;
 
-    /**
-     * From the session, usually; but you can specify your own
-     *
-     * @var int
-     */
+    /** @var int $fileSemester From the session, usually; but you can specify your own */
     protected $fileSemester = -1;
 
-    /**
-     * An MSSQL database instance
-     *
-     * @var \Database
-     */
-    protected $database = null;
+    /** @var array $data All the keys will be put in here to make it compatible with the database query interface */
+    protected $data = [];
 
-    /**
-     * All the keys will be put in here to make it compatible with
-     * the database query interface
-     *
-     * @var array
-     */
-    protected $data = array();
-
-    /**
-     * The primary key associated with the selected class, date and period
-     * This is used in dbo.AttendanceMaster
-     *
-     * @var int
-     */
+    /** @var int $attendanceMasterSeq The primary key associated with the selected class, date and period used in dbo.AttendanceMaster */
     protected $attendanceMasterSeq = -1;
 
     /**
      * Constructor
      *
-     * @param $class
-     * @param $attendanceDate
-     * @param $attendanceDay
-     * @param $attendancePeriod
-     * @param $fileYear
-     * @param $fileSemester
-     * @param $database
+     * @param array $class Result row from SynergyOne.dbo.SubjectClasses
+     * @param Alaress_Date_Format $attendanceDate
+     * @param string $attendanceDay
+     * @param int $attendancePeriod
+     * @param int $fileYear
+     * @param int $fileSemester
+     * @param IConnector $connector
      */
-    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $database)
+    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector)
     {
-        $this->setClass($class);
+        // Store the stuff we'll use again
+
         $this->setClassCampus($class['ClassCampus']);
         $this->setClassCode($class['ClassCode']);
         $this->setClassFileType($class['FileType']);
-        $this->setAttendanceDate($attendanceDate->getDatabaseDate());
-        $this->setAttendanceDay($attendanceDay);
         $this->setAttendancePeriod($attendancePeriod);
         $this->setFileYear($fileYear);
         $this->setFileSemester($fileSemester);
-        $this->setDatabase($database);
 
-        $this->setup();
-    }
+        // Get the attendance master sequence number
 
-    protected function setup()
-    {
-        $class = $this->getClass();
+        $statement = $this->connector->prepareStoredProcedure('spiwkAttendances');
+        
+        $statement->bindInputs([
+            'FileType' => $this->getClassFileType(),
+            'FileYear' => $this->getFileYear(),
+            'FileSemester' => $this->getFileSemester(),
+            'ClassCampus' => $class['ClassCampus'],
+            'ClassCode' => $this->getClassCode(),
+            'AttendanceDate' => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
+            'AttendancePeriod' => $this->getAttendancePeriod(),
+            'AttendanceDayNumber' => $attendanceDay,
+            'StaffID' => $_SESSION['sid'],
+            'AttendedFlag' => 1,
+            'TimeTableGroup' => $this->getTimetableGroup(),
+            'SynWebFlag' => 1,
+        ]);
 
-        /* Default settings for a new AttendanceMaster record
-         */
-        $data = array(
-            'CreatedDate'               => 'GETDATE()',
-            'CreatedByID'               => $_SESSION['sid'],
-            'ModifiedDate'              => 'GETDATE()',
-            'ModifiedByID'              => $_SESSION['sid'],
-            'FileType'                  => $this->getClassFileType(),
-            'FileYear'                  => $this->getFileYear(),
-            'FileSemester'              => $this->getFileSemester(),
-            'ClassCampus'               => $class['ClassCampus'],
-            'ClassCode'                 => $this->getClassCode(),
-            'StaffID'                   => $_SESSION['sid'],
-            'AttendanceDate'            => $this->getAttendanceDate() . ' 00:00:00.000',
-            'AttendancePeriod'          => $this->getAttendancePeriod(),
+        // Bind output parameters for procedure
 
-            /* Where do these come from?
-             */
-            'AttendanceDateTimeFrom'    => null,
-            'AttendanceDateTimeTo'      => null,
+        $attendanceMasterSeq = null;
 
-            /* These two methods can be refactored, they are virtually identical
-             */
-            'AttendanceDayNumber'       => $this->getTimetableDayNumber(),
-            'TimetableGroup'            => $this->getTimetableGroup(),
+        $outputs = [];
+        $outputs['wkAttendanceMasterSeq'] = [
+            'value' => &$attendanceMasterSeq,
+            'type' => PDO::PARAM_INT,
+            'length' => 4
+        ];
 
-            'ClassCancelledFlag'        => 0,
-            'AttendanceOfficerModeFlag' => 0,
-            'SystemProcessNumber'       => 0,
-        );
+        $statement->bindOutputs($outputs);
 
-        $this->setData($data);
-    }
+        $result = $statement->execute();
 
-    /**
-     * Find the DayNumber value for a particular class, date and period
-     * and for a particular FileYear and FileSemester set of values.
-     *
-     * @return mixed
-     */
-    protected function getTimetableDayNumber()
-    {
-        return $this->attendanceDay;
+        if ($result && !empty($attendanceMasterSeq)) {
+            $this->setAttendanceMasterSeq($attendanceMasterSeq);
+        } else {
+            throw new SchoolboxException('Cannot setup attendance record. Unable to retrieve attendance sequence.');
+        }        
     }
 
     /**
      * Find the TimetableGroup value for a particular class, date and period
      * and for a particular FileYear and FileSemester set of values.
      *
-     * @return mixed
+     * @return string|bool
      */
     protected function getTimetableGroup()
     {
         $query = "
-			SELECT *
-			FROM dbo.Timetable
-			WHERE FileType = '{$this->getClassFileType()}'
-			AND FileYear = '{$this->getFileYear()}'
-			AND FileSemester = '{$this->getFileSemester()}'
-			AND PeriodNumber = '{$this->getAttendancePeriod()}'
-			AND ClassCode = '{$this->getClassCode()}'
-			AND ClassCampus = '{$this->getClassCampus()}'
+			SELECT  *
+			FROM    dbo.Timetable
+			WHERE   FileType = :fileType
+			AND     FileYear = :fileYear
+			AND     FileSemester = :fileSemester
+			AND     PeriodNumber = :periodNumber
+			AND     ClassCode = :classCode
+			AND     ClassCampus = :classCampus
 		";
+        
+        $statement = $this->connector->prepareQuery($query, [
+            'fileType'      => $this->getClassFileType(),
+            'fileYear'      => $this->getFileYear(),
+            'fileSemester'  => $this->getFileSemester(),
+            'periodNumber'  => $this->getAttendancePeriod(),
+            'classCode'     => $this->getClassCode(),
+            'classCampus'   => $this->getClassCampus()
+        ]);
+        
+        $result = $statement->fetchAll();
 
-        $result = $this->getDatabase()->getRow($query);
-
-        if (is_array($result)) {
+        if (is_array($result) && isset($result['TimetableGroup'])) {
             return $result['TimetableGroup'];
         }
 
         return false;
-    }
-
-    /**
-     * Insert that stub row
-     */
-    public function setupWork()
-    {
-        $data = $this->getData();
-        $value = array(
-            array('@FileType', $data['FileType'], SQLVARCHAR),
-            array('@FileYear', $data['FileYear'], SQLINT4),
-            array('@FileSemester', $data['FileSemester'], SQLINT4),
-            array('@ClassCampus', $data['ClassCampus'], SQLVARCHAR),
-            array('@ClassCode', $data['ClassCode'], SQLVARCHAR),
-            array('@AttendanceDate', $data['AttendanceDate'], SQLVARCHAR),
-            array('@AttendancePeriod', $data['AttendancePeriod'], SQLINT4),
-            array('@AttendanceDayNumber', $data['AttendanceDayNumber'], SQLINT4),
-            array('@StaffID', $data['StaffID'], SQLINT4),
-            array('@AttendedFlag', 1, SQLINT4),
-            array('@TimeTableGroup', $data['TimetableGroup'], SQLVARCHAR),
-            array('@SynWebFlag', 1, SQLINT4),
-            array('@wkAttendanceMasterSeq', $var, SQLINT4, true, true, -1),
-        );
-
-        $result = $this->getDatabase()->executeProcedure(
-            'spiwkAttendances', $value
-        );
-
-        if ($result['success'] && isset($result['output']['@wkAttendanceMasterSeq'])) {
-            $this->setAttendanceMasterSeq($result['output']['@wkAttendanceMasterSeq']);
-        } else {
-            throw new SchoolboxException('Cannot setup attendance record, ' . $result['message']);
-        }
     }
 
     /**
@@ -247,17 +154,16 @@ class Attendance_Synergetic_AttendanceMaster
      */
     public function save()
     {
-        $result = $this->getDatabase()->executeProcedure(
-            'sptwkAttendances', array(
-                array('@wkAttendanceMasterSeq', $this->getAttendanceMasterSeq(), SQLINT4),
-                array('@HoldFlag', 0, SQLINT1),
-                array('@AttendanceMasterSeq', 'seq', SQLINT4, true),
-            )
+        $statement = $this->connector->executeStoredProcedure('sptwkAttendances', [
+            'wkAttendanceMasterSeq' => $this->getAttendanceMasterSeq(),
+            'HoldFlag' => 0,
+            'AttendanceMasterSeq' => 'seq'
+        ]);
 
-        );
+        $result = $statement->fetch();
+
         return $result['success'];
     }
-
 
     /**
      * Determine if there are attendance records for this particular
@@ -268,49 +174,13 @@ class Attendance_Synergetic_AttendanceMaster
      */
     public function hasAttendanceMasterSeq()
     {
-        if ($this->getAttendanceMasterSeq() > 0) {
-            return true;
-        }
-
-        return false;
+        return $this->getAttendanceMasterSeq() > 0;
     }
 
     /* Getters/Setters
      */
 
     /**
-     * Set attendance date
-     *
-     * @param string $attendanceDate
-     */
-    protected function setAttendanceDate($attendanceDate)
-    {
-        $this->attendanceDate = $attendanceDate;
-    }
-
-    /**
-     * Get attendance date
-     *
-     * @return string
-     */
-    protected function getAttendanceDate()
-    {
-        return $this->attendanceDate;
-    }
-
-    /**
-     * Set attendance period
-     *
-     * @param int $attendancePeriod
-     */
-    protected function setAttendancePeriod($attendancePeriod)
-    {
-        $this->attendancePeriod = $attendancePeriod;
-    }
-
-    /**
-     * Get attendance period
-     *
      * @return int
      */
     protected function getAttendancePeriod()
@@ -319,18 +189,16 @@ class Attendance_Synergetic_AttendanceMaster
     }
 
     /**
-     * Set class code
-     *
-     * @param string $classCode
+     * @param int $attendancePeriod
+     * @return $this
      */
-    protected function setClassCode($classCode)
+    protected function setAttendancePeriod($attendancePeriod)
     {
-        $this->classCode = $classCode;
+        $this->attendancePeriod = $attendancePeriod;
+        return $this;
     }
 
     /**
-     * Get class code
-     *
      * @return string
      */
     protected function getClassCode()
@@ -339,18 +207,16 @@ class Attendance_Synergetic_AttendanceMaster
     }
 
     /**
-     * Set file semester
-     *
-     * @param int $fileSemester
+     * @param string $classCode
+     * @return $this
      */
-    protected function setFileSemester($fileSemester)
+    protected function setClassCode($classCode)
     {
-        $this->fileSemester = $fileSemester;
+        $this->classCode = $classCode;
+        return $this;
     }
 
     /**
-     * Get file semester
-     *
      * @return int
      */
     protected function getFileSemester()
@@ -359,18 +225,16 @@ class Attendance_Synergetic_AttendanceMaster
     }
 
     /**
-     * Set file year
-     *
-     * @param int $fileYear
+     * @param int $fileSemester
+     * @return $this
      */
-    protected function setFileYear($fileYear)
+    protected function setFileSemester($fileSemester)
     {
-        $this->fileYear = $fileYear;
+        $this->fileSemester = $fileSemester;
+        return $this;
     }
 
     /**
-     * Get file year
-     *
      * @return int
      */
     protected function getFileYear()
@@ -379,78 +243,16 @@ class Attendance_Synergetic_AttendanceMaster
     }
 
     /**
-     * Set database
-     *
-     * @param \Database $database
+     * @param int $fileYear
+     * @return $this
      */
-    protected function setDatabase($database)
+    protected function setFileYear($fileYear)
     {
-        $this->database = $database;
+        $this->fileYear = $fileYear;
+        return $this;
     }
 
     /**
-     * Get database
-     *
-     * @return \Database
-     */
-    protected function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * Set data
-     *
-     * @param $data
-     */
-    protected function setData($data)
-    {
-        $this->data = $data;
-    }
-
-    /**
-     * Get data
-     *
-     * @return array
-     */
-    protected function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Set class
-     *
-     * @param null $class
-     */
-    protected function setClass($class)
-    {
-        $this->class = $class;
-    }
-
-    /**
-     * Get class
-     *
-     * @return null
-     */
-    protected function getClass()
-    {
-        return $this->class;
-    }
-
-    /**
-     * Set attendance master seq
-     *
-     * @param int $attendanceMasterSeq
-     */
-    protected function setAttendanceMasterSeq($attendanceMasterSeq)
-    {
-        $this->attendanceMasterSeq = $attendanceMasterSeq;
-    }
-
-    /**
-     * Get attendance master seq
-     *
      * @return int
      */
     public function getAttendanceMasterSeq()
@@ -459,19 +261,13 @@ class Attendance_Synergetic_AttendanceMaster
     }
 
     /**
-     * @param string $attendanceDay
+     * @param int $attendanceMasterSeq
+     * @return $this
      */
-    public function setAttendanceDay($attendanceDay)
+    protected function setAttendanceMasterSeq($attendanceMasterSeq)
     {
-        $this->attendanceDay = $attendanceDay;
-    }
-
-    /**
-     * @param string $classCampus
-     */
-    public function setClassCampus($classCampus)
-    {
-        $this->classCampus = $classCampus;
+        $this->attendanceMasterSeq = $attendanceMasterSeq;
+        return $this;
     }
 
     /**
@@ -480,6 +276,16 @@ class Attendance_Synergetic_AttendanceMaster
     public function getClassCampus()
     {
         return $this->classCampus;
+    }
+
+    /**
+     * @param string $classCampus
+     * @return $this
+     */
+    public function setClassCampus($classCampus)
+    {
+        $this->classCampus = $classCampus;
+        return $this;
     }
 
     /**
@@ -492,7 +298,6 @@ class Attendance_Synergetic_AttendanceMaster
 
     /**
      * @param  string $classFileType
-     *
      * @return $this
      */
     public function setClassFileType($classFileType)
