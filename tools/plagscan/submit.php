@@ -70,8 +70,9 @@ foreach ($allDocuments as $currentDocument) {
              */
             $previousPlagscans = $mapper->findPreviousIncarnationsOf($submissionFile->getId());
 
+            /** @var Plagscan $currentPlagscan */
             foreach($previousPlagscans as $currentPlagscan) {
-                $mapper->privatise($currentPlagscan);
+                $mapper->privatise($currentPlagscan->getPlagscanId());
             }
 
             /* Transmit the new file

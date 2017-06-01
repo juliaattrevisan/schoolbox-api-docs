@@ -12,6 +12,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
@@ -259,13 +260,15 @@ class Mapper extends \Schoolbox\Mapper
      * that haven't already been privatised
      *
      * This identifies assessment/owner ids and finds all the plagscan
-     * ids relevant to anything authored by owner in assessment
+     * instances relevant to anything authored by owner in assessment
      *
      * @param int $studentSubmissionFileId
-     * @return array
+     * @return Collection
      */
     public function findPreviousIncarnationsOf($studentSubmissionFileId)
     {
+        $plagscanDocuments = new Collection();
+
         $query = "
             SELECT student_submission.`id`, `owner`, `box_id`
             FROM student_submission_file 
@@ -284,8 +287,8 @@ class Mapper extends \Schoolbox\Mapper
          */
         if ($ownerDetails) {
             $query = "
-                SELECT plagscan_id
-                FROM plagscan_document
+                SELECT {$this->getColumnString()}
+                FROM {$this->getTable()}
                 INNER JOIN student_submission_file ON plagscan_document.`student_submission_file_id` = student_submission_file.`id`
                 INNER JOIN student_submission ON student_submission.`id` = student_submission_file.`student_submission_id`
                 WHERE plagscan_document.`privatised_at` IS NULL
@@ -306,16 +309,12 @@ class Mapper extends \Schoolbox\Mapper
              * Probably don't need to do this, but I want to be sure
              * given I have to curl this id to plagscan.com every time
              */
-            $plagscanIds = [];
-
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $plagscanIds[$row['plagscan_id']] = $row['plagscan_id'];
+                $plagscanDocuments->setOffset($row['plagscan_id'], $this->hydrate($row));
             }
-
-            return array_keys($plagscanIds);
         }
 
-        return [];
+        return $plagscanDocuments;
     }
 
     /**
