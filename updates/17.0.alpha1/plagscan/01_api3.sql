@@ -12,3 +12,6 @@ ALTER TABLE `plagscan_document` ADD COLUMN `interactive_url` VARCHAR(255) NULL A
 
 -- Add option to allow students to see plagscan reports
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('plagscan_allow_students_report_access', '0', 'Allow Students to see plagiarism reports', 'If enabled, students will have access to plagiarism reports', '3', '15', 'true');
+
+-- Allow plagscan records to remember when they were privatised
+ALTER TABLE `plagscan_document` ADD COLUMN `privatised_at` DATETIME NULL AFTER `interactive_url`;
