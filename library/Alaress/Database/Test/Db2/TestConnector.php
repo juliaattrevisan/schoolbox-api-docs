@@ -19,6 +19,8 @@ class TestConnector extends PHPUnit_Framework_TestCase
 {
     /**
      * Ensure we can establish a connection to DB2 test database
+     *
+     * @requires extension ibm_db2
      */
     public function testConnect()
     {
@@ -34,7 +36,7 @@ class TestConnector extends PHPUnit_Framework_TestCase
 
         $db2Test = $factory->createDb2();
         $result = $db2Test->connect(
-            'ec2-13-54-248-74.ap-southeast-2.compute.amazonaws.com:50000',
+            'ec2-54-153-145-255.ap-southeast-2.compute.amazonaws.com:50000',
             'SBOXTEST',
             'sbox',
             'tnp879'
@@ -45,6 +47,8 @@ class TestConnector extends PHPUnit_Framework_TestCase
 
     /**
      * Test serialization of MySQL database connection
+     *
+     * @requires extension ibm_db2
      */
     public function testSerialize()
     {
@@ -60,7 +64,7 @@ class TestConnector extends PHPUnit_Framework_TestCase
 
         $connectorOriginal = $factory->createDb2();
         $connectorOriginal->connect(
-            'ec2-13-54-248-74.ap-southeast-2.compute.amazonaws.com:50000',
+            'ec2-54-153-145-255.ap-southeast-2.compute.amazonaws.com:50000',
             'SBOXTEST',
             'sbox',
             'tnp879'

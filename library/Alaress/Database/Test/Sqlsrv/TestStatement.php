@@ -190,8 +190,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
         $this->connectSynergetic68();
 
         $statement = $this->synergetic68->executeStoredProcedure('spsStudentPersonal', [
-            'ID' => ['value' => 133],
-            'FileYear' => ['value' => 2010]
+            'ID' => ['value' => 133, 'type' => PDO::PARAM_INT],
+            'FileYear' => ['value' => 2010, 'type' => PDO::PARAM_INT]
         ]);
 
         $student = $statement->fetch();

@@ -20,6 +20,8 @@ class TestPredicateBuilder extends PHPUnit_Framework_TestCase
 
     /**
      * Test predicate builder quoting
+     *
+     * @requires extension ibm_db2
      */
     public function testPredicateBuilder()
     {

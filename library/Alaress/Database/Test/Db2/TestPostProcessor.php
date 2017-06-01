@@ -40,6 +40,8 @@ class TestPostProcessor extends PHPUnit_Framework_TestCase
 
     /**
      * Test plain old boring statements
+     *
+     * @requires extension ibm_db2
      */
     public function testPostProcessor()
     {
@@ -50,7 +52,7 @@ class TestPostProcessor extends PHPUnit_Framework_TestCase
 
         $db2Test = $factory->createDb2();
         $db2Test->connect(
-            'ec2-13-54-248-74.ap-southeast-2.compute.amazonaws.com:50000',
+            'ec2-54-153-145-255.ap-southeast-2.compute.amazonaws.com:50000',
             'SBOXTEST',
             'sbox',
             'tnp879'
