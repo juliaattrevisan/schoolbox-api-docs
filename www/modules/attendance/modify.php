@@ -26,6 +26,10 @@ if (count($this->arg) < 3) {
     error(147);
 }
 
+// Get configuration loader
+
+$configLoader = new Config();
+
 /* Get a class list which we'll match up manually with their attendance records
  * but only if this class exists
  */
@@ -58,7 +62,7 @@ $attendanceDate->startOfDay();
 $now = Alaress_Date_Format::now();
 $now->endOfDay();
 
-$days= Config::get('external_attendance_days');
+$days = $configLoader->get('external_attendance_days');
 
 // If not today and not within days range
 if ($attendanceDate->diffInDays($now) != 0 && $attendanceDate->diffInDays($now) > $days) {
