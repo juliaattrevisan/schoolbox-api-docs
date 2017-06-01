@@ -229,85 +229,88 @@ function checkAllDaySwitch(state, pickerId) {
 function massageDateValue(e) {
     var t = e.target;
 
-    $(t).prop('readonly', true);
-    $(t).prop('disabled', true);
+    if ($.trim($(t).val()) != '') {
 
-    // set up params to guide server-side parsing
-    var opts = getOptions($(t));
-    var params = {
-        string: t.value
-    };
+        $(t).prop('readonly', true);
+        $(t).prop('disabled', true);
 
-    $.get('/ajax/strtotime.php', params, function (data) {
+        // set up params to guide server-side parsing
+        var opts = getOptions($(t));
+        var params = {
+            string: t.value
+        };
 
-        var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
+        $.get('/ajax/strtotime.php', params, function (data) {
 
-        $(t).prop('disabled', false);
+            var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
 
-        // If it couldn't parse a date - show a validation error on the form
-        if (data.error) {
+            $(t).prop('disabled', false);
 
-            $(t).addClass('error');
+            // If it couldn't parse a date - show a validation error on the form
+            if (data.error) {
 
-            if (!$fieldError.length) { // don't create multiple errors
+                $(t).addClass('error');
 
-                var error = '<label id="' + $(t).attr('id') + '-error" class="error" for="' + $(t).attr('id') + '">Please enter a valid date</label>';
+                if (!$fieldError.length) { // don't create multiple errors
 
-                if ($(t).closest('.input-group').length) {
-                    $(t).closest('.input-group').after(error);
+                    var error = '<label id="' + $(t).attr('id') + '-error" class="error" for="' + $(t).attr('id') + '">Please enter a valid date</label>';
+
+                    if ($(t).closest('.input-group').length) {
+                        $(t).closest('.input-group').after(error);
+                    } else {
+                        $(t).after(error);
+                    }
+
                 } else {
-                    $(t).after(error);
+
+                    // It might be hidden - show
+                    $fieldError.show();
                 }
 
             } else {
 
-                // It might be hidden - show
-                $fieldError.show();
+                var newDate = moment(data.time);
+
+                // State of AllDay field
+                // Does the element have time?
+                var state = (newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359' || opts.allDaySwitch);
+
+                // Does the linked element (if any) have time?
+                if (opts.allDayInput) {
+                    var linkedElements = getLinkedElements($(t), opts);
+
+                    linkedElements.forEach(function (item) {
+                        var itemOptions = getOptions($(item));
+                        var itemDate = moment(item.val(), convertFormat(itemOptions.displayFormat));
+                        state = (itemDate.format('HHmm') == '0000' || itemDate.format('HHmm') == '2359');
+
+                        // Update the value of the linked field, if it has changed to all day
+                        if (state) {
+                            setValue($(item), itemOptions, state, true);
+                        }
+                    });
+                }
+
+                // Add the parsed date into the field
+                // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
+                // this causes a limitation that it is *not possible* to set a field of this nature to midnight
+                setValue($(t), opts, state, true, newDate);
+
+                // Remove any error class on the field
+                $(t).removeClass('error');
+
+                // Hide any validation error
+                $fieldError.hide();
             }
 
-        } else {
+            // Restore JS validation on the field
+            enableValidation($(t));
 
-            var newDate = moment(data.time);
-
-            // State of AllDay field
-            // Does the element have time?
-            var state = (newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359' || opts.allDaySwitch);
-
-            // Does the linked element (if any) have time?
-            if (opts.allDayInput) {
-                var linkedElements = getLinkedElements($(t), opts);
-
-                linkedElements.forEach(function (item) {
-                    var itemOptions = getOptions($(item));
-                    var itemDate = moment(item.val(), convertFormat(itemOptions.displayFormat));
-                    state = (itemDate.format('HHmm') == '0000' || itemDate.format('HHmm') == '2359');
-
-                    // Update the value of the linked field, if it has changed to all day
-                    if (state) {
-                        setValue($(item), itemOptions, state, true);
-                    }
-                });
-            }
-
-            // Add the parsed date into the field
-            // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
-            // this causes a limitation that it is *not possible* to set a field of this nature to midnight
-            setValue($(t), opts, state, true, newDate);
-
-            // Remove any error class on the field
-            $(t).removeClass('error');
-
-            // Hide any validation error
-            $fieldError.hide();
-        }
-
-        // Restore JS validation on the field
-        enableValidation($(t));
-
-    }).always(function () {
-        $(t).prop('readonly', false);
-        $(t).prop('disabled', false);
-    });
+        }).always(function () {
+            $(t).prop('readonly', false);
+            $(t).prop('disabled', false);
+        });
+    }
 }
 
 
