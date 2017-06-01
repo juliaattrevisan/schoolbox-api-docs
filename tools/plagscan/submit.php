@@ -72,7 +72,7 @@ foreach ($allDocuments as $currentDocument) {
 
             /** @var Plagscan $currentPlagscan */
             foreach($previousPlagscans as $currentPlagscan) {
-                $mapper->privatise($currentPlagscan->getPlagscanId());
+                $mapper->privatise($currentPlagscan);
             }
 
             /* Transmit the new file

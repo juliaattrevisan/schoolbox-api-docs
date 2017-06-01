@@ -329,15 +329,21 @@ class Mapper extends \Schoolbox\Mapper
     public function privatise(Plagscan $plagscan)
     {
         try {
+
+            /* Privatise in plagscan.com then update our records too
+             */
             $this->getConnector()->privatise($plagscan->getId());
 
-
-            /* TODO: Update in our db
-             */
+            $plagscan->setPrivatisedAt(\Alaress_Date_Format::now());
+            $this->save($plagscan);
         }
         catch (\RuntimeException $e) {
 
             /* Noop - could not privatise in plagscan
+             *
+             * Leave unchanged if plagscan refuses to do it on their end (jleckie, 6:43pm @ June 1)
+             * This allows you to re-encounter documents being checked against older versions of themselves
+             * but can't do much to stop it if plagscan screws us
              */
         }
     }
