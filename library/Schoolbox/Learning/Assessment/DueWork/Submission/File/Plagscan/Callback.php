@@ -63,6 +63,7 @@ class Callback
             /* Convert to new format
              */
             $submissionFile = new SubmissionFile();
+            $submissionFile->setId($studentSubmissionFile->getId());
             $submissionFile->setStorage($studentSubmissionFile->getStorage());
 
             /* Make a somewhat infamous assumption that plagscan completed its stuff

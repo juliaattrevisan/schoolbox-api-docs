@@ -181,6 +181,16 @@ class Mapper extends \Schoolbox\Mapper
             return [];
         }
 
+        /* Privatise all previous incarnations of this (assessment, student) tuple to
+         * prevent documents from being scanned against older versions of themselves
+         */
+        $previousPlagscans = $this->findPreviousIncarnationsOf($file->getId());
+
+        /** @var Plagscan $currentPlagscan */
+        foreach($previousPlagscans as $currentPlagscan) {
+            $this->privatise($currentPlagscan);
+        }
+
         /* Send it to plag
          */
         $plagscanId = $this->getConnector()->transmit($file, $filename);
