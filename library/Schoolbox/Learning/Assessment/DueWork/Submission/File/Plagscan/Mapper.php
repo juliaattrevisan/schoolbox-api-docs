@@ -339,7 +339,7 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Privatise in plagscan.com then update our records too
              */
-            $this->getConnector()->privatise($plagscan->getId());
+            $this->getConnector()->privatise($plagscan->getPlagscanId());
 
             $plagscan->setPrivatisedAt(\Alaress_Date_Format::now());
             $this->save($plagscan);
