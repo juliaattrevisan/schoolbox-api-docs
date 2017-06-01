@@ -1422,7 +1422,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // Call pre-delete hooks
-        $deletedItems = $this->findByColumnList($columnList, $options);
+        $deletedItems = $this->findByPredicates($predicate, $options);
         foreach ($deletedItems as $model) {
             if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
                 return 0;
