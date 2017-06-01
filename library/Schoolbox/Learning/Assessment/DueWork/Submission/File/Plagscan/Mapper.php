@@ -52,6 +52,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('score', self::TYPE_STRING);
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
+        $this->uses('privatised_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
@@ -321,14 +322,15 @@ class Mapper extends \Schoolbox\Mapper
      * Privatise a particular plagscan id
      * in both our db and in plagscan's
      *
-     * @param $plagscanId
+     * @param Plagscan $plagscan
      *
      * @throws \RuntimeException
      */
-    public function privatise($plagscanId)
+    public function privatise(Plagscan $plagscan)
     {
         try {
-            $this->getConnector()->privatise($plagscanId);
+            $this->getConnector()->privatise($plagscan->getId());
+
 
             /* TODO: Update in our db
              */
