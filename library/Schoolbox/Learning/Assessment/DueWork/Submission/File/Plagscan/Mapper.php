@@ -267,7 +267,7 @@ class Mapper extends \Schoolbox\Mapper
     public function findPreviousIncarnationsOf($studentSubmissionFileId)
     {
         $query = "
-            SELECT `owner`, `box_id`
+            SELECT student_submission.`id`, `owner`, `box_id`
             FROM student_submission_file 
             INNER JOIN student_submission ON student_submission_file.`student_submission_id` = student_submission.`id`
             WHERE student_submission_file.`id` = :studentSubmissionFileId
@@ -291,12 +291,14 @@ class Mapper extends \Schoolbox\Mapper
                 WHERE plagscan_document.`privatised_at` IS NULL
                 AND student_submission.`owner` = :ownerId
                 AND student_submission.`box_id` = :boxId
+                AND student_submission.`id` != :submissionId
             ";
 
             $statement = $this->getDatabase()->prepare($query);
             $statement->execute([
                 'ownerId' => $ownerDetails['owner'],
-                'boxId' => $ownerDetails['box_id']
+                'boxId' => $ownerDetails['box_id'],
+                'submissionId' => $ownerDetails['id'],
             ]);
 
             /* De-dupe all the found plagscans
