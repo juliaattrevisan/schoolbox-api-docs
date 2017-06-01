@@ -34,7 +34,11 @@ if (!$mapper->getConnector()) {
 }
 
 /** @var Plagscan $currentDocument */
-$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
+$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE, [
+    'order' => [
+        'student_submission_file_id' => 'ASC'
+    ]
+]);
 
 $log->info("Plagscan now re-processing {$allDocuments->count()} documents");
 
