@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Campus;
 use Schoolbox\Config\Loader as Config;
 
 $this->setTitle('Student Attendance');
@@ -88,6 +89,7 @@ $attendancePeriod = $this->arg[3];
 
 /* Check selected campus is one of users campus  */
 try {
+    /** @var Campus $selectedCampus */
     $selectedCampus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $this->arg[4]);
 } catch (\Schoolbox\Mapper\Exception $e) {
     error(148);
