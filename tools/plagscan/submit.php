@@ -76,6 +76,7 @@ foreach ($allDocuments as $currentDocument) {
 
             /** @var Plagscan $currentPlagscan */
             foreach($previousPlagscans as $currentPlagscan) {
+                $log->info("{$prefix}: privatising {$currentPlagscan->getPlagscanId()} - superseded by student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
                 $mapper->privatise($currentPlagscan);
             }
 
