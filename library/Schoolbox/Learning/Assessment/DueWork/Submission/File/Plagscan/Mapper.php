@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -251,6 +252,66 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return null;
+    }
+
+
+    /**
+     * Find previous incarnations of $studentSubmissionFileId
+     * that haven't already been privatised
+     *
+     * @param int $studentSubmissionFileId
+     * @return array
+     */
+    public function findPreviousIncarnationsOf($studentSubmissionFileId)
+    {
+        $query = "
+            SELECT `owner`, `box_id`
+            FROM student_submission_file 
+            INNER JOIN student_submission ON student_submission_file.`student_submission_id` = student_submission.`id`
+            WHERE student_submission_file.`id` = :studentSubmissionFileId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'studentSubmissionFileId' => $studentSubmissionFileId
+        ]);
+
+        $ownerDetails = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        /* Owner and box_id exists
+         */
+        if ($ownerDetails) {
+            $query = "
+                SELECT plagscan_id
+                FROM plagscan_document
+                INNER JOIN student_submission_file ON plagscan_document.`student_submission_file_id` = student_submission_file.`id`
+                INNER JOIN student_submission ON student_submission.`id` = student_submission_file.`student_submission_id`
+                WHERE plagscan_document.`privatised_at` IS NULL
+                AND student_submission.`owner` = :ownerId
+                AND student_submission.`box_id` = :boxId
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute([
+                'ownerId' => $ownerDetails['owner'],
+                'boxId' => $ownerDetails['box_id']
+            ]);
+
+            /* De-dupe all the found plagscans
+             *
+             * Probably don't need to do this, but I want to be sure
+             * given I have to curl this id to plagscan.com every time
+             */
+            $plagscanIds = [];
+
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $plagscanIds[$row['plagscan_id']] = $row['plagscan_id'];
+            }
+
+            return array_keys($plagscanIds);
+        }
+
+        return [];
     }
 
     /* Getters/Setters
