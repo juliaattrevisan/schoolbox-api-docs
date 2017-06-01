@@ -58,6 +58,10 @@ class Attendance_Synergetic_AttendanceMaster
      */
     public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector)
     {
+        // Store database connection
+
+        $this->connector = $connector;
+
         // Store the stuff we'll use again
 
         $this->setClassCampus($class['ClassCampus']);
@@ -70,7 +74,7 @@ class Attendance_Synergetic_AttendanceMaster
         // Get the attendance master sequence number
 
         $statement = $this->connector->prepareStoredProcedure('spiwkAttendances');
-        
+
         $statement->bindInputs([
             'FileType' => $this->getClassFileType(),
             'FileYear' => $this->getFileYear(),
@@ -86,6 +90,7 @@ class Attendance_Synergetic_AttendanceMaster
             'SynWebFlag' => 1,
         ]);
 
+
         // Bind output parameters for procedure
 
         $attendanceMasterSeq = null;
@@ -100,6 +105,7 @@ class Attendance_Synergetic_AttendanceMaster
         $statement->bindOutputs($outputs);
 
         $result = $statement->execute();
+        $statement->nextRowset();
 
         if ($result && !empty($attendanceMasterSeq)) {
             $this->setAttendanceMasterSeq($attendanceMasterSeq);
@@ -127,7 +133,7 @@ class Attendance_Synergetic_AttendanceMaster
 			AND     ClassCampus = :classCampus
 		";
         
-        $statement = $this->connector->prepareQuery($query, [
+        $statement = $this->connector->executeQuery($query, [
             'fileType'      => $this->getClassFileType(),
             'fileYear'      => $this->getFileYear(),
             'fileSemester'  => $this->getFileSemester(),
@@ -135,8 +141,8 @@ class Attendance_Synergetic_AttendanceMaster
             'classCode'     => $this->getClassCode(),
             'classCampus'   => $this->getClassCampus()
         ]);
-        
-        $result = $statement->fetchAll();
+
+        $result = $statement->fetch();
 
         if (is_array($result) && isset($result['TimetableGroup'])) {
             return $result['TimetableGroup'];

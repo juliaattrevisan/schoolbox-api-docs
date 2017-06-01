@@ -10,31 +10,32 @@
 
 use Schoolbox\Campus;
 use Schoolbox\Config\Loader as Config;
+use Schoolbox\External\Exception as ExternalException;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 
-/* Dropdowns and such for each student
- */
+// Dropdowns and such for each student
+
 $this->setBlock('student', 'student_absent', 'student_absent_block');
 $this->setBlock('student', 'absence_options', 'absence_options_block');
 $this->setBlock('student', 'reason_options', 'reason_options_block');
 
-/* THE THREE MUSKETEERS
- */
+// Ensure correct parameter count
+
 if (count($this->arg) < 3) {
-    error(147);
+    error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
-// Get configuration loader
-
 $configLoader = new Config();
-
-/* Get a class list which we'll match up manually with their attendance records
- * but only if this class exists
- */
+$groupHandler = new Group();
 $externalClass = new External_Synergetic_Class();
+$externalTimetable = new External_Timetable();
+$externalUserHandler = new External_User();
+
 if ($this->arg[0]) {
     $class = $externalClass->getClass($this->arg[0] . '/' . urldecode(urldecode(urldecode($this->arg[1]))), $_SESSION['user']);
 } else {
@@ -42,21 +43,20 @@ if ($this->arg[0]) {
 }
 
 if (!$class) {
-    error(148);
+    error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
 if (!strlen($this->arg[2])) {
-    error(149);
+    error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
 }
 
 if (!preg_match('/^\d+$/', $this->arg[3]) || $this->arg[3] < 0 || $this->arg[3] > 100) {
-    error(150);
+    error(ErrorMapper::ERROR_ATTENDANCE_PAST);
 }
 
-/* Selected date for which to deal with attendances
- * Check that you are allowed to edit something in a particular date range
- * (You cannot edit anything older than the previous week)
- */
+// Selected date for which to deal with attendances check that you are allowed to edit something in a particular date range (You cannot edit anything
+// older than the previous week)
+
 $attendanceDate = new Alaress_Date_Format($this->arg[2], 'Y-m-d');
 $attendanceDate->startOfDay();
 
@@ -67,36 +67,33 @@ $days = $configLoader->get('external_attendance_days');
 
 // If not today and not within days range
 if ($attendanceDate->diffInDays($now) != 0 && $attendanceDate->diffInDays($now) > $days) {
-    error(151);
+    error(ErrorMapper::ERROR_ATTENDANCE_FUTURE);
 }
 
-if ($attendanceDate->gt($now) ) {
-    error(152);
+if ($attendanceDate->gt($now)) {
+    error(ErrorMapper::ERROR_NOT_ENROLLED);
 }
 
-/* Only teachers can mark attendance (we allow all staff, but synergetic may restrict this later aswell)
- */
-$groupHandler = new Group();
+// Only teachers can mark attendance (we allow all staff, but synergetic may restrict this later aswell)
 
 if (!$_SESSION['user']->getRole()->isStaff()) {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
-/* Attendance Period
- */
+// Attendance Period
+
 $attendancePeriod = $this->arg[3];
 
+// Check selected campus is one of users campus
 
-/* Check selected campus is one of users campus  */
 try {
     /** @var Campus $selectedCampus */
     $selectedCampus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $this->arg[4]);
-} catch (\Schoolbox\Mapper\Exception $e) {
-    error(148);
+} catch (MapperException $e) {
+    error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
 /* Get Period Definition */
-$externalTimetable = new External_Timetable();
 $timetableDay = $externalTimetable->getDayNumber($selectedCampus, $attendanceDate->getUnixTimestamp());
 
 $definition = $externalTimetable->getTimetableDefinition(
@@ -104,34 +101,35 @@ $definition = $externalTimetable->getTimetableDefinition(
     $selectedCampus,
     $timetableDay
 );
+
 $periods = array_keys($definition['number'], $attendancePeriod);
 $startTime = $definition['start'][$periods[0]];
 $endTime = $definition['end'][$periods[0]];
 $periodName = $definition['desc'][$periods[0]];
-/* Let's do it
- */
+
 if ($class) {
     /* Cosmetic makeup for the masses
     */
     $this->setVar(
         array(
-            'CLASS_CODE'                => $class['ClassCampus'] . '/' . $class['ClassCode'],
-            'ATTENDANCE_START'          => $startTime,
-            'ATTENDANCE_END'            => $endTime,
-            'ATTENDANCE_DATE'           => $attendanceDate->getDatabaseDate(),
-            'ATTENDANCE_DAY'            => $timetableDay,
+            'CLASS_CODE' => $class['ClassCampus'] . '/' . $class['ClassCode'],
+            'ATTENDANCE_START' => $startTime,
+            'ATTENDANCE_END' => $endTime,
+            'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
+            'ATTENDANCE_DAY' => $timetableDay,
             'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
-            'ATTENDANCE_PERIOD'         => $attendancePeriod,
-            'ATTENDANCE_PERIOD_LONG'    => Scrub::text($periodName),
+            'ATTENDANCE_PERIOD' => $attendancePeriod,
+            'ATTENDANCE_PERIOD_LONG' => Scrub::text($periodName),
         )
     );
 
-    /* Get the attendance record for this class
-     */
-    $externalUserHandler = new External_User();
-    $allStudents         = [];
+    // Get the attendance record for this class
+
+    $allStudents = [];
+
     try {
-        $attendanceHandler   = new External_Synergetic_Attendance(
+
+        $attendanceHandler = new External_Synergetic_Attendance(
             $class,
             $attendanceDate,
             $timetableDay,
@@ -139,9 +137,11 @@ if ($class) {
             $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
             $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId())
         );
+
         $allStudents = $attendanceHandler->findAttendanceRecords();
-    } catch (Exception $e) {
-        error(148); //Class does not exist
+
+    } catch (ExternalException $e) {
+        error(ErrorMapper::ERROR_DATE_FORMAT); //Class does not exist
     }
 
     /* Dish out each row
@@ -150,7 +150,7 @@ if ($class) {
     $attendanceTotal = 0;
     if (is_array($allStudents) && count($allStudents)) {
         $attendanceCount = $attendanceTotal = count($allStudents);
-        $userHandler     = new User();
+        $userHandler = new User();
 
         /* Dropdown options
          */
@@ -175,30 +175,29 @@ if ($class) {
 
             $this->setVar(
                 array(
-                    'STUDENT_UID'                => $user['uid'],
-                    'STUDENT_NAME'               => Scrub::text($currentStudent['StudentName']),
-                    'STUDENT_SYNERGY_ID'         => $currentStudent['ID'],
-                    'STUDENT_ABSENCE_CODE'       => $currentStudent['PossibleAbsenceCode'],
-                    'STUDENT_REASON_CODE'        => $currentStudent['PossibleReasonCode'],
+                    'STUDENT_UID' => $user['uid'],
+                    'STUDENT_NAME' => Scrub::text($currentStudent['StudentName']),
+                    'STUDENT_SYNERGY_ID' => $currentStudent['ID'],
+                    'STUDENT_ABSENCE_CODE' => $currentStudent['PossibleAbsenceCode'],
+                    'STUDENT_REASON_CODE' => $currentStudent['PossibleReasonCode'],
                     'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['ActualEventComment'] ? $currentStudent['ActualEventComment'] : $currentStudent['PossibleDescription']),
-                    'STUDENT_ATTENDANCESTRING'   => Scrub::text($currentStudent['TodaysAttendanceString']),
-                    'STUDENT_NONATTENDREASON'    => Scrub::text($currentStudent['PossibleNonAttendReason']),
-                    'STUDENT_ARRIVAL_TIME'       => isset($arrivalTime[3]) ? date('g:ia', strtotime($arrivalTime[0])) : '',
-                    'STUDENT_DEPT_TIME'          => isset($deptTime[3]) ? date('g:ia', strtotime($deptTime[0])) : '',
-                    'IS_ABSENT'                  => $isAbsent  ? 'checked="checked"' : '',
-                    
+                    'STUDENT_ATTENDANCESTRING' => Scrub::text($currentStudent['TodaysAttendanceString']),
+                    'STUDENT_NONATTENDREASON' => Scrub::text($currentStudent['PossibleNonAttendReason']),
+                    'STUDENT_ARRIVAL_TIME' => isset($arrivalTime[3]) ? date('g:ia', strtotime($arrivalTime[0])) : '',
+                    'STUDENT_DEPT_TIME' => isset($deptTime[3]) ? date('g:ia', strtotime($deptTime[0])) : '',
+                    'IS_ABSENT' => $isAbsent ? 'checked="checked"' : '',
+
                 )
             );
 
-            if($currentStudent['PossibleNonAttendFlag']) {
-                $this->parse('student_absent_block','student_absent');
+            if ($currentStudent['PossibleNonAttendFlag']) {
+                $this->parse('student_absent_block', 'student_absent');
+            } else {
+                $this->setVar('student_absent_block', '');
             }
-            else {
-                $this->setVar('student_absent_block','');
-            }
-            $abscenceCode = $currentStudent['ActualAbsenceTypeCode'] && $currentStudent['ActualAbsenceTypeCode'] != '?'  ? $currentStudent['ActualAbsenceTypeCode'] : $currentStudent['PossibleAbsenceCode'];
+            $abscenceCode = $currentStudent['ActualAbsenceTypeCode'] && $currentStudent['ActualAbsenceTypeCode'] != '?' ? $currentStudent['ActualAbsenceTypeCode'] : $currentStudent['PossibleAbsenceCode'];
             $this->dropDown(
-                'absence_options', $absenceDropdownOptions,  $abscenceCode, 'student',
+                'absence_options', $absenceDropdownOptions, $abscenceCode, 'student',
                 array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
             );
 
@@ -207,7 +206,6 @@ if ($class) {
                 'reason_options', $reasonDropdownOptions, $reasonCode, 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
-
 
 
             $this->parse('student_block', 'student', true);
@@ -225,5 +223,5 @@ if ($class) {
     $this->setVar('ATTENDANCE_COUNT', $attendanceCount);
     $this->setVar('ATTENDANCE_TOTAL', $attendanceTotal);
 } else {
-    error(148);
+    error(ErrorMapper::ERROR_DATE_FORMAT);
 }

@@ -76,8 +76,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
      */
     public function findAttendanceRecords()
     {
-        $statement = $this->connector->prepareStoredProcedure('spswkAttendances');
-        $statement->bindInputs([
+        $statement = $this->connector->executeStoredProcedure('spswkAttendances', [
             'wkAttendanceMasterSeq' => $this->getAttendanceMasterSeq(),
             'FillActualAbsenceColumnsFlag' => 1,
             'CheckPossibleNonAttendFlag' => 1,
@@ -86,8 +85,8 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
 
         $result = $statement->fetchAll();
 
-        if ($result['success'] == 1) {
-            return $result['result'];
+        if (count($result) > 0) {
+            return $result;
         } else {
             throw new ExternalException("Unable to setup work space for attendances, cannot continue");
         }
@@ -121,7 +120,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
      */
     private function getSynergeticLookupOptions($tableName)
     {
-        $statement = $this->connector->prepareQuery("SELECT Code, Description FROM {$tableName} WHERE ActiveFlag = 1");
+        $statement = $this->connector->executeQuery("SELECT Code, Description FROM {$tableName} WHERE ActiveFlag = 1");
         $result = $statement->fetchAll();
 
         $returnArray = [];
@@ -129,13 +128,16 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         // Append code in front of description
 
         foreach ($result as $resultCurrent) {
-            $returnArray['Code'] = trim($resultCurrent['Code']);
+            $return = [];
+            $return['Code'] = trim($resultCurrent['Code']);
 
-            if (!empty($returnArray['Code'])) {
-                $returnArray['Description'] = "{$returnArray['Code']} - {$resultCurrent['Description']}";
+            if (!empty($return['Code'])) {
+                $return['Description'] = "{$return['Code']} - {$resultCurrent['Description']}";
             } else {
-                $returnArray['Description'] = $resultCurrent['Description'];
+                $return['Description'] = $resultCurrent['Description'];
             }
+
+            $returnArray[] = $return;
         }
 
         return $returnArray;
