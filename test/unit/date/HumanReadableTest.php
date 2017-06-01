@@ -13,18 +13,20 @@ class HumanReadableTest extends PHPUnit_Framework_TestCase
 {
 
     /**
+     * The second arg is returned as a closure so the ADF can be instantiated immediately prior to comparison
+     *
      * @return array[]
      */
     public function dataHumanReadable()
     {
         return [
-            [ 'today', ADF::now()->setTime(0, 0, 0) ],
-            [ 'tomorrow', ADF::now()->addDays(1)->setTime(0, 0, 0) ],
-            [ 'yesterday at 8:45am', ADF::now()->addDays(-1)->setTime(8, 45, 0) ],
-            [ 'May 4th 2017 at 2pm', ADF::newDatabaseDate('2017-05-04 14:00:00') ],
-            [ 'in 5 days at 9:30am', ADF::now()->addDays(5)->setTime(9, 30, 0) ],
-            [ '17th Mar 2018 12:00pm', ADF::newDatabaseDate('2018-03-17 12:00:00') ],
-            [ '2 weeks from now', ADF::now()->addDays(14) ],
+            [ 'today',                  function () { return ADF::now()->setTime(0, 0, 0); } ],
+            [ 'tomorrow',               function () { return ADF::now()->addDays(1)->setTime(0, 0, 0); } ],
+            [ 'yesterday at 8:45am',    function () { return ADF::now()->addDays(-1)->setTime(8, 45, 0); } ],
+            [ 'May 4th 2017 at 2pm',    function () { return ADF::newDatabaseDate('2017-05-04 14:00:00'); } ],
+            [ 'in five days at 9:30am', function () { return ADF::now()->addDays(5)->setTime(9, 30, 0); } ],
+            [ '17th Mar 2018 12:00pm',  function () { return ADF::newDatabaseDate('2018-03-17 12:00:00'); } ],
+            [ '2 weeks from now',       function () { return ADF::now()->addDays(14); } ],
         ];
     }
 
@@ -32,16 +34,19 @@ class HumanReadableTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataHumanReadable
      *
-     * @param string $naturalLanguage
-     * @param ADF   $expected
+     * @param string   $naturalLanguage
+     * @param callable $callable
      * @throws InvalidArgumentException
      */
-    public function testHumanReadable($naturalLanguage, $expected)
+    public function testHumanReadable($naturalLanguage, $callable)
     {
         $adf = ADF::newNaturalDate($naturalLanguage);
 
-        // zero the seconds to account for CPU lag
-        $this->assertEquals($expected->setSecond(0)->getDatabase(), $adf->setSecond(0)->getDatabase());
+        /** @var ADF $expected */
+        $expected = $callable();
+
+        // allow up to 5 seconds of variance between expected and actual
+        $this->assertEquals($expected->getUnixTimeStamp(), $adf->getUnixTimeStamp(), '', 5);
     }
 
 }
