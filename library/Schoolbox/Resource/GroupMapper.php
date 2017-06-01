@@ -20,7 +20,8 @@ use \Schoolbox\User;
  * Class GroupMapper
  *
  * @package Schoolbox\Resource
- * @method Group createModel()
+ * @method Group createModel($idValue = null)
+ * @method Group hydrate(array $row, $alias = '', $callback = null)
  */
 class GroupMapper extends Mapper {
 

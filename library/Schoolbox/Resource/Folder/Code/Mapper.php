@@ -12,6 +12,9 @@ namespace Schoolbox\Resource\Folder\Code;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends \Schoolbox\Mapper
 {
 

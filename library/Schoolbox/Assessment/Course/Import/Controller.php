@@ -335,9 +335,7 @@ class Controller extends Base\Base
     {
         $query = $this->getRequest()->query->get('query');
         $userGroupsOnly = false;
-        $getCourse = true;
-        $getUnit = true;
-        $folders = $this->getFolderMapper()->searchByName($query, $userGroupsOnly, $getCourse, $getUnit);
+        $folders = $this->getFolderMapper()->searchByName($query, $userGroupsOnly);
 
         /* Swap keys for selectize compatibility -_-
          */

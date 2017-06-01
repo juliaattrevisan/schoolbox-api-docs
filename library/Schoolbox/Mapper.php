@@ -11,6 +11,7 @@ namespace Schoolbox;
 
 use Alaress\Cache;
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use Aura\Di;
@@ -118,7 +119,7 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_SOFTDELETE        = 64;
 
     /**
-     * @var IDatabase
+     * @var IDatabase|IQuoter
      */
     protected $database;
 
@@ -2313,6 +2314,23 @@ abstract class Mapper implements IMapper, Serializable
             return [];
         }
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+
+    /**
+     * @param Builder $pb
+     * @param array            $options
+     * @return int[]
+     */
+    public function findIdsByPredicates(Builder $pb, array $options = [])
+    {
+        try{
+            $selection = "{$this->getTable()}.{$this->getIdentifierColumn()}";
+            $stmt = $this->selectScalarByPredicates($selection, $pb, $options);
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (UnderflowException $e){
+            return [];
+        }
     }
 
 

@@ -23,7 +23,8 @@ use Schoolbox\Resource\HomepageConfig;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model findOneByColumn($columnName, $columnValue, $order = array())
+ * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends AbstractUnitMapper
 {
