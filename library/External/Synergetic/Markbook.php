@@ -107,10 +107,18 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
 
+        if (!empty($assessment->getAssessment()->getWorkType()->getExternalResultType())) {
+            $resultType =
+                $this->getDatabase()->quote(
+                    $assessment->getAssessment()->getWorkType()->getExternalResultType()
+                );
+        } else {
+            $resultType = 'OGRaw';
+        }
+
         foreach($folder->getCodes() as $classCode) {
 
             $class = $externalClass->getClass($classCode->getCode(), $owner);
-
 
             if (!empty($class)) {
                 $staffID = $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
@@ -141,7 +149,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                           '{$assessmentFieldValues["Heading"]}',
                           '{$assessmentFieldValues["HdgAbbrev1"]}',
                           '{$assessmentFieldValues["HdgAbbrev2"]}',
-                          'OGRaw',
+                          '{$resultType}',
                           '100',
                           '{$assessmentFieldValues["WeightingFactor"]}'
                         )";
