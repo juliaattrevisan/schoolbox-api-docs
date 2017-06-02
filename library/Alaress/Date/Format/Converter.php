@@ -57,6 +57,15 @@ class Alaress_Date_Format_Converter
         return strtr(
             $format,
             array(
+                // time formats
+                'h' => 'hh',
+                'g' => 'h',
+                'a' => 'a',
+                'A' => 'A',
+                'H' => 'HH',
+                'G' => 'H',
+                'i' => 'mm',
+                's' => 'ss',
                 // day formats
                 'j' => 'D',
                 'S' => 'o',
