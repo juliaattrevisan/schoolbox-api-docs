@@ -160,15 +160,25 @@ class Attendance_Synergetic_AttendanceMaster
      */
     public function save()
     {
-        $statement = $this->connector->executeStoredProcedure('sptwkAttendances', [
+        $statement = $this->connector->prepareStoredProcedure('sptwkAttendances');
+
+        $statement->bindInputs([
             'wkAttendanceMasterSeq' => $this->getAttendanceMasterSeq(),
-            'HoldFlag' => 0,
-            'AttendanceMasterSeq' => 'seq'
+            'HoldFlag' => 0
         ]);
 
-        $result = $statement->fetch();
+        $attendanceMasterSeq = null;
 
-        return $result['success'];
+        $outputs = [];
+        $outputs['AttendanceMasterSeq'] = [
+            'value' => &$attendanceMasterSeq,
+            'type' => PDO::PARAM_INT,
+            'length' => 4
+        ];
+
+        $statement->bindOutputs($outputs);
+
+        return $statement->execute();
     }
 
     /**

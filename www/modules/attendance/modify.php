@@ -30,6 +30,8 @@ if (count($this->arg) < 3) {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
+// Setup handlers
+
 $configLoader = new Config();
 $groupHandler = new Group();
 $externalClass = new External_Synergetic_Class();
@@ -93,7 +95,8 @@ try {
     error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
-/* Get Period Definition */
+// Get timetable definition
+
 $timetableDay = $externalTimetable->getDayNumber($selectedCampus, $attendanceDate->getUnixTimestamp());
 
 $definition = $externalTimetable->getTimetableDefinition(
@@ -108,8 +111,9 @@ $endTime = $definition['end'][$periods[0]];
 $periodName = $definition['desc'][$periods[0]];
 
 if ($class) {
-    /* Cosmetic makeup for the masses
-    */
+
+    // Cosmetic makeup for the masses
+
     $this->setVar(
         array(
             'CLASS_CODE' => $class['ClassCampus'] . '/' . $class['ClassCode'],
@@ -141,87 +145,92 @@ if ($class) {
         $allStudents = $attendanceHandler->findAttendanceRecords();
 
     } catch (ExternalException $e) {
-        error(ErrorMapper::ERROR_DATE_FORMAT); //Class does not exist
+        error(ErrorMapper::ERROR_DATE_FORMAT);
     }
 
-    /* Dish out each row
-     */
+    // Render each row
+
     $attendanceCount = 0;
     $attendanceTotal = 0;
+
     if (is_array($allStudents) && count($allStudents)) {
+
         $attendanceCount = $attendanceTotal = count($allStudents);
         $userHandler = new User();
 
-        /* Dropdown options
-         */
+        // Dropdown options
+
         $absenceDropdownOptions = $attendanceHandler->findAbsenceDropdownOptions();
         $reasonDropdownOptions = $attendanceHandler->findReasonDropdownOptions();
 
+        // Iterate each student
 
-        /* Iterate each guy
-         */
         foreach ($allStudents as $currentStudent) {
+
             $user = $userHandler->getBySynergy($currentStudent['ID']);
 
-            /* Replace everything with everything
-             */
+            // Replace everything with everything
+
             preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/', $currentStudent['LateArrivalTime'], $arrivalTime);
             preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/', $currentStudent['EarlyDepartureTime'], $deptTime);
 
             $isAbsent = $currentStudent['AttendedFlag'] == 0;
+
             if ($isAbsent) {
                 $attendanceCount--;
             }
 
-            $this->setVar(
-                array(
-                    'STUDENT_UID' => $user['uid'],
-                    'STUDENT_NAME' => Scrub::text($currentStudent['StudentName']),
-                    'STUDENT_SYNERGY_ID' => $currentStudent['ID'],
-                    'STUDENT_ABSENCE_CODE' => $currentStudent['PossibleAbsenceCode'],
-                    'STUDENT_REASON_CODE' => $currentStudent['PossibleReasonCode'],
-                    'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['ActualEventComment'] ? $currentStudent['ActualEventComment'] : $currentStudent['PossibleDescription']),
-                    'STUDENT_ATTENDANCESTRING' => Scrub::text($currentStudent['TodaysAttendanceString']),
-                    'STUDENT_NONATTENDREASON' => Scrub::text($currentStudent['PossibleNonAttendReason']),
-                    'STUDENT_ARRIVAL_TIME' => isset($arrivalTime[3]) ? date('g:ia', strtotime($arrivalTime[0])) : '',
-                    'STUDENT_DEPT_TIME' => isset($deptTime[3]) ? date('g:ia', strtotime($deptTime[0])) : '',
-                    'IS_ABSENT' => $isAbsent ? 'checked="checked"' : '',
-
-                )
-            );
+            $this->setVar([
+                'STUDENT_UID' => $user['uid'],
+                'STUDENT_NAME' => Scrub::text($currentStudent['StudentName']),
+                'STUDENT_SYNERGY_ID' => $currentStudent['ID'],
+                'STUDENT_ABSENCE_CODE' => $currentStudent['PossibleAbsenceCode'],
+                'STUDENT_REASON_CODE' => $currentStudent['PossibleReasonCode'],
+                'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['ActualEventComment'] ? $currentStudent['ActualEventComment'] : $currentStudent['PossibleDescription']),
+                'STUDENT_ATTENDANCESTRING' => Scrub::text($currentStudent['TodaysAttendanceString']),
+                'STUDENT_NONATTENDREASON' => Scrub::text($currentStudent['PossibleNonAttendReason']),
+                'STUDENT_ARRIVAL_TIME' => isset($arrivalTime[3]) ? date('g:ia', strtotime($arrivalTime[0])) : '',
+                'STUDENT_DEPT_TIME' => isset($deptTime[3]) ? date('g:ia', strtotime($deptTime[0])) : '',
+                'IS_ABSENT' => $isAbsent ? 'checked="checked"' : '',
+            ]);
 
             if ($currentStudent['PossibleNonAttendFlag']) {
                 $this->parse('student_absent_block', 'student_absent');
             } else {
                 $this->setVar('student_absent_block', '');
             }
+
             $abscenceCode = $currentStudent['ActualAbsenceTypeCode'] && $currentStudent['ActualAbsenceTypeCode'] != '?' ? $currentStudent['ActualAbsenceTypeCode'] : $currentStudent['PossibleAbsenceCode'];
+
             $this->dropDown(
                 'absence_options', $absenceDropdownOptions, $abscenceCode, 'student',
                 array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
             );
 
             $reasonCode = $currentStudent['ActualAbsenceReasonCode'] ? $currentStudent['ActualAbsenceReasonCode'] : $currentStudent['PossibleReasonCode'];
+
             $this->dropDown(
                 'reason_options', $reasonDropdownOptions, $reasonCode, 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 
-
             $this->parse('student_block', 'student', true);
 
-            /* Clear children after parsing out the parent
-             */
+            // Clear children after parsing out the parent
+
             $this->setVar('absence_options_block', '');
             $this->setVar('reason_options_block', '');
         }
 
-
     } else {
+
         $this->setVar('student_block', '');
     }
+
     $this->setVar('ATTENDANCE_COUNT', $attendanceCount);
     $this->setVar('ATTENDANCE_TOTAL', $attendanceTotal);
+
 } else {
+
     error(ErrorMapper::ERROR_DATE_FORMAT);
 }

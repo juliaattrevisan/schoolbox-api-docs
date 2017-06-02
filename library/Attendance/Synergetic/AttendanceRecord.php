@@ -1,41 +1,36 @@
 <?php
 
 /**
- * Attendance_Synergetic_AttendanceRecord
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+use Alaress\Database\Statement\Query\IQuery;
+
 class Attendance_Synergetic_AttendanceRecord
 {
+    use External_MssqlConnector;
+    use External_Synergetic_ValidateExternalIdTrait;
 
     /**
-     * An MSSQL database instance
-     *
-     * @var \Database
+     * Constructor
      */
-    protected $database = null;
-
-    /**
-     * @param $database
-     */
-    public function __construct($database)
+    public function __construct()
     {
-        $this->setDatabase($database);
+        // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
+
+        $this->setupDatabase();
     }
 
     /**
      * Update an attendance record
      *
-     * @param $data
-     *
-     * @return \PDOStatement
+     * @param array $data
+     * @return IQuery|bool
      */
     public function update($data)
     {
-
         if (isset($data['ID']) && isset($data['AttendanceMasterSeq'])) {
 
             $userID = $data['ID'];
@@ -45,44 +40,34 @@ class Attendance_Synergetic_AttendanceRecord
 
             $query = "UPDATE dbo.wkAttendances SET";
 
-            /* Set through all the data contained in array and set it */
+            $params = [];
+            $paramCount = 0;
+
+            // Set through all the data contained in array and set it
+
             foreach ($data as $key => $value) {
-                $query .= " $key = '" . $this->getDatabase()->quote($value) . "',";
+                $paramCount++;
+                $query .= " $key = :param{$paramCount},";
+                $params[$paramCount] = $value;
             }
 
             $query = substr($query, 0, -1);
 
-            /* Set based on two key values sequence and user id */
+            // Set based on two key values sequence and user id
+
             $query .= "
-                WHERE wkAttendanceMasterSeq = '$AttendanceMasterSeq'
-                AND	ID = '$userID'
+                WHERE wkAttendanceMasterSeq = :attendanceMasterSeq
+                AND	ID = :id
             ";
-            return $this->getDatabase()->query($query);
+
+            $params['attendanceMasterSeq'] = $AttendanceMasterSeq;
+            $params['id'] = $userID;
+
+            return $this->connector->executeQuery($query, $params);
+
         } else {
+
             return false;
         }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set database
-     *
-     * @param \Database $database
-     */
-    protected function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * Get database
-     *
-     * @return \Database
-     */
-    protected function getDatabase()
-    {
-        return $this->database;
     }
 }
