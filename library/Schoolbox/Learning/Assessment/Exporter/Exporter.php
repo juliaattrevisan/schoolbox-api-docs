@@ -64,10 +64,18 @@ class Exporter
             LEFT JOIN       lu_work_type ON
                             lu_work_type.id = a.work_type_id
             WHERE           YEAR(sr.created_at) = :currentYear
-                            AND sr.id IN (SELECT MAX(id) FROM submission_return sr2 WHERE sr.owner=sr2.owner AND sr.box_id = sr2.box_id)
-                            AND sr.deleted_at IS NULL
-                            AND sr.mark != ''
-                            AND sr.published_at IS NOT NULL
+                            AND sr.id IN 
+                            (
+                                SELECT    id 
+                                FROM      submission_return sr2 
+                                WHERE     sr.owner = sr2.owner AND 
+                                          sr.box_id = sr2.box_id AND
+                                          sr2.deleted_at IS NULL AND              -- Only want undeleted records
+                                          sr2.published_at IS NOT NULL AND        -- Only want published returns
+                                          sr2.mark <> ''                          -- Only want returns with a mark
+                                ORDER BY  sr2.published_at DESC                   -- Order by result publication date
+                                LIMIT     1                                       -- Only want the most recent published return  
+                            )
             ORDER BY        folder_code.code
         ";
 
