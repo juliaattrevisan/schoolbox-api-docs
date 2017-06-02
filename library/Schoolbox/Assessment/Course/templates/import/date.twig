@@ -3,6 +3,7 @@
     assessmentId:     int    - the ID of the assessment in question
     assessmentDate:   ADF    - (optional) assessment date object to work with
     unitDate:         ADF    - unit date object to fall back to. Required if 'assessmentDate' not set
+    endOfDay:         bool   - should the datepicker-endofday data attribute be applied (default: false)
     dateProperty:     string - the name of the property on the object, eg 'publish'
     dateLabel:        string - (optional) the human-readable label to use
     dateSyncProperty: string - the end-date to sync to
@@ -20,13 +21,18 @@
     <input id="{{ id }}_{{ dateProperty }}_date"
            name="{{ inputPrefix }}[dates][{{ dateProperty }}]"
            type="text"
-           value="{% if assessmentDate.valid and not assessmentDate.isNull %}{{ assessmentDate.localShort }}{% else %}{{ unitDate.localShort }}{% endif %}"
+           value="{% if assessmentDate.valid and not assessmentDate.isNull %}{{ endOfDay ? assessmentDate.endOfDay.local : assessmentDate.local }}{% else %}{{ unitDate.local }}{% endif %}"
            data-role="{{ dateProperty }}_date"
            data-datepicker
+           data-datepicker-time
+           data-datepicker-buttontext=""
            data-assessment-id="{{ assessmentId }}"
            {% if dateSyncProperty %}
            data-datepicker-sync
            data-datepicker-sync-enddate="#{{ id }}_{{ dateSyncProperty }}_date"
+           {% endif %}
+           {% if endOfDay %}
+           data-datepicker-endofday
            {% endif %}
            {% if disabled %}disabled{% endif %}
     />

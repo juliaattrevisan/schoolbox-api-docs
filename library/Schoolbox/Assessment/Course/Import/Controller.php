@@ -794,23 +794,23 @@ class Controller extends Base\Base
     protected function applyDates(IAssessable $assessment, array $dates)
     {
         // Set/Update Dates
-        foreach ($dates as $property => $localShort) {
-            $date = \Alaress_Date_Format::newLocalShort($localShort);
+        foreach ($dates as $property => $local) {
+            $date = \Alaress_Date_Format::newLocal($local);
             switch (strtolower($property)) {
                 case 'publish':
-                    $assessment->setPublishAt($date->startOfDay());
+                    $assessment->setPublishAt($date);
                     break;
 
                 case 'open':
-                    $assessment->setOpenAt($date->startOfDay());
+                    $assessment->setOpenAt($date);
                     break;
 
                 case 'due':
-                    $assessment->setDueAt($date->endOfDay());
+                    $assessment->setDueAt($date);
                     break;
 
                 case 'close':
-                    $assessment->setCloseAt($date->endOfDay());
+                    $assessment->setCloseAt($date);
                     break;
 
                 default:

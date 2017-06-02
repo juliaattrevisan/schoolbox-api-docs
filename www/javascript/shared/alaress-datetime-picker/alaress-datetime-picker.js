@@ -200,7 +200,7 @@ function setValue(element, options, state, trigger, date) {
 
 }
 
-function checkAllDaySwitch (state, pickerId) {
+function checkAllDaySwitch(state, pickerId) {
 
     var $timeDiv = $('#pickerCalendar' + pickerId).closest('#picker' + pickerId).find('.flatpickr-time');
 
@@ -229,55 +229,90 @@ function checkAllDaySwitch (state, pickerId) {
 function massageDateValue(e) {
     var t = e.target;
 
-   $(t).prop('readonly', true);
-    $(t).prop('disabled', true);
+    if ($.trim($(t).val()) != '') {
 
-    $.get('/ajax/strtotime.php', { string: t.value, format: 'local_full' }, function (data) {
+        $(t).prop('readonly', true);
+        $(t).prop('disabled', true);
 
-        var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
+        // set up params to guide server-side parsing
+        var opts = getOptions($(t));
+        var params = {
+            string: t.value
+        };
 
-        $(t).prop('disabled', false);
+        $.get('/ajax/strtotime.php', params, function (data) {
 
-        // If it couldn't parse a date - show a validation error on the form
-        if (data.error) {
+            var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
 
-            $(t).addClass('error');
+            $(t).prop('disabled', false);
 
-            if (!$fieldError.length) { // don't create multiple errors
+            // If it couldn't parse a date - show a validation error on the form
+            if (data.error) {
 
-                var error = '<label id="' + $(t).attr('id') + '-error" class="error" for="' + $(t).attr('id') + '">Please enter a valid date</label>';
+                $(t).addClass('error');
 
-                if ($(t).closest('.input-group').length) {
-                    $(t).closest('.input-group').after(error);
+                if (!$fieldError.length) { // don't create multiple errors
+
+                    var error = '<label id="' + $(t).attr('id') + '-error" class="error" for="' + $(t).attr('id') + '">Please enter a valid date</label>';
+
+                    if ($(t).closest('.input-group').length) {
+                        $(t).closest('.input-group').after(error);
+                    } else {
+                        $(t).after(error);
+                    }
+
                 } else {
-                    $(t).after(error);
+
+                    // It might be hidden - show
+                    $fieldError.show();
                 }
 
             } else {
 
-                // It might be hidden - show
-                $fieldError.show();
+                var newDate = moment(data.time);
+
+                // If field has all day switch data param and is end or start of day - make all day
+                var state = ((newDate.format('HHmm') == '0000' || newDate.format('HHmm') == '2359') && (opts.allDaySwitch));
+
+                // Does the linked element (if any) have time?
+                if (opts.allDayInput) {
+                    var linkedElements = getLinkedElements($(t), opts);
+
+                    linkedElements.forEach(function (item) {
+                        var itemOptions = getOptions($(item));
+                        var itemDate = moment(item.val(), convertFormat(itemOptions.displayFormat));
+                        var itemState = ((itemDate.format('HHmm') == '0000' || itemDate.format('HHmm') == '2359') && state);
+
+                        // Update the state of the linked field
+                        setValue($(item), itemOptions, itemState, true);
+
+                        // Update the original field's state to make consistent
+                        // Note: all fields in the group must be 0000 or 2359 in order for all day to be switched on
+                        state = itemState;
+
+                    });
+                }
+
+                // Add the parsed date into the field
+                // assumption: if time is 00:00:00 and the endDay flag is set, push to 23:59:59 instead
+                // this causes a limitation that it is *not possible* to set a field of this nature to midnight
+                setValue($(t), opts, state, true, newDate);
+
+                // Remove any error class on the field
+                $(t).removeClass('error');
+
+                // Hide any validation error
+                $fieldError.hide();
             }
 
-        } else {
+            // Restore JS validation on the field
+            enableValidation($(t));
 
-            // Add the parsed date into the field
-            $(t).val(data.time);
-
-            // Remove any error class on the field
-            $(t).removeClass('error');
-
-            // Hide any validation error
-            $fieldError.hide();
-        }
-
-        // Restore JS validation on the field
-        enableValidation($(t));
-
-    }).always(function () {
-        $(t).prop('readonly', false);
-        $(t).prop('disabled', false);
-    });
+        }).always(function () {
+            $(t).prop('readonly', false);
+            $(t).prop('disabled', false);
+        });
+    }
 }
 
 
@@ -330,7 +365,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
         element.wrap($('<div class="input-group" />'));
 
-        var $datebtn = $('<a class="button icon-calendar" data-adtp-btn />');
+        var $datebtn = $('<a class="adtp-btn icon-calendar" data-adtp-btn />');
 
         if (options.buttonText) {
             $datebtn.text(options.buttonText);
