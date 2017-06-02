@@ -94,14 +94,14 @@
 
                             {% if crocodocRoute %}
                                 <a href="{{ crocodocRoute }}">
-                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
                                     <p>{{ currentFile.filename }} | <span class="meta">Download</span></p>
                                 </a>
                             {% endif %}
                         {% else %}
-                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" rel="external" data-plugin="preview">
-                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
-                                <p>{{ currentFile.filename }}</p>
+                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" title="{{ currentFile.filename }}">
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
+                                <p>{{ currentFile.filename }} | <span class="meta">Download</span></p>
                             </a>
                         {% endif %}
                     </div>
