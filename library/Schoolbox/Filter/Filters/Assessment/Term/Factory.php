@@ -12,9 +12,6 @@ use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Selection;
 
 /**
  * A factory for building 'Term' filter objects
@@ -29,20 +26,22 @@ abstract class Factory extends AbstractFactory
 
 
     /**
-     * @param Filter\Mapper    $filterMapper
-     * @param Option\Mapper    $optionMapper
-     * @param Defaults\Mapper  $defaultMapper
-     * @param Selection\Mapper $selectionMapper
-     * @param Term\Mapper      $termMapper
+     * @param Filter\Mapper                      $filterMapper
+     * @param Filter\Page\Mapper                 $pageMapper
+     * @param Filter\Page\Option\Mapper          $optionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
+     * @param Filter\Selection\Mapper            $selectionMapper
+     * @param Term\Mapper                        $termMapper
      */
     public function __construct(
         Filter\Mapper $filterMapper,
-        Option\Mapper $optionMapper,
-        Defaults\Mapper $defaultMapper,
-        Selection\Mapper $selectionMapper,
+        Filter\Page\Mapper $pageMapper,
+        Filter\Page\Option\Mapper $optionMapper,
+        Filter\Page\Option\Defaults\Mapper $defaultMapper,
+        Filter\Selection\Mapper $selectionMapper,
         Term\Mapper $termMapper
     ) {
-        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($filterMapper, $pageMapper, $optionMapper, $defaultMapper, $selectionMapper);
         $this->termMapper = $termMapper;
     }
 
@@ -65,8 +64,13 @@ abstract class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, Filter\IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
-    {
+    protected function buildExtraComponentArgs(
+        User $user,
+        Filter\Page\Model $pageFilter,
+        Filter\IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    ) {
         return [];
     }
 

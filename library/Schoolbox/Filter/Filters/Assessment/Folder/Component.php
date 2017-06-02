@@ -8,16 +8,13 @@
 namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter\AbstractComponent;
-use Schoolbox\Filter\IDefinition;
-use Schoolbox\Filter\Selection;
+use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Filter\Option;
 
 
-abstract class Component extends AbstractComponent
+abstract class Component extends Filter\AbstractComponent
 {
 
     /**
@@ -32,28 +29,24 @@ abstract class Component extends AbstractComponent
 
 
     /**
-     * @param IDefinition                                 $definition
+     * @param Filter\IDefinition                          $definition
      * @param User                                        $user
-     * @param string                                      $page
-     * @param null|GenericCollection|Selection\Model[]    $savedSelections
-     * @param null|GenericCollection|Selection\Model[]    $selectionOverrides
-     * @param Selection\Mapper                            $filterSelectionMapper
+     * @param Filter\Page\Model                           $pageFilter
+     * @param GenericCollection|Filter\Selection\Model[]  $userSelections
+     * @param Filter\Selection\Mapper                     $filterSelectionMapper
      * @param Collection|GenericCollection|Folder\Model[] $classes
      * @param Collection|GenericCollection|Folder\Model[] $groups
-     *
-     * @throws \DomainException If both saved selections and override selections are null
      */
     public function __construct(
-        IDefinition $definition,
+        Filter\IDefinition $definition,
         User $user,
-        $page,
-        GenericCollection $savedSelections = null,
-        GenericCollection $selectionOverrides = null,
-        Selection\Mapper $filterSelectionMapper,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $userSelections,
+        Filter\Selection\Mapper $filterSelectionMapper,
         GenericCollection $classes,
         GenericCollection $groups
     ) {
-        parent::__construct($definition, $user, $page, $savedSelections, $selectionOverrides, $filterSelectionMapper);
+        parent::__construct($definition, $user, $pageFilter, $userSelections, $filterSelectionMapper);
         $this->classes = $classes;
         $this->groups  = $groups;
     }
@@ -64,8 +57,8 @@ abstract class Component extends AbstractComponent
      *
      * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
      *
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
-     * @return GenericCollection|Selection\Model[]
+     * @param GenericCollection|Filter\Page\Option\Model[] $optionDefaults $optionDefaults
+     * @return GenericCollection|Filter\Selection\Model[]
      * @throws \InvalidArgumentException If option key unrecognised
      */
     protected function getRoleSelections(GenericCollection $optionDefaults)

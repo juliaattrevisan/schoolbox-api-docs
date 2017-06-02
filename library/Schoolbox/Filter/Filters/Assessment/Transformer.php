@@ -59,7 +59,7 @@ class Transformer extends \Schoolbox\Filter\Transformer
         if (!$this->getFiltersByClass()->offsetExists($filterClass)) {
             return null;
         }
-        $instance = $this->getFiltersByClass()[$filterClass];
+        $instance     = $this->getFiltersByClass()[$filterClass];
         $keyConverter = $this->getKeyConverters()[$instance->getId()];
 
         // Is this a 'nullable-context' assessment filter
@@ -69,7 +69,7 @@ class Transformer extends \Schoolbox\Filter\Transformer
             NullableContext\UnitImportSpec\Definition::class,
             NullableContext\UnitSpec\Definition::class,
         ];
-        if(in_array($filterClass, $nullableContexts, true)){
+        if (in_array($filterClass, $nullableContexts, true)) {
             /** @var NullableContext\KeyConverter $keyConverter */
             return $keyConverter->getSelectedItems($this->getSelectionsPerFilter()[$instance->getId()], $this->isFolderFilterUsed);
         }

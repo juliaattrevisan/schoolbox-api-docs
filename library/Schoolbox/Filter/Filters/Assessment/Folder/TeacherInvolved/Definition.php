@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
-use Schoolbox\Filter\Option;
+use Schoolbox\Filter\Page;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
 /**
@@ -21,8 +21,10 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
  */
 class Definition extends FolderFilter\Definition
 {
+
     // The name to expose in the UI
     const NAME = 'Teacher Folders';
+
 
     /**
      * @inheritdoc
@@ -30,8 +32,8 @@ class Definition extends FolderFilter\Definition
     public static function getPages()
     {
         return [
-            Option\Model::PAGE_PENDING_ASSESSMENTS,
-            Option\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_PENDING_ASSESSMENTS,
+            Page\Model::PAGE_MARK_BOOK,
         ];
     }
 
@@ -39,7 +41,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/Folder/TeacherInvolved/templates';
     }

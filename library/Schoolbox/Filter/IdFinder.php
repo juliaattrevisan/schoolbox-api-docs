@@ -16,6 +16,7 @@ use Schoolbox\IMapper;
  */
 interface IdFinder
 {
+
     /**
      * Fetch the singleton instance of this class
      *
@@ -24,6 +25,7 @@ interface IdFinder
      * @return IdFinder
      */
     public static function getInstance(Mapper $filterMapper, IMapper $mapper);
+
 
     /**
      * Fetch an array of IDs that match the specified filters

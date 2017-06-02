@@ -28,6 +28,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
@@ -147,7 +148,7 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
     {
-        $page      = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
+        $page      = FilterPage\Model::PAGE_PENDING_ASSESSMENTS;
         $route     = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
@@ -207,32 +208,32 @@ class Controller extends Base
      * Generate a pending assessment report as HTML string
      *
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
-     * @param string[][]                       $postFilterSelections - Indexed by filter.id, then concrete key
+     * @param string[][]                       $request - Indexed by filter.id, then concrete key
      * @return string
      * @throws \InvalidArgumentException
      * @throws \DomainException
      * @throws \LogicException
      * @throws \ReflectionException If the specified class does not exist
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    protected function generatePendingAssessmentReport(
-        AssessmentFilters\FactoryFactory $filterFactoryFactory,
-        array $postFilterSelections
-    ) {
-        $page          = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
-        $keyConverters = $filterFactoryFactory->buildKeyConverters($page);
-        $codec         = new Filter\Codec();
+    protected function generatePendingAssessmentReport(AssessmentFilters\FactoryFactory $filterFactoryFactory, array $request)
+    {
+        $page              = FilterPage\Model::PAGE_PENDING_ASSESSMENTS;
+        $keyConverters     = $filterFactoryFactory->buildKeyConverters($page);
+        $codec             = new Filter\Codec();
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->filterSelectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
+        $selectionsPerFilter = $codec->buildSelections($this->filterSelectionMapper, $keyConverters, $this->getUser(), $page, $request);
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
-        // Convert Selection models to Filters
+        // Convert Selection models to Filter Collections
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersDto           = $selectionTransformer->buildFiltersDto();
+        $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
 
         // Ensure that assessments are not Assessment Specs
-        $filters = array_merge($filtersDto->getByClass(), [
+        $filters = array_merge($filters, [
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
         ]);
 

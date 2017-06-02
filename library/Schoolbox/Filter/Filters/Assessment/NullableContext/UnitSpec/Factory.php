@@ -9,11 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\Filter\IDefinition;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -22,36 +17,44 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 /**
  * A factory for building 'UnitSpec' filter objects
  */
-class Factory extends AbstractFactory
+class Factory extends Filter\AbstractFactory
 {
+
     /** @var UnitSpec\Mapper */
     private $unitSpecMapper;
 
 
     /**
-     * @param Filter\Mapper     $filterMapper
-     * @param Option\Mapper     $optionMapper
-     * @param Defaults\Mapper   $defaultMapper
-     * @param Selection\Mapper  $selectionMapper
-     * @param UnitSpec\Mapper   $unitSpecMapper
+     * @param Filter\Mapper                      $filterMapper
+     * @param Filter\Page\Mapper                 $pageMapper
+     * @param Filter\Page\Option\Mapper          $optionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
+     * @param Filter\Selection\Mapper            $selectionMapper
+     * @param UnitSpec\Mapper                    $unitSpecMapper
      */
     public function __construct(
         Filter\Mapper $filterMapper,
-        Option\Mapper $optionMapper,
-        Defaults\Mapper $defaultMapper,
-        Selection\Mapper $selectionMapper,
+        Filter\Page\Mapper $pageMapper,
+        Filter\Page\Option\Mapper $optionMapper,
+        Filter\Page\Option\Defaults\Mapper $defaultMapper,
+        Filter\Selection\Mapper $selectionMapper,
         UnitSpec\Mapper $unitSpecMapper
     ) {
-        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
-        $this->unitSpecMapper   = $unitSpecMapper;
+        parent::__construct($filterMapper, $pageMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        $this->unitSpecMapper = $unitSpecMapper;
     }
 
 
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
-    {
+    protected function buildExtraComponentArgs(
+        User $user,
+        Filter\Page\Model $pageFilter,
+        Filter\IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    ) {
         return [];
     }
 

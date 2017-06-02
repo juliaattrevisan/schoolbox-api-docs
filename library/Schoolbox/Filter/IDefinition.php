@@ -7,36 +7,28 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Filter\Option as FilterOption;
-use Schoolbox\Filter;
 
 /**
  * All filter definitions must provide an implementation that adheres to this interface.
  *
- * You should not inject mappers into the filter definitions. They should not do DB calls. The factory should perform
- * the calls and call the required setters for the definition for it to do its work.
+ * Definitions should not do DB calls. They should just contain their specific logic.
  *
- * 3 Responsibilities
- * * Rendering available options and default role selections in the admin pages
- * * Rendering options in a filter panel on a filterable page
- * * Converting user option selections into entities when generating a filterable page's contents
- *
- * Each of these 3 purposes has a corresponding buildFor* method
+ * Their corresponding factory should insert all required dependencies and data.
  */
 interface IDefinition
 {
 
     /**
      * Return the name of the filter to expose in the UI
+     *
      * @return string
      */
     public static function getName();
 
 
     /**
-     * @return Filter\Model
+     * @return Model
      */
     public function getFilter();
 
@@ -46,32 +38,23 @@ interface IDefinition
      *
      * @return string
      */
-    public function getPanelComponentTemplate();
+    public static function getPanelComponentTemplate();
 
 
     /**
-     * Get all possible filter (abstract) options for the specified page, indexed by option.key
+     * Removes any invalid items and inserts logically missing items.
      *
-     * Options may be pulled from:
-     * * DB,
-     * * Hard-coded, or
-     * * Both
+     * Initially, the system has no configured options. In this case we need to insert
+     * initial state so that we can render in admin and in filter panels.
      *
-     * @param string $page Get options just for this page
-     * @return GenericCollection|FilterOption\Model[]
+     * Over time, we may get invalid options that require removed.
+     * eg, if an option represents a Term that is deleted from the system
+     *
+     * @param Page\Model  $pageFilter
+     * @param null|string $roleTypeFilter
+     * @return GenericCollection|Page\Option\Model[]
      */
-    public function getOptions($page);
-
-
-    /**
-     * Returns sets of available (abstract) options, indexed by option.key.
-     * Each Option contains a set of Defaults, indexed by roleType
-     *
-     * @param string      $page           Get options for this page
-     * @param null|string $roleTypeFilter If supplied, get defaults just for this roleType
-     * @return GenericCollection|FilterOption\Model[]
-     */
-    public function getOptionsWithDefaults($page, $roleTypeFilter = null);
+    public function normalisePageOptions(Page\Model $pageFilter, $roleTypeFilter = null);
 
 
     /**
@@ -81,14 +64,6 @@ interface IDefinition
      * @return string[]
      */
     public static function getPages();
-
-
-    /**
-     * Return the set of possible abstract keys for this filter's options
-     *
-     * @return string[]
-     */
-    public function getAbstractKeys();
 
 
     /**
@@ -103,16 +78,4 @@ interface IDefinition
      * @throws \InvalidArgumentException If key is recognised as invalid
      */
     public function getLabel($key);
-
-
-    /**
-     * If the admin has not configured this option, should it be available in filter panels?
-     *
-     * By default, all possible options will be available on all pages. (ie just return true)
-     *
-     * @param string $customAbstractKey
-     * @param string $page
-     * @return bool
-     */
-    public function getInitialAvailability($customAbstractKey, $page);
 }

@@ -9,9 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractDefinition;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 
@@ -21,8 +18,9 @@ use Schoolbox\Learning\Assessment\WorkType;
  * □ None
  * □ One per workType that exists in system
  */
-class Definition extends AbstractDefinition
+class Definition extends Filter\AbstractDefinition
 {
+
     // The name to expose in the UI
     const NAME = 'Work Type';
 
@@ -38,15 +36,15 @@ class Definition extends AbstractDefinition
 
 
     /**
-     * @param Filter\Model    $filter
-     * @param Option\Mapper   $filterOptionMapper
-     * @param Defaults\Mapper $filterDefaultMapper
-     * @param Collection      $workTypes
+     * @param Filter\Model                       $filter
+     * @param Filter\Page\Option\Mapper          $filterOptionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
+     * @param Collection                         $workTypes
      */
     public function __construct(
         Filter\Model $filter,
-        Option\Mapper $filterOptionMapper,
-        Defaults\Mapper $filterDefaultMapper,
+        Filter\Page\Option\Mapper $filterOptionMapper,
+        Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
         Collection $workTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
@@ -71,23 +69,22 @@ class Definition extends AbstractDefinition
     public static function getPages()
     {
         return [
-            Option\Model::PAGE_PENDING_ASSESSMENTS,
-            Option\Model::PAGE_GRADES,
-            Option\Model::PAGE_MARK_BOOK,
-//            Option\Model::PAGE_DUE_WORK_CALENDAR,
+            Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
+            Filter\Page\Model::PAGE_GRADES,
+            Filter\Page\Model::PAGE_MARK_BOOK,
+//            Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }
 
 
     /**
-     * @param GenericCollection|Option\Model[] $options
+     * @param GenericCollection|Filter\Page\Option\Model[] $options
      * @return GenericCollection
      */
     protected function sortFilterOptions(GenericCollection $options)
     {
         // Keys represent WorkType IDs
-
-        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
+        return $options->sortByCallback(function (Filter\Page\Option\Model $left, Filter\Page\Option\Model $right) {
             $leftKey  = $left->getKey();
             $rightKey = $right->getKey();
             if ($leftKey === $right) {
@@ -96,7 +93,7 @@ class Definition extends AbstractDefinition
             if (self::KEY_NONE === $leftKey) {
                 return -1;
             }
-            if(self::KEY_NONE === $rightKey){
+            if (self::KEY_NONE === $rightKey) {
                 return +1;
             }
             // Sort concrete items by workType.id
@@ -131,24 +128,25 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
+    protected function insertDynamicOptions(Filter\Page\Model $pageFilter)
     {
+        $options = $pageFilter->getOptions();
+
         // Ensure it contains all WorkTypes
         foreach ($this->workTypes as $workType) {
 
             $abstractKey = null === $workType ? self::KEY_NONE : (string)$workType->getId();
 
-            if (!$pageOptions->offsetExists($abstractKey)) {
+            if (!$options->offsetExists($abstractKey)) {
                 $option = $this->getFilterOptionMapper()->createModel();
                 $option
-                    ->setFilter($this->getFilter())
+                    ->setFilterPage($pageFilter)
                     ->setKey($abstractKey)
-                    ->setPage($page)
-                    ->setAvailable($this->getInitialAvailability($abstractKey, $page));
-                $pageOptions->setOffset($option->getKey(), $option);
+                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter));
+                $options->setOffset($option->getKey(), $option);
             }
         }
-        return $pageOptions;
+        return $options;
     }
 
 
@@ -165,7 +163,7 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
     {
         // by default, all WorkTypes are available
         return true;
@@ -175,7 +173,7 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/WorkType/templates';
     }

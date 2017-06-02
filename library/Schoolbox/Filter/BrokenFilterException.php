@@ -35,7 +35,7 @@ class BrokenFilterException extends \DomainException
      */
     public function __construct($filterName, $message = '', $code = 0, Throwable $previous = null)
     {
-        if(!is_string($filterName) || '' === $filterName){
+        if (!is_string($filterName) || '' === $filterName) {
             throw new \InvalidArgumentException("Filter name must be a non-empty string: $filterName");
         }
         parent::__construct($message, $code, $previous);

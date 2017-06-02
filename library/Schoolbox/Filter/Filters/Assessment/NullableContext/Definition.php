@@ -7,11 +7,11 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
-use Schoolbox\Filter\AbstractDefinition;
-use Schoolbox\GenericCollection;
+use Schoolbox\Filter;
 
 /**
- * TODO write this better
+ * TODO re-word to clarify
+ *
  * A NullableContext filter is an assessment-context filter that shows a '(none)' option
  *
  * They have a coupling to the 'Folder' filter, as the 'Folder' is the ultimate context.
@@ -27,10 +27,11 @@ use Schoolbox\GenericCollection;
  * If both the (none) and some other options are selected, then the idFinder needs to treat it as empty for other filters, but not empty for this filter.
  * This will ensure other sub-queries will run, but we will UNION those with the concrete items in this filter
  */
-abstract class Definition extends AbstractDefinition
+abstract class Definition extends Filter\AbstractDefinition
 {
 
     const KEY_NONE = 'none';  // match assessments that do NOT reside in this context
+
 
     /**
      * @inheritdoc
@@ -46,17 +47,7 @@ abstract class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
-    {
-        // noop - abstract options are hard-coded, concrete options are run-time
-        return $pageOptions;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
     {
         // All available by default
         return true;

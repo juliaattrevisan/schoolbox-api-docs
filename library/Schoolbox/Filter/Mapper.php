@@ -29,12 +29,34 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('entity', self::TYPE_STRING);
         $this->uses('class', self::TYPE_STRING);
+
+        $this->joinsReverseMulti('filter_id', Page\Mapper::class, 'pages', 'pages');
+
+        $this->registerCallback(self::CALLBACK_PREDELETE, [$this, 'hardDeletePages']);
     }
+
+
+    /**
+     * Pre hard-delete callback to hard-delete any pages using this filter
+     *
+     * @param Model $model
+     * @return bool
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     */
+    public function hardDeletePages(Model $model)
+    {
+        /** @var Page\Mapper $pageMapper */
+        $pageMapper = $this->getJoinMapper('pages');
+        $pages      = $pageMapper->findByColumn('filter_id', $model->getId());
+        $pageMapper->delete($pages);
+        return true;
+    }
+
 
     /**
      * Find all filter instances that relate to the specified entity
      *
-     * @param string $entity  The mapper class for the filtered entity
+     * @param string $entity The mapper class for the filtered entity
      * @return GenericCollection|Model[]
      */
     public function findForEntity($entity)

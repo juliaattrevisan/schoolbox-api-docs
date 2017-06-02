@@ -62,7 +62,6 @@ class KeyConverter extends NullableContext\KeyConverter
     }
 
 
-
     /**
      * @inheritdoc
      */

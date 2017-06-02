@@ -7,10 +7,9 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
-use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
+use Schoolbox\Filter;
 
-
-class KeyConverter extends FolderFilter\KeyConverter
+class KeyConverter extends Filter\Filters\Assessment\Folder\KeyConverter
 {
 
 }

@@ -33,8 +33,13 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, Filter\IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
-    {
+    protected function buildExtraComponentArgs(
+        User $user,
+        Filter\Page\Model $pageFilter,
+        Filter\IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    ) {
         return [];
     }
 

@@ -8,7 +8,6 @@
 namespace Schoolbox\Filter;
 
 use Schoolbox\MapperFactory;
-
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
@@ -50,29 +49,24 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * Build a set of key converters for the specified page
-     *
-     * @param string $page
-     * @return IKeyConverter[]|GenericCollection Indexed by filter.id
+     * @inheritdoc
      * @throws \InvalidArgumentException If unable to find the filter mapper class
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
     public function buildKeyConverters($page)
     {
+        $pageFilters   = $this->buildVisiblePageFilters($page);
         $keyConverters = $this->createKeyConverterCollection();
 
-        foreach ($this->getFilterMapper()->findForEntity(self::getEntity()) as $filter) {
-
-            /** @var IDefinition $class */
-            $class = $filter->getClass();
-
-            // Does this filter appear on the specified page?
-            if (in_array($page, $class::getPages(), true)) {
-                $filterFactory = $this->buildFilterFactoryForFilter($class);
-                $keyConverter  = $filterFactory->buildKeyConverter($filter);
-                $keyConverters->offsetSet($filter->getId(), $keyConverter);
-            }
+        /** @var Page\Model[] $pageFilters */
+        foreach ($pageFilters as $pageFilter) {
+            $filter        = $pageFilter->getFilter();
+            $filterFactory = $this->buildFilterFactoryForFilter($filter->getClass());
+            $keyConverter  = $filterFactory->buildKeyConverter($filter);
+            $keyConverters->offsetSet($filter->getId(), $keyConverter);
         }
         return $keyConverters;
     }
@@ -81,63 +75,168 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     /**
      * Builds a filter panel for the specified user and page, which submits selections to the specified route
      *
-     * Any overrides in $queryArgs will clobber any saved selections
+     * If a visible page-filter has overrides:
+     * * any option in the overrides will be present in the page-filter options in the panel
+     * * user-selections for the page filter will be replaced by the page-filter's overrides
      *
      * @param User      $user
      * @param string    $page
      * @param string    $route
      * @param null|User $viewee
-     * @param array     $queryArgs Indexed by filter.id
+     * @param array     $request Indexed by filter.id
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined the entity it is filtering
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    public function buildPanel(User $user, $page, $route, User $viewee = null, array $queryArgs = [])
+    public function buildPanel(User $user, $page, $route, User $viewee = null, array $request = [])
     {
-        $filterComponents = $this->createFilterComponentCollection();
-
-        if(array_key_exists('page', $queryArgs)){
-            unset($queryArgs['page']);
+        // Clean up aura-inserted items
+        if (array_key_exists('page', $request)) {
+            unset($request['page']);
         }
 
-        $keyConverters = $this->buildKeyConverters($page);
-        $codec         = new Codec();
-        $overrides     = $codec->convertRequestToSelectionModels($this->getFilterSelectionMapper(), $keyConverters, $user, $page, $queryArgs);
+        $codec            = new Codec();
+        $factories        = $this->createFactoryCollection();
+        $keyConverters    = $this->createKeyConverterCollection();
+        $filterComponents = $this->createComponentCollection();
 
-        // Get filters for this factoryFactory's entity type
-        $entityFilters = $this->getFilterMapper()->findForEntity(self::getEntity());
+        // Only build panel components for visible page filters. Hard-coding is handles on the AJAX request.
+        // Ignore anything in $request that is not for a visible page filter
+        $visiblePageFilters = $this->buildVisiblePageFilters($page);
 
-        foreach($entityFilters as $filter){
-            $filterClass = $filter->getClass();
+        // Iteration 1/2 - build Factories and KeyConverters
+        foreach ($visiblePageFilters as $pageFilter) {
+            $filter                   = $pageFilter->getFilter();
+            $filterId                 = $filter->getId();
+            $class                    = $filter->getClass();
+            $factories[$filterId]     = $this->buildFilterFactoryForFilter($class);
+            $keyConverters[$filterId] = $factories[$filterId]->buildKeyConverter($filter);
+        }
 
-            // Does the filter not appear on the specified page?
-            if (!in_array($page, $filterClass::getPages(), true)) {
-                // Don't insert the filter component in panel
-                continue;
-            }
+        // We cannot merely replace userSelections here. That must happen later.
+        // This is because overrideSelections can insert options, but userSelections cannot
+        $overrideSelections = $codec->buildSelections($this->getSelectionMapper(), $keyConverters, $user, $page, $request);
+        $userSelections     = $this->findUserSelections($overrideSelections, $visiblePageFilters, $user, $page);
 
-            $filterFactory = $this->buildFilterFactoryForFilter($filter->getClass());
+        // Iteration 2/2 - build Panel Components
+        foreach ($visiblePageFilters as $pageFilter) {
+            $filter     = $pageFilter->getFilter();
+            $filterId   = $filter->getId();
+            $class      = $filter->getClass();
+            $definition = $factories[$filterId]->buildDefinition($filter);
+            $definition->normalisePageOptions($pageFilter, $user->getRole()->getType());
+
+            $selections = $userSelections[$filter->getId()] ?: $this->getSelectionMapper()->createCollection();
 
             // Did controller or URL request to override saved user-selections ?
-            $component     = $filterFactory->buildComponent($filterClass, $user, $page, $viewee, $overrides[$filter->getId()]);
+            $overrides = $overrideSelections[$filter->getId()] ?: null;
 
-            // Don't bother inserting component if it wasn't build (because no options would be available anyway)
-            if ($component) {
-                $filterComponents->setOffset($filterClass, $component);
-            }
+            $filterComponents[$class] = $factories[$filterId]->buildComponent($definition, $user, $pageFilter, $viewee, $selections, $overrides);
         }
-
         return new Panel($route, $filterComponents);
     }
 
+
     /**
-     * @param null|IComponent[] $contents
-     * @return GenericCollection|IComponent[]
+     * @param GenericCollection|Selection\Model[][] $overrideSelections Indexed by filter.id, then selection.key
+     * @param GenericCollection|Page\Model[]        $visiblePageFilters
+     * @param User                                  $user
+     * @param string                                $page
+     * @return GenericCollection|Selection\Model[][] Indexed by filter.id, then selection.key
+     * @throws \InvalidArgumentException If selection mapper class not found
      */
-    private function createFilterComponentCollection(array $contents = [])
+    private function findUserSelections(GenericCollection $overrideSelections, GenericCollection $visiblePageFilters, User $user, $page)
     {
-        return new GenericCollection(IComponent::class, $contents);
+        /** @var int[] $visibleFilterIds */
+        $visibleFilterIds = $visiblePageFilters->map(function (Page\Model $pageFilter) {
+            return $pageFilter->getFilter()->getId();
+        })->getAll();
+
+        // Filters configured by admin as enabled and user-configurable, and have not been overridden
+        $filterIds = array_diff($visibleFilterIds, $overrideSelections->keys());
+
+        $pb = $this->getSelectionMapper()->getPredicateBuilder();
+        $pb
+            ->equals('filter_id', $filterIds)
+            ->equals('user_id', $user->getId())
+            ->equals('page', $page);
+
+        /** @var GenericCollection|Selection\Model[][] $userSelections */
+        $userSelections = $this->getSelectionMapper()->findByPredicates($pb);
+
+        $userSelections = $userSelections->groupByCallback(function (Selection\Model $selection) {
+            return $selection->getFilter()->getId();
+        });
+
+        foreach ($userSelections as $filterSelections) {
+            $filterSelections->indexBy('key');
+        }
+        return $userSelections;
+    }
+
+
+    /**
+     * Fetch visible page filters from DB, and insert any missing logical items.
+     *
+     * @param string $page
+     * @return Page\Model[]|GenericCollection Indexed by page.filter.id
+     * @throws \InvalidArgumentException If PageFilter mapper class not found
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     */
+    private function buildVisiblePageFilters($page)
+    {
+        // What pageFilters could appear on this page ?
+        /** @var GenericCollection|Model[] $availableFilters */
+        $availableFilters = $this->getFilterMapper()->findAll()->filter(function (Model $instance) use ($page) {
+            $definitionClass = $instance->getClass();
+            return in_array($page, $definitionClass::getPages(), true);
+        });
+
+        $pageFilterMapper = $this->getPageMapper();
+
+        // What pageFilters have been configured by the admin ?
+        /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.id */
+        $savedPageFilters = $pageFilterMapper->findForPage($page)->indexByCallback(function (Page\Model $pageFilter) {
+            return $pageFilter->getFilter()->getId();
+        });
+
+        // And what page filters will we actually show to the end-user ?
+        $visiblePageFilters = $pageFilterMapper->createCollection();
+
+        foreach ($availableFilters as $instance) {
+            $filterId = $instance->getId();
+
+            $pageFilter = $savedPageFilters[$filterId];
+
+            if (!$pageFilter) {
+                $pageFilter = $pageFilterMapper->createModel();
+                $pageFilter
+                    ->setFilter($instance)
+                    ->setPage($page)
+                    ->setEnabled(Page\Model::getEnabledInitialState($instance, $page))
+                    ->setUserConfigurable(Page\Model::getUserConfigurableInitialState($instance, $page));
+            }
+
+            if ($pageFilter->getEnabled() && $pageFilter->getUserConfigurable()) {
+                $visiblePageFilters[$filterId] = $pageFilter;
+                $instance->getPages()[$page]   = $pageFilter;
+            }
+        }
+        return $visiblePageFilters;
+    }
+
+
+    /**
+     * @param null|IFactory[] $contents
+     * @return GenericCollection|IFactory[]
+     */
+    private function createFactoryCollection(array $contents = [])
+    {
+        return new GenericCollection(IFactory::class, $contents);
     }
 
 
@@ -148,6 +247,16 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     private function createKeyConverterCollection(array $contents = [])
     {
         return new GenericCollection(IKeyConverter::class, $contents);
+    }
+
+
+    /**
+     * @param null|IComponent[] $contents
+     * @return GenericCollection|IComponent[]
+     */
+    private function createComponentCollection(array $contents = [])
+    {
+        return new GenericCollection(IComponent::class, $contents);
     }
 
 
@@ -164,14 +273,16 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     {
         $args = array_merge([
             'filterMapper'          => $this->getFilterMapper(),
-            'filterOptionMapper'    => $this->getFilterOptionMapper(),
-            'filterDefaultMapper'   => $this->getFilterDefaultsMapper(),
-            'filterSelectionMapper' => $this->getFilterSelectionMapper(),
+            'filterPageMapper'      => $this->getPageMapper(),
+            'filterOptionMapper'    => $this->getOptionMapper(),
+            'filterDefaultMapper'   => $this->getDefaultsMapper(),
+            'filterSelectionMapper' => $this->getSelectionMapper(),
         ], $extraArgs);
 
         $reflector = new \ReflectionClass($factoryClass);
         return $reflector->newInstanceArgs($args);
     }
+
 
     /**
      * @return MapperFactory
@@ -184,7 +295,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
     /**
      * @return \Schoolbox\Mapper|Mapper
-     * @throws \InvalidArgumentException If unable to find the mapper class
+     * @throws \InvalidArgumentException If mapper class not found
      */
     private function getFilterMapper()
     {
@@ -193,30 +304,40 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @return \Schoolbox\Mapper|Option\Mapper
-     * @throws \InvalidArgumentException
+     * @return \Schoolbox\Mapper|Page\Mapper
+     * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getFilterOptionMapper()
+    private function getPageMapper()
     {
-        return $this->mapperFactory->get(Option\Mapper::class);
+        return $this->mapperFactory->get(Page\Mapper::class);
     }
 
 
     /**
-     * @return \Schoolbox\Mapper|Option\Defaults\Mapper
-     * @throws \InvalidArgumentException
+     * @return \Schoolbox\Mapper|Page\Option\Mapper
+     * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getFilterDefaultsMapper()
+    private function getOptionMapper()
     {
-        return $this->mapperFactory->get(Option\Defaults\Mapper::class);
+        return $this->mapperFactory->get(Page\Option\Mapper::class);
+    }
+
+
+    /**
+     * @return \Schoolbox\Mapper|Page\Option\Defaults\Mapper
+     * @throws \InvalidArgumentException If mapper class not found
+     */
+    private function getDefaultsMapper()
+    {
+        return $this->mapperFactory->get(Page\Option\Defaults\Mapper::class);
     }
 
 
     /**
      * @return \Schoolbox\Mapper|Selection\Mapper
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException If mapper class not found
      */
-    private function getFilterSelectionMapper()
+    private function getSelectionMapper()
     {
         return $this->mapperFactory->get(Selection\Mapper::class);
     }

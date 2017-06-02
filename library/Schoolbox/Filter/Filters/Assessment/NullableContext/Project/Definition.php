@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
-use Schoolbox\GenericCollection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 /**
@@ -22,6 +22,7 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
  */
 class Definition extends NullableContext\Definition
 {
+
     // The name to expose in the UI
     const NAME = 'Project';
 
@@ -36,9 +37,9 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
+    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter)
     {
-        $cleanedPageOptions = parent::unsetInvalidOptions($pageOptions);
+        $cleanedPageOptions = parent::unsetInvalidOptions($pageFilter);
 
         foreach ($cleanedPageOptions as $idx => $option) {
             // For now, no pages can have projects that reside in unitSpecs
@@ -106,7 +107,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/NullableContext/Project/templates';
     }

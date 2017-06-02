@@ -21,7 +21,7 @@ abstract class KeyConverter extends AbstractKeyConverter
      * The returned Collection contains ids and/or 'KEY_NONE' => null
      *
      * @param GenericCollection $availableSelections (can also be null, but Storm doesn't like hint)
-     * @param bool              $foldersFiltered Are folders being filtered?
+     * @param bool              $foldersFiltered     Are folders being filtered?
      * @return null|Collection|int[]|string[] (intentionally not GenericCollection)
      * @throws \InvalidArgumentException If key is invalid
      */
@@ -49,7 +49,7 @@ abstract class KeyConverter extends AbstractKeyConverter
 
             // Are folders being filtered?
             //
-            if($foldersFiltered){
+            if ($foldersFiltered) {
                 return null;
             }
 
@@ -63,7 +63,7 @@ abstract class KeyConverter extends AbstractKeyConverter
         }
 
         // Was just the '(none)' option selected ?
-        if(1 === $selectedItems->count() && null === $selectedItems->first()){
+        if (1 === $selectedItems->count() && null === $selectedItems->first()) {
             // return an empty set. ie assessments not in this context
             return $allItems->emptyClone();
         }
@@ -73,12 +73,13 @@ abstract class KeyConverter extends AbstractKeyConverter
 
     }
 
+
     /**
      * @inheritdoc
      */
     public function sanitiseKey($key)
     {
-        if(Definition::KEY_NONE === $key){
+        if (Definition::KEY_NONE === $key) {
             return $key;
         }
         $this->assertValidKey($key);

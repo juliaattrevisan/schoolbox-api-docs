@@ -5,13 +5,14 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Option;
+namespace Schoolbox\Filter\Page\Option;
 
-use Schoolbox\Filter\Mapper as FilterMapper;
+use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] createCollection($contents = [])
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
@@ -28,10 +29,11 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('filter_id', FilterMapper::class, 'id', self::TYPE_MODEL, null, 'filter', 'filter');
-        $this->uses('page', self::TYPE_STRING);
+        $this->joins('filter_page_id', Filter\Page\Mapper::class, 'id', self::TYPE_MODEL, null, 'filterPage', 'filter_page');
         $this->uses('key', self::TYPE_STRING);
         $this->uses('available', self::TYPE_BOOLEAN);
+
+        $this->joinsReverseMulti('filter_option_id', Filter\Page\Option\Defaults\Mapper::class, 'defaults', 'defaults');
 
         $this->registerCallback(self::CALLBACK_PREDELETE, [$this, 'hardDeleteRoleDefaults']);
     }
@@ -40,15 +42,16 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Pre hard-delete callback to hard-delete any RoleDefaults for this option
      *
-     * @param Model $option
+     * @param Model $model
      * @return bool
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      */
-    public function hardDeleteRoleDefaults(Model $option)
+    public function hardDeleteRoleDefaults(Model $model)
     {
-        /** @var Defaults\Mapper $defaultsMapper */
-        $defaultsMapper = Defaults\Mapper::getInstance();
-        $defaultsModels = $defaultsMapper->findByColumn('filter_option_id', $option->getId());
-        $defaultsMapper->delete($defaultsModels);
+        /** @var Filter\Page\Option\Defaults\Mapper $defaultsMapper */
+        $defaultsMapper = $this->getJoinMapper('defaults');
+        $defaults       = $defaultsMapper->findByColumn('filter_option_id', $model->getId());
+        $defaultsMapper->delete($defaults);
         return true;
     }
 }

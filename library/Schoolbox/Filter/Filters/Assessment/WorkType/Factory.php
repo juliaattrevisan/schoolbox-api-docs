@@ -8,20 +8,16 @@
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Selection;
+use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\WorkType;
 
 
 /**
  * A factory for building 'WorkType' filter objects
  */
-class Factory extends AbstractFactory
+class Factory extends Filter\AbstractFactory
 {
 
     /**
@@ -30,14 +26,23 @@ class Factory extends AbstractFactory
     private $workTypeMapper;
 
 
+    /**
+     * @param Filter\Mapper                      $filterMapper
+     * @param Filter\Page\Mapper                 $pageMapper
+     * @param Filter\Page\Option\Mapper          $optionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
+     * @param Filter\Selection\Mapper            $selectionMapper
+     * @param WorkType\Mapper                    $workTypeMapper
+     */
     public function __construct(
         Filter\Mapper $filterMapper,
-        Option\Mapper $optionMapper,
-        Defaults\Mapper $defaultMapper,
-        Selection\Mapper $selectionMapper,
+        Filter\Page\Mapper $pageMapper,
+        Filter\Page\Option\Mapper $optionMapper,
+        Filter\Page\Option\Defaults\Mapper $defaultMapper,
+        Filter\Selection\Mapper $selectionMapper,
         WorkType\Mapper $workTypeMapper
     ) {
-        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($filterMapper, $pageMapper, $optionMapper, $defaultMapper, $selectionMapper);
         $this->workTypeMapper = $workTypeMapper;
     }
 
@@ -56,8 +61,13 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, Filter\IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
-    {
+    protected function buildExtraComponentArgs(
+        User $user,
+        Filter\Page\Model $pageFilter,
+        Filter\IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    ) {
         return [];
     }
 

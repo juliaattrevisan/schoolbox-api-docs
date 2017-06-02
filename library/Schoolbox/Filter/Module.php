@@ -42,9 +42,9 @@ class Module extends AlaressModule
 
         $loadFactoryFactory = function (array $params) {
             switch ($params['page']) {
-                case Option\Model::PAGE_PENDING_ASSESSMENTS:
-                case Option\Model::PAGE_MARK_BOOK:
-                case Option\Model::PAGE_GRADES:
+                case Page\Model::PAGE_PENDING_ASSESSMENTS:
+                case Page\Model::PAGE_MARK_BOOK:
+                case Page\Model::PAGE_GRADES:
                     return ['factoryFactory' => new Filters\Assessment\FactoryFactory($this->getMapperFactory())];
                 // Other entity types can have their factory factories registered here
             }
@@ -52,8 +52,8 @@ class Module extends AlaressModule
         };
 
 
-        $this->register('GET',  '',        'getIndex',             $isSuper);
-        $this->register('GET',  '/{page}', 'getPageSettings',      $isSuper, $loadFactoryFactory);
+        $this->register('GET', '', 'getIndex', $isSuper);
+        $this->register('GET', '/{page}', 'getPageSettings', $isSuper, $loadFactoryFactory);
         $this->register('POST', '/{page}', 'postSavePageSettings', $isSuper, $loadFactoryFactory);
     }
 
@@ -65,9 +65,10 @@ class Module extends AlaressModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            'filterMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-            'optionsMapper' => $this->getMapperFactory()->getLazy(Option\Mapper::class),
-            'defaultsMapper' => $this->getMapperFactory()->getLazy(Option\Defaults\Mapper::class)
+            'filterMapper'   => $this->getMapperFactory()->getLazy(Mapper::class),
+            'pageMapper'     => $this->getMapperFactory()->getLazy(Page\Mapper::class),
+            'optionsMapper'  => $this->getMapperFactory()->getLazy(Page\Option\Mapper::class),
+            'defaultsMapper' => $this->getMapperFactory()->getLazy(Page\Option\Defaults\Mapper::class),
         ]));
     }
 

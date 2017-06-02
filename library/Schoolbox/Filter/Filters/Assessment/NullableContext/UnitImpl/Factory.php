@@ -9,11 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImpl;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\Filter\IDefinition;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -22,27 +17,30 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 /**
  * A factory for building 'UnitImpl' filter objects
  */
-class Factory extends AbstractFactory
+class Factory extends Filter\AbstractFactory
 {
+
     /** @var UnitImpl\Mapper */
     private $unitImplMapper;
 
 
     /**
-     * @param Filter\Mapper    $filterMapper
-     * @param Option\Mapper    $optionMapper
-     * @param Defaults\Mapper  $defaultMapper
-     * @param Selection\Mapper $selectionMapper
-     * @param UnitImpl\Mapper  $unitImplMapper
+     * @param Filter\Mapper                      $filterMapper
+     * @param Filter\Page\Mapper                 $pageMapper
+     * @param Filter\Page\Option\Mapper          $optionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
+     * @param Filter\Selection\Mapper            $selectionMapper
+     * @param UnitImpl\Mapper                    $unitImplMapper
      */
     public function __construct(
         Filter\Mapper $filterMapper,
-        Option\Mapper $optionMapper,
-        Defaults\Mapper $defaultMapper,
-        Selection\Mapper $selectionMapper,
+        Filter\Page\Mapper $pageMapper,
+        Filter\Page\Option\Mapper $optionMapper,
+        Filter\Page\Option\Defaults\Mapper $defaultMapper,
+        Filter\Selection\Mapper $selectionMapper,
         UnitImpl\Mapper $unitImplMapper
     ) {
-        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($filterMapper, $pageMapper, $optionMapper, $defaultMapper, $selectionMapper);
         $this->unitImplMapper = $unitImplMapper;
     }
 
@@ -50,8 +48,13 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
-    {
+    protected function buildExtraComponentArgs(
+        User $user,
+        Filter\Page\Model $pageFilter,
+        Filter\IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    ) {
         return [];
     }
 

@@ -18,6 +18,7 @@ use Schoolbox\Collection;
  */
 class DataTransferObject
 {
+
     /**
      * Indexed by filter.class
      *

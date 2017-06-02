@@ -27,46 +27,55 @@ class Codec
      * Convert a POST/GET request to a set of Selection Models, index by filter.id, then selection.key
      *
      * @param Selection\Mapper                  $selectionMapper
-     * @param GenericCollection|IKeyConverter[] $keyConverters   Indexed by filter.id
+     * @param GenericCollection|IKeyConverter[] $keyConverters For enabled, user-configurable filters
      * @param User                              $user
      * @param string                            $page
-     * @param int[][]                           $selectionsArray Indexed by filter.id, then selection.key
-     * @return Collection|Selection\Model[][] Indexed by filter.id, then selection.key
+     * @param int[][]                           $request       Indexed by filter.id, then selection.key
+     * @return Collection|GenericCollection[]|Selection\Model[][]   Indexed by filter.id then selection.key
+     * @throws \InvalidArgumentException        If any key is invalid TODO consider catching and discarding invalid items
      */
-    public function convertRequestToSelectionModels(
+    public function buildSelections(
         Selection\Mapper $selectionMapper,
         GenericCollection $keyConverters,
         User $user,
         $page,
-        array $selectionsArray
+        array $request
     ) {
+        // Clean aura remnant
+        if (array_key_exists('page', $request)) {
+            unset($request['page']);
+        }
+
         /** @var Collection|GenericCollection[]|Selection\Model[][] $selections */
         $selections = new GenericCollection(GenericCollection::class);
 
         // Has any data been passed in? (will be empty if no filters available on this page)
-        if (count($selectionsArray)) {
-            foreach ($selectionsArray as $filterId => $filterSelectionArray) {
-
-                // This can occur if we have manually inserted a filter for some reason, eg to exclude assessments in unit-spec contexts
-                if (!$keyConverters->offsetExists($filterId)) {
-                    // Don't include in build
-                    continue;
-                }
-                $keyConverter          = $keyConverters[$filterId];
-                $filter                = $keyConverter->getFilter();
-                $filterSelections      = new GenericCollection(Selection\Model::class);
-                $selections[$filterId] = $filterSelections;
-
+        if (count($request)) {
+            foreach ($request as $filterId => $filterSelectionArray) {
                 // Not an array, this happens for empty sets, eg '?2='
                 if (!is_array($filterSelectionArray)) {
                     continue;
                 }
 
+                $keyConverter = $keyConverters[$filterId];
+
+                // This will occur when a controller hard-codes a filter, but the admin has
+                // disabled the filter for this page. In this case we ignore the controller and respect the admin.
+                if (!$keyConverter) {
+                    continue;
+                }
+
+                $filter                = $keyConverter->getFilter();
+                $filterSelections      = new GenericCollection(Selection\Model::class);
+                $selections[$filterId] = $filterSelections;
+
+
                 /** @var bool[] $filterSelectionArray */
                 foreach ($filterSelectionArray as $key => $isSelected) {
+                    // TODO insert permission checks here to ensure the end-user should be able to include this option in the report
 
                     $selection = $selectionMapper->createModel();
-                    $key = $keyConverter->sanitiseKey($key);
+                    $key       = $keyConverter->sanitiseKey($key);
                     $selection
                         ->setFilter($filter)
                         ->setUser($user)

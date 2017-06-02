@@ -9,10 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractDefinition;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\GenericCollection;
 
 
 /**
@@ -25,16 +21,17 @@ use Schoolbox\GenericCollection;
  * □ Overdue     (late    <= now < close)
  * □ Closed      (close   <= now )
  */
-class Definition extends AbstractDefinition
+class Definition extends Filter\AbstractDefinition
 {
+
     // The name to expose in the UI
     const NAME = 'Activity State';
 
     const KEY_UNPUBLISHED = 'unpublished';
-    const KEY_UPCOMING    = 'upcoming';
-    const KEY_OPEN        = 'open';
-    const KEY_OVERDUE     = 'overdue';
-    const KEY_CLOSED      = 'closed';
+    const KEY_UPCOMING = 'upcoming';
+    const KEY_OPEN = 'open';
+    const KEY_OVERDUE = 'overdue';
+    const KEY_CLOSED = 'closed';
 
 
     /** @var Collection|string[] */
@@ -42,20 +39,21 @@ class Definition extends AbstractDefinition
 
 
     /**
-     * @param Filter\Model    $filter
-     * @param Option\Mapper   $filterOptionMapper
-     * @param Defaults\Mapper $filterDefaultMapper
-     * @param Collection      $temporalStates
+     * @param Filter\Model                       $filter
+     * @param Filter\Page\Option\Mapper          $filterOptionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
+     * @param Collection                         $temporalStates
      */
     public function __construct(
         Filter\Model $filter,
-        Option\Mapper $filterOptionMapper,
-        Defaults\Mapper $filterDefaultMapper,
+        Filter\Page\Option\Mapper $filterOptionMapper,
+        Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
         Collection $temporalStates
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->temporalStates = $temporalStates->shallowClone();
     }
+
 
     /**
      * @inheritdoc
@@ -72,9 +70,9 @@ class Definition extends AbstractDefinition
     public static function getPages()
     {
         return [
-            Option\Model::PAGE_PENDING_ASSESSMENTS,
-            Option\Model::PAGE_MARK_BOOK,
-//            Option\Model::PAGE_GRADES,
+            Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
+            Filter\Page\Model::PAGE_MARK_BOOK,
+//            Filter\Page\Model::PAGE_GRADES,
         ];
     }
 
@@ -106,22 +104,13 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
+    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter)
     {
-        // noop - TemporalStates are purely hard-coded.
-        return $pageOptions;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
-    {
-        $cleanedPageOptions = parent::unsetInvalidOptions($pageOptions);
+        $cleanedPageOptions = parent::unsetInvalidOptions($pageFilter);
 
         foreach ($cleanedPageOptions as $idx => $option) {
             // Do not permit 'upcoming' on the 'grades' page
-            if (self::KEY_UNPUBLISHED === $option->getKey() && Option\Model::PAGE_GRADES === $option->getPage()) {
+            if (self::KEY_UNPUBLISHED === $option->getKey() && Filter\Page\Model::PAGE_GRADES === $pageFilter->getPage()) {
                 $cleanedPageOptions->offsetUnset($idx);
             }
         }
@@ -142,16 +131,17 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
     {
         // by default, all TemporalStates are available
         return true;
     }
 
+
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/TemporalState/templates';
     }

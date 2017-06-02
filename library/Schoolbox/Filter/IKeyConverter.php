@@ -44,6 +44,7 @@ interface IKeyConverter
      * @param string $key
      * @return string
      * @throws \InvalidArgumentException if the key is invalid
+     * @todo consider if we should make this method enforce permissions (by checking admin-configured available options and other permissions)
      */
     public function sanitiseKey($key);
 

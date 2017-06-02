@@ -41,12 +41,14 @@ interface IFactoryFactory
 
 
     /**
-     * Build a set of key converters for the specified page
+     * Build a set of key converters for the specified pageFilters.
+     *
+     * Key Converters should be light-weight as they are instantiated on every filtered report request
+     *
+     * Only includes keyConverters for filters that are configured to be visible on the specified page
      *
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
-     * @throws \InvalidArgumentException If unable to find the filter mapper class
-     * @throws \ReflectionException If the specified class does not exist
      */
     public function buildKeyConverters($page);
 
@@ -58,11 +60,12 @@ interface IFactoryFactory
      * @param string    $page
      * @param string    $route
      * @param null|User $viewee
-     * @param array     $queryArgs
+     * @param array     $request
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined the entity it is filtering
      */
-    public function buildPanel(User $user, $page, $route, User $viewee = null, array $queryArgs = []);
+    public function buildPanel(User $user, $page, $route, User $viewee = null, array $request = []);
+
 }

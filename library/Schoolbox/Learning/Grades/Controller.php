@@ -25,7 +25,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Option as FilterOption;
+use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -191,7 +191,7 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject)
     {
-        $page        = FilterOption\Model::PAGE_GRADES;
+        $page        = FilterPage\Model::PAGE_GRADES;
         $route       = $this->getRouter()->generate('learningGrades.postReport', [
             'userId'    => $viewee->getId(),
             'termCode'  => $term->getCode(),
@@ -258,23 +258,25 @@ class Controller extends Base
      * @throws Filter\BrokenFilterException If a filter is unable to be processed
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws DefinitionException If specified mapper join is not defined
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      * @todo convert to a GET route
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject)
     {
-        $postFilterSelections = $this->request->post['filter_selection'] ?: [];
+        $request = $this->request->post['filter_selection'] ?: [];
+        $page    = FilterPage\Model::PAGE_GRADES;
 
-        $page          = FilterOption\Model::PAGE_GRADES;
         $keyConverters = $this->filterFactoryFactory->buildKeyConverters($page);
         $codec         = new Filter\Codec();
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->selectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
+        $selectionsPerFilter = $codec->buildSelections($this->selectionMapper, $keyConverters, $this->getUser(), $page, $request);
         $this->selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
         // Convert Selection models to Filters
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
         $filtersDto           = $selectionTransformer->buildFiltersDto();
+
 
         /* Merge filters to ensure that assessments:
          * * Belong to this folder

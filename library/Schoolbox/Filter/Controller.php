@@ -10,8 +10,6 @@ namespace Schoolbox\Filter;
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\GenericCollection;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\Role;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
@@ -22,24 +20,30 @@ class Controller extends BaseController
     /** @var Mapper $filterMapper */
     private $filterMapper;
 
-    /** @var Option\Mapper $optionsMapper */
+    /** @var Page\Mapper $pageMapper */
+    private $pageMapper;
+
+    /** @var Page\Option\Mapper $optionsMapper */
     private $optionsMapper;
 
-    /** @var  Option\Defaults\Mapper $defaultsMapper */
+    /** @var Page\Option\Defaults\Mapper $defaultsMapper */
     private $defaultsMapper;
 
 
     /**
-     * @param Mapper          $filterMapper
-     * @param Option\Mapper   $optionsMapper
-     * @param Defaults\Mapper $defaultsMapper
+     * @param Mapper                      $filterMapper
+     * @param Page\Mapper                 $pageMapper
+     * @param Page\Option\Mapper          $optionsMapper
+     * @param Page\Option\Defaults\Mapper $defaultsMapper
      */
     public function __construct(
         Mapper $filterMapper,
-        Option\Mapper $optionsMapper,
-        Option\Defaults\Mapper $defaultsMapper
+        Page\Mapper $pageMapper,
+        Page\Option\Mapper $optionsMapper,
+        Page\Option\Defaults\Mapper $defaultsMapper
     ) {
         $this->filterMapper   = $filterMapper;
+        $this->pageMapper     = $pageMapper;
         $this->optionsMapper  = $optionsMapper;
         $this->defaultsMapper = $defaultsMapper;
     }
@@ -54,15 +58,15 @@ class Controller extends BaseController
      */
     public function getIndex()
     {
-        $filtersPerPage = $this->findVisibleFiltersPerPage();
+        $filtersPerPage = $this->findAvailableFiltersPerPage();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
             'filtersPerPage'           => $filtersPerPage,
 
             // Constants to enable presentation language delegation to TWIG
-            'PAGE_PENDING_ASSESSMENTS' => Option\Model::PAGE_PENDING_ASSESSMENTS,
-            'PAGE_GRADES'              => Option\Model::PAGE_GRADES,
-            'PAGE_MARK_BOOK'           => Option\Model::PAGE_MARK_BOOK,
+            'PAGE_PENDING_ASSESSMENTS' => Page\Model::PAGE_PENDING_ASSESSMENTS,
+            'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
+            'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ]));
     }
@@ -78,31 +82,77 @@ class Controller extends BaseController
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
      * @throws \ReflectionException If a definition class does not exist
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
     public function getPageSettings(IFactoryFactory $factoryFactory, $page)
     {
-        $pageFilters = $this->findVisibleFiltersPerPage()[$page];
+        $definitions = $this->buildCurrentState($factoryFactory, $page);
 
-        /** @var GenericCollection|IDefinition[] $definitions */
-        $definitions = new GenericCollection(IDefinition::class);
-
-        foreach($pageFilters as $name => $instance){
-            $filterFactory      = $factoryFactory->buildFilterFactoryForFilter($instance->getClass());
-            $definitions[$name] = $filterFactory->buildDefinition($instance);
+        $pageFilters = $this->pageMapper->createCollection();
+        foreach ($definitions as $class => $definition) {
+            $pageFilters[$class] = $definition->getFilter()->getPages()[$page];
         }
 
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
-            'pageKey'                  => $page,
+            'page'                     => $page,
             'definitions'              => $definitions,
+            'pageFilters'              => $pageFilters,
             'roleTypes'                => Role::getRoleTypes(),
 
             // Constants to enable presentation language delegation to TWIG
-            'PAGE_PENDING_ASSESSMENTS' => Option\Model::PAGE_PENDING_ASSESSMENTS,
-            'PAGE_GRADES'              => Option\Model::PAGE_GRADES,
-            'PAGE_MARK_BOOK'           => Option\Model::PAGE_MARK_BOOK,
+            'PAGE_PENDING_ASSESSMENTS' => Page\Model::PAGE_PENDING_ASSESSMENTS,
+            'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
+            'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ]));
+    }
+
+
+    /**
+     * Build current system state of filter selections for specified page
+     *
+     * @param IFactoryFactory $factoryFactory
+     * @param string          $page
+     * @return GenericCollection|IDefinition[]
+     * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
+     * @throws \ReflectionException If a definition class does not exist
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     */
+    private function buildCurrentState(IFactoryFactory $factoryFactory, $page)
+    {
+        $availableFilters = $this->findAvailableFiltersPerPage()[$page];
+
+        /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.class */
+        $savedPageFilters = $this->pageMapper->findForPage($page)->indexByCallback(function (Page\Model $page) {
+            return $page->getFilter()->getClass();
+        });
+        $pageFilters      = $this->pageMapper->createCollection();
+
+        $definitions = new GenericCollection(IDefinition::class);
+
+        // Discard invalid data, and insert missing data
+        foreach ($availableFilters as $name => $instance) {
+            $class = $instance->getClass();
+            if ($savedPageFilters->offsetExists($class)) {
+                $pageFilters[$class] = $savedPageFilters[$class];
+            } else {
+                $pageFilter = $this->pageMapper->createModel();
+                $pageFilter
+                    ->setFilter($instance)
+                    ->setPage($page)
+                    ->setEnabled(Page\Model::getEnabledInitialState($instance, $page))
+                    ->setUserConfigurable(Page\Model::getUserConfigurableInitialState($instance, $page));
+                $pageFilters[$class]         = $pageFilter;
+                $instance->getPages()[$page] = $pageFilter;
+            }
+
+            $definition          = $factoryFactory->buildFilterFactoryForFilter($class)->buildDefinition($instance);
+            $definitions[$class] = $definition;
+            $definition->normalisePageOptions($pageFilters[$class]);
+        }
+        return $definitions;
     }
 
 
@@ -110,86 +160,95 @@ class Controller extends BaseController
      * Load up all settings for this page, overlay new settings, and save
      *
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
-     * @param string $page
+     * @param string          $page
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
      * @throws \ReflectionException If a definition class does not exist
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
     public function postSavePageSettings(IFactoryFactory $factoryFactory, $page)
     {
-        // Clean up any invalid roleType defaults
-        $this->deleteDefaultsForInvalidRoleTypes();
-
+        $pagesToSave    = $this->pageMapper->createCollection();
         $optionsToSave  = $this->optionsMapper->createCollection();
         $defaultsToSave = $this->defaultsMapper->createCollection();
 
-        $pageFilters = $this->findVisibleFiltersPerPage()[$page];
+        $definitions = $this->buildCurrentState($factoryFactory, $page);
 
+        /** @var GenericCollection|Page\Model[] $pageFilters */
+        $pageFilters = $this->pageMapper->createCollection();
+        foreach ($definitions as $class => $definition) {
+            $pageFilters[$class] = $definition->getFilter()->getPages()[$page];
+        }
 
         // Load current system options and defaults, and overlay with posted settings
+        /** @var string[] $postEnabled */
+        $postEnabled = $this->getRequest()->post->get('filter_enabled');
+        /** @var string[] $postUserConfigurable */
+        $postUserConfigurable = $this->getRequest()->post->get('filter_user_configurable');
         /** @var string[][] $postOptions */
-        $postOptions  = $this->getRequest()->post->get('filter_options');
+        $postOptions = $this->getRequest()->post->get('filter_options');
         /** @var string[][][] $postDefaults */
         $postDefaults = $this->getRequest()->post->get('filter_defaults');
-        foreach($pageFilters as $name => $instance){
-            $filterFactory = $factoryFactory->buildFilterFactoryForFilter($instance->getClass());
-            $definition    = $filterFactory->buildDefinition($instance);
-            $options       = $definition->getOptionsWithDefaults($page);
 
-            foreach($options as $option){
-                $option->setAvailable(isset($postOptions[$instance->getId()][$option->getKey()]));
+        foreach ($pageFilters as $pageFilter) {
+            $filterId = $pageFilter->getFilter()->getId();
 
-                // Must add() instead of offsetSet($id) as $id will be null if not yet in DB
+            $pageFilter->setEnabled(isset($postEnabled[$filterId]));
+            $pageFilter->setUserConfigurable(isset($postUserConfigurable[$filterId]));
+
+            // Must add() instead of offsetSet($id) as $id will be null if not yet in DB
+            $pagesToSave->add($pageFilter);
+
+            foreach ($pageFilter->getOptions() as $option) {
+                $option->setAvailable(isset($postOptions[$filterId][$option->getKey()]));
                 $optionsToSave->add($option);
 
-                foreach($option->getDefaults() as $default){
-                    $default->setSelected((bool)$postDefaults[$instance->getId()][$option->getKey()][$default->getRoleType()]);
+                foreach ($option->getDefaults() as $default) {
+                    $default->setSelected(isset($postDefaults[$filterId][$option->getKey()][$default->getRoleType()]));
                     $defaultsToSave->add($default);
                 }
             }
-
-            // Delete any invalid options. This can occur when:
-            // * a filter is configured to no longer be available for a page, or
-            // * a lookup list has an item removed
-            $optionsBuilder = $this->optionsMapper->getPredicateBuilder();
-            $keys = $options->getColumnValues('key');
-            $optionsBuilder
-                ->equals('filter_id', $instance->getId())
-                ->equals('page', $page)
-                ->notEquals('key', $options->getColumnValues('key'));
-            $count  = $this->optionsMapper->deleteByPredicates($optionsBuilder);
-            $todo = 1;
         }
 
-
-        // Save new and updated options and defaults
+        $this->pageMapper->save($pagesToSave);
         $this->optionsMapper->save($optionsToSave);
         $this->defaultsMapper->save($defaultsToSave);
+
+        // Delete any invalid pageFilters. This can occur when:
+        // * a filter is configured to no longer be available for a page
+        $pageBuilder = $this->pageMapper->getPredicateBuilder();
+        $pageBuilder
+            ->equals('page', $page)
+            ->notEquals('filter_id', $pagesToSave->map(function (Page\Model $pageFilter) {
+                return $pageFilter->getFilter()->getId();
+            })->getAll());
+        $this->pageMapper->deleteByPredicates($pageBuilder);
+
+        // Delete any invalid pageFilters and Options. This can occur when:
+        // * a lookup list has an item removed
+        foreach ($pagesToSave as $pageFilter) {
+            $optionsBuilder = $this->optionsMapper->getPredicateBuilder();
+            $optionsBuilder
+                ->equals('filter_page_id', $pageFilter->getId())
+                ->notEquals('key', $pageFilter->getOptions()->getColumnValues('key'));
+            $this->optionsMapper->deleteByPredicates($optionsBuilder);
+        }
+
+        // Delete any defaults for roleTypes that don't have access to the page
+        $defaultsBuilder = $this->defaultsMapper->getPredicateBuilder();
+        $defaultsBuilder
+            ->equals('filter_option_id', $optionsToSave->getColumnValues('id'))
+            ->notEquals('role_type', Page\Model::getPageRoleTypes()[$page]);
+        $this->defaultsMapper->deleteByPredicates($defaultsBuilder);
 
         $this->response->content->set($this->buildJsonOutput(['status' => 200]));
     }
 
 
     /**
-     * Hard-delete any roleType default selections if the roleType is no longer valid
-     *
-     * This would occur if a system roleType is removed.
-     *
-     * Returns the number of rows deleted
-     *
-     * @return bool
+     * @return GenericCollection[]|Model[][] $visibleFilters Indexed by page, then filterDefinition.name
      */
-    private function deleteDefaultsForInvalidRoleTypes()
-    {
-        $defaultsBuilder = $this->defaultsMapper->getPredicateBuilder();
-        $defaultsBuilder->notEquals('role_type', Role::getRoleTypes());
-        return $this->defaultsMapper->deleteByPredicates($defaultsBuilder);
-    }
-
-
-    /**
-     * @return GenericCollection[]|Model[][] $visibleFilters Indexed by page, then filterDefinition.class
-     */
-    private function findVisibleFiltersPerPage()
+    private function findAvailableFiltersPerPage()
     {
         /** @var GenericCollection|Model[] $visibleFilters */
         $visibleFilters = $this->filterMapper->findAll()->filter(function (Model $instance) {
@@ -199,9 +258,9 @@ class Controller extends BaseController
 
         // Group filters by which pages they appear on
         $filtersPerPage = [];
-        foreach($visibleFilters as $instance){
+        foreach ($visibleFilters as $instance) {
             $class = $instance->getClass();
-            foreach($class::getPages() as $page){
+            foreach ($class::getPages() as $page) {
                 $filtersPerPage[$page][$class::getName()] = $instance;
             }
         }

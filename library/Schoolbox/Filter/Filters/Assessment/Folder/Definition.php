@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\GenericCollection;
+use Schoolbox\Filter;
 
 /**
  * Display a list of folders (either classes, groups or both) where the student has submitted IResponses or received IFeedback.
@@ -21,18 +22,9 @@ use Schoolbox\GenericCollection;
  */
 abstract class Definition extends AbstractDefinition
 {
+
     const KEY_CLASSES = 'classes';
     const KEY_GROUPS = 'groups';
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
-    {
-        // noop - abstract options are hard-coded, concrete options are run-time
-        return $pageOptions;
-    }
 
 
     /**
@@ -60,7 +52,7 @@ abstract class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
     {
         // Initial config is both classes and groups are available for all pages
         return true;

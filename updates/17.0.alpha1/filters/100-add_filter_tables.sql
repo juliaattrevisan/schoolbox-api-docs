@@ -1,8 +1,9 @@
 -- TODO remove this debug aids
-# DROP TABLE IF EXISTS filter_default;
-# DROP TABLE IF EXISTS filter_selection;
-# DROP TABLE IF EXISTS filter_option;
-# DROP TABLE IF EXISTS filter;
+DROP TABLE IF EXISTS filter_default;
+DROP TABLE IF EXISTS filter_selection;
+DROP TABLE IF EXISTS filter_option;
+DROP TABLE IF EXISTS filter_page;
+DROP TABLE IF EXISTS filter;
 
 -- A list of filters available in the system
 CREATE TABLE filter (
@@ -13,21 +14,35 @@ CREATE TABLE filter (
   INDEX idx_filter_class (`class`)
 ) ENGINE=INNODB;
 
--- A set of options available for each filter.
+-- Which filters are enabled for which pages
+CREATE TABLE filter_page (
+  `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `filter_id` INT(11) NOT NULL,
+  INDEX idx_filter_option_filter_id (`filter_id`),
+  CONSTRAINT fk_filter_option_filter_id
+    FOREIGN KEY (`filter_id`)
+    REFERENCES filter(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
+  `enabled` BOOL NOT NULL,
+  `user_configurable` BOOL NOT NULL,
+  CONSTRAINT unique_filter_page_filter_id_page UNIQUE (`filter_id`, `page`),
+  INDEX idx_filter_option_page (`page`)
+) ENGINE=INNODB;
+
+-- A set of options available for each page_filter.
 -- Some options may be hard-coded. The filter implementation logic determines whether to use configured options or hard-coded ones.
 CREATE TABLE filter_option (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `filter_id` INT(11) NOT NULL,
-    INDEX idx_filter_option_filter_id (`filter_id`),
-    CONSTRAINT fk_filter_option_filter_id
-      FOREIGN KEY (`filter_id`)
-      REFERENCES filter(`id`)
+  `filter_page_id` INT(11) NOT NULL,
+    INDEX idx_filter_option_filter_page_id (`filter_page_id`),
+    CONSTRAINT fk_filter_option_filter_page_id
+      FOREIGN KEY (`filter_page_id`)
+      REFERENCES filter_page (`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
-  `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
   `key` VARCHAR(127) NOT NULL COMMENT 'An abstract key - eg \'all\', \'future\', etc',
   `available` BOOL NOT NULL,
-  CONSTRAINT unique_filter_option_filter_id_page_key UNIQUE (`filter_id`, `page`, `key`),
-  INDEX idx_filter_option_page (`page`),
+  CONSTRAINT unique_filter_option_filter_page_id_key UNIQUE (`filter_page_id`, `key`),
   INDEX idx_filter_option_key (`key`)
 ) ENGINE=INNODB;
 

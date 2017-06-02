@@ -7,25 +7,23 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
-use Schoolbox\Filter\AbstractComponent;
 use Schoolbox\GenericCollection;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Selection;
+use Schoolbox\Filter;
 use Schoolbox\Assessment\Term;
 
 
 /**
  * @method Definition getDefinition()
  */
-abstract class Component extends AbstractComponent
+abstract class Component extends Filter\AbstractComponent
 {
 
     /**
      * A concrete Term model may match one or more availability configs. Eg, the admin may have selected 'all' terms.
      * We need to examine each concrete Term model to see if it matches an availability filter
      *
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
-     * @return GenericCollection|Selection\Model[]
+     * @param GenericCollection|Filter\Page\Option\Model[] $optionDefaults $optionDefaults
+     * @return GenericCollection|Filter\Selection\Model[]
      */
     protected function getRoleSelections(GenericCollection $optionDefaults)
     {
@@ -49,8 +47,8 @@ abstract class Component extends AbstractComponent
     /**
      * Should the specified Term be displayed in list of available options for the user?
      *
-     * @param Term\Model        $term
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
+     * @param Term\Model                                              $term
+     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $optionDefaults $optionDefaults
      * @return bool
      */
     private function isAvailable(Term\Model $term, GenericCollection $optionDefaults)
@@ -80,12 +78,13 @@ abstract class Component extends AbstractComponent
         return false;
     }
 
+
     /**
      * Should the specified Term be selected in list of available options for the user's role?
      *
-     * @param Term\Model        $term
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
-     * @param string $roleType
+     * @param Term\Model                                              $term
+     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $optionDefaults $optionDefaults
+     * @param string                                                  $roleType
      * @return bool
      */
     private function isSelected(Term\Model $term, GenericCollection $optionDefaults, $roleType)

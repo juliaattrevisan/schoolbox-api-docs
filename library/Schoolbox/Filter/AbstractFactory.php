@@ -7,10 +7,6 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\Filter;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -19,13 +15,16 @@ use Schoolbox\User;
 abstract class AbstractFactory implements IFactory
 {
 
-    /** @var Filter\Mapper */
+    /** @var Mapper */
     private $filterMapper;
 
-    /** @var Option\Mapper */
+    /** @var Page\Mapper */
+    private $filterPageMapper;
+
+    /** @var Page\Option\Mapper */
     private $filterOptionMapper;
 
-    /** @var Defaults\Mapper */
+    /** @var Page\Option\Defaults\Mapper */
     private $filterDefaultMapper;
 
     /** @var Selection\Mapper */
@@ -33,12 +32,14 @@ abstract class AbstractFactory implements IFactory
 
 
     public function __construct(
-        Filter\Mapper $filterMapper,
-        Option\Mapper $optionMapper,
-        Defaults\Mapper $defaultMapper,
+        Mapper $filterMapper,
+        Page\Mapper $pageMapper,
+        Page\Option\Mapper $optionMapper,
+        Page\Option\Defaults\Mapper $defaultMapper,
         Selection\Mapper $selectionMapper
     ) {
         $this->filterMapper          = $filterMapper;
+        $this->filterPageMapper      = $pageMapper;
         $this->filterOptionMapper    = $optionMapper;
         $this->filterDefaultMapper   = $defaultMapper;
         $this->filterSelectionMapper = $selectionMapper;
@@ -50,11 +51,11 @@ abstract class AbstractFactory implements IFactory
      *
      * No dynamic options or user-selections relevant.
      *
-     * @param Filter\Model $filter
+     * @param Model $filter
      * @return IDefinition|object
      * @throws \ReflectionException If unable to create an instance of the reflected class
      */
-    public function buildDefinition(Filter\Model $filter)
+    public function buildDefinition(Model $filter)
     {
         $definitionReflector = new \ReflectionClass($filter->getClass());
         return $definitionReflector->newInstanceArgs($this->buildDefinitionArgs($filter));
@@ -66,46 +67,37 @@ abstract class AbstractFactory implements IFactory
      * @throws \ReflectionException If unable to create an instance of the reflected class
      * @throws MapperException If invalid columns names are used
      */
-    public function buildComponent($definitionClass, User $user, $page, User $viewee = null, GenericCollection $selectionOverrides = null)
-    {
-        $filter     = $this->filterMapper->findByClass($definitionClass)->first();
-        $definition = $this->buildDefinition($filter);
-
-        // Don't bother building a component if it will be empty
-        $availableOptions = $definition->getOptions($page)->filter(function(Option\Model $option){
-            return $option->getAvailable();
-        });
-        if(0 === $availableOptions->count()){
-            return null;
-        }
-
-        // Don't bother loading user's saved selections if we are just going to override them
-        $overrideUserSelections = null !== $selectionOverrides;
-
+    public function buildComponent(
+        IDefinition $definition,
+        User $user,
+        Page\Model $pageFilter,
+        User $viewee = null,
+        GenericCollection $selections,
+        GenericCollection $overrides = null
+    ) {
+        // If overrides are present, ignore the user's saved selections.
         $baseArgs = [
             'definition'            => $definition,
             'user'                  => $user,
-            'page'                  => $page,
-            'savedSelections'       => $overrideUserSelections ? null : $this->getSavedSelections($filter, $user, $page),
-            'selectionOverrides'    => $selectionOverrides,
+            'pageFilter'            => $pageFilter,
+            'selections'            => $overrides ?: $selections,
             'filterSelectionMapper' => $this->filterSelectionMapper,
         ];
 
-        $extraArgs = $this->buildExtraComponentArgs($user, $page, $definition, $selectionOverrides, $viewee);
+        $extraArgs = $this->buildExtraComponentArgs($user, $pageFilter, $definition, $overrides, $viewee);
 
-        $componentClass = $this->getAdjacentClass($definitionClass, 'Component');
+        $componentClass = $this->getAdjacentClass(get_class($definition), 'Component');
 
         $componentReflector = new \ReflectionClass($componentClass);
         return $componentReflector->newInstanceArgs(array_merge($baseArgs, $extraArgs));
     }
 
+
     /**
-     * Returns a key converter, able to convert between concrete keys and the entities they represent
-     *
-     * @param Filter\Model $filter
-     * @return IKeyConverter|object
+     * @inheritdoc
+     * @throws \ReflectionException
      */
-    public function buildKeyConverter(Filter\Model $filter)
+    public function buildKeyConverter(Model $filter)
     {
         $keyConverterReflector = new \ReflectionClass($this->getAdjacentClass($filter->getClass(), 'KeyConverter'));
         return $keyConverterReflector->newInstanceArgs($this->buildKeyConverterArgs($filter));
@@ -113,10 +105,10 @@ abstract class AbstractFactory implements IFactory
 
 
     /**
-     * @param Filter\Model $filter
+     * @param Model $filter
      * @return mixed[]
      */
-    protected function buildDefinitionArgs(Filter\Model $filter)
+    protected function buildDefinitionArgs(Model $filter)
     {
         return [
             'filter'              => $filter,
@@ -125,29 +117,37 @@ abstract class AbstractFactory implements IFactory
         ];
     }
 
+
     /**
      * @param User                                     $user
-     * @param string                                   $page
+     * @param Page\Model                               $pageFilter
      * @param IDefinition                              $definition
      * @param null|GenericCollection|Selection\Model[] $overrides
      * @param null|User                                $viewee
      * @return mixed[]
      */
-    protected abstract function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null);
+    protected abstract function buildExtraComponentArgs(
+        User $user,
+        Page\Model $pageFilter,
+        IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    );
 
 
     /**
      * Builds constructor arguments for KeyConverter
      *
-     * @param Filter\Model $filter
+     * @param Model $filter
      * @return mixed[]
      */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
+    protected function buildKeyConverterArgs(Model $filter)
     {
         return [
             'filter' => $filter,
         ];
     }
+
 
     /**
      * Given some class in some namespace, get the class name for an adjacent class in the same namespace
@@ -160,23 +160,5 @@ abstract class AbstractFactory implements IFactory
     {
         $namespace = substr($reference, 0, strrpos($reference, '\\'));
         return "{$namespace}\\{$target}";
-    }
-
-    /**
-     * Get user's existing selections for this filter and page
-     *
-     * @param Filter\Model $filter
-     * @param User         $user
-     * @param string       $page
-     * @return GenericCollection|Selection\Model[]
-     * @throws MapperException If invalid columns names are used
-     */
-    private function getSavedSelections(Filter\Model $filter, User $user, $page)
-    {
-        return $this->filterSelectionMapper->findByColumnList([
-            'filter_id' => $filter->getId(),
-            'user_id'   => $user->getId(),
-            'page'      => $page,
-        ])->indexBy('key');
     }
 }

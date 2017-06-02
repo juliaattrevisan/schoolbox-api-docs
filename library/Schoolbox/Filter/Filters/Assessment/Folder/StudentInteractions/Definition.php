@@ -20,8 +20,10 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
  */
 class Definition extends FolderFilter\Definition
 {
+
     // The name to expose in the UI
     const NAME = 'Student Folders';
+
 
     /**
      * @inheritdoc
@@ -37,7 +39,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/Folder/StudentInteractions/templates';
     }

@@ -17,6 +17,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Filter\Filters;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 
 /**
@@ -25,7 +26,7 @@ use Schoolbox\Filter\Filters;
 class FactoryFactory extends Filter\AbstractFactoryFactory
 {
 
-    const ENTITY = \Schoolbox\Learning\Assessment\DataModel\Mapper::class;
+    const ENTITY = Assessment\Mapper::class;
 
 
     /**

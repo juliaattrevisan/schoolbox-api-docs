@@ -4,8 +4,9 @@
     Enables the admin to
 
     Usage:
-        pageKey                  string
-        definitions              IDefinition[]
+        page                     string
+        definitions              IDefinition[]         Indexed by definition.class
+        pageFilters              Filter\Page\Model[]   Indexed by definition.class
         PAGE_GRADES              string
         PAGE_MARK_BOOK           string
         PAGE_PENDING_ASSESSMENTS string
@@ -14,15 +15,15 @@
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{% if PAGE_GRADES == pageKey %}
+{% if PAGE_GRADES == page %}
     {% set pageName = 'Grades' %}
-{% elseif PAGE_MARK_BOOK == pageKey %}
+{% elseif PAGE_MARK_BOOK == page %}
     {% set pageName = 'Markbook' %}
-{% elseif PAGE_PENDING_ASSESSMENTS == pageKey %}
+{% elseif PAGE_PENDING_ASSESSMENTS == page %}
     {% set pageName = 'Pending Assessments' %}
 {% else %}
     {# Graceful fallback if constant not injected into twig #}
-    {% set pageName = pageKey %}
+    {% set pageName = page %}
 {% endif %}
 
 {% set entity = (definitions | first).filter.entity %}
@@ -45,99 +46,175 @@
 <script type="text/javascript">
     $(function() {
 
-        var $tables           = $('[data-filter-table]');
-        var $checkboxDefaults = $('[type=checkbox][data-option-default]');
-        var $hiddenDefaults   = $('[type=hidden][data-option-default]');
-        var $alerts           = $('[data-alert-filter]');
-        var $saveButton       = $('#save_settings');
-        var $toast            = $('[data-toast]');
+        var $optionAvailable        = $('[data-option-available]');
+        var $roleDefaultAvailable   = $('[data-role-type-available]');
+        var $roleDefaultUnavailable = $('[data-role-type-unavailable]');
+        var $saveButton             = $('#save_settings');
+        var $toast                  = $('[data-toast]');
 
-        // If admin configures an option not to be available, disable role-default checkboxes.
-        // Also check if no options are available. If so, the filter is disabled
-        $tables.on('change', '[data-filter-option]', function(elem){
-            var $checkbox = $(elem.target);
-            var filterId  = $checkbox.data('filter-id');
-            var optionKey = $checkbox.data('option-key');
+        // User toggles 'Enabled' checkbox
+        $('[data-filter-enable]').on('change', function(){
+            var $checkbox = $(this);
+            var $section  = $checkbox.closest('[data-filter]');
 
-            var $optionDefaults = $checkboxDefaults.filter('[data-filter-id='+filterId+'][data-option-key='+optionKey+']');
-            $optionDefaults.prop('disabled', !$checkbox.prop('checked'));
+            var $panel            = $section.find('[data-filter-settings]');
+            var $configurableWrap = $section.find('[data-filter-user-configurable-wrap]');
 
-            checkAllOptionsDisabled(filterId);
+            if($checkbox.prop('checked')){
+                $panel.slideDown();
+                $configurableWrap.show();
+            } else {
+                $panel.slideUp();
+                $configurableWrap.hide();
+            }
+            hideNoConfigurableOptionsMsg($section.data('filter'));
         });
-
-        // If admin changes a roleDefault checkbox, sync the change to the hidden input equivalent, so disabled checkbox states
-        // are still saved. This essentially turns our disabled checkboxes into read-only checkboxes
-        $tables.on('change', '[type=checkbox][data-option-default]', function(elem){
-            var $checkbox = $(elem.target);
-            var filterId  = $checkbox.data('filter-id');
-            var optionKey = $checkbox.data('option-key');
-            var roleType  = $checkbox.data('role-type');
-
-            var $hidden = $hiddenDefaults.filter('[data-filter-id='+filterId+'][data-option-key='+optionKey+'][data-role-type='+roleType+']');
-            $hidden.val($checkbox.prop('checked') ? 1 : 0);
-        });
-
-
-        // User clicks 'Save'
-        $saveButton.on('click', function(event){
-            event.preventDefault();
-            $saveButton.attr('disabled', true);
-
-            var data = $tables.find('input').serialize();
-            var href = $saveButton.data('href');
-
-            $toast.toastActivate({text: 'Saving settings...'});
-
-            // Hack to fix current bug in plugin which shows previous return state when initiating repeated action
-            var duration = 2000;
-
-            $.post(href, data)
-                .success(function () {
-                    $toast.toastTimeout({text: 'Settings saved.', css: 'success', duration: duration});
-                })
-                .error(function(){
-                    $toast.toastTimeout({text: 'Unable to save.', css: 'alert', duration: duration});
-                })
-                .always(function() {
-                    $saveButton.attr('disabled', false);
-                    setTimeout(function(){
-                        $toast.removeClass('success alert');
-                    }, duration);
-
-                });
-        });
-
 
         /**
-         * If admin deselects all options to be available for a page, update column header
-         *
-         * @param {int} filterId
+         * Hide the 'No Configurable Options message' for the specified filter
+         * @param {number} filterId
          */
-        function checkAllOptionsDisabled(filterId)
+        function hideNoConfigurableOptionsMsg(filterId)
         {
-            var $alert = $alerts.filter('[data-alert-filter='+filterId+']');
-            var $table = $tables.filter('[data-filter-table='+filterId+']');
-            var $checkedFilterOptions = $table.find(':checked[data-filter-option]');
+            // Remove any validation warnings about invalid state
+            $('#filter_user_configurable\\['+filterId+'\\]-error').remove();
+        }
 
-            if($checkedFilterOptions.length){
-                $alert.slideUp();
-                $table.css('opacity', 1.0);
+        /**
+         * Hide the 'No Configurable Options message' for the specified filter
+         *
+         * @param {number} filterId
+         */
+        function checkSingleUserConfigurableOption(filterId)
+        {
+            var $filter                   = $('[data-filter='+filterId+']');
+            var $checkboxUserConfigurable = $filter.find('[data-filter-user-configurable]');
+            var $checkedAvailableOptions  = $filter.find(':checked[data-option-available]');
+            var $warningSingleOption      = $filter.find('[data-single-available-option]');
+
+            if($checkboxUserConfigurable.prop('checked') && 1 === $checkedAvailableOptions.length){
+                $warningSingleOption.slideDown();
             } else {
-                $alert.slideDown();
-                $table.css('opacity', 0.75);
+                $warningSingleOption.slideUp();
             }
         }
+
+        // User toggles a 'User-configurable' checkbox
+        $('[data-filter-user-configurable]').on('change', function(){
+            var $checkbox = $(this);
+            var $section  = $checkbox.closest('[data-filter]');
+            var filterId  = $section.data('filter');
+
+            var $legendHardCoded    = $section.find('[data-hard-coded]');
+            var $legendConfigurable = $section.find('[data-configurable]');
+            var $availableColumns   = $section.find('[data-available-col]');
+
+            if($checkbox.prop('checked')){
+                $legendHardCoded.hide();
+                $legendConfigurable.show();
+                $availableColumns.show();
+                $section.find('[data-option-available]').trigger('change');
+            } else {
+                $legendHardCoded.show();
+                $legendConfigurable.hide();
+                $availableColumns.hide();
+                $roleDefaultAvailable.show();
+                $roleDefaultUnavailable.hide();
+            }
+            checkSingleUserConfigurableOption(filterId);
+        });
+
+        // User toggles an 'Available' checkbox
+        $optionAvailable.on('change', function(){
+            var $checkbox        = $(this);
+            var $row             = $checkbox.closest('[data-options-row]');
+            var $availableWrap   = $row.find('[data-role-type-available]');
+            var $unavailableWrap = $row.find('[data-role-type-unavailable]');
+
+            if($checkbox.prop('checked')){
+                $availableWrap.show();
+                $unavailableWrap.hide();
+            } else {
+                $availableWrap.hide();
+                $unavailableWrap.show();
+            }
+
+            // Remove any validation warnings about invalid state
+            var filterId = $checkbox.closest('[data-filter]').data('filter');
+            hideNoConfigurableOptionsMsg(filterId);
+            checkSingleUserConfigurableOption(filterId);
+        });
+
+
+        $.validator.addMethod(
+            "hasAvailableOptions",
+            function(value, element) {
+                // Not user configurable?
+                if(undefined === value){
+                    // Always valid
+                    return true;
+                }
+                var $elem    = $(element);
+                var $section = $elem.closest('[data-filter]');
+                var countAvailable = $section.find(':checked[data-option-available]').length;
+
+                // No available options selected?
+                if(!countAvailable){
+                    $elem.focus();
+                    return false;
+                }
+                return true;
+            },
+            "You've configured this filter to be user-configurable, but no options are available for users to configure."
+        );
+
+        $('form[data-filter-settings]').alaressValidate({
+            rules: {
+                {% for definition in definitions %}
+                    'filter_user_configurable[{{ definition.filter.id }}]': 'hasAvailableOptions'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            },
+            errorPlacement: function($error, $elem) {
+                if($elem.is('[data-filter-user-configurable]')){
+                    $elem.closest('[data-filter-user-configurable-wrap]').after($error);
+                } else {
+                    $.alaressValidate.defaultErrorPlacement($error, $elem);
+                }
+            },
+            submitHandler: function(form) {
+                $saveButton.attr('disabled', true);
+
+                var data = $(form).find('input').serialize();
+                var href = $saveButton.data('href');
+
+                $toast.toastActivate({text: 'Saving settings...'});
+
+                // Hack to fix current bug in plugin which shows previous return state when initiating repeated action
+                var duration = 2000;
+
+                $.post(href, data)
+                    .success(function () {
+                        $toast.toastTimeout({text: 'Settings saved.', css: 'success', duration: duration});
+                    })
+                    .error(function(){
+                        $toast.toastTimeout({text: 'Unable to save.', css: 'alert', duration: duration});
+                    })
+                    .always(function() {
+                        $saveButton.attr('disabled', false);
+                        setTimeout(function(){
+                            $toast.removeClass('success alert');
+                        }, duration);
+                    });
+            }
+        });
     });
 </script>
 
 <style>
-    .column-options,
-    .column-on,
+    .column-options-label,
+    .column-available,
     .column-role-type{
         width: 120px;
-    }
-    .filter-name{
-        font-size: 120%;
     }
 </style>
 
@@ -151,103 +228,141 @@
     </div>
 </div>
 
-{% for name, definition in definitions %}
-    {% set options = definition.optionsWithDefaults(pageKey) %}
-
-    {# Are any options available ? #}
-    {% set hasOptions = false %}
-    {% for option in options if not hasOptions %}
-        {% if option.available %}
-            {% set hasOptions = true %}
-        {% endif %}
-    {% endfor %}
-
-    <div class="row" data-alert-filter="{{ definition.filter.id }}" {% if hasOptions %}style="display: none;"{% endif %}>
-        <div class="small-12">
-            <div data-alert class="alert-box warning" style="margin-bottom: 0;">
-                All options unchecked. Filter not applied to page.
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="small-12">
-            <table data-filter-table="{{ definition.filter.id }}">
-                <col class="column-options">
-                <col>
-                <col class="column-on">
-                <col class="column-role-type" span="4">
-                <tr>
-                    <th colspan="2"><span class="filter-name">{{ name }}</span></th>
-                    <th>On</th>
-                    <th colspan="{{ roleTypes | length }}">Default state</th>
-                </tr>
-                <tr>
-                    <th colspan="3"></th>
-                    {% for roleType in roleTypes %}
-                        <th>{{ roleType | capitalize }}</th>
-                    {% endfor %}
-                </tr>
-                {% for option in options %}
-                    <tr>
-                        <th>{% if loop.first %}Options:{% endif %}</th>
-                        <th>{{ definition.label(option.key) | capitalize }}</th>
-                        <td>
-                            <input
-                                    id="checkbox_{{ definition.filter.id }}_{{ option.key }}"
-                                    type="checkbox"
-                                    name="filter_options[{{ definition.filter.id }}][{{ option.key }}]"
-                                    {% if option.available %}checked{% endif %}
-                                    data-filter-option
-                                    data-filter-id="{{ definition.filter.id }}"
-                                    data-option-key="{{ option.key }}"
-                            >
-                            <label for="checkbox_{{ definition.filter.id }}_{{ option.key }}" class="checkbox-label"></label>
-                        </td>
-                        {% for roleType in roleTypes %}
-                            <td>
-                            {% set default = option.defaults[roleType] %}
-                            {% if not default %}
-                                <span title="This role type does not have access to this page">NA</span>
-                            {% else %}
-                                {# If checkbox disabled, we still want to save its state. Need to sync checkbox state to hidden input #}
-                                <input
-                                        type="hidden"
-                                        name="filter_defaults[{{ definition.filter.id }}][{{ option.key }}][{{ roleType }}]"
-                                        value="{% if default.selected %}1{% else %}0{% endif %}"
-                                        data-option-default
-                                        data-filter-id="{{ definition.filter.id }}"
-                                        data-option-key="{{ option.key }}"
-                                        data-role-type="{{ roleType }}"
-                                >
-                                <input
-                                        id="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}"
-                                        type="checkbox"
-                                        name="filter_defaults[{{ definition.filter.id }}][{{ option.key }}][{{ roleType }}]"
-                                        {% if default.selected %}checked{% endif %}
-                                        {% if not option.available %}disabled{% endif %}
-                                        data-option-default
-                                        data-filter-id="{{ definition.filter.id }}"
-                                        data-option-key="{{ option.key }}"
-                                        data-role-type="{{ roleType }}"
-                                >
-                                <label readonly="true" for="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}" class="checkbox-label"></label>
-                            {% endif %}
-                            </td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-{% endfor %}
-
-
 <div class="row">
-    <div class="small-12">
-        <section class="content">
-            <input type="submit" id="save_settings" value="Save Settings" data-href="{{ routeLookup('filters.postSavePageSettings', { page: pageKey }) }}">
+    <form data-filter-settings>
+        {% for class, pageFilter in pageFilters %}
+            <div class="small-12 island">
+                {% set definition = definitions[class] %}
+                {% set options    = pageFilter.options %}
+                <section data-filter="{{ definition.filter.id }}">
+                    {# Header #}
+                    <fieldset class="content">
+                        <div class="small-4 columns">
+                            <h2>{{ definition.name }}</h2>
+                        </div>
+                        <div class="small-4 columns">
+                            <input
+                                    id="checkbox_enabled_{{ definition.filter.id }}"
+                                    type="checkbox"
+                                    name="filter_enabled[{{ definition.filter.id }}]"
+                                    {% if pageFilter.enabled %}checked{% endif %}
+                                    data-filter-enable
+                            >
+                            <label for="checkbox_enabled_{{ definition.filter.id }}" class="checkbox-label">Enabled</label>
+                        </div>
+                        <div class="small-4 columns">
+                            <span data-filter-user-configurable-wrap {% if not pageFilter.enabled %} style="display:none;"{% endif %}>
+                                <input
+                                        id="checkbox_user_configurable_{{ definition.filter.id }}"
+                                        type="checkbox"
+                                        name="filter_user_configurable[{{ definition.filter.id }}]"
+                                        {% if pageFilter.userConfigurable %}checked{% endif %}
+                                        data-filter-user-configurable
+                                >
+                                <label for="checkbox_user_configurable_{{ definition.filter.id }}" class="checkbox-label">User-configurable</label>
+                            </span>
+                        </div>
+                    </fieldset>
+                    <fieldset data-filter-settings class="content"{% if not pageFilter.enabled %} style="display:none;"{% endif %}>
+                        <legend>
+                            <span data-hard-coded{% if pageFilter.userConfigurable %} style="display: none;"{% endif %}>
+                                <strong>Hard-Coded Selections</strong>: Users' reports will be filtered to these settings. Users will be unable to view or alter these selections.
+                            </span>
+                            <span data-configurable{% if not pageFilter.userConfigurable %} style="display: none;"{% endif %}>
+                                <strong>Default Selections</strong>: Select which options should be available to the user, and whether they are selected by default.
+                            </span>
+                        </legend>
+
+
+
+                        <table>
+                            <colgroup>
+                                <col class="column-options-label">
+                                <col class="column-options">
+                                <col class="column-available">
+                                <col class="column-role-type" span="4">
+                            </colgroup>
+                            <tr>
+                                <th colspan="3"></th>
+                                <th colspan="{{ roleTypes | length }}">Role Types</th>
+                            </tr>
+                            <tr>
+                                <th colspan="2"></th>
+                                <th><span data-available-col{% if not pageFilter.userConfigurable %} style="display:none;"{% endif %}>Available</span></th>
+                                {% for roleType in roleTypes %}
+                                    <th>{{ roleType | capitalize }}</th>
+                                {% endfor %}
+                            </tr>
+                            {% for option in options %}
+                                <tr data-options-row>
+                                    <th>{% if loop.first %}Options:{% endif %}</th>
+                                    <th>{{ definition.label(option.key) | capitalize }}</th>
+                                    <td>
+                                        <span data-available-col {% if not pageFilter.userConfigurable %} style="display:none;"{% endif %}>
+                                            <input
+                                                    id="checkbox_{{ definition.filter.id }}_{{ option.key }}"
+                                                    type="checkbox"
+                                                    name="filter_options[{{ definition.filter.id }}][{{ option.key }}]"
+                                                    {% if option.available %}checked{% endif %}
+                                                    data-option-available
+                                                    data-filter-id="{{ definition.filter.id }}"
+                                                    data-option-key="{{ option.key }}"
+                                            >
+                                            <label for="checkbox_{{ definition.filter.id }}_{{ option.key }}" class="checkbox-label"></label>
+                                        </span>
+                                    </td>
+                                    {% for roleType in roleTypes %}
+                                        <td>
+                                            {% set default = option.defaults[roleType] %}
+                                            {% if not default %}
+                                                <span title="This role type does not have access to this page">NA</span>
+                                            {% else %}
+                                                <span data-role-type-available {% if not option.available and pageFilter.userConfigurable %}style="display: none;"{% endif %}>
+                                                    <input
+                                                            id="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}"
+                                                            type="checkbox"
+                                                            name="filter_defaults[{{ definition.filter.id }}][{{ option.key }}][{{ roleType }}]"
+                                                            {% if default.selected %}checked{% endif %}
+                                                            data-option-default
+                                                            data-filter-id="{{ definition.filter.id }}"
+                                                            data-option-key="{{ option.key }}"
+                                                            data-role-type="{{ roleType }}"
+                                                    >
+                                                    <label for="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}" class="checkbox-label"></label>
+                                                </span>
+                                                <span data-role-type-unavailable {% if option.available or not pageFilter.userConfigurable %}style="display: none;"{% endif %}>
+                                                    <span title="Option not available on this page">-</span>
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+
+                        {# Alternatively this could be implemented as orange altert icon next to 'Available' header. Clicking on icon shows msg in modal #}
+                        <div data-single-available-option class="small-12 column" {% if not pageFilter.userConfigurable or 1 != pageFilter.countAvailableOptions %}style="display: none;"{% endif %}>
+                            <p class="warning alert-box icon-alert">
+                                <strong>Warning.</strong> Only one option available for user to configure.<br>
+                                <br>
+                                A user-configurable filter with only one option available is unable to alter the items displayed on a filterable page.
+                                If the option is unchecked, the filter will not be applied, and the report will display all available options, in this case just one.
+                                If the option is checked, then the user will see items that match the option.<br>
+                                <br>
+                                If you wish users to always only see items that match one specific option, then you should uncheck this filter's 'User-configurable' checkbox.
+                            </p>
+                        </div>
+                    </fieldset>
+                </section>
+            </div>
+        {% endfor %}
+
+        <div class="small-12 island">
+            <input type="submit" id="save_settings" value="Save Settings" data-href="{{ routeLookup('filters.postSavePageSettings', { page: page }) }}">
             <div class="toast" data-toast></div>
-        </section>
-    </div>
+        </div>
+    </form>
 </div>
+
+
 

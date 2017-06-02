@@ -5,10 +5,10 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Option\Defaults;
+namespace Schoolbox\Filter\Page\Option\Defaults;
 
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Filter\Option\Model as FilterOption;
+use Schoolbox\Filter\Page\Option\Model as FilterOption;
 
 class Model
 {

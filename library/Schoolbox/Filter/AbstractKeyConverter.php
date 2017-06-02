@@ -36,6 +36,7 @@ abstract class AbstractKeyConverter implements IKeyConverter
      */
     abstract protected function getItem($key);
 
+
     /**
      * @inheritdoc
      */

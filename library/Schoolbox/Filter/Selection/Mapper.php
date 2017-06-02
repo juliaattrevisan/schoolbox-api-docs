@@ -55,9 +55,9 @@ class Mapper extends \Schoolbox\Mapper
 
         // Save User's current selections
         $selectionsToSave = $this->createCollection();
-        foreach($selectionsPerFilter as $filterId => $filterSelections){
+        foreach ($selectionsPerFilter as $filterId => $filterSelections) {
             /** @var Model[] $filterSelections */
-            foreach($filterSelections as $key => $selection){
+            foreach ($filterSelections as $key => $selection) {
                 $selectionsToSave->add($selection);
             }
         }

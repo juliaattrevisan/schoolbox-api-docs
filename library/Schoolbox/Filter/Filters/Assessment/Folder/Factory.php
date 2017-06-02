@@ -9,17 +9,13 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Selection;
 use Schoolbox\Resource\Folder;
 
 
 /**
  * A factory for building 'Folder' filter objects
  */
-abstract class Factory extends AbstractFactory
+abstract class Factory extends Filter\AbstractFactory
 {
 
     /**
@@ -29,20 +25,22 @@ abstract class Factory extends AbstractFactory
 
 
     /**
-     * @param Filter\Mapper    $filterMapper
-     * @param Option\Mapper    $optionMapper
-     * @param Defaults\Mapper  $defaultMapper
-     * @param Selection\Mapper $selectionMapper
-     * @param Folder\Mapper    $folderMapper
+     * @param Filter\Mapper                      $filterMapper
+     * @param Filter\Page\Mapper                 $pageMapper
+     * @param Filter\Page\Option\Mapper          $optionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
+     * @param Filter\Selection\Mapper            $selectionMapper
+     * @param Folder\Mapper                      $folderMapper
      */
     public function __construct(
         Filter\Mapper $filterMapper,
-        Option\Mapper $optionMapper,
-        Defaults\Mapper $defaultMapper,
-        Selection\Mapper $selectionMapper,
+        Filter\Page\Mapper $pageMapper,
+        Filter\Page\Option\Mapper $optionMapper,
+        Filter\Page\Option\Defaults\Mapper $defaultMapper,
+        Filter\Selection\Mapper $selectionMapper,
         Folder\Mapper $folderMapper
     ) {
-        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($filterMapper, $pageMapper, $optionMapper, $defaultMapper, $selectionMapper);
         $this->folderMapper = $folderMapper;
     }
 

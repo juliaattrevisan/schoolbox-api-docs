@@ -7,36 +7,33 @@
 
 namespace Schoolbox\Filter;
 
-use Schoolbox\Filter;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Provides common filter definition behaviour
  */
 abstract class AbstractDefinition implements IDefinition
 {
+
     // The name to expose in the UI
     const NAME = '';
 
-    /** @var Filter\Model */
+    /** @var Model */
     private $filter;
 
-    /** @var Option\Mapper */
+    /** @var Page\Option\Mapper */
     private $filterOptionMapper;
 
-    /** @var Defaults\Mapper */
+    /** @var Page\Option\Defaults\Mapper */
     private $filterDefaultMapper;
 
 
     /**
-     * @param Model           $filter
-     * @param Option\Mapper   $filterOptionMapper
-     * @param Defaults\Mapper $filterDefaultMapper
+     * @param Model                       $filter
+     * @param Page\Option\Mapper          $filterOptionMapper
+     * @param Page\Option\Defaults\Mapper $filterDefaultMapper
      */
-    public function __construct(Filter\Model $filter, Option\Mapper $filterOptionMapper, Defaults\Mapper $filterDefaultMapper)
+    public function __construct(Model $filter, Page\Option\Mapper $filterOptionMapper, Page\Option\Defaults\Mapper $filterDefaultMapper)
     {
         $this->filter              = $filter;
         $this->filterOptionMapper  = $filterOptionMapper;
@@ -51,7 +48,7 @@ abstract class AbstractDefinition implements IDefinition
     public static function getName()
     {
         $name = static::NAME;
-        if(!$name){
+        if (!$name) {
             throw new \DomainException('Concrete classes must implement the NAME constant');
         }
         return $name;
@@ -59,58 +56,58 @@ abstract class AbstractDefinition implements IDefinition
 
 
     /**
-     * @inheritdoc
+     * If the admin has not configured this option, should it be available in filter panels?
+     *
+     * Normally, all possible options will be available on all pages. (ie just return true)
+     *
+     * @param string     $customAbstractKey
+     * @param Page\Model $pageFilter
+     * @return bool
      */
-    public function getOptions($page)
+    protected abstract function getInitialAvailability($customAbstractKey, Page\Model $pageFilter);
+
+
+    /**
+     * Ensure this pageFilterOptions contains all custom abstract options.
+     *
+     * eg 'All' 'Past' 'Future' etc
+     *
+     * @param Page\Model $pageFilter
+     * @return GenericCollection|Page\Option\Model[]
+     */
+    protected function insertAbstractOptions(Page\Model $pageFilter)
     {
-        // Is specified page is not in the valid pages?
-        if (!in_array($page, static::getPages(), true)) {
-            // Bug out
-            return $this->filterOptionMapper->createCollection();
-        }
-
-        // Get existing DB values, discarding any that belong to invalid pages
-        $columnList = [
-            'filter_id' => $this->getFilter()->getId(),
-            'page'      => $page,
-        ];
-
-        /** @var GenericCollection|Option\Model[] $pageOptions */
-        $pageOptions = $this->getFilterOptionMapper()->findByColumnList($columnList)->indexBy('key');
+        $options = $pageFilter->getOptions();
 
         // Ensure it contains all abstract custom options
         foreach ($this->getCustomKeys() as $customAbstractKey) {
-            if (!$pageOptions->offsetExists($customAbstractKey)) {
-                $option = $this->getFilterOptionMapper()->createModel();
+            if (!$options->offsetExists($customAbstractKey)) {
+                $option = $this->filterOptionMapper->createModel();
 
                 // If not yet configured by admin, should this option be available?
-                $isAvailable = $this->getInitialAvailability($customAbstractKey, $page);
+                $isAvailable = $this->getInitialAvailability($customAbstractKey, $pageFilter);
 
                 $option
-                    ->setFilter($this->getFilter())
+                    ->setFilterPage($pageFilter)
                     ->setKey($customAbstractKey)
-                    ->setPage($page)
                     ->setAvailable($isAvailable);
-                $pageOptions->setOffset($option->getKey(), $option);
+                $options->setOffset($option->getKey(), $option);
             }
         }
-
-        $pageOptions = $this->insertDynamicOptions($pageOptions, $page);
-        $pageOptions = $this->unsetInvalidOptions($pageOptions);
-
-        // Order the options. 'All', then 'Current', then 'Previous', then from most recent term back
-        return $this->sortFilterOptions($pageOptions);
+        return $options;
     }
 
 
     /**
      * Insert dynamic options into list. Eg each WorkType or Term that exists in the system right now.
      *
-     * @param GenericCollection|Option\Model[] $pageOptions
-     * @param string                           $page
-     * @return GenericCollection|Option\Model[]
+     * @param Page\Model $pageFilter
+     * @return GenericCollection|Page\Option\Model[]
      */
-    abstract protected function insertDynamicOptions(GenericCollection $pageOptions, $page);
+    protected function insertDynamicOptions(Page\Model $pageFilter)
+    {
+        return $pageFilter->getOptions();
+    }
 
 
     /**
@@ -124,62 +121,83 @@ abstract class AbstractDefinition implements IDefinition
      *
      * Filters that are based on lookup lists will need to remove items no longer in that lookup list
      *
-     * @param GenericCollection|Option\Model[] $pageOptions
-     * @return GenericCollection|Option\Model[]
+     * @param Page\Model $pageFilter
+     * @return GenericCollection|Page\Option\Model[]
      */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
+    protected function unsetInvalidOptions(Page\Model $pageFilter)
     {
         // Note: You must override this is you wish to remove some options for specific pages
         $validKeys = $this->getAbstractKeys();
         $validKeys = array_combine($validKeys, $validKeys);
 
-        foreach ($pageOptions as $idx => $option) {
-            if(!array_key_exists($option->getKey(), $validKeys)){
-                $pageOptions->offsetUnset($idx);
+        $options = $pageFilter->getOptions();
+
+        foreach ($options as $idx => $option) {
+            if (!array_key_exists($option->getKey(), $validKeys)) {
+                $options->offsetUnset($idx);
             }
         }
-        return $pageOptions;
+        return $options;
+    }
+
+
+    /**
+     * Removes any defaults that should not exist.
+     *
+     * This can occur when we change which roleTypes can view a page
+     *
+     * If filtering to a specific roleType, remove anything that doesn't match
+     *
+     * @param Page\Model  $pageFilter
+     * @param null|string $roleTypeFilter
+     * @return GenericCollection|Page\Option\Model[]
+     */
+    protected function unsetInvalidDefaults(Page\Model $pageFilter, $roleTypeFilter = null)
+    {
+        $validRoleTypes = $roleTypeFilter ? [$roleTypeFilter] : Page\Model::getPageRoleTypes()[$pageFilter->getPage()];
+        $validRoleTypes = array_combine($validRoleTypes, $validRoleTypes);
+
+        $options = $pageFilter->getOptions();
+        foreach ($options as $option) {
+            $defaults = $option->getDefaults();
+            foreach ($defaults as $idx => $default) {
+                if (!array_key_exists($default->getRoleType(), $validRoleTypes)) {
+                    $defaults->offsetUnset($idx);
+                }
+            }
+        }
+        return $options;
     }
 
 
     /**
      * @inheritdoc
-     * @throws BaseMapper\Exception
      */
-    public function getOptionsWithDefaults($page, $roleTypeFilter = null)
+    public function normalisePageOptions(Page\Model $pageFilter, $roleTypeFilter = null)
+    {
+        $this->insertAbstractOptions($pageFilter);
+        $this->insertDynamicOptions($pageFilter);
+        $this->unsetInvalidOptions($pageFilter);
+        $this->unsetInvalidDefaults($pageFilter, $roleTypeFilter);
+        $this->insertRoleDefaults($pageFilter, $roleTypeFilter);
+
+        return $this->sortFilterOptions($pageFilter->getOptions());
+    }
+
+
+    /**
+     * @param Page\Model  $pageFilter
+     * @param null|string $roleTypeFilter
+     */
+    private function insertRoleDefaults(Page\Model $pageFilter, $roleTypeFilter = null)
     {
         // Get the role types that can access this page
-        $roleTypes = Option\Model::getRoleTypesForPage($page);
-
-        // Get all possible options for this page, indexed by option.key
-        $pageOptions = $this->getOptions($page);
-
-        // Load existing defaults for options, and group by option
-        // We need to filter by $roleTypes to ensure if we have removed roles from accessing the page, they do not
-        // continue to appear in the admin options
-        $columnList = [
-            'filter_option_id' => $pageOptions->getColumnValues('id'),
-            'role_type'        => $roleTypeFilter ?: $roleTypes,
-        ];
-
-        $existingDefaults          = $this->getFilterDefaultMapper()->findByColumnList($columnList);
-        $existingDefaultsPerOption = $existingDefaults->groupByCallback(function (Defaults\Model $default) {
-            return $default->getFilterOption()->getKey();
-        });
-
-        // At this point, options are valid, but defaults may belong to invalid options. This
-        // will occur if, eg an item is removed from a lookup list
-        foreach ($pageOptions as $optionKey => $option){
-            if($existingDefaultsPerOption->offsetExists($optionKey)){
-                $option->setDefaults($existingDefaultsPerOption[$optionKey]->indexBy('roleType'));
-            }
-        }
-
+        $roleTypes = Page\Model::getRoleTypesForPage($pageFilter->getPage());
 
         /* Ensure all defaults are present in our model graph
          * If saved in DB, use that, else use system-initial values
          */
-        foreach ($pageOptions as $option) {
+        foreach ($pageFilter->getOptions() as $option) {
 
             foreach ($roleTypes as $roleType) {
 
@@ -193,13 +211,11 @@ abstract class AbstractDefinition implements IDefinition
                     $default
                         ->setFilterOption($option)
                         ->setRoleType($roleType)
-                        ->setSelected($this->getInitialSelectedState($option->getKey(), $page, $roleType));
+                        ->setSelected($this->getInitialSelectedState($option->getKey(), $pageFilter->getPage(), $roleType));
                     $option->getDefaults()[$roleType] = $default;
                 }
             }
         }
-
-        return $this->sortFilterOptions($pageOptions);
     }
 
 
@@ -208,7 +224,7 @@ abstract class AbstractDefinition implements IDefinition
      *
      * By default, return false (never setting available option to be pre-selected)
      *
-     * @param string $key       The option's abstract key
+     * @param string $key The option's abstract key
      * @param string $page
      * @param string $roleType
      * @return bool
@@ -243,12 +259,12 @@ abstract class AbstractDefinition implements IDefinition
      *
      * By default, sort them as defined in $this->getCustomKeys()
      *
-     * @param GenericCollection|Option\Model[] $options
-     * @return GenericCollection
+     * @param GenericCollection|Page\Option\Model[] $options
+     * @return GenericCollection|Page\Option\Model[]
      */
     protected function sortFilterOptions(GenericCollection $options)
     {
-        return $options->sortByCallback(function (Option\Model $left, Option\Model $right) {
+        return $options->sortByCallback(function (Page\Option\Model $left, Page\Option\Model $right) {
 
             $leftPos  = array_search($left->getKey(), $this->getAbstractKeys(), true);
             $rightPos = array_search($right->getKey(), $this->getAbstractKeys(), true);
@@ -263,15 +279,26 @@ abstract class AbstractDefinition implements IDefinition
      *
      * @return string
      */
-    protected abstract function getTemplatesDir();
+    protected static function getTemplatesDir()
+    {
+        // undefined on abstract. Concrete class must implement
+        return '';
+    }
 
 
     /**
      * @inheritdoc
+     * @throws \DomainException If this definition has not defined a template directory
      */
-    public function getPanelComponentTemplate()
+    public static function getPanelComponentTemplate()
     {
-        return $this->getTemplatesDir() . DIRECTORY_SEPARATOR . 'component.twig';
+        $templateDir = static::getTemplatesDir();
+
+        if (!$templateDir) {
+            throw new \DomainException('Template directory not defined for filter definition: ' . get_called_class());
+        }
+
+        return $templateDir . DIRECTORY_SEPARATOR . 'component.twig';
     }
 
     /* Getters
@@ -279,7 +306,7 @@ abstract class AbstractDefinition implements IDefinition
 
 
     /**
-     * @return Filter\Model
+     * @return Model
      */
     public function getFilter()
     {
@@ -288,7 +315,7 @@ abstract class AbstractDefinition implements IDefinition
 
 
     /**
-     * @return Option\Mapper
+     * @return Page\Option\Mapper
      */
     protected function getFilterOptionMapper()
     {
@@ -297,7 +324,7 @@ abstract class AbstractDefinition implements IDefinition
 
 
     /**
-     * @return Defaults\Mapper
+     * @return Page\Option\Defaults\Mapper
      */
     public function getFilterDefaultMapper()
     {

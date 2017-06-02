@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
@@ -19,8 +18,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term;
 use DueWork_ErrorMapper;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
-use Schoolbox\Filter\Option as FilterOption;
 use Schoolbox\User;
 use Schoolbox\GenericCollection;
 
@@ -42,21 +39,21 @@ class Controller extends Base
     /** @var Access */
     private $access;
 
-    /** @var AssessmentFilter\IdFinder */
+    /** @var Filter\Filters\Assessment\IdFinder */
     private $assessmentIdFinder;
 
-    /** @var AssessmentFilter\FactoryFactory */
+    /** @var Filter\Filters\Assessment\FactoryFactory */
     private $filterFactoryFactory;
 
 
     /**
-     * @param AssessmentMapperProxy           $assessmentMapperProxy
-     * @param GradeGroup\Model                $defaultGradeGroup
-     * @param Term\Mapper                     $termMapper
-     * @param DueWork_ErrorMapper             $dueWorkErrorMapper
-     * @param Access                          $access
-     * @param AssessmentFilter\IdFinder       $assessmentIdFinder
-     * @param AssessmentFilter\FactoryFactory $filterFactoryFactory
+     * @param AssessmentMapperProxy                    $assessmentMapperProxy
+     * @param GradeGroup\Model                         $defaultGradeGroup
+     * @param Term\Mapper                              $termMapper
+     * @param DueWork_ErrorMapper                      $dueWorkErrorMapper
+     * @param Access                                   $access
+     * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
+     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -64,8 +61,8 @@ class Controller extends Base
         Term\Mapper $termMapper,
         DueWork_ErrorMapper $dueWorkErrorMapper,
         Access $access,
-        AssessmentFilter\IdFinder $assessmentIdFinder,
-        AssessmentFilter\FactoryFactory $filterFactoryFactory
+        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
     ) {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->defaultGradeGroup     = $defaultGradeGroup;
@@ -90,6 +87,7 @@ class Controller extends Base
         $this->getMarkbookForClassAndTerm($folderId, $currentTerm, $viewee);
     }
 
+
     /**
      * Redirect to the markbook for the specified class and term
      *
@@ -100,25 +98,25 @@ class Controller extends Base
      */
     public function getMarkbookForClassAndTerm($folderId, Term\Model $term, User $viewee = null)
     {
-        $user        = $viewee ?: $this->getUser();
-        $route       = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $user->getId()]);
+        $user  = $viewee ?: $this->getUser();
+        $route = $this->getRouter()->generate('learningMarkbook.getMarkbook', ['userId' => $user->getId()]);
 
-        $filterMapper = Filter\Mapper::getInstance();
+        $filterMapper    = Filter\Mapper::getInstance();
         $selectionMapper = Filter\Selection\Mapper::getInstance();
 
         $selections = new GenericCollection(GenericCollection::class);
         $filters    = $filterMapper->findForEntity(\Schoolbox\Learning\Assessment\DataModel\Mapper::class);
-        foreach($filters as $filter){
+        foreach ($filters as $filter) {
             $selections[$filter->getId()] = $selectionMapper->createCollection();
 
-            if(Filter\Filters\Assessment\Folder\TeacherInvolved\Definition::class === $filter->getClass()){
+            if (Filter\Filters\Assessment\Folder\TeacherInvolved\Definition::class === $filter->getClass()) {
                 $selections[$filter->getId()][$folderId] = $this->createSelectionModel($selectionMapper, $filter, (string)$folderId);
-            } elseif(Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()){
+            } elseif (Filter\Filters\Assessment\Term\Due\Definition::class === $filter->getClass()) {
                 $selections[$filter->getId()][$term->getId()] = $this->createSelectionModel($selectionMapper, $filter, (string)$term->getId());
             }
         }
 
-        $codec = new Filter\Codec();
+        $codec        = new Filter\Codec();
         $getArgString = $codec->convertSelectionsToQueryString($selections);
 
         $this->getResponse()->redirect->to("{$route}?{$getArgString}");
@@ -139,7 +137,7 @@ class Controller extends Base
         $selection
             ->setFilter($filter)
             ->setUser($this->getUser())
-            ->setPage(FilterOption\Model::PAGE_MARK_BOOK)
+            ->setPage(Filter\Page\Model::PAGE_MARK_BOOK)
             ->setKey($key)
             ->setSelected(true);
         return $selection;
@@ -153,10 +151,12 @@ class Controller extends Base
      * @level 165
      * @param null|User $viewee Whose markbook are we looking at?
      * @throws RouteNotFound
-     * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
-     * @throws \ReflectionException      If the specified filter definition class does not exist
-     * @throws ServiceNotFound           If unable to locate HTML web Output
-     * @throws \DomainException          If of the filters on this page does not have its slug set
+     * @throws \InvalidArgumentException             If unable to locate Filter mapper class, or required filter definition classes
+     * @throws \ReflectionException                  If the specified filter definition class does not exist
+     * @throws ServiceNotFound                       If unable to locate HTML web Output
+     * @throws \DomainException                      If of the filters on this page does not have its slug set
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      */
     public function getMarkbook(User $viewee = null)
     {
@@ -164,7 +164,7 @@ class Controller extends Base
         if (null === $viewee) {
             $viewee = $this->getUser();
         }
-        $page      = FilterOption\Model::PAGE_MARK_BOOK;
+        $page      = Filter\Page\Model::PAGE_MARK_BOOK;
         $route     = $this->getRouter()->generate('learningMarkbook.postMarkbook', ['userId' => $viewee->getId()]);
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
@@ -194,18 +194,18 @@ class Controller extends Base
     public function postMarkbook(User $viewee)
     {
         try {
-            $postFilterSelections = $this->request->post['filter_selection'] ?: [];
+            $request = $this->request->post['filter_selection'] ?: [];
 
             /**
              * @var Filter\DataTransferObject $filtersDto
              * @var Filter\Codec              $codec
              * @var Filter\Selection\Model[][]
              */
-            list($filtersDto, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($postFilterSelections, true);
+            list($filters, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($request, true);
 
             // Ensure that assessments are not Assessment Specs
-            $filters = array_merge($filtersDto->getByClass(), [
-                AssessmentFilter\NullableContext\UnitSpec\Definition::class => [],
+            $filters = array_merge($filters, [
+                Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
             ]);
 
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
@@ -246,31 +246,33 @@ class Controller extends Base
 
 
     /**
-     * @param array $request
-     * @param bool  $save Should we persist these selections to the DB ?
+     * @param array $request  Indexed by filter.id, option.key
+     * @param bool  $saveToDB Should we persist these selections to the DB ?
      * @return array
      * @throws \InvalidArgumentException If unable to find the filter mapper class
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    private function convertRequestToFilters(array $request, $save)
+    private function convertRequestToFilters(array $request, $saveToDB)
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
-        $page            = FilterOption\Model::PAGE_MARK_BOOK;
+        $page            = Filter\Page\Model::PAGE_MARK_BOOK;
         $keyConverters   = $this->filterFactoryFactory->buildKeyConverters($page);
         $codec           = new Filter\Codec();
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelectionModels($selectionMapper, $keyConverters, $this->getUser(), $page, $request);
-        if ($save) {
+        $selectionsPerFilter = $codec->buildSelections($selectionMapper, $keyConverters, $this->getUser(), $page, $request);
+        if ($saveToDB) {
             $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
-        // Convert Selection models to Filters
-        $selectionTransformer = new AssessmentFilter\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersTODO          = $selectionTransformer->buildFiltersDto();
+        // Convert Selection models to Filter Collections
+        $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $selectionsPerFilter);
+        $filtersDTO           = $selectionTransformer->buildFiltersDto();
 
-        return [$filtersTODO, $codec, $selectionsPerFilter];
+        return [$filtersDTO->getByClass(), $codec, $selectionsPerFilter];
     }
 
 
@@ -278,22 +280,22 @@ class Controller extends Base
      * Stream a filtered markbook in CSV format
      *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
-     * @throws \DomainException If attempting to get the slug from a filter where it has not been set
-     * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
-     * @throws \InvalidArgumentException If any filter keys not recognised
-     * @throws \ReflectionException If a specified filter class does not exist
+     * @throws \DomainException                      If attempting to get the slug from a filter where it has not been set
+     * @throws Filter\BrokenFilterException          If a injected filter is unable to be processed
+     * @throws \InvalidArgumentException             If any filter keys not recognised
+     * @throws \ReflectionException                  If a specified filter class does not exist
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      */
     public function getMarkbookExport()
     {
         $filtersArray = $this->request->query->getArrayCopy();
-        unset($filtersArray['page']);
 
-        /** @var Filter\DataTransferObject $filtersDto */
-        list($filtersDto) = $this->convertRequestToFilters($filtersArray, false);
+        list($filters) = $this->convertRequestToFilters($filtersArray, false);
 
         // Ensure that assessments are not Assessment Specs
-        $filters = array_merge($filtersDto->getByClass(), [
-            AssessmentFilter\NullableContext\UnitSpec\Definition::class => [],
+        $filters = array_merge($filters, [
+            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
         ]);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
@@ -303,7 +305,6 @@ class Controller extends Base
         $csvExporter->export($markbook, 'Markbook.csv');
         exit;
     }
-
 
 
     /**
@@ -358,34 +359,6 @@ class Controller extends Base
             // Let Twig figure it out
             return null;
         }
-    }
-
-
-    /**
-     * Convert comma-separated strings into arrays
-     *
-     * @param null[]|Collection[] $filters
-     * @return string
-     */
-    private function buildQueryArgs(array $filters)
-    {
-        // Convert filters to query args so export can retrieve this report
-        // TODO Convert $filters from array to DTO and make this a method on that DTO. SA-3379  SA-3201
-        $queryArgs = [];
-        foreach ($filters as $slug => $filter) {
-            if (!$filter instanceof Collection) {
-                continue;
-            }
-            $queryArg = "$slug=";
-            if (0 === $filter->count()) {
-                $queryArg .= 'none';
-            } else {
-                $queryArg .= implode(',', $filter->keys());
-            }
-
-            $queryArgs[] = $queryArg;
-        }
-        return implode('&', $queryArgs);
     }
 
 
