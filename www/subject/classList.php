@@ -55,7 +55,7 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
         $category = $categoryMapper->findByCode($val);
     } catch (\Exception $e) {
         try {
-            $codeParts = explode('/', $val);
+            $codeParts = explode('/', $val, 2);
             if ($codeParts) {
                 $category = $categoryMapper->findByCode($codeParts[1]);
             }
