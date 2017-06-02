@@ -91,21 +91,21 @@ if (is_array($_POST['studentID'])) {
     if (is_array($_POST['attending'])) {
         $attending = $_POST['attending'];
     } else {
-        $attending = array();
+        $attending = [];
     }
 
     for ($i = 0; $_POST['studentID'][$i]; $i++) {
 
         // Create a new record
 
-        $data = array(
+        $data = [
             'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
             'ID' => $_POST['studentID'][$i],
             'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
             'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
             'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
             'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
-        );
+        ];
 
         if ($_POST['LateArrivalTime'][$i]) {
             $data['LateArrivalFlag'] = 1;
