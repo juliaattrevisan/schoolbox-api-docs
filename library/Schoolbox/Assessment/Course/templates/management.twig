@@ -11,6 +11,7 @@ Usage:
 #}
 
 
+{% autoescape 'js' %}
 <script type="text/javascript" xmlns="http://www.w3.org/1999/html">
     $(function() {
         /* Attach Course Selector Modal listeners
@@ -18,7 +19,7 @@ Usage:
         $.fn.courseSelectorModal({
             courseSelector: {
                 query: {
-                    folder:           {{ folder.id }},
+                    folder:           Number('{{ folder.id }}'),
                     hasAdd:           false,
                     hasTot:           false,
                     linkToUnits:      false,
@@ -115,6 +116,7 @@ Usage:
         });
     });
 </script>
+{% endautoescape %}
 
 
 <ul class="breadcrumb">

@@ -13,6 +13,7 @@ Usage:
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-builder.js"></script>
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
 
@@ -195,6 +196,7 @@ Usage:
 
     });
 </script>
+{% endautoescape %}
 
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>

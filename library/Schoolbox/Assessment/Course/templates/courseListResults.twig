@@ -68,6 +68,7 @@
 
 <div class="toast" data-course-toast></div>
 
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
         $('[data-collapser]').collapsable();
@@ -107,5 +108,4 @@
         })
     });
 </script>
-
-
+{% endautoescape %}
