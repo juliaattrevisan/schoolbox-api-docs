@@ -167,7 +167,7 @@
 
                     <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
                         <i class="icon-project"></i>
-                        <p>You project currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an activity</a> next.</p>
+                        <p>You {{ locale.project }} currently has no activities.<br />To start assessing students you should <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an activity</a> next.</p>
                     </div>
                 </div>
 
@@ -209,7 +209,7 @@
                         {% else %}
                             <div class="empty-state">
                                 <i class="icon-group"></i>
-                                <p>There are no students currently undertaking this project.</p>
+                                <p>There are no students currently undertaking this {{ locale.project }}.</p>
                             </div>
                         {% endif %}
                     </div>
@@ -227,3 +227,4 @@
             {% endif %}
         </div>
     </div>
+</div>

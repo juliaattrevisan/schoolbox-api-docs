@@ -14,7 +14,7 @@
             responseId: responseId,
             response: currentFeedback.response
         }) %}
-        {% set tooltip = 'Resume Inline Grading' %}
+        {% set tooltip = 'Resume Inline ' ~ locale.grading.proper %}
     {% endif %}
 {% else %}
     {% if not currentFeedback.isPublished %}

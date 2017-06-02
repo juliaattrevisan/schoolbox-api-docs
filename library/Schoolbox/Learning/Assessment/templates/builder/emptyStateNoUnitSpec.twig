@@ -58,35 +58,35 @@ Usage:
 
     {% if folderHasCourse %}
 
-        <p>This component works on unit pages to create activities to import to your class. This is a course page so the component doesn't work here.</p>
-    <p><a href="{{ routeLookup('course.courseList') }}">Go to Manage Courses</a> to add a unit page to your course and create activities there.</p>
+        <p>This component works on {{ locale.unit }} pages to create activities to import to your class. This is a course page so the component doesn't work here.</p>
+    <p><a href="{{ routeLookup('course.courseList') }}">Go to Manage Courses</a> to add a {{ locale.unit }} page to your course and create activities there.</p>
 
     {% elseif parentHasUnit %}
 
-        <p>This component works on unit pages to create activities to import to your class. This page has been created underneath a unit page not a course page so the component doesn't work here.</p>
-        <p>To create a sub-unit to your unit page, <a href="{{ routeLookup('course.courseList') }}">go to Manage Courses</a> and create a project in your unit.</p>
+        <p>This component works on {{ locale.unit }} pages to create activities to import to your class. This page has been created underneath a {{ locale.unit }} page not a course page so the component doesn't work here.</p>
+        <p>To create a sub-{{ locale.unit }} to your {{ locale.unit }} page, <a href="{{ routeLookup('course.courseList') }}">go to Manage Courses</a> and create a {{ locale.project }} in your {{ locale.unit }}.</p>
 
     {% elseif folderHasClass %}
 
-        <p>This component works on unit pages to create activities to import to your class. This page is a class page so the component doesn't work here.</p>
-        <p><a href="{{ routeLookup('course.courseList') }}">Go to the course list</a> to create a course with units to import into your class.</p>
+        <p>This component works on {{ locale.unit }} pages to create activities to import to your class. This page is a class page so the component doesn't work here.</p>
+        <p><a href="{{ routeLookup('course.courseList') }}">Go to the course list</a> to create a course with {{ locale.unit.plural }} to import into your class.</p>
 
     {% elseif not parentHasCourse and not folderHasParent %}
 
-        <p>This component works on unit pages within courses to create activities to import to your class. This page has no parent folder to use as a course. <a href="#" data-action="delete-component">Remove this component</a>.</p>
+        <p>This component works on {{ locale.unit }} pages within courses to create activities to import to your class. This page has no parent folder to use as a course. <a href="#" data-action="delete-component">Remove this component</a>.</p>
 
     {% elseif not parentHasCourse %}
 
         {% if parentWritable %}
-            <p><a data-convert-folders="2" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}">Convert this page to a unit page</a> to start creating activities that you can import into classes and reuse again. <b>Important</b>: This action will convert the page above to a course page.</p>
+            <p><a data-convert-folders="2" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}">Convert this page to a {{ locale.unit }} page</a> to start creating activities that you can import into classes and reuse again. <b>Important</b>: This action will convert the page above to a course page.</p>
         {% else %}
-            <p>This page is not a unit and the parent page is not a course.</p>
-            <p>You have permission to convert this page to a unit but do not have permission to convert the parent page to a course.</p>
+            <p>This page is not a {{ locale.unit }} and the parent page is not a course.</p>
+            <p>You have permission to convert this page to a {{ locale.unit }} but do not have permission to convert the parent page to a course.</p>
         {% endif %}
 
     {% elseif parentHasCourse %}
 
-        <p><a data-convert-folders="1" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}">Convert this page to a unit page</a> to start creating activities that you can import into classes and reuse again.</p>
+        <p><a data-convert-folders="1" href="{{ routeLookup('course.convertFolders', {courseFolderId: folder.parent.id, unitFolderId: folder.id }) }}">Convert this page to a {{ locale.unit }} page</a> to start creating activities that you can import into classes and reuse again.</p>
 
     {% endif %}
 

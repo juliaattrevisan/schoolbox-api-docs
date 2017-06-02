@@ -68,6 +68,7 @@
 
 <div class="toast" data-course-toast></div>
 
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
         $('[data-collapser]').collapsable();
@@ -81,7 +82,7 @@
             var href = this.href;
 
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete this course? This will delete ALL units within this course, as well as any other content that has been added!',
+                text: 'Are you sure you want to delete this course? This will delete ALL {{ locale.unit.plural }} within this course, as well as any other content that has been added!',
                 confirmEvent: function() {
 
                     // A toast
@@ -107,5 +108,4 @@
         })
     });
 </script>
-
-
+{% endautoescape %}

@@ -13,7 +13,7 @@ Usage:
 ) }}
 
 <div class="row">
-    <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
+    <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending {{ locale.assessment.properPlural }}</h1></div>
 </div>
 
 

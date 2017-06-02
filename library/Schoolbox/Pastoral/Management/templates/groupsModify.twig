@@ -3,25 +3,23 @@
 {# Change a couple of labels depending on if we are creating/updating a group #}
 
 {% if group is not empty %}
-    {% set heading = 'Modify Pastoral Group' %}
+    {% set heading = 'Modify ' ~ locale.pastoral.proper ~ ' Group' %}
     {% set button = 'Save Changes' %}
 {% else %}
-    {% set heading = 'Create Pastoral Group' %}
+    {% set heading = 'Create ' ~ locale.pastoral.proper ~ ' Group' %}
     {% set button = 'Create Group' %}
 {% endif %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
 [ 'Groups Management',  routeLookup('pastoralManagement.getGroups') ],
 [ heading ]
 ) }}
 
-{# Heading fluff #}
-
 <div class="row">
     <div class="small-12 columns">
-        <h1>Pastoral Care</h1>
+        <h1>{{ locale.pastoralCare.proper }}</h1>
     </div>
 </div>
 
@@ -231,7 +229,7 @@
             $('[data-delete]').click(function(e) {
                 e.preventDefault();
                 $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated pastoral records.',
+                    text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated {{ locale.pastoral }} records.',
                     confirmEvent: function () {
                         $('#formDelete').submit();
                     }

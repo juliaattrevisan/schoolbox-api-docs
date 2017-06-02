@@ -6,7 +6,7 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-[ 'Pastoral Care',      routeLookup('pastoral.getIndex') ],
+[ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
 [ 'Reports',            routeLookup('pastoralReportBuilder.getIndex') ],
 [ pageTitle ]
 ) }}
@@ -206,7 +206,7 @@
 
 <div class="row">
     <div class="small-12 column">
-        <h1>Pastoral Care Reports</h1>
+        <h1>{{ locale.pastoralCare.proper }} Reports</h1>
         <h2 class="subheader">{{ pageTitle }}</h2>
     </div>
 </div>
@@ -252,9 +252,9 @@
                         </label>
                         {% if severities | length %}
                             <label>
-                                Minimum Severity Level
+                                Minimum {{ locale.severity.proper }} Level
                                 <select id="filterSeverity" name="severity">
-                                    <option value="">Show All Severity Levels</option>
+                                    <option value="">Show All {{ locale.severity.proper }} Levels</option>
                                     {% for severity in severities %}
                                         <option {% if severity.id == report.severity.id %}selected{% endif %} value="{{ severity.order }}">
                                             {{ severity.name }}
@@ -324,10 +324,10 @@
                     <div class="small-12 columns content">
                         <div class="checklist">
                             <label>
-                                Super User / Pastoral Moderator Filter
+                                Super User / {{ locale.pastoral.proper }} Moderator Filter
                             </label>
                             <p class="meta">
-                                As you are logged in as either a superuser or pastoral moderator you have access to view all
+                                As you are logged in as either a superuser or {{ locale.pastoral }} moderator you have access to view all
                                 records in the system. To filter the report to show only those incidents in which you are
                                 involved tick the checkbox below.
                             </p>
@@ -427,7 +427,7 @@
                                     <div class="grip"></div>
                                     <div class="card small-12 wrap-down">
                                         <p>
-                                            Severity
+                                            {{ locale.severity.proper }}
                                             <span class="meta"> ({% for severity in severities %}{{ severity.name }}{% if not loop.last %}, {% endif %}{% endfor %})</span>
                                         </p>
                                     </div>
@@ -453,9 +453,9 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
-                                Pastoral Groups
+                                {{ locale.pastoral.proper }} Groups
                                 <span class="hint has-tip tip-top" data-tooltip
-                                      title="Select the pastoral groups you would like to share this report with.">?</span>
+                                      title="Select the {{ locale.pastoral }} groups you would like to share this report with.">?</span>
                                 {% for group in groups %}
                                     <input type="hidden" name="group[{{ group.id }}]" value="0"/>
                                     <input type="checkbox" name="group[{{ group.id }}]"

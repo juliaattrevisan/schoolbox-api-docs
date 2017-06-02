@@ -24,7 +24,7 @@
 <div class="row" id="pending_assessments">
     <div class="small-12 columns island">
         {% if assessmentsToMark|length %}
-            <h2 class="subheader">Requires Assessment</h2>
+            <h2 class="subheader">Requires {{ locale.assessment.proper }}</h2>
 
             {% for assessment in assessmentsToMark %}
 
@@ -192,7 +192,7 @@
         {% if not assessmentsToMark|length and not assessmentsToChase|length %}
             <div class="empty-state">
                 <i class="icon-approve"></i>
-                <p>You have no assessments to review or followup. To view a complete list of past assessments visit your <a href="/learning/classes">classes</a> markbook.</p>
+                <p>You have no {{ locale.assessment.plural }} to review or followup. To view a complete list of past {{ locale.assessment.plural }} visit your <a href="/learning/classes">classes</a> markbook.</p>
             </div>
         {% endif %}
     </div>

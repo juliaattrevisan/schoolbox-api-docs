@@ -1,7 +1,7 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 <ul class="breadcrumb hide-on-print">
-    <li><a href="{{ routeLookup('pastoral.getIndex') }}">Pastoral Care</a></li>
+    <li><a href="{{ routeLookup('pastoral.getIndex') }}">{{ locale.pastoralCare.proper }}</a></li>
     <li><a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Reports</a></li>
     <li class="active"><a href="#">Records By Tag - {{ tag.name }}</a></li>
 </ul>
@@ -134,7 +134,7 @@
         <div class="small-12 column">
             <div class="empty-state">
                 <i class="icon-pastoral"></i>
-                <p>No pastoral records matched your report criteria.</p>
+                <p>No {{ locale.pastoral }} records matched your report criteria.</p>
             </div>
 
             <a class="button submit expand" href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Select Another Report</a>

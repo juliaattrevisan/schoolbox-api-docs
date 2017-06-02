@@ -60,7 +60,7 @@
                                     <i class="icon-due-work size-32"></i>
                                 </a>
                                 <p>
-                                    Due Work
+                                    {{ locale.dueWork.proper }}
                                 </p>
                                 <p class="meta spaced {{ dueWorkClass }}">{{ (counts.dueWorkCompleted / counts.dueWork * 100) | round(1, 'common') }}%
                                     Submitted</p>

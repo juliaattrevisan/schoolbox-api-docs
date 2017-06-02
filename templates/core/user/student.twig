@@ -224,7 +224,7 @@
                                 {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
                                     <li>
                                         <a href="/learning/due/{{ user.getId() }}"
-                                           class="icon-due-work">Due Work</a>
+                                           class="icon-due-work">{{ locale.dueWork.proper }}</a>
                                     </li>
                                 {% endif %}
                             {% endblock buttons_dueWork %}
@@ -254,7 +254,7 @@
                             {% if isStaff or isParentOfStudent %}
                                 <li>
                                     <a href="{{ routeLookup('pastoral.getStudent', {studentId: user.id}) }}"
-                                       class="icon-pastoral">Pastoral Care</a>
+                                       class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
                                 </li>
                             {% endif %}
                         {% endif %}

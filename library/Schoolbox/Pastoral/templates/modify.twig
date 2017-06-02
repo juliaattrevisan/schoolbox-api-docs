@@ -5,14 +5,14 @@
 
 {% if record.id %}
     {% set saveRoute = routeLookup('pastoral.postRecordUpdate', {recordId: record.id}) %}
-    {% set pageTitle = 'Update Pastoral Record' %}
+    {% set pageTitle = 'Update ' ~ locale.pastoral.proper ~ ' Record' %}
 {% else %}
     {% set saveRoute = routeLookup('pastoral.postRecordInsert') %}
-    {% set pageTitle = 'Add Pastoral Record' %}
+    {% set pageTitle = 'Add ' ~ locale.pastoral.proper ~ ' Record' %}
 {% endif %}
 
 {{ bread.crumbs(
-[ 'Pastoral Care',              routeLookup('pastoral.getIndex') ],
+[ locale.pastoralCare.proper,              routeLookup('pastoral.getIndex') ],
 [ record.student.fullName,      routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
 [ record.heading,               routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) ],
 [ pageTitle ]
@@ -36,7 +36,7 @@
             </div>
             {% if record.id is not empty and isRouteAuthorized('pastoral.postDelete', {record: record}) %}
                 <nav>
-                    <a href="#" data-delete class="icon-delete" title="Delete Pastoral Record"></a>
+                    <a href="#" data-delete class="icon-delete" title="Delete {{ locale.pastoral.proper }} Record"></a>
                 </nav>
             {% endif %}
         </div>
@@ -82,7 +82,7 @@
                     <div class="small-12 medium-6 columns">
                         {% if severities | length %}
                             <label>
-                                Severity
+                                {{ locale.severity.proper }}
                                 <select class="required" name="severityId">
                                     {% for severity in severities %}
                                         <option {% if severity.id == record.severity.id %}selected{% endif %}
@@ -150,9 +150,9 @@
                     <div class="small-12 columns">
                         {% if groups | length %}
                             <label>
-                                Pastoral Groups
+                                {{ locale.pastoral.proper }} Groups
                                 <span class="hint has-tip tip-top" data-tooltip
-                                      title="Select the pastoral groups that can view this record.">?</span>
+                                      title="Select the {{ locale.pastoral }} groups that can view this record.">?</span>
                                 {% for group in groups %}
                                     <input type="hidden" name="group[{{ group.id }}]" value="0"/>
                                     <input type="checkbox" name="group[{{ group.id }}]"
@@ -169,10 +169,10 @@
                                 {% endfor %}
                             </label>
                         {% else %}
-                            <label>Pastoral Groups</label>
+                            <label>{{ locale.pastoral.proper }} Groups</label>
                             <p class="meta">
-                                No pastoral groups are currently defined, please contact your pastoral administrator
-                                to use the pastoral group functionality.
+                                No {{ locale.pastoral }} groups are currently defined, please contact your {{ locale.pastoral }} administrator
+                                to use the {{ locale.pastoral }} group functionality.
                             </p>
                         {% endif %}
                     </div>
@@ -228,7 +228,7 @@
                     <div class="small-12 columns">
                         <label>
                             Students
-                            <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
+                            <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the {{ locale.pastoralCare }} area for these students.">?</span>
                             <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
                         </label>
                         {% if record.relatedRecords | length %}
@@ -377,7 +377,7 @@
                 },
 
                 messages: {
-                    'heading': {required: 'You must enter a title enter a heading before you can proceed.'}
+                    'heading': {required: 'You must enter a title before you can proceed'}
                 }
             });
         });
