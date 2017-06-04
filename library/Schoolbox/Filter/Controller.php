@@ -87,7 +87,8 @@ class Controller extends BaseController
      */
     public function getPageSettings(IFactoryFactory $factoryFactory, $page)
     {
-        $definitions = $this->buildCurrentState($factoryFactory, $page);
+        $enabledOnly = false;
+        $definitions = $factoryFactory->buildCurrentState($page, $enabledOnly);
 
         $pageFilters = $this->pageMapper->createCollection();
         foreach ($definitions as $class => $definition) {
@@ -110,53 +111,6 @@ class Controller extends BaseController
 
 
     /**
-     * Build current system state of filter selections for specified page
-     *
-     * @param IFactoryFactory $factoryFactory
-     * @param string          $page
-     * @return GenericCollection|IDefinition[]
-     * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
-     * @throws \ReflectionException If a definition class does not exist
-     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
-     */
-    private function buildCurrentState(IFactoryFactory $factoryFactory, $page)
-    {
-        $availableFilters = $this->findAvailableFiltersPerPage()[$page];
-
-        /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.class */
-        $savedPageFilters = $this->pageMapper->findForPage($page)->indexByCallback(function (Page\Model $page) {
-            return $page->getFilter()->getClass();
-        });
-        $pageFilters      = $this->pageMapper->createCollection();
-
-        $definitions = new GenericCollection(IDefinition::class);
-
-        // Discard invalid data, and insert missing data
-        foreach ($availableFilters as $name => $instance) {
-            $class = $instance->getClass();
-            if ($savedPageFilters->offsetExists($class)) {
-                $pageFilters[$class] = $savedPageFilters[$class];
-            } else {
-                $pageFilter = $this->pageMapper->createModel();
-                $pageFilter
-                    ->setFilter($instance)
-                    ->setPage($page)
-                    ->setEnabled(Page\Model::getEnabledInitialState($instance, $page))
-                    ->setUserConfigurable(Page\Model::getUserConfigurableInitialState($instance, $page));
-                $pageFilters[$class]         = $pageFilter;
-                $instance->getPages()[$page] = $pageFilter;
-            }
-
-            $definition          = $factoryFactory->buildFilterFactoryForFilter($class)->buildDefinition($instance);
-            $definitions[$class] = $definition;
-            $definition->normalisePageOptions($pageFilters[$class]);
-        }
-        return $definitions;
-    }
-
-
-    /**
      * Load up all settings for this page, overlay new settings, and save
      *
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
@@ -168,11 +122,14 @@ class Controller extends BaseController
      */
     public function postSavePageSettings(IFactoryFactory $factoryFactory, $page)
     {
+        $enabledOnly = false;
+        $definitions = $factoryFactory->buildCurrentState($page, $enabledOnly);
+
         $pagesToSave    = $this->pageMapper->createCollection();
         $optionsToSave  = $this->optionsMapper->createCollection();
         $defaultsToSave = $this->defaultsMapper->createCollection();
 
-        $definitions = $this->buildCurrentState($factoryFactory, $page);
+
 
         /** @var GenericCollection|Page\Model[] $pageFilters */
         $pageFilters = $this->pageMapper->createCollection();

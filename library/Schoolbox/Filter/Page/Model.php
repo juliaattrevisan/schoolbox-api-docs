@@ -38,34 +38,6 @@ class Model
 
 
     /**
-     * Before the admin has configured it, should a filter on a page be enabled?
-     *
-     * @param Filter\Model $filter
-     * @param string       $page
-     * @return bool
-     */
-    public static function getEnabledInitialState(Filter\Model $filter, $page)
-    {
-        // For now, all available filters are enabled
-        return true;
-    }
-
-
-    /**
-     * Before the admin has configured it, should a filter on a page be user-configurable?
-     *
-     * @param Filter\Model $filter
-     * @param string       $page
-     * @return bool
-     */
-    public static function getUserConfigurableInitialState(Filter\Model $filter, $page)
-    {
-        // For now, if enabled, it is user-configurable also
-        return static::getEnabledInitialState($filter, $page);
-    }
-
-
-    /**
      * Returns a list of roleTypes that can view each page
      *
      * @return string[][]
@@ -140,22 +112,6 @@ class Model
         $this->options = new GenericCollection(Option\Model::class);
     }
 
-
-    /**
-     * How may options are available?
-     *
-     * @return int
-     */
-    public function getCountAvailableOptions()
-    {
-        $count = 0;
-        foreach ($this->options as $option) {
-            if ($option->getAvailable()) {
-                $count++;
-            }
-        }
-        return $count;
-    }
 
     /* Getters / Setters
      */

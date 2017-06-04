@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\Collection;
 use Schoolbox\MapperFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -56,10 +57,12 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    public function buildKeyConverters($page)
+    public function buildEnabledKeyConverters($page)
     {
-        $pageFilters   = $this->buildVisiblePageFilters($page);
-        $keyConverters = $this->createKeyConverterCollection();
+        $enabledOnly          = true;
+        $userConfigurableOnly = false;
+        $pageFilters          = $this->buildPageFilters($page, $enabledOnly, $userConfigurableOnly);
+        $keyConverters        = $this->createKeyConverterCollection();
 
         /** @var Page\Model[] $pageFilters */
         foreach ($pageFilters as $pageFilter) {
@@ -70,6 +73,62 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         }
         return $keyConverters;
     }
+
+
+    /**
+     * @inheritdoc
+     * @throws \InvalidArgumentException             If no filter definition class not found, or filter factory not registered
+     * @throws \ReflectionException                  If the specified class does not exist
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
+     * @throws \DomainException                      If attempting to fetch the entity from an abstract factoryFactory
+     */
+    public function buildCurrentState($page, $enabledOnly)
+    {
+        /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.id */
+        $savedPageFilters = $this->getPageMapper()->findForPage($page)->indexByCallback(function (Page\Model $pageFilter) {
+            return $pageFilter->getFilter()->getId();
+        });
+
+        // Get all filters for this entity type
+        $entityFilters = $this->getFilterMapper()->findForEntity(static::getEntity());
+
+        $definitions = $this->createDefinitionCollection();
+
+        foreach($entityFilters as $filter){
+            $class = $filter->getClass();
+
+            // Can this filter never appear on this page?
+            if(!in_array($page, $class::getPages(), true)){
+                continue;
+            }
+            $filterId = $filter->getId();
+
+            // Do we have admin-configured data?
+            if($savedPageFilters[$filterId]){
+                $pageFilter = $savedPageFilters[$filterId];
+            } else {
+                $pageFilter = $this->getPageMapper()->createModel();
+                $pageFilter
+                    ->setFilter($filter)
+                    ->setPage($page)
+                    ->setEnabled($class::getEnabledInitialState($page))
+                    ->setUserConfigurable($class::getUserConfigurableInitialState($page));
+            }
+            $filter->getPages()[$page] = $pageFilter;
+
+            if ($enabledOnly && !$pageFilter->getEnabled()) {
+                continue;
+            }
+
+            $factory             = $this->buildFilterFactoryForFilter($class);
+            $definition          = $factory->buildDefinition($filter);
+            $definitions[$class] = $definition;
+            $definition->normalisePageOptions($pageFilter);
+        }
+        return $definitions;
+    }
+
 
 
     /**
@@ -93,36 +152,39 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      */
     public function buildPanel(User $user, $page, $route, User $viewee = null, array $request = [])
     {
-        // Clean up aura-inserted items
-        if (array_key_exists('page', $request)) {
-            unset($request['page']);
-        }
+        $enabledOnly          = true;
+        $userConfigurableOnly = false;
+        $enabledPageFilters   = $this->buildPageFilters($page, $enabledOnly, $userConfigurableOnly);
 
         $codec            = new Codec();
         $factories        = $this->createFactoryCollection();
         $keyConverters    = $this->createKeyConverterCollection();
         $filterComponents = $this->createComponentCollection();
 
-        // Only build panel components for visible page filters. Hard-coding is handles on the AJAX request.
+        // Build panel components for all enabled page filters, even if hard-coded (we will store this client side in hidden fields)
         // Ignore anything in $request that is not for a visible page filter
-        $visiblePageFilters = $this->buildVisiblePageFilters($page);
 
         // Iteration 1/2 - build Factories and KeyConverters
-        foreach ($visiblePageFilters as $pageFilter) {
+        foreach ($enabledPageFilters as $filterId => $pageFilter) {
             $filter                   = $pageFilter->getFilter();
-            $filterId                 = $filter->getId();
             $class                    = $filter->getClass();
             $factories[$filterId]     = $this->buildFilterFactoryForFilter($class);
             $keyConverters[$filterId] = $factories[$filterId]->buildKeyConverter($filter);
         }
 
+        // Which of the enabled page-filters are configurable by the end user?
+        /** @var GenericCollection|Page\Model[] $userConfigurablePageFilters */
+        $userConfigurablePageFilters = $enabledPageFilters->filter(function(Page\Model $pageFilter){
+            return $pageFilter->getUserConfigurable();
+        });
+
         // We cannot merely replace userSelections here. That must happen later.
         // This is because overrideSelections can insert options, but userSelections cannot
-        $overrideSelections = $codec->buildSelections($this->getSelectionMapper(), $keyConverters, $user, $page, $request);
-        $userSelections     = $this->findUserSelections($overrideSelections, $visiblePageFilters, $user, $page);
+        $overrideSelections = $codec->convertRequestToSelections($this->getSelectionMapper(), $keyConverters, $user, $page, $request);
+        $userSelections     = $this->findUserSelections($overrideSelections, $userConfigurablePageFilters, $user, $page);
 
         // Iteration 2/2 - build Panel Components
-        foreach ($visiblePageFilters as $pageFilter) {
+        foreach ($enabledPageFilters as $pageFilter) {
             $filter     = $pageFilter->getFilter();
             $filterId   = $filter->getId();
             $class      = $filter->getClass();
@@ -145,7 +207,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @param GenericCollection|Page\Model[]        $visiblePageFilters
      * @param User                                  $user
      * @param string                                $page
-     * @return GenericCollection|Selection\Model[][] Indexed by filter.id, then selection.key
+     * @return Collection|GenericCollection[]|Selection\Model[][] Indexed by filter.id, then selection.key
      * @throws \InvalidArgumentException If selection mapper class not found
      */
     private function findUserSelections(GenericCollection $overrideSelections, GenericCollection $visiblePageFilters, User $user, $page)
@@ -157,6 +219,11 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         // Filters configured by admin as enabled and user-configurable, and have not been overridden
         $filterIds = array_diff($visibleFilterIds, $overrideSelections->keys());
+
+        // If ignoring all saved user-selections (because everything is overridden)
+        if(0 === count($filterIds)){
+            return new Collection();
+        }
 
         $pb = $this->getSelectionMapper()->getPredicateBuilder();
         $pb
@@ -182,16 +249,19 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * Fetch visible page filters from DB, and insert any missing logical items.
      *
      * @param string $page
+     * @param bool   $enabledOnly          Only include page-filters that are enabled
+     * @param bool   $userConfigurableOnly Only include page-filters that are user-configurable
      * @return Page\Model[]|GenericCollection Indexed by page.filter.id
      * @throws \InvalidArgumentException If PageFilter mapper class not found
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \DomainException If attempting to fetch the entity for an abstract factory factory
      */
-    private function buildVisiblePageFilters($page)
+    private function buildPageFilters($page, $enabledOnly, $userConfigurableOnly)
     {
         // What pageFilters could appear on this page ?
         /** @var GenericCollection|Model[] $availableFilters */
-        $availableFilters = $this->getFilterMapper()->findAll()->filter(function (Model $instance) use ($page) {
+        $availableFilters = $this->getFilterMapper()->findForEntity(static::getEntity())->filter(function (Model $instance) use ($page) {
             $definitionClass = $instance->getClass();
             return in_array($page, $definitionClass::getPages(), true);
         });
@@ -199,16 +269,19 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         $pageFilterMapper = $this->getPageMapper();
 
         // What pageFilters have been configured by the admin ?
+        // Note we cannot filter by $enabledOnly, $userConfigurableOnly here, as we want explicitly disabled items
+        // to not be ignored later when we insert initial state to fill missing data
         /** @var GenericCollection|Page\Model[] $savedPageFilters Indexed by filter.id */
         $savedPageFilters = $pageFilterMapper->findForPage($page)->indexByCallback(function (Page\Model $pageFilter) {
             return $pageFilter->getFilter()->getId();
         });
 
         // And what page filters will we actually show to the end-user ?
-        $visiblePageFilters = $pageFilterMapper->createCollection();
+        $pageFilters = $pageFilterMapper->createCollection();
 
         foreach ($availableFilters as $instance) {
             $filterId = $instance->getId();
+            $class    = $instance->getClass();
 
             $pageFilter = $savedPageFilters[$filterId];
 
@@ -217,16 +290,22 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
                 $pageFilter
                     ->setFilter($instance)
                     ->setPage($page)
-                    ->setEnabled(Page\Model::getEnabledInitialState($instance, $page))
-                    ->setUserConfigurable(Page\Model::getUserConfigurableInitialState($instance, $page));
+                    ->setEnabled($class::getEnabledInitialState($page))
+                    ->setUserConfigurable($class::getUserConfigurableInitialState($page));
             }
 
-            if ($pageFilter->getEnabled() && $pageFilter->getUserConfigurable()) {
-                $visiblePageFilters[$filterId] = $pageFilter;
-                $instance->getPages()[$page]   = $pageFilter;
+            // Skip if not enabled
+            if ($enabledOnly && !$pageFilter->getEnabled()) {
+                continue;
             }
+            // Skip if not user-configurable
+            if($userConfigurableOnly && !$pageFilter->getUserConfigurable()){
+                continue;
+            }
+            $pageFilters[$filterId]      = $pageFilter;
+            $instance->getPages()[$page] = $pageFilter;
         }
-        return $visiblePageFilters;
+        return $pageFilters;
     }
 
 
@@ -237,6 +316,15 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     private function createFactoryCollection(array $contents = [])
     {
         return new GenericCollection(IFactory::class, $contents);
+    }
+
+    /**
+     * @param null|IDefinition[] $contents
+     * @return GenericCollection|IDefinition[]
+     */
+    private function createDefinitionCollection(array $contents = [])
+    {
+        return new GenericCollection(IDefinition::class, $contents);
     }
 
 
@@ -272,8 +360,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     protected function buildFactory($factoryClass, array $extraArgs = [])
     {
         $args = array_merge([
-            'filterMapper'          => $this->getFilterMapper(),
-            'filterPageMapper'      => $this->getPageMapper(),
             'filterOptionMapper'    => $this->getOptionMapper(),
             'filterDefaultMapper'   => $this->getDefaultsMapper(),
             'filterSelectionMapper' => $this->getSelectionMapper(),

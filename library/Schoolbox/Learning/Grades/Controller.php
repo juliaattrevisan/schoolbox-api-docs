@@ -197,8 +197,8 @@ class Controller extends Base
             'termCode'  => $term->getCode(),
             'subjectId' => $subject->getId(),
         ]);
-        $queryArgs   = $this->getRequest()->query->getArrayCopy();
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
+        $request     = $this->getRequest()->query->getArrayCopy();
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $request);
 
         /* Build an markbook of assessments that:
          * * Belong to this folder
@@ -263,19 +263,17 @@ class Controller extends Base
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject)
     {
-        $request = $this->request->post['filter_selection'] ?: [];
-        $page    = FilterPage\Model::PAGE_GRADES;
+        $request         = $this->request->post['filter_selection'] ?: [];
+        $page            = FilterPage\Model::PAGE_GRADES;
+        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
+        $codec           = new Filter\Codec();
+        $userSelections  = $codec->convertRequestToSelections($this->selectionMapper, $keyConverters, $this->getUser(), $page, $request);
 
-        $keyConverters = $this->filterFactoryFactory->buildKeyConverters($page);
-        $codec         = new Filter\Codec();
+        // TODO don't save selections for non user-configurable page filters
+        $this->selectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
-        // Convert Request to Selection models
-        $selectionsPerFilter = $codec->buildSelections($this->selectionMapper, $keyConverters, $this->getUser(), $page, $request);
-        $this->selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
-
-        // Convert Selection models to Filters
-        $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersDto           = $selectionTransformer->buildFiltersDto();
+        $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $userSelections);
+        $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
 
 
         /* Merge filters to ensure that assessments:
@@ -284,7 +282,7 @@ class Controller extends Base
          * * Are not Assessment Specs
          * * Are not before their publish date (ie are not KEY_UNPUBLISHED)
          */
-        $filters = array_merge($filtersDto->getByClass(), [
+        $filters = array_merge($filters, [
             AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
             AssessmentFilters\Term\Due\Definition::class                   => $term,
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
@@ -297,6 +295,7 @@ class Controller extends Base
         ]);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);

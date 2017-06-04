@@ -24,7 +24,7 @@ class DataTransferObject
      *
      * @var null[]|Collection[]
      */
-    private $selectionsPerClass;
+    private $selectionsPerClass = [];
 
 
     /**

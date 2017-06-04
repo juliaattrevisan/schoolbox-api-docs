@@ -56,6 +56,24 @@ abstract class AbstractDefinition implements IDefinition
 
 
     /**
+     * @inheritdoc
+     */
+    public static function getEnabledInitialState($page)
+    {
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public static function getUserConfigurableInitialState($page)
+    {
+        return true;
+    }
+
+
+    /**
      * If the admin has not configured this option, should it be available in filter panels?
      *
      * Normally, all possible options will be available on all pages. (ie just return true)

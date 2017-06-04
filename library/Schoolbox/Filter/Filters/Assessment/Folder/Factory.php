@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 
 
@@ -23,25 +24,27 @@ abstract class Factory extends Filter\AbstractFactory
      */
     private $folderMapper;
 
+    /** @var Access */
+    private $access;
+
 
     /**
-     * @param Filter\Mapper                      $filterMapper
-     * @param Filter\Page\Mapper                 $pageMapper
      * @param Filter\Page\Option\Mapper          $optionMapper
      * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
      * @param Filter\Selection\Mapper            $selectionMapper
      * @param Folder\Mapper                      $folderMapper
+     * @param Access                             $access
      */
     public function __construct(
-        Filter\Mapper $filterMapper,
-        Filter\Page\Mapper $pageMapper,
         Filter\Page\Option\Mapper $optionMapper,
         Filter\Page\Option\Defaults\Mapper $defaultMapper,
         Filter\Selection\Mapper $selectionMapper,
-        Folder\Mapper $folderMapper
+        Folder\Mapper $folderMapper,
+        Access $access
     ) {
-        parent::__construct($filterMapper, $pageMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->folderMapper = $folderMapper;
+        $this->access = $access;
     }
 
 
@@ -65,6 +68,7 @@ abstract class Factory extends Filter\AbstractFactory
 
         return array_merge(parent::buildKeyConverterArgs($filter), [
             'folderIds' => $folderIds,
+            'access'    => $this->access,
         ]);
     }
 }

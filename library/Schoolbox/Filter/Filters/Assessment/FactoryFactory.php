@@ -11,6 +11,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -52,6 +53,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
             case Filters\Assessment\Folder\TeacherInvolved\Definition::class:
                 return $this->buildFactory(Filters\Assessment\Folder\TeacherInvolved\Factory::class, [
                     'folderMapper' => $this->getMapperFactory()->get(Folder\Mapper::class),
+                    'access'       => $this->getMapperFactory()->get(Access::class),
                 ]);
             case Filters\Assessment\Folder\StudentInteractions\Definition::class:
                 return $this->buildFactory(Filters\Assessment\Folder\StudentInteractions\Factory::class, [

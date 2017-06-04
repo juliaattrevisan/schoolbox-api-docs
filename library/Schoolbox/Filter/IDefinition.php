@@ -78,4 +78,21 @@ interface IDefinition
      * @throws \InvalidArgumentException If key is recognised as invalid
      */
     public function getLabel($key);
+
+
+    /**
+     * Prior to admin-configuration, should this filter be enable on the specified page?
+     *
+     * @param string $page
+     * @return bool
+     */
+    public static function getEnabledInitialState($page);
+
+    /**
+     * Prior to admin-configuration, should this filter be user-configurable on the specified page?
+     *
+     * @param string $page
+     * @return bool
+     */
+    public static function getUserConfigurableInitialState($page);
 }

@@ -44,16 +44,13 @@ class Factory extends FolderFilter\Factory
         $folders = $this->getFolderMapper()->findForUser($viewee, $getSubjects, $groupAccessLevel, true)->indexBy('id');
 
         // Did caller specify they wish to insert some custom folders in the list?
+        // (Note that perm check was already performed by key-converter)
         if ($overrides && $overrides->count()) {
             $folderIds    = $overrides->getColumnValues('key');
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
-            // Check permission
-            $access = Access::getInstance();
             foreach ($extraFolders as $extraFolder) {
-                if ($access->isInstructor($user, $extraFolder)) {
-                    $folders[$extraFolder->getId()] = $extraFolder;
-                }
+                $folders[$extraFolder->getId()] = $extraFolder;
             }
         }
 

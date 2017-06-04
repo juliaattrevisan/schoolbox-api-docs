@@ -63,10 +63,12 @@ class Mapper extends \Schoolbox\Mapper
      * * FilterPage options are indexed by option.key
      * * Option defaults are indexed by default.roleType
      *
-     * @param string $page
+     * @param string      $page
      * @return Model[]|GenericCollection
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      */
     public function findForPage($page)
     {

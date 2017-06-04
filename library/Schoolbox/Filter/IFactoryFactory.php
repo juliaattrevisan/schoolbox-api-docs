@@ -41,16 +41,27 @@ interface IFactoryFactory
 
 
     /**
-     * Build a set of key converters for the specified pageFilters.
+     * Build a set of key converters for filters configured as enabled for the specified page
      *
      * Key Converters should be light-weight as they are instantiated on every filtered report request
-     *
-     * Only includes keyConverters for filters that are configured to be visible on the specified page
      *
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
      */
-    public function buildKeyConverters($page);
+    public function buildEnabledKeyConverters($page);
+
+
+    /**
+     * Build the current state of filters for a page, regardless of whether the state
+     * is saved in the admin, or derived from initial state logic.
+     *
+     * For admin pages, we want all pageFilters, for public page, we just want the enabled ones.
+     *
+     * @param string $page
+     * @param bool   $enabledOnly
+     * @return GenericCollection|IDefinition[]  Indexed by filter.class
+     */
+    public function buildCurrentState($page, $enabledOnly);
 
 
     /**

@@ -26,22 +26,18 @@ abstract class Factory extends AbstractFactory
 
 
     /**
-     * @param Filter\Mapper                      $filterMapper
-     * @param Filter\Page\Mapper                 $pageMapper
      * @param Filter\Page\Option\Mapper          $optionMapper
      * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
      * @param Filter\Selection\Mapper            $selectionMapper
      * @param Term\Mapper                        $termMapper
      */
     public function __construct(
-        Filter\Mapper $filterMapper,
-        Filter\Page\Mapper $pageMapper,
         Filter\Page\Option\Mapper $optionMapper,
         Filter\Page\Option\Defaults\Mapper $defaultMapper,
         Filter\Selection\Mapper $selectionMapper,
         Term\Mapper $termMapper
     ) {
-        parent::__construct($filterMapper, $pageMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->termMapper = $termMapper;
     }
 

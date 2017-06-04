@@ -70,16 +70,22 @@ abstract class AbstractComponent implements IComponent
     {
         $availableOptions = $this->pageFilter->getOptions();
 
+        // Role-selections === 'hard-coded' selections
         $roleSelections = $this->getRoleSelections($availableOptions);
-        $userSelections = $this->getUserSelections($availableOptions);
+
+        // User-selections. Don't bother building if not user-configurable
+        $userSelections = $this->pageFilter->getUserConfigurable()
+            ? $this->getUserSelections($availableOptions)
+            : $this->filterSelectionMapper->createCollection();
 
         // Note: 'isAvailable' != 'enabled' && 'user-configurable'
         //        It can also be unavailable if no concrete options match the available abstract options
         return [
-            'isAvailable'    => (bool)$userSelections->count(),
-            'definition'     => $this->getDefinition(),
-            'roleSelections' => $roleSelections,
-            'userSelections' => $userSelections,
+            'isUserConfigurable' => $this->pageFilter->getUserConfigurable(),
+            'hasOptions'         => (bool)$roleSelections->count(),
+            'definition'         => $this->definition,
+            'roleSelections'     => $roleSelections,
+            'userSelections'     => $userSelections,
         ];
     }
 
@@ -87,8 +93,8 @@ abstract class AbstractComponent implements IComponent
     /**
      * Generate a list of concrete options, selected as per user's selections
      *
-     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $availableOptions
-     * @return \Schoolbox\Filter\Selection\Model[]|GenericCollection
+     * @param GenericCollection|Page\Option\Model[] $availableOptions
+     * @return Selection\Model[]|GenericCollection
      */
     protected function getUserSelections(GenericCollection $availableOptions)
     {
@@ -110,7 +116,7 @@ abstract class AbstractComponent implements IComponent
      *
      * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
      *
-     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $optionDefaults Abstract options
+     * @param GenericCollection|Page\Option\Model[] $optionDefaults Abstract options
      * @return GenericCollection|Selection\Model[] Concrete selections
      */
     protected function getRoleSelections(GenericCollection $optionDefaults)
@@ -125,6 +131,9 @@ abstract class AbstractComponent implements IComponent
         $roleType            = $this->user->getRole()->getType();
 
         foreach ($optionDefaults as $option) {
+            if(!$option->getAvailable()){
+                continue;
+            }
             $key                       = $option->getKey();
             $selected                  = $option->getDefaults()[$roleType]->getSelected();
             $availableSelections[$key] = $this->createSelection($key, $selected);

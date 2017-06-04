@@ -8,10 +8,8 @@ namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
-use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
@@ -25,7 +23,6 @@ use Schoolbox\Error;
 use DueWork_ErrorMapper;
 use \Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Filters\Assessment as AssessmentFilter;
 
 
 class Module extends BaseModule
@@ -111,7 +108,7 @@ class Module extends BaseModule
                     );
                 }),
                 'filterFactoryFactory'       => $injector->lazy(function(){
-                    return new AssessmentFilter\FactoryFactory($this->getMapperFactory());
+                    return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
                 }),
             ])
         );

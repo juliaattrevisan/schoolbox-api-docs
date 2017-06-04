@@ -14,13 +14,6 @@ use Schoolbox\User;
 
 abstract class AbstractFactory implements IFactory
 {
-
-    /** @var Mapper */
-    private $filterMapper;
-
-    /** @var Page\Mapper */
-    private $filterPageMapper;
-
     /** @var Page\Option\Mapper */
     private $filterOptionMapper;
 
@@ -32,14 +25,10 @@ abstract class AbstractFactory implements IFactory
 
 
     public function __construct(
-        Mapper $filterMapper,
-        Page\Mapper $pageMapper,
         Page\Option\Mapper $optionMapper,
         Page\Option\Defaults\Mapper $defaultMapper,
         Selection\Mapper $selectionMapper
     ) {
-        $this->filterMapper          = $filterMapper;
-        $this->filterPageMapper      = $pageMapper;
         $this->filterOptionMapper    = $optionMapper;
         $this->filterDefaultMapper   = $defaultMapper;
         $this->filterSelectionMapper = $selectionMapper;

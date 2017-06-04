@@ -25,22 +25,18 @@ class Factory extends Filter\AbstractFactory
 
 
     /**
-     * @param Filter\Mapper                      $filterMapper
-     * @param Filter\Page\Mapper                 $pageMapper
      * @param Filter\Page\Option\Mapper          $optionMapper
      * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
      * @param Filter\Selection\Mapper            $selectionMapper
      * @param UnitSpec\Mapper                    $unitSpecMapper
      */
     public function __construct(
-        Filter\Mapper $filterMapper,
-        Filter\Page\Mapper $pageMapper,
         Filter\Page\Option\Mapper $optionMapper,
         Filter\Page\Option\Defaults\Mapper $defaultMapper,
         Filter\Selection\Mapper $selectionMapper,
         UnitSpec\Mapper $unitSpecMapper
     ) {
-        parent::__construct($filterMapper, $pageMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->unitSpecMapper = $unitSpecMapper;
     }
 

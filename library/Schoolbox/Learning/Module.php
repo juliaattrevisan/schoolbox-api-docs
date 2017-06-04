@@ -173,7 +173,6 @@ class Module extends BaseModule
             'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
             'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
             'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'filterMapper'               => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
             'assessmentIdFinder'         => $injector->lazy(function(){
                 /** @var Filter\Mapper $filterMapper */
                 $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);

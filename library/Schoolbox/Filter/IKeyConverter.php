@@ -9,6 +9,7 @@ namespace Schoolbox\Filter;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\User;
 
 /**
  * Knows how to map between an option.key and the item
@@ -27,26 +28,20 @@ interface IKeyConverter
     public function getFilter();
 
 
-//    /**
-//     * Get the concrete key for some item
-//     *
-//     * @param $item
-//     * @return string
-//     */
-//    public function getKey($item);
-
-
     /**
      * Sanitises a key before insertion in filter_selection table
      *
      * Ensures the key is logically valid, and always returns a string
      *
+     * Can perform permission checks, throws exception if not permitted
+     *
      * @param string $key
+     * @param User   $user
+     * @param string $page
      * @return string
      * @throws \InvalidArgumentException if the key is invalid
-     * @todo consider if we should make this method enforce permissions (by checking admin-configured available options and other permissions)
      */
-    public function sanitiseKey($key);
+    public function sanitiseKey($key, User $user, $page);
 
 
     /**

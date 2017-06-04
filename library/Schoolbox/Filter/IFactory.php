@@ -34,7 +34,13 @@ interface IFactory
     /**
      * Build a filter component, ready to inject into a filter panel
      *
-     * Returns NULL if no options would be available
+     * $selections:
+     * * cannot insert items
+     * * ignored if $overrides are present, or if $pageFilter is not user-configurable
+     *
+     * $overrides:
+     * * can insert items
+     * * if non-null, ignore $selections
      *
      * @param IDefinition                              $definition They type of filter we are building
      * @param User                                     $user

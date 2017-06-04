@@ -80,24 +80,6 @@
             $('#filter_user_configurable\\['+filterId+'\\]-error').remove();
         }
 
-        /**
-         * Hide the 'No Configurable Options message' for the specified filter
-         *
-         * @param {number} filterId
-         */
-        function checkSingleUserConfigurableOption(filterId)
-        {
-            var $filter                   = $('[data-filter='+filterId+']');
-            var $checkboxUserConfigurable = $filter.find('[data-filter-user-configurable]');
-            var $checkedAvailableOptions  = $filter.find(':checked[data-option-available]');
-            var $warningSingleOption      = $filter.find('[data-single-available-option]');
-
-            if($checkboxUserConfigurable.prop('checked') && 1 === $checkedAvailableOptions.length){
-                $warningSingleOption.slideDown();
-            } else {
-                $warningSingleOption.slideUp();
-            }
-        }
 
         // User toggles a 'User-configurable' checkbox
         $('[data-filter-user-configurable]').on('change', function(){
@@ -121,7 +103,6 @@
                 $roleDefaultAvailable.show();
                 $roleDefaultUnavailable.hide();
             }
-            checkSingleUserConfigurableOption(filterId);
         });
 
         // User toggles an 'Available' checkbox
@@ -142,7 +123,6 @@
             // Remove any validation warnings about invalid state
             var filterId = $checkbox.closest('[data-filter]').data('filter');
             hideNoConfigurableOptionsMsg(filterId);
-            checkSingleUserConfigurableOption(filterId);
         });
 
 
@@ -339,19 +319,6 @@
                                 </tr>
                             {% endfor %}
                         </table>
-
-                        {# Alternatively this could be implemented as orange altert icon next to 'Available' header. Clicking on icon shows msg in modal #}
-                        <div data-single-available-option class="small-12 column" {% if not pageFilter.userConfigurable or 1 != pageFilter.countAvailableOptions %}style="display: none;"{% endif %}>
-                            <p class="warning alert-box icon-alert">
-                                <strong>Warning.</strong> Only one option available for user to configure.<br>
-                                <br>
-                                A user-configurable filter with only one option available is unable to alter the items displayed on a filterable page.
-                                If the option is unchecked, the filter will not be applied, and the report will display all available options, in this case just one.
-                                If the option is checked, then the user will see items that match the option.<br>
-                                <br>
-                                If you wish users to always only see items that match one specific option, then you should uncheck this filter's 'User-configurable' checkbox.
-                            </p>
-                        </div>
                     </fieldset>
                 </section>
             </div>

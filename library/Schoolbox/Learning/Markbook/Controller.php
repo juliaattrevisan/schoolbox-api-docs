@@ -259,11 +259,11 @@ class Controller extends Base
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
         $page            = Filter\Page\Model::PAGE_MARK_BOOK;
-        $keyConverters   = $this->filterFactoryFactory->buildKeyConverters($page);
+        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
         $codec           = new Filter\Codec();
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->buildSelections($selectionMapper, $keyConverters, $this->getUser(), $page, $request);
+        $selectionsPerFilter = $codec->convertRequestToSelections($selectionMapper, $keyConverters, $this->getUser(), $page, $request);
         if ($saveToDB) {
             $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
