@@ -20,7 +20,7 @@
 {% elseif PAGE_MARK_BOOK == page %}
     {% set pageName = 'Markbook' %}
 {% elseif PAGE_PENDING_ASSESSMENTS == page %}
-    {% set pageName = 'Pending Assessments' %}
+    {% set pageName = 'Pending ' ~ locale.assessment.proper %}
 {% else %}
     {# Graceful fallback if constant not injected into twig #}
     {% set pageName = page %}
@@ -28,7 +28,7 @@
 
 {% set entity = (definitions | first).filter.entity %}
 {%- if ENTITY_ASSESSMENTS == entity -%}
-    {%- set entityName = 'Activity' -%}
+    {%- set entityName = locale.assessment -%}
     {%- set entityIcon = 'due-work' -%}
 {%- else -%}
     {# Graceful degradation to generic filter icon if constant not injected into twig #}
@@ -85,7 +85,6 @@
         $('[data-filter-user-configurable]').on('change', function(){
             var $checkbox = $(this);
             var $section  = $checkbox.closest('[data-filter]');
-            var filterId  = $section.data('filter');
 
             var $legendHardCoded    = $section.find('[data-hard-coded]');
             var $legendConfigurable = $section.find('[data-configurable]');
