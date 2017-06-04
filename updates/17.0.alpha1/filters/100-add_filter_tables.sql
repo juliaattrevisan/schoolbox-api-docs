@@ -1,15 +1,15 @@
 -- TODO remove this debug aids
-DROP TABLE IF EXISTS filter_default;
-DROP TABLE IF EXISTS filter_selection;
-DROP TABLE IF EXISTS filter_option;
-DROP TABLE IF EXISTS filter_page;
-DROP TABLE IF EXISTS filter;
+# DROP TABLE IF EXISTS filter_default;
+# DROP TABLE IF EXISTS filter_selection;
+# DROP TABLE IF EXISTS filter_option;
+# DROP TABLE IF EXISTS filter_page;
+# DROP TABLE IF EXISTS filter;
 
 -- A list of filters available in the system
 CREATE TABLE filter (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `entity` VARCHAR(127) NOT NULL,
-  `class` VARCHAR(127) NOT NULL,
+  `entity` VARCHAR(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+  `class` VARCHAR(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   INDEX idx_filter_entity (`entity`),
   INDEX idx_filter_class (`class`)
 ) ENGINE=INNODB;
@@ -40,7 +40,7 @@ CREATE TABLE filter_option (
       FOREIGN KEY (`filter_page_id`)
       REFERENCES filter_page (`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
-  `key` VARCHAR(127) NOT NULL COMMENT 'An abstract key - eg \'all\', \'future\', etc',
+  `key` VARCHAR(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'An abstract key - eg \'all\', \'future\', etc',
   `available` BOOL NOT NULL,
   CONSTRAINT unique_filter_option_filter_page_id_key UNIQUE (`filter_page_id`, `key`),
   INDEX idx_filter_option_key (`key`)
@@ -80,7 +80,7 @@ CREATE TABLE filter_selection (
       REFERENCES user(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
   `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
-  `key` VARCHAR(127) NOT NULL COMMENT 'A concrete key - eg a Model ID',
+  `key` VARCHAR(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'A concrete key - eg a Model ID',
   `selected` BOOL,
   CONSTRAINT unique_filter_selection_filter_id_user_id_page_key UNIQUE (`filter_id`, `user_id`, `page`, `key`),
   INDEX idx_filter_selection_page (`page`),
