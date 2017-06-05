@@ -49,7 +49,10 @@ class Broker extends Base implements IBroker
 
         /** @noinspection PhpUndefinedClassConstantInspection */
 
-        $this->databaseAttributes = [PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8];
+        $this->databaseAttributes = [
+            // UTF-8 Encode Query Responses
+            PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
+        ];
 
         // Set MSSQL specific post-connect queries
 
@@ -136,6 +139,11 @@ class Broker extends Base implements IBroker
             $multipleActiveResultsSets = "0";
         }
 
-        return "sqlsrv:Server={$this->connector->getHostname()};{$portString}Database={$this->connector->getDatabase()};MultipleActiveResultSets={$multipleActiveResultsSets};";
+        return
+            "sqlsrv:Server={$this->connector->getHostname()};" .
+            $portString .
+            "Database={$this->connector->getDatabase()};" .
+            "LoginTimeout=" . self::LOGIN_TIMEOUT . ";" .                // Give the connector 5 seconds to login- so we can default back to Offline connector
+            "MultipleActiveResultSets={$multipleActiveResultsSets};";    // Disable Multiple Active Result Sets (aka. MARS) for performance reasons
     }
 }

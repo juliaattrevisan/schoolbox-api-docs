@@ -26,6 +26,9 @@ use PDOStatement;
 
 abstract class Base implements IBroker
 {
+    /** Login timeout (seconds) */
+    const LOGIN_TIMEOUT = 5;
+
     /** @var array $options Connection options */
     protected $options = [];
 
@@ -64,6 +67,7 @@ abstract class Base implements IBroker
         $this->statementCache = new Cache(function ($statement, $options) {
             return $this->pdo->prepare($statement, $options);
         });
+
         $this->quoter = $this->buildQuoter();
     }
 
@@ -103,10 +107,17 @@ abstract class Base implements IBroker
         // Set any database connection options that we want to allow
 
         $connectOptions = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            'LoginTimeout' => self::LOGIN_TIMEOUT
         ];
 
         try {
+
+            // Change PHP default socket timeout value temporarily
+
+            $defaultSocketTimeout = ini_get('default_socket_timeout');
+
+            ini_set('default_socket_timeout', self::LOGIN_TIMEOUT);
 
             // Create a new PDO instance using the DSN string and supplied username/password parameters
 
@@ -116,6 +127,10 @@ abstract class Base implements IBroker
                 $this->connector->getPassword(),
                 $connectOptions
             );
+
+            // Restore default socket timeout
+
+            ini_set('default_socket_timeout', $defaultSocketTimeout);
 
             // These will only get called if the child class overrides the values- don't *think*
             // we need these to be parameters as they're really just there to get the database in a
