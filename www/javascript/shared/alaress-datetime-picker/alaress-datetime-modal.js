@@ -77,9 +77,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
             });
 
-            // Reset time radios
+            // Update time radios to correct times
             updateTimeControls($byTimetable.find('[data-tt-period][data-campus=' + selectedCampus + ']'));
 
+            // Reset the selected radio back to the first one
+            $byTimetable.find('[data-adtp-tt-period-start]').prop('checked', true);
         });
 
         // Listen for changes to term
