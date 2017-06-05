@@ -53,7 +53,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Listen for changes to campus
         timetable.campus.change(function () {
 
-            var selectedCampus = $(this).find('option:selected').val();
+            var selectedCampus = $(this).val();
 
             buildCycles();
             resetTimetable();
