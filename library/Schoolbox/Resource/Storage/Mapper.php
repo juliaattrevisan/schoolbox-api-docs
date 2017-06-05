@@ -224,13 +224,15 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      * @param string $alias
      * @param callable|null $callback
      *
-     * @return Model
+     * @return null|Model
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
-        /** @var Model $storage */
+        /** @var null|Model $storage */
         $storage = parent::hydrate($row, $alias, $callback);
-        $storage->setPath($this->getManager()->calcPath($storage));
+        if($storage instanceof Model){
+            $storage->setPath($this->getManager()->calcPath($storage));
+        }
         return $storage;
     }
 
