@@ -1,23 +1,29 @@
 <?php
-
 /**
  * Calendar_Layout_Full_Abstract
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
 abstract class Calendar_Layout_Full_Abstract
 {
+    /** @var Calendar $calendarHandler */
     protected $calendarHandler = null;
+
+    /** @var Group $groupHandler */
     protected $groupHandler = null;
+
     protected $subStuHandler = null;
     protected $page = null;
     protected $date = '';
-    protected $categoryList = array();
+    protected $categoryList = [];
     protected $templateFile = '';
-    protected $selected = array();
+    protected $selected = [];
     protected $selectedDate = null;
     protected $startOfWeek = null;
 
@@ -30,17 +36,16 @@ abstract class Calendar_Layout_Full_Abstract
     /** @var  Schoolbox\User $viewer   Who is currently viewing the Calendar */
     protected $viewer;
 
-
     /**
      * Constructor
      *
      * @param $page
-     * @param \Schoolbox\User $user
+     * @param User $user
      * @param $date
-     * @param \Schoolbox\User $viewer
+     * @param User $viewer
      * @param Calendar_Api_Factory $factory
      */
-    public function __construct($page, \Schoolbox\User $user, $date, \Schoolbox\User $viewer, Calendar_Api_Factory $factory)
+    public function __construct($page, User $user, $date, User $viewer, Calendar_Api_Factory $factory)
     {
         $api = $factory->produceForUser($user);
 
@@ -57,7 +62,6 @@ abstract class Calendar_Layout_Full_Abstract
         $this->setPage($page);
         $this->setDate($date);
         $this->setCategoryList($this->getGroupHandler()->involvedInCategoryList($user->getId()));
-
         $this->setupTemplateFile();
         $this->setupBlocks();
     }
@@ -76,24 +80,33 @@ abstract class Calendar_Layout_Full_Abstract
     {
         if ($currentUser->getId() != $userId) {
             try {
-                \Schoolbox\UserMapper::getInstance()->findById($userId);
+                UserMapper::getInstance()->findById($userId);
             } catch (Exception $e) {
-                throw new \Exception('User does not exist', 31, $e);
+                throw new Exception('User does not exist', 31, $e);
             }
             if (!$currentUser->getSuperuser() &&
                 !$currentUser->getRole()->isStaff() &&
                 !$groupHandler->isParentOfChild($userId)
             ) {
-                throw new \Exception('Current user does not have permission to view calendar for this user', 125);
+                throw new Exception('Current user does not have permission to view calendar for this user', 125);
             }
         }
         return true;
     }
 
+    /**
+     * @return mixed
+     */
     abstract protected function setupTemplateFile();
 
+    /**
+     * @return mixed
+     */
     abstract protected function setupBlocks();
 
+    /**
+     * @return void
+     */
     abstract protected function render();
 
     /**
@@ -189,21 +202,21 @@ abstract class Calendar_Layout_Full_Abstract
         $this->getPage()->dropDown(
             'export_group',
             $category_list,
-            array(),
+            [],
             TEMPLATE_content,
             array('name' => 'EXPORT_GROUP_NAME', 'id' => 'EXPORT_GROUP_ID')
         );
         $this->getPage()->dropDown(
             'export_campus',
             $campus_list,
-            array(),
+            [],
             TEMPLATE_content,
             array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
         );
         $this->getPage()->dropDown(
             'export_type',
             $typeList,
-            array(),
+            [],
             TEMPLATE_content,
             array('type' => 'EXPORT_TYPE_NAME', 'id' => 'EXPORT_TYPE_ID')
         );
@@ -251,7 +264,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Set calendar handler
      *
-     * @param $calendarHandler
+     * @param Calendar $calendarHandler
      */
     protected function setCalendarHandler($calendarHandler)
     {
@@ -261,7 +274,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Get calendar handler
      *
-     * @return null
+     * @return Calendar
      */
     protected function getCalendarHandler()
     {
@@ -271,7 +284,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Set group handler
      *
-     * @param $groupHandler
+     * @param Group $groupHandler
      */
     protected function setGroupHandler($groupHandler)
     {
@@ -281,7 +294,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Get group handler
      *
-     * @return null
+     * @return Group
      */
     protected function getGroupHandler()
     {
@@ -371,7 +384,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Set category list
      *
-     * @param $categoryList
+     * @param array $categoryList
      */
     protected function setCategoryList($categoryList)
     {
@@ -471,7 +484,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Set user
      *
-     * @param null $user
+     * @param User $user
      */
     protected function setUser($user)
     {
@@ -481,7 +494,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Get user
      *
-     * @return null
+     * @return User
      */
     protected function getUser()
     {
@@ -491,7 +504,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Set viewer
      *
-     * @param \User $viewer
+     * @param User $viewer
      */
     public function setViewer($viewer){
         $this->viewer = $viewer;
@@ -500,7 +513,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Get viewer
      *
-     * @return \User
+     * @return User
      */
     public function getViewer(){
         return $this->viewer;

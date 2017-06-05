@@ -9,75 +9,45 @@
 
 namespace Calendar\Event\Collection;
 
+use Calendar;
 use Calendar_Api_EventType_Interface;
+use Group;
 use SitePage;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\RendererInterface;
-use \Schoolbox\User;
+use Schoolbox\User;
 
 class Renderer
 {
+    /** @var string $interfaceClass */
     protected $interfaceClass = 'Calendar_Api_EventType_Interface';
 
-    /**
-     * An instance of a Calendar API class
-     *
-     * @var Calendar_Api_EventType_Interface
-     */
+    /** @var Calendar_Api_EventType_Interface $api An instance of a Calendar API class */
     protected $api = null;
 
-    /**
-     * A unix timestamp
-     *
-     * @var int
-     */
+    /** @var int $startTimestamp A unix timestamp */
     protected $startTimestamp = -1;
 
-    /**
-     * A unix timestamp
-     *
-     * @var int
-     */
+    /** @var int $endTimestamp A unix timestamp */
     protected $endTimestamp = -1;
 
-    /**
-     * An instance of sitepage
-     *
-     * @var SitePage
-     */
+    /** @var SitePage $page An instance of sitepage */
     protected $page;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     protected $user;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     protected $viewer;
 
-    /**
-     * Deprecated group handler for permission checks
-     * when rendering
-     * @var \Group
-     */
+    /** @var Group $groupHandler */
     protected $groupHandler;
 
-    /**
-     * Deprecated calendar handler for permission checks when rendering
-     * @var \Calendar
-     */
+    /** @var Calendar $calendarHandler */
     protected $calendarHandler;
 
-    /*
-     */
-    /**
-     * Mega-stack Collection instance which stores all events
-     *
-     * @var Collection
-     */
+    /** @var Collection $allEvents Mega-stack Collection instance which stores all events */
     protected $allEvents = null;
 
     /**
@@ -86,11 +56,11 @@ class Renderer
      * @param $api
      * @param $startTimestamp
      * @param $endTimestamp
-     * @param \Schoolbox\User $user
-     * @param \SitePage $page
-     * @param \Schoolbox\User $viewer
+     * @param User $user
+     * @param Sitepage $page
+     * @param User $viewer
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, User $user, \SitePage $page, User $viewer)
+    public function __construct($api, $startTimestamp, $endTimestamp, User $user, Sitepage $page, User $viewer)
     {
         $this->setApi($api);
         $this->setStartTimestamp($startTimestamp);
@@ -100,11 +70,10 @@ class Renderer
         $this->setViewer($viewer);
 
         //TODO remove these deprecated dependencies
-        $this->setGroupHandler(new \Group());
-        $this->setCalendarHandler(new \Calendar());
+        $this->setGroupHandler(new Group());
+        $this->setCalendarHandler(new Calendar());
 
         $this->setAllEvents(new Collection());
-
         $this->collectAllEvents();
     }
 
@@ -226,7 +195,7 @@ class Renderer
     /**
      * Set page
      *
-     * @param \SitePage $page
+     * @param Sitepage $page
      */
     protected function setPage($page)
     {
@@ -236,7 +205,7 @@ class Renderer
     /**
      * Get page
      *
-     * @return \SitePage
+     * @return Sitepage
      */
     protected function getPage()
     {
@@ -274,7 +243,7 @@ class Renderer
     }
 
     /**
-     * @param \Calendar $calendarHandler
+     * @param Calendar $calendarHandler
      */
     public function setCalendarHandler($calendarHandler)
     {
@@ -282,7 +251,7 @@ class Renderer
     }
 
     /**
-     * @return \Calendar
+     * @return Calendar
      */
     public function getCalendarHandler()
     {
@@ -290,7 +259,7 @@ class Renderer
     }
 
     /**
-     * @param \Group $groupHandler
+     * @param Group $groupHandler
      */
     public function setGroupHandler($groupHandler)
     {
@@ -298,7 +267,7 @@ class Renderer
     }
 
     /**
-     * @return \Group
+     * @return Group
      */
     public function getGroupHandler()
     {
@@ -336,6 +305,4 @@ class Renderer
     {
         return $this->viewer;
     }
-
-
 }

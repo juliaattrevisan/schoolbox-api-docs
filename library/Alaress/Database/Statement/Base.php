@@ -45,6 +45,13 @@ abstract Class Base implements IStatement
     /**
      * @inheritdoc
      */
+    public function close() {
+        return $this->statement->closeCursor();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function fetch($fetchStyle = PDO::FETCH_ASSOC)
     {
         $result = $this->statement->fetch($fetchStyle);

@@ -112,6 +112,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $statement->bindOutputs($outputs);
         $statement->execute();
+        $statement->close();
 
         if (isset($currentDay)) {
             return $currentDay;
