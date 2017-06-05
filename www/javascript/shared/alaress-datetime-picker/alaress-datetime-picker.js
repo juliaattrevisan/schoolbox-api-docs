@@ -500,7 +500,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     if (options.enableTime === true) {
 
-                        var selectedPeriod = $timetablePicker.find('[data-tt-period] option:selected').val();
+                        var selectedPeriod = $timetablePicker.find('[data-tt-period][data-campus=' + selectedCampus + ']').val();
 
                         if (selectedPeriod == 'allday') {
 
