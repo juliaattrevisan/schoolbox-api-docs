@@ -22,10 +22,10 @@ abstract class Component extends Filter\AbstractComponent
      * A concrete Term model may match one or more availability configs. Eg, the admin may have selected 'all' terms.
      * We need to examine each concrete Term model to see if it matches an availability filter
      *
-     * @param GenericCollection|Filter\Page\Option\Model[] $optionDefaults $optionDefaults
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions $optionDefaults
      * @return GenericCollection|Filter\Selection\Model[]
      */
-    protected function getRoleSelections(GenericCollection $optionDefaults)
+    protected function getRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
@@ -35,9 +35,9 @@ abstract class Component extends Filter\AbstractComponent
 
         foreach ($this->getDefinition()->getTerms() as $term) {
 
-            if ($this->isAvailable($term, $optionDefaults)) {
+            if ($this->isAvailable($term, $abstractOptions)) {
                 $key                       = (string)$term->getId();
-                $availableSelections[$key] = $this->createSelection($key, $this->isSelected($term, $optionDefaults, $roleType));
+                $availableSelections[$key] = $this->createSelection($key, $this->isSelected($term, $abstractOptions, $roleType));
             }
         }
         return $availableSelections;

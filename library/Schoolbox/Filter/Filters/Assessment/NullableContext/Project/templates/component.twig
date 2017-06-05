@@ -22,14 +22,16 @@
 
         {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}</h4>{% endif %}
 
-        {% include '@filters/_selectionCheckbox.twig' with {
-            userSelection: userSelections[keyNone],
-            roleSelection: roleSelections[keyNone],
-            label:         '(none)'
-        } only %}
+        {% if roleSelections[keyNone] %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                roleSelection:      roleSelections[keyNone],
+                userSelection:      userSelections[keyNone],
+                label:              '(none)'
+            } only %}
+        {% endif %}
 
         {% for project in projects %}
-            {% set selection = userSelections[project.id] %}
+            {% set selection = roleSelections[project.id] %}
             {% if project.assessmentModel.assessmentContext is unitImplementation %}
                 {% set title = project.title ~ ' (' ~ project.folder.title ~ ')' %}
             {% else %}
@@ -37,8 +39,8 @@
             {% endif %}
 
             {% include '@filters/_selectionCheckbox.twig' with {
-                userSelection: selection,
-                roleSelection: roleSelections[project.id],
+                roleSelection: selection,
+                userSelection: userSelections[project.id],
                 label:         title
             } only %}
         {% endfor %}

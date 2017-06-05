@@ -5,7 +5,7 @@
         roleSelections:     FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
         userSelections:     FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
         courseSpecs:        CourseSpec[]      - Course Specifications containing Unit Specifications
-        keyOnFolder:        string            - The 'ON FOLDER' key
+        keyNone:            string            - The '(none)' key
 
 #}
 
@@ -21,19 +21,21 @@
 
         {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}</h4>{% endif %}
 
-        {% include '@filters/_selectionCheckbox.twig' with {
-            userSelection:      userSelections[keyOnFolder],
-            roleSelection:      roleSelections[keyOnFolder],
-            label:              '(none)'
-        } only %}
+        {% if roleSelections[keyNone] %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                roleSelection:      roleSelections[keyNone],
+                userSelection:      userSelections[keyNone],
+                label:              '(none)'
+            } only %}
+        {% endif %}
 
         {% for course in courseSpecs %}
             {{ course.title }}
             {% for unit in course.units %}
                 {% set roleSelection = roleSelections[unit.id] %}
                 {% include '@filters/_selectionCheckbox.twig' with {
-                    userSelection:      userSelections[unit.id],
                     roleSelection:      roleSelection,
+                    userSelection:      userSelections[unit.id],
                     label:              unit.title
                 } only %}
             {% endfor %}

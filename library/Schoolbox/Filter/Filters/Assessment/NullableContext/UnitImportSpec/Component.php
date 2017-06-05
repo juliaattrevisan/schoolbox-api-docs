@@ -94,21 +94,21 @@ class Component extends Filter\AbstractComponent
 
 
     /**
-     * Generate a list of available options, selected as per role defaults.
-     *
-     * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
-     *
-     * @param GenericCollection|Filter\Page\Option\Model[] $optionDefaults $optionDefaults
-     * @return GenericCollection|Filter\Selection\Model[]
+     * @inheritdoc
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions $optionDefaults
      * @throws \InvalidArgumentException If option key unrecognised
      */
-    protected function getRoleSelections(GenericCollection $optionDefaults)
+    protected function getRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
 
+        foreach ($abstractOptions as $option) {
 
-        foreach ($optionDefaults as $option) {
+            if(!$option->getAvailable()){
+                continue;
+            }
+
             $selected = $option->getDefaults()[$roleType]->getSelected();
 
             // Is this the 'On Folder' abstract option?
@@ -147,7 +147,7 @@ class Component extends Filter\AbstractComponent
     {
         return array_merge(parent::toContext(), [
             'courseSpecs' => $this->courseSpecs,
-            'keyOnFolder' => Definition::KEY_NONE,
+            'keyNone'     => Definition::KEY_NONE,
         ]);
     }
 

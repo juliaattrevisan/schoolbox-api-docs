@@ -68,18 +68,16 @@ abstract class AbstractComponent implements IComponent
      */
     public function toContext()
     {
-        $availableOptions = $this->pageFilter->getOptions();
+        $abstractOptions = $this->pageFilter->getOptions();
 
         // Role-selections === 'hard-coded' selections
-        $roleSelections = $this->getRoleSelections($availableOptions);
+        $roleSelections = $this->getRoleSelections($abstractOptions);
 
         // User-selections. Don't bother building if not user-configurable
         $userSelections = $this->pageFilter->getUserConfigurable()
-            ? $this->getUserSelections($availableOptions)
+            ? $this->getUserSelections($abstractOptions)
             : $this->filterSelectionMapper->createCollection();
 
-        // Note: 'isAvailable' != 'enabled' && 'user-configurable'
-        //        It can also be unavailable if no concrete options match the available abstract options
         return [
             'isUserConfigurable' => $this->pageFilter->getUserConfigurable(),
             'hasOptions'         => (bool)$roleSelections->count(),
@@ -116,10 +114,10 @@ abstract class AbstractComponent implements IComponent
      *
      * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
      *
-     * @param GenericCollection|Page\Option\Model[] $optionDefaults Abstract options
+     * @param GenericCollection|Page\Option\Model[] $abstractOptions Abstract options
      * @return GenericCollection|Selection\Model[] Concrete selections
      */
-    protected function getRoleSelections(GenericCollection $optionDefaults)
+    protected function getRoleSelections(GenericCollection $abstractOptions)
     {
         // IMPORTANT:
         // This base implementation represents the case when there is a 1:1 between option.key and selection.key
@@ -130,7 +128,7 @@ abstract class AbstractComponent implements IComponent
         $availableSelections = $this->filterSelectionMapper->createCollection();
         $roleType            = $this->user->getRole()->getType();
 
-        foreach ($optionDefaults as $option) {
+        foreach ($abstractOptions as $option) {
             if(!$option->getAvailable()){
                 continue;
             }

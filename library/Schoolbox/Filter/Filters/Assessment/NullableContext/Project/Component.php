@@ -63,23 +63,19 @@ class Component extends Filter\AbstractComponent
 
 
     /**
-     * Generate a list of available options, selected as per role defaults.
-     *
-     * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
-     *
-     * @param GenericCollection|Filter\Page\Option\Model[] $optionDefaults $optionDefaults
-     * @return GenericCollection|Filter\Selection\Model[]
+     * @inheritdoc
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions $optionDefaults
      * @throws \InvalidArgumentException If option key unrecognised
      */
-    protected function getRoleSelections(GenericCollection $optionDefaults)
+    protected function getRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
 
         // Insert the (none) option
         $key = Definition::KEY_NONE;
-        if ($optionDefaults->offsetExists($key)) {
-            $isSelected                = $optionDefaults[$key]->getDefaults()[$roleType]->isSelected();
+        if ($abstractOptions[$key]->getAvailable()) {
+            $isSelected                = $abstractOptions[$key]->getDefaults()[$roleType]->isSelected();
             $availableSelections[$key] = $this->createSelection($key, $isSelected);
         }
 
@@ -88,7 +84,7 @@ class Component extends Filter\AbstractComponent
 
         foreach ($this->projects as $project) {
             $key                       = (string)$project->getId();
-            $availableSelections[$key] = $this->createSelection($key, $this->isSelected($project, $optionDefaults, $roleType));
+            $availableSelections[$key] = $this->createSelection($key, $this->isSelected($project, $abstractOptions, $roleType));
         }
         return $availableSelections;
     }

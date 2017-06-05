@@ -53,20 +53,21 @@ abstract class Component extends Filter\AbstractComponent
 
 
     /**
-     * Generate a list of available options, selected as per role defaults.
-     *
-     * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
-     *
-     * @param GenericCollection|Filter\Page\Option\Model[] $optionDefaults $optionDefaults
-     * @return GenericCollection|Filter\Selection\Model[]
+     * @inheritdoc
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions
      * @throws \InvalidArgumentException If option key unrecognised
      */
-    protected function getRoleSelections(GenericCollection $optionDefaults)
+    protected function getRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
 
-        foreach ($optionDefaults as $option) {
+        foreach ($abstractOptions as $option) {
+
+            if(!$option->getAvailable()){
+                continue;
+            }
+
             $selected = $option->getDefaults()[$roleType]->getSelected();
 
             if (Definition::KEY_CLASSES === $option->getKey()) {
