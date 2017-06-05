@@ -333,7 +333,9 @@ class RecursiveUndeleter
             }
 
             echo "\nExample to undelete folder with ID = 123:\n";
-            echo "    php ./RecursiveUndelete.php --mapper 'Schoolbox\Resource\Folder\Mapper' --id 123 -p\n\n";
+            $file = __FILE__;
+            $mapper = Folder\Mapper::class;
+            echo "    php $file -m '$mapper' -i 123 -p\n\n";
             exit(1);
         }
     }
