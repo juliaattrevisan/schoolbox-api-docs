@@ -83,6 +83,11 @@ class Model
     protected $studentSubmissionFileId;
 
     /**
+     * @var \Alaress_Date_Format
+     */
+    protected $privatisedAt;
+
+    /**
      * Figure out the url to the plagscan report
      *
      * @param $requestScheme
@@ -269,6 +274,25 @@ class Model
     public function setStudentSubmissionFileId($studentSubmissionFileId)
     {
         $this->studentSubmissionFileId = $studentSubmissionFileId;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getPrivatisedAt()
+    {
+        return $this->privatisedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $privatisedAt
+     *
+     * @return $this
+     */
+    public function setPrivatisedAt($privatisedAt)
+    {
+        $this->privatisedAt = $privatisedAt;
         return $this;
     }
 }

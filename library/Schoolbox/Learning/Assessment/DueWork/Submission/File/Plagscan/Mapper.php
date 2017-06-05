@@ -11,11 +11,10 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -50,6 +49,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('score', self::TYPE_STRING);
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
+        $this->uses('privatised_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
@@ -181,6 +181,16 @@ class Mapper extends \Schoolbox\Mapper
             return [];
         }
 
+        /* Privatise all previous incarnations of this (assessment, student) tuple to
+         * prevent documents from being scanned against older versions of themselves
+         */
+        $previousPlagscans = $this->findPreviousIncarnationsOf($file->getId());
+
+        /** @var Plagscan $currentPlagscan */
+        foreach($previousPlagscans as $currentPlagscan) {
+            $this->privatise($currentPlagscan);
+        }
+
         /* Send it to plag
          */
         $plagscanId = $this->getConnector()->transmit($file, $filename);
@@ -251,6 +261,98 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return null;
+    }
+
+    /**
+     * Find previous incarnations of $studentSubmissionFileId
+     * that haven't already been privatised
+     *
+     * This identifies assessment/owner ids and finds all the plagscan
+     * instances relevant to anything authored by owner in assessment
+     *
+     * @param int $studentSubmissionFileId
+     * @return Collection
+     */
+    public function findPreviousIncarnationsOf($studentSubmissionFileId)
+    {
+        $plagscanDocuments = new Collection();
+
+        $query = "
+            SELECT student_submission.`id`, `owner`, `box_id`
+            FROM student_submission_file 
+            INNER JOIN student_submission ON student_submission_file.`student_submission_id` = student_submission.`id`
+            WHERE student_submission_file.`id` = :studentSubmissionFileId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'studentSubmissionFileId' => $studentSubmissionFileId
+        ]);
+
+        $ownerDetails = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        /* Owner and box_id exists
+         */
+        if ($ownerDetails) {
+            $query = "
+                SELECT {$this->getColumnString()}
+                FROM {$this->getTable()}
+                INNER JOIN student_submission_file ON plagscan_document.`student_submission_file_id` = student_submission_file.`id`
+                INNER JOIN student_submission ON student_submission.`id` = student_submission_file.`student_submission_id`
+                WHERE plagscan_document.`privatised_at` IS NULL
+                AND student_submission.`owner` = :ownerId
+                AND student_submission.`box_id` = :boxId
+                AND student_submission.`id` < :submissionId
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute([
+                'ownerId' => $ownerDetails['owner'],
+                'boxId' => $ownerDetails['box_id'],
+                'submissionId' => $ownerDetails['id'],
+            ]);
+
+            /* De-dupe all the found plagscans
+             *
+             * Probably don't need to do this, but I want to be sure
+             * given I have to curl this id to plagscan.com every time
+             */
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $plagscanDocuments->setOffset($row['plagscan_id'], $this->hydrate($row));
+            }
+        }
+
+        return $plagscanDocuments;
+    }
+
+    /**
+     * Privatise a particular plagscan id
+     * in both our db and in plagscan's
+     *
+     * @param Plagscan $plagscan
+     *
+     * @throws \RuntimeException
+     */
+    public function privatise(Plagscan $plagscan)
+    {
+        try {
+
+            /* Privatise in plagscan.com then update our records too
+             */
+            $this->getConnector()->privatise($plagscan->getPlagscanId());
+
+            $plagscan->setPrivatisedAt(\Alaress_Date_Format::now());
+            $this->save($plagscan);
+        }
+        catch (\RuntimeException $e) {
+
+            /* Noop - could not privatise in plagscan
+             *
+             * Leave unchanged if plagscan refuses to do it on their end (jleckie, 6:43pm @ June 1)
+             * This allows you to re-encounter documents being checked against older versions of themselves
+             * but can't do much to stop it if plagscan screws us
+             */
+        }
     }
 
     /* Getters/Setters

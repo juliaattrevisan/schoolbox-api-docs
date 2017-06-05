@@ -34,7 +34,11 @@ if (!$mapper->getConnector()) {
 }
 
 /** @var Plagscan $currentDocument */
-$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE);
+$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE, [
+    'order' => [
+        'student_submission_file_id' => 'ASC'
+    ]
+]);
 
 $log->info("Plagscan now re-processing {$allDocuments->count()} documents");
 
@@ -64,6 +68,20 @@ foreach ($allDocuments as $currentDocument) {
         $filename = $mapper->plagscanFilename($submissionFile);
 
         if ($filename !== null) {
+
+            /* Privatise all previous incarnations of this (assessment, student) tuple to
+             * prevent documents from being scanned against older versions of themselves
+             */
+            $previousPlagscans = $mapper->findPreviousIncarnationsOf($submissionFile->getId());
+
+            /** @var Plagscan $currentPlagscan */
+            foreach($previousPlagscans as $currentPlagscan) {
+                $log->info("{$prefix}: privatising {$currentPlagscan->getPlagscanId()} - superseded by student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
+                $mapper->privatise($currentPlagscan);
+            }
+
+            /* Transmit the new file
+             */
             $plagscanId = $mapper->getConnector()->transmit($submissionFile, $filename);
 
             /* Update the db with this new plagscan id
