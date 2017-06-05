@@ -67,7 +67,7 @@ class Component extends Filter\AbstractComponent
      * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions $optionDefaults
      * @throws \InvalidArgumentException If option key unrecognised
      */
-    protected function getRoleSelections(GenericCollection $abstractOptions)
+    protected function buildRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();

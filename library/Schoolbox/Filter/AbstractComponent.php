@@ -71,11 +71,11 @@ abstract class AbstractComponent implements IComponent
         $abstractOptions = $this->pageFilter->getOptions();
 
         // Role-selections === 'hard-coded' selections
-        $roleSelections = $this->getRoleSelections($abstractOptions);
+        $roleSelections = $this->buildRoleSelections($abstractOptions);
 
-        // User-selections. Don't bother building if not user-configurable
+        // User-selections. Don't build if not user-configurable
         $userSelections = $this->pageFilter->getUserConfigurable()
-            ? $this->getUserSelections($abstractOptions)
+            ? $this->buildUserSelections($roleSelections)
             : $this->filterSelectionMapper->createCollection();
 
         return [
@@ -91,33 +91,35 @@ abstract class AbstractComponent implements IComponent
     /**
      * Generate a list of concrete options, selected as per user's selections
      *
-     * @param GenericCollection|Page\Option\Model[] $availableOptions
+     * @param GenericCollection|Selection\Model[] $roleSelections
      * @return Selection\Model[]|GenericCollection
      */
-    protected function getUserSelections(GenericCollection $availableOptions)
+    protected function buildUserSelections(GenericCollection $roleSelections)
     {
-        $availableSelections = $this->getRoleSelections($availableOptions);
+        $userSelections = $roleSelections->emptyClone();
 
         // Overlay user-specific selection settings
-        foreach ($availableSelections as $key => $availableSelection) {
+        foreach ($roleSelections as $key => $roleSelection) {
+            $userSelection = clone $roleSelection;
             if ($this->userSelections->offsetExists($key)) {
-                $availableSelection->setSelected($this->userSelections[$key]->getSelected());
+                $userSelection->setSelected($this->userSelections[$key]->getSelected());
             }
+            $userSelections[$key] = $userSelection;
         }
 
-        return $availableSelections;
+        return $userSelections;
     }
 
 
     /**
-     * Generate a list of available concrete options, selected as per role defaults.
+     * Generate a list of available concrete options, selected as per role defaults, indexed by selection.key
      *
      * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
      *
      * @param GenericCollection|Page\Option\Model[] $abstractOptions Abstract options
      * @return GenericCollection|Selection\Model[] Concrete selections
      */
-    protected function getRoleSelections(GenericCollection $abstractOptions)
+    protected function buildRoleSelections(GenericCollection $abstractOptions)
     {
         // IMPORTANT:
         // This base implementation represents the case when there is a 1:1 between option.key and selection.key
