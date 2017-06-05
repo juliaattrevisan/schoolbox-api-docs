@@ -496,6 +496,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 $timetablePicker.find('[data-adtp-tt-submit]').click(function () {
 
                     var newDate = moment($(this).attr('data-timetable-value'));
+                    var selectedCampus = $timetablePicker.find('[data-adtp-tt-campus]').val();
 
                     if (options.enableTime === true) {
 
@@ -512,7 +513,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         } else {
 
                             var periodTime = $timetablePicker.find('[name*="periodTime' + pickerId + '"]:checked').val();
-                            var newTime = moment($timetablePicker.find('[data-tt-period] option:selected').attr('data-' + periodTime + '-time'), 'h:mma');
+                            var newTime = moment($timetablePicker.find('[data-tt-period][data-campus=' + selectedCampus + '] option:selected').attr('data-' + periodTime + '-time'), 'h:mma');
 
                             newDate = newDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
                         }

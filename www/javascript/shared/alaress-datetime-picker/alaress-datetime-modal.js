@@ -77,6 +77,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
             });
 
+            // Reset time radios
+            updateTimeControls($byTimetable.find('[data-tt-period][data-campus=' + selectedCampus + ']'));
+
         });
 
         // Listen for changes to term
@@ -115,23 +118,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         // Catch period select change
         $byTimetable.find('[data-tt-period]').change(function() {
-
-            // If all day - hide radios
-            if ($(this).val() == 'allday') {
-                $(this).parents('div').find('[data-adtp-tt-time]').addClass('hide');
-            } else {
-
-                // Show time radios
-                $(this).parents('div').find('[data-adtp-tt-time]').removeClass('hide');
-
-                // Fill in period start and end times based on what period was selected
-                var periodStart = $(this).find('option:selected').data('start-time'),
-                    periodEnd = $(this).find('option:selected').data('end-time');
-
-                $byTimetable.find('[data-adtp-tt-time] [data-start-time]').text(periodStart);
-                $byTimetable.find('[data-adtp-tt-time] [data-end-time]').text(periodEnd);
-
-            }
+            updateTimeControls($(this));
         });
 
     }
@@ -749,6 +736,32 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 ifNotDate.call(this);
             }
         });
+    }
+
+
+    /**
+     * Update the time radios based on what period is selected
+     *
+     * @param periodSelect
+     */
+    function updateTimeControls($periodSelect) {
+
+        // If all day - hide radios
+        if ($periodSelect.val() == 'allday') {
+            $periodSelect.parents('div').find('[data-adtp-tt-time]').addClass('hide');
+        } else {
+
+            // Show time radios
+            $periodSelect.parents('div').find('[data-adtp-tt-time]').removeClass('hide');
+
+            // Fill in period start and end times based on what period was selected
+            var periodStart = $periodSelect.find('option:selected').data('start-time'),
+                periodEnd = $periodSelect.find('option:selected').data('end-time');
+
+            $byTimetable.find('[data-adtp-tt-time] [data-start-time]').text(periodStart);
+            $byTimetable.find('[data-adtp-tt-time] [data-end-time]').text(periodEnd);
+
+        }
     }
 
 
