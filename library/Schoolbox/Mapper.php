@@ -2860,7 +2860,7 @@ abstract class Mapper implements IMapper, Serializable
      *                           $row:    the row from the database
      *
      * @throws Exception
-     * @return object
+     * @return null|object
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
