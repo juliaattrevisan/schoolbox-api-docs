@@ -7,8 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 
-use Schoolbox\Filter\IDefinition;
-use Schoolbox\Filter\Option;
+use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
@@ -22,13 +21,17 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 class Factory extends FolderFilter\Factory
 {
 
-
     /**
      * @inheritdoc
      * @throws DefinitionException If join not defined
      */
-    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
-    {
+    protected function buildExtraComponentArgs(
+        User $user,
+        Filter\Page\Model $pageFilter,
+        Filter\IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    ) {
         $folders = $this->getFolderMapper()->createCollection()
                         ->mergeUnique($this->getFolderMapper()->findFoldersWithFeedbackToStudent($viewee), 'id')
                         ->mergeUnique($this->getFolderMapper()->findFoldersWithResponses($viewee), 'id')
@@ -36,11 +39,10 @@ class Factory extends FolderFilter\Factory
 
 
         // Should this role type see classes for this page?
-        /** @var Option\Model[][] $options */
-        $options = $definition->getOptions($page);
+        $options = $pageFilter->getOptions();
 
-        $showClasses = $options[Definition::KEY_CLASSES][$page]->getAvailable();
-        $showGroups  = $options[Definition::KEY_GROUPS][$page]->getAvailable();
+        $showClasses = $options[Definition::KEY_CLASSES]->getAvailable();
+        $showGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
 
 
         // Divide folders into Classes and Groups (not mutually exclusive!)

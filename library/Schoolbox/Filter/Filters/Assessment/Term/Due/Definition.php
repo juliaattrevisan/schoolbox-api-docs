@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term\Due;
 
-use Schoolbox\Filter\Option as FilterOption;
+use Schoolbox\Filter\Page;
 use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
 
 /**
@@ -23,15 +23,19 @@ use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
 class Definition extends AssessmentTermFilter\Definition
 {
 
+    // The name to expose in the UI
+    const NAME = 'Term Due';
+
+
     /**
      * @inheritdoc
      */
     public static function getPages()
     {
         return [
-            FilterOption\Model::PAGE_PENDING_ASSESSMENTS,
-//            FilterOption\Model::PAGE_GRADES,
-            FilterOption\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_PENDING_ASSESSMENTS,
+//            Page\Model::PAGE_GRADES,
+            Page\Model::PAGE_MARK_BOOK,
         ];
     }
 
@@ -39,7 +43,7 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/Term/Due/templates';
     }

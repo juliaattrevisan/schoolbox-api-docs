@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
-use Schoolbox\GenericCollection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 /**
@@ -23,6 +23,9 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
 class Definition extends NullableContext\Definition
 {
 
+    // The name to expose in the UI
+    const NAME = 'Project';
+
     // Where does the project reside?
     const KEY_ON_CLASS_FOLDER = 'on_class_folder';     // created directly on a class folder
     const KEY_ON_GROUP_FOLDER = 'on_group_folder';     // created directly on a group folder
@@ -34,18 +37,20 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
+    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter)
     {
-        foreach ($pageOptions as $idx => $option) {
+        $cleanedPageOptions = parent::unsetInvalidOptions($pageFilter);
+
+        foreach ($cleanedPageOptions as $idx => $option) {
             // For now, no pages can have projects that reside in unitSpecs
             // This is because the list of projects is set to:
             // 1. Projects in folders taught by user, plus
             // 2. Projects in unit-impls on folders taught by user
             if (self::KEY_ON_UNIT_SPEC === $option->getKey()) {
-                $pageOptions->offsetUnset($idx);
+                $cleanedPageOptions->offsetUnset($idx);
             }
         }
-        return $pageOptions;
+        return $cleanedPageOptions;
     }
 
 
@@ -102,7 +107,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/NullableContext/Project/templates';
     }

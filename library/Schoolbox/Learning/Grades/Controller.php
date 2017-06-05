@@ -25,7 +25,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Option as FilterOption;
+use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -191,14 +191,14 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject)
     {
-        $page        = FilterOption\Model::PAGE_GRADES;
+        $page        = FilterPage\Model::PAGE_GRADES;
         $route       = $this->getRouter()->generate('learningGrades.postReport', [
             'userId'    => $viewee->getId(),
             'termCode'  => $term->getCode(),
             'subjectId' => $subject->getId(),
         ]);
-        $queryArgs   = $this->getRequest()->query->getArrayCopy();
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
+        $request     = $this->getRequest()->query->getArrayCopy();
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $request);
 
         /* Build an markbook of assessments that:
          * * Belong to this folder
@@ -227,8 +227,7 @@ class Controller extends Base
 
         // Show the Current Grade Average for instructors and for students if the config var is on
         $isInstructor       = $this->access->isInstructor($this->getUser(), $subject);
-        $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()
-                                                    ->get('show_overall_grade');
+        $canSeeGradeAverage = $isInstructor || $this->getConfigLoader()->get('show_overall_grade');
 
         // Get folders for drop-down.
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
@@ -259,23 +258,23 @@ class Controller extends Base
      * @throws Filter\BrokenFilterException If a filter is unable to be processed
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws DefinitionException If specified mapper join is not defined
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      * @todo convert to a GET route
      */
     public function postReport(User $viewee, Term\Model $term, Folder\Model $subject)
     {
-        $postFilterSelections = $this->request->post['filter_selection'] ?: [];
+        $request         = $this->request->post['filter_selection'] ?: [];
+        $page            = FilterPage\Model::PAGE_GRADES;
+        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
+        $codec           = new Filter\Codec();
+        $userSelections  = $codec->convertRequestToSelections($this->selectionMapper, $keyConverters, $this->getUser(), $page, $request);
 
-        $page          = FilterOption\Model::PAGE_GRADES;
-        $keyConverters = $this->filterFactoryFactory->buildKeyConverters($page);
-        $codec         = new Filter\Codec();
+        // TODO don't save selections for non user-configurable page filters
+        $this->selectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
-        // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->selectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
-        $this->selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+        $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $userSelections);
+        $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
 
-        // Convert Selection models to Filters
-        $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersDto           = $selectionTransformer->buildFiltersDto();
 
         /* Merge filters to ensure that assessments:
          * * Belong to this folder
@@ -283,7 +282,7 @@ class Controller extends Base
          * * Are not Assessment Specs
          * * Are not before their publish date (ie are not KEY_UNPUBLISHED)
          */
-        $filters = array_merge($filtersDto->getByClass(), [
+        $filters = array_merge($filters, [
             AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
             AssessmentFilters\Term\Due\Definition::class                   => $term,
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
@@ -296,6 +295,7 @@ class Controller extends Base
         ]);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);

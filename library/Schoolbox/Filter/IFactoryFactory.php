@@ -41,14 +41,27 @@ interface IFactoryFactory
 
 
     /**
-     * Build a set of key converters for the specified page
+     * Build a set of key converters for filters configured as enabled for the specified page
+     *
+     * Key Converters should be light-weight as they are instantiated on every filtered report request
      *
      * @param string $page
      * @return IKeyConverter[]|GenericCollection Indexed by filter.id
-     * @throws \InvalidArgumentException If unable to find the filter mapper class
-     * @throws \ReflectionException If the specified class does not exist
      */
-    public function buildKeyConverters($page);
+    public function buildEnabledKeyConverters($page);
+
+
+    /**
+     * Build the current state of filters for a page, regardless of whether the state
+     * is saved in the admin, or derived from initial state logic.
+     *
+     * For admin pages, we want all pageFilters, for public page, we just want the enabled ones.
+     *
+     * @param string $page
+     * @param bool   $enabledOnly
+     * @return GenericCollection|IDefinition[]  Indexed by filter.class
+     */
+    public function buildCurrentState($page, $enabledOnly);
 
 
     /**
@@ -58,11 +71,12 @@ interface IFactoryFactory
      * @param string    $page
      * @param string    $route
      * @param null|User $viewee
-     * @param array     $queryArgs
+     * @param array     $request
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined the entity it is filtering
      */
-    public function buildPanel(User $user, $page, $route, User $viewee = null, array $queryArgs = []);
+    public function buildPanel(User $user, $page, $route, User $viewee = null, array $request = []);
+
 }

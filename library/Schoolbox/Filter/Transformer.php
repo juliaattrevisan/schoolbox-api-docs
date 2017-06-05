@@ -18,6 +18,7 @@ use Schoolbox\GenericCollection;
  */
 class Transformer
 {
+
     /**
      * Indexed by filter.class
      *
@@ -58,6 +59,7 @@ class Transformer
         $this->selectionsPerFilter = $selectionsPerFilter;
     }
 
+
     /**
      * Get a set of entities represented by a filter component's selections
      *
@@ -70,7 +72,7 @@ class Transformer
         if (!$this->filtersByClass->offsetExists($filterClass)) {
             return null;
         }
-        $filterId = $this->filtersByClass[$filterClass]->getId();
+        $filterId     = $this->filtersByClass[$filterClass]->getId();
         $keyConverter = $this->keyConverters[$filterId];
 
         return $keyConverter->getSelectedItems($this->selectionsPerFilter[$filterId]);
@@ -85,7 +87,7 @@ class Transformer
     public function buildFiltersDto()
     {
         $filters = new DataTransferObject();
-        foreach($this->getSelectionsPerFilter() as $filterId => $selections){
+        foreach ($this->getSelectionsPerFilter() as $filterId => $selections) {
             $instance = $this->keyConverters[$filterId]->getFilter();
             $filters->setSelections($instance, $this->getSelectedItems($instance->getClass()));
         }

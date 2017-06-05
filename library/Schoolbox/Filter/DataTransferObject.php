@@ -18,12 +18,13 @@ use Schoolbox\Collection;
  */
 class DataTransferObject
 {
+
     /**
      * Indexed by filter.class
      *
      * @var null[]|Collection[]
      */
-    private $selectionsPerClass;
+    private $selectionsPerClass = [];
 
 
     /**

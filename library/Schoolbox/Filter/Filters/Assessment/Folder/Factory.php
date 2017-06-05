@@ -9,17 +9,14 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Selection;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 
 
 /**
  * A factory for building 'Folder' filter objects
  */
-abstract class Factory extends AbstractFactory
+abstract class Factory extends Filter\AbstractFactory
 {
 
     /**
@@ -27,23 +24,27 @@ abstract class Factory extends AbstractFactory
      */
     private $folderMapper;
 
+    /** @var Access */
+    private $access;
+
 
     /**
-     * @param Filter\Mapper    $filterMapper
-     * @param Option\Mapper    $optionMapper
-     * @param Defaults\Mapper  $defaultMapper
-     * @param Selection\Mapper $selectionMapper
-     * @param Folder\Mapper    $folderMapper
+     * @param Filter\Page\Option\Mapper          $optionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
+     * @param Filter\Selection\Mapper            $selectionMapper
+     * @param Folder\Mapper                      $folderMapper
+     * @param Access                             $access
      */
     public function __construct(
-        Filter\Mapper $filterMapper,
-        Option\Mapper $optionMapper,
-        Defaults\Mapper $defaultMapper,
-        Selection\Mapper $selectionMapper,
-        Folder\Mapper $folderMapper
+        Filter\Page\Option\Mapper $optionMapper,
+        Filter\Page\Option\Defaults\Mapper $defaultMapper,
+        Filter\Selection\Mapper $selectionMapper,
+        Folder\Mapper $folderMapper,
+        Access $access
     ) {
-        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->folderMapper = $folderMapper;
+        $this->access = $access;
     }
 
 
@@ -67,6 +68,7 @@ abstract class Factory extends AbstractFactory
 
         return array_merge(parent::buildKeyConverterArgs($filter), [
             'folderIds' => $folderIds,
+            'access'    => $this->access,
         ]);
     }
 }

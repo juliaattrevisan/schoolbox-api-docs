@@ -9,10 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractDefinition;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 
 
@@ -26,8 +22,11 @@ use Schoolbox\Learning\Assessment\AssessmentType;
  * Defaults to full set, but run-time options will enable controller to exclude individual items
  *
  */
-class Definition extends AbstractDefinition
+class Definition extends Filter\AbstractDefinition
 {
+
+    // The name to expose in the UI
+    const NAME = 'Activity Type';
 
     const KEY_PROJECT = AssessmentType::TYPE_PROJECT;
     const KEY_QUIZ = AssessmentType::TYPE_QUIZ;
@@ -39,15 +38,15 @@ class Definition extends AbstractDefinition
 
 
     /**
-     * @param Filter\Model    $filter
-     * @param Option\Mapper   $filterOptionMapper
-     * @param Defaults\Mapper $filterDefaultMapper
-     * @param Collection      $assessmentTypes
+     * @param Filter\Model                       $filter
+     * @param Filter\Page\Option\Mapper          $filterOptionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
+     * @param Collection                         $assessmentTypes
      */
     public function __construct(
         Filter\Model $filter,
-        Option\Mapper $filterOptionMapper,
-        Defaults\Mapper $filterDefaultMapper,
+        Filter\Page\Option\Mapper $filterOptionMapper,
+        Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
         Collection $assessmentTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
@@ -61,10 +60,10 @@ class Definition extends AbstractDefinition
     public static function getPages()
     {
         return [
-            Option\Model::PAGE_PENDING_ASSESSMENTS,
-            Option\Model::PAGE_GRADES,
-            Option\Model::PAGE_MARK_BOOK,
-            Option\Model::PAGE_DUE_WORK_CALENDAR,
+            Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
+            Filter\Page\Model::PAGE_GRADES,
+            Filter\Page\Model::PAGE_MARK_BOOK,
+//            Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }
 
@@ -93,7 +92,7 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
     {
         // by default, all AssessmentTypes are available
         return true;
@@ -112,25 +111,17 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
+    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter)
     {
-        // noop - AssessmentTypes are purely hard-coded.
-        return $pageOptions;
-    }
+        $cleanPageOptions = parent::unsetInvalidOptions($pageFilter);
 
-
-    /**
-     * @inheritdoc
-     */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
-    {
-        foreach ($pageOptions as $idx => $option) {
+        foreach ($cleanPageOptions as $idx => $option) {
             // Do not permit 'projects' on the 'pendingAssessments' page
-            if (self::KEY_PROJECT === $option->getKey() && Option\Model::PAGE_PENDING_ASSESSMENTS === $option->getPage()) {
-                $pageOptions->offsetUnset($idx);
+            if (self::KEY_PROJECT === $option->getKey() && Filter\Page\Model::PAGE_PENDING_ASSESSMENTS === $pageFilter->getPage()) {
+                $cleanPageOptions->offsetUnset($idx);
             }
         }
-        return $pageOptions;
+        return $cleanPageOptions;
     }
 
 
@@ -147,7 +138,7 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/AssessmentType/templates';
     }

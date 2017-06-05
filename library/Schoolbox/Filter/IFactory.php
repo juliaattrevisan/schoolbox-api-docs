@@ -34,16 +34,30 @@ interface IFactory
     /**
      * Build a filter component, ready to inject into a filter panel
      *
-     * Returns NULL if no options would be available
+     * $selections:
+     * * cannot insert items
+     * * ignored if $overrides are present, or if $pageFilter is not user-configurable
      *
-     * @param string                                   $definitionClass They type of filter we are building
+     * $overrides:
+     * * can insert items
+     * * if non-null, ignore $selections
+     *
+     * @param IDefinition                              $definition They type of filter we are building
      * @param User                                     $user
-     * @param string                                   $page
+     * @param Page\Model                               $pageFilter
      * @param null|User                                $viewee
-     * @param null|GenericCollection|Selection\Model[] $selectionOverrides
+     * @param GenericCollection|Selection\Model[]      $selections Indexed by selection.key
+     * @param null|GenericCollection|Selection\Model[] $overrides  Indexed by selection.key
      * @return IComponent|null
      */
-    public function buildComponent($definitionClass, User $user, $page, User $viewee = null, GenericCollection $selectionOverrides = null);
+    public function buildComponent(
+        IDefinition $definition,
+        User $user,
+        Page\Model $pageFilter,
+        User $viewee = null,
+        GenericCollection $selections,
+        GenericCollection $overrides = null
+    );
 
 
     /**

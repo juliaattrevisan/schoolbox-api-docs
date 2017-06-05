@@ -9,12 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
-use Schoolbox\Filter\IDefinition;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
@@ -26,7 +20,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 /**
  * A factory for building 'UnitSpec' filter objects
  */
-class Factory extends AbstractFactory
+class Factory extends Filter\AbstractFactory
 {
 
     /** @var Folder\Mapper */
@@ -40,24 +34,22 @@ class Factory extends AbstractFactory
 
 
     /**
-     * @param Filter\Mapper     $filterMapper
-     * @param Option\Mapper     $optionMapper
-     * @param Defaults\Mapper   $defaultMapper
-     * @param Selection\Mapper  $selectionMapper
-     * @param Folder\Mapper     $folderMapper
-     * @param CourseImpl\Mapper $courseImplMapper
-     * @param UnitSpec\Mapper   $unitSpecMapper
+     * @param Filter\Page\Option\Mapper          $optionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $defaultMapper
+     * @param Filter\Selection\Mapper            $selectionMapper
+     * @param Folder\Mapper                      $folderMapper
+     * @param CourseImpl\Mapper                  $courseImplMapper
+     * @param UnitSpec\Mapper                    $unitSpecMapper
      */
     public function __construct(
-        Filter\Mapper $filterMapper,
-        Option\Mapper $optionMapper,
-        Defaults\Mapper $defaultMapper,
-        Selection\Mapper $selectionMapper,
+        Filter\Page\Option\Mapper $optionMapper,
+        Filter\Page\Option\Defaults\Mapper $defaultMapper,
+        Filter\Selection\Mapper $selectionMapper,
         Folder\Mapper $folderMapper,
         CourseImpl\Mapper $courseImplMapper,
         UnitSpec\Mapper $unitSpecMapper
     ) {
-        parent::__construct($filterMapper, $optionMapper, $defaultMapper, $selectionMapper);
+        parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->folderMapper     = $folderMapper;
         $this->courseImplMapper = $courseImplMapper;
         $this->unitSpecMapper   = $unitSpecMapper;
@@ -67,13 +59,17 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
-    {
+    protected function buildExtraComponentArgs(
+        User $user,
+        Filter\Page\Model $pageFilter,
+        Filter\IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    ) {
         // Should this role type see classes for this page?
-        /** @var Option\Model[][] $options */
-        $options     = $definition->getOptions($page);
-        $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS][$page];
-        $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP][$page];
+        $options     = $pageFilter->getOptions();
+        $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS];
+        $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP];
 
         $getSubjects = $classOption->getAvailable();
 

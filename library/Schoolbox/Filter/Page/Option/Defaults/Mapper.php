@@ -5,12 +5,13 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Option\Defaults;
+namespace Schoolbox\Filter\Page\Option\Defaults;
 
-use Schoolbox\Filter\Option\Mapper as FilterOptionMapper;
+use Schoolbox\Filter\Page\Option\Mapper as FilterOptionMapper;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends \Schoolbox\Mapper
 {

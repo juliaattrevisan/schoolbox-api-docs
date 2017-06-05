@@ -7,39 +7,38 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
-use Schoolbox\Filter\AbstractComponent;
 use Schoolbox\GenericCollection;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Selection;
+use Schoolbox\Filter;
 use Schoolbox\Assessment\Term;
 
 
 /**
  * @method Definition getDefinition()
  */
-abstract class Component extends AbstractComponent
+abstract class Component extends Filter\AbstractComponent
 {
 
     /**
      * A concrete Term model may match one or more availability configs. Eg, the admin may have selected 'all' terms.
      * We need to examine each concrete Term model to see if it matches an availability filter
      *
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
-     * @return GenericCollection|Selection\Model[]
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions $optionDefaults
+     * @return GenericCollection|Filter\Selection\Model[]
      */
-    protected function getRoleSelections(GenericCollection $optionDefaults)
+    protected function buildRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
+        $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
         // A term will be available if it matches any abstract key.
         // A term will be selected if any matching abstract term descriptions were selected
 
         foreach ($this->getDefinition()->getTerms() as $term) {
 
-            if ($this->isAvailable($term, $optionDefaults)) {
+            if (!$isUserConfigurable || $this->isAvailable($term, $abstractOptions)) {
                 $key                       = (string)$term->getId();
-                $availableSelections[$key] = $this->createSelection($key, $this->isSelected($term, $optionDefaults, $roleType));
+                $availableSelections[$key] = $this->createSelection($key, $this->isSelected($term, $abstractOptions, $roleType));
             }
         }
         return $availableSelections;
@@ -49,78 +48,79 @@ abstract class Component extends AbstractComponent
     /**
      * Should the specified Term be displayed in list of available options for the user?
      *
-     * @param Term\Model        $term
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
+     * @param Term\Model                                   $term
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions
      * @return bool
      */
-    private function isAvailable(Term\Model $term, GenericCollection $optionDefaults)
+    private function isAvailable(Term\Model $term, GenericCollection $abstractOptions)
     {
         $termFinish   = $term->getActualFinish();
         $currentTerm  = $this->getDefinition()->getCurrentTerm();
         $previousTerm = $this->getDefinition()->getPreviousTerm();
 
-        if ($optionDefaults->offsetExists(Definition::KEY_ALL)) {
+        if ($abstractOptions[Definition::KEY_ALL]->getAvailable()) {
             return true;
         }
-        if ($optionDefaults->offsetExists(Definition::KEY_FUTURE) && $term->getStart()->isFuture()) {
+        if ($abstractOptions[Definition::KEY_FUTURE]->getAvailable() && $term->getStart()->isFuture()) {
             return true;
         }
-        if ($currentTerm && $optionDefaults->offsetExists(Definition::KEY_CURRENT) && $currentTerm->getId() === $term->getId()) {
+        if ($currentTerm && $abstractOptions[Definition::KEY_CURRENT]->getAvailable() && $currentTerm->getId() === $term->getId()) {
             return true;
         }
-        if ($previousTerm && $optionDefaults->offsetExists(Definition::KEY_PREVIOUS) && $previousTerm->getId() === $term->getId()) {
+        if ($previousTerm && $abstractOptions[Definition::KEY_PREVIOUS]->getAvailable() && $previousTerm->getId() === $term->getId()) {
             return true;
         }
-        if (!$termFinish->isNull() && $optionDefaults->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()) {
+        if (!$termFinish->isNull() && $abstractOptions[Definition::KEY_PAST]->getAvailable() && $term->getActualFinish()->isPast()) {
             return true;
         }
-        if ($optionDefaults->offsetExists($term->getId())) {
+        if ($abstractOptions[$term->getId()] && $abstractOptions[$term->getId()]->getAvailable()) {
             return true;
         }
         return false;
     }
 
+
     /**
      * Should the specified Term be selected in list of available options for the user's role?
      *
-     * @param Term\Model        $term
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
-     * @param string $roleType
+     * @param Term\Model                                              $term
+     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $abstractOptions
+     * @param string                                                  $roleType
      * @return bool
      */
-    private function isSelected(Term\Model $term, GenericCollection $optionDefaults, $roleType)
+    private function isSelected(Term\Model $term, GenericCollection $abstractOptions, $roleType)
     {
         $termFinish   = $term->getActualFinish();
         $currentTerm  = $this->getDefinition()->getCurrentTerm();
         $previousTerm = $this->getDefinition()->getPreviousTerm();
 
-        if ($optionDefaults->offsetExists(Definition::KEY_ALL)
-            && $optionDefaults[Definition::KEY_ALL]->getDefaults()[$roleType]->getSelected()
+        if ($abstractOptions->offsetExists(Definition::KEY_ALL)
+            && $abstractOptions[Definition::KEY_ALL]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($optionDefaults->offsetExists(Definition::KEY_FUTURE) && $term->getStart()->isFuture()
-            && $optionDefaults[Definition::KEY_FUTURE]->getDefaults()[$roleType]->getSelected()
+        if ($abstractOptions->offsetExists(Definition::KEY_FUTURE) && $term->getStart()->isFuture()
+            && $abstractOptions[Definition::KEY_FUTURE]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($currentTerm && $optionDefaults->offsetExists(Definition::KEY_CURRENT) && $currentTerm->getId() === $term->getId()
-            && $optionDefaults[Definition::KEY_CURRENT]->getDefaults()[$roleType]->getSelected()
+        if ($currentTerm && $abstractOptions->offsetExists(Definition::KEY_CURRENT) && $currentTerm->getId() === $term->getId()
+            && $abstractOptions[Definition::KEY_CURRENT]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($previousTerm && $optionDefaults->offsetExists(Definition::KEY_PREVIOUS) && $previousTerm->getId() === $term->getId()
-            && $optionDefaults[Definition::KEY_PREVIOUS]->getDefaults()[$roleType]->getSelected()
+        if ($previousTerm && $abstractOptions->offsetExists(Definition::KEY_PREVIOUS) && $previousTerm->getId() === $term->getId()
+            && $abstractOptions[Definition::KEY_PREVIOUS]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if (!$termFinish->isNull() && $optionDefaults->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()
-            && $optionDefaults[Definition::KEY_PAST]->getDefaults()[$roleType]->getSelected()
+        if (!$termFinish->isNull() && $abstractOptions->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()
+            && $abstractOptions[Definition::KEY_PAST]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($optionDefaults->offsetExists($term->getId())
-            && $optionDefaults[$term->getId()]->getDefaults()[$roleType]->getSelected()
+        if ($abstractOptions->offsetExists($term->getId())
+            && $abstractOptions[$term->getId()]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }

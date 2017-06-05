@@ -5,21 +5,15 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Option;
+namespace Schoolbox\Filter\Page;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Filter\Model as Filter;
+use Schoolbox\Filter;
 use Schoolbox\Role;
-use Schoolbox\Filter\Option\Defaults\Model as FilterDefault;
-use Schoolbox\Filter\Option\Defaults\Mapper as FilterDefaultMapper;
 
 /**
- * FilterOptions can represent different things.
- *
- * They may represent a specific term, such as '2017-2' or a abstract term, eg 'current'.
- *
- * It is up to the FilterDefinition to interpret the meaning of the option's abstractKey. (ie it may be a model ID, or some abstract concept)
+ * Represents a filter instance on a page
  */
 class Model
 {
@@ -27,33 +21,15 @@ class Model
     // Pages with configurable filters
     // These are enums in DB, you will need to update column definition if you add to this list
     const PAGE_PENDING_ASSESSMENTS = 'pending';
-    const PAGE_GRADES              = 'grades';
-    const PAGE_MARK_BOOK           = 'markbook';
-    const PAGE_LEARNING_ANALYTICS  = 'analytics';
-    const PAGE_DUE_WORK_CALENDAR   = 'dueWorkCal';
-
-
-    /**
-     * Return the enum set
-     *
-     * @return string[]
-     */
-    public static function getPages()
-    {
-        return [
-            self::PAGE_PENDING_ASSESSMENTS,
-            self::PAGE_GRADES,
-            self::PAGE_MARK_BOOK,
-            self::PAGE_LEARNING_ANALYTICS,
-            self::PAGE_DUE_WORK_CALENDAR,
-        ];
-    }
+    const PAGE_GRADES = 'grades';
+    const PAGE_MARK_BOOK = 'markbook';
+    const PAGE_LEARNING_ANALYTICS = 'analytics';
+    const PAGE_DUE_WORK_CALENDAR = 'dueWorkCal';
 
 
     /**
      * @param string $page
      * @return string[]
-     * @todo move this and make more efficient
      */
     public static function getRoleTypesForPage($page)
     {
@@ -65,7 +41,6 @@ class Model
      * Returns a list of roleTypes that can view each page
      *
      * @return string[][]
-     * @todo - this does not belong here. FilterOption should not be coupled to Role.
      */
     public static function getPageRoleTypes()
     {
@@ -96,7 +71,7 @@ class Model
     use Id;
 
     /**
-     * @var Filter
+     * @var Filter\Model
      */
     private $filter;
 
@@ -107,38 +82,43 @@ class Model
      */
     private $page;
 
-    /**
-     * An abstract key. Eg 'all', 'future', '1', '3', etc which may represent 1 or more concrete keys.
-     *
-     * It is up to the concrete filter definitions to apply semantics to this value.
-     *
-     * @var string
-     */
-    private $key;
 
     /**
-     * Should this option be selectable in the filter?
+     * Is this page potentially filtered by this filter?
      *
      * @var bool
      */
-    private $available;
+    private $enabled;
 
     /**
-     * The roleType-specific defaults configured by the admin for this option
+     * Can the end-user see and configure this page filter?
      *
-     * @var GenericCollection|FilterDefault[]
+     * @var bool
      */
-    private $defaults;
+    private $userConfigurable;
 
 
+    /**
+     * @var GenericCollection|\Schoolbox\Filter\Page\Option\Model[]
+     */
+    private $options;
+
+
+    /**
+     * Constructor
+     */
     public function __construct()
     {
-        $this->defaults = FilterDefaultMapper::getInstance()->createCollection();
+        $this->options = new GenericCollection(Option\Model::class);
     }
 
 
+    /* Getters / Setters
+     */
+
+
     /**
-     * @return Filter
+     * @return Filter\Model
      */
     public function getFilter()
     {
@@ -147,10 +127,10 @@ class Model
 
 
     /**
-     * @param Filter $filter
+     * @param Filter\Model $filter
      * @return $this
      */
-    public function setFilter(Filter $filter)
+    public function setFilter(Filter\Model $filter)
     {
         $this->filter = $filter;
         return $this;
@@ -178,21 +158,21 @@ class Model
 
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getKey()
+    public function getEnabled()
     {
-        return $this->key;
+        return $this->enabled;
     }
 
 
     /**
-     * @param string $key
+     * @param bool $enabled
      * @return $this
      */
-    public function setKey($key)
+    public function setEnabled($enabled)
     {
-        $this->key = $key;
+        $this->enabled = $enabled;
         return $this;
     }
 
@@ -200,39 +180,40 @@ class Model
     /**
      * @return bool
      */
-    public function getAvailable()
+    public function getUserConfigurable()
     {
-        return $this->available;
+        return $this->userConfigurable;
     }
 
 
     /**
-     * @param bool $available
+     * @param bool $userConfigurable
      * @return $this
      */
-    public function setAvailable($available)
+    public function setUserConfigurable($userConfigurable)
     {
-        $this->available = $available;
+        $this->userConfigurable = $userConfigurable;
         return $this;
     }
 
 
     /**
-     * @return GenericCollection|FilterDefault[]
+     * @return GenericCollection|\Schoolbox\Filter\Page\Option\Model[]
      */
-    public function getDefaults()
+    public function getOptions()
     {
-        return $this->defaults;
+        return $this->options;
     }
 
 
     /**
-     * @param FilterDefault[]|GenericCollection $defaults
+     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $options
      * @return $this
+     * @throws \UnexpectedValueException If Collection of wrong type
      */
-    public function setDefaults(GenericCollection $defaults)
+    public function setOptions(GenericCollection $options)
     {
-        $this->defaults->replaceWith($defaults);
+        $this->options->replaceWith($options);
         return $this;
     }
 

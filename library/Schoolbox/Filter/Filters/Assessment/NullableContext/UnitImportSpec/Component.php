@@ -7,20 +7,16 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
-use Schoolbox\Filter\AbstractComponent;
-use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
-use Schoolbox\Filter\IDefinition;
-use Schoolbox\Filter\Selection;
+use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Schoolbox\Filter\Option;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractComponent
+class Component extends Filter\AbstractComponent
 {
 
     /**
@@ -44,27 +40,24 @@ class Component extends AbstractComponent
 
 
     /**
-     * @param IDefinition                              $definition
-     * @param User                                     $user
-     * @param string                                   $page
-     * @param null|GenericCollection|Selection\Model[] $savedSelections
-     * @param null|GenericCollection|Selection\Model[] $selectionOverrides
-     * @param Selection\Mapper                         $filterSelectionMapper
-     * @param GenericCollection|UnitSpec\Model[]       $unitSpecsImportedToClasses
-     * @param GenericCollection|UnitSpec\Model[]       $unitSpecsImportedToGroups
-     * @throws \DomainException If both saved selections and override selections are null
+     * @param Filter\IDefinition                         $definition
+     * @param User                                       $user
+     * @param Filter\Page\Model                          $pageFilter
+     * @param GenericCollection|Filter\Selection\Model[] $userSelections
+     * @param Filter\Selection\Mapper                    $filterSelectionMapper
+     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToClasses
+     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToGroups
      */
     public function __construct(
-        IDefinition $definition,
+        Filter\IDefinition $definition,
         User $user,
-        $page,
-        GenericCollection $savedSelections = null,
-        GenericCollection $selectionOverrides = null,
-        Selection\Mapper $filterSelectionMapper,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $userSelections,
+        Filter\Selection\Mapper $filterSelectionMapper,
         GenericCollection $unitSpecsImportedToClasses,
         GenericCollection $unitSpecsImportedToGroups
     ) {
-        parent::__construct($definition, $user, $page, $savedSelections, $selectionOverrides, $filterSelectionMapper);
+        parent::__construct($definition, $user, $pageFilter, $userSelections, $filterSelectionMapper);
         $this->unitSpecsImportedToClasses = $unitSpecsImportedToClasses;
         $this->unitSpecsImportedToGroups  = $unitSpecsImportedToGroups;
 
@@ -101,21 +94,22 @@ class Component extends AbstractComponent
 
 
     /**
-     * Generate a list of available options, selected as per role defaults.
-     *
-     * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
-     *
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
-     * @return GenericCollection|Selection\Model[]
+     * @inheritdoc
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions $optionDefaults
      * @throws \InvalidArgumentException If option key unrecognised
      */
-    protected function getRoleSelections(GenericCollection $optionDefaults)
+    protected function buildRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
+        $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
+        foreach ($abstractOptions as $option) {
 
-        foreach ($optionDefaults as $option) {
+            if($isUserConfigurable && !$option->getAvailable()){
+                continue;
+            }
+
             $selected = $option->getDefaults()[$roleType]->getSelected();
 
             // Is this the 'On Folder' abstract option?
@@ -154,7 +148,7 @@ class Component extends AbstractComponent
     {
         return array_merge(parent::toContext(), [
             'courseSpecs' => $this->courseSpecs,
-            'keyOnFolder' => Definition::KEY_NONE,
+            'keyNone'     => Definition::KEY_NONE,
         ]);
     }
 

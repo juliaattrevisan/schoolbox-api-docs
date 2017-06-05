@@ -457,17 +457,17 @@ Usage:
                     {% set countComponents = 0 %}
                     {% for component in panel.components %}
                         {% set template = component.template %}
-                        {% set data = component.toContext() %}
-                        {% if data.isAvailable %}
+                        {% set data     = component.toContext() %}
+                        {% if data.isUserConfigurable %}
                             {% set countComponents = countComponents + 1 %}
-                            {% include component.template with component.toContext() %}
                         {% endif %}
+                        {% include component.template with data only %}
                     {% endfor %}
 
                     {% if not countComponents %}
                         <div class="empty-state" style="flex-grow: 1; margin: 16px 20px 0;">
                             <i class="icon-info"></i>
-                            <p>No filters are configured for this page.</p>
+                            <p>No filters are user-configurable on this page.</p>
                         </div>
                     {% endif %}
                 </div>

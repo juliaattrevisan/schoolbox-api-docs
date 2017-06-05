@@ -1,25 +1,30 @@
 {#
     The most basic filter sub-panel template, renders a flat list of checkboxes
     Usage:
-        isAvailable:    bool              - Should this component be available in the panel ?
-        definition:     IFilterDefinition
-        roleSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
-        userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        isUserConfigurable: bool                     - If false, just hidden input. If true, render a checkbox to clobber hidden value
+        definition:         IFilterDefinition
+        roleSelections:     Filter\Selection\Model[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections:     Filter\Selection\Model[] - A set of filter selections made by the current user, indexed by selection.key
 #}
 
-{# Are any options available? If not, don't render this filter at all #}
-{% if isAvailable %}
+{# Are any options available? #}
+{% if 0 == roleSelections | length %}
+    {# By default, no available concrete options would mean no entities ever match #}
+    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
+{% else %}
 
     {# Concrete component template to define #}
     {% set filterName = filterName ?: 'undefined' %}
 
-    <div class="checklist" data-component="{{ definition.filter.id }}" style="margin: 0 15px; min-width: 100px;">
-        <h4 data-filter-name>{{ filterName }}</h4>
-        {% for selection in userSelections %}
+    <div class="checklist" data-component="{{ definition.filter.id }}" {% if isUserConfigurable %}style="margin: 0 15px; min-width: 100px;"{% endif %}>
+
+        {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}</h4>{% endif %}
+
+        {% for selection in roleSelections %}
             {% include '@filters/_selectionCheckbox.twig' with {
-                userSelection: selection,
-                roleSelection: roleSelections[selection.key],
-                label:         definition.label(selection.key)
+                roleSelection:      selection,
+                userSelection:      userSelections[selection.key],
+                label:              definition.label(selection.key)
             } only %}
         {% endfor %}
     </div>

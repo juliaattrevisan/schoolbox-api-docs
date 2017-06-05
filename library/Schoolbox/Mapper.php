@@ -1364,9 +1364,9 @@ abstract class Mapper implements IMapper, Serializable
      * Deletes (whether hard or soft) all records that match the given column value
      * Returns the number of records deleted.
      *
-     * @param string $columnName
-     * @param string $columnValue
-     * @param array  $options
+     * @param string                    $columnName
+     * @param string|string[]|int|int[] $columnValue
+     * @param array                     $options
      * @return int
      */
     public function deleteByColumn($columnName, $columnValue, array $options = [])
@@ -1422,7 +1422,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // Call pre-delete hooks
-        $deletedItems = $this->findByColumnList($columnList, $options);
+        $deletedItems = $this->findByPredicates($predicate, $options);
         foreach ($deletedItems as $model) {
             if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
                 return 0;

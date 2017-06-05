@@ -26,6 +26,10 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
 class Definition extends NullableContext\Definition
 {
 
+    // The name to expose in the UI
+    const NAME = 'Unit Specification';
+
+
     /**
      * @inheritdoc
      */
@@ -53,7 +57,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/NullableContext/UnitSpec/templates';
     }

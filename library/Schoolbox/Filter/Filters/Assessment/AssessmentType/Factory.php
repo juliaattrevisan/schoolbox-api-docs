@@ -8,8 +8,6 @@
 namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
 use Schoolbox\Collection;
-use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\Filter\IDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
@@ -17,7 +15,7 @@ use Schoolbox\Filter;
 /**
  * A factory for building 'AssessmentType' filter objects
  */
-class Factory extends AbstractFactory
+class Factory extends Filter\AbstractFactory
 {
 
     /**
@@ -34,8 +32,13 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    protected function buildExtraComponentArgs(User $user, $page, IDefinition $definition, GenericCollection $overrides = null, User $viewee = null)
-    {
+    protected function buildExtraComponentArgs(
+        User $user,
+        Filter\Page\Model $pageFilter,
+        Filter\IDefinition $definition,
+        GenericCollection $overrides = null,
+        User $viewee = null
+    ) {
         return [];
     }
 

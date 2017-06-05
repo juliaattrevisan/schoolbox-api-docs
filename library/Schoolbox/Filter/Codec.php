@@ -24,37 +24,41 @@ class Codec
 {
 
     /**
-     * Convert a POST/GET request to a set of Selection Models, index by filter.id, then selection.key
+     * Convert a HTTP Request to a set of Selection Models, index by filter.id, then selection.key
+     *
+     * Able to return empty sets, to indicate all options should be unchecked.
+     *
+     * Only pageFilters that are enabled for this page will have their key-converters injected.
      *
      * @param Selection\Mapper                  $selectionMapper
-     * @param GenericCollection|IKeyConverter[] $keyConverters   Indexed by filter.id
+     * @param GenericCollection|IKeyConverter[] $keyConverters Indexed by filter.id
      * @param User                              $user
      * @param string                            $page
-     * @param int[][]                           $selectionsArray Indexed by filter.id, then selection.key
-     * @return Collection|Selection\Model[][] Indexed by filter.id, then selection.key
+     * @param int[][]                           $request       Indexed by filter.id, then selection.key
+     * @return Collection|GenericCollection[]|Selection\Model[][] Indexed by filter.id then selection.key
      */
-    public function convertRequestToSelectionModels(
+    public function convertRequestToSelections(
         Selection\Mapper $selectionMapper,
         GenericCollection $keyConverters,
         User $user,
         $page,
-        array $selectionsArray
+        array $request
     ) {
+        // Clean up aura-inserted items (do this as low down in logic as possible - not in controller)
+        if (array_key_exists('page', $request)) {
+            unset($request['page']);
+        }
+
         /** @var Collection|GenericCollection[]|Selection\Model[][] $selections */
         $selections = new GenericCollection(GenericCollection::class);
 
         // Has any data been passed in? (will be empty if no filters available on this page)
-        if (count($selectionsArray)) {
-            foreach ($selectionsArray as $filterId => $filterSelectionArray) {
+        if (count($request)) {
+            foreach ($request as $filterId => $filterSelectionArray) {
 
-                // This can occur if we have manually inserted a filter for some reason, eg to exclude assessments in unit-spec contexts
-                if (!$keyConverters->offsetExists($filterId)) {
-                    // Don't include in build
-                    continue;
-                }
-                $keyConverter          = $keyConverters[$filterId];
-                $filter                = $keyConverter->getFilter();
-                $filterSelections      = new GenericCollection(Selection\Model::class);
+                // Create the collection before checking if empty.
+                // This is so the controller can still clear user-selections.
+                $filterSelections      = $selectionMapper->createCollection();
                 $selections[$filterId] = $filterSelections;
 
                 // Not an array, this happens for empty sets, eg '?2='
@@ -62,57 +66,41 @@ class Codec
                     continue;
                 }
 
+                $keyConverter = $keyConverters[$filterId];
+
+                // Page filter not enabled?
+                if (null === $keyConverter) {
+                    // Silently ignore it.
+                    continue;
+                }
+
+                $filter = $keyConverter->getFilter();
+
                 /** @var bool[] $filterSelectionArray */
                 foreach ($filterSelectionArray as $key => $isSelected) {
 
+                    try {
+                        $keyConverter->sanitiseKey($key, $user, $page);
+                    } catch (\InvalidArgumentException $e) {
+                        // User is not permitted to select this option for this page filter
+                        // Silently discard it and move on
+                        // TODO instead call assertValidKey(). That method will need to take $user and $page as args
+                        // TODO SA-3532
+                        continue;
+                    }
+
                     $selection = $selectionMapper->createModel();
-                    $key = $keyConverter->sanitiseKey($key);
                     $selection
                         ->setFilter($filter)
                         ->setUser($user)
-                        ->setPage($page)
-                        ->setKey($key)
+                        ->setPage((string)$page)
+                        ->setKey((string)$key)
                         ->setSelected((bool)$isSelected);
                     $filterSelections[$key] = $selection;
                 }
             }
         }
         return $selections;
-    }
-
-
-    /**
-     * Convert filters to a GET query string
-     *
-     * @param GenericCollection|IKeyConverter[] $keyConverters TODO index by class or id?
-     * @param null[]                            Collection     []|mixed[][] $filters  TODO index by class or id?
-     * @return string
-     * @todo is this even needed?
-     */
-    public function convertFiltersToQueryString(GenericCollection $keyConverters, array $filters)
-    {
-        $queryStrings = [];
-
-        foreach ($filters as $class => $selectedItems) {
-            if (!$selectedItems instanceof Collection) {
-                continue;
-            }
-
-            $keyConverter = $keyConverters[$class];
-            $id           = $keyConverter->getFilter()->getId();
-
-            if (0 === $selectedItems->count()) {
-                $queryStrings[] = "{$id}=";  // TODO note that this is NOT array syntax
-                continue;
-            }
-
-            /** @var Collection|mixed[] $selectedItems */
-            foreach ($selectedItems as $item) {
-                $queryStrings[] = "{$id}[{$keyConverter->getKey($item)}]=1";
-            }
-        }
-
-        return implode('&', $queryStrings);
     }
 
 
@@ -130,7 +118,8 @@ class Codec
             }
 
             if (0 === $filterSelections->count()) {
-                $queryStrings[] = "{$filterId}=";  // TODO note that this is NOT array syntax
+                // Note that this is NOT array syntax, eg '1=&2=' meaning both 1 and 2 are empty arrays
+                $queryStrings[] = "{$filterId}=";
                 continue;
             }
 

@@ -9,6 +9,7 @@ namespace Schoolbox\Filter;
 
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\User;
 
 
 abstract class AbstractKeyConverter implements IKeyConverter
@@ -36,10 +37,11 @@ abstract class AbstractKeyConverter implements IKeyConverter
      */
     abstract protected function getItem($key);
 
+
     /**
      * @inheritdoc
      */
-    public function sanitiseKey($key)
+    public function sanitiseKey($key, User $user, $page)
     {
         $this->assertValidKey($key);
         return (string)$key;

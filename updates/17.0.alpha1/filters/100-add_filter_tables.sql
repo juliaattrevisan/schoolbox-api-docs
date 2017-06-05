@@ -2,28 +2,48 @@
 # DROP TABLE IF EXISTS filter_default;
 # DROP TABLE IF EXISTS filter_selection;
 # DROP TABLE IF EXISTS filter_option;
+# DROP TABLE IF EXISTS filter_page;
 # DROP TABLE IF EXISTS filter;
 
 -- A list of filters available in the system
 CREATE TABLE filter (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `entity` VARCHAR(255) NOT NULL,
-  `class` VARCHAR(255) NOT NULL
+  `entity` VARCHAR(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+  `class` VARCHAR(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  INDEX idx_filter_entity (`entity`),
+  INDEX idx_filter_class (`class`)
 ) ENGINE=INNODB;
 
--- A set of options available for each filter.
+-- Which filters are enabled for which pages
+CREATE TABLE filter_page (
+  `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `filter_id` INT(11) NOT NULL,
+  INDEX idx_filter_option_filter_id (`filter_id`),
+  CONSTRAINT fk_filter_option_filter_id
+    FOREIGN KEY (`filter_id`)
+    REFERENCES filter(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
+  `enabled` BOOL NOT NULL,
+  `user_configurable` BOOL NOT NULL,
+  CONSTRAINT unique_filter_page_filter_id_page UNIQUE (`filter_id`, `page`),
+  INDEX idx_filter_option_page (`page`)
+) ENGINE=INNODB;
+
+-- A set of options available for each page_filter.
 -- Some options may be hard-coded. The filter implementation logic determines whether to use configured options or hard-coded ones.
 CREATE TABLE filter_option (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `filter_id` INT(11) NOT NULL,
-    INDEX filter_option_filter_id (`filter_id`),
-    CONSTRAINT fk_filter_option_filter_id
-      FOREIGN KEY (`filter_id`)
-      REFERENCES filter(`id`)
+  `filter_page_id` INT(11) NOT NULL,
+    INDEX idx_filter_option_filter_page_id (`filter_page_id`),
+    CONSTRAINT fk_filter_option_filter_page_id
+      FOREIGN KEY (`filter_page_id`)
+      REFERENCES filter_page (`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
-  `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
-  `key` VARCHAR(255) NOT NULL COMMENT 'An abstract key - eg \'all\', \'future\', etc',
-  `available` BOOL NOT NULL
+  `key` VARCHAR(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'An abstract key - eg \'all\', \'future\', etc',
+  `available` BOOL NOT NULL,
+  CONSTRAINT unique_filter_option_filter_page_id_key UNIQUE (`filter_page_id`, `key`),
+  INDEX idx_filter_option_key (`key`)
 ) ENGINE=INNODB;
 
 
@@ -32,13 +52,15 @@ CREATE TABLE filter_option (
 CREATE TABLE filter_default (
   `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `filter_option_id` INT(11) NOT NULL,
-    INDEX filter_default_filter_option_id (`filter_option_id`),
+    INDEX idx_filter_default_filter_option_id (`filter_option_id`),
     CONSTRAINT fk_filter_default_filter_option_id
       FOREIGN KEY (`filter_option_id`)
       REFERENCES filter_option(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
-  `role_type` VARCHAR(255) NOT NULL,
-  `selected` BOOL
+  `role_type` ENUM ('staff','parent','student','guest') NOT NULL,
+  `selected` BOOL,
+  CONSTRAINT unique_filter_default_filter_option_id_role_type UNIQUE (`filter_option_id`, `role_type`),
+  INDEX idx_filter_default_role_type (`role_type`)
 ) ENGINE=INNODB;
 
 -- User configured filter selections per user
@@ -46,20 +68,23 @@ CREATE TABLE filter_default (
 -- the admin has configured the availabilities and defaults.
 CREATE TABLE filter_selection (
   `filter_id` INT(11) NOT NULL,
-    INDEX filter_selection_filter_id (`filter_id`),
+    INDEX idx_filter_selection_filter_id (`filter_id`),
     CONSTRAINT fk_filter_selection_filter_id
       FOREIGN KEY (`filter_id`)
       REFERENCES filter(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
   `user_id` INT(11) UNSIGNED NOT NULL,
-    INDEX filter_selection_user_id (`user_id`),
+    INDEX idx_filter_selection_user_id (`user_id`),
     CONSTRAINT fk_filter_selection_user_id
       FOREIGN KEY (`user_id`)
       REFERENCES user(`id`)
       ON DELETE CASCADE ON UPDATE CASCADE,
   `page` ENUM ('pending','grades','markbook','analytics','dueWorkCal') NOT NULL,
-  `key` VARCHAR(255) NOT NULL COMMENT 'A concrete key - eg a Model ID',
-  `selected` BOOL
+  `key` VARCHAR(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'A concrete key - eg a Model ID',
+  `selected` BOOL,
+  CONSTRAINT unique_filter_selection_filter_id_user_id_page_key UNIQUE (`filter_id`, `user_id`, `page`, `key`),
+  INDEX idx_filter_selection_page (`page`),
+  INDEX idx_filter_selection_key (`key`)
 ) ENGINE=INNODB;
 
 -- We don't need this anymore - it's superseded by the 'AssessmentType' filter

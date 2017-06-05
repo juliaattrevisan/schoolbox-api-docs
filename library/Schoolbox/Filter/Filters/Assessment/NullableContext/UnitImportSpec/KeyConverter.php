@@ -48,7 +48,7 @@ class KeyConverter extends NullableContext\KeyConverter
      */
     public function getItem($key)
     {
-        if(Definition::KEY_NONE === $key){
+        if (Definition::KEY_NONE === $key) {
             return null;
         }
         $this->assertValidKey($key);
@@ -67,13 +67,12 @@ class KeyConverter extends NullableContext\KeyConverter
     }
 
 
-
     /**
      * @inheritdoc
      */
     protected function assertValidKey($key)
     {
-        if(Definition::KEY_NONE === $key){
+        if (Definition::KEY_NONE === $key) {
             return;
         }
         if (!$this->unitSpecIds->offsetExists($key)) {

@@ -10,6 +10,7 @@ namespace Schoolbox\Learning;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -28,8 +29,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Option as FilterOption;
-use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 
@@ -60,11 +59,8 @@ class Controller extends Base
     /** @var CourseSpecificationMapper */
     private $courseSpecificationMapper;
 
-    /** @var Filter\Mapper */
-    private $filterMapper;
 
-
-    /** @var FilterSelection\Mapper */
+    /** @var Filter\Selection\Mapper */
     private $filterSelectionMapper;
 
 
@@ -79,8 +75,7 @@ class Controller extends Base
      * @param Timetable_ColourMapper     $timetableColourMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param CourseSpecificationMapper  $courseSpecificationMapper
-     * @param FilterSelection\Mapper     $filterSelectionMapper
-     * @param Filter\Mapper              $filterMapper
+     * @param Filter\Selection\Mapper    $filterSelectionMapper
      * @param AssessmentFilters\IdFinder $assessmentIdFinder
      */
     public function __construct(
@@ -90,8 +85,7 @@ class Controller extends Base
         Timetable_ColourMapper $timetableColourMapper,
         CourseImplementationMapper $courseImplementationMapper,
         CourseSpecificationMapper $courseSpecificationMapper,
-        FilterSelection\Mapper $filterSelectionMapper,
-        Filter\Mapper $filterMapper,
+        Filter\Selection\Mapper $filterSelectionMapper,
         AssessmentFilters\IdFinder $assessmentIdFinder
     ) {
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
@@ -101,7 +95,6 @@ class Controller extends Base
         $this->courseImplementationMapper = $courseImplementationMapper;
         $this->courseSpecificationMapper  = $courseSpecificationMapper;
         $this->filterSelectionMapper      = $filterSelectionMapper;
-        $this->filterMapper               = $filterMapper;
         $this->assessmentIdFinder         = $assessmentIdFinder;
     }
 
@@ -143,11 +136,16 @@ class Controller extends Base
      * @throws \InvalidArgumentException
      * @throws Mapper\Exception
      * @throws \ReflectionException If unable to find the class for a filter registered on this page
-     * @throws \DomainException If filter factoryFactory has not defined the entity it is filtering
+     * @throws \DomainException     If filter factoryFactory has not defined the entity it is filtering
+     * @throws NotFound             If $viewee is not staff
      */
     public function getPendingAssessmentsForUser(User $viewee, AssessmentFilters\FactoryFactory $filterFactoryFactory)
     {
-        $page      = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
+        if(!$viewee->getRole()->isStaff()){
+            throw new NotFound('Only staff have pending assessments. Found: ' . $viewee->getRole()->getType());
+        }
+
+        $page      = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
         $route     = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
@@ -207,32 +205,32 @@ class Controller extends Base
      * Generate a pending assessment report as HTML string
      *
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
-     * @param string[][]                       $postFilterSelections - Indexed by filter.id, then concrete key
+     * @param string[][]                       $request - Indexed by filter.id, then concrete key
      * @return string
      * @throws \InvalidArgumentException
      * @throws \DomainException
      * @throws \LogicException
      * @throws \ReflectionException If the specified class does not exist
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    protected function generatePendingAssessmentReport(
-        AssessmentFilters\FactoryFactory $filterFactoryFactory,
-        array $postFilterSelections
-    ) {
-        $page          = FilterOption\Model::PAGE_PENDING_ASSESSMENTS;
-        $keyConverters = $filterFactoryFactory->buildKeyConverters($page);
-        $codec         = new Filter\Codec();
+    protected function generatePendingAssessmentReport(AssessmentFilters\FactoryFactory $filterFactoryFactory, array $request)
+    {
+        $page              = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
+        $keyConverters     = $filterFactoryFactory->buildEnabledKeyConverters($page);
+        $codec             = new Filter\Codec();
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelectionModels($this->filterSelectionMapper, $keyConverters, $this->getUser(), $page, $postFilterSelections);
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->filterSelectionMapper, $keyConverters, $this->getUser(), $page, $request);
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
-        // Convert Selection models to Filters
+        // Convert Selection models to Filter Collections
         $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersDto           = $selectionTransformer->buildFiltersDto();
+        $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
 
         // Ensure that assessments are not Assessment Specs
-        $filters = array_merge($filtersDto->getByClass(), [
+        $filters = array_merge($filters, [
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
         ]);
 

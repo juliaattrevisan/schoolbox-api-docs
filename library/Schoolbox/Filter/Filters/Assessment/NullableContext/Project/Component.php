@@ -7,22 +7,19 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
-use Schoolbox\Filter\AbstractComponent;
-use Schoolbox\Filter\Filters\Assessment\NullableContext\Project\Definition;
-use Schoolbox\Filter\IDefinition;
+use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;
-use Schoolbox\Filter\Selection;
 use Schoolbox\User;
-use Schoolbox\Filter\Option;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 
 /**
  * @method Definition getDefinition()
  */
-class Component extends AbstractComponent
+class Component extends Filter\AbstractComponent
 {
+
     /**
      * Projects that reside on options set as available in admin, and are linked
      * to current user's folders.
@@ -31,29 +28,27 @@ class Component extends AbstractComponent
      */
     private $projects;
 
+
     /**
-     * @param IDefinition                              $definition
-     * @param User                                     $user
-     * @param string                                   $page
-     * @param null|GenericCollection|Selection\Model[] $savedSelections
-     * @param null|GenericCollection|Selection\Model[] $selectionOverrides
-     * @param Selection\Mapper                         $filterSelectionMapper
-     * @param GenericCollection|Project\Model[]        $projects
-     *
-     * @throws \DomainException If both saved selections and override selections are null
+     * @param Filter\IDefinition                         $definition
+     * @param User                                       $user
+     * @param Filter\Page\Model                          $pageFilter
+     * @param GenericCollection|Filter\Selection\Model[] $userSelections
+     * @param Filter\Selection\Mapper                    $filterSelectionMapper
+     * @param GenericCollection|Project\Model[]          $projects
      */
     public function __construct(
-        IDefinition $definition,
+        Filter\IDefinition $definition,
         User $user,
-        $page,
-        GenericCollection $savedSelections = null,
-        GenericCollection $selectionOverrides = null,
-        Selection\Mapper $filterSelectionMapper,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $userSelections,
+        Filter\Selection\Mapper $filterSelectionMapper,
         GenericCollection $projects
     ) {
-        parent::__construct($definition, $user, $page, $savedSelections, $selectionOverrides, $filterSelectionMapper);
+        parent::__construct($definition, $user, $pageFilter, $userSelections, $filterSelectionMapper);
         $this->projects = $projects;
     }
+
 
     /**
      * @inheritdoc
@@ -68,32 +63,30 @@ class Component extends AbstractComponent
 
 
     /**
-     * Generate a list of available options, selected as per role defaults.
-     *
-     * Each option representing a concrete item (as opposed to an abstract concept in the admin system)
-     *
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
-     * @return GenericCollection|Selection\Model[]
+     * @inheritdoc
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions $optionDefaults
      * @throws \InvalidArgumentException If option key unrecognised
      */
-    protected function getRoleSelections(GenericCollection $optionDefaults)
+    protected function buildRoleSelections(GenericCollection $abstractOptions)
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
+        $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
         // Insert the (none) option
         $key = Definition::KEY_NONE;
-        if($optionDefaults->offsetExists($key)){
-            $isSelected = $optionDefaults[$key]->getDefaults()[$roleType]->isSelected();
+        if (!$isUserConfigurable || $abstractOptions[$key]->getAvailable()) {
+            $isSelected                = $abstractOptions[$key]->getDefaults()[$roleType]->isSelected();
             $availableSelections[$key] = $this->createSelection($key, $isSelected);
         }
 
         // A project will be available if it matches any abstract key. (only available projects were injected from factory)
         // A project will be checked if any matching abstract project defaults were checked
 
+        // TODO ensure the factory ignores $option.isAvailable if $pageFilter.userConfigurable == false
         foreach ($this->projects as $project) {
             $key                       = (string)$project->getId();
-            $availableSelections[$key] = $this->createSelection($key, $this->isSelected($project, $optionDefaults, $roleType));
+            $availableSelections[$key] = $this->createSelection($key, $this->isSelected($project, $abstractOptions, $roleType));
         }
         return $availableSelections;
     }
@@ -102,9 +95,9 @@ class Component extends AbstractComponent
     /**
      * Should the specified Project be checked in list of available options for the user's role?
      *
-     * @param Project\Model                    $project
-     * @param GenericCollection|Option\Model[] $optionDefaults $optionDefaults
-     * @param string                           $roleType
+     * @param Project\Model                                $project
+     * @param GenericCollection|Filter\Page\Option\Model[] $optionDefaults
+     * @param string                                       $roleType
      * @return bool
      */
     private function isSelected(Project\Model $project, GenericCollection $optionDefaults, $roleType)
@@ -112,11 +105,11 @@ class Component extends AbstractComponent
         $context = $project->getAssessmentModel()->getAssessmentContext();
         $folder  = $project->getFolder();
 
-        $onFolder = $context instanceof Folder\Model;
+        $onFolder   = $context instanceof Folder\Model;
         $inUnitImpl = $context instanceof UnitImpl\Model;
 
-        $onClassFolder = $onFolder && $folder->getCodes()->count() > 0;
-        $onGroupFolder = $onFolder && $folder->getGroup();
+        $onClassFolder   = $onFolder && $folder->getCodes()->count() > 0;
+        $onGroupFolder   = $onFolder && $folder->getGroup();
         $onClassUnitImpl = $inUnitImpl && $folder->getCodes()->count() > 0;
         $onGroupUnitImpl = $inUnitImpl && $folder->getGroup();
 

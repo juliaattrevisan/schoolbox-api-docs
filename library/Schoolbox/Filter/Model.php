@@ -8,10 +8,12 @@
 namespace Schoolbox\Filter;
 
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
 {
+
     use Id;
 
     /**
@@ -33,13 +35,19 @@ class Model
 
 
     /**
-     * @return string
-     * @todo Think of a better way to do this. Should be twig responsibility
+     * Pages where this filter resides
+     *
+     * @var GenericCollection|Page\Model[]
      */
-    public function getName()
+    private $pages;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-        $pathFragments = explode('\\', $this->class);
-        return $pathFragments[count($pathFragments) - 2];
+        $this->pages = new GenericCollection(Page\Model::class);
     }
 
 
@@ -65,6 +73,7 @@ class Model
         return $this;
     }
 
+
     /**
      * @return string|IDefinition
      */
@@ -81,6 +90,26 @@ class Model
     public function setClass($class)
     {
         $this->class = $class;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|Page\Model[]
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+
+    /**
+     * @param GenericCollection|Page\Model[] $pages
+     * @return $this
+     */
+    public function setPages(GenericCollection $pages)
+    {
+        $this->pages->replaceWith($pages);
         return $this;
     }
 }

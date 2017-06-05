@@ -9,10 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\AbstractDefinition;
-use Schoolbox\Filter\Option;
-use Schoolbox\Filter\Option\Defaults;
-use Schoolbox\GenericCollection;
 
 
 /**
@@ -21,8 +17,11 @@ use Schoolbox\GenericCollection;
  * □ Unweighted
  *
  */
-class Definition extends AbstractDefinition
+class Definition extends Filter\AbstractDefinition
 {
+
+    // The name to expose in the UI
+    const NAME = 'Weighting';
 
     const KEY_WEIGHTED = 'weighted';
     const KEY_UNWEIGHTED = 'unweighted';
@@ -33,15 +32,15 @@ class Definition extends AbstractDefinition
 
 
     /**
-     * @param Filter\Model    $filter
-     * @param Option\Mapper   $filterOptionMapper
-     * @param Defaults\Mapper $filterDefaultMapper
-     * @param Collection      $weightingTypes
+     * @param Filter\Model                       $filter
+     * @param Filter\Page\Option\Mapper          $filterOptionMapper
+     * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
+     * @param Collection                         $weightingTypes
      */
     public function __construct(
         Filter\Model $filter,
-        Option\Mapper $filterOptionMapper,
-        Defaults\Mapper $filterDefaultMapper,
+        Filter\Page\Option\Mapper $filterOptionMapper,
+        Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
         Collection $weightingTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
@@ -64,10 +63,10 @@ class Definition extends AbstractDefinition
     public static function getPages()
     {
         return [
-            Option\Model::PAGE_PENDING_ASSESSMENTS,
-            Option\Model::PAGE_GRADES,
-            Option\Model::PAGE_MARK_BOOK,
-            Option\Model::PAGE_DUE_WORK_CALENDAR,
+            Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
+            Filter\Page\Model::PAGE_GRADES,
+            Filter\Page\Model::PAGE_MARK_BOOK,
+//            Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }
 
@@ -90,26 +89,6 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function insertDynamicOptions(GenericCollection $pageOptions, $page)
-    {
-        // noop - WeightingTypes are purely hard-coded.
-        return $pageOptions;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function unsetInvalidOptions(GenericCollection $pageOptions)
-    {
-        // noop - WeightingTypes are purely hard-coded.
-        return $pageOptions;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
         // No options checked
@@ -120,7 +99,7 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, $page)
+    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
     {
         // by default, all WeightingTypes are available
         return true;
@@ -130,7 +109,7 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/WeightingType/templates';
     }

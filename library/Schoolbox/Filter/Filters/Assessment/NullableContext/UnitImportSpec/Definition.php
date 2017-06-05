@@ -8,7 +8,7 @@
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
-use Schoolbox\Filter\Option;
+use Schoolbox\Filter\Page;
 
 /**
  * The unit-spec that an an assessment-impl's unit-impl was imported from.
@@ -37,6 +37,9 @@ use Schoolbox\Filter\Option;
  */
 class Definition extends NullableContext\Definition
 {
+
+    // The name to expose in the UI
+    const NAME = "Unit Import's Specification";
 
     /* Show units imported to the following folder types:
      * eg,
@@ -72,8 +75,8 @@ class Definition extends NullableContext\Definition
     public static function getPages()
     {
         return [
-            Option\Model::PAGE_MARK_BOOK,
-            Option\Model::PAGE_PENDING_ASSESSMENTS,
+            Page\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_PENDING_ASSESSMENTS,
         ];
     }
 
@@ -85,7 +88,7 @@ class Definition extends NullableContext\Definition
     {
         switch ($key) {
             case self::KEY_NONE:
-                return 'No Unit';
+                return '(none)';
             case self::KEY_IMPORTED_TO_CLASS:
                 return 'Units imported to classes';
             case self::KEY_IMPORTED_TO_GROUP:
@@ -98,7 +101,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function getTemplatesDir()
+    protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/NullableContext/UnitImportSpec/templates';
     }
