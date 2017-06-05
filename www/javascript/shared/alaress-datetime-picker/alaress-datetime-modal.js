@@ -261,7 +261,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             selectedTerm = timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
             termEnd = timetable.term.find(':selected').attr('data-end-date'),
-            monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
+            monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd)),
+            selectedDate = moment(timetable.submit.attr('data-timetable-value'));
 
         // Don't try to divide by zero
         if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
@@ -275,11 +276,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 var endDate   = moment(value[valueKeys[valueKeys.length - 1]]);
                 var hideClass = 'hide';
 
-                if (index == 1 && !moment(twigVars.date).isBetween(termStart, termEnd, 'day', '[]')) {
+                if (index == 1 && !selectedDate.isBetween(termStart, termEnd, 'day', '[]')) {
                     // if this date is outside the bounds of the term, display the first week
                     hideClass = '';
 
-                } else if (moment(twigVars.date).isBetween(startDate, endDate, 'day', '[]')) {
+                } else if (selectedDate.isBetween(startDate, endDate, 'day', '[]')) {
                     // show this week if the selected date is in this week
                     hideClass = '';
                 }
