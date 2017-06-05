@@ -102,10 +102,11 @@ class Component extends Filter\AbstractComponent
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
+        $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
         foreach ($abstractOptions as $option) {
 
-            if(!$option->getAvailable()){
+            if($isUserConfigurable && !$option->getAvailable()){
                 continue;
             }
 

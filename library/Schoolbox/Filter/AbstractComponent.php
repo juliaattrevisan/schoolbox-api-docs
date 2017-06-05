@@ -129,9 +129,10 @@ abstract class AbstractComponent implements IComponent
 
         $availableSelections = $this->filterSelectionMapper->createCollection();
         $roleType            = $this->user->getRole()->getType();
+        $isUserConfigurable  = $this->pageFilter->getUserConfigurable();
 
         foreach ($abstractOptions as $option) {
-            if(!$option->getAvailable()){
+            if($isUserConfigurable && !$option->getAvailable()){
                 continue;
             }
             $key                       = $option->getKey();
@@ -181,6 +182,14 @@ abstract class AbstractComponent implements IComponent
     protected function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * @return Page\Model
+     */
+    protected function getPageFilter()
+    {
+        return $this->pageFilter;
     }
 
 

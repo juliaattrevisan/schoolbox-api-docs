@@ -29,13 +29,14 @@ abstract class Component extends Filter\AbstractComponent
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
+        $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
         // A term will be available if it matches any abstract key.
         // A term will be selected if any matching abstract term descriptions were selected
 
         foreach ($this->getDefinition()->getTerms() as $term) {
 
-            if ($this->isAvailable($term, $abstractOptions)) {
+            if (!$isUserConfigurable || $this->isAvailable($term, $abstractOptions)) {
                 $key                       = (string)$term->getId();
                 $availableSelections[$key] = $this->createSelection($key, $this->isSelected($term, $abstractOptions, $roleType));
             }
@@ -47,8 +48,8 @@ abstract class Component extends Filter\AbstractComponent
     /**
      * Should the specified Term be displayed in list of available options for the user?
      *
-     * @param Term\Model                                              $term
-     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $abstractOptions
+     * @param Term\Model                                   $term
+     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions
      * @return bool
      */
     private function isAvailable(Term\Model $term, GenericCollection $abstractOptions)

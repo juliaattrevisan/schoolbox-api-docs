@@ -71,10 +71,11 @@ class Component extends Filter\AbstractComponent
     {
         $availableSelections = $this->getFilterSelectionMapper()->createCollection();
         $roleType            = $this->getUser()->getRole()->getType();
+        $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
         // Insert the (none) option
         $key = Definition::KEY_NONE;
-        if ($abstractOptions[$key]->getAvailable()) {
+        if (!$isUserConfigurable || $abstractOptions[$key]->getAvailable()) {
             $isSelected                = $abstractOptions[$key]->getDefaults()[$roleType]->isSelected();
             $availableSelections[$key] = $this->createSelection($key, $isSelected);
         }
@@ -82,6 +83,7 @@ class Component extends Filter\AbstractComponent
         // A project will be available if it matches any abstract key. (only available projects were injected from factory)
         // A project will be checked if any matching abstract project defaults were checked
 
+        // TODO ensure the factory ignores $option.isAvailable if $pageFilter.userConfigurable == false
         foreach ($this->projects as $project) {
             $key                       = (string)$project->getId();
             $availableSelections[$key] = $this->createSelection($key, $this->isSelected($project, $abstractOptions, $roleType));
