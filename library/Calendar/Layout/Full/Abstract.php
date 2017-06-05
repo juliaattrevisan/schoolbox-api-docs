@@ -105,7 +105,7 @@ abstract class Calendar_Layout_Full_Abstract
     abstract protected function setupBlocks();
 
     /**
-     * @return mixed
+     * @return void
      */
     abstract protected function render();
 
