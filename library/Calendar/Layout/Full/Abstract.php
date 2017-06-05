@@ -1,14 +1,15 @@
 <?php
-use Schoolbox\User;
-
 /**
  * Calendar_Layout_Full_Abstract
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
 abstract class Calendar_Layout_Full_Abstract
 {
     /** @var Calendar $calendarHandler */
@@ -34,7 +35,6 @@ abstract class Calendar_Layout_Full_Abstract
 
     /** @var  Schoolbox\User $viewer   Who is currently viewing the Calendar */
     protected $viewer;
-
 
     /**
      * Constructor
@@ -81,15 +81,15 @@ abstract class Calendar_Layout_Full_Abstract
     {
         if ($currentUser->getId() != $userId) {
             try {
-                \Schoolbox\UserMapper::getInstance()->findById($userId);
+                UserMapper::getInstance()->findById($userId);
             } catch (Exception $e) {
-                throw new \Exception('User does not exist', 31, $e);
+                throw new Exception('User does not exist', 31, $e);
             }
             if (!$currentUser->getSuperuser() &&
                 !$currentUser->getRole()->isStaff() &&
                 !$groupHandler->isParentOfChild($userId)
             ) {
-                throw new \Exception('Current user does not have permission to view calendar for this user', 125);
+                throw new Exception('Current user does not have permission to view calendar for this user', 125);
             }
         }
         return true;
@@ -385,7 +385,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Set category list
      *
-     * @param $categoryList
+     * @param array $categoryList
      */
     protected function setCategoryList($categoryList)
     {
