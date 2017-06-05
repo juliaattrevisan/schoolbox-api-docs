@@ -52,9 +52,36 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         // Listen for changes to campus
         timetable.campus.change(function () {
+
+            var selectedCampus = $(this).val();
+
             buildCycles();
             resetTimetable();
             revealTimetable();
+
+            // Show the correct days for the selected campus, hide others
+            $byTimetable.find('[data-tt-day]').each(function() {
+                if ($(this).attr('data-campus') == selectedCampus) {
+                    $(this).removeClass('hide');
+                } else {
+                    $(this).addClass('hide');
+                }
+            });
+
+            // Show the correct period dropdown for the selected campus, hide others
+            $byTimetable.find('[data-tt-period]').each(function() {
+                if ($(this).attr('data-campus') == selectedCampus) {
+                    $(this).removeClass('hide');
+                } else {
+                    $(this).addClass('hide');
+                }
+            });
+
+            // Update time radios to correct times
+            updateTimeControls($byTimetable.find('[data-tt-period][data-campus=' + selectedCampus + ']'));
+
+            // Reset the selected radio back to the first one
+            $byTimetable.find('[data-adtp-tt-period-start]').prop('checked', true);
         });
 
         // Listen for changes to term
@@ -93,23 +120,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         // Catch period select change
         $byTimetable.find('[data-tt-period]').change(function() {
-
-            // If all day - hide radios
-            if ($(this).val() == 'allday') {
-                $(this).parents('div').find('[data-adtp-tt-time]').addClass('hide');
-            } else {
-
-                // Show time radios
-                $(this).parents('div').find('[data-adtp-tt-time]').removeClass('hide');
-
-                // Fill in period start and end times based on what period was selected
-                var periodStart = $(this).find('option:selected').data('start-time'),
-                    periodEnd = $(this).find('option:selected').data('end-time');
-
-                $byTimetable.find('[data-adtp-tt-time] [data-start-time]').text(periodStart);
-                $byTimetable.find('[data-adtp-tt-time] [data-end-time]').text(periodEnd);
-
-            }
+            updateTimeControls($(this));
         });
 
     }
@@ -251,7 +262,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             selectedTerm = timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
             termEnd = timetable.term.find(':selected').attr('data-end-date'),
-            monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
+            monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd)),
+            selectedDate = moment(timetable.submit.attr('data-timetable-value'));
 
         // Don't try to divide by zero
         if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
@@ -265,11 +277,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 var endDate   = moment(value[valueKeys[valueKeys.length - 1]]);
                 var hideClass = 'hide';
 
-                if (index == 1 && !moment(twigVars.date).isBetween(termStart, termEnd, 'day', '[]')) {
+                if (index == 1 && !selectedDate.isBetween(termStart, termEnd, 'day', '[]')) {
                     // if this date is outside the bounds of the term, display the first week
                     hideClass = '';
 
-                } else if (moment(twigVars.date).isBetween(startDate, endDate, 'day', '[]')) {
+                } else if (selectedDate.isBetween(startDate, endDate, 'day', '[]')) {
                     // show this week if the selected date is in this week
                     hideClass = '';
                 }
@@ -726,6 +738,32 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 ifNotDate.call(this);
             }
         });
+    }
+
+
+    /**
+     * Update the time radios based on what period is selected
+     *
+     * @param periodSelect
+     */
+    function updateTimeControls($periodSelect) {
+
+        // If all day - hide radios
+        if ($periodSelect.val() == 'allday') {
+            $periodSelect.parents('div').find('[data-adtp-tt-time]').addClass('hide');
+        } else {
+
+            // Show time radios
+            $periodSelect.parents('div').find('[data-adtp-tt-time]').removeClass('hide');
+
+            // Fill in period start and end times based on what period was selected
+            var periodStart = $periodSelect.find('option:selected').data('start-time'),
+                periodEnd = $periodSelect.find('option:selected').data('end-time');
+
+            $byTimetable.find('[data-adtp-tt-time] [data-start-time]').text(periodStart);
+            $byTimetable.find('[data-adtp-tt-time] [data-end-time]').text(periodEnd);
+
+        }
     }
 
 

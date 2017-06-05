@@ -91,8 +91,9 @@
 
                                 <div class="day-picker" data-tt-days>
                                     {% for campus in timetable %}
+                                        {% set hideClass = loop.index0 > 0 ? 'hide' : '' %}
                                         {% for i in 1..timetable[campus.campusId].dayCount %}
-                                            <div class="flatpickr-day {{ activeClass }}" data-tt-day="{{ i }}">{{ i }}</div>
+                                            <div class="flatpickr-day {{ activeClass }} {{ hideClass }}" data-tt-day="{{ i }}" data-campus="{{ campus.campusId }}">{{ i }}</div>
                                         {% endfor %}
                                     {% endfor %}
                                 </div>
@@ -113,7 +114,7 @@
                                     </label>
 
                                     {% for campus in timetable %}
-                                        <select data-tt-period>
+                                        <select class="{% if loop.index0 > 0 %}hide{% endif %}" data-tt-period data-campus="{{ campus.campusId }}">
                                             <option value="allday">All Day</option>
                                             {% for description in timetable[campus.campusId].desc %}
                                                 <option value="" data-start-time="{{ timetable[campus.campusId].start[loop.index0] }}" data-end-time="{{ timetable[campus.campusId].end[loop.index0] }}">{{ description }}</option>
@@ -127,9 +128,9 @@
                             <div data-adtp-tt-time-controls>
                                 <div class="radiolist hide" data-adtp-tt-time>
                                     <label>Time:</label>
-                                    <input type="radio" name="periodTime{{ id }}" value="start" id="periodStart{{ id }}" checked>
+                                    <input type="radio" name="periodTime{{ id }}" value="start" id="periodStart{{ id }}" checked data-adtp-tt-period-start>
                                     <label for="periodStart{{ id }}">Period start (<span data-start-time></span>)</label>
-                                    <input type="radio" name="periodTime{{ id }}" value="end" id="periodEnd{{ id }}">
+                                    <input type="radio" name="periodTime{{ id }}" value="end" id="periodEnd{{ id }}" data-adtp-tt-period-end>
                                     <label for="periodEnd{{ id }}">Period end (<span data-end-time></span>)</label>
                                 </div>
                             </div>
