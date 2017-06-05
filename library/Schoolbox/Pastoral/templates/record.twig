@@ -82,11 +82,11 @@
                                 <dt class="small-12 medium-3">{{ locale.severity.proper }}:</dt>
                                 <dd class="small-12 medium-9">{{ record.severity.name }}</dd>
                             {% endif %}
-                            <dt class="small-12 medium-3">Category:</dt>
-                            <dd class="small-12 medium-9">{{ record.category.name }}</dd>
-                            {% if record.type.name is not empty %}
-                                <dt class="small-12 medium-3">Sub Category:</dt>
-                                <dd class="small-12 medium-9">{{ record.type.name }}</dd>
+                            <dt class="small-12 medium-3">Type:</dt>
+                            <dd class="small-12 medium-9">{{ record.type.name }}</dd>
+                            {% if record.category.name is not empty %}
+                                <dt class="small-12 medium-3">Sub-Type:</dt>
+                                <dd class="small-12 medium-9">{{ record.category.name }}</dd>
                             {% endif %}
                             {% if record.points is not empty %}
                                 <dt class="small-12 medium-3">Points:</dt>
