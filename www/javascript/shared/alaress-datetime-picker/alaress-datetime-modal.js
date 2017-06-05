@@ -53,16 +53,24 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Listen for changes to campus
         timetable.campus.change(function () {
 
-            var campus = $(this).find('option:selected').val();
+            var selectedCampus = $(this).find('option:selected').val();
 
             buildCycles();
             resetTimetable();
             revealTimetable();
 
             // Show the correct days for the selected campus, hide others
-
             $byTimetable.find('[data-tt-day]').each(function() {
-                if ($(this).attr('data-campus') == campus) {
+                if ($(this).attr('data-campus') == selectedCampus) {
+                    $(this).removeClass('hide');
+                } else {
+                    $(this).addClass('hide');
+                }
+            });
+
+            // Show the correct period dropdown for the selected campus, hide others
+            $byTimetable.find('[data-tt-period]').each(function() {
+                if ($(this).attr('data-campus') == selectedCampus) {
                     $(this).removeClass('hide');
                 } else {
                     $(this).addClass('hide');
