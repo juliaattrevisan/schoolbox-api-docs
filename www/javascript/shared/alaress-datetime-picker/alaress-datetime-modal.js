@@ -55,6 +55,16 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             buildCycles();
             resetTimetable();
             revealTimetable();
+
+            // Show the correct days for the selected campus, hide others
+            var campus = $(this).find('option:selected').val();
+            $('[data-tt-day]').each(function() {
+                if ($(this).attr('data-campus') == campus) {
+                    $(this).removeClass('hide');
+                } else {
+                    $(this).addClass('hide');
+                }
+            });
         });
 
         // Listen for changes to term

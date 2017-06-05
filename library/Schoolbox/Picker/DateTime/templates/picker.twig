@@ -93,7 +93,7 @@
                                     {% for campus in timetable %}
                                         {% set hideClass = loop.index0 > 0 ? 'hide' : '' %}
                                         {% for i in 1..timetable[campus.campusId].dayCount %}
-                                            <div class="flatpickr-day {{ activeClass }} {{ hideClass }}" data-tt-day="{{ i }}">{{ i }}</div>
+                                            <div class="flatpickr-day {{ activeClass }} {{ hideClass }}" data-tt-day="{{ i }}" data-campus="{{ campus.campusId }}">{{ i }}</div>
                                         {% endfor %}
                                     {% endfor %}
                                 </div>
