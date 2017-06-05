@@ -18,8 +18,8 @@
  *  ShortOpt | LongOpt
  *  -p       | --perform   *without* this flag, un-delete will only perform a dry-run
  *  -m       | --mapper    which mapper class does the root entity belong to?
- *  -i       | --ids       Comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
- *  -w       | --windows   duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
+ *  -i       | --id        Comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
+ *  -w       | --window    duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
  *  -v       | --verbose   verbosity:   how much activity will be logged.
  */
 
@@ -63,6 +63,12 @@ $undeleter->run();
 
 class RecursiveUndeleter
 {
+    const COLOUR_GREEN = "\033[32m";
+    const COLOUR_RED = "\033[31m";
+    const COLOUR_GREY = "\033[37m";
+    const COLOUR_YELLOW = "\033[1;33m";
+    const COLOUR_WHITE = "\033[0m";
+
     // To account for legacy non-synchronised deletedAt timestamps, how much allowance should we consider as being
     // part of same action?
     const DEFAULT_DELETED_AT_WINDOW = 120 ; // default to 1 minute either side of root object's soft-delete timestamp
@@ -326,16 +332,53 @@ class RecursiveUndeleter
         $this->getCommandLineIds($errors, $opts);
         $this->getCommandLineTimestampWindow($errors, $opts);
 
+        $red    = self::COLOUR_RED;
+        $green  = self::COLOUR_GREEN;
+        $white  = self::COLOUR_WHITE;
+        $yellow = self::COLOUR_YELLOW;
+
         if(count($errors)) {
-            echo "\nInvalid syntax. You must: \n";
+            echo "\n{$red}Invalid syntax. You must: \n";
             foreach($errors as $error) {
-                echo "- $error\n";
+                echo "\t- $error\n";
             }
 
-            echo "\nExample to undelete folder with ID = 123:\n";
-            $file = __FILE__;
+            $file   = __FILE__;
+            $class  = __CLASS__;
             $mapper = Folder\Mapper::class;
-            echo "    php $file -m '$mapper' -i 123 -p\n\n";
+
+            $helpMsg = "{$white}
+NAME
+       $class - recursively undelete a graph of models in the database
+
+SYNOPSIS
+       {$green}php $file {$yellow}[OPTION]...{$white}
+
+DESCRIPTION
+       Recursively undelete a graph of models in the database.
+
+       Mandatory arguments to long options are mandatory for short options too.
+
+       {$yellow}-i, --id=ID...{$white}
+              comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
+
+       {$yellow}-m, --mapper=MAPPER_CLASS{$white}
+              which mapper class does the root entity belong to?
+
+       {$yellow}-p, --perform{$white}
+              *without* this flag, un-delete will only perform a dry-run
+
+       {$yellow}-w, --window=WINDOW{$white}
+              duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
+
+       {$yellow}-v, --verbose{$white}
+              verbosity:   how much activity will be logged.
+
+EXAMPLE
+       Example to undelete folder with ID = 123:
+            {$green}php $file {$yellow}-m '$mapper' -i 123 -p{$white}
+";
+            echo $helpMsg;
             exit(1);
         }
     }
@@ -349,8 +392,11 @@ class RecursiveUndeleter
      */
     private function getCommandLineIds(&$errors, array $opts)
     {
+        $red    = self::COLOUR_RED;
+        $yellow = self::COLOUR_YELLOW;
+
         if(isset($opts['i'], $opts['id'])) {
-            $errors[] = "not specify IDs using both the short '-i' and long '--id' option syntax";
+            $errors[] = "{$red}not specify IDs using both the short '{$yellow}-i{$red}' and long '{$yellow}--id{$red}' option syntax";
             return;
         }
 
@@ -362,7 +408,7 @@ class RecursiveUndeleter
             $idString = $opts['id'];
         }
         else {
-            $errors[] = "specify IDs using either the short '-i' or long '--id' option syntax";
+            $errors[] = "{$red}specify IDs using either the short '{$yellow}-i{$red}' or long '{$yellow}--id{$red}' option syntax";
             return;
         }
 
@@ -388,8 +434,11 @@ class RecursiveUndeleter
      */
     private function getCommandLineTimestampWindow(&$errors, array $opts)
     {
+        $red    = self::COLOUR_RED;
+        $yellow = self::COLOUR_YELLOW;
+
         if(isset($opts['w'], $opts['window'])) {
-            $errors[] = "not specify timestamp window using both the short '-w' and long '--window' option syntax";
+            $errors[] = "{$red}not specify timestamp window using both the short '{$yellow}-w{$red}' and long '{$yellow}--window{$red}' option syntax";
             return;
         }
 
@@ -430,15 +479,17 @@ class RecursiveUndeleter
      */
     private function getCommandLineMapperClass(&$errors, array $opts)
     {
+        $red    = self::COLOUR_RED;
+        $yellow = self::COLOUR_YELLOW;
 
         // Did user provide both short and long options?
         if(isset($opts['m'], $opts['mapper'])) {
-            $errors[] = "specify mapper using either the short '-m' or long '--mapper' option syntax, but not both";
+            $errors[] = "{$red}specify mapper using either the short '{$yellow}-m{$red}' or long '{$yellow}--mapper{$red}' option syntax, but not both";
             return;
         }
         // Did user provide neither short nor long option
         if(!isset($opts['m']) && !isset($opts['mapper'])) {
-            $errors[] = "specify mapper using either the short '-m' or long '--mapper' option syntax";
+            $errors[] = "{$red}specify mapper using either the short '{$yellow}-m{$red}' or long '{$yellow}--mapper{$red}' option syntax";
 
             return;
         }
