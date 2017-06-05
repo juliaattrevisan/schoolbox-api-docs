@@ -55,6 +55,7 @@
         {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}</h4>{% endif %}
 
         {% if hasClasses %}
+            <h4>Classes</h4>
             {% for classFolder in classes %}
                 {% set selection = roleSelections[classFolder.id] %}
 
@@ -73,6 +74,7 @@
         {% endif %}
 
         {% if hasGroups %}
+            <h4>Groups</h4>
             {% for groupFolder in groups %}
                 {% set selection = roleSelection[groupFolder.id] %}
                 {% include '@filters/_selectionCheckboxWithDuplicates.twig' with {
