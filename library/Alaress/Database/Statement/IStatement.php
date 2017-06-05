@@ -25,6 +25,14 @@ interface IStatement
     public function rowCount();
 
     /**
+     * Close statement (without MARS enabled you can only have one statement active at a time, this prevents
+     * the need to iterate the results fully before moving on to another query)
+     *
+     * @return bool
+     */
+    public function close();
+
+    /**
      * Get single record from last executed query
      *
      * @param int $fetchStyle PDO fetch style
