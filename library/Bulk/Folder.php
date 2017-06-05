@@ -117,16 +117,11 @@ class Bulk_Folder
                                 'error' => "Subject code already exists ({$subjectCode})",
                             ];
                         } catch (MapperException $e) {
-
                             /* noop - folder doesn't exist
                              */
                         }
 
                         $codes[] = $subjectCode;
-                    }
-
-                    if (count($codes)) {
-                        continue;
                     }
 
                     /* Parent folder
