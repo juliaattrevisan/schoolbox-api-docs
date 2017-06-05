@@ -21,9 +21,9 @@ abstract class Calendar_Layout_Full_Abstract
     protected $subStuHandler = null;
     protected $page = null;
     protected $date = '';
-    protected $categoryList = array();
+    protected $categoryList = [];
     protected $templateFile = '';
-    protected $selected = array();
+    protected $selected = [];
     protected $selectedDate = null;
     protected $startOfWeek = null;
 
@@ -62,7 +62,6 @@ abstract class Calendar_Layout_Full_Abstract
         $this->setPage($page);
         $this->setDate($date);
         $this->setCategoryList($this->getGroupHandler()->involvedInCategoryList($user->getId()));
-
         $this->setupTemplateFile();
         $this->setupBlocks();
     }
@@ -203,21 +202,21 @@ abstract class Calendar_Layout_Full_Abstract
         $this->getPage()->dropDown(
             'export_group',
             $category_list,
-            array(),
+            [],
             TEMPLATE_content,
             array('name' => 'EXPORT_GROUP_NAME', 'id' => 'EXPORT_GROUP_ID')
         );
         $this->getPage()->dropDown(
             'export_campus',
             $campus_list,
-            array(),
+            [],
             TEMPLATE_content,
             array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
         );
         $this->getPage()->dropDown(
             'export_type',
             $typeList,
-            array(),
+            [],
             TEMPLATE_content,
             array('type' => 'EXPORT_TYPE_NAME', 'id' => 'EXPORT_TYPE_ID')
         );
