@@ -471,14 +471,6 @@ class Connector
     }
 
     /**
-     * @param string $apiUrl
-     */
-    private function setApiUrl($apiUrl)
-    {
-        $this->apiUrl = $apiUrl;
-    }
-
-    /**
      * @return ValidFiles
      */
     private function getValidFiles()
