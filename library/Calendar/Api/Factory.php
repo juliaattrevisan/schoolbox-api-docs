@@ -42,7 +42,7 @@ class Calendar_Api_Factory
      * @param AssessmentDataSource $assessmentDataSource
      * @param  IConnector $databaseExternal
      */
-    public function __construct(AssessmentDataSource $assessmentDataSource, IConnector $databaseExternal)
+    public function __construct(AssessmentDataSource $assessmentDataSource, $databaseExternal)
     {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->databaseExternal = $databaseExternal;
