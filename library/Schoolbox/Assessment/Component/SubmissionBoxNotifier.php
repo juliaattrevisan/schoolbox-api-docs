@@ -427,7 +427,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // renamed
         if (!empty($diff['name'])) {
             foreach($students as $student){
-                $bob = $this->setForNotifyRenamed($bob, $submissionBox, $diff, $user);
+                $bob = $this->setForNotifyRenamed($bob, $submissionBox, $diff, $user, $student);
                 $envelope->targetToUser($student, $bob->build());
             }
         }
@@ -469,17 +469,21 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $box
      * @param array         $diff
      * @param User          $author
+     * @param User          $student
      *
      * @return Builder
      */
-    protected function setForNotifyRenamed($bob, $box, $diff, $author)
+    protected function setForNotifyRenamed(Builder $bob, SubmissionBox $box, array $diff, User $author, User $student)
     {
+        $assessmentId = $box->getAssessmentModel()->getId();
+        $studentId    = $student->getId();
+
         return $bob->setTitle(":author renamed :oldname to :newname in :catname")
             // params for this instance - oldname doesn't have an associated href
             ->setParams(array(
                 'author'  => new UserParam($author),
                 'oldname' => new Param($diff['name'][1]),
-                'newname' => new Param($diff['name'][0], "/learning/assessments/".$box->getAssessmentId()),
+                'newname' => new Param($diff['name'][0], "/learning/assessments/{$assessmentId}/{$studentId}"),
                 'catname' => new CategoryParam($box->getCategory())
             ))
             ->setTopics(array("duework.{$box->getId()}.renamed"));
@@ -721,7 +725,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         if (!empty($diff['name'])) {
             foreach ($students as $student) {
                 $bob = $this
-                    ->setForNotifyRenamed($bob, $submissionBox, $diff, $user)
+                    ->setForNotifyRenamed($bob, $submissionBox, $diff, $user, $student)
                     ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
                     ->setTitle(":child's $boxType was renamed from :oldname to :newname in :catname")
                     ->unsetParam('author')
