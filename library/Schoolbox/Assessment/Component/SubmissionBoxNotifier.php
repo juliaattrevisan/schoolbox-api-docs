@@ -38,6 +38,9 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 
+/**
+ * @method SubmissionBoxMapper getMapper()
+ */
 class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInterface
 {
 
@@ -249,12 +252,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         // be sure the target method exists
-        if (!$this->mapper instanceof FeedableMapperInterface) {
+        if (!$this->getMapper() instanceof FeedableMapperInterface) {
             return $c;
         }
 
-        /** @var Collection|SubmissionBox[] $boxes */
-        $boxes = $this->mapper->findForFeed($context, $limit, $offset);
+        $boxes = $this->getMapper()->findForFeed($context, $limit, $offset);
 
         foreach ($boxes as $box) {
             $c = $c
@@ -329,8 +331,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // re-hydrate, because manual hydration, because fail -_-
         $boxId = $submissionBox->getId();
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
+        $submissionBox = $this->getMapper()->findById($boxId);
         $assessmentModel = $submissionBox->getAssessmentModel();
 
         $workType = $assessmentModel->getWorkType();
@@ -379,8 +380,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $boxId = $submissionBox->getId();
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
+        $submissionBox = $this->getMapper()->findById($boxId);
         $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // discard all update notifications if the submissionbox isn't open (EXCEPT work returns opening up)
@@ -585,8 +585,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $bob      = new Builder();
         $boxId    = $submissionBox->getId();
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
+        $submissionBox = $this->getMapper()->findById($boxId);
         $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
@@ -634,8 +633,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $bob      = new Builder();
         $boxId    = $submissionBox->getId();
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
+        $submissionBox = $this->getMapper()->findById($boxId);
         $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
@@ -685,8 +683,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $boxId = $submissionBox->getId();
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
+        $submissionBox = $this->getMapper()->findById($boxId);
         $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
@@ -809,8 +806,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $bob      = new Builder();
         $boxId    = $submissionBox->getId();
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
+        $submissionBox = $this->getMapper()->findById($boxId);
         $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
@@ -847,8 +843,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     {
         $boxId = $submissionBox->getId();
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
+        $submissionBox = $this->getMapper()->findById($boxId);
         $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
@@ -948,8 +943,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $bob      = new Builder();
         $boxId    = $submissionBox->getId();
 
-        /** @var SubmissionBox $submissionBox */
-        $submissionBox = $this->mapper->findById($boxId);
+        $submissionBox = $this->getMapper()->findById($boxId);
         $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
