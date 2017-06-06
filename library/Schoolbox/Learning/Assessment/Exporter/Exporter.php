@@ -64,7 +64,7 @@ class Exporter
             LEFT JOIN       lu_work_type ON
                             lu_work_type.id = a.work_type_id
             WHERE           YEAR(sr.created_at) = :currentYear
-                            AND sr.id IN 
+                            AND sr.id =
                             (
                                 SELECT    id 
                                 FROM      submission_return sr2 
