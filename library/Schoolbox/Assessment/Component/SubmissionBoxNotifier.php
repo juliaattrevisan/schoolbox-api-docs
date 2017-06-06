@@ -278,6 +278,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     {
         $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
+        // Ensure folder codes are hydrated
+        $folder = $this->folderMapper->findById($folder->getId());
+
         // full list of students in this folder
         $userCollection = $this->userAccessMapper->findStudentsInCategory($folder);
 
@@ -337,10 +340,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
         $assessmentId  = $submissionBox->getAssessmentModel()->getId();
-
-        // Hydrate folders codes
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
-        $folder        = $this->folderMapper->findById($folder->getId());
 
         $workType = $submissionBox->getAssessmentModel()->getWorkType();
         $boxType = mb_strtolower($workType ? $workType->getName() : '');
@@ -363,11 +363,16 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setByline("Due {$submissionBox->getDueDate()->getCalendarDateTime()}")
             ->setSeverity(Logger::NOTICE);
 
-        $students = $this->userAccessMapper->findStudentsInCategory($folder);
+        // Hydrate folder to ensure presence of folders codes
+        $students = $this->userAccessMapper->findStudentsInCategory(
+            $this->folderMapper->findById($folder->getId())
+        );
+
         foreach($students as $student){
+            $href = "/learning/assessments/{$assessmentId}/{$student->getId()}";
             $bob
-                ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
-                ->setParam('box', new Param($boxName, "/learning/assessments/{$assessmentId}/{$student->getId()}"));
+                ->setHref($href)
+                ->setParam('box', new Param($boxName, $href));
             $envelope->targetToUser($student, $bob->build());
         }
 
@@ -426,15 +431,15 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
-        $students = $this->userAccessMapper->findStudentsInCategory(
-        // needs fully hydrated folder
-            $this->folderMapper->findById($folder->getId())
-        );
-
         $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addFilter('roletype', [Role::STUDENT]);
+
+        // Hydrate folder to ensure presence of folders codes
+        $students = $this->userAccessMapper->findStudentsInCategory(
+            $this->folderMapper->findById($folder->getId())
+        );
 
         // renamed
         if (!empty($diff['name'])) {
@@ -687,12 +692,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         foreach ($unsubmittedStudents as $student) {
             $childId = $student->getId();
+            $href    = "/learning/assessments/$assessmentId/$childId";
             // target the parents of this particular student
             $bob->setIcon('/portrait?size=square64&userId=' . $student->getExternalId())
-                ->setHref("/learning/assessments/$assessmentId/$childId")
+                ->setHref($href)
                 ->setParams([
                     'child'   => new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'),
-                    'boxname' => new Param($submissionBox->getName(), "/learning/assessments/$assessmentId/$childId"),
+                    'boxname' => new Param($submissionBox->getName(), $href),
                 ]);
             $envelope->targetToParent($childId, $bob->build());
         }
@@ -840,29 +846,36 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     {
         $envelope = new Envelope();
         $bob      = new Builder();
-        $boxId    = $submissionBox->getId();
 
+        $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
+        $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
         if (!$submissionBox->getAcceptOnline() || $submissionBox->getDueDate()->getUnixTimeStamp() > time()) {
             return $envelope;
         }
 
-        $href = "/learning/assessments/".$submissionBox->getAssessmentId();
         $bob->setTitle('Submissions have closed for :boxname in :catname')
-            ->setParams(array(
-                'boxname' => new Param($submissionBox->getName(), $href),
-                'catname' => new CategoryParam($folder),
-            ))
+            ->setParam('catname', new CategoryParam($folder))
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=cross")
-            ->setHref($href)
             ->setSeverity(Logger::NOTICE)
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.closed");
 
-        $envelope->broadcastToCategory($folder, UserAccess::ACCESS_READ, $bob->build());
+        // Hydrate folder to ensure presence of folders codes
+        $students = $this->userAccessMapper->findStudentsInCategory(
+            $this->folderMapper->findById($folder->getId())
+        );
+
+        foreach($students as $student){
+            $href = "/learning/assessments/{$assessmentId}/{$student->getId()}";
+            $bob
+                ->setHref($href)
+                ->setParam('boxname', new Param($submissionBox->getName(), $href));
+            $envelope->targetToUser($student, $bob->build());
+        }
 
         return $envelope;
     }
@@ -872,16 +885,16 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param Envelope      $envelope
      * @param Builder       $bob
-     * @param callable      $callback
+     * @param callable      $callback      Accepts a User object as method arg
      * @throws Mapper\Exception If column names invalid
      * @return Envelope
      */
     protected function notifyOverdue($submissionBox, $envelope, $bob, $callback)
     {
-        $boxId = $submissionBox->getId();
-
+        $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
+        $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
         if (!$submissionBox->getAcceptOnline()) {
@@ -894,14 +907,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         $boxName = $submissionBox->getName();
-        $href    = "/learning/assessments/".$submissionBox->getAssessmentId();
 
-        $bob->setParams(array(
-            'boxname' => new Param($boxName, $href),
-            'catname' => new CategoryParam($folder),
-        ))
+        $bob->setParam('catname', new CategoryParam($folder))
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
-            ->setHref($href)
             ->setSeverity(Logger::ERROR)
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.overdue");
@@ -910,6 +918,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         if (is_callable($callback)) {
             foreach ($unsubmittedStudents as $user) {
+                $href = "/learning/assessments/{$assessmentId}/{$user->getId()}";
+                $bob
+                    ->setHref($href)
+                    ->setParam('boxname', new Param($boxName, $href));
                 $callback($user);
             }
         }
@@ -936,9 +948,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $bob->setTitle(':boxname is now overdue in :catname');
 
-        return $this->notifyOverdue($submissionBox, $envelope, $bob, function ($student) use (&$envelope, &$bob) {
+        $callback = function ($student) use ($envelope, $bob) {
             $envelope->targetToUser($student, $bob->build());
-        });
+        };
+
+        return $this->notifyOverdue($submissionBox, $envelope, $bob, $callback);
     }
 
 
@@ -964,11 +978,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
-        return $this->notifyOverdue($submissionBox, $envelope, $bob, function ($student) use (&$envelope, &$bob) {
-            /** @var User $student */
+        $callback = function (User $student) use ($envelope, $bob){
             $bob->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'));
             $envelope->targetToParent($student->getId(), $bob->build());
-        });
+        };
+
+        return $this->notifyOverdue($submissionBox, $envelope, $bob, $callback);
     }
 
 
@@ -987,10 +1002,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     {
         $envelope = new Envelope();
         $bob      = new Builder();
-        $boxId    = $submissionBox->getId();
 
+        $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
+        $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
         if (!$submissionBox->getAcceptOnline()) {
@@ -1003,12 +1019,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
+        $href = "/learning/assessments/{$assessmentId}/status";
         $bob->setTitle(':boxname has closed and :number did not submit work')
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
-            ->setHref("/learning/assessments/".$submissionBox->getAssessmentId()."/status")
+            ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setParams(array(
-                'boxname' => new Param($submissionBox->getName(), "/submission/viewSubmission/$boxId"),
+                'boxname' => new Param($submissionBox->getName(), $href),
                 'number'  => new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
             ))
             ->setSeverity(Logger::ERROR)
@@ -1017,7 +1034,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'roletype' => Role::STAFF
             ]);
 
-        $envelope->broadcastToCategory($folder, 2, $bob->build());
+        $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
 
         return $envelope;
     }
