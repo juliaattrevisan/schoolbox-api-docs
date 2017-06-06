@@ -36,11 +36,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         if($("#calendarResponse" + twigVars.id).attr('data-datepicker-date') !== undefined) {
             var responseDate = moment(($("#calendarResponse" + twigVars.id).attr('data-datepicker-date')), 'YYYY-MM-DD');
-            var inputDate = moment(window.pickerInstance[twigVars.id].input.value, 'YYYY-MM-DD');
 
             if(responseDate.diff(inputDate)) {
                 requestDataByDate(inputDate.format('YYYY-MM-DD'), 'calendar');
-                requestDataByDate(inputDate.format('YYYY-MM-DD'), 'timetable');
             }
         }
 
