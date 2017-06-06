@@ -678,8 +678,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
-        $assessmentModel = $submissionBox->getAssessmentModel();
-        $folder = $assessmentModel->getAssessmentContext()->getFolder();
+        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
+        $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions or is blocked from parents
         if (!$submissionBox->getAcceptOnline() || $this->conf->get('restrict_student_submissions')) {
@@ -705,7 +705,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
-            ->setHref("/learning/assessments/".$submissionBox->getAssessmentId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addFilter('roletype', [Role::PARENT]);
@@ -722,6 +721,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach ($students as $student) {
                 $bob = $this
                     ->setForNotifyRenamed($bob, $submissionBox, $diff, $user)
+                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
                     ->setTitle(":child's $boxType was renamed from :oldname to :newname in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
@@ -739,6 +739,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 $verb = $newDate > $oldDate ? 'extended' : 'changed';
                 $bob = $this
                     ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)
+                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
                     ->setTitle(":child's $boxType :boxname closing date was $verb to :date in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
@@ -758,6 +759,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 }
                 $bob = $this
                     ->setForNotifyAcceptOnlineChanged($bob, $submissionBox)
+                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
                     ->setTitle($m)
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
@@ -772,6 +774,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach ($students as $student) {
                 $bob = $this
                     ->setForNotifyUpdated($bob, $submissionBox, $user)
+                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
                     ->setTitle(":child's $boxType :boxname was updated in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
