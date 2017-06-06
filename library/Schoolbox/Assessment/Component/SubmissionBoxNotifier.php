@@ -339,7 +339,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // re-hydrate, because manual hydration, because fail -_-
         $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         $workType = $submissionBox->getAssessmentModel()->getWorkType();
@@ -369,7 +368,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         );
 
         foreach($students as $student){
-            $href = "/learning/assessments/{$assessmentId}/{$student->getId()}";
+            $href = $this->buildParticipantRoute($submissionBox, $student);
             $bob
                 ->setHref($href)
                 ->setParam('box', new Param($boxName, $href));
@@ -398,7 +397,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // discard all update notifications if the submissionbox isn't open (EXCEPT work returns opening up)
@@ -446,7 +444,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach($students as $student){
                 $bob = $this
                     ->setForNotifyRenamed($bob, $submissionBox, $diff, $user, $student)
-                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
+                    ->setHref($this->buildParticipantRoute($submissionBox, $student));
                 $envelope->targetToUser($student, $bob->build());
             }
         }
@@ -457,7 +455,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach($students as $student){
                 $bob = $this
                     ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user, $student)
-                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
+                    ->setHref($this->buildParticipantRoute($submissionBox, $student));
                 $envelope->targetToUser($student, $bob->build());
             }
         }
@@ -468,7 +466,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach($students as $student){
                 $bob = $this
                     ->setForNotifyAcceptOnlineChanged($bob, $submissionBox, $student)
-                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
+                    ->setHref($this->buildParticipantRoute($submissionBox, $student));
                 $envelope->targetToUser($student, $bob->build());
             }
         }
@@ -479,7 +477,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach($students as $student){
                 $bob = $this
                     ->setForNotifyUpdated($bob, $submissionBox, $user, $student)
-                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
+                    ->setHref($this->buildParticipantRoute($submissionBox, $student));
                 $envelope->targetToUser($student, $bob->build());
             }
         }
@@ -500,15 +498,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      */
     protected function setForNotifyRenamed(Builder $bob, SubmissionBox $box, array $diff, User $author, User $student)
     {
-        $assessmentId = $box->getAssessmentModel()->getId();
-        $studentId    = $student->getId();
-
         return $bob->setTitle(':author renamed :oldname to :newname in :catname')
             // params for this instance - oldname doesn't have an associated href
             ->setParams(array(
                 'author'  => new UserParam($author),
                 'oldname' => new Param($diff['name'][1]),
-                'newname' => new Param($diff['name'][0], "/learning/assessments/{$assessmentId}/{$studentId}"),
+                'newname' => new Param($diff['name'][0], $this->buildParticipantRoute($box, $student)),
                 'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ))
             ->setTopics(array("duework.{$box->getId()}.renamed"));
@@ -538,14 +533,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             $dateformat = $relative->getTimeOnly() .' on '. $dateformat;
         }
 
-        $assessmentId = $box->getAssessmentModel()->getId();
-        $studentId    = $student->getId();
-
         return $bob->setTitle(":author $verb :boxname to :date in :catname")
             ->setTopics(array("duework.{$box->getId()}.datechanged"))
             ->setParams(array(
                 'author'  => new UserParam($author),
-                'boxname' => new Param($box->getName(), "/learning/assessments/{$assessmentId}/{$studentId}"),
+                'boxname' => new Param($box->getName(), $this->buildParticipantRoute($box, $student)),
                 'date'    => new Param($dateformat),
                 'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ));
@@ -566,12 +558,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ? 'You now need to submit online for :boxname in :catname'
             : 'You no longer need to submit online for :boxname in :catname';
 
-        $assessmentId = $box->getAssessmentModel()->getId();
-        $studentId    = $student->getId();
-
         return $bob->setTitle($m)
             ->setParams(array(
-                'boxname' => new Param($box->getName(), "/learning/assessments/{$assessmentId}/{$studentId}"),
+                'boxname' => new Param($box->getName(), $this->buildParticipantRoute($box, $student)),
                 'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
@@ -589,13 +578,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      */
     protected function setForNotifyUpdated(Builder $bob, SubmissionBox $box, User $author, User $student)
     {
-        $assessmentId = $box->getAssessmentModel()->getId();
-        $studentId    = $student->getId();
-
         return $bob->setTitle(':author updated :boxname in :catname')
             ->setParams(array(
                 'author'  => new UserParam($author),
-                'boxname' => new Param($box->getName(), "/learning/assessments/{$assessmentId}/{$studentId}"),
+                'boxname' => new Param($box->getName(), $this->buildParticipantRoute($box, $student)),
                 'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
@@ -620,7 +606,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
@@ -642,7 +627,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->addFilter('roletype', [Role::STUDENT]);
 
         foreach ($unsubmittedStudents as $student) {
-            $href = "/learning/assessments/{$assessmentId}/{$student->getId()}";
+            $href = $this->buildParticipantRoute($submissionBox, $student);
             $bob
                 ->setParam('boxname', new Param($boxName, $href))
                 ->setHref($href);
@@ -671,7 +656,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $boxId    = $submissionBox->getId();
 
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions or is blocked from parents
@@ -691,8 +675,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
         foreach ($unsubmittedStudents as $student) {
-            $childId = $student->getId();
-            $href    = "/learning/assessments/$assessmentId/$childId";
+            $href    = $this->buildParticipantRoute($submissionBox, $student);
             // target the parents of this particular student
             $bob->setIcon('/portrait?size=square64&userId=' . $student->getExternalId())
                 ->setHref($href)
@@ -700,7 +683,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                     'child'   => new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'),
                     'boxname' => new Param($submissionBox->getName(), $href),
                 ]);
-            $envelope->targetToParent($childId, $bob->build());
+            $envelope->targetToParent($student, $bob->build());
         }
 
         return $envelope;
@@ -725,7 +708,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $boxId = $submissionBox->getId();
 
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions or is blocked from parents
@@ -768,7 +750,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach ($students as $student) {
                 $bob = $this
                     ->setForNotifyRenamed($bob, $submissionBox, $diff, $user, $student)
-                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
+                    ->setHref($this->buildParticipantRoute($submissionBox, $student))
                     ->setTitle(":child's $boxType was renamed from :oldname to :newname in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
@@ -786,7 +768,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 $verb = $newDate > $oldDate ? 'extended' : 'changed';
                 $bob = $this
                     ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user, $student)
-                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
+                    ->setHref($this->buildParticipantRoute($submissionBox, $student))
                     ->setTitle(":child's $boxType :boxname closing date was $verb to :date in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
@@ -804,7 +786,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                     : ':child no longer need to submit online for :boxname in :catname';
                 $bob = $this
                     ->setForNotifyAcceptOnlineChanged($bob, $submissionBox, $student)
-                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
+                    ->setHref($this->buildParticipantRoute($submissionBox, $student))
                     ->setTitle($m)
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
@@ -819,7 +801,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach ($students as $student) {
                 $bob = $this
                     ->setForNotifyUpdated($bob, $submissionBox, $user, $student)
-                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
+                    ->setHref($this->buildParticipantRoute($submissionBox, $student))
                     ->setTitle(":child's $boxType :boxname was updated in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
@@ -849,7 +831,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
@@ -870,7 +851,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         );
 
         foreach($students as $student){
-            $href = "/learning/assessments/{$assessmentId}/{$student->getId()}";
+            $href = $this->buildParticipantRoute($submissionBox, $student);
             $bob
                 ->setHref($href)
                 ->setParam('boxname', new Param($submissionBox->getName(), $href));
@@ -893,7 +874,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     {
         $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
@@ -918,7 +898,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         if (is_callable($callback)) {
             foreach ($unsubmittedStudents as $user) {
-                $href = "/learning/assessments/{$assessmentId}/{$user->getId()}";
+                $href = $this->buildParticipantRoute($submissionBox, $user);
                 $bob
                     ->setHref($href)
                     ->setParam('boxname', new Param($boxName, $href));
@@ -1005,7 +985,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
@@ -1019,7 +998,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
-        $href = "/learning/assessments/{$assessmentId}/status";
+        $href = $this->buildStatusRoute($submissionBox);
         $bob->setTitle(':boxname has closed and :number did not submit work')
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
             ->setHref($href)
@@ -1037,6 +1016,31 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $bob->build());
 
         return $envelope;
+    }
+
+
+    /**
+     * Convenience helper to build a route to the Participant Summary page
+     *
+     * @param SubmissionBox $submissionBox
+     * @param User          $student
+     * @return string
+     */
+    private function buildParticipantRoute(SubmissionBox $submissionBox, User $student)
+    {
+        return sprintf('/learning/assessments/%s/%s', $submissionBox->getAssessmentModel()->getId(), $student->getId());
+    }
+
+
+    /**
+     * Convenience helper to build a route to the Assessment Status page
+     *
+     * @param SubmissionBox $submissionBox
+     * @return string
+     */
+    private function buildStatusRoute(SubmissionBox $submissionBox)
+    {
+        return sprintf('/learning/assessments/%s/status', $submissionBox->getAssessmentModel()->getId());
     }
 
 }
