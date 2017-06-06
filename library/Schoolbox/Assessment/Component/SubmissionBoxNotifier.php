@@ -454,7 +454,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // if none of the above apply, but there are changes, just be generic
         if ($envelope->count() == 0 && count($diff)) {
             foreach($students as $student){
-                $bob = $this->setForNotifyUpdated($bob, $submissionBox, $user);
+                $bob = $this->setForNotifyUpdated($bob, $submissionBox, $user, $student);
                 $envelope->targetToUser($student, $bob->build());
             }
         }
@@ -552,16 +552,20 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param Builder       $bob
      * @param SubmissionBox $box
      * @param User          $author
+     * @param User          $student
      *
      * @return Builder
      */
-    protected function setForNotifyUpdated($bob, $box, $author)
+    protected function setForNotifyUpdated(Builder $bob, SubmissionBox $box, User $author, User $student)
     {
-        return $bob->setTitle(":author updated :boxname in :catname")
+        $assessmentId = $box->getAssessmentModel()->getId();
+        $studentId    = $student->getId();
+
+        return $bob->setTitle(':author updated :boxname in :catname')
             ->setParams(array(
                 'author'  => new UserParam($author),
-                'boxname' => new Param($box->getName(), "/learning/assessments/".$box->getAssessmentId()),
-                'catname' => new CategoryParam($box->getCategory())
+                'boxname' => new Param($box->getName(), "/learning/assessments/{$assessmentId}/{$studentId}"),
+                'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
     }
@@ -778,7 +782,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         if ($envelope->count() == 0 && count($diff)) {
             foreach ($students as $student) {
                 $bob = $this
-                    ->setForNotifyUpdated($bob, $submissionBox, $user)
+                    ->setForNotifyUpdated($bob, $submissionBox, $user, $student)
                     ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
                     ->setTitle(":child's $boxType :boxname was updated in :catname")
                     ->unsetParam('author')
