@@ -113,7 +113,12 @@ abstract class Base implements IBroker
 
         try {
 
-            // Change PHP default socket timeout value temporarily
+            // Due to ambiguity in PDO specification, the PDO_SQLSRV driver doesn't respect the PDO::ATTR_TIMEOUT variable as indicated
+            // in the Microsoft blog post (https://blogs.msdn.microsoft.com/brian_swan/2010/04/27/design-decisions-in-the-pdo-driver-for-sql-server/)
+            //
+            // Instead they use a custom attribute for login timeout. Unfortunately the operating system gets in the way here as well, and we need to
+            // set the socket timeout to the same value as the login timeout for this login timeout attribute to have the desired effect. So as not to
+            // blow things up prematurely later in the system, we revert the timeout as soon as we have created the PDO connection.
 
             $defaultSocketTimeout = ini_get('default_socket_timeout');
 
