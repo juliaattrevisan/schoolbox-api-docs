@@ -372,16 +372,18 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param User          $user
      * @param array         $diff
      * @return Envelope
+     *
+     * @throws Mapper\Exception If submission box is not found
      */
     public function notifyStudentUpdated($submissionBox, $user, $diff = null)
     {
         $envelope = new Envelope();
-        $bob = new Builder();
+        $bob      = new Builder();
 
-        $boxId = $submissionBox->getId();
-
+        $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
+        $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // discard all update notifications if the submissionbox isn't open (EXCEPT work returns opening up)
         $openStamp  = $submissionBox->getOpenDate()->getUnixTimeStamp();
@@ -419,7 +421,6 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         );
 
         $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
-            ->setHref("/learning/assessments/".$submissionBox->getAssessmentId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addFilter('roletype', [Role::STUDENT]);
@@ -427,7 +428,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // renamed
         if (!empty($diff['name'])) {
             foreach($students as $student){
-                $bob = $this->setForNotifyRenamed($bob, $submissionBox, $diff, $user, $student);
+                $bob = $this
+                    ->setForNotifyRenamed($bob, $submissionBox, $diff, $user, $student)
+                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
                 $envelope->targetToUser($student, $bob->build());
             }
         }
@@ -436,7 +439,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // extended or shortened
         if (!empty($diff['dueDate'])) {
             foreach($students as $student){
-                $bob = $this->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user);
+                $bob = $this
+                    ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)
+                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
                 $envelope->targetToUser($student, $bob->build());
             }
         }
@@ -445,16 +450,20 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // changed accepting online submissions
         if (!empty($diff['acceptOnline'])) {
             foreach($students as $student){
-                $bob = $this->setForNotifyAcceptOnlineChanged($bob, $submissionBox);
+                $bob = $this
+                    ->setForNotifyAcceptOnlineChanged($bob, $submissionBox)
+                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
                 $envelope->targetToUser($student, $bob->build());
             }
         }
         unset($diff['acceptOnline']);
 
         // if none of the above apply, but there are changes, just be generic
-        if ($envelope->count() == 0 && count($diff)) {
+        if ($envelope->count() === 0 && count($diff)) {
             foreach($students as $student){
-                $bob = $this->setForNotifyUpdated($bob, $submissionBox, $user, $student);
+                $bob = $this
+                    ->setForNotifyUpdated($bob, $submissionBox, $user, $student)
+                    ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
                 $envelope->targetToUser($student, $bob->build());
             }
         }
