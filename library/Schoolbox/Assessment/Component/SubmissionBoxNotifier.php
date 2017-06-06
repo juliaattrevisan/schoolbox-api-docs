@@ -334,28 +334,26 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $bob      = new Builder();
 
         // re-hydrate, because manual hydration, because fail -_-
-        $boxId = $submissionBox->getId();
-
+        $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $assessmentModel = $submissionBox->getAssessmentModel();
+        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
 
-        $workType = $assessmentModel->getWorkType();
+        $workType = $submissionBox->getAssessmentModel()->getWorkType();
         $boxType = mb_strtolower($workType ? $workType->getName() : '');
         $boxName = $submissionBox->getName();
 
         $authorExtId = $user->getExternalId();
 
-        $folder = $assessmentModel->getAssessmentContext()->getFolder();
+        // needs fully hydrated folder
+        $folder = $this->folderMapper->findById($submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder()->getId());
 
         $indefArticle = in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a';
 
         $bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
             ->setParams(array(
                 'user' => new UserParam($user, ParameterInterface::STACKING_REPLACE),
-                'box'  => new Param($boxName, "/learning/assessments/".$submissionBox->getAssessmentId()),
                 'cat'  => new CategoryParam($folder)
             ))
-            ->setHref("/learning/assessments/".$submissionBox->getAssessmentId())
             ->setIcon("/portrait?userId=$authorExtId&size={$this->iconSize}")
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.open")
@@ -364,7 +362,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setByline("Due {$submissionBox->getDueDate()->getCalendarDateTime()}")
             ->setSeverity(Logger::NOTICE);
 
-        $envelope->broadcastToCategory($folder, UserAccess::ACCESS_READ, $bob->build());
+        $students = $this->userAccessMapper->findStudentsInCategory($folder);
+        foreach($students as $student){
+            $bob
+                ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
+                ->setParam('box', new Param($boxName, "/learning/assessments/{$assessmentId}/{$student->getId()}"));
+            $envelope->targetToUser($student, $bob->build());
+        }
 
         return $envelope;
     }
