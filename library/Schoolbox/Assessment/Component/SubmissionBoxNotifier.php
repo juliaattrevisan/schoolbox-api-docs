@@ -18,9 +18,7 @@ use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as SubmissionMapper;
-use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
@@ -159,7 +157,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                       ->getObject();
 
         // check for detachment
-        if ($bundle->getMethod() == Mapper::METHOD_DELETE) {
+        if ($bundle->getMethod() === Mapper::METHOD_DELETE) {
             $bundle->detachEach(
                    array(
                        self::TRIGGER_OPEN,
@@ -240,6 +238,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param string $roletype - the roletype of the user for whom this feed is being retrieved
      * @param int    $limit    - how many messages to retrieve
      * @param int    $offset   - by default, most recent
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Collection|Instance[]
      */
     public function getFeed($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0)
@@ -247,7 +248,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $c = new Collection();
 
         // if parents aren't allowed to see due work, return an empty collection
-        if ($roletype == Role::PARENT && $this->conf->get('restrict_parent_duework_access')) {
+        if ($roletype === Role::PARENT && $this->conf->get('restrict_parent_duework_access')) {
             return $c;
         }
 
@@ -270,6 +271,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
     /**
      * @param SubmissionBox $submissionBox
+     * @throws Mapper\Exception If column names invalid
      * @return User[]|Collection
      */
     protected function getStudentsUnsubmittedList($submissionBox)
@@ -321,6 +323,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @var SubmissionBox $submissionBox
      * @param User        $user
      * @param array       $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
     public function notifyStudentOpen($submissionBox, $user, $diff = null)
@@ -342,7 +347,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $folder = $assessmentModel->getAssessmentContext()->getFolder();
 
-        $indefArticle = in_array(strtolower($boxType[0]), array('a', 'e', 'i', 'o', 'u')) ? 'an' : 'a';
+        $indefArticle = in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a';
 
         $bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
             ->setParams(array(
@@ -356,7 +361,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->addTopic("duework.$boxId.open")
             ->addFilter('roletype', array(Role::STUDENT))
             ->setBody($submissionBox->getDescription())
-            ->setByline("Due " . $submissionBox->getDueDate()->getCalendarDateTime())
+            ->setByline("Due {$submissionBox->getDueDate()->getCalendarDateTime()}")
             ->setSeverity(Logger::NOTICE);
 
         $envelope->broadcastToCategory($folder, UserAccess::ACCESS_READ, $bob->build());
@@ -371,9 +376,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
-     *
-     * @throws Mapper\Exception If submission box is not found
      */
     public function notifyStudentUpdated($submissionBox, $user, $diff = null)
     {
@@ -487,7 +493,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $assessmentId = $box->getAssessmentModel()->getId();
         $studentId    = $student->getId();
 
-        return $bob->setTitle(":author renamed :oldname to :newname in :catname")
+        return $bob->setTitle(':author renamed :oldname to :newname in :catname')
             // params for this instance - oldname doesn't have an associated href
             ->setParams(array(
                 'author'  => new UserParam($author),
@@ -541,11 +547,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      */
     protected function setForNotifyAcceptOnlineChanged($bob, $box)
     {
-        if ($box->getAcceptOnline()) {
-            $m = "You now need to submit online for :boxname in :catname";
-        } else {
-            $m = "You no longer need to submit online for :boxname in :catname";
-        }
+        $m = $box->getAcceptOnline()
+            ? 'You now need to submit online for :boxname in :catname'
+            : 'You no longer need to submit online for :boxname in :catname';
 
         return $bob->setTitle($m)
             ->setParams(array(
@@ -586,6 +590,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
     public function notifyStudentUpcoming($submissionBox, $user, $diff = null)
@@ -634,6 +641,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
     public function notifyParentUpcoming($submissionBox, $user, $diff = null)
@@ -683,6 +693,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
     public function notifyParentUpdated($submissionBox, $user, $diff = null)
@@ -767,11 +780,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // changed accepting online submissions
         if (!empty($diff['acceptOnline'])) {
             foreach ($students as $student) {
-                if ($submissionBox->getAcceptOnline()) {
-                    $m = ":child needs to submit online for :boxname in :catname";
-                } else {
-                    $m = ":child no longer need to submit online for :boxname in :catname";
-                }
+                $m = $submissionBox->getAcceptOnline()
+                    ? ':child needs to submit online for :boxname in :catname'
+                    : ':child no longer need to submit online for :boxname in :catname';
                 $bob = $this
                     ->setForNotifyAcceptOnlineChanged($bob, $submissionBox)
                     ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
@@ -785,7 +796,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         unset($diff['acceptOnline']);
 
         // if none of the above apply, but there are changes, just be generic
-        if ($envelope->count() == 0 && count($diff)) {
+        if ($envelope->count() === 0 && count($diff)) {
             foreach ($students as $student) {
                 $bob = $this
                     ->setForNotifyUpdated($bob, $submissionBox, $user, $student)
@@ -807,6 +818,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
     public function notifyFeedClosed($submissionBox, $user, $diff = null)
@@ -824,7 +838,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         $href = "/learning/assessments/".$submissionBox->getAssessmentId();
-        $bob->setTitle("Submissions have closed for :boxname in :catname")
+        $bob->setTitle('Submissions have closed for :boxname in :catname')
             ->setParams(array(
                 'boxname' => new Param($submissionBox->getName(), $href),
                 'catname' => new CategoryParam($folder),
@@ -846,6 +860,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param Envelope      $envelope
      * @param Builder       $bob
      * @param callable      $callback
+     * @throws Mapper\Exception If column names invalid
      * @return Envelope
      */
     protected function notifyOverdue($submissionBox, $envelope, $bob, $callback)
@@ -882,7 +897,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         if (is_callable($callback)) {
             foreach ($unsubmittedStudents as $user) {
-                call_user_func($callback, $user);
+                $callback($user);
             }
         }
 
@@ -896,6 +911,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
     public function notifyStudentOverdue($submissionBox, $user, $diff = null)
@@ -903,7 +921,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $envelope = new Envelope();
         $bob      = new Builder();
 
-        $bob->setTitle(":boxname is now overdue in :catname");
+        $bob->setTitle(':boxname is now overdue in :catname');
 
         return $this->notifyOverdue($submissionBox, $envelope, $bob, function ($student) use (&$envelope, &$bob) {
             $envelope->targetToUser($student, $bob->build());
@@ -917,6 +935,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
     public function notifyParentOverdue($submissionBox, $user, $diff = null)
@@ -924,7 +945,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $envelope = new Envelope();
         $bob      = new Builder();
 
-        $bob->setTitle(":child did not submit work for :boxname in :catname");
+        $bob->setTitle(':child did not submit work for :boxname in :catname');
 
         if ($this->conf->get('restrict_student_submissions')) {
             return $envelope;
@@ -944,6 +965,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $submissionBox
      * @param User          $user
      * @param array         $diff
+     * @throws Mapper\Exception          If submission box is not found
+     * @throws \OutOfBoundsException     If severity is not set
+     * @throws \InvalidArgumentException If a required property was not set
      * @return Envelope
      */
     public function notifyStaffClosed($submissionBox, $user, $diff = null)
@@ -962,17 +986,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $totalUnsubmitted = $this->getStudentsUnsubmittedList($submissionBox)->count();
 
         // everyone submitted! woohoo!
-        if ($totalUnsubmitted == 0) {
+        if ($totalUnsubmitted === 0) {
             return $envelope;
         }
 
-        $bob->setTitle(":boxname has closed and :number did not submit work")
+        $bob->setTitle(':boxname has closed and :number did not submit work')
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
             ->setHref("/learning/assessments/".$submissionBox->getAssessmentId()."/status")
             ->setNamespace($this->getSlug())
             ->setParams(array(
                 'boxname' => new Param($submissionBox->getName(), "/submission/viewSubmission/$boxId"),
-                'number'  => new Param(sprintf("%s student%s", $totalUnsubmitted, $totalUnsubmitted == 1 ? '' : 's'))
+                'number'  => new Param(sprintf('%s student%s', $totalUnsubmitted, $totalUnsubmitted === 1 ? '' : 's'))
             ))
             ->setSeverity(Logger::ERROR)
             ->addTopic("duework.$boxId.closed")
