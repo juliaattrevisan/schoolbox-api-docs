@@ -611,10 +611,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     {
         $envelope = new Envelope();
         $bob      = new Builder();
-        $boxId    = $submissionBox->getId();
 
+        $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
-        $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
+        $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions
         if (!$submissionBox->getAcceptOnline()) {
@@ -622,25 +623,24 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         $boxName = $submissionBox->getName();
-        $href    = "/submission/submissionHistory/$boxId";
         $when    = $submissionBox->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
 
+        $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
+
         $bob->setTitle(":boxname is due $when from now in :catname")
-            ->setParams(array(
-                'boxname' => new Param($boxName, $href),
-                'catname' => new CategoryParam($folder),
-            ))
+            ->setParam('catname', new CategoryParam($folder))
             ->setIcon("/images/icon.php?size={$this->iconSize}&icon=work")
-            ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::WARNING)
             ->addTopic("duework.$boxId.upcoming")
             ->addFilter('roletype', [Role::STUDENT]);
 
-        $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
-
-        foreach ($unsubmittedStudents->getColumnValues('id') as $id) {
-            $envelope->targetToUser($id, $bob->build());
+        foreach ($unsubmittedStudents as $student) {
+            $href = "/learning/assessments/{$assessmentId}/{$student->getId()}";
+            $bob
+                ->setParam('boxname', new Param($boxName, $href))
+                ->setHref($href);
+            $envelope->targetToUser($student, $bob->build());
         }
 
         return $envelope;
