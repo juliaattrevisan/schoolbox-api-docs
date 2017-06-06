@@ -461,7 +461,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         if (!empty($diff['acceptOnline'])) {
             foreach($students as $student){
                 $bob = $this
-                    ->setForNotifyAcceptOnlineChanged($bob, $submissionBox)
+                    ->setForNotifyAcceptOnlineChanged($bob, $submissionBox, $student)
                     ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
                 $envelope->targetToUser($student, $bob->build());
             }
@@ -550,18 +550,22 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      *
      * @param Builder       $bob
      * @param SubmissionBox $box
+     * @param User          $student
      *
      * @return Builder
      */
-    protected function setForNotifyAcceptOnlineChanged($bob, $box)
+    protected function setForNotifyAcceptOnlineChanged(Builder $bob, SubmissionBox $box, User $student)
     {
         $m = $box->getAcceptOnline()
             ? 'You now need to submit online for :boxname in :catname'
             : 'You no longer need to submit online for :boxname in :catname';
 
+        $assessmentId = $box->getAssessmentModel()->getId();
+        $studentId    = $student->getId();
+
         return $bob->setTitle($m)
             ->setParams(array(
-                'boxname' => new Param($box->getName(), "/learning/assessments/".$box->getAssessmentId()),
+                'boxname' => new Param($box->getName(), "/learning/assessments/{$assessmentId}/{$studentId}"),
                 'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
@@ -792,7 +796,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                     ? ':child needs to submit online for :boxname in :catname'
                     : ':child no longer need to submit online for :boxname in :catname';
                 $bob = $this
-                    ->setForNotifyAcceptOnlineChanged($bob, $submissionBox)
+                    ->setForNotifyAcceptOnlineChanged($bob, $submissionBox, $student)
                     ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
                     ->setTitle($m)
                     ->unsetParam('author')
