@@ -347,7 +347,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         $authorExtId = $user->getExternalId();
 
-        $indefArticle = in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a';
+        $indefArticle = $boxType ?
+            in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a'
+            : '';
 
         $bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
             ->setParams([
@@ -741,7 +743,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         );
 
         // renamed
-        $workType = $assessmentModel->getWorkType();
+        $workType = $submissionBox->getAssessmentModel()->getWorkType();
         $boxType = mb_strtolower($workType ? $workType->getName() : '');
         if (!empty($diff['name'])) {
             foreach ($students as $student) {
