@@ -7,13 +7,13 @@
 
 namespace Schoolbox\User\Password\Reset;
 
+use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Psr\Log\NullLogger;
-use Schoolbox\External\Connector\CommunityPortalFactory;
 use Schoolbox\Mail;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\UserMapper;
@@ -77,6 +77,12 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
+        try {
+            $communityPortalFactory = $injector->lazyGet('externalCommunityPortal');
+        } catch (AlaressDatabaseException $e) {
+            $communityPortalFactory = null;
+        }
+
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(
@@ -85,7 +91,7 @@ class Module extends BaseModule
                     'passwordService'        => $injector->lazyNew(PasswordService::class),
                     'userMapper'             => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'resetMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'communityPortalFactory' => $injector->lazyGet('externalCommunityPortal'),
+                    'communityPortalFactory' => $communityPortalFactory,
                     'mailFactory'            => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
                         [
