@@ -187,6 +187,8 @@ function setValue(element, options, state, trigger, date) {
         element.val(v);
     }
 
+    setPickerValue(pId, v.format('YYYY-MM-DD HH:mm:ss'));
+
     if (trigger === true) {
         element.trigger('change');
     }
@@ -199,6 +201,10 @@ function setValue(element, options, state, trigger, date) {
     $('#' + element.attr('id') + '-error').hide();
     $(element).removeClass('error');
 
+}
+
+function setPickerValue(pickerId, value) {
+    $("#picker" + pickerId).attr('data-datepicker-value', value);
 }
 
 function checkAllDaySwitch(state, pickerId) {
@@ -399,7 +405,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     element.attr('data-datepicker-id', pickerId);
 
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
-    $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
+    $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" data-datepicker-value class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
+
+    setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)).format('YYYY-MM-DD HH:mm:ss'));
 
     // Create click event to open the modal for the element
 
