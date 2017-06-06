@@ -627,7 +627,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
-        $folder = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $assessmentId  = $submissionBox->getAssessmentModel()->getId();
+        $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         // don't raise notifications if this box doesn't accept online submissions or is blocked from parents
         if (!$submissionBox->getAcceptOnline() || $this->conf->get('restrict_student_submissions')) {
@@ -637,10 +638,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $when = $submissionBox->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
 
         $bob->setTitle(":child has not yet submitted work for :boxname, which is due $when from now in :catname")
-            ->setParams(array(
-                'catname' => new CategoryParam($folder),
-                'boxname' => new Param($submissionBox->getName(), "/learning/assessments/".$submissionBox->getAssessmentId())
-            ))
+            ->setParam('catname', new CategoryParam($folder))
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::WARNING)
             ->addTopic("duework.$boxId.upcoming");
@@ -652,8 +650,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             $childId = $student->getId();
             // target the parents of this particular student
             $bob->setIcon('/portrait?size=square64&userId=' . $student->getExternalId())
-                ->setHref("/learning/assessments/".$submissionBox->getAssessmentId()."/".$childId)
-                ->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'));
+                ->setHref("/learning/assessments/$assessmentId/$childId")
+                ->setParams([
+                    'child'   => new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'),
+                    'boxname' => new Param($submissionBox->getName(), "/learning/assessments/$assessmentId/$childId"),
+                ]);
             $envelope->targetToParent($childId, $bob->build());
         }
 
