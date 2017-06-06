@@ -417,7 +417,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setHref("/learning/assessments/".$submissionBox->getAssessmentId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
-            ->addFilter('roletype', Role::STUDENT);
+            ->addFilter('roletype', [Role::STUDENT]);
 
         // renamed
         if (!empty($diff['name'])) {
@@ -599,7 +599,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::WARNING)
             ->addTopic("duework.$boxId.upcoming")
-            ->addFilter('roletype', Role::STUDENT);
+            ->addFilter('roletype', [Role::STUDENT]);
 
         $unsubmittedStudents = $this->getStudentsUnsubmittedList($submissionBox);
 
@@ -708,7 +708,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setHref("/learning/assessments/".$submissionBox->getAssessmentId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
-            ->addFilter('roletype', Role::PARENT);
+            ->addFilter('roletype', [Role::PARENT]);
 
         $students = $this->userAccessMapper->findStudentsInCategory(
             // needs fully hydrated folder
