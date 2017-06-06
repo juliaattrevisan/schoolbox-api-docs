@@ -450,7 +450,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         if (!empty($diff['dueDate'])) {
             foreach($students as $student){
                 $bob = $this
-                    ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)
+                    ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user, $student)
                     ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}");
                 $envelope->targetToUser($student, $bob->build());
             }
@@ -515,10 +515,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
      * @param SubmissionBox $box
      * @param array         $diff
      * @param User          $author
+     * @param User          $student
      *
      * @return Builder
      */
-    protected function setForNotifyDueDateChanged($bob, $box, $diff, $author)
+    protected function setForNotifyDueDateChanged(Builder $bob, SubmissionBox $box, array $diff, User $author, User $student)
     {
         // strtotime is safe here because dates are in 'YYYY-MM-DD H:i:s' format
         $oldDate    = strtotime($diff['dueDate'][1]);
@@ -531,11 +532,14 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             $dateformat = $relative->getTimeOnly() .' on '. $dateformat;
         }
 
+        $assessmentId = $box->getAssessmentModel()->getId();
+        $studentId    = $student->getId();
+
         return $bob->setTitle(":author $verb :boxname to :date in :catname")
             ->setTopics(array("duework.{$box->getId()}.datechanged"))
             ->setParams(array(
                 'author'  => new UserParam($author),
-                'boxname' => new Param($box->getName(), "/learning/assessments/".$box->getAssessmentId()),
+                'boxname' => new Param($box->getName(), "/learning/assessments/{$assessmentId}/{$studentId}"),
                 'date'    => new Param($dateformat),
                 'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ));
@@ -770,7 +774,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 $newDate = strtotime($diff['dueDate'][0]);
                 $verb = $newDate > $oldDate ? 'extended' : 'changed';
                 $bob = $this
-                    ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)
+                    ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user, $student)
                     ->setHref("/learning/assessments/{$assessmentId}/{$student->getId()}")
                     ->setTitle(":child's $boxType :boxname closing date was $verb to :date in :catname")
                     ->unsetParam('author')
