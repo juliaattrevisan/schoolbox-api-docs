@@ -484,7 +484,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'author'  => new UserParam($author),
                 'oldname' => new Param($diff['name'][1]),
                 'newname' => new Param($diff['name'][0], "/learning/assessments/{$assessmentId}/{$studentId}"),
-                'catname' => new CategoryParam($box->getCategory())
+                'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ))
             ->setTopics(array("duework.{$box->getId()}.renamed"));
     }
@@ -518,7 +518,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 'author'  => new UserParam($author),
                 'boxname' => new Param($box->getName(), "/learning/assessments/".$box->getAssessmentId()),
                 'date'    => new Param($dateformat),
-                'catname' => new CategoryParam($box->getCategory())
+                'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ));
     }
 
@@ -541,7 +541,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         return $bob->setTitle($m)
             ->setParams(array(
                 'boxname' => new Param($box->getName(), "/learning/assessments/".$box->getAssessmentId()),
-                'catname' => new CategoryParam($box->getCategory())
+                'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
             ))
             ->setTopics(array("duework.{$box->getId()}.updated"));
     }
