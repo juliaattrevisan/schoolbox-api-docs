@@ -338,14 +338,15 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $submissionBox = $this->getMapper()->findById($boxId);
         $assessmentId  = $submissionBox->getAssessmentModel()->getId();
 
+        // Hydrate folders codes
+        $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $folder        = $this->folderMapper->findById($folder->getId());
+
         $workType = $submissionBox->getAssessmentModel()->getWorkType();
         $boxType = mb_strtolower($workType ? $workType->getName() : '');
         $boxName = $submissionBox->getName();
 
         $authorExtId = $user->getExternalId();
-
-        // needs fully hydrated folder
-        $folder = $this->folderMapper->findById($submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder()->getId());
 
         $indefArticle = in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a';
 
