@@ -413,6 +413,11 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             return $envelope;
         }
 
+        $students = $this->userAccessMapper->findStudentsInCategory(
+        // needs fully hydrated folder
+            $this->folderMapper->findById($folder->getId())
+        );
+
         $bob->setIcon("/portrait?userId={$user->getExternalId()}&size=square64")
             ->setHref("/learning/assessments/".$submissionBox->getAssessmentId())
             ->setNamespace($this->getSlug())
@@ -421,41 +426,37 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         // renamed
         if (!empty($diff['name'])) {
-            $envelope->broadcastToCategory(
-                $folder,
-                UserAccess::ACCESS_READ,
-                $this->setForNotifyRenamed($bob, $submissionBox, $diff, $user)->build()
-            );
+            foreach($students as $student){
+                $bob = $this->setForNotifyRenamed($bob, $submissionBox, $diff, $user);
+                $envelope->targetToUser($student, $bob->build());
+            }
         }
         unset($diff['name']);
 
         // extended or shortened
         if (!empty($diff['dueDate'])) {
-            $envelope->broadcastToCategory(
-                $folder,
-                UserAccess::ACCESS_READ,
-                $this->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)->build()
-            );
+            foreach($students as $student){
+                $bob = $this->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user);
+                $envelope->targetToUser($student, $bob->build());
+            }
         }
         unset($diff['dueDate']);
 
         // changed accepting online submissions
         if (!empty($diff['acceptOnline'])) {
-            $envelope->broadcastToCategory(
-                $folder,
-                UserAccess::ACCESS_READ,
-                $this->setForNotifyAcceptOnlineChanged($bob, $submissionBox)->build()
-            );
+            foreach($students as $student){
+                $bob = $this->setForNotifyAcceptOnlineChanged($bob, $submissionBox);
+                $envelope->targetToUser($student, $bob->build());
+            }
         }
         unset($diff['acceptOnline']);
 
         // if none of the above apply, but there are changes, just be generic
         if ($envelope->count() == 0 && count($diff)) {
-            $envelope->broadcastToCategory(
-                $folder,
-                UserAccess::ACCESS_READ,
-                $this->setForNotifyUpdated($bob, $submissionBox, $user)->build()
-            );
+            foreach($students as $student){
+                $bob = $this->setForNotifyUpdated($bob, $submissionBox, $user);
+                $envelope->targetToUser($student, $bob->build());
+            }
         }
 
         return $envelope;
