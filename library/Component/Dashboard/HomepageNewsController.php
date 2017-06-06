@@ -91,7 +91,14 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
 
         /** @noinspection PhpUnusedLocalVariableInspection */
         foreach ($alist as $a) {
-            // iterates the set
+
+            // Iterates the set
+
+            // No offence to the author this code, I can imagine the circumstances... but...
+            //
+            // This is stupid and should be nuked from orbit- however is currently required as the implementation of
+            // Activity_ListArray::current() actually does rendering... do iterating and doing nothing, is actually
+            // doing something... ┌∩┐(◣_◢)┌∩┐
         }
 
         return true;
