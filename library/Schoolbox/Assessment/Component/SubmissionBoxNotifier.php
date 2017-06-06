@@ -350,10 +350,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $indefArticle = in_array(strtolower($boxType[0]), ['a', 'e', 'i', 'o', 'u'], true) ? 'an' : 'a';
 
         $bob->setTitle(":user opened $indefArticle $boxType :box in :cat")
-            ->setParams(array(
+            ->setParams([
                 'user' => new UserParam($user, ParameterInterface::STACKING_REPLACE),
-                'cat'  => new CategoryParam($folder)
-            ))
+                'cat'  => new CategoryParam($folder),
+            ])
             ->setIcon("/portrait?userId=$authorExtId&size={$this->iconSize}")
             ->setNamespace($this->getSlug())
             ->addTopic("duework.$boxId.open")
@@ -534,13 +534,13 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         return $bob->setTitle(":author $verb :boxname to :date in :catname")
-            ->setTopics(array("duework.{$box->getId()}.datechanged"))
-            ->setParams(array(
+            ->setTopics(["duework.{$box->getId()}.datechanged"])
+            ->setParams([
                 'author'  => new UserParam($author),
                 'boxname' => new Param($box->getName(), $this->buildParticipantRoute($box, $student)),
                 'date'    => new Param($dateformat),
                 'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
-            ));
+            ]);
     }
 
     /**
@@ -559,10 +559,10 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             : 'You no longer need to submit online for :boxname in :catname';
 
         return $bob->setTitle($m)
-            ->setParams(array(
+            ->setParams([
                 'boxname' => new Param($box->getName(), $this->buildParticipantRoute($box, $student)),
                 'catname' => new CategoryParam($box->getAssessmentModel()->getAssessmentContext()->getFolder())
-            ))
+            ])
             ->setTopics(array("duework.{$box->getId()}.updated"));
     }
 
@@ -679,10 +679,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             // target the parents of this particular student
             $bob->setIcon('/portrait?size=square64&userId=' . $student->getExternalId())
                 ->setHref($href)
-                ->setParams([
-                    'child'   => new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'),
-                    'boxname' => new Param($submissionBox->getName(), $href),
-                ]);
+                ->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'))
+                ->setParam('boxname', new Param($submissionBox->getName(), $href));
             $envelope->targetToParent($student, $bob->build());
         }
 
@@ -703,10 +701,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     public function notifyParentUpdated($submissionBox, $user, $diff = null)
     {
         $envelope = new Envelope();
-        $bob = new Builder();
+        $bob      = new Builder();
 
-        $boxId = $submissionBox->getId();
-
+        $boxId         = $submissionBox->getId();
         $submissionBox = $this->getMapper()->findById($boxId);
         $folder        = $submissionBox->getAssessmentModel()->getAssessmentContext()->getFolder();
 
