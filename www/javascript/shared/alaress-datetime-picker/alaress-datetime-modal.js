@@ -110,6 +110,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // Update the selected date
             $(this).closest('[data-adtp]').find('[data-tt-selected-date]').text(selectedDate);
 
+            // Unhide the event calendar (in the case it was hidden via expanding due work)
+            $('#timetableResponse' + twigVars.id + '-events').removeClass('hide');
+
             // Load events
             requestDataByDay($(this));
 
@@ -203,6 +206,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
                 latestDate = newDate;
             }
+
+            // Unhide the event calendar (in the case it was hidden via expanding due work)
+            $('#calendarResponse' + twigVars.id + '-events').removeClass('hide');
         },
         onMonthChange: function(selectedDates, dateStr, instance) {
             var mo = instance.currentMonth + 1,
