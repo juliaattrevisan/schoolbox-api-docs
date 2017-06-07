@@ -64,7 +64,9 @@ class Calendar_Api_Factory
                 $config->setId($currentConfig->getId());
 
                 $this->addConfig($config);
+
             } catch (DomainException $e) {
+
                 //Calendar not enabled, dont add
             }
         }
