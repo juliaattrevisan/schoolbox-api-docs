@@ -104,6 +104,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
+        $assessment->getType()
+
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
 
