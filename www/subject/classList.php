@@ -54,7 +54,18 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
     try {
         $category = $categoryMapper->findByCode($val);
     } catch (\Exception $e) {
-        $this->error(18);
+        try {
+            $codeParts = explode('/', $val, 2);
+            if ($codeParts) {
+                $category = $categoryMapper->findByCode($codeParts[1]);
+            }
+            else {
+                $this->error(18);
+            }
+        }
+        catch (\Exception $e) {
+            $this->error(18);
+        }
     }
 
     $canEmail = false;
