@@ -39,6 +39,8 @@ convertFormat = function (format) {
     });
 };
 
+var databaseFormatMoment = 'YYYY-MM-DD HH:mm:ss';
+
 //Use global counter in case multiple alaressDateTimePicker() have been called from one page
 
 var pickerCounter = 0;
@@ -187,7 +189,7 @@ function setValue(element, options, state, trigger, date) {
         element.val(v);
     }
 
-    setPickerValue(pId, v.format('YYYY-MM-DD HH:mm:ss'));
+    setPickerValue(pId, value.format(databaseFormatMoment));
 
     if (trigger === true) {
         element.trigger('change');
@@ -206,6 +208,12 @@ function setValue(element, options, state, trigger, date) {
 function setPickerValue(pickerId, value) {
     $("#picker" + pickerId).attr('data-datepicker-value', value);
 }
+
+function getPickerValue(pickerId) {
+    return $("#picker" + pickerId).attr('data-datepicker-value');
+}
+
+
 
 function checkAllDaySwitch(state, pickerId) {
 
@@ -407,7 +415,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
     $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" data-datepicker-value class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
 
-    setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)).format('YYYY-MM-DD HH:mm:ss'));
+    setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)).format(databaseFormatMoment));
+
+    getPickerValue(pickerId);
 
     // Create click event to open the modal for the element
 
@@ -465,7 +475,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD HH:mm:ss')), function () {
+            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format(databaseFormatMoment)), function () {
 
                 // Capture open of modal
                 $(document).on('opened.fndtn.reveal', '#adtp-modal-' + pickerId, function () {

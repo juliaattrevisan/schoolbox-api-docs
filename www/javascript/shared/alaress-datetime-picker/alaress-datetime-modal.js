@@ -29,6 +29,18 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     var heatCache = {};
 
+    $(document).on('opened.fndtn.reveal', '#picker' + twigVars.id, function () {
+        var inputDate = moment(getPickerValue(twigVars.id), 'YYYY-MM-DD');
+
+        if(twigVars.timetable && $('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value') !== undefined) {
+            var responseDate = moment(($('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value')), 'YYYY-MM-DD');
+            if(responseDate.diff(inputDate)) {
+                resetTimetable(inputDate);
+                requestDataByDate(inputDate.format('YYYY-MM-DD'), 'timetable');
+            }
+        }
+    });
+
     // Timetable picker
     var $byTimetable = $('#byTimetable-' + twigVars.id);
 
@@ -364,9 +376,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Reset the timetable day selectors
      * Only show selected day as active
      */
-    function resetTimetable() {
+    function resetTimetable(date) {
 
-        var selectedDate = moment(timetable.submit.attr('data-timetable-value')).format('YYYY-MM-DD'); // The currently selected date
+        var selectedDate = moment(date ? date : timetable.submit.attr('data-timetable-value')).format('YYYY-MM-DD'); // The currently selected date
 
         // Remove selected on all days for a blank slate
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
