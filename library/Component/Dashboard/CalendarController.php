@@ -75,13 +75,11 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                 $this->getUser()
             );
 
-            return true;
-
         } catch (AlaressDatabaseException $e) {
             // This will fail if the external DB is unavailable when trying to get the API factory
         }
 
-        return false;
+        return true;
     }
 
     /**
