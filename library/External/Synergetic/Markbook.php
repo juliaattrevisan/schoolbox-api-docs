@@ -9,6 +9,7 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -111,7 +112,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
 
         // Hydrate result type -_-
-        $workType   = SubmissionBox\WorkTypeMapper::getInstance()->findById($assessment->getType());
+        $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
         $resultType = $workType->getExternalResultType();
         if (!empty($resultType)) {
             $resultType = $this->getDatabase()->quote($resultType);
