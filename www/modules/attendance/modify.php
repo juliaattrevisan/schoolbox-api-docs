@@ -178,7 +178,7 @@ if ($class) {
             }
 
             preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/', $currentStudent['EarlyDepartureTime'], $deptTime);
-            
+
             if (count($deptTime) == 0) {
                 preg_match('/([0-9]+):([0-5])([0-9]):00.000(AM|PM)/', $currentStudent['EarlyDepartureTime'], $deptTime);
             }

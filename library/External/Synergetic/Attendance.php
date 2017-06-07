@@ -25,7 +25,6 @@ use Schoolbox\External\Exception as ExternalException;
 class External_Synergetic_Attendance implements External_AttendanceInterface
 {
     use External_MssqlConnector;
-    use External_Synergetic_ValidateExternalIdTrait;
 
     /** @var Attendance_Synergetic_AttendanceMaster $attendanceMaster An instance of Attendance_Synergetic_AttendanceMaster_Abstract */
     private $attendanceMaster = null;
