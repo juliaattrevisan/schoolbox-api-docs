@@ -62,22 +62,17 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
         // TODO: Inject the event factory
 
-        try {
-            /** @var Calendar_Api_Factory $eventFactory */
-            $eventFactory = $this->getSitePage()->getDi()->get('calendarApiFactory');
-            $api = $eventFactory->produceForUser($this->getUser());
-            $this->eventRenderer = new Lister(
-                $api,
-                $this->start->getUnixTimeStamp(),
-                $this->end->getUnixTimeStamp(),
-                $this->getUser(),
-                $this->getSitePage(),
-                $this->getUser()
-            );
-
-        } catch (AlaressDatabaseException $e) {
-            // This will fail if the external DB is unavailable when trying to get the API factory
-        }
+        /** @var Calendar_Api_Factory $eventFactory */
+        $eventFactory = $this->getSitePage()->getDi()->get('calendarApiFactory');
+        $api = $eventFactory->produceForUser($this->getUser());
+        $this->eventRenderer = new Lister(
+            $api,
+            $this->start->getUnixTimeStamp(),
+            $this->end->getUnixTimeStamp(),
+            $this->getUser(),
+            $this->getSitePage(),
+            $this->getUser()
+        );
 
         return true;
     }
