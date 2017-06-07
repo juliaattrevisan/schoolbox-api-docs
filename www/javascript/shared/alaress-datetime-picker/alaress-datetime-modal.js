@@ -40,6 +40,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 resetTimetable(inputDate);
                 requestDataByDate(inputDate.format('YYYY-MM-DD'), 'timetable');
             }
+            else {
+                selectLockedValues();
+            }
         }
     });
 
@@ -61,6 +64,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         // On first load request data by date for the timetable
         requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'timetable');
+
+        lockValues();
 
         // Listen for changes to campus
         timetable.campus.change(function () {
@@ -342,7 +347,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 termEnd = moment($(this).attr('data-end-date'), 'YYYY-MM-DD');
 
             if (inputDate.isBetween(termStart, termEnd)) {
-                $(this).prop("selected", true);
+                $(this).prop('selected', true);
             }
         });
     }
@@ -353,7 +358,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function resetCycles() {
         var inputDate = moment(getPickerValue(twigVars.id), 'YYYY-MM-DD'),
             activeTerm =  timetable.term.find('option:selected').val();
-console.log(inputDate);
+
         buildCycles(activeTerm);
 
         $byTimetable.find('[data-parent-term="' + activeTerm + '"]').each(function() {
@@ -363,7 +368,6 @@ console.log(inputDate);
                 cycleEnd = moment($(this).attr('data-cycle-end'), 'YYYY-MM-DD');
 
             if (inputDate.isBetween(cycleStart, cycleEnd)) {
-                console.log($(this));
                 $(this).removeClass('hide');
             }
         });
@@ -420,9 +424,6 @@ console.log(inputDate);
         // Remove selected on all days for a blank state
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
 
-        // Remove date text
-        $byTimetable.find('[data-tt-selected-date]').text('none');
-
         // Loop through cycle days and check if currently set date matches
         $byTimetable.find('[data-tt-day]').each(function() {
             if (selectedDate.format('YYYY-MM-DD') == $(this).attr('data-date')) {
@@ -460,6 +461,8 @@ console.log(inputDate);
      * @param target
      */
     function requestDataByDate(date, target) {
+
+        lockValues(date);
 
         if (twigVars.type == 'duework') { // Fetch student assessments
 
@@ -509,9 +512,6 @@ console.log(inputDate);
 
         var day = element.attr('data-tt-day'),
             date = element.attr('data-date');
-
-        // Update the date data attr on the submit button
-        timetable.submit.attr('data-timetable-value', date);
 
         if (twigVars.type == 'duework') { // Fetch student assessments
 
@@ -1078,6 +1078,51 @@ console.log(inputDate);
         }
 
         return monthsToFetch;
+    }
+
+    /**
+     * Lock in selected date value, term, cycle, week, day
+     *
+     * @param date
+     */
+    function lockValues() {
+
+        var date = moment(timetable.submit.attr('data-timetable-value')).format('YYYY-MM-DD');
+            selectedCampus = timetable.campus.val(),
+            selectedTerm = timetable.term.val(),
+            selectedCycle = $byTimetable.find('[data-parent-term="' + selectedTerm + '"]').not('.hide').attr('data-adtp-tt-cycle'),
+            selectedDay = $byTimetable.find('[data-date=' + date + ']').attr('data-tt-day');
+
+        timetable.submit.attr('data-timetable-campus', selectedCampus);
+        timetable.submit.attr('data-timetable-term', selectedTerm);
+        timetable.submit.attr('data-timetable-cycle', selectedCycle);
+        timetable.submit.attr('data-timetable-day', selectedDay);
+
+        // Update the date data attr on the submit button
+        timetable.submit.attr('data-timetable-value', date);
+    }
+
+    /**
+     * Select the values for campus, term, cycle, date that refer to the selected date
+     *
+     * @param date
+     */
+
+    function selectLockedValues() {
+        igitf(timetable.submit.attr('data-timetable-campus') > 0) {
+            timetable.campus.val(timetable.submit.attr('data-timetable-campus'));
+        }
+
+        if(timetable.submit.attr('data-timetable-term') > 0) {
+            timetable.term.val(timetable.submit.attr('data-timetable-term'));
+        }
+
+        if(timetable.submit.attr('data-timetable-cycle') > 0) {
+        }
+
+        if(timetable.submit.attr('data-timetable-day') > 0) {
+        }
+
     }
 
 };
