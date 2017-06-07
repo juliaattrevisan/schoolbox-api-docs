@@ -35,6 +35,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         if(twigVars.timetable && $('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value') !== undefined) {
             var responseDate = moment(($('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value')), 'YYYY-MM-DD');
             if(responseDate.diff(inputDate)) {
+                resetTerms();
+                resetCycles();
                 resetTimetable(inputDate);
                 requestDataByDate(inputDate.format('YYYY-MM-DD'), 'timetable');
             }
@@ -328,6 +330,32 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
     }
 
+    /**
+     * Update selected term
+     */
+    function resetTerms() {
+        var inputDate = moment(getPickerValue(twigVars.id), 'YYYY-MM-DD');
+        // Hide all terms
+        timetable.term.val([]);
+        timetable.term.find('option').each(function(){
+            var termStart = moment($(this).attr('data-start-date'), 'YYYY-MM-DD'),
+                termFinish = moment($(this).attr('data-end-date'), 'YYYY-MM-DD');
+
+            if (inputDate.isBetween(termStart, termFinish)) {
+                $(this).prop("selected", true);
+            }
+        });
+    }
+
+    /**
+     * Update selected cycle
+     */
+    function resetCycles() {
+        var inputDate = getPickerValue(twigVars.id);
+        // Hide all cycles
+        $byTimetable.find('[data-adtp-tt-cycle]').addClass('hide');
+    }
+
 
     /**
      * Show the timetable picker
@@ -376,18 +404,21 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         var selectedDate = moment(date ? date : timetable.submit.attr('data-timetable-value')); // The currently selected date
 
-        // Remove selected on all days for a blank slate
+        // Remove selected on all days for a blank state
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
+
+        // Remove date text
+        $byTimetable.find('[data-tt-selected-date]').text('none');
 
         // Loop through cycle days and check if currently set date matches
         $byTimetable.find('[data-tt-day]').each(function() {
             if (selectedDate.format('YYYY-MM-DD') == $(this).attr('data-date')) {
                 $(this).addClass('selected');
+                // Update the selected date text
+                $byTimetable.find('[data-tt-selected-date]').text(selectedDate.format('dddd, MMM D, Y'));
             }
         });
 
-        // Update the selected date
-        $byTimetable.find('[data-tt-selected-date]').text(selectedDate.format('dddd, MMM D, Y'));
     }
 
 
