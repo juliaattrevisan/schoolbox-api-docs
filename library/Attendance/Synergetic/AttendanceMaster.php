@@ -1,18 +1,18 @@
-<?php
-
-use Alaress\Database\Connector\IConnector;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
+x<?php
 
 /**
  * Attendance_Synergetic_AttendanceMaster
  *
  * Each instance of this represents a new row in the AttendanceMaster table.
- * Default values are defined in setup() and written to the db via insertStub()
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+
 class Attendance_Synergetic_AttendanceMaster
 {
     /** @var IConnector $connector Database connector */
@@ -89,7 +89,6 @@ class Attendance_Synergetic_AttendanceMaster
             'TimeTableGroup' => $this->getTimetableGroup(),
             'SynWebFlag' => 1,
         ]);
-
 
         // Bind output parameters for procedure
 
@@ -193,8 +192,7 @@ class Attendance_Synergetic_AttendanceMaster
         return $this->getAttendanceMasterSeq() > 0;
     }
 
-    /* Getters/Setters
-     */
+    // Getters & Setters
 
     /**
      * @return int
