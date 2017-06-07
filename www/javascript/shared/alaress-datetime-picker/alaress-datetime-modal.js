@@ -60,10 +60,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // On first load request data by date for the timetable
         requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'timetable');
 
-        // Update the selected date
-        var selectedDate = moment(twigVars.date).format('dddd, MMM D, Y');
-        $byTimetable.find('[data-tt-selected-date]').text(selectedDate);
-
         // Listen for changes to campus
         timetable.campus.change(function () {
 
@@ -378,17 +374,20 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function resetTimetable(date) {
 
-        var selectedDate = moment(date ? date : timetable.submit.attr('data-timetable-value')).format('YYYY-MM-DD'); // The currently selected date
+        var selectedDate = moment(date ? date : timetable.submit.attr('data-timetable-value')); // The currently selected date
 
         // Remove selected on all days for a blank slate
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
 
         // Loop through cycle days and check if currently set date matches
         $byTimetable.find('[data-tt-day]').each(function() {
-            if (selectedDate == $(this).attr('data-date')) {
+            if (selectedDate.format('YYYY-MM-DD') == $(this).attr('data-date')) {
                 $(this).addClass('selected');
             }
         });
+
+        // Update the selected date
+        $byTimetable.find('[data-tt-selected-date]').text(selectedDate.format('dddd, MMM D, Y'));
     }
 
 
