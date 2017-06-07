@@ -21,6 +21,10 @@ class Model
      */
     private $name;
 
+    /**
+     * @var string
+     */
+    private $externalResultType;
 
     /**
      * @param int $id
@@ -59,5 +63,24 @@ class Model
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @param string $externalResultType
+     * @return static
+     */
+    public function setExternalResultType($externalResultType)
+    {
+        $this->externalResultType = $externalResultType;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getExternalResultType()
+    {
+        return $this->externalResultType;
     }
 }

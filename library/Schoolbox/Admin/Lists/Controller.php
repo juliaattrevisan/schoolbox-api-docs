@@ -424,7 +424,11 @@ class Controller extends Base
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 12,
+                        'width'     => 8,
+                    ],
+                    'externalResultType' => [
+                        'caption'   => 'External SIS Type',
+                        'width'     => 4,
                     ],
                 ]
             ],
