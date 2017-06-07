@@ -103,12 +103,15 @@ class Bulk_Folder
                     /* Check if subject code already exists
 					 */
                     $codes = [];
+                    $skip = false;
 
                     for ($i=2; $row[$i]; $i++) {
                         $subjectCode = trim($row[$i]);
 
                         try {
                             $folder = $folderMapper->findByCode($subjectCode);
+
+                            $skip = true;
 
                             $output[] = [
                                 'id' => '',
@@ -117,17 +120,18 @@ class Bulk_Folder
                                 'error' => "Subject code already exists ({$subjectCode})",
                             ];
                         } catch (MapperException $e) {
-
                             /* noop - folder doesn't exist
                              */
+                            $codes[] = $subjectCode;
                         }
-
-                        $codes[] = $subjectCode;
                     }
 
-                    if (count($codes)) {
+                    /*skip folder creation if above we found any of the folder subjectCodes exist already
+                    */
+                    if($skip) {
                         continue;
                     }
+
 
                     /* Parent folder
                      */
@@ -154,6 +158,7 @@ class Bulk_Folder
                     /* Accumulate all folder codes
                      */
                     foreach ($codes as $currentCode) {
+
                         $folderCode = $folderCodeMapper->createModel();
                         $folderCode->setCode($currentCode);
 
