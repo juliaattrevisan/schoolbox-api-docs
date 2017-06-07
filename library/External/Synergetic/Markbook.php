@@ -110,11 +110,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
 
-        if (!empty($assessment->getAssessment()->getWorkType()->getExternalResultType())) {
-            $resultType =
-                $this->getDatabase()->quote(
-                    $assessment->getAssessment()->getWorkType()->getExternalResultType()
-                );
+        // Hydrate result type -_-
+        $workType   = SubmissionBox\WorkTypeMapper::getInstance()->findById($assessment->getType());
+        $resultType = $workType->getExternalResultType();
+        if (!empty($resultType)) {
+            $resultType = $this->getDatabase()->quote($resultType);
         } else {
             $resultType = 'OGRaw';
         }
