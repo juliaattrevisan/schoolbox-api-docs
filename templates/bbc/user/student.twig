@@ -3,6 +3,8 @@
 {% if showButtons %}
     {% block buttons_miscellaneous %}
         <!-- Start on School Grades page initially -->
-        <li><a href="/tassportal/teacherkiosk?link=index.cfm%3Fdo%3Dkiosk.students.main.student.details%26stud_code%3D{{ user.getExternalId() }}" class="icon-progress">TASS Profile</a></li>
+        {% if USER.role.staff %}
+            <li><a href="/modules/tassportal/teacherkiosk?link=index.cfm%3Fdo%3Dkiosk.students.main.student.details%26stud_code%3D{{ user.getExternalId() }}" class="icon-progress">TASS Profile</a></li>
+        {% endif %}
     {% endblock buttons_miscellaneous %}
 {% endif %}
