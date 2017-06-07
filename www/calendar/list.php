@@ -82,48 +82,44 @@ $this->setVar(
     )
 );
 
-try {
+/** @var Calendar_Api_Factory $factory */
+$factory = $this->getDi()->get('calendarApiFactory');
+$api = $factory->produceForUser($user);
 
-    /** @var Calendar_Api_Factory $factory */
-    $factory = $this->getDi()->get('calendarApiFactory');
-    $api = $factory->produceForUser($user);
+// Extend finish by one day for search
 
-    // Extend finish by one day for search
+$calendar = new Lister(
+    $api,
+    $start->getUnixTimestamp(),
+    $finish->addDays(1)->getUnixTimestamp(),
+    $user,
+    $this,
+    $user
+);
 
-    $calendar = new Lister(
-        $api,
-        $start->getUnixTimestamp(),
-        $finish->addDays(1)->getUnixTimestamp(),
-        $user,
-        $this,
-        $user
-    );
+$lastDate = false;
 
-    $lastDate = false;
+if ($calendar->getAllEvents()->count()) {
+    foreach ($calendar->getAllEvents() as $currentEvent) {
+        $currentDate = $currentEvent->getStartTime()->getDatabaseDate();
 
-    if ($calendar->getAllEvents()->count()) {
-        foreach ($calendar->getAllEvents() as $currentEvent) {
-            $currentDate = $currentEvent->getStartTime()->getDatabaseDate();
-
-            if ($lastDate && ($lastDate != $currentDate)) {
-                $this->parse('date_block', 'date', true);
-                $this->setVar('event_block', '');
-            }
-
-            $this->setVar('EVENT_DATE', $currentEvent->getStartTime()->getLongDateOnly());
-
-            $this->setVar('TWIG_EVENT', $calendar->renderEvent($currentEvent, 'html'));
-            $this->parse('event_block', 'event', true);
-            $lastDate = $currentDate;
+        if ($lastDate && ($lastDate != $currentDate)) {
+            $this->parse('date_block', 'date', true);
+            $this->setVar('event_block', '');
         }
 
-        // Parze out blox after last event
+        $this->setVar('EVENT_DATE', $currentEvent->getStartTime()->getLongDateOnly());
 
-        $this->parse('date_block', 'date', true);
-    } else {
-        $this->parse('has_no_events_block', 'has_no_events');
+        $this->setVar('TWIG_EVENT', $calendar->renderEvent($currentEvent, 'html'));
+        $this->parse('event_block', 'event', true);
+        $lastDate = $currentDate;
     }
-} catch (AlaressDatabaseException $e) {
+
+    // Parze out blox after last event
+
+    $this->parse('date_block', 'date', true);
+} else {
+    $this->parse('has_no_events_block', 'has_no_events');
 }
 
 $groupHandler = new Group();
