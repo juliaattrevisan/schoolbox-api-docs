@@ -752,7 +752,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                     ->setHref($this->buildParticipantRoute($submissionBox, $student))
                     ->setTitle(":child's $boxType was renamed from :oldname to :newname in :catname")
                     ->unsetParam('author')
-                    ->setParam('child', new UserParam($student))
+                    ->setParam('child', new UserParam($student, Param::STACKING_REPLACE, '{firstname}'))
                 ;
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
@@ -770,7 +770,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                     ->setHref($this->buildParticipantRoute($submissionBox, $student))
                     ->setTitle(":child's $boxType :boxname closing date was $verb to :date in :catname")
                     ->unsetParam('author')
-                    ->setParam('child', new UserParam($student))
+                    ->setParam('child', new UserParam($student, Param::STACKING_REPLACE, '{firstname}'))
                 ;
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
@@ -788,7 +788,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                     ->setHref($this->buildParticipantRoute($submissionBox, $student))
                     ->setTitle($m)
                     ->unsetParam('author')
-                    ->setParam('child', new UserParam($student))
+                    ->setParam('child', new UserParam($student, Param::STACKING_REPLACE, '{firstname}'))
                 ;
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
@@ -803,7 +803,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                     ->setHref($this->buildParticipantRoute($submissionBox, $student))
                     ->setTitle(":child's $boxType :boxname was updated in :catname")
                     ->unsetParam('author')
-                    ->setParam('child', new UserParam($student))
+                    ->setParam('child', new UserParam($student, Param::STACKING_REPLACE, '{firstname}'))
                 ;
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
