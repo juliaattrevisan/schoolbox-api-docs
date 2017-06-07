@@ -88,6 +88,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function createAssessment(Activity $assessment)
     {
+        $result = false;
+
         /** Fix the hydrations */
         $folder = $assessment->getCategory();
         /** @var int $folderId */
@@ -103,8 +105,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         if (!$this->isExternalIdValid($owner->getExternalId())) {
             return false;
         }
-
-        $assessment->getType()
 
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
@@ -155,10 +155,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                           '100',
                           '{$assessmentFieldValues["WeightingFactor"]}'
                         )";
-                $statement = $this->getDatabase()->query($query);
+                $result = $this->getDatabase()->query($query);
             }
         }
-        return $statement;
+
+        return $result;
     }
 
 
@@ -302,7 +303,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $assessmentRemoteList = $this->getAssessment($activity);
         }
 
-        foreach($assessmentRemoteList as $assessmentRemote ) {
+        $success = true;
+
+        foreach ($assessmentRemoteList as $assessmentRemote ) {
 
             if($this->doesMarkExist($assessmentRemote['FileType'],
                 $assessmentRemote['FileYear'],
@@ -382,9 +385,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 }
             }
 
-            $statement = $this->getDatabase()->query($query);
+            $success = $this->getDatabase()->query($query);
         }
-        return $statement;
+        return $success;
     }
 
     /**
