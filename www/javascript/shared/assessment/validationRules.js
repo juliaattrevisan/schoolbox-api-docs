@@ -1,3 +1,5 @@
+var scriptValidationRules = $('script[src*=validationRules]');
+
 /**
  * Validation rules that can be applied to the form on load
  */
@@ -27,7 +29,7 @@ var validateOptions = {
         }
     },
     messages: {
-        weight: 'The grading weight should zero or greater'
+        weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater'
     }
 };
 

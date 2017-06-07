@@ -87,7 +87,7 @@
                                 <h3>{{ report.name }}</h3>
                             </a>
                             <p class="meta">
-                                <i title="Pastoral Groups" class="icon-group"></i>
+                                <i title="{{ locale.pastoralCare.proper }} Groups" class="icon-group"></i>
                                 {% if report.groups | length %}
                                     {% for group in report.groups %}
                                         {{ group.name }}{% if not loop.last %},{% endif %}
