@@ -152,7 +152,7 @@ class Mapper extends \Schoolbox\Mapper
         /** @var Plagscan $plagscan */
         $plagscan = $this->createModel();
         $plagscan->setPlagscanId(null);
-        $plagscan->setStatus(Plagscan::STATUS_QUEUED);
+        $plagscan->setStatus(Plagscan::STATUS_UNSCANNABLE);
         $plagscan->setStudentSubmissionFileId($file->getId());
         $plagscan->setCreatedAt(\Alaress_Date_Format::now());
         $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
