@@ -272,12 +272,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     /**
      * Build cycles dynamically
      */
-    function buildCycles() {
+    function buildCycles(term) {
 
         var selectedCampus = 'campus_' + timetable.campus.find(':selected').val(),
             daysInCycle = timetable.campus.find(':selected').attr('data-days'),
             termDuration = timetable.term.find(':selected').attr('data-duration'),
-            selectedTerm = timetable.term.find(':selected').val(),
+            selectedTerm = term ? term : timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
             termEnd = timetable.term.find(':selected').attr('data-end-date'),
             monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd)),
@@ -304,7 +304,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                     hideClass = '';
                 }
 
-                optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + index + '" data-cycle-start="' + startDate.format('YYYY-MM-DD') + '" data-cycle-end="' + endDate.format('YYYY-MM-DD') + '">';
+                optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + index + '" data-cycle-start="' + startDate.format('YYYY-MM-DD') + '" data-cycle-end="' + endDate.format('YYYY-MM-DD') + '" data-parent-term="' + selectedTerm + '">';
                 optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Week</span> ' + index + '</div>';
                 optionsHtml += '<div class="adtp-tt-week-date">' + startDate.format('MMM D') + ' - ' + endDate.format('MMM D') + '</div>';
                 optionsHtml += '</div>';
@@ -339,9 +339,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         timetable.term.val([]);
         timetable.term.find('option').each(function(){
             var termStart = moment($(this).attr('data-start-date'), 'YYYY-MM-DD'),
-                termFinish = moment($(this).attr('data-end-date'), 'YYYY-MM-DD');
+                termEnd = moment($(this).attr('data-end-date'), 'YYYY-MM-DD');
 
-            if (inputDate.isBetween(termStart, termFinish)) {
+            if (inputDate.isBetween(termStart, termEnd)) {
                 $(this).prop("selected", true);
             }
         });
@@ -351,9 +351,22 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Update selected cycle
      */
     function resetCycles() {
-        var inputDate = getPickerValue(twigVars.id);
-        // Hide all cycles
-        $byTimetable.find('[data-adtp-tt-cycle]').addClass('hide');
+        var inputDate = moment(getPickerValue(twigVars.id), 'YYYY-MM-DD'),
+            activeTerm =  timetable.term.find('option:selected').val();
+console.log(inputDate);
+        buildCycles(activeTerm);
+
+        $byTimetable.find('[data-parent-term="' + activeTerm + '"]').each(function() {
+
+            $(this).addClass('hide');
+            var cycleStart = moment($(this).attr('data-cycle-start'), 'YYYY-MM-DD'),
+                cycleEnd = moment($(this).attr('data-cycle-end'), 'YYYY-MM-DD');
+
+            if (inputDate.isBetween(cycleStart, cycleEnd)) {
+                console.log($(this));
+                $(this).removeClass('hide');
+            }
+        });
     }
 
 
