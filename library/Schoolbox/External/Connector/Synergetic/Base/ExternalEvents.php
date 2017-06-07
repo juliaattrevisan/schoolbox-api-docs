@@ -9,7 +9,6 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
@@ -21,12 +20,6 @@ class ExternalEvents extends Base implements IExternalEvents
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
-        // If the external database is unavailable we will return an empty array
-
-        if (!$this->databaseExternal instanceof IConnector) {
-            return [];
-        }
-
         $start = new Alaress_Date_Format($startDate, 'U');
         $finish = new Alaress_Date_Format($endDate, 'U');
 

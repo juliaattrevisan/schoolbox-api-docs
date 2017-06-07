@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\External\Connector\Offline\Base\ExternalEvents as OfflineExternalEvents;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
@@ -34,6 +35,12 @@ class Factory
      */
     public function build($config, $databaseExternal, $type)
     {
+        // Check if external DB is unavailable and return offline class if we can't access
+
+        if (!$databaseExternal instanceof IConnector) {
+            return new OfflineExternalEvents($config, null);
+        }
+
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type'));
         $schoolCode = ucwords($config->get('site_location'));
 

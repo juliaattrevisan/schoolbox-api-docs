@@ -56,7 +56,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         /** @var IIterator $externalEvents */
         $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
 
-        if (count($externalEvents) == 0) {
+        if ($externalEvents->count() == 0) {
             return $stack;
         }
 

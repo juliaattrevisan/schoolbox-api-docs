@@ -14,7 +14,7 @@ use Schoolbox\IConfigLoader;
 
 abstract class Base
 {
-    /** @var IConnector $databaseExternal External database connection - will be NULL if the external database is unavailable */
+    /** @var IConnector */
     protected $databaseExternal;
 
     /** @var IConfigLoader */
@@ -29,7 +29,6 @@ abstract class Base
     public function __construct($config, $databaseExternal)
     {
         $this->config = $config;
-
         $this->databaseExternal = $databaseExternal;
     }
 }
