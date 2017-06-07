@@ -111,18 +111,18 @@ abstract class Base implements IBroker
             'LoginTimeout' => self::LOGIN_TIMEOUT
         ];
 
+        // Due to ambiguity in PDO specification, the PDO_SQLSRV driver doesn't respect the PDO::ATTR_TIMEOUT variable as indicated
+        // in the Microsoft blog post (https://blogs.msdn.microsoft.com/brian_swan/2010/04/27/design-decisions-in-the-pdo-driver-for-sql-server/)
+        //
+        // Instead they use a custom attribute for login timeout. Unfortunately the operating system gets in the way here as well, and we need to
+        // set the socket timeout to the same value as the login timeout for this login timeout attribute to have the desired effect. So as not to
+        // blow things up prematurely later in the system, we revert the timeout as soon as we have created the PDO connection.
+
+        $defaultSocketTimeout = ini_get('default_socket_timeout');
+
+        ini_set('default_socket_timeout', self::LOGIN_TIMEOUT);
+
         try {
-
-            // Due to ambiguity in PDO specification, the PDO_SQLSRV driver doesn't respect the PDO::ATTR_TIMEOUT variable as indicated
-            // in the Microsoft blog post (https://blogs.msdn.microsoft.com/brian_swan/2010/04/27/design-decisions-in-the-pdo-driver-for-sql-server/)
-            //
-            // Instead they use a custom attribute for login timeout. Unfortunately the operating system gets in the way here as well, and we need to
-            // set the socket timeout to the same value as the login timeout for this login timeout attribute to have the desired effect. So as not to
-            // blow things up prematurely later in the system, we revert the timeout as soon as we have created the PDO connection.
-
-            $defaultSocketTimeout = ini_get('default_socket_timeout');
-
-            ini_set('default_socket_timeout', self::LOGIN_TIMEOUT);
 
             // Create a new PDO instance using the DSN string and supplied username/password parameters
 
@@ -133,38 +133,38 @@ abstract class Base implements IBroker
                 $connectOptions
             );
 
-            // Restore default socket timeout
-
-            ini_set('default_socket_timeout', $defaultSocketTimeout);
-
-            // These will only get called if the child class overrides the values- don't *think*
-            // we need these to be parameters as they're really just there to get the database in a
-            // state where our functions operate as expected
-
-            foreach ($this->databaseAttributes as $attribute => $value) {
-                $this->pdo->setAttribute($attribute, $value);
-            }
-
-            foreach ($this->postConnectQueries as $sql) {
-                $this->pdo->exec($sql);
-            }
-
-            if (DebugBar::isEnabled()) {
-                $this->installCollector();
-
-                /** @var DataCollectorInterface $collector */
-                $collector = $this->getCollector();
-
-                if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
-                    DebugBar::getInstance()->addCollector($collector);
-                }
-            }
-
         } catch (PDOException $e) {
 
             // Something went wrong during connection
 
             throw new DatabaseException("Error connecting to database.\nDSN String: {$this->getDsn()}\nPDO Error: {$e->getMessage()}");
+        }
+
+        // Restore default socket timeout
+
+        ini_set('default_socket_timeout', $defaultSocketTimeout);
+
+        // These will only get called if the child class overrides the values- don't *think*
+        // we need these to be parameters as they're really just there to get the database in a
+        // state where our functions operate as expected
+
+        foreach ($this->databaseAttributes as $attribute => $value) {
+            $this->pdo->setAttribute($attribute, $value);
+        }
+
+        foreach ($this->postConnectQueries as $sql) {
+            $this->pdo->exec($sql);
+        }
+
+        if (DebugBar::isEnabled()) {
+            $this->installCollector();
+
+            /** @var DataCollectorInterface $collector */
+            $collector = $this->getCollector();
+
+            if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
+                DebugBar::getInstance()->addCollector($collector);
+            }
         }
 
         return true;
