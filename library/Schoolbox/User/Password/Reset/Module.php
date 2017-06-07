@@ -77,12 +77,6 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        try {
-            $communityPortalFactory = $injector->lazyGet('externalCommunityPortal');
-        } catch (AlaressDatabaseException $e) {
-            $communityPortalFactory = null;
-        }
-
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(
@@ -91,7 +85,7 @@ class Module extends BaseModule
                     'passwordService'        => $injector->lazyNew(PasswordService::class),
                     'userMapper'             => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'resetMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'communityPortalFactory' => $communityPortalFactory,
+                    'communityPortalFactory' => $injector->lazyGet('externalCommunityPortal'),
                     'mailFactory'            => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
                         [
