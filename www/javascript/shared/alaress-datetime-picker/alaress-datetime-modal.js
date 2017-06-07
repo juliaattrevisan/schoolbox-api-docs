@@ -527,9 +527,10 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Hide the loader
         $('#' + target + 'Response' + twigVars.id + ' .loader').addClass('hide');
 
+        console.log(twigVars);
         if (template == 'duework') {
 
-            html = '<h2 class="mini">Due Work (<span data-due-work-title>' + dictMostLoaded + '</span>)</h2>';
+            html = '<h2 class="mini">' + twigVars.locale.dueWorkProper + ' (<span data-due-work-title>' + dictMostLoaded + '</span>)</h2>';
 
             if (data.students === undefined) {
                 html += 'Error loading data';
