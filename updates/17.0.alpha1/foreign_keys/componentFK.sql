@@ -31,7 +31,7 @@ ALTER TABLE `component_config_instance`
   ADD CONSTRAINT `fk_component_config_instance_component_instance_id`
 FOREIGN KEY (`component_instance_id`)
 REFERENCES `component_instance` (`id`)
-  ON DELETE NO ACTION
+  ON DELETE CASCADE
   ON UPDATE NO ACTION;
 
 DELETE component_instance FROM component_instance
