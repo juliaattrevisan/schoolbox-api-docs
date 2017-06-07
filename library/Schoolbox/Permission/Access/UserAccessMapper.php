@@ -281,9 +281,9 @@ class UserAccessMapper extends Mapper
     }
 
     /**
-    * @param FolderModel $folder
-    * @param bool $includeSynergy
-    * @return Collection|User[]
+     * @param FolderModel $folder          Folder codes must be hydrated if $includeSynergy == true
+     * @param bool        $includeSynergy
+     * @return Collection|User[]
     */
     public function findStudentsInCategory($folder, $includeSynergy = true)
     {
@@ -304,12 +304,12 @@ class UserAccessMapper extends Mapper
 
 
     /**
-     * @param FolderModel $folder
-     * @param string $roleType If provided, restrict to this role type
-     * @param int $accessType
-     * @param bool $includeSynergy
-     * @param bool $exactAccess If true, only fetch users with exactly $accessType.
-     *                          By default, fetch users with at least $accessType.
+     * @param FolderModel $folder      Folder codes must be hydrated if $includeSynergy == true
+     * @param string      $roleType    If provided, restrict to this role type
+     * @param int         $accessType
+     * @param bool        $includeSynergy
+     * @param bool        $exactAccess If true, only fetch users with exactly $accessType.
+     *                                 By default, fetch users with at least $accessType.
      * @return Collection|User[]
      */
     public function findUsersInCategory(

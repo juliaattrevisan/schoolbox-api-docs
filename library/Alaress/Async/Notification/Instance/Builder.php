@@ -273,8 +273,8 @@ class Builder implements BuilderInterface
 	/**
 	 * Builds an instance from the construction given
 	 *
-	 * @throws OutOfBoundsException
-	 * @throws InvalidArgumentException
+	 * @throws OutOfBoundsException     If severity is not set
+	 * @throws InvalidArgumentException If a required property was not set
 	 * @return Instance
 	 */
 	public function build() {
