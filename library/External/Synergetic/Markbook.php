@@ -64,7 +64,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         MarkOutOf,
                         WeightingFactor
                   FROM StaffAssessmentMarkBook
-                  WHERE HdgAbbrev2 = '".$this->getMarkbookIdentifier($assessment)."'";
+                  WHERE HdgAbbrev2 = '" . $this->getMarkbookIdentifier($assessment) . "'";
         return $this->getDatabase()->getAll($query);
     }
 
@@ -97,7 +97,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $folder = FolderMapper::getInstance()->findById($folderId);
 
         $externalClass = new External_Synergetic_Class();
-        if($assessment->getOwner() instanceof Schoolbox\User) {
+        if ($assessment->getOwner() instanceof Schoolbox\User) {
             $owner = $assessment->getOwner();
         } else {
             $owner = UserMapper::getInstance()->findById($assessment->getOwner());
@@ -118,7 +118,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $resultType = 'OGRaw';
         }
 
-        foreach($folder->getCodes() as $classCode) {
+        foreach ($folder->getCodes() as $classCode) {
 
             $class = $externalClass->getClass($classCode->getCode(), $owner);
 
@@ -168,7 +168,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param string
      * @param Activity $assessment
-     * @return array
+     * @return bool
      */
     public function updateAssessment(Activity $assessment)
     {
@@ -180,7 +180,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                   WHERE
                         HdgAbbrev2 = '{$assessmentFieldValues["HdgAbbrev2"]}'
                     ";
-        $this->getDatabase()->query($query);
+        return $this->getDatabase()->query($query);
     }
 
     /**
@@ -189,7 +189,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function deleteAssessment(Activity $assessment)
     {
         $identifier = $this->getMarkbookIdentifier($assessment);
-        $queries[]  = "
+        $queries[] = "
             DELETE studentBook
             FROM StudentAssessmentMarkBook studentBook
             INNER JOIN StaffAssessmentMarkBook staffBook
@@ -201,7 +201,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 AND studentBook.ClassCode    = staffBook.ClassCode
             WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
         ";
-        $queries[]  = "
+        $queries[] = "
             DELETE staffBook
             FROM StaffAssessmentMarkBook staffBook
             WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
@@ -227,13 +227,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $weight = 0;
         if ($assessment->getSubmissionBox() instanceof Schoolbox\Assessment\Component\SubmissionBox) {
             $weight = $assessment->getSubmissionBox()->getWeight();
-        } elseif($assessment->getAssessment() instanceof Quiz) {
+        } elseif ($assessment->getAssessment() instanceof Quiz) {
             $weight = $assessment->getAssessment()->getWeight();
         }
         return [
-            'Heading'         => $this->getDatabase()->quote($assessment->getName()),
-            'HdgAbbrev1'      => $this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(),10)),
-            'HdgAbbrev2'      => $this->getMarkbookIdentifier($assessment),
+            'Heading' => $this->getDatabase()->quote($assessment->getName()),
+            'HdgAbbrev1' => $this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(), 10)),
+            'HdgAbbrev2' => $this->getMarkbookIdentifier($assessment),
             'WeightingFactor' => $weight,
         ];
     }
@@ -245,7 +245,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @return bool
      * @throws Exception
      */
-    public function setMark( $result)
+    public function setMark($result)
     {
 
         $activity = new Activity;
@@ -279,11 +279,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $evAttempt = new Assess_Attempt();
             $total = $evAttempt->getTotalMarks($result->getQuiz()->getId(), $result->getId());
             $actual = $evAttempt->getMarksForAttempt($result->getId());
-            $mark = ($actual / $total)*100;
+            $mark = ($actual / $total) * 100;
             $comment = '';
             $dueDate = $quiz->getFinish();
-        }
-        else {
+        } else {
             throw new \Exception('Unknown object passed');
         }
         $activity->setOwner($student);
@@ -291,23 +290,25 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         if (!(
             $this->isExternalIdValid($student->getExternalId())
             && $this->isExternalIdValid($marker->getExternalId())
-        )) {
+        )
+        ) {
             return false;
         }
 
         $assessmentRemoteList = $this->getAssessment($activity);
 
         // If assessment box does not exist, create it first
-        if(!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1 ) {
+
+        if (!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1) {
             $this->createAssessment($activity);
             $assessmentRemoteList = $this->getAssessment($activity);
         }
 
         $success = true;
 
-        foreach ($assessmentRemoteList as $assessmentRemote ) {
+        foreach ($assessmentRemoteList as $assessmentRemote) {
 
-            if($this->doesMarkExist($assessmentRemote['FileType'],
+            if ($this->doesMarkExist($assessmentRemote['FileType'],
                 $assessmentRemote['FileYear'],
                 $assessmentRemote['FileSemester'],
                 $assessmentRemote['ClassCampus'],
@@ -323,7 +324,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
                     $query = "UPDATE StudentAssessmentMarkBook SET
                             Result = '{$mark}',
-                            TopicComment = '".$this->getDatabase()->quote($comment)."'
+                            TopicComment = '" . $this->getDatabase()->quote($comment) . "'
                           WHERE
                               FileType = '{$assessmentRemote['FileType']}' AND
                               FileYear = '{$assessmentRemote['FileYear']}' AND
@@ -372,21 +373,24 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                                     '{$assessmentRemote['FileSemester']}',
                                     '{$assessmentRemote['ClassCampus']}',
                                     '{$assessmentRemote['ClassCode']}',
-                                    '".$student->getExternalId()."',
+                                    '" . $student->getExternalId() . "',
                                     '0',
                                     '{$assessmentRemote['MarkBookSeq']}',
                                     '{$mark}',
-                                    '".$this->getDatabase()->quote($comment)."',
-                                    CONVERT( datetime, '".$this->getDatabase()->quote($dueDate->getDatabase())."', 20),
-                                    '".$marker->getExternalId()."',
+                                    '" . $this->getDatabase()->quote($comment) . "',
+                                    CONVERT( datetime, '" . $this->getDatabase()->quote($dueDate->getDatabase()) . "', 20),
+                                    '" . $marker->getExternalId() . "',
                                     CURRENT_TIMESTAMP
                                   )
                     ";
                 }
             }
 
-            $success = $this->getDatabase()->query($query);
+            if (isset($query)) {
+                $success = $this->getDatabase()->query($query);
+            }
         }
+
         return $success;
     }
 
@@ -403,7 +407,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param $studentID
      * @return bool
      */
-    private function doesMarkExist($fileType, $fileYear, $fileSemester, $classCampus, $classCode, $assessmentID, $studentID) {
+    private function doesMarkExist($fileType, $fileYear, $fileSemester, $classCampus, $classCode, $assessmentID, $studentID)
+    {
         if (!$this->isExternalIdValid($studentID)) {
             return false;
         }
