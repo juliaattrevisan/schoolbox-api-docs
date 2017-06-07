@@ -135,6 +135,10 @@ abstract class Base implements IBroker
 
         } catch (PDOException $e) {
 
+            // Need to restore timeout both here and in normal control flow
+
+            ini_set('default_socket_timeout', $defaultSocketTimeout);
+
             // Something went wrong during connection
 
             throw new DatabaseException("Error connecting to database.\nDSN String: {$this->getDsn()}\nPDO Error: {$e->getMessage()}");
