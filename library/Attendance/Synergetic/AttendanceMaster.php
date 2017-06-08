@@ -1,4 +1,4 @@
-x<?php
+<?php
 
 /**
  * Attendance_Synergetic_AttendanceMaster
@@ -106,7 +106,10 @@ class Attendance_Synergetic_AttendanceMaster
         $result = $statement->execute();
         $statement->nextRowset();
 
-        if ($result && !empty($attendanceMasterSeq)) {
+        // Don't know if all these are required. But it is possible for the query to return an unknown
+        // value for AttendanceMasterSeq due to an error handler in the stored procedure.
+
+        if ($result && !empty($attendanceMasterSeq) && is_numeric($attendanceMasterSeq) && $attendanceMasterSeq > 0) {
             $this->setAttendanceMasterSeq($attendanceMasterSeq);
         } else {
             throw new SchoolboxException('Cannot setup attendance record. Unable to retrieve attendance sequence.');
