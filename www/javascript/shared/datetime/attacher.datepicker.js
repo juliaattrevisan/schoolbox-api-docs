@@ -19,7 +19,20 @@
 
             if ($dateinput.attr('data-datepicker-id') === undefined) {
 
-                $dateinput.alaressDateTimePicker();
+                var staller = null;
+
+                if ($dateinput.closest('[data-mage]').length) {
+                    // find the submit button and use that to stall
+                    staller = $dateinput.closest('[data-mage]').find('[data-mage-next]');
+
+                } else if ($dateinput.closest('form').length) {
+                    // use the form itself as the stall target
+                    staller = $dateinput.closest('form');
+                }
+
+                $dateinput.alaressDateTimePicker({
+                    staller: staller
+                });
 
             }
         });
