@@ -22,10 +22,7 @@ class Storage extends BaseTransformation
                 'args' => array(
                     'width' => 32,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'square64' => array(
             array(
@@ -33,10 +30,7 @@ class Storage extends BaseTransformation
                 'args' => array(
                     'width' => 64,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'square128' => array(
             array(
@@ -44,10 +38,7 @@ class Storage extends BaseTransformation
                 'args' => array(
                     'width' => 128,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'square200' => array(
             array(
@@ -55,10 +46,7 @@ class Storage extends BaseTransformation
                 'args' => array(
                     'width' => 200,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'constrain200' => array(
             array(
@@ -67,10 +55,7 @@ class Storage extends BaseTransformation
                     'width' => 200,
                     'height' => 300
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'rectangle' => array(
             array(
@@ -79,10 +64,7 @@ class Storage extends BaseTransformation
                     'width' => 140,
                     'height' => 50
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'maxsize' => array(
             array(
@@ -90,9 +72,6 @@ class Storage extends BaseTransformation
                 'args' => array(
                     'width' => 2048,
                     'height' => 2048
-                ),
-                array(
-                    'method' => 'Sharpen'
                 )
             )
         ),
@@ -104,9 +83,6 @@ class Storage extends BaseTransformation
                 'args' => array(
                     'width' => 2000,
                     'height' => 452
-                ),
-                array(
-                    'method' => 'Sharpen'
                 )
             )
         ),
@@ -119,10 +95,7 @@ class Storage extends BaseTransformation
                     'width' => 300,
                     'height' => 300,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* ePortfolio Image Gallery list needs to be a square
@@ -134,10 +107,7 @@ class Storage extends BaseTransformation
                     'width' => 80,
                     'height' => 80,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* ePortfolio Image Gallery can probably be lightboxed
@@ -149,10 +119,7 @@ class Storage extends BaseTransformation
                     'width' => 800,
                     'height' => 800,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* Card images are 2:1 ratio.  So this is used on class card */
@@ -163,10 +130,7 @@ class Storage extends BaseTransformation
                     'width' => 800,
                     'height' => 400,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* Card images are 2:1 ratio.  So this is used on class card */
@@ -177,10 +141,7 @@ class Storage extends BaseTransformation
                     'width' => 200,
                     'height' => 100,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* Test to find out whether Constrain skipped canvas creation

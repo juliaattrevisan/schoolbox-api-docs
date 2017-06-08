@@ -27,10 +27,7 @@ class DefaultTransformation extends BaseTransformation
                     'width' => 300,
                     'height' => 300,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* These are the lightboxed images that appear when viewing images
@@ -43,10 +40,7 @@ class DefaultTransformation extends BaseTransformation
                     'width' => 800,
                     'height' => 600,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* Test sequence
@@ -71,10 +65,7 @@ class DefaultTransformation extends BaseTransformation
                         'blue' => 255,
                     )
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* Half Canvas
@@ -99,10 +90,7 @@ class DefaultTransformation extends BaseTransformation
                         'blue' => 255,
                     )
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* Top Third
@@ -125,10 +113,7 @@ class DefaultTransformation extends BaseTransformation
                     'width' => 350,
                     'height' => 350,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
 
         /* StretchyButtons
@@ -157,10 +142,7 @@ class DefaultTransformation extends BaseTransformation
                     'middle' => './img/temp/middle.png',
                     'right' => './img/temp/right.png'
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         )
     );
 }

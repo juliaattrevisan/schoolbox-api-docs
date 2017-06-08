@@ -22,10 +22,7 @@ class Portrait extends BaseTransformation
                 'args' => array(
                     'width' => 32,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'square48' => array(
             array(
@@ -33,10 +30,7 @@ class Portrait extends BaseTransformation
                 'args' => array(
                     'width' => 48,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'square64' => array(
             array(
@@ -44,10 +38,7 @@ class Portrait extends BaseTransformation
                 'args' => array(
                     'width' => 64,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'square80' => array(
             array(
@@ -55,10 +46,7 @@ class Portrait extends BaseTransformation
                 'args' => array(
                     'width' => 80,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'constrain128' => array(
             array(
@@ -67,10 +55,7 @@ class Portrait extends BaseTransformation
                     'width' => 128,
                     'height' => 400
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'square200' => array(
             array(
@@ -78,10 +63,7 @@ class Portrait extends BaseTransformation
                 'args' => array(
                     'width' => 200,
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'constrain200' => array(
             array(
@@ -90,10 +72,7 @@ class Portrait extends BaseTransformation
                     'width' => 200,
                     'height' => 300
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'constrain64' => array(
             array(
@@ -102,10 +81,7 @@ class Portrait extends BaseTransformation
                     'width' => 64,
                     'height' => 96
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'profile' => array(
             array(
@@ -114,10 +90,7 @@ class Portrait extends BaseTransformation
                     'width' => 250,
                     'height' => 300
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
         'rectangle' => array(
             array(
@@ -126,10 +99,7 @@ class Portrait extends BaseTransformation
                     'width' => 140,
                     'height' => 50
                 )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
+            )
         ),
     );
 }
