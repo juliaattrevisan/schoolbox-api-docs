@@ -278,7 +278,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Build cycles dynamically
      */
     function buildCycles(term) {
-
+        // TODO: needs refactoring and logic dedupe
         var selectedCampus = 'campus_' + timetable.campus.find(':selected').val(),
             daysInCycle = timetable.campus.find(':selected').attr('data-days'),
             termDuration = timetable.term.find(':selected').attr('data-duration'),
@@ -1104,12 +1104,10 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     /**
      * Select the values for campus, term, cycle, date that refer to the selected date
-     *
-     * @param date
      */
 
     function selectLockedValues() {
-        igitf(timetable.submit.attr('data-timetable-campus') > 0) {
+        if(timetable.submit.attr('data-timetable-campus') > 0) {
             timetable.campus.val(timetable.submit.attr('data-timetable-campus'));
         }
 
@@ -1117,10 +1115,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             timetable.term.val(timetable.submit.attr('data-timetable-term'));
         }
 
-        if(timetable.submit.attr('data-timetable-cycle') > 0) {
-        }
+        buildCycles();
 
-        if(timetable.submit.attr('data-timetable-day') > 0) {
+        if(timetable.submit.attr('data-timetable-value').length > 0) {
+            $byTimetable.find('[data-date]').removeClass('selected');
+            $byTimetable.find('[data-date=' + timetable.submit.attr('data-timetable-value') + ']').addClass('selected');
         }
 
     }
