@@ -193,6 +193,9 @@ blockquote{
 // Deleted or struck out content
 .strike, .del {
     text-decoration: line-through;
+	&[disabled] {
+		color: $aluminum;
+	}
 }
 
 // Typically descriptive text

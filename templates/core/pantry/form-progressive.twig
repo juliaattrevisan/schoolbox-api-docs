@@ -1,9 +1,3 @@
-<style>
-    a[disabled] {
-        color: #999;
-        text-decoration: line-through;
-    }
-</style>
 <div class="row">
     <div class="small-12 island">
         <h1>Pantry - Progressive Form</h1>
@@ -258,7 +252,7 @@
             var $link = $(this);
 
             var d = $.Deferred().done(function () {
-                $link.removeAttr('href').attr('disabled', true);
+                $link.removeAttr('href').addClass('strike').attr('disabled', true);
             });
 
             $link.one('click', function () {
