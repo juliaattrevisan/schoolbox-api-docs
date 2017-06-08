@@ -24,19 +24,7 @@ class Sharpen extends BaseStrategy
      */
     public function manipulate($image)
     {
-        $image->effects()->convolve(
-            new ConvolutionMatrix(
-                -0.2,
-                -1,
-                -0.2,
-                -1,
-                15,
-                -1,
-                -0.2,
-                -1,
-                -0.2
-            )
-        );
+        $image->effects()->sharpen();
         return $image;
     }
 }
