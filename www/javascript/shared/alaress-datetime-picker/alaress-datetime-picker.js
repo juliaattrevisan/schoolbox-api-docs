@@ -80,7 +80,8 @@ function getOptions(element) {
         altFormat: getValue(element, 'data-datepicker-format'), // false|date|datetime
         type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
         endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
-        endPeriod: getValue(element, 'data-datepicker-endofperiod')// It will use end of the period to set time through timetable picker
+        endPeriod: getValue(element, 'data-datepicker-endofperiod'), // It will use end of the period to set time through timetable picker
+        staller: null
     };
     return elementOptions;
 }
@@ -224,9 +225,10 @@ function checkAllDaySwitch(state, pickerId) {
  * This uses an AJAX call to /ajax/strtotime.php, which uses method strtotime()
  * to convert the input's value to a recognisable date value.
  *
- * @param e a jQuery event
+ * @param {jQuery.Event} e       a jQuery event
+ * @param {jQuery}       staller if given, the element to attach the AJAX promise to
  */
-function massageDateValue(e) {
+function massageDateValue(e, staller) {
     var t = e.target;
 
     if ($.trim($(t).val()) != '') {
@@ -240,7 +242,14 @@ function massageDateValue(e) {
             string: t.value
         };
 
-        $.get('/ajax/strtotime.php', params, function (data) {
+        var xhr = $.get('/ajax/strtotime.php', params);
+
+        if (staller) {
+            // install this XHR as stalling form submit
+            staller.stallSubmit(xhr);
+        }
+
+        xhr.done(function (data) {
 
             var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
 
@@ -400,7 +409,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     });
 
     element
-        .on('blur', massageDateValue)
+        .on('blur', function (e) {
+            massageDateValue(e, options.staller);
+        })
         .on('focus', function() {
             // Temporarily disable JS validation on this field so that it doesn't harass the user that
             // things like 'today' aren't valid dates
