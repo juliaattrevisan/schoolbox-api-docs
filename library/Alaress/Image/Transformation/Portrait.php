@@ -7,99 +7,98 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Transformation;
 
 class Portrait extends BaseTransformation
 {
-
-    protected $allTransformations = array(
-        'square32' => array(
-            array(
+    /** @var array $allTransformations */
+    protected $allTransformations = [
+        'square32' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 32,
-                )
-            )
-        ),
-        'square48' => array(
-            array(
+                ]
+            ]
+        ],
+        'square48' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 48,
-                )
-            )
-        ),
-        'square64' => array(
-            array(
+                ]
+            ]
+        ],
+        'square64' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 64,
-                )
-            )
-        ),
-        'square80' => array(
-            array(
+                ]
+            ]
+        ],
+        'square80' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 80,
-                )
-            )
-        ),
-        'constrain128' => array(
-            array(
+                ]
+            ]
+        ],
+        'constrain128' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 128,
                     'height' => 400
-                )
-            )
-        ),
-        'square200' => array(
-            array(
+                ]
+            ]
+        ],
+        'square200' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 200,
-                )
-            )
-        ),
-        'constrain200' => array(
-            array(
+                ]
+            ]
+        ],
+        'constrain200' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 200,
                     'height' => 300
-                )
-            )
-        ),
-        'constrain64' => array(
-            array(
+                ]
+            ]
+        ],
+        'constrain64' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 64,
                     'height' => 96
-                )
-            )
-        ),
-        'profile' => array(
-            array(
+                ]
+            ]
+        ],
+        'profile' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 250,
                     'height' => 300
-                )
-            )
-        ),
-        'rectangle' => array(
-            array(
+                ]
+            ]
+        ],
+        'rectangle' => [
+            [
                 'method' => 'Rectangle',
-                'args' => array(
+                'args' => [
                     'width' => 140,
                     'height' => 50
-                )
-            )
-        ),
-    );
+                ]
+            ]
+        ],
+    ];
 }

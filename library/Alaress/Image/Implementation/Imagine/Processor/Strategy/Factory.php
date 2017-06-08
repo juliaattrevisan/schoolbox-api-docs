@@ -44,7 +44,7 @@ class Factory implements FactoryInterface
                 return new Square($strategyArgs, $imageManager);
             default:
                 $strategyName = '\\Alaress\\Image\\Rewrite\\Imagine\\Processor\\Strategy\\' . $strategy;
-                $processor    = new $strategyName($strategyArgs, $imageManager);
+                $processor = new $strategyName($strategyArgs, $imageManager);
                 return $processor;
         }
     }

@@ -4,117 +4,116 @@
  *
  * A list of all the transformations used throughout the site
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
  */
 
 namespace Alaress\Image\Transformation;
 
 class DefaultTransformation extends BaseTransformation
 {
-
-    protected $allTransformations = array(
+    /** @var array $allTransformations */
+    protected $allTransformations = [
 
         /* These are the preview images that display when you add images to
 		 * a cms page via the tinyMCE
 		 */
-        'AdminPreview' => array(
-            array(
+        'AdminPreview' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 300,
                     'height' => 300,
-                )
-            )
-        ),
+                ]
+            ]
+        ],
 
         /* These are the lightboxed images that appear when viewing images
 		 * from the asset browser
 		 */
-        'AdminGallery' => array(
-            array(
+        'AdminGallery' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 800,
                     'height' => 600,
-                )
-            )
-        ),
+                ]
+            ]
+        ],
 
         /* Test sequence
 		 */
-        'Foxtrot' => array(
-            array(
+        'Foxtrot' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 800,
                     'height' => 830,
-                )
-            ),
-            array(
+                ]
+            ],
+            [
                 'method' => 'Placement',
-                'args' => array(
+                'args' => [
                     'width' => 900,
                     'height' => 900,
                     'position' => 'middle',
-                    'bgcolor' => array(
+                    'bgcolor' => [
                         'red' => 155,
                         'green' => 155,
                         'blue' => 255,
-                    )
-                )
-            )
-        ),
+                    ]
+                ]
+            ]
+        ],
 
         /* Half Canvas
 		 */
-        'HalfCanvas' => array(
-            array(
+        'HalfCanvas' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 200,
                     'height' => 200,
-                )
-            ),
-            array(
+                ]
+            ],
+            [
                 'method' => 'Placement',
-                'args' => array(
+                'args' => [
                     'width' => 400,
                     'height' => 400,
                     'position' => 'left',
-                    'bgcolor' => array(
+                    'bgcolor' => [
                         'red' => 80,
                         'green' => 128,
                         'blue' => 255,
-                    )
-                )
-            )
-        ),
+                    ]
+                ]
+            ]
+        ],
 
         /* Top Third
 		 */
-        'TopThird' => array(
-            array(
+        'TopThird' => [
+            [
                 'method' => 'Crop',
-                'args' => array(
-                    'coordinates' => array(
+                'args' => [
+                    'coordinates' => [
                         'x0' => 20,
                         'y0' => 0,
                         'x1' => 80,
                         'y1' => 66,
-                    )
-                )
-            ),
-            array(
+                    ]
+                ]
+            ],
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 350,
                     'height' => 350,
-                )
-            )
-        ),
+                ]
+            ]
+        ],
 
         /* StretchyButtons
 		 * Caveat: Only understands png files
@@ -126,23 +125,23 @@ class DefaultTransformation extends BaseTransformation
 		 * If you need to change the dimensions you should add a Constrain
 		 * transformation after you've constructed the button image
 		 */
-        'StretchyButton' => array(
-            array(
+        'StretchyButton' => [
+            [
                 'method' => 'Placement',
-                'args' => array(
+                'args' => [
                     'width' => 2012,
                     'height' => 52,
                     'position' => 'middle',
-                )
-            ),
-            array(
+                ]
+            ],
+            [
                 'method' => 'StretchyButton',
-                'args' => array(
+                'args' => [
                     'left' => './img/temp/left.png',
                     'middle' => './img/temp/middle.png',
                     'right' => './img/temp/right.png'
-                )
-            )
-        )
-    );
+                ]
+            ]
+        ]
+    ];
 }
