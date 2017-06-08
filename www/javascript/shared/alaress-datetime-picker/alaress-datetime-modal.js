@@ -127,7 +127,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             // Load events
             requestDataByDay($(this));
-            lockValues();
+            lockValues($(this).attr('data-date'));
 
         });
 
@@ -1067,21 +1067,21 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      *
      * @param date
      */
-    function lockValues() {
+    function lockValues(date) {
 
-        var date = moment(timetable.submit.attr('data-timetable-value')).format(momentFormats.databaseShort);
-            selectedCampus = timetable.campus.val(),
+        var selectedCampus = timetable.campus.val(),
             selectedTerm = timetable.term.val(),
-            selectedCycle = $byTimetable.find('[data-parent-term="' + selectedTerm + '"]').not('.hide').attr('data-adtp-tt-cycle'),
-            selectedDay = $byTimetable.find('[data-date=' + date + ']').attr('data-tt-day');
+            selectedCycle = $byTimetable.find('[data-parent-term="' + selectedTerm + '"]').not('.hide').attr('data-adtp-tt-cycle');
 
         timetable.submit.attr('data-timetable-campus', selectedCampus);
         timetable.submit.attr('data-timetable-term', selectedTerm);
         timetable.submit.attr('data-timetable-cycle', selectedCycle);
-        timetable.submit.attr('data-timetable-day', selectedDay);
 
-        // Update the date data attr on the submit button
-        timetable.submit.attr('data-timetable-value', date);
+        if (date) {
+            // Update the date data attr on the submit button
+            timetable.submit.attr('data-timetable-value', date);
+        }
+
     }
 
     /**
