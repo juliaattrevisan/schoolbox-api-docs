@@ -110,6 +110,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // Update the selected date
             $(this).closest('[data-adtp]').find('[data-tt-selected-date]').text(selectedDate);
 
+            // Unhide the event calendar (in the case it was hidden via expanding due work)
+            $('#timetableResponse' + twigVars.id + '-events').removeClass('hide');
+
             // Load events
             requestDataByDay($(this));
 
@@ -203,6 +206,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 }
                 latestDate = newDate;
             }
+
+            // Unhide the event calendar (in the case it was hidden via expanding due work)
+            $('#calendarResponse' + twigVars.id + '-events').removeClass('hide');
         },
         onMonthChange: function(selectedDates, dateStr, instance) {
             var mo = instance.currentMonth + 1,
@@ -649,8 +655,16 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             // the div is hidden - render it when it comes into view
             if ($calendarDiv.not(':visible')) {
-                // `one`, not `on`
-                $('#picker'+twigVars.id).find('[data-tab]').one('click', ':not(.active)', function () {
+
+                // If it was hidden because the tab wasn't open
+                $('#picker'+twigVars.id).find('[data-tab]').one('click', ':not(.active)', function () { // purposefully `one`, not `on`
+                    setTimeout(function () {
+                        $calendarDiv.fullCalendar('render');
+                    }, 80);
+                });
+
+                // If it was hidden because the full due work list was expanded (quickly before the calendar loaded)
+                $pickerResponse.find('[data-hide-full-due]').one('click', function() {  // purposefully `one`, not `on`
                     setTimeout(function () {
                         $calendarDiv.fullCalendar('render');
                     }, 80);
