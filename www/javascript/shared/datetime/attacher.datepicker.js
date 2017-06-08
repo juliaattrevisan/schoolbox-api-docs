@@ -26,8 +26,8 @@ function attachAlaressDatePicker() {
         var staller = null;
 
         if ($dateinput.closest('[data-mage]').length) {
-            // find the submit button and use that to stall
-            staller = $dateinput.closest('[data-mage]').find('[data-mage-next]');
+            // find the submit button and use that to stall (and init if not already)
+            staller = $dateinput.closest('[data-mage]').find('[data-mage-next]').stallSubmit({ event:'click' });
 
         } else if ($dateinput.closest('form').length) {
             // use the form itself as the stall target
