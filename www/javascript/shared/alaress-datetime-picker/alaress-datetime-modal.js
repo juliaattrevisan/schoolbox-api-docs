@@ -37,7 +37,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             if(responseDate.diff(inputDate)) {
                 resetTerms();
                 resetCycles();
-                resetTimetable(inputDate);
+                resetDays(inputDate);
                 requestDataByDate(inputDate.format('YYYY-MM-DD'), 'timetable');
             }
             else {
@@ -60,7 +60,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         buildCycles();
         revealTimetable();
-        resetTimetable();
+        resetDays();
 
         // On first load request data by date for the timetable
         requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'timetable');
@@ -73,7 +73,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             var selectedCampus = $(this).val();
 
             buildCycles();
-            resetTimetable();
+            resetDays();
             revealTimetable();
 
             // Show the correct days for the selected campus, hide others
@@ -104,7 +104,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Listen for changes to term
         timetable.term.change(function() {
             buildCycles();
-            resetTimetable();
+            resetDays();
         });
 
         // Attach week cycle functionality to prev & next buttons
@@ -118,14 +118,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Selecting a day
         $byTimetable.on('click', '[data-tt-day]:not(.disabled)', function() {
 
-            var selectedDate = moment($(this).attr('data-date')).format('dddd, MMM D, Y');
-
-            // Add selected class & remove others with the class
-            $(this).parents('.day-picker').find('[data-tt-day]').removeClass('selected');
-            $(this).addClass('selected');
-
-            // Update the selected date
-            $(this).closest('[data-adtp]').find('[data-tt-selected-date]').text(selectedDate);
+            resetDays($(this).attr('data-date'));
 
             // Unhide the event calendar (in the case it was hidden via expanding due work)
             $('#timetableResponse' + twigVars.id + '-events').removeClass('hide');
@@ -417,7 +410,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Reset the timetable day selectors
      * Only show selected day as active
      */
-    function resetTimetable(date) {
+    function resetDays(date) {
 
         var selectedDate = moment(date ? date : timetable.submit.attr('data-timetable-value')); // The currently selected date
 
@@ -425,13 +418,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
 
         // Loop through cycle days and check if currently set date matches
-        $byTimetable.find('[data-tt-day]').each(function() {
-            if (selectedDate.format('YYYY-MM-DD') == $(this).attr('data-date')) {
-                $(this).addClass('selected');
-                // Update the selected date text
-                $byTimetable.find('[data-tt-selected-date]').text(selectedDate.format('dddd, MMM D, Y'));
-            }
-        });
+        $byTimetable.find('[data-date=' + selectedDate.format('YYYY-MM-DD') + ']').addClass('selected');
+        $byTimetable.find('[data-tt-selected-date]').text(selectedDate.format('dddd, MMM D, Y'));
 
     }
 
@@ -766,7 +754,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $newCycle.removeClass('hide');
 
             addDatesToDays();
-            resetTimetable();
+            resetDays();
 
         }
     }
@@ -1117,10 +1105,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         buildCycles();
 
-        if(timetable.submit.attr('data-timetable-value').length > 0) {
-            $byTimetable.find('[data-date]').removeClass('selected');
-            $byTimetable.find('[data-date=' + timetable.submit.attr('data-timetable-value') + ']').addClass('selected');
-        }
+        resetDays();
 
     }
 
