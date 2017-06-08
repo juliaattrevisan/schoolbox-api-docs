@@ -30,7 +30,7 @@
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postUpdateAssessment', {assessmentId: assessment.id, assessment: assessment}) }}" id="assessmentForm" method="post">
             <section>
-                <fieldset class="content">
+                <fieldset class="content" data-mage>
                     <div class="small-12 columns">
                         <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                         <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
