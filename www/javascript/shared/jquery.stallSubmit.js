@@ -23,18 +23,20 @@
         setOptions.call(this, options);
 
         // register the listener
-        $(this.element).on(this.options.event, function (e) {
-            if (e.namespace && e.namespace == pluginName) {
+        $(this.element).on(this.options.event, function (e, shortCircuit) {
+
+            if (shortCircuit === pluginName) {
                 // allow the event to occur
                 return true;
             }
 
             // there are unresolved deferreds: do not event yet
             e.preventDefault();
+            e.stopPropagation();
 
             $.when.apply(window, staller.getDeferreds()).done(function () {
                 // ok *now* you may event
-                $(staller.element).trigger(staller.options.event + '.' + pluginName);
+                $(staller.element).trigger(staller.options.event, [ pluginName ]);
             });
         });
     }
