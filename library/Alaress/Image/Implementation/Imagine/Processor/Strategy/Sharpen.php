@@ -7,12 +7,10 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
 
-use Imagine\Image\Effects\ConvolutionMatrix;
 use Imagine\Image\ImageInterface;
 
 class Sharpen extends BaseStrategy
@@ -20,7 +18,7 @@ class Sharpen extends BaseStrategy
     /**
      * {@inheritdoc}
      *
-     * @var ImageInterface $image
+     * @param ImageInterface $image
      */
     public function manipulate($image)
     {
