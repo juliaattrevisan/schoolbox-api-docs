@@ -78,7 +78,10 @@
         $('[data-mage-trainstop=' + this.thisPart + '] a').off('click', onrevert).on('click', onrevert);
 
         // prevent submissions on click and prevent double-listen
-        $elem.off('click', onclick).on('click', onclick);
+        // this is delegated so stallSubmit can do its job where required
+        $form
+            .off('click', '[name=' + this.thisPart + ']', onclick)
+            .on('click',  '[name=' + this.thisPart + ']', onclick);
     }
 
 
