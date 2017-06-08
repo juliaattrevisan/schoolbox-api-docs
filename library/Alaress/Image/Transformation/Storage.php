@@ -7,193 +7,153 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Transformation;
 
 class Storage extends BaseTransformation
 {
-
-    protected $allTransformations = array(
-        'square32' => array(
-            array(
+    /** @var array $allTransformations */
+    protected $allTransformations = [
+        'square32' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 32,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
-        'square64' => array(
-            array(
+                ]
+            ]
+        ],
+        'square64' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 64,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
-        'square128' => array(
-            array(
+                ]
+            ]
+        ],
+        'square128' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 128,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
-        'square200' => array(
-            array(
+                ]
+            ]
+        ],
+        'square200' => [
+            [
                 'method' => 'Square',
-                'args' => array(
+                'args' => [
                     'width' => 200,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
-        'constrain200' => array(
-            array(
+                ]
+            ]
+        ],
+        'constrain200' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 200,
                     'height' => 300
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
-        'rectangle' => array(
-            array(
+                ]
+            ]
+        ],
+        'rectangle' => [
+            [
                 'method' => 'Rectangle',
-                'args' => array(
+                'args' => [
                     'width' => 140,
                     'height' => 50
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
-        'maxsize' => array(
-            array(
+                ]
+            ]
+        ],
+        'maxsize' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 2048,
                     'height' => 2048
-                ),
-                array(
-                    'method' => 'Sharpen'
-                )
-            )
-        ),
+                ]
+            ]
+        ],
         /* The huge cover photo on the ePortfolio Profile page
 		 */
-        'eportfolioCoverPhoto' => array(
-            array(
+        'eportfolioCoverPhoto' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 2000,
                     'height' => 452
-                ),
-                array(
-                    'method' => 'Sharpen'
-                )
-            )
-        ),
+                ]
+            ]
+        ],
         /* ePortfolio Recent Photo list needs to be a square
 		 */
-        'eportfolioRecentPhoto' => array(
-            array(
+        'eportfolioRecentPhoto' => [
+            [
                 'method' => 'Rectangle',
-                'args' => array(
+                'args' => [
                     'width' => 300,
                     'height' => 300,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
+                ]
+            ]
+        ],
 
         /* ePortfolio Image Gallery list needs to be a square
 		 */
-        'eportfolioImageGalleryThumbnail' => array(
-            array(
+        'eportfolioImageGalleryThumbnail' => [
+            [
                 'method' => 'Rectangle',
-                'args' => array(
+                'args' => [
                     'width' => 80,
                     'height' => 80,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
+                ]
+            ]
+        ],
 
         /* ePortfolio Image Gallery can probably be lightboxed
 		 */
-        'eportfolioImageGalleryLarge' => array(
-            array(
+        'eportfolioImageGalleryLarge' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 800,
                     'height' => 800,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
+                ]
+            ]
+        ],
 
         /* Card images are 2:1 ratio.  So this is used on class card */
-        'cardImageLarge' => array(
-            array(
+        'cardImageLarge' => [
+            [
                 'method' => 'Rectangle',
-                'args' => array(
+                'args' => [
                     'width' => 800,
                     'height' => 400,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
+                ]
+            ]
+        ],
 
         /* Card images are 2:1 ratio.  So this is used on class card */
-        'cardImageSmall' => array(
-            array(
+        'cardImageSmall' => [
+            [
                 'method' => 'Rectangle',
-                'args' => array(
+                'args' => [
                     'width' => 200,
                     'height' => 100,
-                )
-            ),
-            array(
-                'method' => 'Sharpen'
-            ),
-        ),
+                ]
+            ]
+        ],
 
         /* Test to find out whether Constrain skipped canvas creation
 		 * when resultant image dimension was the same as the original
 		 */
-        'cacheTest' => array(
-            array(
+        'cacheTest' => [
+            [
                 'method' => 'Constrain',
-                'args' => array(
+                'args' => [
                     'width' => 247,
                     'height' => 204,
-                )
-            )
-        ),
-    );
+                ]
+            ]
+        ],
+    ];
 }
