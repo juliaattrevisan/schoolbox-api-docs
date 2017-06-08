@@ -30,21 +30,23 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     var heatCache = {};
 
     $(document).on('opened.fndtn.reveal', '#picker' + twigVars.id, function () {
-        var inputDate = moment(getPickerValue(twigVars.id), 'YYYY-MM-DD');
+
+        var inputDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort);
 
         if(twigVars.timetable && $('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value') !== undefined) {
-            var responseDate = moment(($('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value')), 'YYYY-MM-DD');
+            var responseDate = moment(($('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value')), momentFormats.databaseShort);
             if(responseDate.diff(inputDate)) {
                 resetTerms();
                 resetCycles();
-                resetDays(inputDate);
-                requestDataByDate(inputDate.format('YYYY-MM-DD'), 'timetable');
+                resetDays(inputDate.format(momentFormats.databaseShort));
+                requestDataByDate(inputDate.format(momentFormats.databaseShort), 'timetable');
             }
             else {
                 selectLockedValues();
-                requestDataByDate(inputDate.format('YYYY-MM-DD'), 'timetable');
+                requestDataByDate(inputDate.format(momentFormats.databaseShort), 'timetable');
             }
         }
+
     });
 
     // Timetable picker
@@ -303,7 +305,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                     hideClass = '';
                 }
 
-                optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + index + '" data-cycle-start="' + startDate.format('YYYY-MM-DD') + '" data-cycle-end="' + endDate.format('YYYY-MM-DD') + '" data-parent-term="' + selectedTerm + '">';
+                optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + index + '" data-cycle-start="' + startDate.format(momentFormats.databaseShort) + '" data-cycle-end="' + endDate.format(momentFormats.databaseShort) + '" data-parent-term="' + selectedTerm + '">';
                 optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Week</span> ' + index + '</div>';
                 optionsHtml += '<div class="adtp-tt-week-date">' + startDate.format('MMM D') + ' - ' + endDate.format('MMM D') + '</div>';
                 optionsHtml += '</div>';
@@ -333,12 +335,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Update selected term
      */
     function resetTerms() {
-        var inputDate = moment(getPickerValue(twigVars.id), 'YYYY-MM-DD');
+        var inputDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort);
         // Hide all terms
         timetable.term.val([]);
         timetable.term.find('option').each(function(){
-            var termStart = moment($(this).attr('data-start-date'), 'YYYY-MM-DD'),
-                termEnd = moment($(this).attr('data-end-date'), 'YYYY-MM-DD');
+            var termStart = moment($(this).attr('data-start-date'), momentFormats.databaseShort),
+                termEnd = moment($(this).attr('data-end-date'), momentFormats.databaseShort);
 
             if (inputDate.isBetween(termStart, termEnd)) {
                 $(this).prop('selected', true);
@@ -350,7 +352,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Update selected cycle
      */
     function resetCycles() {
-        var inputDate = moment(getPickerValue(twigVars.id), 'YYYY-MM-DD'),
+        var inputDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
             activeTerm =  timetable.term.find('option:selected').val();
 
         buildCycles(activeTerm);
@@ -358,8 +360,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         $byTimetable.find('[data-parent-term="' + activeTerm + '"]').each(function() {
 
             $(this).addClass('hide');
-            var cycleStart = moment($(this).attr('data-cycle-start'), 'YYYY-MM-DD'),
-                cycleEnd = moment($(this).attr('data-cycle-end'), 'YYYY-MM-DD');
+            var cycleStart = moment($(this).attr('data-cycle-start'), momentFormats.databaseShort),
+                cycleEnd = moment($(this).attr('data-cycle-end'), momentFormats.databaseShort);
 
             if (inputDate.isBetween(cycleStart, cycleEnd)) {
                 $(this).removeClass('hide');
@@ -418,8 +420,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         var selectedDate = moment(date ? date : timetable.submit.attr('data-timetable-value')); // The currently selected date
 
-        $byTimetable.find('[data-date=' + selectedDate.format('YYYY-MM-DD') + ']').addClass('selected');
-        $byTimetable.find('[data-tt-selected-date]').text(selectedDate.format('dddd, MMM D, Y'));
+        $byTimetable.find('[data-date=' + selectedDate.format(momentFormats.databaseShort) + ']').addClass('selected');
+        $byTimetable.find('[data-tt-selected-date]').text(selectedDate.format(momentFormats.nice));
 
     }
 
@@ -565,7 +567,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         var $pickerResponse = $('#' + target + 'Response' + twigVars.id); // The event container
         var $pickerResponseDueWork = $('#' + target + 'Response' + twigVars.id + '-duework');
         var $pickerResponseEvents = $('#' + target + 'Response' + twigVars.id + '-events');
-        var displayDate = moment(data.date).format('MMMM DD, YYYY'); // The selected date in a nice format
+        var displayDate = moment(data.date).format(momentFormats.nice); // The selected date in a nice format
         var html = '';
 
         // Clear out any old response display
@@ -765,7 +767,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function addDatesToDays() {
         iterateVisibleTimetableDays(
             function (dayMoment) {
-                $(this).attr('data-date', dayMoment.format('YYYY-MM-DD')).removeClass('disabled');
+                $(this).attr('data-date', dayMoment.format(momentFormats.databaseShort)).removeClass('disabled');
             },
             function () {
                 $(this).removeAttr('data-date').addClass('disabled');
@@ -1067,7 +1069,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function lockValues() {
 
-        var date = moment(timetable.submit.attr('data-timetable-value')).format('YYYY-MM-DD');
+        var date = moment(timetable.submit.attr('data-timetable-value')).format(momentFormats.databaseShort);
             selectedCampus = timetable.campus.val(),
             selectedTerm = timetable.term.val(),
             selectedCycle = $byTimetable.find('[data-parent-term="' + selectedTerm + '"]').not('.hide').attr('data-adtp-tt-cycle'),

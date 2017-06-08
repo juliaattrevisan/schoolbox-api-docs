@@ -39,7 +39,11 @@ convertFormat = function (format) {
     });
 };
 
-var databaseFormatMoment = 'YYYY-MM-DD HH:mm:ss';
+var momentFormats = {
+        database: 'YYYY-MM-DD HH:mm:ss',
+        databaseShort: 'YYYY-MM-DD',
+        nice: 'dddd, MMM D, Y'
+    };
 
 //Use global counter in case multiple alaressDateTimePicker() have been called from one page
 
@@ -189,7 +193,7 @@ function setValue(element, options, state, trigger, date) {
         element.val(v);
     }
 
-    setPickerValue(pId, value.format(databaseFormatMoment));
+    setPickerValue(pId, value.format(momentFormats.database));
 
     if (trigger === true) {
         element.trigger('change');
@@ -415,7 +419,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
     $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" data-datepicker-value class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
 
-    setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)).format(databaseFormatMoment));
+    setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)).format(momentFormats.database));
 
     getPickerValue(pickerId);
 
@@ -475,7 +479,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format(databaseFormatMoment)), function () {
+            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format(momentFormats.database)), function () {
 
                 // Capture open of modal
                 $(document).on('opened.fndtn.reveal', '#adtp-modal-' + pickerId, function () {
