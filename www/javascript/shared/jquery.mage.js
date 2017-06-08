@@ -48,7 +48,10 @@
         }
 
         // wrap the interceptor so we can clear and reset it for overloading
-        var onclick = function (e) { clickIntercept(e, self, $elem, $form); };
+        var onclick = function (e) {
+            e.preventDefault();
+            submitSection(self, $elem, $form);
+        };
 
         var onrevert = function (e) {
             e.preventDefault();
@@ -293,14 +296,13 @@
     }
 
     /**
+     * Perform submission of this section of the form
      *
-     * @param {event} e
      * @param {Mage} self
      * @param {jQuery} elem
      * @param {jQuery} [form] optional
      */
-    function clickIntercept(e, self, elem, form) {
-        e.preventDefault();
+    function submitSection(self, elem, form) {
 
         // destroy any existing alaressValidate options
         $(form).removeData('validator');
@@ -558,7 +560,7 @@
      * call event handlers.
      *
      * (Mage does in order to call validation handlers manually, because it
-     *  needs the result from all of them - see clickIntercept)
+     *  needs the result from all of them - see submitSection)
      *
      * @param target
      * @param event
