@@ -101,9 +101,7 @@ Usages:
         {# Init stage 3 mage #}
         var initStage3 = function() {
 
-            $('[data-datepicker]').each(function() {
-                $(this).alaressDateTimePicker();
-            });
+            $('[data-datepicker]').each(attachAlaressDatePicker);
 
             var stageThree = $('input[data-mage-next="part-assessments-select"]');
 
@@ -153,9 +151,7 @@ Usages:
         var initStage4 = function(){
 
             {# Init stage 4 mage #}
-            $('[data-datepicker]').each(function() {
-                $(this).alaressDateTimePicker();
-            });
+            $('[data-datepicker]').each(attachAlaressDatePicker);
 
             var stageFour = $('input[data-mage-next="part-results-select"]');
 
