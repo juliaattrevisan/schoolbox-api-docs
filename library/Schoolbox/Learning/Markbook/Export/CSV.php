@@ -318,7 +318,7 @@ class CSV implements IExporter
      */
     private function parseNumerator($humanReadableMark)
     {
-        if(preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $humanReadableMark, $markParts)){
+        if(preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)){
             return $markParts[1];
         }
         return null;
@@ -332,7 +332,7 @@ class CSV implements IExporter
      */
     private function parseDenominator($humanReadableMark)
     {
-        if(preg_match('/(\\d+)\\s*\\/\\s*(\\d+)/', $humanReadableMark, $markParts)){
+        if(preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)){
             return $markParts[2];
         }
         return null;
