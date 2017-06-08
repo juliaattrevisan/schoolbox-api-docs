@@ -248,7 +248,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         // Build an All Day switch if it's been set in the options
         if (pickerOptions.allDaySwitch === true) {
-            html += '<div class="time-switch"><input id="hideTime' + twigVars.id + '" type="checkbox" value="1" checked>' +
+            html += '<div class="time-switch" data-adtp-calendar-allday><input id="hideTime' + twigVars.id + '" type="checkbox" value="1" checked>' +
                 '<label for="hideTime' + twigVars.id + '" class="checkbox-label">All Day</label></div>' +
                 '</div>';
         }
@@ -620,7 +620,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             var events = [];
 
-            html = '<h2 class="mini">Your Calendar</h2>';
+            html = '<h2 class="mini" data-adtp-calendar-title>Your Calendar</h2>';
 
             if (data.appointments !== undefined && data.appointments.length !== 0) {
                 for (var i = 0; i < data.appointments.length; i++) {
@@ -649,11 +649,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 defaultView: 'agendaDay',
                 events: events,
                 eventColor: '#def',
-                height: 270,
+                height: calcCalendarHeight(target),
                 defaultDate: moment(data.date)
             });
 
-            // the div is hidden - render it when it comes into view
+            // the div is hidden - render it when it comes into view, and adjust the height
             if ($calendarDiv.not(':visible')) {
 
                 // If it was hidden because the tab wasn't open
@@ -667,6 +667,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $pickerResponse.find('[data-hide-full-due]').one('click', function() {  // purposefully `one`, not `on`
                     setTimeout(function () {
                         $calendarDiv.fullCalendar('render');
+                        $calendarDiv.fullCalendar('option', 'height', calcCalendarHeight(target));
                     }, 80);
                 });
             }
@@ -778,6 +779,29 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $byTimetable.find('[data-adtp-tt-time] [data-end-time]').text(periodEnd);
 
         }
+    }
+
+
+    /**
+     * Determine the amount of space available for fullcalendar in the right panel
+     *
+     * @param target
+     * @return int
+     */
+    function calcCalendarHeight(target) {
+
+        var calendarHeight = $('[data-adtp-left-panel=' + target + ']').outerHeight(true); // The height of the left panel
+        var dueWorkHeight = $('#' + target + 'Response' + twigVars.id + '-duework').outerHeight(true); // Height of the 'heaviest workload' card (with the 'mini' heading)
+        var calendarTitleHeight = $('[data-adtp-calendar-title]').outerHeight(true); // Height of the 'your calendar' heading
+
+        // Subtract heights from the left panel height as necessary
+        calendarHeight -= calendarTitleHeight;
+
+        if (pickerOptions.type == 'duework') {
+            calendarHeight -= dueWorkHeight;
+        }
+
+        return calendarHeight;
     }
 
 

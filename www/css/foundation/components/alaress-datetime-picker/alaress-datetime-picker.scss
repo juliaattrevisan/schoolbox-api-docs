@@ -265,6 +265,10 @@ input.datepicker-input {
         font-weight: $font-weight-bold;
     }
 
+    .adtp-tt-period {
+        margin-bottom: 0;
+    }
+
 
     /**
      * Response / event list
@@ -280,6 +284,10 @@ input.datepicker-input {
                 @extend .cursor-pointer;
                 line-height: rem-calc(44);
             }
+        }
+
+        .mini {
+            margin-top: 0;
         }
     }
 
