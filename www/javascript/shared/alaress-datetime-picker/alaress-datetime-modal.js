@@ -42,6 +42,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
             else {
                 selectLockedValues();
+                requestDataByDate(inputDate.format('YYYY-MM-DD'), 'timetable');
             }
         }
     });
@@ -61,11 +62,10 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         buildCycles();
         revealTimetable();
         resetDays();
-
+        // Lock date, campus and term values on the update button
+        lockValues();
         // On first load request data by date for the timetable
         requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'timetable');
-
-        lockValues();
 
         // Listen for changes to campus
         timetable.campus.change(function () {
@@ -125,6 +125,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             // Load events
             requestDataByDay($(this));
+            lockValues();
 
         });
 
@@ -366,7 +367,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         });
     }
 
-
     /**
      * Show the timetable picker
      */
@@ -405,19 +405,19 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         $byTimetable.find('[data-adtp-tt-error]').removeClass('hide');
     }
 
-
     /**
      * Reset the timetable day selectors
      * Only show selected day as active
+     *
+     * @param date {string}
      */
     function resetDays(date) {
-
-        var selectedDate = moment(date ? date : timetable.submit.attr('data-timetable-value')); // The currently selected date
 
         // Remove selected on all days for a blank state
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
 
-        // Loop through cycle days and check if currently set date matches
+        var selectedDate = moment(date ? date : timetable.submit.attr('data-timetable-value')); // The currently selected date
+
         $byTimetable.find('[data-date=' + selectedDate.format('YYYY-MM-DD') + ']').addClass('selected');
         $byTimetable.find('[data-tt-selected-date]').text(selectedDate.format('dddd, MMM D, Y'));
 
@@ -431,6 +431,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @returns {boolean}
      */
     function hasTime(value) {
+
         var v = moment(value);
         if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
             return false;
@@ -439,6 +440,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             return false;
         }
         return true;
+
     }
 
 
@@ -449,8 +451,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param target
      */
     function requestDataByDate(date, target) {
-
-        lockValues(date);
 
         if (twigVars.type == 'duework') { // Fetch student assessments
 
@@ -642,7 +642,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 html += '</div>';
 
             }
-            
+
             $pickerResponseDueWork.append(html);
 
             $pickerResponse.find('[data-show-full-due]').click(function() {
@@ -759,7 +759,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
     }
 
-
     /**
      * Add date data attributes to day selectors on timetable picker
      */
@@ -773,7 +772,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
         );
     }
-
 
     /**
      * Iterate the timetable days and apply the given callbacks to them accordingly
@@ -803,7 +801,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
         });
     }
-
 
     /**
      * Update the time radios based on what period is selected
@@ -885,7 +882,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         });
     }
 
-
     /**
      * Adds heatmap to a month view of flatpickr
      *
@@ -903,7 +899,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             applyHeatToDay($(this), yr, mo, day);
         });
     }
-
 
     /**
      * Ergh... the fact that this function even exists.....
@@ -966,7 +961,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
     }
 
-
     /**
      * Retrieve heat data from they server, then apply it according to the onSuccess callback
      *
@@ -1015,7 +1009,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     }
 
-
     /**
      * Append a tool tip regarding heatmap
      */
@@ -1027,7 +1020,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         var $monthDiv = $modal.find('.flatpickr-current-month');
         $monthDiv.append($('<a class="icon-help" />').attr('title', tt));
     }
-
 
     /**
      * Return a collection of years & months for given start and end dates (usually term start and end)
@@ -1095,6 +1087,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
 
     function selectLockedValues() {
+
         if(timetable.submit.attr('data-timetable-campus') > 0) {
             timetable.campus.val(timetable.submit.attr('data-timetable-campus'));
         }
@@ -1104,7 +1097,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
 
         buildCycles();
-
         resetDays();
 
     }
