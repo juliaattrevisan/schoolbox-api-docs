@@ -13,29 +13,29 @@
 (function($){
 
     $(function(){
-        $('[data-datepicker]').each(function() {
-
-            var $dateinput = $(this);
-
-            if ($dateinput.attr('data-datepicker-id') === undefined) {
-
-                var staller = null;
-
-                if ($dateinput.closest('[data-mage]').length) {
-                    // find the submit button and use that to stall
-                    staller = $dateinput.closest('[data-mage]').find('[data-mage-next]');
-
-                } else if ($dateinput.closest('form').length) {
-                    // use the form itself as the stall target
-                    staller = $dateinput.closest('form');
-                }
-
-                $dateinput.alaressDateTimePicker({
-                    staller: staller
-                });
-
-            }
-        });
-
+        $('[data-datepicker]').each(attachAlaressDatePicker);
     });
 })(jQuery);
+
+
+function attachAlaressDatePicker() {
+    var $dateinput = $(this);
+
+    if ($dateinput.attr('data-datepicker-id') === undefined) {
+
+        var staller = null;
+
+        if ($dateinput.closest('[data-mage]').length) {
+            // find the submit button and use that to stall
+            staller = $dateinput.closest('[data-mage]').find('[data-mage-next]');
+
+        } else if ($dateinput.closest('form').length) {
+            // use the form itself as the stall target
+            staller = $dateinput.closest('form');
+        }
+
+        $dateinput.alaressDateTimePicker({
+            staller: staller
+        });
+    }
+}
