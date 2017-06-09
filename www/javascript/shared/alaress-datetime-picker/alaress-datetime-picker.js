@@ -417,6 +417,12 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             // Temporarily disable JS validation on this field so that it doesn't harass the user that
             // things like 'today' aren't valid dates
             disableValidation(element);
+        })
+        .on('keydown', function (e) {
+            if (e.keyCode === 13) {
+                massageDateValue(e, options.staller);
+                return true;
+            }
         });
 
     $datepickerButton.click(function () {
