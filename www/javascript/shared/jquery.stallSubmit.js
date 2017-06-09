@@ -57,11 +57,21 @@
     }
 
 
+    /**
+     * Push a deferred onto our stack
+     *
+     * @param {jQuery.Deferred} deferred
+     */
     StallSubmit.prototype.push = function (deferred) {
         this.deferreds.push(deferred);
     };
 
 
+    /**
+     * Return the list of deferred items stalling this element
+     *
+     * @returns {Array}
+     */
     StallSubmit.prototype.getDeferreds = function () {
         return this.deferreds;
     };
