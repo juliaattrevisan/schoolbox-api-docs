@@ -277,8 +277,7 @@ input.datepicker-input {
         margin-top: 1rem;
 
         .top-due-work {
-            display:flex;
-            margin-bottom:.5rem;
+            display: flex;
 
             .icon-next {
                 @extend .cursor-pointer;
@@ -292,6 +291,10 @@ input.datepicker-input {
     }
 
     .adtp-response-duework {
+        p {
+            margin-bottom: 0;
+        }
+
         .icon-previous {
             color: $accent-foreground;
         }
