@@ -162,6 +162,7 @@
     </div>
 </div>
 
+{% autoescape 'js' %}
 <script>
     $.fn.alaressDateTimeModal({
         date: new Date('{{ value }}'),
@@ -170,7 +171,7 @@
         displayFormat: '{{ displayFormat }}',
         displayFormatDate: '{{ displayFormatDate }}',
         type: '{{ type }}',
-        timetable: {{ timetable ? true : false }},
+        timetable: {{ timetable ? 'true' : 'false' }},
         {% if timetableVars %}
         timetableVars: {
             {% for campus in timetableVars.byCampus %}
@@ -191,3 +192,4 @@
         }
     });
 </script>
+{% endautoescape %}
