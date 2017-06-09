@@ -152,7 +152,7 @@
         </div>
         <div class="small-12 medium-4 column">
             {% set urlSuffix = (encodedReturnUrl | length) ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl) : '' %}
-            <input type="submit" value="{% if 'import' == action %}Import{% else %}Modify{% endif %}" data-mage-next="part-results-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postAssessments') }}{{ urlSuffix }}" />
+            <input name="finalise" type="submit" value="{% if 'import' == action %}Import{% else %}Modify{% endif %}" data-mage-next="part-results-select" data-mage-working="Working..." formaction="{{ routeLookup('courseImport.postAssessments') }}{{ urlSuffix }}" />
         </div>
     </div>
 </div>
