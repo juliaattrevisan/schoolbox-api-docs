@@ -29,15 +29,16 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     var heatCache = {};
 
     // Timetable picker
-    if (twigVars.timetable) {
+    var $byTimetable = $('#byTimetable-' + twigVars.id);
 
-        // Timetable elements
-        var $byTimetable = $('#byTimetable-' + twigVars.id);
-        var timetable = {
-            campus: $byTimetable.find('[data-adtp-tt-campus]'),
-            term: $byTimetable.find('[data-adtp-tt-term]'),
-            submit: $byTimetable.find('[data-adtp-tt-submit]')
-        };
+    // Timetable elements
+    var timetable = {
+        campus: $byTimetable.find('[data-adtp-tt-campus]'),
+        term: $byTimetable.find('[data-adtp-tt-term]'),
+        submit: $byTimetable.find('[data-adtp-tt-submit]')
+    };
+
+    if (twigVars.timetable) {
 
         buildCycles();
         revealTimetable();
