@@ -14,6 +14,23 @@ use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
+/**
+ * Parse date/time strings to get the time only
+ *
+ * @param string $input
+ * @return string
+ */
+function parseDateTimeString($input)
+{
+    if (preg_match('/((?:[0-2])?[0-9]:[0-5][0-9]):[0-5][0-9](?:\.|:)000(AM|PM)?/i', $input, $matches)) {
+        array_shift($matches);
+        $parts = implode('', $matches);
+        return date('g:ia', strtotime($parts));
+    }
+
+    error(ErrorMapper::ERROR_DATE_FORMAT);
+}
+
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
@@ -169,19 +186,13 @@ if ($class) {
 
             $user = $userHandler->getBySynergy($currentStudent['ID']);
 
+            $pattern = '/((?:[0-2])?[0-9]:[0-5][0-9]):[0-5][0-9](?:\.|:)000(AM|PM)?/i';
+
             // Replace everything with everything
 
-            preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/', $currentStudent['LateArrivalTime'], $arrivalTime);
 
-            if (count($arrivalTime) == 0) {
-                preg_match('/([0-9]+):([0-5])([0-9]):00.000(AM|PM)/', $currentStudent['LateArrivalTime'], $arrivalTime);
-            }
-
-            preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/', $currentStudent['EarlyDepartureTime'], $deptTime);
-
-            if (count($deptTime) == 0) {
-                preg_match('/([0-9]+):([0-5])([0-9]):00.000(AM|PM)/', $currentStudent['EarlyDepartureTime'], $deptTime);
-            }
+            $arrivalTime = parseDateTimeString($currentStudent['LateArrivalTime']);
+            $deptTime = parseDateTimeString($currentStudent['EarlyDepartureTime']);
 
             $isAbsent = $currentStudent['AttendedFlag'] == 0;
 
