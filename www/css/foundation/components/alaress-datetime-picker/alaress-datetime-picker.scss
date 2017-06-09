@@ -46,6 +46,7 @@ input.datepicker-input {
         margin: 0 auto;
         border: $pickr-border;
         box-shadow: none;
+        position: static;
 
         &.arrowTop:before,
         &.arrowTop:after {
