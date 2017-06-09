@@ -793,7 +793,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         var calendarHeight = $('[data-adtp-left-panel=' + target + ']').outerHeight(true); // The height of the left panel
         var dueWorkHeight = $('#' + target + 'Response' + twigVars.id + '-duework').outerHeight(true); // Height of the 'heaviest workload' card (with the 'mini' heading)
-        var calendarTitleHeight = $('[data-adtp-calendar-title]').outerHeight(true); // Height of the 'your calendar' heading
+        var calendarTitleHeight = $('#' + target + 'Response' + twigVars.id + '-events [data-adtp-calendar-title]').outerHeight(true); // Height of the 'your calendar' heading
 
         // Subtract heights from the left panel height as necessary
         calendarHeight -= calendarTitleHeight;
