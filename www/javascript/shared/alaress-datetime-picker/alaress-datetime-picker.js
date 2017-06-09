@@ -419,7 +419,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
     $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" data-datepicker-value class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
 
-    setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)).format(momentFormats.database));
+    setPickerValue(pickerId, (element.val() ? moment(element.val(), convertFormat(options.displayFormat)) : moment()).format(momentFormats.database));
 
     getPickerValue(pickerId);
 
