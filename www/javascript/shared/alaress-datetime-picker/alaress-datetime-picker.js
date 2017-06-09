@@ -244,11 +244,6 @@ function massageDateValue(e, staller) {
 
         var xhr = $.get('/ajax/strtotime.php', params);
 
-        if (staller) {
-            // install this XHR as stalling form submit
-            staller.stallSubmit(xhr);
-        }
-
         xhr.done(function (data) {
 
             var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
@@ -321,6 +316,12 @@ function massageDateValue(e, staller) {
             $(t).prop('readonly', false);
             $(t).prop('disabled', false);
         });
+
+        // this listener needs to be installed last in this case
+        if (staller) {
+            // install this XHR as stalling form submit
+            staller.stallSubmit(xhr);
+        }
     }
 }
 
