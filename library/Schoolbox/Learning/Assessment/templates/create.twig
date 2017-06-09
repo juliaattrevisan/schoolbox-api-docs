@@ -47,6 +47,9 @@
                         .find('[data-assessment-details]')
                         .html(data);
 
+                    // attach DP
+                    $('[data-datepicker]').each(attachAlaressDatePicker);
+
                     /* Save everything when creating with Part 1
                      */
                     var assessmentType = $('input[name="type"]:checked').val();

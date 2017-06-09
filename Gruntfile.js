@@ -136,6 +136,9 @@ module.exports = function(grunt) {
                     'www/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js',
                     'www/javascript/shared/alaress-datetime-picker/alaress-datetime-modal.js',
 
+                    // Allow deference of form submit actions
+                    'www/javascript/shared/jquery.stallSubmit.js',
+
                     // Random Scripts
                     // Various javascripts that are so tiny they didn't get
                     // their own files/plugins
