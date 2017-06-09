@@ -37,7 +37,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             var responseDate = moment(($('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value')), momentFormats.databaseShort);
             if(responseDate.diff(inputDate)) {
                 resetTerms();
-                resetCycles();
+                buildCycles();
                 resetDays(inputDate.format(momentFormats.databaseShort));
                 requestDataByDate(inputDate.format(momentFormats.databaseShort), 'timetable');
             }
@@ -72,35 +72,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Listen for changes to campus
         timetable.campus.change(function () {
 
-            var selectedCampus = $(this).val();
-
             buildCycles();
             resetDays();
             revealTimetable();
+            revealByCampus();
 
-            // Show the correct days for the selected campus, hide others
-            $byTimetable.find('[data-tt-day]').each(function() {
-                if ($(this).attr('data-campus') == selectedCampus) {
-                    $(this).removeClass('hide');
-                } else {
-                    $(this).addClass('hide');
-                }
-            });
-
-            // Show the correct period dropdown for the selected campus, hide others
-            $byTimetable.find('[data-tt-period]').each(function() {
-                if ($(this).attr('data-campus') == selectedCampus) {
-                    $(this).removeClass('hide');
-                } else {
-                    $(this).addClass('hide');
-                }
-            });
-
-            // Update time radios to correct times
-            updateTimeControls($byTimetable.find('[data-tt-period][data-campus=' + selectedCampus + ']'));
-
-            // Reset the selected radio back to the first one
-            $byTimetable.find('[data-adtp-tt-period-start]').prop('checked', true);
         });
 
         // Listen for changes to term
@@ -141,10 +117,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     }
 
-
     // Setup calendar
     var newDate, latestDate;
-
 
     // Accommodating the "start of the week" SB config
     Flatpickr.localize(Flatpickr.l10ns.default);
@@ -273,12 +247,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     /**
      * Build cycles dynamically
      */
-    function buildCycles(term) {
-        // TODO: needs refactoring and logic dedupe
+    function buildCycles() {
+
         var selectedCampus = 'campus_' + timetable.campus.find(':selected').val(),
             daysInCycle = timetable.campus.find(':selected').attr('data-days'),
             termDuration = timetable.term.find(':selected').attr('data-duration'),
-            selectedTerm = term ? term : timetable.term.find(':selected').val(),
+            selectedTerm = timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
             termEnd = timetable.term.find(':selected').attr('data-end-date'),
             monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd)),
@@ -314,6 +288,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             $byTimetable.find('[data-tt-weeks]').html(optionsHtml);
 
+            resetCycles();
             addDatesToDays();
 
             // trigger a fetch for any heat data that might be absent
@@ -342,7 +317,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             var termStart = moment($(this).attr('data-start-date'), momentFormats.databaseShort),
                 termEnd = moment($(this).attr('data-end-date'), momentFormats.databaseShort);
 
-            if (inputDate.isBetween(termStart, termEnd)) {
+            if (inputDate.isBetween(termStart, termEnd, 'day', '[]')) {
                 $(this).prop('selected', true);
             }
         });
@@ -352,21 +327,61 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Update selected cycle
      */
     function resetCycles() {
+
         var inputDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
-            activeTerm =  timetable.term.find('option:selected').val();
+            $activeTerm =  timetable.term.find('option:selected'),
+            termStart =  moment($activeTerm.attr('data-start-date'), momentFormats.databaseShort),
+            termEnd = moment($activeTerm.attr('data-end-date'), momentFormats.databaseShort);
+        // If the input date falls into the term, check which cycle to select. Otherwise go with the first one.
+        if (inputDate.isBetween(termStart, termEnd, 'day', '[]')) {
+            $byTimetable.find('[data-parent-term="' + $activeTerm.val() + '"]').each(function () {
+                $(this).addClass('hide');
+                var cycleStart = moment($(this).attr('data-cycle-start'), momentFormats.databaseShort),
+                    cycleEnd = moment($(this).attr('data-cycle-end'), momentFormats.databaseShort);
 
-        buildCycles(activeTerm);
+                if (inputDate.isBetween(cycleStart, cycleEnd, 'day', '[]')) {
+                    $(this).removeClass('hide');
+                }
+            });
+        }
+        else {
+            $('[data-adtp-tt-cycle= 1]').removeClass('hide');
+        }
 
-        $byTimetable.find('[data-parent-term="' + activeTerm + '"]').each(function() {
+    }
 
-            $(this).addClass('hide');
-            var cycleStart = moment($(this).attr('data-cycle-start'), momentFormats.databaseShort),
-                cycleEnd = moment($(this).attr('data-cycle-end'), momentFormats.databaseShort);
+    /**
+     * Hide/display campus related input
+     */
+    function revealByCampus()
+    {
 
-            if (inputDate.isBetween(cycleStart, cycleEnd)) {
+        var selectedCampus = timetable.campus.find(':selected').val();
+
+        // Show the correct days for the selected campus, hide others
+        $byTimetable.find('[data-tt-day]').each(function () {
+            if ($(this).attr('data-campus') == selectedCampus) {
                 $(this).removeClass('hide');
+            } else {
+                $(this).addClass('hide');
             }
         });
+
+        // Show the correct period dropdown for the selected campus, hide others
+        $byTimetable.find('[data-tt-period]').each(function () {
+            if ($(this).attr('data-campus') == selectedCampus) {
+                $(this).removeClass('hide');
+            } else {
+                $(this).addClass('hide');
+            }
+        });
+
+        // Update time radios to correct times
+        updateTimeControls($byTimetable.find('[data-tt-period][data-campus=' + selectedCampus + ']'));
+
+        // Reset the selected radio back to the first one
+        $byTimetable.find('[data-adtp-tt-period-start]').prop('checked', true);
+
     }
 
     /**
@@ -765,6 +780,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * Add date data attributes to day selectors on timetable picker
      */
     function addDatesToDays() {
+
         iterateVisibleTimetableDays(
             function (dayMoment) {
                 $(this).attr('data-date', dayMoment.format(momentFormats.databaseShort)).removeClass('disabled');
@@ -782,6 +798,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param {Function} ifNotDate
      */
     function iterateVisibleTimetableDays(ifDate, ifNotDate) {
+
         // Change the date data attributes on each day
         var cycleNumber    = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle') || 1;
         var selectedCampus = 'campus_' + timetable.campus.find(':selected').val();
@@ -1100,6 +1117,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         buildCycles();
         resetDays();
+        revealByCampus();
 
     }
 
