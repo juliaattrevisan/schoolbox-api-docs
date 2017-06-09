@@ -660,6 +660,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $('#picker'+twigVars.id).find('[data-tab]').one('click', ':not(.active)', function () { // purposefully `one`, not `on`
                     setTimeout(function () {
                         $calendarDiv.fullCalendar('render');
+                        $calendarDiv.fullCalendar('option', 'height', calcCalendarHeight(target));
                     }, 80);
                 });
 
