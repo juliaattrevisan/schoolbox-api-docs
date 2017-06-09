@@ -63,7 +63,16 @@
      * @param {jQuery.Deferred} deferred
      */
     StallSubmit.prototype.push = function (deferred) {
-        this.deferreds.push(deferred);
+
+        // because jQuery, if a Deferred goes to 'rejected' it will never resolve inside $.when()
+        // therefore we have to wrap it in a shim... -_-
+        var resolver = $.Deferred();
+
+        // add a handler to the original Deferred that will *always* resolve the shim
+        deferred.always(function () { resolver.resolve(); });
+
+        // put the shim on the stack rather than the original
+        this.deferreds.push(resolver);
     };
 
 
