@@ -1,0 +1,32 @@
+# suite config
+suites:
+    acceptance:
+        actor: AcceptanceTester
+        path: .
+        modules:
+            enabled:
+                - WebDriver:
+                    url: http://192.168.36.10
+                    browser: chrome
+                    port: 4444
+                - \Helper\Acceptance
+                
+extensions:
+    enabled: [Codeception\Extension\RunFailed]
+
+params: 
+    - env
+
+gherkin: []    
+
+# additional paths
+paths:
+    tests: test/acceptance
+    output: test/acceptance/_output
+    data: test/acceptance/_data
+    support: test/acceptance/_support
+    envs: test/acceptance/_envs
+
+settings:
+    shuffle: false
+    lint: true
