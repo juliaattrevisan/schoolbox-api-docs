@@ -12,7 +12,9 @@ suites:
                 - \Helper\Acceptance
                 
 extensions:
-    enabled: [Codeception\Extension\RunFailed]
+    enabled:
+        - Codeception\Extension\RunFailed
+        - Codeception\Extension\Recorder
 
 params: 
     - env
