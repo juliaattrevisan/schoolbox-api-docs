@@ -9,6 +9,7 @@
 
         // Save form for task completion
         $('form[data-progress-tick-form="selfAssessed"]').progressTickForm({
+            label: $('[data-save-progress-state]'),
             transitions: {
                 incomplete:      'selfAssessed',
                 selfAssessed:    'incomplete',
@@ -45,3 +46,5 @@
         {% endif %}
     </div>
 </div>
+
+<div class="toast" data-alert data-save-progress-state></div>
