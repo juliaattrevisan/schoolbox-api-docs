@@ -89,6 +89,9 @@
             var defaults = {
                 element: element,
 
+                container: '[data-timetable-container]',
+                header: '[data-timetable-header]',
+
                 /* Reforged timetables end up inside this element
                  */
                 target: '[data-smaller]'
@@ -113,8 +116,11 @@
          */
         function assemble() {
             $(config.element).each(function() {
-                var timetable   = $(this);
-                var periodNames = timetable.find('thead th');
+                var timetable   = $(this),
+                    container   = timetable.closest(config.container),
+                    header      = timetable.closest(config.header),
+                    target      = container.find(config.target),
+                    periodNames = timetable.find('thead th');
 
                 /* For every day, assemble a two column timetable
                  */
@@ -133,11 +139,11 @@
                 /* Assemble island
                  */
                 var section = $(config.section).append(table);
-                var island  = $(config.island).append(config.header).append(section);
+                var island  = $(config.island).append(header).append(section);
 
                 /* Inject and add a separator in case you have multiple timetables
                  */
-                $(config.target).append(island);
+                target.append(island);
             });
         }
 
