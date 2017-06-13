@@ -24,5 +24,17 @@
             {% endif %}
         </div>
     </div>
+    <nav>
+        {##
+         # Buttons
+         #
+         # Teacher: sees nav
+         # Participant: sees complete task button (if of course it's a task that's self-assessable)
+         #}
+        {% include '@learningAssessment/fragments/progressTick.twig' with {
+            assessment: assessable,
+            participant: assessable.getParticipant(USER)
+        } only %}
+    </nav>
 </li>
 
