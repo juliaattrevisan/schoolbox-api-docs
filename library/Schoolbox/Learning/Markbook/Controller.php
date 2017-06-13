@@ -292,6 +292,7 @@ class Controller extends Base
     public function getMarkbookExport(User $viewee)
     {
         $filtersArray = $this->request->query->getArrayCopy();
+        unset($filtersArray['page']);
 
         list($filters) = $this->convertRequestToFilters($filtersArray, $viewee, false);
 
