@@ -147,7 +147,6 @@ class Mapper extends BaseMapper
         ";
 
         $statement = $this->database->prepare($sql);
-
         $statement->execute(['survey_id' => $surveyId]);
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -237,15 +236,23 @@ class Mapper extends BaseMapper
 
         if (!$this->getSessionUser()->isSuperuser()) {
 
-            $folderIds = $folderMapper->findForUser($this->getSessionUser(), true)->getColumnValues('id');
+            // Create a sub-predicate to restrict based on folder perms
 
-            var_dump($folderIds);
+            $folderPredicate = $this->getPredicateBuilder();
+
+            // Get all folders the person has permissions to
+
+            $folderIds = $folderMapper->findForUser($this->getSessionUser(), true)->getColumnValues('id');
 
             // Find all the surveys on these pages
 
             foreach ($folderIds as $folderId) {
-                $predicateBuilder->equals('category_id', $folderId);
+                $folderPredicate->equals('category_id', $folderId);
             }
+
+            // Stuff them all into an OR/ANY predicate
+
+            $predicateBuilder->any($folderPredicate);
         }
 
         // And filter the name of the survey
