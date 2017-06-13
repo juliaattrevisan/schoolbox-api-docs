@@ -649,18 +649,23 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 defaultView: 'agendaDay',
                 events: events,
                 eventColor: '#def',
-                height: calcCalendarHeight(target),
-                defaultDate: moment(data.date)
+                height: 0, // Height is calculated below on render
+                defaultDate: moment(data.date),
+                viewRender: function() {
+                    // Calculate the height available for this and set it
+                    $calendarDiv.fullCalendar('option', 'height', calcCalendarHeight(target));
+
+                }
             });
 
-            // the div is hidden - render it when it comes into view, and adjust the height
+            // If the div where the calendar is going is hidden at this time - render will need to be called when it is
+            // visible.
             if ($calendarDiv.not(':visible')) {
 
                 // If it was hidden because the tab wasn't open
                 $('#picker'+twigVars.id).find('[data-tab]').one('click', ':not(.active)', function () { // purposefully `one`, not `on`
                     setTimeout(function () {
                         $calendarDiv.fullCalendar('render');
-                        $calendarDiv.fullCalendar('option', 'height', calcCalendarHeight(target));
                     }, 80);
                 });
 
@@ -668,7 +673,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $pickerResponse.find('[data-hide-full-due]').one('click', function() {  // purposefully `one`, not `on`
                     setTimeout(function () {
                         $calendarDiv.fullCalendar('render');
-                        $calendarDiv.fullCalendar('option', 'height', calcCalendarHeight(target));
                     }, 80);
                 });
             }
@@ -792,15 +796,24 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function calcCalendarHeight(target) {
 
         var calendarHeight = $('[data-adtp-left-panel=' + target + ']').outerHeight(true); // The height of the left panel
-        var dueWorkHeight = $('#' + target + 'Response' + twigVars.id + '-duework').outerHeight(true); // Height of the 'heaviest workload' card (with the 'mini' heading)
         var calendarTitleHeight = $('#' + target + 'Response' + twigVars.id + '-events [data-adtp-calendar-title]').outerHeight(true); // Height of the 'your calendar' heading
+        var dueWorkHeight; // Height of the 'heaviest workload' card (with the 'mini' heading)
 
-        // Subtract heights from the left panel height as necessary
-        calendarHeight -= calendarTitleHeight;
-
-        if (pickerOptions.type == 'duework') {
-            calendarHeight -= dueWorkHeight;
+        if (pickerOptions.type != 'duework') {
+            dueWorkHeight = 1; // Avoid endless loop below
         }
+
+        // In absence of a way to check when the elements have all loaded - loop this until the due work div has a height.
+        do {
+            // Subtract heights from the left panel height as necessary
+            calendarHeight -= calendarTitleHeight;
+
+            if (pickerOptions.type == 'duework') {
+                dueWorkHeight = $('#' + target + 'Response' + twigVars.id + '-duework').outerHeight(true);
+                calendarHeight -= dueWorkHeight;
+            }
+
+        } while (dueWorkHeight == 0);
 
         return calendarHeight;
     }
