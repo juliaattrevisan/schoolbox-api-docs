@@ -203,11 +203,6 @@ class Controller extends Base
              */
             list($filters, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($request, true);
 
-            // Ensure that assessments are not Assessment Specs
-            $filters = array_merge($filters, [
-                Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-            ]);
-
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds);
 
@@ -272,7 +267,12 @@ class Controller extends Base
         $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $selectionsPerFilter);
         $filtersDTO           = $selectionTransformer->buildFiltersDto();
 
-        return [$filtersDTO->getByClass(), $codec, $selectionsPerFilter];
+        // Ensure that assessments are not Assessment Specs
+        $filters = array_merge($filtersDTO->getByClass(), [
+            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
+        ]);
+
+        return [$filters, $codec, $selectionsPerFilter];
     }
 
 
@@ -292,11 +292,6 @@ class Controller extends Base
         $filtersArray = $this->request->query->getArrayCopy();
 
         list($filters) = $this->convertRequestToFilters($filtersArray, false);
-
-        // Ensure that assessments are not Assessment Specs
-        $filters = array_merge($filters, [
-            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-        ]);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds);
