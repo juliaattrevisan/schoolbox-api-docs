@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -21,6 +22,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\User;
 
 
 /**
@@ -99,6 +101,46 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                 ]);
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
+    }
+
+
+    /**
+     * An assessment-specific function to ensure that if the admin disables the teacher-folder filter
+     * then we fall back to the viewee's involved classes and groups.
+     *
+     * Also users that the user is an instructor of any filtered-to teacher-folder.
+     *
+     * @param null[]|Collection[] $filters
+     * @param User                $user
+     * @param User                $viewee
+     * @return null[]|Collection[]
+     */
+    public function checkTeacherFolders(array $filters, User $user, User $viewee)
+    {
+        /** @var Folder\Mapper $folderMapper */
+        $folderMapper    = $this->getMapperFactory()->get(Folder\Mapper::class);
+        $access          = Access::getInstance();
+
+        // No teacher folder ?
+        if (!array_key_exists(Filters\Assessment\Folder\TeacherInvolved\Definition::class, $filters)){
+
+            // Insert all involved folders for the specified viewee
+            $filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class] = new Collection();
+            $involvedFolders = $folderMapper->findForUser($viewee, true, UserAccess::ACCESS_WRITE);
+            foreach($involvedFolders as $involvedFolder){
+                $folderId = $involvedFolder->getId();
+                $filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class][$folderId] = $folderId;
+            }
+        }
+
+        foreach($filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class] as $folderId){
+            $folder = $folderMapper->createModel($folderId);
+            if(!$access->isInstructor($user, $folder)){
+                $filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class]->offsetUnset($folderId);
+            }
+        }
+
+        return $filters;
     }
 
 

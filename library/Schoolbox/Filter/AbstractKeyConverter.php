@@ -41,16 +41,6 @@ abstract class AbstractKeyConverter implements IKeyConverter
     /**
      * @inheritdoc
      */
-    public function sanitiseKey($key, User $user, $page)
-    {
-        $this->assertValidKey($key);
-        return (string)$key;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getSelectedItems(GenericCollection $availableSelections = null)
     {
         if (null === $availableSelections) {

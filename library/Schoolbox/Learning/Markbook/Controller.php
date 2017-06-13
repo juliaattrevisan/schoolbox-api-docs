@@ -202,7 +202,7 @@ class Controller extends Base
              * @var Filter\Codec               $codec
              * @var Filter\Selection\Model[][] $selectionsPerFilter
              */
-            list($filters, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($request, true);
+            list($filters, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($request, $viewee, true);
 
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds);
@@ -243,6 +243,7 @@ class Controller extends Base
 
     /**
      * @param array $request  Indexed by filter.id, option.key
+     * @param User  $viewee
      * @param bool  $saveToDB Should we persist these selections to the DB ?
      * @return array
      * @throws \InvalidArgumentException If unable to find the filter mapper class
@@ -251,7 +252,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    private function convertRequestToFilters(array $request, $saveToDB)
+    private function convertRequestToFilters(array $request, User $viewee, $saveToDB)
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
         $page            = Filter\Page\Model::PAGE_MARK_BOOK;
@@ -264,6 +265,8 @@ class Controller extends Base
         }
 
         $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $page);
+
+        $filters = $this->filterFactoryFactory->checkTeacherFolders($filters, $this->getUser(), $viewee);
 
         // Ensure that assessments are not Assessment Specs
         $filters = array_merge($filters, [
@@ -278,6 +281,7 @@ class Controller extends Base
      * Stream a filtered markbook in CSV format
      *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
+     * @param User $viewee
      * @throws \DomainException                      If attempting to get the slug from a filter where it has not been set
      * @throws Filter\BrokenFilterException          If a injected filter is unable to be processed
      * @throws \InvalidArgumentException             If any filter keys not recognised
@@ -285,11 +289,11 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      */
-    public function getMarkbookExport()
+    public function getMarkbookExport(User $viewee)
     {
         $filtersArray = $this->request->query->getArrayCopy();
 
-        list($filters) = $this->convertRequestToFilters($filtersArray, false);
+        list($filters) = $this->convertRequestToFilters($filtersArray, $viewee, false);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds);
