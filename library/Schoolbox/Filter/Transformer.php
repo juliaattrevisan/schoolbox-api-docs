@@ -80,16 +80,18 @@ class Transformer
 
 
     /**
-     * Build a filter DTO by converting filterSelection models into Collections of disparate entities
+     * Build an array of filters, ready for injection into an IdFinder
      *
-     * @return DataTransferObject
+     * @return null[]|Collection[] Indexed by filter.class
      */
-    public function buildFiltersDto()
+    public function getByClass()
     {
-        $filters = new DataTransferObject();
+        $filters = [];
+
         foreach ($this->getSelectionsPerFilter() as $filterId => $selections) {
-            $instance = $this->keyConverters[$filterId]->getFilter();
-            $filters->setSelections($instance, $this->getSelectedItems($instance->getClass()));
+            $instance        = $this->keyConverters[$filterId]->getFilter();
+            $class           = $instance->getClass();
+            $filters[$class] = $this->getSelectedItems($class);
         }
         return $filters;
     }

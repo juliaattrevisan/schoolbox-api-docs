@@ -92,7 +92,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         $keyConverters        = $this->buildEnabledKeyConverters($page);
         $selectionTransformer = $this->buildTransformer($keyConverters, $selectionsPerFilter);
 
-        return $selectionTransformer->buildFiltersDto()->getByClass();
+        return $selectionTransformer->getByClass();
     }
 
 

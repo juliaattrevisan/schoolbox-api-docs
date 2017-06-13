@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
@@ -197,9 +198,9 @@ class Controller extends Base
             $request = $this->request->post['filter_selection'] ?: [];
 
             /**
-             * @var Filter\DataTransferObject $filtersDto
-             * @var Filter\Codec              $codec
-             * @var Filter\Selection\Model[][]
+             * @var null[]|Collection[]        $filters
+             * @var Filter\Codec               $codec
+             * @var Filter\Selection\Model[][] $selectionsPerFilter
              */
             list($filters, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($request, true);
 
