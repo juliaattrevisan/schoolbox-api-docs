@@ -265,13 +265,14 @@ class Controller extends Base
     {
         $request         = $this->request->post['filter_selection'] ?: [];
         $page            = FilterPage\Model::PAGE_GRADES;
-        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
-        $codec           = new Filter\Codec();
-        $userSelections  = $codec->convertRequestToSelections($this->selectionMapper, $keyConverters, $this->getUser(), $page, $request);
+
+        $codec           = $this->filterFactoryFactory->buildCodec();
+        $userSelections  = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
         // TODO don't save selections for non user-configurable page filters
         $this->selectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
+        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
         $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $userSelections);
         $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
 

@@ -41,6 +41,11 @@ interface IFactoryFactory
 
 
     /**
+     * @return Codec
+     */
+    public function buildCodec();
+
+    /**
      * Build a set of key converters for filters configured as enabled for the specified page
      *
      * Key Converters should be light-weight as they are instantiated on every filtered report request

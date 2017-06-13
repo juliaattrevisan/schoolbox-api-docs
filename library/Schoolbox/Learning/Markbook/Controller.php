@@ -116,7 +116,7 @@ class Controller extends Base
             }
         }
 
-        $codec        = new Filter\Codec();
+        $codec        = $this->filterFactoryFactory->buildCodec();
         $getArgString = $codec->convertSelectionsToQueryString($selections);
 
         $this->getResponse()->redirect->to("{$route}?{$getArgString}");
@@ -254,16 +254,16 @@ class Controller extends Base
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
         $page            = Filter\Page\Model::PAGE_MARK_BOOK;
-        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
-        $codec           = new Filter\Codec();
+        $codec           = $this->filterFactoryFactory->buildCodec();
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelections($selectionMapper, $keyConverters, $this->getUser(), $page, $request);
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
         if ($saveToDB) {
             $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
         // Convert Selection models to Filter Collections
+        $keyConverters        = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
         $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $selectionsPerFilter);
         $filtersDTO           = $selectionTransformer->buildFiltersDto();
 

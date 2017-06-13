@@ -51,6 +51,15 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
     /**
      * @inheritdoc
+     */
+    public function buildCodec()
+    {
+        return new Codec($this->getFilterMapper(), $this->getSelectionMapper());
+    }
+
+
+    /**
+     * @inheritdoc
      * @throws \InvalidArgumentException If unable to find the filter mapper class
      * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined what entity it is filtering
@@ -152,25 +161,18 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      */
     public function buildPanel(User $user, $page, $route, User $viewee = null, array $request = [])
     {
+        // Clean up aura-inserted items (do this as low down in logic as possible - not in controller)
+        if (array_key_exists('page', $request)) {
+            unset($request['page']);
+        }
+
         $enabledOnly          = true;
         $userConfigurableOnly = false;
         $enabledPageFilters   = $this->buildPageFilters($page, $enabledOnly, $userConfigurableOnly);
 
-        $codec            = new Codec();
-        $factories        = $this->createFactoryCollection();
-        $keyConverters    = $this->createKeyConverterCollection();
-        $filterComponents = $this->createComponentCollection();
-
         // Build panel components for all enabled page filters, even if hard-coded (we will store this client side in hidden fields)
         // Ignore anything in $request that is not for a visible page filter
-
-        // Iteration 1/2 - build Factories and KeyConverters
-        foreach ($enabledPageFilters as $filterId => $pageFilter) {
-            $filter                   = $pageFilter->getFilter();
-            $class                    = $filter->getClass();
-            $factories[$filterId]     = $this->buildFilterFactoryForFilter($class);
-            $keyConverters[$filterId] = $factories[$filterId]->buildKeyConverter($filter);
-        }
+        $filterComponents     = $this->createComponentCollection();
 
         // Which of the enabled page-filters are configurable by the end user?
         /** @var GenericCollection|Page\Model[] $userConfigurablePageFilters */
@@ -180,23 +182,25 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         // We cannot merely replace userSelections here. That must happen later.
         // This is because overrideSelections can insert options, but userSelections cannot
-        $overrideSelections = $codec->convertRequestToSelections($this->getSelectionMapper(), $keyConverters, $user, $page, $request);
+        $codec              = $this->buildCodec();
+        $overrideSelections = $codec->convertRequestToSelections($user, $page, $request);
         $userSelections     = $this->findUserSelections($overrideSelections, $userConfigurablePageFilters, $user, $page);
 
-        // Iteration 2/2 - build Panel Components
+        // Build Panel Components
         foreach ($enabledPageFilters as $pageFilter) {
             $filter     = $pageFilter->getFilter();
             $filterId   = $filter->getId();
             $class      = $filter->getClass();
-            $definition = $factories[$filterId]->buildDefinition($filter);
+            $factory    = $this->buildFilterFactoryForFilter($class);
+            $definition = $factory->buildDefinition($filter);
             $definition->normalisePageOptions($pageFilter, $user->getRole()->getType());
 
-            $selections = $userSelections[$filter->getId()] ?: $this->getSelectionMapper()->createCollection();
+            $selections = $userSelections[$filterId] ?: $this->getSelectionMapper()->createCollection();
 
             // Did controller or URL request to override saved user-selections ?
-            $overrides = $overrideSelections[$filter->getId()] ?: null;
+            $overrides = $overrideSelections[$filterId] ?: null;
 
-            $filterComponents[$class] = $factories[$filterId]->buildComponent($definition, $user, $pageFilter, $viewee, $selections, $overrides);
+            $filterComponents[$class] = $factory->buildComponent($definition, $user, $pageFilter, $viewee, $selections, $overrides);
         }
         return new Panel($route, $filterComponents);
     }
@@ -306,16 +310,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             $instance->getPages()[$page] = $pageFilter;
         }
         return $pageFilters;
-    }
-
-
-    /**
-     * @param null|IFactory[] $contents
-     * @return GenericCollection|IFactory[]
-     */
-    private function createFactoryCollection(array $contents = [])
-    {
-        return new GenericCollection(IFactory::class, $contents);
     }
 
     /**
