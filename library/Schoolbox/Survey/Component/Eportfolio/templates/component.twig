@@ -93,7 +93,35 @@
             </tbody>
         </table>
 
-        {% if (survey.attempts | length < survey.maxAttempts) and (eportfolioUser.id == USER.id) %}
+        {#
+            This is some sort of weird parallel universe logic...
+
+            Firstly in spite of its naming- maxAttempts is actually used as a boolean flag
+            to indicate if multiple attempts are allowed...
+
+            However this database field is also shared by quizzes which does use it as an
+            integer showing the maximum number of allowed attempts...
+
+            And as if that wasn't painful enough- the logic of the boolean seems is the
+            complete inverse of common sense (and the checkbox state on the modify form)...
+
+            0 = Allow multiple attempts...
+            1 = Don't allow multiple attempts...
+
+              .-'---`-.
+            ,'          `.
+            |             \
+            |              \
+            \           _  \
+            ,\  _    ,'-,/-)\
+            ( * \ \,' ,' ,'-)
+             `._,)     -',-')
+               \/         ''/
+                )        / /
+               /       ,'-'    :facepalm:
+        #}
+
+        {% if (survey.attempts | length == 0 or survey.maxAttempts == 0) and (eportfolioUser.id == USER.id) %}
             <div class="component-action">
                 <section>
                     <a href="/survey/intro/{{ survey.id }}" class="button">
