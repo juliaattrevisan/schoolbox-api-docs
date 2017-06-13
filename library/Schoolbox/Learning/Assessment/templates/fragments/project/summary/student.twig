@@ -1,7 +1,13 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+{% set labelIncomplete = 'Incomplete' %}
+{% set labelPending    = 'Self-Assessed' %}
+{% set labelReviewed   = 'Teacher-Assessed' %}
+
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
+
+{% autoescape 'js' %}
 <script type="text/javascript">
     // Add previews
     $(function() {
@@ -14,10 +20,37 @@
                 incomplete:      'selfAssessed',
                 selfAssessed:    'incomplete',
                 teacherAssessed: 'incomplete'
+            },
+            onChange: function(newTaskStatus) {
+                // Update the light and the row's status
+                var $row       = $(this).closest('[data-assessment]'),
+                    $light     = $row.find('[data-assessment-status-light]'),
+                    $text      = $row.find('[data-assessment-status-text]'),
+                    newLabel   = '',
+                    newClass   = '';
+
+                switch (newTaskStatus) {
+                    case 'incomplete':
+                        newLabel = '{{ labelIncomplete }}';
+                        newClass = '';
+                        break;
+                    case 'selfAssessed':
+                        newLabel = '{{ labelPending }}';
+                        newClass = 'pending';
+                        break;
+                    case 'teacherAssessed':
+                        newLabel = '{{ labelReviewed }}';
+                        newClass = 'reviewed';
+                        break;
+                }
+
+                $light.removeClass('pending reviewed').addClass(newClass);
+                $text.text(newLabel);
             }
         });
     });
 </script>
+{% endautoescape %}
 
 <div class="row">
     <div class="small-12 columns">
