@@ -217,18 +217,15 @@ class Controller extends Base
      */
     protected function generatePendingAssessmentReport(AssessmentFilters\FactoryFactory $filterFactoryFactory, array $request)
     {
-        $page              = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
+        $page                = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
 
         // Convert Request to Selection models
-        $codec             = $filterFactoryFactory->buildCodec();
+        $codec               = $filterFactoryFactory->buildCodec();
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
-        // Convert Selection models to Filter Collections
-        $keyConverters     = $filterFactoryFactory->buildEnabledKeyConverters($page);
-        $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
+        $filters = $filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $page);
 
         // Ensure that assessments are not Assessment Specs
         $filters = array_merge($filters, [

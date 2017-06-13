@@ -7,9 +7,11 @@
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
 use Schoolbox\Assessment\Term;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -97,5 +99,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                 ]);
         }
         throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function buildTransformer(GenericCollection $keyConverters, Collection $selectionsPerFilter)
+    {
+        return new Transformer($keyConverters, $selectionsPerFilter);
     }
 }

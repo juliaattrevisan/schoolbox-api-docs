@@ -262,13 +262,10 @@ class Controller extends Base
             $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
-        // Convert Selection models to Filter Collections
-        $keyConverters        = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
-        $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersDTO           = $selectionTransformer->buildFiltersDto();
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $page);
 
         // Ensure that assessments are not Assessment Specs
-        $filters = array_merge($filtersDTO->getByClass(), [
+        $filters = array_merge($filters, [
             Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
         ]);
 

@@ -86,6 +86,31 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
     /**
      * @inheritdoc
+     */
+    public function convertSelectionsToFilters(Collection $selectionsPerFilter, $page)
+    {
+        $keyConverters        = $this->buildEnabledKeyConverters($page);
+        $selectionTransformer = $this->buildTransformer($keyConverters, $selectionsPerFilter);
+
+        return $selectionTransformer->buildFiltersDto()->getByClass();
+    }
+
+
+    /**
+     * Build a transformer of the desired type
+     *
+     * @param IKeyConverter[]|GenericCollection                  $keyConverters       Indexed by filter.id
+     * @param Collection|GenericCollection[]|Selection\Model[][] $selectionsPerFilter Indexed by filter.id then selection.key
+     * @return Transformer
+     */
+    protected function buildTransformer(GenericCollection $keyConverters, Collection $selectionsPerFilter)
+    {
+        return new Transformer($keyConverters, $selectionsPerFilter);
+    }
+
+
+    /**
+     * @inheritdoc
      * @throws \InvalidArgumentException             If no filter definition class not found, or filter factory not registered
      * @throws \ReflectionException                  If the specified class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper

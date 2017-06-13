@@ -272,10 +272,7 @@ class Controller extends Base
         // TODO don't save selections for non user-configurable page filters
         $this->selectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
-        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
-        $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $userSelections);
-        $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
-
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $page);
 
         /* Merge filters to ensure that assessments:
          * * Belong to this folder
@@ -296,7 +293,6 @@ class Controller extends Base
         ]);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
