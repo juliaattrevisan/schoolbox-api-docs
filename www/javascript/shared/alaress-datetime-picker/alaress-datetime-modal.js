@@ -72,7 +72,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Listen for changes to campus
         timetable.campus.change(function () {
 
-            buildCycles();
+            resetCycles();
             resetDays();
             revealTimetable();
             revealByCampus();
@@ -245,7 +245,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
 
     /**
-     * Build cycles dynamically
+     * Build cycles dynamically for all campuses and selected term
      */
     function buildCycles() {
 
@@ -263,27 +263,29 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             var optionsHtml = '';
 
-            $.each(twigVars.timetableVars[selectedCampus].cycles[selectedTerm], function(index, value) {
+            $.each(twigVars.timetableVars, function(campus, terms) {
+                $.each(terms.cycles[selectedTerm], function (cycle, value) {
 
-                var valueKeys = Object.keys(value);
-                var startDate = moment(value[valueKeys[0]]);
-                var endDate   = moment(value[valueKeys[valueKeys.length - 1]]);
-                var hideClass = 'hide';
+                    var valueKeys = Object.keys(value);
+                    var startDate = moment(value[valueKeys[0]]);
+                    var endDate = moment(value[valueKeys[valueKeys.length - 1]]);
+                    var hideClass = 'hide';
 
-                if (index == 1 && !selectedDate.isBetween(termStart, termEnd, 'day', '[]')) {
-                    // if this date is outside the bounds of the term, display the first week
-                    hideClass = '';
+                    if (cycle == 1 && !selectedDate.isBetween(termStart, termEnd, 'day', '[]')) {
+                        // if this date is outside the bounds of the term, display the first week
+                        hideClass = '';
 
-                } else if (selectedDate.isBetween(startDate, endDate, 'day', '[]')) {
-                    // show this week if the selected date is in this week
-                    hideClass = '';
-                }
+                    } else if (selectedDate.isBetween(startDate, endDate, 'day', '[]')) {
+                        // show this week if the selected date is in this week
+                        hideClass = '';
+                    }
 
-                optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + index + '" data-cycle-start="' + startDate.format(momentFormats.databaseShort) + '" data-cycle-end="' + endDate.format(momentFormats.databaseShort) + '" data-parent-term="' + selectedTerm + '">';
-                optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Week</span> ' + index + '</div>';
-                optionsHtml += '<div class="adtp-tt-week-date">' + startDate.format('MMM D') + ' - ' + endDate.format('MMM D') + '</div>';
-                optionsHtml += '</div>';
+                    optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + cycle + '" data-cycle-start="' + startDate.format(momentFormats.databaseShort) + '" data-cycle-end="' + endDate.format(momentFormats.databaseShort) + '" data-parent-campus="' + campus + '" data-parent-term="' + selectedTerm + '">';
+                    optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Week</span> ' + cycle + '</div>';
+                    optionsHtml += '<div class="adtp-tt-week-date">' + startDate.format('MMM D') + ' - ' + endDate.format('MMM D') + '</div>';
+                    optionsHtml += '</div>';
 
+                });
             });
 
             $byTimetable.find('[data-tt-weeks]').html(optionsHtml);
@@ -324,17 +326,23 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     }
 
     /**
-     * Update selected cycle
+     * Reveal cycle
      */
     function resetCycles() {
 
         var inputDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
-            $activeTerm =  timetable.term.find('option:selected'),
-            termStart =  moment($activeTerm.attr('data-start-date'), momentFormats.databaseShort),
-            termEnd = moment($activeTerm.attr('data-end-date'), momentFormats.databaseShort);
+            $selectedCampus = timetable.campus.find(':selected'),
+            $selectedTerm =  timetable.term.find(':selected'),
+            termStart =  moment($selectedTerm.attr('data-start-date'), momentFormats.databaseShort),
+            termEnd = moment($selectedTerm.attr('data-end-date'), momentFormats.databaseShort);
+
+        // Hide all cycles
+        $byTimetable.find('[data-adtp-tt-cycle]').addClass('hide');
+
         // If the input date falls into the term, check which cycle to select. Otherwise go with the first one.
         if (inputDate.isBetween(termStart, termEnd, 'day', '[]')) {
-            $byTimetable.find('[data-parent-term="' + $activeTerm.val() + '"]').each(function () {
+            $byTimetable.find('[data-parent-campus="campus_' + $selectedCampus.val() + '"]').each(function () {
+                console.log($(this));
                 $(this).addClass('hide');
                 var cycleStart = moment($(this).attr('data-cycle-start'), momentFormats.databaseShort),
                     cycleEnd = moment($(this).attr('data-cycle-end'), momentFormats.databaseShort);
@@ -345,7 +353,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             });
         }
         else {
-            $('[data-adtp-tt-cycle= 1]').removeClass('hide');
+            $('[data-parent-campus="campus_' + $selectedCampus.val() + '"][data-adtp-tt-cycle= 1]').removeClass('hide');
         }
 
     }
