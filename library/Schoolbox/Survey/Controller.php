@@ -13,7 +13,6 @@ use PHPExcel;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Worksheet;
 use PHPExcel_Writer_Excel2007;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -30,8 +29,21 @@ class Controller extends Base
     /** @var FolderMapper */
     private $folderMapper;
 
+    /** @var PHPExcel $excel */
+    private $excel;
+
+    /** @var PHPExcel_Worksheet $activeSheet */
+    private $activeSheet;
+
+    /** @var int $tabIndex */
+    private $tabIndex;
+
+    /** @var int $currentRow */
+    private $currentRow;
+
     /**
      * Constructor
+     *
      * @param UserMapper $userMapper
      * @param SurveyMapper $surveyMapper
      * @param FolderMapper $folderMapper
@@ -46,11 +58,9 @@ class Controller extends Base
         $this->folderMapper = $folderMapper;
     }
 
-
     /**
      * Perform an AJAX search for surveys
      *
-     * @param string $search
      * @return string
      */
     public function getSelectize()
@@ -61,18 +71,6 @@ class Controller extends Base
             )
         ));
     }
-
-    /** @var PHPExcel $excel */
-    private $excel;
-
-    /** @var PHPExcel_Worksheet $activeSheet */
-    private $activeSheet;
-
-    /** @var int $tabIndex */
-    private $tabIndex;
-
-    /** @var int $currentRow */
-    private $currentRow;
 
     /**
      * Retrieve spreadsheet containing aggregated survey results
