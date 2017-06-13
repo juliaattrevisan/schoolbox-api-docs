@@ -22,6 +22,10 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 function parseDateTimeString($input)
 {
+    if (empty(trim($input))) {
+        return '';
+    }
+
     if (preg_match('/((?:[0-2])?[0-9]:[0-5][0-9]):[0-5][0-9](?:\.|:)000(AM|PM)?/i', $input, $matches)) {
         array_shift($matches);
         $parts = implode('', $matches);
@@ -188,12 +192,6 @@ if ($class) {
 
             $pattern = '/((?:[0-2])?[0-9]:[0-5][0-9]):[0-5][0-9](?:\.|:)000(AM|PM)?/i';
 
-            // Replace everything with everything
-
-
-            $arrivalTime = parseDateTimeString($currentStudent['LateArrivalTime']);
-            $deptTime = parseDateTimeString($currentStudent['EarlyDepartureTime']);
-
             $isAbsent = $currentStudent['AttendedFlag'] == 0;
 
             if ($isAbsent) {
@@ -209,8 +207,8 @@ if ($class) {
                 'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['ActualEventComment'] ? $currentStudent['ActualEventComment'] : $currentStudent['PossibleDescription']),
                 'STUDENT_ATTENDANCESTRING' => Scrub::text($currentStudent['TodaysAttendanceString']),
                 'STUDENT_NONATTENDREASON' => Scrub::text($currentStudent['PossibleNonAttendReason']),
-                'STUDENT_ARRIVAL_TIME' => isset($arrivalTime[3]) ? date('g:ia', strtotime($arrivalTime[0])) : '',
-                'STUDENT_DEPT_TIME' => isset($deptTime[3]) ? date('g:ia', strtotime($deptTime[0])) : '',
+                'STUDENT_ARRIVAL_TIME' => parseDateTimeString($currentStudent['LateArrivalTime']),
+                'STUDENT_DEPT_TIME' => parseDateTimeString($currentStudent['EarlyDepartureTime']),
                 'IS_ABSENT' => $isAbsent ? 'checked="checked"' : '',
             ]);
 
