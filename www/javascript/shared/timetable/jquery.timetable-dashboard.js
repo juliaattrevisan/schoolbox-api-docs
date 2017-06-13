@@ -112,40 +112,44 @@
          * Assemble a timetable
          */
         function assemble() {
-            var periodNames = $(config.element).find('thead th');
+            $(config.element).each(function() {
+                var timetable   = $(this);
+                var periodNames = timetable.find('thead th');
 
-            /* For every day, assemble a two column timetable
-             */
-            var table = $('<table class="no-hover">');
+                /* For every day, assemble a two column timetable
+                 */
+                var table = $('<table class="no-hover">');
 
-            /* Generate table rows
-             */
-            $.each(periodNames, function(index, element) {
-                var tr = $('<tr></tr>');
-                tr.append($(element).clone());
-                tr.append(dataCellSelector(1, index+1).clone());
+                /* Generate table rows
+                 */
+                $.each(periodNames, function(index, element) {
+                    var tr = $('<tr></tr>');
+                    tr.append($(element).clone());
+                    tr.append(dataCellSelector(timetable, 1, index+1).clone());
 
-                table.append(tr);
+                    table.append(tr);
+                });
+
+                /* Assemble island
+                 */
+                var section = $(config.section).append(table);
+                var island  = $(config.island).append(config.header).append(section);
+
+                /* Inject and add a separator in case you have multiple timetables
+                 */
+                $(config.target).append(island);
             });
-
-            /* Assemble island
-             */
-            var section = $(config.section).append(table);
-            var island = $(config.island).append(config.header).append(section)
-
-            /* Inject and add a separator in case you have multiple timetables
-             */
-            $(config.target).append(island);
         }
 
         /**
          * Select a cell in main timetable
          *
+         * @param table
          * @param row
          * @param column
          */
-        function dataCellSelector(row, column) {
-            return $(config.element).find('tbody tr:nth-child('+row+') td:nth-child('+column+')').first();
+        function dataCellSelector(table, row, column) {
+            return table.find('tbody tr:nth-child('+row+') td:nth-child('+column+')').first();
         }
     }
 }(jQuery));
