@@ -22,18 +22,19 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 columns">
             <!-- BEGIN campus_timetable -->
-            <h2 class="subheader">
-                <a href="/timetable/">
-                    <!-- BEGIN timetable_campus_name -->
-                    {CAMPUS_NAME} -
-                    <!-- END timetable_campus_name -->
-                    {DAYNAME}
-                </a>
-            </h2>
-            <section>
-                <div class="scrollable show-for-medium-up">
-                    <table class="timetable" data-timetable>
-                        <thead>
+            <div data-timetable-container>
+                <h2 class="subheader" data-timetable-header>
+                    <a href="/timetable/">
+                        <!-- BEGIN timetable_campus_name -->
+                        {CAMPUS_NAME} -
+                        <!-- END timetable_campus_name -->
+                        {DAYNAME}
+                    </a>
+                </h2>
+                <section>
+                    <div class="scrollable show-for-medium-up">
+                        <table class="timetable" data-timetable>
+                            <thead>
                             <tr>
                                 <!-- BEGIN timetable_header -->
                                 <th class='{PERIOD_TH_CLASS}' style='width:{TIMETABLE_FIELD_WIDTH}%'>
@@ -42,8 +43,8 @@
                                 </th>
                                 <!-- END timetable_header -->
                             </tr>
-                        </thead>
-                        <tbody>
+                            </thead>
+                            <tbody>
                             <tr>
                                 <!-- BEGIN timetable_period -->
                                 <td style="width:{TIMETABLE_FIELD_WIDTH}%">
@@ -54,12 +55,12 @@
                                                 {PERIOD_DESC}
                                             </a>
                                             <div>{PERIOD_CODE}<br />
-                                            {PERIOD_ROOM}</div>
+                                                {PERIOD_ROOM}</div>
                                             <!-- BEGIN period_class_link_attendance -->
                                             <br />
                                             <span class="{ATTENDANCE_ICON}">
                                                 <a href='/modules/tassportal/teacherkiosk?link=kiosk/index.cfm%3Fdo%3Dkiosk.curriculum.TIACurAttndBasic%26tt_id%3D{ATTENDANCE_TIMETABLE_CODE}%26classes%3D{ATTENDANCE_CLASS_CODE}%26yeargroupsandclasses%3D%7C{ATTENDANCE_CLASS_CODE}%26bfromtimetable%3Dtrue%26amp%3Bcurrenttchcode%3D{EXTERNAL_ID}%26mode%3DAttend%26subjectcode%3D{ATTENDANCE_SUBJECT_CODE}%26ttdate%3D{ATTENDANCE_ATTENDANCE_DATE}%26periodcode%3D{ATTENDANCE_ATTENDANCE_PERIOD}%26dayCode%3D{ATTENDANCE_ATTENDANCE_DAY}%26tchCode%3D{EXTERNAL_ID}'
-                                                title="Mark Attendance">Attendance</a>
+                                                   title="Mark Attendance">Attendance</a>
                                             </span>
                                             <!-- END period_class_link_attendance -->
                                         </div>
@@ -69,7 +70,7 @@
                                         <div class="timetable-subject" style="background:{PERIOD_COLOUR};" data-timetable-subject>
                                             {PERIOD_DESC}
                                             <div>{PERIOD_CODE}<br />
-                                            {PERIOD_ROOM}</div>
+                                                {PERIOD_ROOM}</div>
                                             <!-- BEGIN period_class_attendance -->
                                             <br />
                                             <span class="{ATTENDANCE_ICON}">
@@ -83,13 +84,13 @@
                                 </td>
                                 <!-- END timetable_period -->
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            <!-- END campus_timetable -->
-
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
             <div class="row timetable-small show-for-small-only" data-smaller></div>
+            <!-- END campus_timetable -->
         </div>
     </div>
 </div>
