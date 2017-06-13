@@ -5,10 +5,9 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Survey\Model as Survey;
-use Schoolbox\User;
 
 class Component_Config_Survey extends Component_Config_Abstract
 {
@@ -26,15 +25,16 @@ class Component_Config_Survey extends Component_Config_Abstract
             /** @var Survey $survey */
             $survey = $surveyMapper->findById($configValue);
 
-            $selectedValues   = [];
+            $selectedValues = [];
             $selectedValues[] = [
-                'id'   => $survey->getId(),
+                'id' => $survey->getId(),
                 'name' => $survey->getFolder()->getName() . " - " . $survey->getTitle(),
             ];
+
             $page->setVar('COMPONENT_CONFIG_ID', $survey->getId());
             $page->setVar('COMPONENT_CONFIG_VALUE', json_encode($selectedValues));
 
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
 
             $page->setVar('COMPONENT_CONFIG_NAME', 'Survey');
             $page->setVar('COMPONENT_CONFIG_ID', '');
