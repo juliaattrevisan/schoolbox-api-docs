@@ -153,15 +153,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 ]);
 
                 break;
-
-            case BaseMapper::METHOD_DELETE:
-                $bundle->detachEach([
-                    self::TRIGGER_OPEN,
-                    self::TRIGGER_UPCOMING,
-                    self::TRIGGER_OVERDUE,
-                    self::TRIGGER_CLOSED,
-                ]);
-                break;
         }
 
     }
