@@ -597,7 +597,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 html += '</div>';
 
             }
-
+            
             $pickerResponseDueWork.append(html);
 
             $pickerResponse.find('[data-show-full-due]').click(function() {
@@ -652,8 +652,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 height: 0, // Height is calculated below on render
                 defaultDate: moment(data.date),
                 viewRender: function() {
-                    // Calculate the height available for this and set it
-                    $calendarDiv.fullCalendar('option', 'height', calcCalendarHeight(target));
+                    // Calculate the height available and set it
+                    setFullCalendarHeight(target);
 
                 }
             });
@@ -788,34 +788,43 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
 
     /**
-     * Determine the amount of space available for fullcalendar in the right panel
+     * Determine the amount of space available for fullcalendar in the right panel, then set it.
+     * This will create an interval to loop until the due work card has loaded (if there will be one).
      *
      * @param target
-     * @return int
      */
-    function calcCalendarHeight(target) {
+    function setFullCalendarHeight(target) {
 
-        var calendarHeight = $('[data-adtp-left-panel=' + target + ']').outerHeight(true); // The height of the left panel
-        var calendarTitleHeight = $('#' + target + 'Response' + twigVars.id + '-events [data-adtp-calendar-title]').outerHeight(true); // Height of the 'your calendar' heading
-        var dueWorkHeight; // Height of the 'heaviest workload' card (with the 'mini' heading)
+        var intervalLength = 0; // Run this immediately (an interval will be set after the first run)
 
-        if (pickerOptions.type != 'duework') {
-            dueWorkHeight = 1; // Avoid endless loop below
-        }
+        var calcInterval = setInterval(function() {
 
-        // In absence of a way to check when the elements have all loaded - loop this until the due work div has a height.
-        do {
-            // Subtract heights from the left panel height as necessary
-            calendarHeight -= calendarTitleHeight;
+            var $dueWorkCard = $('#' + target + 'Response' + twigVars.id + '-duework'), // The 'heaviest workload' card (with the 'mini' heading)
+                dueWorkHeightInner = $dueWorkCard.height();                             // Height of the card above, excluding padding & margins
 
-            if (pickerOptions.type == 'duework') {
-                dueWorkHeight = $('#' + target + 'Response' + twigVars.id + '-duework').outerHeight(true);
-                calendarHeight -= dueWorkHeight;
+            // Check if the height should now be set (either no due work or due work hasn't loaded)
+            if ((pickerOptions.type != 'duework') || (pickerOptions.type == 'duework' && dueWorkHeightInner > 0)) {
+
+                var calendarHeight = $('[data-adtp-left-panel=' + target + ']').outerHeight(true),                                              // The height of the left panel
+                    calendarTitleHeight = $('#' + target + 'Response' + twigVars.id + '-events [data-adtp-calendar-title]').outerHeight(true),  // Height of the 'your calendar' heading
+                    dueWorkHeightOuter = $dueWorkCard.outerHeight(true);                                                                        // Height of the card above, including padding & margins
+
+                // Subtract heights from the left panel height as necessary
+                calendarHeight -= calendarTitleHeight;
+                if (pickerOptions.type == 'duework') {
+                    calendarHeight -= dueWorkHeightOuter;
+                }
+
+                // Set the fullcalendar height
+                $('#' + target + 'Response' + twigVars.id + '-events #calendar-response-fc').fullCalendar('option', 'height', calendarHeight);
+
+                // Stop this from running again
+                clearInterval(calcInterval);
             }
 
-        } while (dueWorkHeight == 0);
+            intervalLength = 500;
 
-        return calendarHeight;
+        }, intervalLength);
     }
 
 
