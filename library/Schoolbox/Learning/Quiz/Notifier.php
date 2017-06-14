@@ -98,6 +98,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         /** @var Model $quiz */
         $quiz = $bundle->getEvent()->getObject();
 
+        // check for detachment
+        if ($bundle->getMethod() === Mapper::METHOD_DELETE) {
+            $bundle->detachEach([
+                self::TRIGGER_OPEN,
+                self::TRIGGER_UPCOMING,
+                self::TRIGGER_OVERDUE,
+                self::TRIGGER_CLOSED,
+            ]);
+            return;
+        }
+
         // the mere fact that this is required is ludicrous
         if (!($quiz->getStart() && $quiz->getFinish())) {
             $quiz = $this->fullyHydrateQuiz($quiz);
