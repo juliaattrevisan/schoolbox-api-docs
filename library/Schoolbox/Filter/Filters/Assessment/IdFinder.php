@@ -81,14 +81,14 @@ class IdFinder extends Filter\AbstractIdFinder
         $termsDue       = $completeFilters[TermFilter\Due\Definition::class];
         $termsClose     = $completeFilters[TermFilter\Close\Definition::class];
         $weightings     = $completeFilters[WeightingType\Definition::class];
-        $workTypes      = $completeFilters[WorkTypeFilter\Definition::class];
+        $workTypeIds    = $completeFilters[WorkTypeFilter\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)               = $this->getClauseAType($aTypes);
         list($temporalWhere, $temporalParams)       = $this->getClauseTemporalState($temporalStates);
         list($termDJoin, $termDWhere, $termDParams) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         list($termCJoin, $termCWhere, $termCParams) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams)     = $this->getClauseWeighting($weightings);
-        list($workTypeWhere,  $workTypeParams)      = $this->getClauseWorkType($workTypes);
+        list($workTypeWhere,  $workTypeParams)      = $this->getClauseWorkType($workTypeIds);
         list($deletedWhere)                         = $this->getClauseDeleted($deleted);
 
         // Merge all the params
@@ -701,13 +701,13 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'WorkType' filter
      *
-     * @param Collection|WorkType\Model[] $workTypes
+     * @param Collection|int[] $workTypeIds
      * @return mixed[]
      */
-    private function getClauseWorkType(Collection $workTypes = null)
+    private function getClauseWorkType(Collection $workTypeIds = null)
     {
         // If no workTypes selected, don't filter
-        if (null === $workTypes) {
+        if (null === $workTypeIds) {
             return ['TRUE', []];
         }
 
@@ -716,16 +716,16 @@ class IdFinder extends Filter\AbstractIdFinder
         // There are two ways to specify that you want assessments without a workType.
         // The first is by passing an empty Collection, the latter is by inserting NULL in that collection.
         // Need to support both.
-        if (!$workTypes->count()) {
+        if (!$workTypeIds->count()) {
             $builder->isNull('a.work_type_id');
         }
 
         // If Collection is empty, this will never execute - so no need to wrap
-        foreach ($workTypes as $workType) {
-            if (null === $workType) {
+        foreach ($workTypeIds as $workTypeId) {
+            if (null === $workTypeId) {
                 $builder->isNull('a.work_type_id');
             } else {
-                $builder->equals('a.work_type_id', $workType->getId());
+                $builder->equals('a.work_type_id', $workTypeId);
             }
         }
         return ['(' . implode(' OR ', $builder->getWhere()) . ')', $builder->getParams()];
