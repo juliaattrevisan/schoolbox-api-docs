@@ -9,6 +9,7 @@ suites:
                     url: http://192.168.36.10
                     browser: chrome
                     port: 4444
+                    window_size: maximize
                 - \Helper\Acceptance
                 
 extensions:
