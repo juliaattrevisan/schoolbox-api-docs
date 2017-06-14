@@ -15,20 +15,31 @@ use Schoolbox\User;
  * Responsible:
  * * Convert POST/GET array to Selection\Model[][]
  * * Convert Selection\Model[][] to GET param string
- * * Convert Filters to GET param string
  *
  * TODO - for now there is no compression. Need to add this in SA-3201
  * TODO - This is placeholder. All server-side URL compression/decompression + encoding/decoding will happen inside here
  */
 class Codec
 {
+
+    /**
+     * @var Mapper
+     */
     private $filterMapper;
 
+    /**
+     * @var Selection\Mapper
+     */
     private $selectionMapper;
 
+
+    /**
+     * @param Mapper           $filterMapper
+     * @param Selection\Mapper $selectionMapper
+     */
     public function __construct(Mapper $filterMapper, Selection\Mapper $selectionMapper)
     {
-        $this->filterMapper = $filterMapper;
+        $this->filterMapper    = $filterMapper;
         $this->selectionMapper = $selectionMapper;
     }
 
@@ -40,9 +51,9 @@ class Codec
      *
      * Only pageFilters that are enabled for this page will have their key-converters injected.
      *
-     * @param User                              $user
-     * @param string                            $page
-     * @param int[][]                           $request       Indexed by filter.id, then selection.key
+     * @param User    $user
+     * @param string  $page
+     * @param int[][] $request Indexed by filter.id, then selection.key
      * @return Collection|GenericCollection[]|Selection\Model[][] Indexed by filter.id then selection.key
      */
     public function convertRequestToSelections(User $user, $page, array $request)

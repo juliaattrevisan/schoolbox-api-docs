@@ -9,8 +9,10 @@ namespace Schoolbox\Filter\Filters\Assessment;
 
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Learning\Assessment\WorkType as AWorkType;
+use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
+use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
 
 
 /**
@@ -76,10 +78,10 @@ class IdFinder extends Filter\AbstractIdFinder
         // Sub-query modifiers
         $aTypes         = $completeFilters[AssessmentType\Definition::class];
         $temporalStates = $completeFilters[TemporalState\Definition::class];
-        $termsDue       = $completeFilters[\Schoolbox\Filter\Filters\Assessment\Term\Due\Definition::class];
-        $termsClose     = $completeFilters[\Schoolbox\Filter\Filters\Assessment\Term\Close\Definition::class];
+        $termsDue       = $completeFilters[TermFilter\Due\Definition::class];
+        $termsClose     = $completeFilters[TermFilter\Close\Definition::class];
         $weightings     = $completeFilters[WeightingType\Definition::class];
-        $workTypes      = $completeFilters[WorkType\Definition::class];
+        $workTypes      = $completeFilters[WorkTypeFilter\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)               = $this->getClauseAType($aTypes);
         list($temporalWhere, $temporalParams)       = $this->getClauseTemporalState($temporalStates);
@@ -699,7 +701,7 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'WorkType' filter
      *
-     * @param Collection|AWorkType\Model[] $workTypes
+     * @param Collection|WorkType\Model[] $workTypes
      * @return mixed[]
      */
     private function getClauseWorkType(Collection $workTypes = null)
@@ -842,14 +844,14 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Did call explicitly request assessments due in some term, but no terms supplied?
-        $termsDue = $completeFilters[\Schoolbox\Filter\Filters\Assessment\Term\Due\Definition::class];
+        $termsDue = $completeFilters[TermFilter\Due\Definition::class];
         if ($termsDue instanceOf Collection && !$termsDue->count()) {
             // All assessments have due dates
             return true;
         }
 
         // Did call explicitly request assessments close in some term, but no terms supplied?
-        $termsClose = $completeFilters[\Schoolbox\Filter\Filters\Assessment\Term\Close\Definition::class];
+        $termsClose = $completeFilters[TermFilter\Close\Definition::class];
         if ($termsClose instanceOf Collection && !$termsClose->count()) {
             // All assessments have have a close date
             return true;

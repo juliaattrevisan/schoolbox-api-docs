@@ -60,7 +60,7 @@ abstract class AbstractDefinition implements IDefinition
      */
     public static function isMandatory($page)
     {
-        // Default to not being mandatory. The admin can disable the filter from any page.
+        // Default to not being mandatory. The admin can disable this filter on any page where it appears.
         return false;
     }
 
