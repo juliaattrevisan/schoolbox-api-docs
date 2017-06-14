@@ -40,7 +40,7 @@ interface IKeyConverter
      *
      *
      * @param null|GenericCollection|Selection\Model[] $availableSelections Indexed by setting.key
-     * @return null|Collection (intentionally not GenericCollection)
+     * @return null|Collection|int[]|string[] (intentionally not GenericCollection as it only contains scalars)
      */
     public function getSelectedItems(GenericCollection $availableSelections = null);
 

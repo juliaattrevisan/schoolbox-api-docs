@@ -10,7 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
+
 
 /**
  * Specialised logic to deal with the 'KEY_NONE' semantics

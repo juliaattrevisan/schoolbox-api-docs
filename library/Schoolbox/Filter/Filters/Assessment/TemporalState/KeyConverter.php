@@ -10,12 +10,10 @@ namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\GenericCollection;
 
 
 /**
  * Converts between TemporalState concrete keys and TemporalState strings
- * @method null|Collection|string[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 class KeyConverter extends AbstractKeyConverter
 {

@@ -15,7 +15,6 @@ use Schoolbox\Filter;
 
 /**
  * Converts between termFilter concrete keys and Term.ids
- * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 abstract class KeyConverter extends AbstractKeyConverter
 {
