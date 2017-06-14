@@ -80,46 +80,71 @@ class Factory extends Filter\AbstractFactory
         User $viewee = null
     ) {
         return [
-            'projects' => $this->getProjects($pageFilter->getOptions(), $viewee),
+            'projects' => $this->getProjects($pageFilter, $viewee),
         ];
     }
 
 
     /**
-     * @param Collection|GenericCollection[]|\Schoolbox\Filter\Page\Option\Model[][] $options
-     * @param User                                                                   $viewee
+     * @param Filter\Page\Model $pageFilter
+     * @param User              $viewee
      * @return Collection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      */
-    private function getProjects(Collection $options, User $viewee)
+    private function getProjects(Filter\Page\Model $pageFilter, User $viewee)
     {
+        // Determine which folders we are ultimately interested in getting projects from:
+        $options             = $pageFilter->getOptions();
+
+        $optionNone          = $options[Definition::KEY_NONE];
+        $optionClassFolder   = $options[Definition::KEY_ON_CLASS_FOLDER];
+        $optionGroupFolder   = $options[Definition::KEY_ON_GROUP_FOLDER];
+        $optionClassUnitImpl = $options[Definition::KEY_ON_CLASS_UNIT_IMPL];
+        $optionGroupUnitImpl = $options[Definition::KEY_ON_GROUP_UNIT_IMPL];
+
+        if ($pageFilter->getUserConfigurable()) {
+            $inClass                   = $optionClassFolder->getAvailable();
+            $inGroup                   = $optionGroupFolder->getAvailable();
+            $inUnitImplImportedToClass = $optionClassUnitImpl->getAvailable();
+            $inUnitImplImportedToGroup = $optionGroupUnitImpl->getAvailable();
+        } else {
+            $roleType   = $viewee->getRole()->getType();
+            $inNone                    = $optionNone->getDefaults()[$roleType]->getSelected();
+            $inClass                   = $optionClassFolder->getDefaults()[$roleType]->getSelected();
+            $inGroup                   = $optionGroupFolder->getDefaults()[$roleType]->getSelected();
+            $inUnitImplImportedToClass = $optionClassUnitImpl->getDefaults()[$roleType]->getSelected();
+            $inUnitImplImportedToGroup = $optionGroupUnitImpl->getDefaults()[$roleType]->getSelected();
+
+            // Are all available options unchecked ?
+            if(!($inNone || $inClass || $inGroup || $inUnitImplImportedToClass || $inUnitImplImportedToGroup)){
+                // For consistency, this must logically equate to the filter not reducing the full set.
+                $inNone = $inClass = $inGroup = $inUnitImplImportedToClass = $inUnitImplImportedToGroup = true;
+            }
+        }
+        // Which folders do we need to fetch ?
+        $getClasses = $inClass || $inUnitImplImportedToClass;
+        $getGroups  = $inGroup || $inUnitImplImportedToGroup;
+
         $projects = $this->projectMapper->createCollection();
 
-        // Determine which folders we are ultimately interested in getting projects from:
-        $onClassFolder             = $options[Definition::KEY_ON_CLASS_FOLDER]->getAvailable();
-        $onGroupFolder             = $options[Definition::KEY_ON_GROUP_FOLDER]->getAvailable();
-        $inUnitImplImportedToClass = $options[Definition::KEY_ON_CLASS_UNIT_IMPL]->getAvailable();
-        $inUnitImplImportedToGroup = $options[Definition::KEY_ON_GROUP_UNIT_IMPL]->getAvailable();
-
-        $getSubjects      = $onClassFolder || $inUnitImplImportedToClass;
-        $groupAccessLevel = $onGroupFolder || $inUnitImplImportedToGroup ? UserAccess::ACCESS_WRITE
-            : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
-
         // Are we not getting projects for either classes or groups?
-        if (!$getSubjects && $groupAccessLevel !== UserAccess::ACCESS_WRITE) {
+        if (!$getClasses && $getGroups) {
             // Bug out early.
             return $projects;
         }
 
-        $involvedFolders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
+        // Note: '-1' is a hack to mean 'INVALID', to force no group folders to be matched.
+        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : -1;
+
+        $involvedFolders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, true);
 
         // Divide folders into immediate contexts, and indirect contexts via a unit-impl
         /** @var GenericCollection $directFolders */
-        $directFolders = $involvedFolders->filter(function (Folder\Model $folder) use ($onClassFolder, $onGroupFolder) {
+        $directFolders = $involvedFolders->filter(function (Folder\Model $folder) use ($inClass, $inGroup) {
             $isClass = $folder->getCodes()->count();
             $isGroup = $folder->getGroup();
-            return ($isClass && $onClassFolder) || ($isGroup && $onGroupFolder);
+            return ($isClass && $inClass) || ($isGroup && $inGroup);
         })->indexBy('id');
 
         /** @var GenericCollection $indirectFolders */

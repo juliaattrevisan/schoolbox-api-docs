@@ -76,7 +76,7 @@ class Definition extends NullableContext\Definition
     {
         // For now, not available on any pages - purely used for internal query building
         return [
-//            \Schoolbox\Filter\Option\Model::PAGE_MARK_BOOK,
+//            Filter\Page\Model::PAGE_MARK_BOOK,
         ];
     }
 
