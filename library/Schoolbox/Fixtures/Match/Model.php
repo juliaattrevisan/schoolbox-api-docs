@@ -161,7 +161,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Team $homeTeam
+     * @param Team $homeTeam|null
      * @return static
      */
     public function setHomeTeam(Team $homeTeam = null)
@@ -179,7 +179,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Team $awayTeam
+     * @param Team $awayTeam|null
      * @return static
      */
     public function setAwayTeam(Team $awayTeam = null)
@@ -197,7 +197,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param School $awaySchool
+     * @param School $awaySchool|null
      * @return static
      */
     public function setAwaySchool(School $awaySchool = null)
@@ -215,7 +215,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param School $homeSchool
+     * @param School $homeSchool|null
      * @return static
      */
     public function setHomeSchool(School $homeSchool = null)
