@@ -67,7 +67,9 @@
                      # at this point in time. Also disables when copying
                      # the rubric mark value in.
                      #}
-                    $assignFromRubricButton.on('click', function() {
+                    $assignFromRubricButton.on('click', function(e) {
+
+                        e.preventDefault();
                         $(this).prop('disabled', true);
 
                         $status
