@@ -29,21 +29,29 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     var heatCache = {};
 
-    $(document).on('opened.fndtn.reveal', '#picker' + twigVars.id, function () {
+    $(document).on('open.fndtn.reveal', '#picker' + twigVars.id, function () {
 
-        if(twigVars.timetable && $('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value') !== undefined) {
-
-            var inputDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
-                timetableValue =  moment(getTimetablePickerValue(), momentFormats.databaseShort);
-
-            if(timetableValue.diff(inputDate)) {
-                setTimetablePickerValue(inputDate.format(momentFormats.databaseShort));
-                resetTerms();
-                requestDataByDate(inputDate.format(momentFormats.databaseShort), 'timetable');
-            }
-        }
+        resetTimetablePicker(getPickerValue(twigVars.id));
 
     });
+
+    function resetTimetablePicker(date) {
+
+        if(twigVars.timetable) {
+
+            var timetableValue =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
+                activeValue = moment(date, momentFormats.databaseShort);
+
+            if(timetableValue.diff(activeValue)) {
+                setTimetablePickerValue(activeValue.format(momentFormats.databaseShort));
+                requestDataByDate(activeValue.format(momentFormats.databaseShort), 'timetable');
+            }
+
+            resetTerms();
+
+        }
+
+    }
 
     // Timetable picker
     var $byTimetable = $('#byTimetable-' + twigVars.id);
@@ -60,10 +68,14 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Converting JS date to database short format
         var initialDate = twigVars.date.getFullYear() + '-' + ('0' + (twigVars.date.getMonth()+1)).slice(-2) + '-' + twigVars.date.getDate();
 
+        // Set initial value to the timetable picker
         setTimetablePickerValue(initialDate);
-        resetTerms();
-        revealTimetable();
+
+        // Get data for the initial date
         requestDataByDate(encodeURIComponent(initialDate), 'timetable');
+
+        // // Visualise the timetable picker for the given date
+        // resetTimetablePicker(initialDate);
 
         // Listen for changes to campus
         timetable.campus.change(function () {
@@ -244,7 +256,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             selectedTerm = timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
             termEnd = timetable.term.find(':selected').attr('data-end-date'),
-            monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd)),
             activeDate = moment(getTimetablePickerValue(), momentFormats.databaseShort);
 
         // Don't try to divide by zero
@@ -283,7 +294,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
              */
             resetCycles();
 
-            // trigger a fetch for any heat data that might be absent
+            var  monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
+
+                // trigger a fetch for any heat data that might be absent
             for (var year in monthsToFetch) {
                 for (var monthIndex in monthsToFetch[year]) {
                     requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
