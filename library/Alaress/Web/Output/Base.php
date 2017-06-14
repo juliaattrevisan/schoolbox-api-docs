@@ -6,8 +6,6 @@
  * Depending on the output content, it may output a JSON array, a JSON/HTML
  * object, HTML wrapped in a skin or HTML with no template.
  *
- * It expects that
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -19,9 +17,7 @@ use Aura\Web\Response;
 
 class Base implements OutputInterface
 {
-    /**
-     * @var Response
-     */
+    /** @var Response $response */
     protected $response;
 
     /**
@@ -47,17 +43,22 @@ class Base implements OutputInterface
         $this->outputResponseCode();
         $this->outputHeaders();
         $this->outputCookies();
+
         // Don't send response body if there is a redirect.
+
         $location = $this->getResponse()->headers->get('location');
 
         // Is there a post-output callback?
         // Buffer response body and output it later
+
         if ($this->hasPostOutputCallbacks()) {
             ob_start();
         }
+
         if (!isset($location)) {
             $this->outputResponseBody();
         }
+
         if ($this->hasPostOutputCallbacks()) {
             $this->runPostOutputCallbacks(ob_get_clean());
         }
@@ -68,21 +69,32 @@ class Base implements OutputInterface
      *
      * This method can be overridden to mangle the response object, headers, etc.
      */
-    public function preprocessOutput() {}
+    public function preprocessOutput()
+    {
+    }
 
     /**
      * Outputs the response code header from the response.
      */
-    protected function outputResponseCode() {
-        header($this->getResponse()->status->get(), true, $this->getResponse()->status->getCode());
+    protected function outputResponseCode()
+    {
+        header(
+            $this->getResponse()->status->get(),
+            true,
+            $this->getResponse()->status->getCode()
+        );
     }
 
     /**
      * Outputs other headers from the response (besides the response code, which
      * is output by outputResponseCode())
      */
-    protected function outputHeaders() {
-        foreach ($this->getResponse()->headers->get() as $label => $value) {
+    protected function outputHeaders()
+    {
+        /** @var array $headers */
+        $headers = $this->getResponse()->headers->get();
+
+        foreach ($headers as $label => $value) {
             header("{$label}: {$value}");
         }
     }
@@ -90,7 +102,8 @@ class Base implements OutputInterface
     /**
      * Outputs cookies from the response object.
      */
-    protected function outputCookies() {
+    protected function outputCookies()
+    {
         foreach ($this->getResponse()->cookies->get() as $name => $cookie) {
             setcookie(
                 $name,
@@ -107,12 +120,12 @@ class Base implements OutputInterface
     /**
      * Outputs the response body from the response object.
      *
-     * This method assumes the output is simply a string, or was set in
-     * `$this->setData`.
+     * This method assumes the output is simply a string, or was set in `$this->setData`.
      */
     protected function outputResponseBody()
     {
         $data = $this->getData();
+
         if (isset($data)) {
             echo $data;
         } else {
@@ -130,9 +143,11 @@ class Base implements OutputInterface
     protected function getPostOutputCallbacks()
     {
         $content = $this->getResponse()->content->get();
+
         if (is_array($content) && isset($content['postOutput'])) {
             return $content['postOutput'];
         }
+
         return [];
     }
 
@@ -156,18 +171,26 @@ class Base implements OutputInterface
     protected function runPostOutputCallbacks($output = '')
     {
         $callbacks = $this->getPostOutputCallbacks();
+
         if (!empty($callbacks)) {
+
             // Output now
             // No content encoding because gzip interferes with content length
+
             echo $output;
+
             header('Content-Encoding: none');
-            header("Content-Length: ".strlen($output));
+            header("Content-Length: " . strlen($output));
             header('Connection: close');
-            ignore_user_abort(); // this appears to do nothing. With no param, this is a getter, not setter...
+
+            // this appears to do nothing. With no param, this is a getter, not setter...
+
+            ignore_user_abort();
             flush();
             session_write_close();
 
             // Callbacks
+
             foreach ($callbacks as $callback) {
                 if (is_callable($callback)) {
                     $callback();
@@ -181,35 +204,39 @@ class Base implements OutputInterface
      *
      * Assumes that `$this->response->content` is an array or array-like object.
      *
-     * @param  string $field
-     * @param  mixed  $default
+     * @param string $field
+     * @param mixed $default
      * @return mixed Value of $field in $response, or $default if not set.
      */
     protected function retrieveFieldFromResponse($field, $default = null)
     {
         if ($this->response instanceof Response) {
             $content = $this->getResponse()->content->get();
+
             // $content could be this same object (as it's set via $response->set)
             if (is_array($content) || $content instanceof \ArrayAccess) {
                 return isset($content[$field]) ? $content[$field] : $default;
             }
         }
+
         return $default;
     }
 
     /**
-     * @param  \Aura\Web\Response $response
+     * @param Response $response
      * @return $this
      */
-    public function setResponse($response) {
+    public function setResponse($response)
+    {
         $this->response = $response;
         return $this;
     }
 
     /**
-     * @return \Aura\Web\Response
+     * @return Response
      */
-    public function getResponse() {
+    public function getResponse()
+    {
         return $this->response;
     }
 
@@ -218,9 +245,7 @@ class Base implements OutputInterface
      */
     protected function getData()
     {
-        return isset($this->data)
-            ? $this->data
-            : $this->retrieveFieldFromResponse('data', []);
+        return isset($this->data) ? $this->data : $this->retrieveFieldFromResponse('data', []);
     }
 
     /**
