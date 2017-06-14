@@ -139,8 +139,6 @@ class Controller extends Base
 
         $eportfolioImport = new EportfolioImport();
         $eportfolioImport->setOwnerId($this->getUser()->getId());
-        $eportfolioImport->setCreatedAt(Alaress_Date_Format::now());
-        $eportfolioImport->setUpdatedAt(Alaress_Date_Format::now());
         $this->eportfolioImportMapper->save($eportfolioImport);
         $id = $eportfolioImport->getId();
 
