@@ -21,6 +21,15 @@
     {% if 0 == roleSelections | length %}
         {# By default, no available concrete options would mean no entities ever match #}
         <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
+
+        {% if isUserConfigurable %}
+            <div class="empty-state">
+                <i class="icon-info"></i>
+                <p>No results possible as no filter options available.<br>
+                Please contact your administrator if you think this is in error.
+                </p>
+            </div>
+        {% endif %}
     {% else %}
         {% block userOptions %}
             {% for selection in roleSelections %}
