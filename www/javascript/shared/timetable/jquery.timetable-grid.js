@@ -169,7 +169,6 @@
                  */
                 header: '<h2 class="subheader"></h2>',
                 island: '<div class="small-12 island no-pad"></div>',
-                section: '<section></section>'
             }
 
             var merged = $.extend(defaults, derived, options);
@@ -230,8 +229,7 @@
                     table.append(tr);
                 });
 
-                var section = $(config.section).append(table);
-                var island = $(config.island).append(header).append(section)
+                var island = $(config.island).append(header).append(table);
 
                 /* Inject and add a separator in case you have multiple timetables
                  */
