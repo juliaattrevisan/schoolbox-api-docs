@@ -87,7 +87,12 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
         }
 
 		/** @var SubmissionBox $box */
-		$box = $this->boxMapper->findById($mark->getSubmissionBox()->getId());
+		$box = $this->boxMapper->findByIdWithFallback($mark->getSubmissionBox()->getId());
+
+		if ($box->isDeleted()) {
+			// don't. even. bother.
+			return;
+		}
 
 		if($box->getMarkVisibility() == IAssessable::MARK_VISIBILITY_PRIVATE) {
 			// don't. even. bother.
