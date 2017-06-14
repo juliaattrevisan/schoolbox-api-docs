@@ -36,6 +36,11 @@ abstract class KeyConverter extends AbstractKeyConverter
         $availableItems = $allItems->emptyClone();
         $selectedItems  = $allItems->emptyClone();
 
+        // No available items?
+        if (0 === $availableSelections->count()) {
+            return $selectedItems;
+        }
+
         foreach ($availableSelections as $selection) {
             $key  = $selection->getKey();
             $item = $this->getItem($key);
