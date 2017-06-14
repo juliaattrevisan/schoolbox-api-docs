@@ -58,6 +58,7 @@ class Factory extends Filter\AbstractFactory
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException If $viewee is NULL
      */
     protected function buildExtraComponentArgs(
         User $user,
@@ -66,18 +67,36 @@ class Factory extends Filter\AbstractFactory
         GenericCollection $overrides = null,
         User $viewee = null
     ) {
+        if(null === $viewee){
+            throw new \InvalidArgumentException('Viewee cannot be null');
+        }
+
         // Should this role type see classes for this page?
         $options     = $pageFilter->getOptions();
+        $noneOption  = $options[Definition::KEY_NONE];
         $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS];
         $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP];
 
-        $getSubjects = $classOption->getAvailable();
+        if($pageFilter->getUserConfigurable()){
+            $getClasses = $classOption->getAvailable();
+            $getGroups  = $groupOption->getAvailable();
+        } else {
+            $roleType   = $viewee->getRole()->getType();
+            $getNone    = $noneOption->getDefaults()[$roleType]->getSelected();
+            $getClasses = $classOption->getDefaults()[$roleType]->getSelected();
+            $getGroups  = $groupOption->getDefaults()[$roleType]->getSelected();
 
-        $groupAccessLevel = $groupOption->getAvailable()
-            ? UserAccess::ACCESS_WRITE
-            : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
+            // Are all available options unchecked ?
+            if(!$getNone && !$getClasses && !$getGroups){
+                // For consistency, this must logically equate to the filter not reducing the full set.
+                $getClasses = $getGroups = true;
+            }
+        }
 
-        $folders = $this->folderMapper->findForUser($viewee, $getSubjects, $groupAccessLevel, true);
+        // Note: '-1' is a hack to mean 'INVALID', to force no group folders to be matched.
+        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : -1;
+
+        $folders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, true);
 
 
         // Get all courses imported to these folders

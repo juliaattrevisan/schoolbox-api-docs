@@ -6,48 +6,36 @@
         userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
         projects:       Project\Model[]   - Project data models, linked via assessment model to Folder or UnitImpl
         keyNone:        string            - The 'NONE' key
-
-
 #}
+{% extends '@filters/_component.twig' %}
 
-{% set filterName = locale.project.proper %}
+{% block filterName %}{{ locale.project.proper }}{% endblock %}
 
-{# Are any options available? #}
-{% if 0 == roleSelections | length %}
-    {# By default, no available concrete options would mean no entities ever match #}
-    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
-{% else %}
+{% block userOptions %}
 
-    <div class="checklist" data-component="{{ definition.filter.id }}" {% if isUserConfigurable %}style="margin: 0 15px; min-width: 100px;"{% endif %}>
+    {% if roleSelections[keyNone] %}
+        {% include '@filters/_selectionCheckbox.twig' with {
+            roleSelection:      roleSelections[keyNone],
+            userSelection:      userSelections[keyNone],
+            label:              '(none)',
+            disabled:           isDisabled
+        } only %}
+    {% endif %}
 
-        {% set isDisabled = 1 == roleSelections | length %}
-
-        {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}{% if isDisabled %}<span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>{% endif %}</h4>{% endif %}
-
-        {% if roleSelections[keyNone] %}
-            {% include '@filters/_selectionCheckbox.twig' with {
-                roleSelection:      roleSelections[keyNone],
-                userSelection:      userSelections[keyNone],
-                label:              '(none)',
-                disabled:           isDisabled
-            } only %}
+    {% for project in projects %}
+        {% set selection = roleSelections[project.id] %}
+        {% if project.assessmentModel.assessmentContext is unitImplementation %}
+            {% set title = project.title ~ ' (' ~ project.folder.title ~ ')' %}
+        {% else %}
+            {% set title = project.title %}
         {% endif %}
 
-        {% for project in projects %}
-            {% set selection = roleSelections[project.id] %}
-            {% if project.assessmentModel.assessmentContext is unitImplementation %}
-                {% set title = project.title ~ ' (' ~ project.folder.title ~ ')' %}
-            {% else %}
-                {% set title = project.title %}
-            {% endif %}
-
-            {% include '@filters/_selectionCheckbox.twig' with {
-                roleSelection: selection,
-                userSelection: userSelections[project.id],
-                label:         title,
-                disabled:      isDisabled
-            } only %}
-        {% endfor %}
-    </div>
-{% endif %}
+        {% include '@filters/_selectionCheckbox.twig' with {
+            roleSelection: selection,
+            userSelection: userSelections[project.id],
+            label:         title,
+            disabled:      isDisabled
+        } only %}
+    {% endfor %}
+{% endblock %}
 

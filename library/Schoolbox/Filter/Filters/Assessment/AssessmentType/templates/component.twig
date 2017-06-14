@@ -1,4 +1,4 @@
 {% extends '@filters/_component.twig' %}
 
-{% set filterName = locale.assessment.proper ~ ' Type' %}
+{% block filterName %}{{ locale.assessment.proper ~ ' Type' }}{% endblock %}
 

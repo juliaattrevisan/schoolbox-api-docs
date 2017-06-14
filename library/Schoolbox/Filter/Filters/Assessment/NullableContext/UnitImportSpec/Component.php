@@ -112,7 +112,7 @@ class Component extends Filter\AbstractComponent
 
             $selected = $option->getDefaults()[$roleType]->getSelected();
 
-            // Is this the 'On Folder' abstract option?
+            // Is this the '(none)' abstract option?
             if (Definition::KEY_NONE === $option->getKey()) {
                 $key                       = $option->getKey();
                 $availableSelections[$key] = $this->createSelection($key, $selected);

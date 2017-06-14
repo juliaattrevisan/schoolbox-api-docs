@@ -8,41 +8,30 @@
         keyNone:            string            - The '(none)' key
 
 #}
+{% extends '@filters/_component.twig' %}
 
-{% set filterName = locale.unit.proper %}
+{% block filterName %}{{ locale.unit.proper }}{% endblock %}
 
-{# Are any options available? #}
-{% if 0 == roleSelections | length %}
-    {# By default, no available concrete options would mean no entities ever match #}
-    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
-{% else %}
+{% block userOptions %}
+    {% if roleSelections[keyNone] %}
+        {% include '@filters/_selectionCheckbox.twig' with {
+            roleSelection:      roleSelections[keyNone],
+            userSelection:      userSelections[keyNone],
+            label:              '(none)',
+            disabled:           isDisabled
+        } only %}
+    {% endif %}
 
-    <div class="checklist" data-component="{{ definition.filter.id }}" {% if isUserConfigurable %}style="margin: 0 15px; min-width: 100px;"{% endif %}>
-
-        {% set isDisabled = 1 == roleSelections | length %}
-
-        {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}{% if isDisabled %}<span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>{% endif %}</h4>{% endif %}
-
-        {% if roleSelections[keyNone] %}
+    {% for course in courseSpecs %}
+        {% if isUserConfigurable %}{{ course.title }}{% endif %}
+        {% for unit in course.units %}
+            {% set roleSelection = roleSelections[unit.id] %}
             {% include '@filters/_selectionCheckbox.twig' with {
-                roleSelection:      roleSelections[keyNone],
-                userSelection:      userSelections[keyNone],
-                label:              '(none)',
+                roleSelection:      roleSelection,
+                userSelection:      userSelections[unit.id],
+                label:              unit.title,
                 disabled:           isDisabled
             } only %}
-        {% endif %}
-
-        {% for course in courseSpecs %}
-            {{ course.title }}
-            {% for unit in course.units %}
-                {% set roleSelection = roleSelections[unit.id] %}
-                {% include '@filters/_selectionCheckbox.twig' with {
-                    roleSelection:      roleSelection,
-                    userSelection:      userSelections[unit.id],
-                    label:              unit.title,
-                    disabled:           isDisabled
-                } only %}
-            {% endfor %}
         {% endfor %}
-    </div>
-{% endif %}
+    {% endfor %}
+{% endblock %}
