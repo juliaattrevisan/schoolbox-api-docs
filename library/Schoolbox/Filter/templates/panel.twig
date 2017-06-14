@@ -260,7 +260,7 @@ Usage:
             $submitButton.attr('disabled', false);
             $cancelChangesBtn.attr('disabled', false);
             $resetToDefaultsBtn.attr('disabled', false);
-            $optionCheckboxes.attr('disabled', false);
+            $optionCheckboxes.filter(':not([data-disabled])').attr('disabled', false);
         }
 
         /**

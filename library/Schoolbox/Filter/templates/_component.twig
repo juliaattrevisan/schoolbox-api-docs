@@ -18,13 +18,18 @@
 
     <div class="checklist" data-component="{{ definition.filter.id }}" {% if isUserConfigurable %}style="margin: 0 15px; min-width: 100px;"{% endif %}>
 
-        {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}</h4>{% endif %}
+        {% set isDisabled = 1 == roleSelections | length %}
+
+        {% if isUserConfigurable %}
+            <h4 data-filter-name>{{ filterName }}{% if isDisabled %}<span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>{% endif %}</h4>
+        {% endif %}
 
         {% for selection in roleSelections %}
             {% include '@filters/_selectionCheckbox.twig' with {
                 roleSelection:      selection,
                 userSelection:      userSelections[selection.key],
-                label:              definition.label(selection.key)
+                label:              definition.label(selection.key),
+                disabled:           isDisabled
             } only %}
         {% endfor %}
     </div>
