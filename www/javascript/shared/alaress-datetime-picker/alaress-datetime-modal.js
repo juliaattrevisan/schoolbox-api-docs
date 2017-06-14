@@ -654,7 +654,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 viewRender: function() {
                     // Calculate the height available and set it
                     setFullCalendarHeight(target);
-
                 }
             });
 
@@ -805,7 +804,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // Check if the height should now be set (either no due work or due work hasn't loaded)
             if ((pickerOptions.type != 'duework') || (pickerOptions.type == 'duework' && dueWorkHeightInner > 0)) {
 
-                var calendarHeight = $('[data-adtp-left-panel=' + target + ']').outerHeight(true),                                              // The height of the left panel
+                var calendarHeight = $('#picker' + twigVars.id + ' [data-adtp-left-panel=' + target + ']').outerHeight(true),                   // The height of the left panel
                     calendarTitleHeight = $('#' + target + 'Response' + twigVars.id + '-events [data-adtp-calendar-title]').outerHeight(true),  // Height of the 'your calendar' heading
                     dueWorkHeightOuter = $dueWorkCard.outerHeight(true);                                                                        // Height of the card above, including padding & margins
 
