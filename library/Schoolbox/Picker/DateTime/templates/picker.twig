@@ -18,7 +18,7 @@
 <div class="row" style="padding:0.875rem;">
     <div class="tabs-content">
         <div class="content active" id="byDate-{{ id }}" role="tabpanel" aria-hidden="false">
-            <div class="small-12 medium-{{ width }} columns">
+            <div class="small-12 medium-{{ width }} columns" data-adtp-left-panel="calendar">
 
                 {# Placeholder for calendar ot be rendered in #}
                 <div id="pickerCalendar{{ id }}"></div>
@@ -44,7 +44,7 @@
         {% if timetable %}
             <div class="content" id="byTimetable-{{ id }}" role="tabpanel" aria-hidden="true">
 
-                <div class="small-12 medium-{{ width }} columns">
+                <div class="small-12 medium-{{ width }} columns" data-adtp-left-panel="timetable">
 
                     {# Placeholder for timetable ot be rendered in #}
                     <div id="timetable{{ id }}">
@@ -114,7 +114,7 @@
                                     </label>
 
                                     {% for campus in timetable %}
-                                        <select class="{% if loop.index0 > 0 %}hide{% endif %}" data-tt-period data-campus="{{ campus.campusId }}">
+                                        <select class="adtp-tt-period {% if loop.index0 > 0 %}hide{% endif %}" data-tt-period data-campus="{{ campus.campusId }}">
                                             <option value="allday">All Day</option>
                                             {% for description in timetable[campus.campusId].desc %}
                                                 <option value="" data-start-time="{{ timetable[campus.campusId].start[loop.index0] }}" data-end-time="{{ timetable[campus.campusId].end[loop.index0] }}">{{ description }}</option>

@@ -46,6 +46,7 @@ input.datepicker-input {
         margin: 0 auto;
         border: $pickr-border;
         box-shadow: none;
+        position: static;
 
         &.arrowTop:before,
         &.arrowTop:after {
@@ -265,6 +266,10 @@ input.datepicker-input {
         font-weight: $font-weight-bold;
     }
 
+    .adtp-tt-period {
+        margin-bottom: 0;
+    }
+
 
     /**
      * Response / event list
@@ -273,17 +278,24 @@ input.datepicker-input {
         margin-top: 1rem;
 
         .top-due-work {
-            display:flex;
-            margin-bottom:.5rem;
+            display: flex;
 
             .icon-next {
                 @extend .cursor-pointer;
                 line-height: rem-calc(44);
             }
         }
+
+        .mini {
+            margin-top: 0;
+        }
     }
 
     .adtp-response-duework {
+        p {
+            margin-bottom: 0;
+        }
+
         .icon-previous {
             color: $accent-foreground;
         }
