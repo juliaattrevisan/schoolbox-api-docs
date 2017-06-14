@@ -114,6 +114,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $quiz = $this->fullyHydrateQuiz($quiz);
         }
 
+        // Still no start/finish? Attach nothing
+        if (
+            !$quiz->getStart() instanceof Alaress_Date_Format
+            || $quiz->getStart()->isNull()
+            || !$quiz->getFinish() instanceof Alaress_Date_Format
+            || $quiz->getFinish()->isNull()
+        ) {
+            return;
+        }
+
         $open = $quiz->getStart()->getUnixTimeStamp();
         $closed = $quiz->getFinish()->getUnixTimeStamp();
         $upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
