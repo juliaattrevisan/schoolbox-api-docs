@@ -14,8 +14,11 @@ suites:
                 
 extensions:
     enabled:
+        - Codeception\Extension\Logger
         - Codeception\Extension\RunFailed
         - Codeception\Extension\Recorder
+#        - Codeception\Extension\Recorder:
+#            delete_successful: false
 
 params: 
     - env
