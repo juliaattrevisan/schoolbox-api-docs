@@ -174,14 +174,14 @@ class Base implements OutputInterface
 
         if (!empty($callbacks)) {
 
+            header('Content-Encoding: none');
+            header("Content-Length: " . strlen($output));
+            header('Connection: close');
+
             // Output now
             // No content encoding because gzip interferes with content length
 
             echo $output;
-
-            header('Content-Encoding: none');
-            header("Content-Length: " . strlen($output));
-            header('Connection: close');
 
             // this appears to do nothing. With no param, this is a getter, not setter...
 
