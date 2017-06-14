@@ -78,7 +78,12 @@ else {
 
 $log->notice("Only syncing work between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}");
 
-$categoryList = traverse($parentId, $folderMapper);
+// Also include provided parent ID
+$categoryList = [];
+if ($parentId) {
+    $categoryList[$parentId] = $folderMapper->findById($parentId);
+}
+$categoryList = $categoryList + traverse($parentId, $folderMapper);
 
 foreach($categoryList as $category) {
     $log->notice("Processing assessments from: {$category->getName()} ({$category->getCodeString()})");
