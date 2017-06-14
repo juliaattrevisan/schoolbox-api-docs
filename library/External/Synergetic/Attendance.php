@@ -18,182 +18,128 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
+use Attendance_Synergetic_AttendanceMaster as AttendanceMaster;
+use Schoolbox\External\Exception as ExternalException;
+
 class External_Synergetic_Attendance implements External_AttendanceInterface
 {
+    use External_MssqlConnector;
 
-    /**
-     * The classCode whose attendances you are marking
-     *
-     * @var string
-     */
-    private $classCode = '';
-
-    /**
-     * The date in Y-m-d of the class
-     *
-     * @var string
-     */
-    private $attendanceDate = '';
-
-    /**
-     * The AttendancePeriod of the class
-     *
-     * @var int
-     */
-    private $attendancePeriod = -1;
-
-    /**
-     * An instance of Attendance_Synergetic_AttendanceMaster_Abstract
-     *
-     * @var null
-     */
+    /** @var Attendance_Synergetic_AttendanceMaster $attendanceMaster An instance of Attendance_Synergetic_AttendanceMaster_Abstract */
     private $attendanceMaster = null;
-
-    /**
-     * The attendance records for all students in the selected class, date and period
-     *
-     * @var array
-     */
-    private $allAttendanceRecords = array();
-
-    /**
-     * An MSSQL database instance
-     *
-     * @var \Database
-     */
-    private $database = null;
-
-    /**
-     * Usually from the session
-     *
-     * @var int
-     */
-    private $fileYear = -1;
-
-    /**
-     * Usually from the session
-     *
-     * @var int
-     */
-    private $fileSemester = -1;
 
     /**
      * Constructor
      *
-     * @param $class
+     * @param array $class Result row from SynergyOne.dbo.SubjectClasses
      * @param Alaress_Date_Format $attendanceDate
-     * @param $attendancePeriod
-     * @param $fileYear
-     * @param $fileSemester
-     * @param $database
+     * @param string $attendanceDay
+     * @param int $attendancePeriod
+     * @param int $fileYear
+     * @param int $fileSemester
      */
-    public function __construct($class, Alaress_Date_Format $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $database)
+    public function __construct($class, Alaress_Date_Format $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester)
     {
-        $this->setClassCode($class['ClassCode']);
-        $this->setAttendanceDate($attendanceDate->getDatabaseDate());
-        $this->setAttendancePeriod($attendancePeriod);
-        $this->setFileYear($fileYear);
-        $this->setFileSemester($fileSemester);
-        $this->setDatabase($database);
+        // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
 
-        /* Get the primary key associated with the selected class, date and period
-          */
+        $this->setupDatabase();
 
-        /* Find out whether the specified class, date and period have an existing AttendanceMaster record
-         * If it does, the roll has been marked before and we only need to edit individual people
-         *
-         * Otherwise set up a new record for the AttendanceMaster table
-         *
-         * This can be encapsulated further in a Factory
-        */
+        // Get the primary key associated with the selected class, date and period
+        //
+        // Find out whether the specified class, date and period have an existing AttendanceMaster record
+        // If it does, the roll has been marked before and we only need to edit individual people
+        //
+        // Otherwise set up a new record for the AttendanceMaster table
+        //
+        // This can be encapsulated further in a Factory
 
-        $attendanceMaster = new Attendance_Synergetic_AttendanceMaster($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $database);
+        $attendanceMaster = new AttendanceMaster(
+            $class,
+            $attendanceDate,
+            $attendanceDay,
+            $attendancePeriod,
+            $fileYear,
+            $fileSemester,
+            $this->connector
+        );
+
         $this->setAttendanceMaster($attendanceMaster);
-
-        $attendanceMaster->setupWork();
-
-        $this->setup();
     }
-
-    /**
-     * Hook method
-     */
-    private function setup()
-    {
-    }
-
 
     /**
      * Get a list of attendees for a particular class, date and period
      *
-     * @return mixed
+     * @return array
+     * @throws ExternalException
      */
     public function findAttendanceRecords()
     {
-        $result = $this->getDatabase()->executeProcedure(
-            'spswkAttendances', array(
-                array('@wkAttendanceMasterSeq', $this->getAttendanceMasterSeq(), SQLINT4),
-                array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
-                array('@CheckPossibleNonAttendFlag', 1, SQLINT4),
-                array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
-            )
-        );
+        $statement = $this->connector->executeStoredProcedure('spswkAttendances', [
+            'wkAttendanceMasterSeq' => $this->getAttendanceMasterSeq(),
+            'FillActualAbsenceColumnsFlag' => 1,
+            'CheckPossibleNonAttendFlag' => 1,
+            'CalculateTodaysAttendanceStringFlag' => 1
+        ]);
 
-        if ($result['success'] == 1) {
-            $this->setAllAttendanceRecords($result['result']);
-            return $this->getAllAttendanceRecords();
-        }
-        else {
-            throw new Schoolbox\External\Exception("Unable to setup work space for attendances, cannot continue");
-        }
+        $result = $statement->fetchAll();
 
+        if (count($result) > 0) {
+            return $result;
+        } else {
+            throw new ExternalException("Unable to setup work space for attendances, cannot continue");
+        }
     }
 
     /**
-     * A list of options for the Absence dropdown
+     * A list of options for the absence type drop-down
      *
-     * @return mixed
+     * @return array
      */
     public function findAbsenceDropdownOptions()
     {
-        $query = "
-            SELECT Code, Description
-            FROM dbo.luAbsenceType
-            WHERE ActiveFlag = 1
-        ";
-
-        return $this->formatDropDownOptions($this->getDatabase()->getAll($query));
+        return $this->getSynergeticLookupOptions("dbo.luAbsenceType");
     }
 
     /**
-     * A list of options for the Reason dropdown
+     * A list of options for the attendance reason drop-down
      *
-     * @return mixed
+     * @return array
      */
     public function findReasonDropdownOptions()
     {
-        $query = "
-            SELECT Code, Description
-            FROM dbo.luAbsenceReason
-            WHERE ActiveFlag = 1
-        ";
-
-        return $this->formatDropDownOptions($this->getDatabase()->getAll($query));
+        return $this->getSynergeticLookupOptions("dbo.luAbsenceReason");
     }
 
     /**
-     * Append code in front of description in drop downs
+     * Get Synergetic lookup table options with code appended in front of description for use in drop downs
+     *
+     * @param string $tableName
+     * @return array
      */
-    private function formatDropDownOptions($drop) {
+    private function getSynergeticLookupOptions($tableName)
+    {
+        $statement = $this->connector->executeQuery("SELECT Code, Description FROM {$tableName} WHERE ActiveFlag = 1");
+        $result = $statement->fetchAll();
 
-        /* Append code in front of description */
-        array_walk($drop, function(&$value, &$key) {
-            if($value['Code']) {
-                $value['Description'] = '' . $value['Code'] . ' - ' . $value['Description'];
+        $returnArray = [];
+
+        // Append code in front of description
+
+        foreach ($result as $resultCurrent) {
+            $return = [];
+            $return['Code'] = trim($resultCurrent['Code']);
+
+            if (!empty($return['Code'])) {
+                $return['Description'] = "{$return['Code']} - {$resultCurrent['Description']}";
+            } else {
+                $return['Description'] = $resultCurrent['Description'];
             }
-        });
 
-        return $drop;
+            $returnArray[] = $return;
+        }
+
+        return $returnArray;
     }
 
     /**
@@ -208,88 +154,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         return $this->getAttendanceMaster()->hasAttendanceMasterSeq();
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * Set attendance date
-     *
-     * @param string $attendanceDate
-     */
-    private function setAttendanceDate($attendanceDate)
-    {
-        $this->attendanceDate = $attendanceDate;
-    }
-
-    /**
-     * Get attendance date
-     *
-     * @return string
-     */
-    private function getAttendanceDate()
-    {
-        return $this->attendanceDate;
-    }
-
-    /**
-     * Set attendance period
-     *
-     * @param int $attendancePeriod
-     */
-    private function setAttendancePeriod($attendancePeriod)
-    {
-        $this->attendancePeriod = $attendancePeriod;
-    }
-
-    /**
-     * Get attendance period
-     *
-     * @return int
-     */
-    private function getAttendancePeriod()
-    {
-        return $this->attendancePeriod;
-    }
-
-    /**
-     * Set class code
-     *
-     * @param string $classCode
-     */
-    private function setClassCode($classCode)
-    {
-        $this->classCode = $classCode;
-    }
-
-    /**
-     * Get class code
-     *
-     * @return string
-     */
-    private function getClassCode()
-    {
-        return $this->classCode;
-    }
-
-    /**
-     * Set database
-     *
-     * @param \Database $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * Get database
-     *
-     * @return \Database
-     */
-    private function getDatabase()
-    {
-        return $this->database;
-    }
+    // Getters/Setters
 
     /**
      * Delegation method
@@ -301,26 +166,6 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     private function getAttendanceMasterSeq()
     {
         return $this->getAttendanceMaster()->getAttendanceMasterSeq();
-    }
-
-    /**
-     * Set attendance records for a particular class, date and period
-     *
-     * @param array $allAttendanceRecords
-     */
-    private function setAllAttendanceRecords($allAttendanceRecords)
-    {
-        $this->allAttendanceRecords = $allAttendanceRecords;
-    }
-
-    /**
-     * Get all attendance records for a particular class, date and period
-     *
-     * @return array
-     */
-    private function getAllAttendanceRecords()
-    {
-        return $this->allAttendanceRecords;
     }
 
     /**
@@ -341,45 +186,5 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     public function getAttendanceMaster()
     {
         return $this->attendanceMaster;
-    }
-
-    /**
-     * Set file year
-     *
-     * @param int $fileYear
-     */
-    private function setFileYear($fileYear)
-    {
-        $this->fileYear = $fileYear;
-    }
-
-    /**
-     * Get file year
-     *
-     * @return int
-     */
-    private function getFileYear()
-    {
-        return $this->fileYear;
-    }
-
-    /**
-     * Set file semester
-     *
-     * @param int $fileSemester
-     */
-    private function setFileSemester($fileSemester)
-    {
-        $this->fileSemester = $fileSemester;
-    }
-
-    /**
-     * Get file semester
-     *
-     * @return int
-     */
-    private function getFileSemester()
-    {
-        return $this->fileSemester;
     }
 }

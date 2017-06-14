@@ -35,6 +35,20 @@ abstract Class Base implements IStatement
     protected $parameters = [];
 
     /**
+     * On destruction of statement make sure the cursor is closed. This might cover our rear ends in some
+     * situations where we don't close off a query/proc call properly- but this is not a guarantee as it may
+     * still be referenced somewhere- so don't rely on it.
+     *
+     * Close or fully iterate your query result set!
+     */
+    public function __destruct()
+    {
+        if ($this->statement instanceof PDOStatement) {
+            $this->statement->closeCursor();
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function rowCount()

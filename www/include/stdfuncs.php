@@ -12,6 +12,7 @@
 function error($ec, $message="", $code = 400) {
     /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
     global $kernel;
+    /** @var SitePage $page */
     global $page;
     if (isset($page) && $page instanceof SitePage) {
         $page->setDi($kernel->getDependencyInjector());

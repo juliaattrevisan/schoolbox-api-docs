@@ -1237,6 +1237,8 @@ class External_Synergetic_User implements External_UserInterface
 
                     return self::$fileYearSemesterUser[$externalUserId];
                 }
+
+                $statement->close();
             }
         }
 
@@ -1254,13 +1256,18 @@ class External_Synergetic_User implements External_UserInterface
                     'semester' => $semester['FileSemester'],
                 ];
 
+                // Since we are not fully iterating we need to close the result set
+                $querySemester->close();
+
             } else {
+
+                // Since we are not fully iterating we need to close the result set
+                $querySemester->close();
 
                 // If everything falls in a heap- return a blank array
 
                 return [];
             }
-
         }
 
         return self::$fileYearSemesterDefault;
