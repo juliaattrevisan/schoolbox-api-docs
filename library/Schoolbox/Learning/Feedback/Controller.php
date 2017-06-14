@@ -109,7 +109,7 @@ class Controller extends Base
 
         try {
             $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
-            $this->processRubric($participant, $this->getRequest()->post);
+            $this->processRubric($participant, $this->getRequest()->post->getArrayCopy());
         }
         catch (\RangeException $e) {
             $this->sendError('Invalid mark provided');
