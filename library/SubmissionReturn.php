@@ -31,7 +31,8 @@ class SubmissionReturn extends DeprecatedModel
     {
         $query = "SELECT r.*,user.title, user.firstname, user.lastname, user.id AS uid, username, user.synergy_id, user.group_id, local_email, alt_email
                   FROM ( `" . $this->_table . "` r,  user)
-                  WHERE r.deleted_at IS NULL 
+                  WHERE r.deleted_at IS NULL
+                  AND r.published_at IS NOT NULL
                   AND user.id = r.owner 
                   AND box_id = " . $this->db->smartQuote($box_id) . " 
                   AND user.deleted_at IS NULL
