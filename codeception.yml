@@ -11,7 +11,12 @@ suites:
                     port: 4444
                     window_size: maximize
                 - \Helper\Acceptance
-                
+                - Db:
+                    dsn: "mysql:host=localhost;dbname=schoolbox"
+                    user: "root"
+                    password: "tnp879"
+                    # dump goes here
+
 extensions:
     enabled:
         - Codeception\Extension\Logger
