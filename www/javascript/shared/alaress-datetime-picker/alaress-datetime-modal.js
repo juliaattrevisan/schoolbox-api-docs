@@ -46,6 +46,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 setTimetablePickerValue(activeValue.format(momentFormats.databaseShort));
                 requestDataByDate(activeValue.format(momentFormats.databaseShort), 'timetable');
             }
+            else {
+                requestDataByDate(timetableValue.format(momentFormats.databaseShort), 'timetable');
+            }
 
             resetTerms();
 
@@ -71,11 +74,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Set initial value to the timetable picker
         setTimetablePickerValue(initialDate);
 
-        // Get data for the initial date
-        requestDataByDate(encodeURIComponent(initialDate), 'timetable');
-
-        // // Visualise the timetable picker for the given date
-        // resetTimetablePicker(initialDate);
+        resetTimetablePicker(initialDate);
 
         // Listen for changes to campus
         timetable.campus.change(function () {

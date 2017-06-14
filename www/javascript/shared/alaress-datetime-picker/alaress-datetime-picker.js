@@ -421,14 +421,13 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     setPickerValue(pickerId, (element.val() ? moment(element.val(), convertFormat(options.displayFormat)) : moment()).format(momentFormats.database));
 
-    getPickerValue(pickerId);
-
     // Create click event to open the modal for the element
 
     element.change(function () {
         if (window.pickerInstance[pickerId] !== undefined) {
             window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
         }
+        setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)).format(momentFormats.database));
     });
 
     element
