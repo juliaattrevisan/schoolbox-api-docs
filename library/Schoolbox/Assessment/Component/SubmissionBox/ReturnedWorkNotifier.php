@@ -124,7 +124,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      */
     public function notifyStudentReturned($returnedWork, $user, $diff = null)
     {
-        return $this->generateMessage('student', $returnedWork, $user, $diff);
+        return $this->generateMessage(Role::STUDENT, $returnedWork, $user, $diff);
     }
 
     /**
@@ -161,7 +161,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $href = "/submission/submissionHistory/$boxId/$studentId";
 
         // if student, 2nd-person language
-        if ($target == 'student' && $box->getMarkVisibility() >= IAssessable::MARK_VISIBILITY_STUDENT) {
+        if ($target === Role::STUDENT && $box->getMarkVisibility() >= IAssessable::MARK_VISIBILITY_STUDENT) {
             $bob = new Builder();
             $bob->setIcon($icon)
                 ->setNamespace($this->getSlug())
@@ -175,7 +175,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
                 ->addFilter('roletype', [Role::STUDENT]);
             $envelope->targetToUser($studentId, $bob->build());
         } // if parent, 3rd-person language
-        elseif ($target == 'parent' && $this->parentCanView($box)) {
+        elseif ($target === Role::PARENT && $this->parentCanView($box)) {
             // If parent can't view results for this grade:
             // target to student's grades page
             if (!$box->isMarkShownToParents()) {
@@ -231,7 +231,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      */
     public function notifyParentReturned($returnedWork, $user, $diff = null)
     {
-        return $this->generateMessage('parent', $returnedWork, $user, $diff);
+        return $this->generateMessage(Role::PARENT, $returnedWork, $user, $diff);
     }
 
 } 
