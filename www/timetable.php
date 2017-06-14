@@ -141,7 +141,6 @@ foreach ($userList as $user) {
                  */
                 $days = count($timetable[1]['day']);
 
-                $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));
                 $periodCount = 1;
                 //for each period
                 foreach ($timetable as $row) {
