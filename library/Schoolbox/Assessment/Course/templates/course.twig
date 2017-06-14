@@ -315,7 +315,7 @@ Usage:
                                             <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
                                         </div>
                                         <div class="small-12 medium-4 column">
-                                            <input type="submit" class="button" value="Create {{ locale.unit.proper }}"
+                                            <input name="spawn-unit" type="submit" class="button" value="Create {{ locale.unit.proper }}"
                                                    data-mage-next="spawn-unit" data-mage-working="Working..."
                                                    formaction="{{ routeLookup('course.newUnit', { id: courseSpec.Id }) }}"/>
                                         </div>
