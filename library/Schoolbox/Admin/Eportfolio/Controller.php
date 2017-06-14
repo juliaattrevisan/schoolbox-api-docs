@@ -418,13 +418,9 @@ class Controller extends Base
      */
     private function log($message, $id, $status = null)
     {
-        // Use actual time instead of request time
-        $time = new Alaress_Date_Format(time(), Alaress_Date_Format::TIMESTAMP);
         $log = new EportfolioImportLog();
         $log->setImportId($id);
         $log->setResult($message);
-        $log->setUpdatedAt($time);
-        $log->setCreatedAt($time);
         $this->eportfolioImportLogMapper->save($log);
 
         if ($status != null) {
