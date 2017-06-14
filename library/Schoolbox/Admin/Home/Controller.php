@@ -10,6 +10,7 @@
 namespace Schoolbox\Admin\Home;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
@@ -17,9 +18,11 @@ use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
 
-
 class Controller extends Base
 {
+    /**
+     * Display admin settings homepage
+     */
     public function getIndex()
     {
         // Disk usage
@@ -31,10 +34,11 @@ class Controller extends Base
 
         // Memory Usage
 
-        if(is_readable('/proc/meminfo'))
-        {
-            foreach(file('/proc/meminfo') as $ri) {
-                $m[strtok($ri, ':')] = str_replace(' kB','',strtok(''))*1024;
+        $m = [];
+
+        if (is_readable('/proc/meminfo')) {
+            foreach (file('/proc/meminfo') as $ri) {
+                $m[strtok($ri, ':')] = str_replace(' kB', '', strtok('')) * 1024;
             }
 
             $memory_total = $m['MemTotal'];
@@ -52,26 +56,20 @@ class Controller extends Base
 
         $external_db_version = '';
 
-        if(ConfigMapper::getInstance()->get('external_enable'))
-        {
+        if (ConfigMapper::getInstance()->get('external_enable')) {
             $external_ping = new \External_Ping();
 
-            if ($external_ping->isResponsive())
-            {
+            if ($external_ping->isResponsive()) {
                 $external_db = ucfirst(ConfigMapper::getInstance()->get('external_type'));
                 $external_db_light = 'success';
                 $external_db_status = 'Online';
                 $external_db_version = $external_ping->getVersion();
-            }
-            else
-            {
+            } else {
                 $external_db = ucfirst(ConfigMapper::getInstance()->get('external_type'));
                 $external_db_light = 'alert';
                 $external_db_status = 'Offline';
             }
-        }
-        else
-        {
+        } else {
             $external_db = ucfirst(ConfigMapper::getInstance()->get('external_type'));
             $external_db_light = 'alert';
             $external_db_status = 'Disabled';
@@ -79,26 +77,20 @@ class Controller extends Base
 
         // Email status
 
-        if (ConfigMapper::getInstance()->get('mail_enable') && ConfigMapper::getInstance()->get('mail_smtp_host'))
-        {
-            $socket=socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if (ConfigMapper::getInstance()->get('mail_enable') && ConfigMapper::getInstance()->get('mail_smtp_host')) {
+            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
             socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 1, 'usec' => 0));
 
-            if(@socket_connect($socket, ConfigMapper::getInstance()->get('mail_smtp_host'), ConfigMapper::getInstance()->get('mail_smtp_port')))
-            {
+            if (@socket_connect($socket, ConfigMapper::getInstance()->get('mail_smtp_host'), ConfigMapper::getInstance()->get('mail_smtp_port'))) {
                 $email_light = 'success';
                 $email_status = 'Online';
-            }
-            else
-            {
+            } else {
                 $email_light = 'alert';
                 $email_status = 'Offline';
             }
 
             socket_close($socket);
-        }
-        else
-        {
+        } else {
             $email_light = 'alert';
             $email_status = 'Disabled';
         }
@@ -111,26 +103,21 @@ class Controller extends Base
         $ldap_alt_light = 'alert';
         $ldap_alt_status = 'Disabled';
 
-        if(ConfigMapper::getInstance()->get('ldap_enable'))
-        {
+        if (ConfigMapper::getInstance()->get('ldap_enable')) {
             $tempsession = new \Session;
 
             // Check primary LDAP server bind
 
-            if (trim(ConfigMapper::getInstance()->get('ldap_host')) != "")
-            {
-                $ds=ldap_connect(ConfigMapper::getInstance()->get('ldap_host'));
+            if (trim(ConfigMapper::getInstance()->get('ldap_host')) != "") {
+                $ds = ldap_connect(ConfigMapper::getInstance()->get('ldap_host'));
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
                 $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(ConfigMapper::getInstance()->get('ldap_user')), utf8_encode(ConfigMapper::getInstance()->get('ldap_pass')));
 
-                if($ldapbind)
-                {
+                if ($ldapbind) {
                     $ldap_light = 'success';
                     $ldap_status = 'Online';
-                }
-                else
-                {
+                } else {
                     $ldap_light = 'alert';
                     $ldap_status = 'Offline';
                 }
@@ -140,20 +127,16 @@ class Controller extends Base
 
             // Check secondary LDAP server bind
 
-            if (trim(ConfigMapper::getInstance()->get('ldap_host_alt')) != "")
-            {
-                $ds=ldap_connect(ConfigMapper::getInstance()->get('ldap_host_alt'));
+            if (trim(ConfigMapper::getInstance()->get('ldap_host_alt')) != "") {
+                $ds = ldap_connect(ConfigMapper::getInstance()->get('ldap_host_alt'));
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
                 $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape(ConfigMapper::getInstance()->get('ldap_user_alt')), utf8_encode(ConfigMapper::getInstance()->get('ldap_pass')));
 
-                if($ldapbind)
-                {
+                if ($ldapbind) {
                     $ldap_alt_light = 'success';
                     $ldap_alt_status = 'Online';
-                }
-                else
-                {
+                } else {
                     $ldap_alt_light = 'alert';
                     $ldap_alt_status = 'Offline';
                 }
@@ -166,7 +149,7 @@ class Controller extends Base
 
         $context = ProxyServer::getInstance()->getContext();
 
-        if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
+        if (@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html', null, $context)) {
             $www_light = 'success';
             $www_status = 'Available';
         } else {
@@ -179,12 +162,10 @@ class Controller extends Base
         $logs = [];
         $logsRecent = LogMapper::getInstance()->findRecent(30);
 
-        foreach($logsRecent as $log)
-        {
+        foreach ($logsRecent as $log) {
             $action = '';
 
-            switch($log['login'])
-            {
+            switch ($log['login']) {
                 case '1' :
                     $action = 'Logged in';
                     break;
@@ -192,33 +173,33 @@ class Controller extends Base
                     $action = 'Failed login';
                     break;
                 case 'modify':
-                    $action = 'Modified '.$log['ip'];
+                    $action = 'Modified ' . $log['ip'];
                     break;
                 case 'move':
-                    $action = 'Moved '.$log['ip'];
+                    $action = 'Moved ' . $log['ip'];
                     break;
                 case 'access':
-                    $action = 'Accessed '.$log['ip'];
+                    $action = 'Accessed ' . $log['ip'];
                     break;
                 case 'create' :
-                    $action = 'Added '.$log['ip'];
+                    $action = 'Added ' . $log['ip'];
                     break;
                 case 'delete' :
-                    $action = 'Deleted '.$log['ip'];
+                    $action = 'Deleted ' . $log['ip'];
                     break;
 
                 default:  //If unknown, skip output
                     continue;
             }
 
-            if($action != '') {
+            if ($action != '') {
 
                 $date = new \Alaress_Date_Format($log['occurred'], \Alaress_Date_Format::DATABASE_FORMAT);
 
                 $logs[] = [
-                    'date'      => $date->getShort(),
-                    'action'    => $action,
-                    'name'      => "{$log['firstname']} {$log['lastname']}"
+                    'date' => $date->getShort(),
+                    'action' => $action,
+                    'name' => "{$log['firstname']} {$log['lastname']}"
                 ];
             }
         }
@@ -230,7 +211,7 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminHome/index.twig',
-                'data'     => array(
+                'data' => array(
                     'pageCurrent' => basename($this->getRequest()->query->get('page')),
                     'disk_used' => \Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                     'disk_total' => \Alaress_Byte_Format::bytesToString($disk_total),
@@ -260,25 +241,32 @@ class Controller extends Base
     /**
      * Provides a view of the current external DB health, linked from the admin dashboard
      */
-    public function getHealthcheck() {
-
-        /** @var IConnector $databaseExternal */
-        $databaseExternal = $this->getDi()->get('databaseExternal');
-
+    public function getHealthcheck()
+    {
         /** @var IConfigLoader $configMapper */
         $configMapper = $this->getDi()->get('config');
 
-        $healthCheck = new Healthcheck($databaseExternal, $configMapper);
+        try {
+            /** @var IConnector $databaseExternal */
+            $databaseExternal = $this->getDi()->get('databaseExternal');
+            $healthCheck = new Healthcheck($databaseExternal, $configMapper);
+            $output = $healthCheck->run();
+        } catch (AlaressDatabaseException $e) {
+            $output = [
+                'errors' => [
+                    $e->getMessage()
+                ]
+            ];
+        }
 
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminHome/healthcheck.twig',
-                'data'     => array(
+                'data' => array(
                     'pageCurrent' => 'healthcheck',
-                    'output' => $healthCheck->run(),
+                    'output' => $output
                 )
             )
         );
     }
-
 }

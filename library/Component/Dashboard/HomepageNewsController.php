@@ -1,14 +1,16 @@
 <?php
+
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-class Component_Dashboard_HomepageNewsController extends Component_Dashboard_ControllerAbstract {
-
+class Component_Dashboard_HomepageNewsController extends Component_Dashboard_ControllerAbstract
+{
+    /** @var array $feedList */
     private $feedList;
+
+    /** @var int $limit */
     private $limit = 20;
 
     /**
@@ -16,9 +18,11 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute() {
+    public function execute()
+    {
         $feedHandler = new Feed();
         $groupHandler = new Group();
+
         $userAccess = $groupHandler->involvedInCategoryList(
             $this->getConfig('user') ? $this->getConfig('user') : $_SESSION['id']
         );
@@ -55,30 +59,48 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                         'external_id' => $f['external_id'],
                         'link' => $f['link'],
                         'user_id' => $f['user_id'],
-                        'name'    => $f['name'],
-                        'action'  => $f['action'],
+                        'name' => $f['name'],
+                        'action' => $f['action'],
                         'timestamp' => $feedTime->getUnixTimestamp(),
                     );
                 }
+
                 return true;
             }
         }
+
         return false;
     }
 
-    public function renderTemplate($templateHandle) {
+    /**
+     * @param string $templateHandle
+     * @return bool
+     */
+    public function renderTemplate($templateHandle)
+    {
         if (!$this->loadTemplate($templateHandle, 'homepageNews')) {
             return false;
         }
+
         $this->setVar('SUBJ_HAS_GRADE', 'no-grade');
 
         $alist = new Activity_ListArray($this->feedList);
         $alist->setShowAvatars(false);
         $alist->setShowTrends(false);
         $alist->setTarget($this->getSitePage(), 'ACTIVITY_LIST');
+
+        /** @noinspection PhpUnusedLocalVariableInspection */
         foreach ($alist as $a) {
-            // iterates the set
+
+            // Iterates the set
+
+            // No offence to the author this code, I can imagine the circumstances... but...
+            //
+            // This is stupid and should be nuked from orbit- however is currently required as the implementation of
+            // Activity_ListArray::current() actually does rendering... do iterating and doing nothing, is actually
+            // doing something... ┌∩┐(◣_◢)┌∩┐
         }
+
         return true;
     }
 
@@ -87,7 +109,8 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
      *
      * @return array
      */
-    public function getDataFromExecute() {
+    public function getDataFromExecute()
+    {
         return $this->feedList;
     }
 

@@ -10,12 +10,14 @@ namespace Schoolbox\Application;
 use Alaress\Application\Boot\BootstrapInterface;
 use Alaress\Application\Kernel;
 use Alaress\Authorizer\Rule;
+use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
+use Calendar_Api_Factory;
 use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
 use DebugBar\Bridge\Twig\TwigCollector;
 use Alaress\Session\Factory;
@@ -27,10 +29,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as Grad
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\L10n\Mapper as L10nMapper;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -43,6 +45,7 @@ use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use SitePage;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
 use Twig_Loader_Filesystem;
@@ -280,13 +283,13 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
         // inject web params (yep, even Sitepage!)
         $di->set('layoutEngine', $di->lazy(function() use ($di) {
-            $sitepage = new \SitePage(false);
+            $sitepage = new SitePage(false);
             $sitepage->setDi($di);
             return $sitepage;
         }));;
 
         $di->set('sitePage',     $di->lazy(function() use ($di) {
-            $sitepage = new \SitePage();
+            $sitepage = new SitePage();
             $sitepage->setDi($di);
             return $sitepage;
         }));
@@ -735,13 +738,23 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set('rule:isStaffOrSuper',   $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isSuperuser'), $di->get('rule:isStaff')); }));
         $di->set('rule:isStaffOrStudent', $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isStaff'),     $di->get('rule:isStudent')); }));
 
+
         // Calendar API factory - requires an assessment data source to build some types
         $di->set(
             'calendarApiFactory',
-            $di->lazyNew(
-                \Calendar_Api_Factory::class,
-                ['assessmentDataSource' => $di->lazyGet('assessmentDataSource'),
-                'databaseExternal' => $di->lazyGet('databaseExternal')]
+            $di->lazy(
+                function () use ($di, $mapperFactory) {
+                    try {
+                        /** @var IConnector $databaseExternal */
+                        $databaseExternal = $di->get('databaseExternal');
+                    } catch (AlaressDatabaseException $e) {
+                        $databaseExternal = null;
+                    }
+
+                    /** @var AssessmentDataSource $assessmentDataSource */
+                    $assessmentDataSource = $di->get('assessmentDataSource');
+                    return new Calendar_Api_Factory($assessmentDataSource, $databaseExternal);
+                }
             )
         );
 

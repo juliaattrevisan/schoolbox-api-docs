@@ -54,6 +54,7 @@ class External_DatabaseFactory
                     $dbClass =  new $databaseClass();
                     return $dbClass;
                 } catch (\Schoolbox\External\Exception $e) {
+                } catch (\Alaress\Database\Exception $e) {
                 }
             }
         }

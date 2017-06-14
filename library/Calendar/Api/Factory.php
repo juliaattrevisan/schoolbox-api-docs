@@ -42,7 +42,7 @@ class Calendar_Api_Factory
      * @param AssessmentDataSource $assessmentDataSource
      * @param  IConnector $databaseExternal
      */
-    public function __construct(AssessmentDataSource $assessmentDataSource, IConnector $databaseExternal)
+    public function __construct(AssessmentDataSource $assessmentDataSource, IConnector $databaseExternal = null)
     {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->databaseExternal = $databaseExternal;
@@ -64,7 +64,9 @@ class Calendar_Api_Factory
                 $config->setId($currentConfig->getId());
 
                 $this->addConfig($config);
+
             } catch (DomainException $e) {
+
                 //Calendar not enabled, dont add
             }
         }

@@ -34,6 +34,13 @@ class Factory
      */
     public function build($config, $databaseExternal, $type)
     {
+        // Check if external DB is unavailable and return offline class if we can't access
+
+        if (!$databaseExternal instanceof IConnector) {
+            $offlineClass = "\\Schoolbox\\External\\Connector\\Offline\\Base\\{$type}";
+            return new $offlineClass($config, null);
+        }
+
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type'));
         $schoolCode = ucwords($config->get('site_location'));
 

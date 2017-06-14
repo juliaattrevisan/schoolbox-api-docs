@@ -31,20 +31,25 @@ class Factory
      * @deprecated
      * @return IConnector
      */
-    public static function getInstanceExternal() {
+    public static function getInstanceExternal()
+    {
         if (!isset(self::$connectorExternal)) {
-            $factory = new DatabaseFactory();
-
-            self::$connectorExternal = $factory->createMssql();
-
             $config = ConfigMapper::getInstance();
+            $factory = new DatabaseFactory();
+            $database = $factory->createMssql();
 
-            self::$connectorExternal->connect(
+            // This will throw an exception on error
+
+            $database->connect(
                 $config->get('external_db_host'),
                 $config->get('external_db_db'),
                 $config->get('external_db_user'),
                 $config->get('external_db_passwd')
             );
+
+            // So only cache the instance on success
+
+            self::$connectorExternal = $database;
         }
 
         return self::$connectorExternal;
@@ -118,14 +123,11 @@ class Factory
             throw new DatabaseException("Unknown external database type.");
         }
 
-        if (!$connectorExternal->connect(
+        $connectorExternal->connect(
             $config['external_db_host'],
             $config['external_db_db'],
             $config['external_db_user'],
-            $config['external_db_passwd']
-        )) {
-            throw new DatabaseException("Unable to connect to {$config['external_type']} database.");
-        }
+            $config['external_db_passwd']);
 
         // HumanEdge is a special little potato with two databases
 
@@ -138,7 +140,8 @@ class Factory
                 $config['external_humanedge_aplus_db_db'],
                 $config['external_humanedge_aplus_db_user'],
                 $config['external_humanedge_aplus_db_passwd']
-            )) {
+            )
+            ) {
                 throw new DatabaseException("Unable to connect to HumanEdge A+ database.");
             }
 
