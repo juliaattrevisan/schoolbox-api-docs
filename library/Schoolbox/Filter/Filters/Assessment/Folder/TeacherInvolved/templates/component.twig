@@ -27,10 +27,12 @@
     {# By default, no available concrete options would mean no entities ever match #}
     <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
 
+    {% if isUserConfigurable %}
     <h4>Class / Group</h4>
     <div data-alert class="alert-box alert">
         Warning. No Classes or Groups. No results possible.
     </div>
+    {% endif %}
 {% else %}
 
     <script>
@@ -54,7 +56,7 @@
         {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}</h4>{% endif %}
 
         {% if hasClasses %}
-            {% if hasGroups %}<h4>Classes</h4>{% endif %}
+            {% if hasGroups and isUserConfigurable %}<h4>Classes</h4>{% endif %}
             {% for classFolder in classes %}
                 {% set selection = roleSelections[classFolder.id] %}
 
@@ -68,12 +70,12 @@
             {% endfor %}
         {% endif %}
 
-        {% if hasClasses and hasGroups %}
+        {% if hasClasses and hasGroups and isUserConfigurable %}
         <hr>
         {% endif %}
 
         {% if hasGroups %}
-            {% if hasClasses %}<h4>Groups</h4>{% endif %}
+            {% if hasClasses and isUserConfigurable %}<h4>Groups</h4>{% endif %}
             {% for groupFolder in groups %}
                 {% set selection = roleSelections[groupFolder.id] %}
                 {% include '@filters/_selectionCheckboxWithDuplicates.twig' with {
