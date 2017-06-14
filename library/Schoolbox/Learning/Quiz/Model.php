@@ -239,12 +239,12 @@ class Model implements ISoftDeletable, IAssessableDataModel
     /**
      * The base assessable model that is a part of this model.
      *
-     * @var Model
+     * @var AssessmentModel
      */
     protected $assessmentModel;
 
     /**
-     * @return Model
+     * @return AssessmentModel
      */
     public function getAssessmentModel()
     {
