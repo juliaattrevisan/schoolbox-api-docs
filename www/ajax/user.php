@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * @author    Someone <support@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+use Schoolbox\Role;
+use Schoolbox\UserMapper;
+
 require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 
@@ -6,61 +16,65 @@ $userHandler = new User();
 $groupHandler = new Group();
 $pageHandler = new SitePage();
 $emailObj = new Email();
-$userMapper = \Schoolbox\UserMapper::getInstance();
+$userMapper = UserMapper::getInstance();
 
-$result = $suggestions = $data = $return = array();
+$result = $suggestions = $data = $return = [];
 
-$excludeID          = $_GET['excludeID'];
-$keyword            = $_GET['query'];
-$groupID            = $_GET['groupID'];
-$roleTypeID         = $_GET['roleTypeID'];
-$showCampus         = !empty($_GET['showCampus']);
+$excludeID = $_GET['excludeID'];
+$keyword = $_GET['query'];
+$groupID = $_GET['groupID'];
+$roleTypeID = $_GET['roleTypeID'];
+$showCampus = !empty($_GET['showCampus']);
 $residentialHouseID = $_GET['residentialHouseID'];
+
 if (!empty($residentialHouseID)) {
     $residentialHouseID = explode(';', $residentialHouseID);
 }
 
 $filterParents = false;
 
-if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
-    && (strlen($groupID) || strlen($roleTypeID))
-) {
+if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (strlen($groupID) || strlen($roleTypeID))) {
+    
     if (strlen($roleTypeID)) {
+        
         // Search in a list of role types.
-        $groupID = array();
+        
+        $groupID = [];
+        
         foreach (explode(';', strtolower($roleTypeID)) as $roleType) {
-            $thisRoleGroups = array();
+            $thisRoleGroups = [];
             switch ($roleType) {
-                case \Schoolbox\Role::STAFF:
-                case 'staff':
+                case Role::STAFF:
                     $thisRoleGroups = $groupHandler->getStaffGroupTypeIds();
                     break;
                 case 'parentofstudent':
                     $filterParents = true;
                     $thisRoleGroups = $groupHandler->getParentGroupTypeIds();
                     break;
-                case \Schoolbox\Role::PARENT:
-                case 'parent':
+                case Role::PARENT:
                     $thisRoleGroups = $groupHandler->getParentGroupTypeIds();
                     break;
-                case \Schoolbox\Role::STUDENT:
-                case 'student':
+                case Role::STUDENT:
                     $thisRoleGroups = $groupHandler->getStudentGroupTypeIds();
                     break;
-                case \Schoolbox\Role::GUEST:
-                case 'guest':
+                case Role::GUEST:
                     $thisRoleGroups = $groupHandler->getGuestGroupTypeIds();
                     break;
             }
+
             $groupID = array_merge($groupID, $thisRoleGroups);
         }
-    }
-    elseif (strstr($groupID, ';')) {
+
+    } elseif (strstr($groupID, ';')) {
+
         // Search in a list of role types.
+
         $groupID = explode(';', $groupID);
-    }
-    else {
+
+    } else {
+
         // Search group 0 (all groups)
+
         $groupID = 0;
     }
 
@@ -106,10 +120,10 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
 
                 if ($email) {
                     $fullEmail = $user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>';
-                    $return[] = array(
+                    $return[] = [
                         'name' => $fullEmail,
-                        'id'   => $fullEmail,
-                    );
+                        'id' => $fullEmail,
+                    ];
                 }
             } else {
 
@@ -120,7 +134,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
                 }
 
                 if ($showCampus) {
-                    $person .= ' '.$user['campusName'].' ';
+                    $person .= ' ' . $user['campusName'] . ' ';
                 }
 
                 $person .= $user['gname'];
@@ -129,14 +143,14 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
                     $person .= " ({$user['synergy_id']})";
                 }
 
-                $return[] = array(
-                    'name'          => $person,
-                    'id'            => intval($user['uid']),
-                    'first_name'    => $user['firstname'],
-                    'last_name'     => $user['lastname'],
-                    'role'          => $user['gname'],
-                    'external_id'   => $user['synergy_id']
-                );
+                $return[] = [
+                    'name' => $person,
+                    'id' => intval($user['uid']),
+                    'first_name' => $user['firstname'],
+                    'last_name' => $user['lastname'],
+                    'role' => $user['gname'],
+                    'external_id' => $user['synergy_id']
+                ];
             }
         }
     }

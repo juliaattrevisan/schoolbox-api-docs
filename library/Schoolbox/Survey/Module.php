@@ -12,7 +12,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
-use Twig_Loader_Chain;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -50,17 +49,15 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
     }
-
 
     /**
      * @param PathMatcher $matcher
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreload($matcher, '.*', function($params) {
+        $this->addRoutePreload($matcher, '.*', function ($params) {
 
             $preloads = [];
 

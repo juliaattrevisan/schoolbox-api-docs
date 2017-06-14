@@ -19,7 +19,6 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
-use Schoolbox\Survey\Attempt\Model as SurveyAttempt;
 
 class Mapper extends BaseMapper
 {
@@ -51,6 +50,9 @@ class Mapper extends BaseMapper
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getSelectString()
     {
         return "
@@ -83,13 +85,13 @@ class Mapper extends BaseMapper
                 $folder = $this->hydrateJoin($row, 'folder', 'f');
                 $model->setFolder($folder);
 
-
                 /** @var Collection $attempts */
                 $attempts = $this->getJoinMapper('assess_attempts')->findByColumn('assess_id', $model->getId());
                 $model->setAttempts($attempts);
             }
         }
 
+        /** @noinspection PhpDeprecationInspection */
         return $this->hydrateList($results);
     }
 
@@ -145,7 +147,6 @@ class Mapper extends BaseMapper
         ";
 
         $statement = $this->database->prepare($sql);
-
         $statement->execute(['survey_id' => $surveyId]);
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -235,13 +236,23 @@ class Mapper extends BaseMapper
 
         if (!$this->getSessionUser()->isSuperuser()) {
 
+            // Create a sub-predicate to restrict based on folder perms
+
+            $folderPredicate = $this->getPredicateBuilder();
+
+            // Get all folders the person has permissions to
+
             $folderIds = $folderMapper->findForUser($this->getSessionUser(), true)->getColumnValues('id');
 
             // Find all the surveys on these pages
 
             foreach ($folderIds as $folderId) {
-                $predicateBuilder->equals('category_id', $folderId);
+                $folderPredicate->equals('category_id', $folderId);
             }
+
+            // Stuff them all into an OR/ANY predicate
+
+            $predicateBuilder->any($folderPredicate);
         }
 
         // And filter the name of the survey
