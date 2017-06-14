@@ -148,9 +148,11 @@ class Controller extends BaseController
         $postDefaults = $this->getRequest()->post->get('filter_defaults');
 
         foreach ($pageFilters as $pageFilter) {
-            $filterId = $pageFilter->getFilter()->getId();
+            $filterId    = $pageFilter->getFilter()->getId();
+            $class       = $pageFilter->getFilter()->getClass();
+            $isMandatory = $class::isMandatory($pageFilter->getPage());
 
-            $pageFilter->setEnabled(isset($postEnabled[$filterId]));
+            $pageFilter->setEnabled($isMandatory || isset($postEnabled[$filterId]));
             $pageFilter->setUserConfigurable(isset($postUserConfigurable[$filterId]));
 
             // Must add() instead of offsetSet($id) as $id will be null if not yet in DB
