@@ -58,6 +58,16 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @inheritdoc
      */
+    public static function isMandatory($page)
+    {
+        // Default to not being mandatory. The admin can disable the filter from any page.
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public static function getEnabledInitialState($page)
     {
         return true;

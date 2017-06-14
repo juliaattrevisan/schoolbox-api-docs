@@ -28,6 +28,19 @@ interface IDefinition
 
 
     /**
+     * Is this filter mandatory for the specified page?
+     *
+     * If so, the admin will not be able to disable this filter from appearing on the specified page.
+     *
+     * No effect on user-configurability.
+     *
+     * @param string $page
+     * @return bool
+     */
+    public static function isMandatory($page);
+
+
+    /**
      * @return Model
      */
     public function getFilter();
