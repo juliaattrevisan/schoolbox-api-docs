@@ -9,7 +9,8 @@
 // Build datepicker options here... again...
 $.fn.alaressDateTimeModal = function(twigVars) {
 
-    var $picker = $('#' + twigVars.element);
+    var $picker = $('#' + twigVars.element); // The input
+    var $modal = $('#adtp-modal-' + twigVars.id);
     var pickerOptions = {
         // Flatpickr related
         enableTime: getValue($picker, 'data-datepicker-time'),
@@ -177,7 +178,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             // Fix Flatpickr display enableTime
             if (pickerOptions.enableTime) {
-                $('#picker' + twigVars.id).find('.flatpickr-time').show();
+                $modal.find('.flatpickr-time').show();
             }
 
             requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
@@ -243,7 +244,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function renderAllDaySwitch() {
 
-        var $timeDiv = $('#pickerCalendar' + twigVars.id).closest('#picker' + twigVars.id).find('.flatpickr-time');
+        var $timeDiv = $('#pickerCalendar' + twigVars.id).closest('#adtp-modal-' + twigVars.id).find('.flatpickr-time');
         var html = '';
 
         // Build an All Day switch if it's been set in the options
@@ -662,7 +663,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             if ($calendarDiv.not(':visible')) {
 
                 // If it was hidden because the tab wasn't open
-                $('#picker'+twigVars.id).find('[data-tab]').one('click', ':not(.active)', function () { // purposefully `one`, not `on`
+                $modal.find('[data-tab]').one('click', ':not(.active)', function () { // purposefully `one`, not `on`
                     setTimeout(function () {
                         $calendarDiv.fullCalendar('render');
                     }, 80);
@@ -679,7 +680,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
 
         if (template == 'duework' && data.students.length > 0) {
-            $('#picker'+twigVars.id).find('[data-collapser]').collapsable();
+            $modal.find('[data-collapser]').collapsable();
         }
     }
 
@@ -804,7 +805,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // Check if the height should now be set (either no due work or due work hasn't loaded)
             if ((pickerOptions.type != 'duework') || (pickerOptions.type == 'duework' && dueWorkHeightInner > 0)) {
 
-                var calendarHeight = $('#picker' + twigVars.id + ' [data-adtp-left-panel=' + target + ']').outerHeight(true),                   // The height of the left panel
+                var calendarHeight = $modal.find('[data-adtp-left-panel=' + target + ']').outerHeight(true),                   // The height of the left panel
                     calendarTitleHeight = $('#' + target + 'Response' + twigVars.id + '-events [data-adtp-calendar-title]').outerHeight(true),  // Height of the 'your calendar' heading
                     dueWorkHeightOuter = $dueWorkCard.outerHeight(true);                                                                        // Height of the card above, including padding & margins
 
@@ -979,7 +980,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // TODO allow this to be injected by construction
         var tt = 'The "heat" of a day represents the largest number of assessments any of your students has due that day, capped at 5.';
 
-        var $monthDiv = $('#picker' + twigVars.id).find('.flatpickr-current-month');
+        var $monthDiv = $modal.find('.flatpickr-current-month');
         $monthDiv.append($('<a class="icon-help" />').attr('title', tt));
     }
 

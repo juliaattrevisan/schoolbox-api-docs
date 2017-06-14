@@ -203,7 +203,7 @@ function setValue(element, options, state, trigger, date) {
 
 function checkAllDaySwitch(state, pickerId) {
 
-    var $timeDiv = $('#pickerCalendar' + pickerId).closest('#picker' + pickerId).find('.flatpickr-time');
+    var $timeDiv = $('#pickerCalendar' + pickerId).closest('#adtp-modal-' + pickerId).find('.flatpickr-time');
 
     // All Day is on
     if (state === true) {
@@ -399,7 +399,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     element.attr('data-datepicker-id', pickerId);
 
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
-    $('body').append('<div data-reveal id="picker' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
+    $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
 
     // Create click event to open the modal for the element
 
@@ -440,27 +440,27 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             originalValue = moment(originalValue, convertFormat(options.displayFormatDate));
         }
 
-        var picker = $('#picker' + pickerId);
+        var $modal = $('#adtp-modal-' + pickerId);
 
         // Only AJAX in the picker if we haven't already
 
-        if (picker.data('status') === undefined) {
+        if ($modal.data('status') === undefined) {
 
             // Update picker status
-            picker.data('status', 'loading');
+            $modal.data('status', 'loading');
 
             //Check if the form is inside another modal
             var reveal = element.parents('*[data-reveal]');
             if (reveal.length > 0) {
-                picker.data('reveal', reveal.attr('id'));
+                $modal.data('reveal', reveal.attr('id'));
             }
 
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            picker.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD HH:mm:ss')), function () {
+            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD HH:mm:ss')), function () {
 
                 // Capture open of modal
-                $(document).on('opened.fndtn.reveal', '#picker' + pickerId, function () {
+                $(document).on('opened.fndtn.reveal', '#adtp-modal-' + pickerId, function () {
 
                     // Check and refresh visibility of time and allDaySwitch state
                     // Hide time picker if allday hidden field is set to 1
@@ -474,19 +474,19 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 });
 
                 // Capture closure of modal
-                $(document).on('closed.fndtn.reveal', '#picker' + pickerId, function () {
+                $(document).on('closed.fndtn.reveal', '#adtp-modal-' + pickerId, function () {
                     // Open back the parent modal, if any
-                    if ((picker.data('reveal').length > 0)) {
-                        $('#' + picker.data('reveal')).foundation('reveal', 'open');
+                    if (($modal.data('reveal').length > 0)) {
+                        $('#' + $modal.data('reveal')).foundation('reveal', 'open');
                     }
                 });
                 // Update picker status
-                picker.data('status', 'loaded');
+                $modal.data('status', 'loaded');
 
                 // Display the datetime picker modal
-                picker.foundation('reveal', 'open');
+                $modal.foundation('reveal', 'open');
                 // Initialise tabs
-                picker.foundation('reflow', 'tab');
+                $modal.foundation('reflow', 'tab');
 
                 var $datePicker = $('#byDate-' + pickerId),
                     $timetablePicker = $('#byTimetable-' + pickerId);
@@ -507,7 +507,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     }
 
                     // Close modal
-                    picker.foundation('reveal', 'close');
+                    $modal.foundation('reveal', 'close');
 
                 });
 
@@ -545,17 +545,17 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                             setValue(item, getOptions(item), false, true);
                         });
                     }
-                    picker.foundation('reveal', 'close');
+                    $modal.foundation('reveal', 'close');
                 });
 
             });
 
-        } else if (picker.data('status') === 'loaded') {
+        } else if ($modal.data('status') === 'loaded') {
 
             // Update picker values, in case element field value has changed
             window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
 
-            picker.foundation('reveal', 'open');
+            $modal.foundation('reveal', 'open');
 
         }
     });
