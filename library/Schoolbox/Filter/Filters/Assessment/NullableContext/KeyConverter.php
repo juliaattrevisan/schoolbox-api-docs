@@ -7,31 +7,25 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
-use Schoolbox\Collection;
-use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Filter;
 
 
 /**
  * Specialised logic to deal with the 'KEY_NONE' semantics
  */
-abstract class KeyConverter extends AbstractKeyConverter
+abstract class KeyConverter extends Filter\AbstractKeyConverter
 {
 
     /**
      * The returned Collection contains ids and/or 'KEY_NONE' => null
      *
-     * @param GenericCollection $availableSelections (can also be null, but Storm doesn't like hint)
-     * @param bool              $foldersFiltered     Are folders being filtered?
-     * @return null|Collection|int[]|string[] (intentionally not GenericCollection)
-     * @throws \InvalidArgumentException If key is invalid
+     * @inheritdoc
+     * @param GenericCollection|Filter\Selection\Model[] $availableSelections
+     * @param bool                                       $foldersFiltered Are folders being filtered?
      */
-    public function getSelectedItems(GenericCollection $availableSelections = null, $foldersFiltered = true)
+    public function getSelectedItems(GenericCollection $availableSelections, $foldersFiltered = true)
     {
-        if (null === $availableSelections) {
-            return null;
-        }
-
         $allItems       = $this->getAllPossibleItems();
         $availableItems = $allItems->emptyClone();
         $selectedItems  = $allItems->emptyClone();

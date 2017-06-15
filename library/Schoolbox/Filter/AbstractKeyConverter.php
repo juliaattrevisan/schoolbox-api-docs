@@ -40,12 +40,8 @@ abstract class AbstractKeyConverter implements IKeyConverter
     /**
      * @inheritdoc
      */
-    public function getSelectedItems(GenericCollection $availableSelections = null)
+    public function getSelectedItems(GenericCollection $availableSelections)
     {
-        if (null === $availableSelections) {
-            return null;
-        }
-
         $allItems       = $this->getAllPossibleItems();
         $availableItems = $allItems->emptyClone();
         $selectedItems  = $allItems->emptyClone();
