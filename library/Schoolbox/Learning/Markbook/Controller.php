@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
@@ -116,7 +117,7 @@ class Controller extends Base
             }
         }
 
-        $codec        = new Filter\Codec();
+        $codec        = $this->filterFactoryFactory->buildCodec();
         $getArgString = $codec->convertSelectionsToQueryString($selections);
 
         $this->getResponse()->redirect->to("{$route}?{$getArgString}");
@@ -197,16 +198,11 @@ class Controller extends Base
             $request = $this->request->post['filter_selection'] ?: [];
 
             /**
-             * @var Filter\DataTransferObject $filtersDto
-             * @var Filter\Codec              $codec
-             * @var Filter\Selection\Model[][]
+             * @var null[]|Collection[]        $filters
+             * @var Filter\Codec               $codec
+             * @var Filter\Selection\Model[][] $selectionsPerFilter
              */
-            list($filters, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($request, true);
-
-            // Ensure that assessments are not Assessment Specs
-            $filters = array_merge($filters, [
-                Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-            ]);
+            list($filters, $codec, $selectionsPerFilter) = $this->convertRequestToFilters($request, $viewee, true);
 
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
             $markbook      = $this->buildMarkbook($assessmentIds);
@@ -247,6 +243,7 @@ class Controller extends Base
 
     /**
      * @param array $request  Indexed by filter.id, option.key
+     * @param User  $viewee
      * @param bool  $saveToDB Should we persist these selections to the DB ?
      * @return array
      * @throws \InvalidArgumentException If unable to find the filter mapper class
@@ -255,24 +252,28 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    private function convertRequestToFilters(array $request, $saveToDB)
+    private function convertRequestToFilters(array $request, User $viewee, $saveToDB)
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
         $page            = Filter\Page\Model::PAGE_MARK_BOOK;
-        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
-        $codec           = new Filter\Codec();
+        $codec           = $this->filterFactoryFactory->buildCodec();
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelections($selectionMapper, $keyConverters, $this->getUser(), $page, $request);
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
         if ($saveToDB) {
             $selectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
-        // Convert Selection models to Filter Collections
-        $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $selectionsPerFilter);
-        $filtersDTO           = $selectionTransformer->buildFiltersDto();
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $page);
 
-        return [$filtersDTO->getByClass(), $codec, $selectionsPerFilter];
+        $filters = $this->filterFactoryFactory->checkTeacherFolders($filters, $this->getUser(), $viewee);
+
+        // Ensure that assessments are not Assessment Specs
+        $filters = array_merge($filters, [
+            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
+        ]);
+
+        return [$filters, $codec, $selectionsPerFilter];
     }
 
 
@@ -280,6 +281,7 @@ class Controller extends Base
      * Stream a filtered markbook in CSV format
      *
      * @api   GET /learning/markbook/:userId/export?{filterQueryArgs}
+     * @param User $viewee
      * @throws \DomainException                      If attempting to get the slug from a filter where it has not been set
      * @throws Filter\BrokenFilterException          If a injected filter is unable to be processed
      * @throws \InvalidArgumentException             If any filter keys not recognised
@@ -287,16 +289,12 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      */
-    public function getMarkbookExport()
+    public function getMarkbookExport(User $viewee)
     {
         $filtersArray = $this->request->query->getArrayCopy();
+        unset($filtersArray['page']);
 
-        list($filters) = $this->convertRequestToFilters($filtersArray, false);
-
-        // Ensure that assessments are not Assessment Specs
-        $filters = array_merge($filters, [
-            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-        ]);
+        list($filters) = $this->convertRequestToFilters($filtersArray, $viewee, false);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         $markbook      = $this->buildMarkbook($assessmentIds);

@@ -15,7 +15,6 @@ use Schoolbox\User;
  * Responsible:
  * * Convert POST/GET array to Selection\Model[][]
  * * Convert Selection\Model[][] to GET param string
- * * Convert Filters to GET param string
  *
  * TODO - for now there is no compression. Need to add this in SA-3201
  * TODO - This is placeholder. All server-side URL compression/decompression + encoding/decoding will happen inside here
@@ -24,41 +23,51 @@ class Codec
 {
 
     /**
+     * @var Mapper
+     */
+    private $filterMapper;
+
+    /**
+     * @var Selection\Mapper
+     */
+    private $selectionMapper;
+
+
+    /**
+     * @param Mapper           $filterMapper
+     * @param Selection\Mapper $selectionMapper
+     */
+    public function __construct(Mapper $filterMapper, Selection\Mapper $selectionMapper)
+    {
+        $this->filterMapper    = $filterMapper;
+        $this->selectionMapper = $selectionMapper;
+    }
+
+
+    /**
      * Convert a HTTP Request to a set of Selection Models, index by filter.id, then selection.key
      *
      * Able to return empty sets, to indicate all options should be unchecked.
      *
      * Only pageFilters that are enabled for this page will have their key-converters injected.
      *
-     * @param Selection\Mapper                  $selectionMapper
-     * @param GenericCollection|IKeyConverter[] $keyConverters Indexed by filter.id
-     * @param User                              $user
-     * @param string                            $page
-     * @param int[][]                           $request       Indexed by filter.id, then selection.key
+     * @param User    $user
+     * @param string  $page
+     * @param int[][] $request Indexed by filter.id, then selection.key
      * @return Collection|GenericCollection[]|Selection\Model[][] Indexed by filter.id then selection.key
      */
-    public function convertRequestToSelections(
-        Selection\Mapper $selectionMapper,
-        GenericCollection $keyConverters,
-        User $user,
-        $page,
-        array $request
-    ) {
-        // Clean up aura-inserted items (do this as low down in logic as possible - not in controller)
-        if (array_key_exists('page', $request)) {
-            unset($request['page']);
-        }
-
+    public function convertRequestToSelections(User $user, $page, array $request)
+    {
         /** @var Collection|GenericCollection[]|Selection\Model[][] $selections */
         $selections = new GenericCollection(GenericCollection::class);
 
-        // Has any data been passed in? (will be empty if no filters available on this page)
+        // Has any data been passed in? (will be empty if no filters enabled on this page)
         if (count($request)) {
             foreach ($request as $filterId => $filterSelectionArray) {
 
                 // Create the collection before checking if empty.
                 // This is so the controller can still clear user-selections.
-                $filterSelections      = $selectionMapper->createCollection();
+                $filterSelections      = $this->selectionMapper->createCollection();
                 $selections[$filterId] = $filterSelections;
 
                 // Not an array, this happens for empty sets, eg '?2='
@@ -66,34 +75,16 @@ class Codec
                     continue;
                 }
 
-                $keyConverter = $keyConverters[$filterId];
-
-                // Page filter not enabled?
-                if (null === $keyConverter) {
-                    // Silently ignore it.
-                    continue;
-                }
-
-                $filter = $keyConverter->getFilter();
+                $filter = $this->filterMapper->createModel($filterId);
+                $page   = (string)$page;
 
                 /** @var bool[] $filterSelectionArray */
                 foreach ($filterSelectionArray as $key => $isSelected) {
-
-                    try {
-                        $keyConverter->sanitiseKey($key, $user, $page);
-                    } catch (\InvalidArgumentException $e) {
-                        // User is not permitted to select this option for this page filter
-                        // Silently discard it and move on
-                        // TODO instead call assertValidKey(). That method will need to take $user and $page as args
-                        // TODO SA-3532
-                        continue;
-                    }
-
-                    $selection = $selectionMapper->createModel();
+                    $selection = $this->selectionMapper->createModel();
                     $selection
                         ->setFilter($filter)
                         ->setUser($user)
-                        ->setPage((string)$page)
+                        ->setPage($page)
                         ->setKey((string)$key)
                         ->setSelected((bool)$isSelected);
                     $filterSelections[$key] = $selection;

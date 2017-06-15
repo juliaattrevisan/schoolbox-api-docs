@@ -73,17 +73,4 @@ abstract class KeyConverter extends AbstractKeyConverter
         return $selectedItems;
 
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function sanitiseKey($key, User $user, $page)
-    {
-        if (Definition::KEY_NONE === $key) {
-            return $key;
-        }
-        $this->assertValidKey($key);
-        return (string)$key;
-    }
 }

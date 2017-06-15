@@ -10,70 +10,58 @@ namespace Schoolbox\Filter\Filters\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Term;
 use Schoolbox\Filter;
 
 
 /**
- * Converts between termFilter concrete keys and Term models
- * @method null|GenericCollection|Term\Model[] getSelectedItems(GenericCollection $availableSelections = null)
+ * Converts between termFilter concrete keys and Term.ids
+ * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 abstract class KeyConverter extends AbstractKeyConverter
 {
 
     /**
-     * All Terms in the system (regardless of whether they are available)
+     * All Term Ids in the system (regardless of whether they are available)
      *
-     * @var GenericCollection|Term\Model[]
+     * @var GenericCollection|int[]
      */
-    private $terms;
+    private $termIds;
 
 
     /**
-     * @param Filter\Model                   $filter
-     * @param GenericCollection|Term\Model[] $terms
+     * @param Filter\Model     $filter
+     * @param Collection|int[] $termIds
      */
-    public function __construct(Filter\Model $filter, GenericCollection $terms)
+    public function __construct(Filter\Model $filter, Collection $termIds)
     {
         parent::__construct($filter);
 
         // Ensure invoker cannot mutate our collection's sorting or indexing after construction
-        $this->terms = $terms->shallowClone()->indexBy('id');
+        $this->termIds = $termIds->shallowClone()->indexByCallback(function($val){
+            return $val;
+        });
     }
 
 
-//    /**
-//     * @param Term\Model $item
-//     * @return string
-//     */
-//    public function getKey($item)
-//    {
-//        return (string)$item->getId();
-//    }
-
-
     /**
-     * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
-     *
-     * @param string $key
-     * @return mixed|Term\Model
-     * @throws \InvalidArgumentException
+     * @inheritdoc
+     * @return int
      */
     protected function getItem($key)
     {
         $this->assertValidKey($key);
-        return $this->terms[$key];
+        return (int)$key;
     }
 
 
     /**
      * Return all available concrete items
      *
-     * @return Collection|GenericCollection|Term\Model[]
+     * @return Collection|int[]
      */
     public function getAllPossibleItems()
     {
-        return $this->terms->shallowClone();
+        return $this->termIds->shallowClone();
     }
 
 
@@ -82,8 +70,8 @@ abstract class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
-        if (!$this->terms->offsetExists($key)) {
-            throw new \InvalidArgumentException("No term found for key:  $key");
+        if (!is_numeric($key)) {
+            throw new \InvalidArgumentException("Term keys must be numeric, representing term.id:  $key");
         }
     }
 }

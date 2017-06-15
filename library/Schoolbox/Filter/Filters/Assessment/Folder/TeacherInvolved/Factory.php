@@ -9,7 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
@@ -24,6 +23,7 @@ class Factory extends FolderFilter\Factory
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException If $viewee is NULL
      */
     protected function buildExtraComponentArgs(
         User $user,
@@ -32,16 +32,33 @@ class Factory extends FolderFilter\Factory
         GenericCollection $overrides = null,
         User $viewee = null
     ) {
+
+        if(null === $viewee){
+            throw new \InvalidArgumentException('Viewee cannot be null');
+        }
+
         // Should this role type see classes for this page?
         $options = $pageFilter->getOptions();
 
-        $getSubjects = $options[Definition::KEY_CLASSES]->getAvailable();
+        if($pageFilter->getUserConfigurable()){
+            $getClasses = $options[Definition::KEY_CLASSES]->getAvailable();
+            $getGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
+        } else {
+            $roleType   = $viewee->getRole()->getType();
+            $getClasses = $options[Definition::KEY_CLASSES]->getDefaults()[$roleType]->getSelected();
+            $getGroups  = $options[Definition::KEY_GROUPS]->getDefaults()[$roleType]->getSelected();
 
-        $groupAccessLevel = $options[Definition::KEY_GROUPS]->getAvailable()
-            ? UserAccess::ACCESS_WRITE
-            : -1; // TODO - fix this dirty hack which is being used to prevent retrieval of group folders!
+            // Are all available options unchecked ?
+            if(!$getClasses && !$getGroups){
+                // For consistency, this must logically equate to the filter not reducing the full set.
+                $getClasses = $getGroups = true;
+            }
+        }
 
-        $folders = $this->getFolderMapper()->findForUser($viewee, $getSubjects, $groupAccessLevel, true)->indexBy('id');
+        // Note: '-1' is a hack to mean 'INVALID', to force no group folders to be matched.
+        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : -1;
+
+        $folders = $this->getFolderMapper()->findForUser($viewee, $getClasses, $groupAccessLevel, true)->indexBy('id');
 
         // Did caller specify they wish to insert some custom folders in the list?
         // (Note that perm check was already performed by key-converter)

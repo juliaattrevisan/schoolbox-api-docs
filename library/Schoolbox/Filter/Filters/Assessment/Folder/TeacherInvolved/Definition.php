@@ -37,6 +37,15 @@ class Definition extends FolderFilter\Definition
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function isMandatory($page)
+    {
+        // The teacher folder filter must be enabled on all pages. No effect on user-configurability
+        return true;
+    }
+
 
     /**
      * @inheritdoc

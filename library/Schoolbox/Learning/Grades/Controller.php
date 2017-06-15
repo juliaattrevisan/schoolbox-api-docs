@@ -208,7 +208,7 @@ class Controller extends Base
          */
         $filters       = [
             AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
-            AssessmentFilters\Term\Due\Definition::class                   => $term,
+            AssessmentFilters\Term\Due\Definition::class                   => $term->getId(),
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
             AssessmentFilters\TemporalState\Definition::class              => [
                 AssessmentFilters\TemporalState\Definition::KEY_UPCOMING,
@@ -265,16 +265,14 @@ class Controller extends Base
     {
         $request         = $this->request->post['filter_selection'] ?: [];
         $page            = FilterPage\Model::PAGE_GRADES;
-        $keyConverters   = $this->filterFactoryFactory->buildEnabledKeyConverters($page);
-        $codec           = new Filter\Codec();
-        $userSelections  = $codec->convertRequestToSelections($this->selectionMapper, $keyConverters, $this->getUser(), $page, $request);
+
+        $codec           = $this->filterFactoryFactory->buildCodec();
+        $userSelections  = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
         // TODO don't save selections for non user-configurable page filters
         $this->selectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
-        $selectionTransformer = new Filter\Filters\Assessment\Transformer($keyConverters, $userSelections);
-        $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
-
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $page);
 
         /* Merge filters to ensure that assessments:
          * * Belong to this folder
@@ -284,7 +282,7 @@ class Controller extends Base
          */
         $filters = array_merge($filters, [
             AssessmentFilters\Folder\StudentInteractions\Definition::class => $subject->getId(),
-            AssessmentFilters\Term\Due\Definition::class                   => $term,
+            AssessmentFilters\Term\Due\Definition::class                   => $term->getId(),
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
             AssessmentFilters\TemporalState\Definition::class              => [
                 AssessmentFilters\TemporalState\Definition::KEY_UPCOMING,
@@ -295,7 +293,6 @@ class Controller extends Base
         ]);
 
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);

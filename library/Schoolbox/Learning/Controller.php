@@ -170,7 +170,7 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User                             $viewee The user whose pending assessments we are viewing. TODO not used, but will be when GET + POST routes merge
+     * @param User                             $viewee The user whose pending assessments we are viewing.
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @var  string[][]                        $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
      * @throws \LogicException
@@ -185,7 +185,7 @@ class Controller extends Base
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
 
-            $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $postFilterSelections);
+            $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $viewee, $postFilterSelections);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
@@ -205,6 +205,7 @@ class Controller extends Base
      * Generate a pending assessment report as HTML string
      *
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
+     * @param User                             $viewee
      * @param string[][]                       $request - Indexed by filter.id, then concrete key
      * @return string
      * @throws \InvalidArgumentException
@@ -215,19 +216,19 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    protected function generatePendingAssessmentReport(AssessmentFilters\FactoryFactory $filterFactoryFactory, array $request)
+    protected function generatePendingAssessmentReport(AssessmentFilters\FactoryFactory $filterFactoryFactory, User $viewee, array $request)
     {
-        $page              = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
-        $keyConverters     = $filterFactoryFactory->buildEnabledKeyConverters($page);
-        $codec             = new Filter\Codec();
+        $page                = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
 
         // Convert Request to Selection models
-        $selectionsPerFilter = $codec->convertRequestToSelections($this->filterSelectionMapper, $keyConverters, $this->getUser(), $page, $request);
+        $codec               = $filterFactoryFactory->buildCodec();
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
-        // Convert Selection models to Filter Collections
-        $selectionTransformer = new AssessmentFilters\Transformer($keyConverters, $selectionsPerFilter);
-        $filters              = $selectionTransformer->buildFiltersDto()->getByClass();
+        $filters = $filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $page);
+
+        $filters = $filterFactoryFactory->checkTeacherFolders($filters, $this->getUser(), $viewee);
 
         // Ensure that assessments are not Assessment Specs
         $filters = array_merge($filters, [

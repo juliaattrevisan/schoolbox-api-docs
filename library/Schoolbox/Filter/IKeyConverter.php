@@ -29,22 +29,6 @@ interface IKeyConverter
 
 
     /**
-     * Sanitises a key before insertion in filter_selection table
-     *
-     * Ensures the key is logically valid, and always returns a string
-     *
-     * Can perform permission checks, throws exception if not permitted
-     *
-     * @param string $key
-     * @param User   $user
-     * @param string $page
-     * @return string
-     * @throws \InvalidArgumentException if the key is invalid
-     */
-    public function sanitiseKey($key, User $user, $page);
-
-
-    /**
      * For the user's posted selections, generate a collection of items they represent.
      *
      * If the set of selections is the logical full set of that item type, and either all are

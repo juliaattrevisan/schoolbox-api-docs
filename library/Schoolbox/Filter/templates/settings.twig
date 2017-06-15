@@ -213,21 +213,24 @@
             <div class="small-12 island">
                 {% set definition = definitions[class] %}
                 {% set options    = pageFilter.options %}
+                {% set isMandatory = definition.isMandatory(pageFilter.page) %}
                 <section data-filter="{{ definition.filter.id }}">
                     {# Header #}
                     <fieldset class="content">
                         <div class="small-4 columns">
-                            <h2>{{ definition.name }}</h2>
+                            <h2>{{ definition.name }}{% if isMandatory %}<span data-tooltip="" class="hint has-tip tip-top" title="This filter is mandatory for this page.">?</span>{% endif %}</h2>
                         </div>
-                        <div class="small-4 columns">
+                        <div class="small-4 columns" {% if isMandatory %} title="This filter is mandatory for this page."{% endif %}>
                             <input
                                     id="checkbox_enabled_{{ definition.filter.id }}"
                                     type="checkbox"
                                     name="filter_enabled[{{ definition.filter.id }}]"
-                                    {% if pageFilter.enabled %}checked{% endif %}
+                                    {% if isMandatory or pageFilter.enabled %}checked{% endif %}
+                                    {% if isMandatory %}disabled{% endif %}
                                     data-filter-enable
                             >
                             <label for="checkbox_enabled_{{ definition.filter.id }}" class="checkbox-label">Enabled</label>
+
                         </div>
                         <div class="small-4 columns">
                             <span data-filter-user-configurable-wrap {% if not pageFilter.enabled %} style="display:none;"{% endif %}>
