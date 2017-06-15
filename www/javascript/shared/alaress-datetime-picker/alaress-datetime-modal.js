@@ -727,6 +727,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
              * Populate dates for the active cycle
              */
             addDatesToDays();
+            applyHeatToTimetable();
 
         }
     }
