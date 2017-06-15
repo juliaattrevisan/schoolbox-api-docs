@@ -35,27 +35,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     });
 
-    function resetTimetablePicker(date) {
-
-        if(twigVars.timetable) {
-
-            var timetableValue =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
-                activeValue = moment(date, momentFormats.databaseShort);
-
-            if(timetableValue.diff(activeValue)) {
-                setTimetablePickerValue(activeValue.format(momentFormats.databaseShort));
-                requestDataByDate(activeValue.format(momentFormats.databaseShort), 'timetable');
-            }
-            else {
-                requestDataByDate(timetableValue.format(momentFormats.databaseShort), 'timetable');
-            }
-
-            resetTerms();
-
-        }
-
-    }
-
     // Timetable picker
     var $byTimetable = $('#byTimetable-' + twigVars.id);
 
@@ -104,7 +83,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             setTimetablePickerValue($(this).attr('data-date'));
             resetDays();
             requestDataByDay($(this));
-            lockValues($(this).attr('data-date'));
 
         });
 
@@ -1107,42 +1085,9 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     }
 
     /**
-     * Lock in selected date value, term, cycle, week, day
-     *
-     * @param date
-     */
-    function lockValues() {
-
-        var selectedCampus = timetable.campus.val(),
-            selectedTerm = timetable.term.val(),
-            selectedCycle = $byTimetable.find('[data-parent-term="' + selectedTerm + '"]').not('.hide').attr('data-adtp-tt-cycle');
-
-        timetable.submit.attr('data-timetable-campus', selectedCampus);
-        timetable.submit.attr('data-timetable-term', selectedTerm);
-        timetable.submit.attr('data-timetable-cycle', selectedCycle);
-
-    }
-
-    /**
-     * Select the values for campus, term, cycle, date that refer to the selected date
-     */
-    function selectLockedValues() {
-
-        if(timetable.submit.attr('data-timetable-campus') > 0) {
-            timetable.campus.val(timetable.submit.attr('data-timetable-campus'));
-        }
-
-        if(timetable.submit.attr('data-timetable-term') > 0) {
-            timetable.term.val(timetable.submit.attr('data-timetable-term'));
-        }
-
-        buildCycles();
-        revealByCampus();
-
-    }
-
-    /**
      * Set value to the timetable picker
+     *
+     * @param date (database short format)
      */
     function setTimetablePickerValue(date) {
 
@@ -1158,6 +1103,32 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         $button = $byTimetable.find('[data-timetable-value]');
         return $button.attr('data-timetable-value');
+
+    }
+
+    /**
+     * Visualise the timetable for a given date
+     *
+     * @param date (database short format)
+     */
+    function resetTimetablePicker(date) {
+
+        if(twigVars.timetable) {
+
+            var timetableValue =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
+                activeValue = moment(date, momentFormats.databaseShort);
+
+            if(timetableValue.diff(activeValue)) {
+                setTimetablePickerValue(activeValue.format(momentFormats.databaseShort));
+                requestDataByDate(activeValue.format(momentFormats.databaseShort), 'timetable');
+            }
+            else {
+                requestDataByDate(timetableValue.format(momentFormats.databaseShort), 'timetable');
+            }
+
+            resetTerms();
+
+        }
 
     }
 
