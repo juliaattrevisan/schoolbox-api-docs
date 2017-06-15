@@ -88,11 +88,17 @@ class Transformer
     {
         $filters = [];
 
-        foreach ($this->getSelectionsPerFilter() as $filterId => $selections) {
-            $instance        = $this->keyConverters[$filterId]->getFilter();
-            $class           = $instance->getClass();
+        /* Note: We iterate key-converters not the selections.
+         *       This means we skip any selections that do not have a corresponding keyConverter.
+         *       This is because the selections reflect was was sent by the client, but we don't rely on that,
+         *       the key-converters are built by the system and reflect which filters are enabled.
+         */
+        foreach($this->keyConverters as $keyConverter){
+            $filter          = $keyConverter->getFilter();
+            $class           = $filter->getClass();
             $filters[$class] = $this->getSelectedItems($class);
         }
+
         return $filters;
     }
 
