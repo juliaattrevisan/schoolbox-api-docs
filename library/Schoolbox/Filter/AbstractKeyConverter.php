@@ -9,7 +9,6 @@ namespace Schoolbox\Filter;
 
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
 
 
 abstract class AbstractKeyConverter implements IKeyConverter
