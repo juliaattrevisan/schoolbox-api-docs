@@ -84,6 +84,11 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         /** @var SubmissionBox $box */
         $box = $this->boxMapper->findByIdWithFallback($mark->getSubmissionBox()->getId());
 
+        if ($box->getId() === null) {
+            // don't. even. bother.
+            return;
+        }
+
         if ($box->isDeleted()) {
             // don't. even. bother.
             return;

@@ -158,13 +158,21 @@ class SubmissionNotifier extends AbstractModuleNotifier
                 if ($boxId) {
                     /** @var SubmissionBox $owningBox */
                     $owningBox = $this->submissionBoxMapper->findByIdWithFallback($boxId);
+
+                    if ($owningBox->getId() === null) {
+                        // don't. even. bother.
+                        return;
+                    }
+
                     if ($owningBox->isDeleted()) {
                         break;
                     }
+
                     // if multi-submit, don't notify
                     if ($owningBox->getAcceptMultiple()) {
                         break;
                     }
+
                     $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
                 }
 
