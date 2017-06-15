@@ -458,7 +458,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     }
 
-
     /**
      * Get event data based on date
      *
@@ -513,9 +512,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param target
      */
     function loadingResponse(target) {
+
         $('#' + target + 'Response' + twigVars.id + '-duework').html('');
         $('#' + target + 'Response' + twigVars.id + '-events').html('');
         $('#' + target + 'Response' + twigVars.id + ' .loader').removeClass('hide');
+
     }
 
 
@@ -703,9 +704,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function changeCycle($button, prev) {
 
-        var $currentWeek = $button.closest('[data-tt-week-selector]').find('[data-adtp-tt-cycle]:visible');
+        var $currentWeek = $button.closest('[data-tt-week-selector]').find('[data-adtp-tt-cycle]:visible'),
+            // Scroll only through the cycles that belong to the same campus
+            currentCampus = $currentWeek.attr('data-parent-campus');
 
-        if ( (prev && $currentWeek.prev().length) || (!prev && $currentWeek.next().length) ) {
+        if ( (prev && $currentWeek.prev().length && $currentWeek.prev().attr('data-parent-campus') === currentCampus)
+            || (!prev && $currentWeek.next().length && $currentWeek.next().attr('data-parent-campus') === currentCampus) ) {
 
             // Hide the current cycle title
             $currentWeek.addClass('hide');
