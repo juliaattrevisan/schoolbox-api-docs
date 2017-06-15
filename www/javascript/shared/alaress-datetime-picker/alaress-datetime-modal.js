@@ -478,7 +478,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $.get((twigVars.routeLookup.getDueByDate).replace(/{folderId}/g, folder).replace(/{date}/g, urlDate))
 
                 .done(function (urlDate) {
-                    appendResponse(urlDate, 'duework', urlDate);
+                    appendResponse(urlDate, 'duework', target);
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
@@ -487,7 +487,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // Pull in events as well
             $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, urlDate))
                 .done(function (urlDate) {
-                    appendResponse(urlDate, 'events', urlDate);
+                    appendResponse(urlDate, 'events', target);
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
