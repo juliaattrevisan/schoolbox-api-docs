@@ -11,10 +11,10 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
 /**
- * Encapsulates the transform of filter Selection models into filters (Collections of disparate entities)
- * eg Term Models, WorkType Models, AssessmentType strings etc
+ * Encapsulates the transform of filter Selection models into filters (Collections of ints or string representing selected filter options)
+ * eg Term Model Ids, WorkType Model Ids, AssessmentType strings etc
  *
- * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter::class) should return a set of 3 Term models.
+ * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter::class) should return a set of 3 Term model ids.
  */
 class Transformer
 {
