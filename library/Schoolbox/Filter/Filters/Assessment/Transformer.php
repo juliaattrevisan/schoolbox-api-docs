@@ -67,7 +67,7 @@ class Transformer extends \Schoolbox\Filter\Transformer
      * @return null|Collection|mixed[]
      * @throws \InvalidArgumentException If any selection key is invalid
      */
-    public function getSelectedItems($filterClass)
+    protected function getSelectedItems($filterClass)
     {
         if (!$this->getFiltersByClass()->offsetExists($filterClass)) {
             return null;
