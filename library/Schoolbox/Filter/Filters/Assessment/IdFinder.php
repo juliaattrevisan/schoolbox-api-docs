@@ -8,8 +8,6 @@
 namespace Schoolbox\Filter\Filters\Assessment;
 
 use Schoolbox\Collection;
-use Schoolbox\Assessment\Term;
-use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
 use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
@@ -528,16 +526,16 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'TermClose' filter
      *
-     * @param Collection|Term\Model[] $terms      (can also be NULL, but storm doesn't like that type-hint)
-     * @param string                  $dateColumn ['due_date'|'close_date']
+     * @param Collection|int[] $termIds    (can also be NULL, but storm doesn't like that type-hint)
+     * @param string           $dateColumn ['due_date'|'close_date']
      * @return string[]
      * @throws Filter\BrokenFilterException If filter cannot be constructed
      * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
      */
-    private function getClauseTerm(Collection $terms = null, $dateColumn)
+    private function getClauseTerm(Collection $termIds = null, $dateColumn)
     {
         // Is this filter being applied ?
-        if (null === $terms) {
+        if (null === $termIds) {
             return ['', 'TRUE', []];
         }
 
@@ -552,7 +550,7 @@ class IdFinder extends Filter\AbstractIdFinder
         JOIN term $t ON (a.$dateColumn >= $t.start  AND ($t.actual_finish IS NULL OR a.$dateColumn < $t.actual_finish))";
 
             $builder = $this->getMapper()->getPredicateBuilder();
-                $builder->equals("$t.id", $terms->getAll());
+                $builder->equals("$t.id", $termIds->getAll());
 
              return [$joinClause, implode(' AND ', $builder->getWhere()), $builder->getParams() ];
     }
