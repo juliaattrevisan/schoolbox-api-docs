@@ -361,6 +361,7 @@ DESCRIPTION
 
        {$yellow}-i, --id=ID...{$white}
               comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
+              If any entity is not soft-deleted, it will be ignored.
 
        {$yellow}-m, --mapper=MAPPER_CLASS{$white}
               which mapper class does the root entity belong to?
@@ -677,6 +678,8 @@ EXAMPLE
      * If model has a timestamp (not boolean) soft-delete field, generate a pair of ADFs that child objects must
      * be deleted between to be considered part of the same delete cascade.
      *
+     * If the object is not deleted, returns scalar NULLs
+     *
      * @param object $model
      * @return null[]|Alaress_Date_Format[]
      */
@@ -686,10 +689,13 @@ EXAMPLE
         if(method_exists($model, 'getDeletedAt')){
             /** @var Mapper\Traits\Model\DeletedAtDate $model */
             $deletedAt = $model->getDeletedAt();
-            $deletedAfter  = clone $deletedAt;
-            $deletedAfter->addSeconds(-1 * $this->deletedAtWindow / 2);
-            $deletedBefore = clone $deletedAt;
-            $deletedBefore->addSeconds(+1 * $this->deletedAtWindow / 2);
+            if($deletedAt instanceof Alaress_Date_Format && !$deletedAt instanceof Alaress_Date_NullDate){
+                $deletedAfter  = clone $deletedAt;
+                $deletedAfter->addSeconds(-1 * $this->deletedAtWindow / 2);
+
+                $deletedBefore = clone $deletedAt;
+                $deletedBefore->addSeconds(+1 * $this->deletedAtWindow / 2);
+            }
         }
         return [$deletedAfter, $deletedBefore];
     }
