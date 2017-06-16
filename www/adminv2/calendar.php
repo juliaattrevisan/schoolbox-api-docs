@@ -249,6 +249,12 @@ foreach ($typeList as $type) {
                 $allCampuses[] = $currentCampus->getName();
             }
 
+            /* Combine all three of the auxiliary collections
+             */
+            $appliesTo = [];
+            $appliesTo = array_merge($allUsers, $allCategories, $allCampuses);
+            $appliesTo = implode('<br />', $appliesTo);
+
             /* Special selection modifiers for javascript control
              */
             $modifier = '';
@@ -267,9 +273,7 @@ foreach ($typeList as $type) {
                 'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
                 'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
                 'CLEANUP_EVENT_EVENTTYPE' => $currentEvent->getType()->getType(),
-                'CLEANUP_EVENT_USERS' => implode('<br />', $allUsers),
-                'CLEANUP_EVENT_CATEGORIES' => implode('<br />', $allCategories),
-                'CLEANUP_EVENT_CAMPUSES' => implode('<br />', $allCampuses),
+                'CLEANUP_EVENT_APPLIES_TO' => $appliesTo,
                 'CLEANUP_EVENT_MODIFIER' => $modifier,
             ]);
 
