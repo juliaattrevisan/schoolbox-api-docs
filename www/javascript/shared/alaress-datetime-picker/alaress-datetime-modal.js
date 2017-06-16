@@ -31,7 +31,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     $(document).on('open.fndtn.reveal', '#picker' + twigVars.id, function () {
 
-        resetTimetablePicker(getPickerValue(twigVars.id));
+        resetTimetablePicker();
 
     });
 
@@ -52,8 +52,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         // Set initial value to the timetable picker
         setTimetablePickerValue(initialDate);
-
-        resetTimetablePicker(initialDate);
+        resetTimetablePicker();
 
         // Listen for changes to campus
         timetable.campus.change(function () {
@@ -92,6 +91,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         // Catch period select change
         $byTimetable.find('[data-tt-period]').change(function() {
             updateTimeControls($(this));
+        });
+
+        // If input value gets changed from outside, reset the timetable picker
+        $picker.change(function() {
+            resetTimetablePicker();
         });
 
     }
@@ -468,6 +472,8 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         var urlDate = encodeURIComponent(date);
 
+        setRequestDate(date);
+
         if (twigVars.type == 'duework') { // Fetch student assessments
 
             loadingResponse(target);
@@ -532,7 +538,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         var $pickerResponse = $('#' + target + 'Response' + twigVars.id); // The event container
         var $pickerResponseDueWork = $('#' + target + 'Response' + twigVars.id + '-duework');
         var $pickerResponseEvents = $('#' + target + 'Response' + twigVars.id + '-events');
-        var displayDate = moment(data.date).format(momentFormats.nice); // The selected date in a nice format
         var html = '';
 
         // Clear out any old response display
@@ -1047,7 +1052,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function setTimetablePickerValue(date) {
 
-        $button = $byTimetable.find('[data-timetable-value]');
+        var $button = $byTimetable.find('[data-timetable-value]');
         $button.attr('data-timetable-value', date);
 
     }
@@ -1057,29 +1062,62 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function getTimetablePickerValue() {
 
-        $button = $byTimetable.find('[data-timetable-value]');
+        var $button = $byTimetable.find('[data-timetable-value]');
         return $button.attr('data-timetable-value');
 
     }
 
     /**
-     * Visualise the timetable for a given date
+     * Set data request date to the response container
      *
-     * @param date (database short format)
+     * @param {string} date (database short format)
      */
-    function resetTimetablePicker(date) {
+    function setRequestDate(date) {
+
+        var $response = $('#timetableResponse' + twigVars.id);
+        $response.attr('data-adtp-response-date', date);
+
+    }
+
+    /**
+     * Get latest data request date
+     */
+    function getRequestDate() {
+
+        var $response = $('#timetableResponse' + twigVars.id);
+        return $response.attr('data-adtp-response-date');
+
+    }
+
+    /**
+     * Visualise the timetable for a given date
+     */
+    function resetTimetablePicker() {
 
         if(twigVars.timetable) {
 
-            var timetableValue =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
-                activeValue = moment(date, momentFormats.databaseShort);
+            var timetableDate =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
+                activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
+                requestDate = moment(getRequestDate(), momentFormats.databaseShort);
 
-            if(timetableValue.diff(activeValue)) {
-                setTimetablePickerValue(activeValue.format(momentFormats.databaseShort));
-                requestDataByDate(activeValue.format(momentFormats.databaseShort), 'timetable');
+            // The picker value has been changed externally
+            if(timetableDate.diff(activeDate)) {
+                // Set new value
+                setTimetablePickerValue(activeDate.format(momentFormats.databaseShort));
+                // And request data for the new date
+                requestDataByDate(activeDate.format(momentFormats.databaseShort), 'timetable');
+            }
+            // Some data has already been requested
+            else if (requestDate.isValid()) {
+                // But check if the data request needs to be updated
+                if (requestDate.diff(timetableDate)) {
+                    requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
+                }
+                // The data matches the date, don't re-request
             }
             else {
-                requestDataByDate(timetableValue.format(momentFormats.databaseShort), 'timetable');
+                // Request data for the current timetable value
+                requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
             }
 
             resetTerms();
