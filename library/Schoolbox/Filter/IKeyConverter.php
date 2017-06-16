@@ -47,7 +47,7 @@ interface IKeyConverter
      *
      * If the selected set of items equals the full possible set, we can forgo the filter check in our DB query for a performance boost
      *
-     * @return Collection (intentionally not a GenericCollection)
+     * @return Collection|int[]|string[] (intentionally not a GenericCollection)
      */
     public function getAllPossibleItems();
 }

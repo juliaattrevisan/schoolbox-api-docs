@@ -46,6 +46,13 @@ abstract class AbstractKeyConverter implements IKeyConverter
         $availableItems = $allItems->emptyClone();
         $selectedItems  = $allItems->emptyClone();
 
+        // No available selections?
+        if (0 === $availableSelections->count()) {
+            // Short-circuit and return empty collection
+            return $selectedItems;
+        }
+
+        // Build the available and selected item collections
         foreach ($availableSelections as $selection) {
             $key  = $selection->getKey();
             $item = $this->getItem($key);
@@ -55,20 +62,24 @@ abstract class AbstractKeyConverter implements IKeyConverter
             }
         }
 
-        // Was nothing selected ?
-        if (0 === $selectedItems->count()) {
-            // Were all possible options available ?
-            if ($allItems->count() === $availableItems->count()) {
-                // Return NULL - so the DB generator can forgo the filter entirely
-                return null;
-            }
-            // Return the available options (ie none of a subset being selected equals all of the subset being selected)
+        $countAll       = $allItems->count();
+        $countSelected  = $selectedItems->count();
+        $countAvailable = $availableItems->count();
+
+        // Are are all possible options available, and none or all were selected ?
+        if ($countAll === $countAvailable && (0 === $countSelected || $countAvailable === $countSelected)) {
+            // Return NULL - so the DB generator can forgo the filter entirely
+            return null;
+        }
+
+        // Are a subset of possible options available, and none of the subset were selected ?
+        if($countAll !== $countAvailable && 0 === $countSelected){
+            // Nothing selected is the same as all available options being selected.
             return $availableItems;
         }
 
         // Either not all possible items were available for selection, or a subset of items was selected.
         return $selectedItems;
-
     }
 
 
