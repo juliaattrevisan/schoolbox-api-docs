@@ -57,7 +57,7 @@
         }
 
         return getDateFromString(dateDisplayFormats.momentJs, date, hour, minute, 0)
-    }
+    };
 
 
     /**
@@ -76,7 +76,7 @@
             .minute(minute)
             .second(second)
         ;
-    }
+    };
 
 
     /**
@@ -84,10 +84,12 @@
      */
     $.validator.addMethod('datepickerDate', function(value, element) {
 
+        var datepickerMoment;
+
         if ($(element).data('datepicker-date-only')) {
-            var datepickerMoment = moment(value, dateDisplayFormats.momentJs, true);
+            datepickerMoment = moment(value, dateDisplayFormats.momentJs, true);
         } else {
-            var datepickerMoment = moment(value, dateDisplayFormats.momentJs + ' h:mma', true);
+            datepickerMoment = moment(value, dateDisplayFormats.momentJs + ' h:mma', true);
         }
 
         return datepickerMoment.isValid();
@@ -106,7 +108,6 @@
             && other_date.isValid()
             && date.valueOf() >= other_date.valueOf()
         ;
-       return true;
     }, 'Please enter a valid date');
 
 
@@ -191,7 +192,7 @@
         if (this.optional(element)) {
             return true
         }
-        var selected = $(element).find(':selected[value]')
+        var selected = $(element).find(':selected[value]');
         return (selected.length > 0)
     }, 'Please select a value');
 
