@@ -228,7 +228,7 @@ foreach ($typeList as $type) {
 
             /** @var \Schoolbox\User $currentUser */
             foreach ($currentEvent->getUserCollection() as $currentUser) {
-                $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($currentUser->getUserId());
+                $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($currentUser->getId());
 
                 if ($user instanceof \Schoolbox\User) {
                     $allUsers[] = $user->getFullName();
