@@ -11,7 +11,7 @@ class LoginCest
         $i->fillField('username', 'alaress');
         $i->fillField('password', 'alaress');
         $i->click('Submit');
-        $i->see("Good Morning, Alaress Admin");
+        $i->see("NEWS HEADLINES");
     }
     
     public function loginWithInvalidPassword(AcceptanceTester $i)
