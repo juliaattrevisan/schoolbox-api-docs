@@ -63,11 +63,16 @@ $undeleter->run();
 
 class RecursiveUndeleter
 {
-    const COLOUR_GREEN = "\033[32m";
-    const COLOUR_RED = "\033[31m";
-    const COLOUR_GREY = "\033[37m";
-    const COLOUR_YELLOW = "\033[1;33m";
+    const COLOUR_GREEN = "\033[0;32m";
+    const COLOUR_RED = "\033[0;31m";
+    const COLOUR_GREY = "\033[0;37m";
+    const COLOUR_YELLOW = "\033[0;33m";
     const COLOUR_WHITE = "\033[0m";
+
+    const COLOUR_BOLD_GREEN = "\033[0;32m";
+    const COLOUR_BOLD_RED = "\033[0;31m";
+    const COLOUR_BOLD_GREY = "\033[0;37m";
+    const COLOUR_BOLD_YELLOW = "\033[0;33m";
 
     // To account for legacy non-synchronised deletedAt timestamps, how much allowance should we consider as being
     // part of same action?
@@ -89,7 +94,7 @@ class RecursiveUndeleter
     private $perform;
 
     /** @var string */
-    private $rootMapperClass;
+    private $rootTable;
 
     /** @var IMapper */
     private $rootMapper;
@@ -291,19 +296,29 @@ class RecursiveUndeleter
      */
     private function loadRootMapper()
     {
-        if(!class_exists($this->rootMapperClass)) {
-            $this->logger->error("Mapper class does not exist: {$this->rootMapperClass}");
-            exit(1);
+        // Use the specified root table to find the root mapper
+        /** @var IMapper $mapperClass */
+        foreach(self::$softDeleteRegistry as $mapperClass => $children){
+
+            // A bit of house keeping to try to keep things in order
+            if(!class_exists($mapperClass)) {
+                $this->logger->warning("Registry corruption detected. Mapper class does not exist: {$mapperClass}");
+            }
+
+            try {
+                $mapperInstance = $mapperClass::getInstance();
+                if($mapperInstance->getTable() === $this->rootTable){
+                    $this->rootMapper = $mapperInstance;
+                    return;
+                }
+            }
+            catch(Exception $e) {
+                $this->logger->warning($e->getMessage());
+            }
         }
-        try {
-            /** @var IMapper $mapperClass */
-            $mapperClass      = $this->rootMapperClass;
-            $this->rootMapper = $mapperClass::getInstance();
-        }
-        catch(Exception $e) {
-            $this->logger->error($e->getMessage());
-            exit(1);
-        }
+
+        $this->logger->error("No mapper found in registry with table: '{$this->rootTable}'");
+        exit(1);
     }
 
 
@@ -324,11 +339,11 @@ class RecursiveUndeleter
      */
     private function parseCommandLineArgs()
     {
-        $opts   = getopt('m:i:w:vp', ['mapper:', 'id:', 'window:', 'verbose', 'perform']);
+        $opts   = getopt('t:i:w:vp', ['table:', 'id:', 'window:', 'verbose', 'perform']);
         $errors = [];
         $this->getCommandLinePerform($opts);
         $this->getCommandLineThreshold($opts);
-        $errors = $this->getCommandLineMapperClass($errors, $opts);
+        $errors = $this->getCommandLineTable($errors, $opts);
         $errors = $this->getCommandLineIds($errors, $opts);
         $errors = $this->getCommandLineTimestampWindow($errors, $opts);
 
@@ -345,7 +360,7 @@ class RecursiveUndeleter
 
             $file   = __FILE__;
             $class  = __CLASS__;
-            $mapper = Folder\Mapper::class;
+            $table = 'folder';
 
             $helpMsg = "{$white}
 NAME
@@ -361,10 +376,10 @@ DESCRIPTION
 
        {$yellow}-i, --id=ID...{$white}
               comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
-              If any entity is not soft-deleted, it will be ignored.
+              If any entity with a specified ID is not soft-deleted, it will be ignored.
 
-       {$yellow}-m, --mapper=MAPPER_CLASS{$white}
-              which mapper class does the root entity belong to?
+       {$yellow}-t, --table=TABLE{$white}
+              which database table does the root entity reside in?
 
        {$yellow}-p, --perform{$white}
               *without* this flag, un-delete will only perform a dry-run
@@ -377,7 +392,7 @@ DESCRIPTION
 
 EXAMPLE
        Example to undelete folder with ID = 123:
-            {$green}php $file {$yellow}-m '$mapper' -i 123 -p{$white}
+            {$green}php $file {$yellow}-t '$table' -i 123 -p{$white}
 ";
             echo $helpMsg;
             exit(1);
@@ -483,34 +498,34 @@ EXAMPLE
      * @param array $opts
      * @return string[]
      */
-    private function getCommandLineMapperClass(array $errors, array $opts)
+    private function getCommandLineTable(array $errors, array $opts)
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
         // Did user provide both short and long options?
-        if(isset($opts['m'], $opts['mapper'])) {
-            $errors[] = "{$red}specify mapper using either the short '{$yellow}-m{$red}' or long '{$yellow}--mapper{$red}' option syntax, but not both";
+        if(isset($opts['t'], $opts['table'])) {
+            $errors[] = "{$red}specify database table using either the short '{$yellow}-t{$red}' or long '{$yellow}--table{$red}' option syntax, but not both";
             return $errors;
         }
         // Did user provide neither short nor long option
-        if(!isset($opts['m']) && !isset($opts['mapper'])) {
-            $errors[] = "{$red}specify mapper using either the short '{$yellow}-m{$red}' or long '{$yellow}--mapper{$red}' option syntax";
+        if(!isset($opts['t']) && !isset($opts['table'])) {
+            $errors[] = "{$red}specify database table using either the short '{$yellow}-t{$red}' or long '{$yellow}--table{$red}' option syntax";
             return $errors;
         }
 
-        // What mapper are we targeting?
-        $shortMapper = isset($opts['m']) ? $opts['m'] : null;
-        $longMapper  = isset($opts['mapper']) ? $opts['mapper'] : null;
+        // What table are we targeting?
+        $shortOpt = isset($opts['t']) ? $opts['t'] : null;
+        $longOpt  = isset($opts['table']) ? $opts['table'] : null;
 
-        if(is_string($shortMapper)) {
-            $this->rootMapperClass = $shortMapper;
+        if(is_string($shortOpt)) {
+            $this->rootTable = $shortOpt;
         }
-        elseif(is_string($longMapper)) {
-            $this->rootMapperClass = $longMapper;
+        elseif(is_string($longOpt)) {
+            $this->rootTable = $longOpt;
         }
         else {
-            $errors[] = 'not specify the mapper argument multiple times';
+            $errors[] = 'not specify the database table option multiple times';
         }
         return $errors;
     }
