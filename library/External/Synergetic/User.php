@@ -1170,6 +1170,27 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
+    public function getHousemasterEmails($externalUserId)
+    {
+        $sql = "
+            SELECT OccupEmail FROM Community 
+            JOIN luHouse ON HeadOfHouseID = Community.ID
+            JOIN StudentYears ON StudentYears.House = luHouse.Code
+            WHERE StudentYears.ID = :ID AND FileYear = :FileYear AND FileSemester = :FileSemester
+        ";
+
+        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+
+        return $this->getConnector()->executeQuery($sql, [
+            'ID' => $externalUserId,
+            'FileYear' => $fileYearSemester['year'],
+            'FileSemester' => $fileYearSemester['semester'],
+        ])->fetchColumn();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getStudentForms()
     {
         $iteratorForms = $this->getConnector()->executeQueryIterator(

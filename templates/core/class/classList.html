@@ -12,14 +12,21 @@ $(function() {
 			return !(form.data('noStudentEmails'));
 		},
 		'No email addresses were found for the selected students.'
-	)
-	$.validator.addMethod(
-		'remote.noParentEmails',
-		function() {
-			return !(form.data('noParentEmails'));
-		},
-		'No email addresses were found for the parents of the selected students.'
-	)
+	);
+    $.validator.addMethod(
+        'remote.noParentEmails',
+        function() {
+            return !(form.data('noParentEmails'));
+        },
+        'No email addresses were found for the parents of the selected students.'
+    );
+    $.validator.addMethod(
+        'remote.noHousemasterEmails',
+        function() {
+            return !(form.data('noHousemasterEmails'));
+        },
+        'No email addresses were found for the housemasters of the selected students.'
+    )   ; 
 
 	/* Validate checkbox selections
 	 */
@@ -29,7 +36,8 @@ $(function() {
 				required: true,
 				minlength: 1,
 				'remote.noStudentEmails': true,
-				'remote.noParentEmails': true
+                'remote.noParentEmails': true,
+                'remote.noHousemasterEmails': true
 			}
 		},
 		messages: {
@@ -170,18 +178,37 @@ $(function() {
                         form.data('noStudentEmails', false).data('noParentEmails', false)
                         if (form.valid()) {
                             $('#email-selected-parents')
-                                    .emailSelected({
-                                        source: $('#contact-table'),
-                                        url: '/subject/classList/ajax/emailParentsById.php',
-                                        classCode: '{CLASS_CODE}',
-                                        target: $(this).find('input[name=bcc]')
-                                    })
-                                    .on('emailSelected.noEmail', function() {
-                                        // Trigger the no parent email error
-                                        form.data('noParentEmails', true).valid();
-                                    })
+                                .emailSelected({
+                                    source: $('#contact-table'),
+                                    url: '/subject/classList/ajax/emailParentsById.php',
+                                    classCode: '{CLASS_CODE}',
+                                    target: $(this).find('input[name=bcc]')
+                                })
+                                .on('emailSelected.noEmail', function() {
+                                    // Trigger the no parent email error
+                                    form.data('noParentEmails', true).valid();
+                                })
                         }
                     });
+
+                    $('#email-selected-housemasters').click(function(event) {
+                        event.preventDefault();
+                        var form = $('#contact-table-form');
+                        form.data('noStudentEmails', false).data('noHousemasterEmails', false)
+                        if (form.valid()) {
+                            $('#email-selected-housemasters')
+                                .emailSelected({
+                                    source: $('#contact-table'),
+                                    url: '/subject/classList/ajax/emailHousemastersById.php',
+                                    classCode: '{CLASS_CODE}',
+                                    target: $(this).find('input[name=bcc]')
+                                })
+                                .on('emailSelected.noEmail', function() {
+                                    // Trigger the no housemaster email error
+                                    form.data('noHousemasterEmails', true).valid();
+                                })
+                        }
+                    });                    
                 });
             </script>
             <ul class="inline-list no-margin">
@@ -204,6 +231,16 @@ $(function() {
                     </form>
                 </li>
                 <!-- END parent_email -->
+
+                <!-- BEGIN housemaster_email -->
+                <li class="no-margin">
+                    <form id="email-selected-housemasters" action="/mail/createMail.php" method="post" class="no-margin">
+                        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
+                        <input type="hidden" name="bcc" value="" />
+                        &nbsp;<button type="submit" class="button icon-email">Email Housemasters of Selected Students</button>
+                    </form>
+                </li>
+                <!-- END housemaster_email -->
             </ul>
         </div>
     </div>

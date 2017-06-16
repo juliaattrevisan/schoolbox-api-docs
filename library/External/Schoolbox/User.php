@@ -415,7 +415,18 @@ class External_Schoolbox_User implements External_UserInterface
         return $this->database;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getHousemasterByHouseId($houseID)
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserId)
     {
         return false;
     }

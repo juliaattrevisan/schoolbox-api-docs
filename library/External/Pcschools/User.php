@@ -1025,6 +1025,14 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserId)
+    {
+        return false;
+    }
+
+    /**
      * List of campuses a staff member is involved in based on timetable
      *
      * @importance low - used in a few sync scripts.

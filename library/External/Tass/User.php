@@ -822,18 +822,36 @@ class External_Tass_User implements External_UserInterface
         return $database->trimAll($database->getAll($query));
     }
 
+    /**
+     * @inheritdoc
+     */
     private function setDatabase($database)
     {
         $this->database = $database;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getDatabase()
     {
         return $this->database;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getHousemasterByHouseId($houseID)
     {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserId)
+    {
+        return false;
     }
 
     /**

@@ -1058,11 +1058,21 @@ class External_Maze_User implements External_UserInterface {
 		return array();
 	}
 
-	/**
-	 * Stub method, probably not used
-	 */
-	public function getHousemasterByHouseId($houseID) {
+    /**
+     * @inheritdoc
+     */
+	public function getHousemasterByHouseId($houseID)
+    {
+        // Return nothing
 	}
+
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserId)
+    {
+        // Return nothing
+    }
 
     /**
      * Not yet implemented for this connector
