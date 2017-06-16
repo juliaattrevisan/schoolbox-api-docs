@@ -86,7 +86,7 @@
 
         var datepickerMoment;
 
-        if ($(element).data('datepicker-date-only')) {
+        if (typeof $(element).attr('data-datepicker-time') == 'undefined') { // Date only field
             datepickerMoment = moment(value, dateDisplayFormats.momentJs, true);
         } else {
             datepickerMoment = moment(value, dateDisplayFormats.momentJsDatetime, true);
