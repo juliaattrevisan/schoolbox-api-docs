@@ -29,7 +29,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     var heatCache = {};
 
-    $(document).on('open.fndtn.reveal', '#picker' + twigVars.id, function () {
+    $(document).on('open.fndtn.reveal', $modal, function () {
 
         resetTimetablePicker();
 

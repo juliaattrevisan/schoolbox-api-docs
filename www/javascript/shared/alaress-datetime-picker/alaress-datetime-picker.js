@@ -210,11 +210,11 @@ function setValue(element, options, state, trigger, date) {
 }
 
 function setPickerValue(pickerId, value) {
-    $("#picker" + pickerId).attr('data-datepicker-value', value);
+    $("#adtp-modal-" + pickerId).attr('data-datepicker-value', value);
 }
 
 function getPickerValue(pickerId) {
-    return $("#picker" + pickerId).attr('data-datepicker-value');
+    return $("#adtp-modal-" + pickerId).attr('data-datepicker-value');
 }
 
 
