@@ -7,7 +7,7 @@ suites:
             enabled:
                 - WebDriver:
                     url: http://192.168.36.10
-                    browser: chrome
+                    browser: phantomjs
                     port: 4444
                     window_size: maximize
                 - \Helper\Acceptance
