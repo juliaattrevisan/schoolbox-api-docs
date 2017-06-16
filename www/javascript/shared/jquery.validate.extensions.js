@@ -89,7 +89,7 @@
         if ($(element).data('datepicker-date-only')) {
             datepickerMoment = moment(value, dateDisplayFormats.momentJs, true);
         } else {
-            datepickerMoment = moment(value, dateDisplayFormats.momentJs + ' h:mma', true);
+            datepickerMoment = moment(value, dateDisplayFormats.momentJsDatetime, true);
         }
 
         return datepickerMoment.isValid();
