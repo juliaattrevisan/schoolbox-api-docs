@@ -152,13 +152,30 @@ class SubmissionNotifier extends AbstractModuleNotifier
                 break;
 
             case Mapper::METHOD_DELETE: // submission deleted - if single-submit, student can submit again
-                /** @var SubmissionBox $owningBox */
-                $owningBox = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
-                // if multi-submit, don't notify
-                if ($owningBox->getAcceptMultiple()) {
-                    break;
+
+                // Maybe the box itself doesn't exist any more?
+                // No point attempting to trigger anything if so
+                if ($boxId) {
+                    /** @var SubmissionBox $owningBox */
+                    $owningBox = $this->submissionBoxMapper->findByIdWithFallback($boxId);
+
+                    if ($owningBox->getId() === null) {
+                        // don't. even. bother.
+                        return;
+                    }
+
+                    if ($owningBox->isDeleted()) {
+                        break;
+                    }
+
+                    // if multi-submit, don't notify
+                    if ($owningBox->getAcceptMultiple()) {
+                        break;
+                    }
+
+                    $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
                 }
-                $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+
                 break;
 
             case Mapper::METHOD_READ:
