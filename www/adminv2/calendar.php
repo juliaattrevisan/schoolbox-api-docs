@@ -222,15 +222,20 @@ foreach ($typeList as $type) {
              */
             $allUsers = [];
 
+            /** @var \Schoolbox\User $currentUser */
             foreach ($currentEvent->getUserCollection() as $currentUser) {
-                $allUsers[] = \Schoolbox\UserMapper::getInstance()->findById($currentUser->getUserId())->getFullName();
+                $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($currentUser->getUserId());
+
+                if ($user instanceof \Schoolbox\User) {
+                    $allUsers[] = $user->getFullName();
+                }
             }
 
             $allCategories = [];
 
             /** @var \Schoolbox\Calendar\Relation\Category $currentCategory */
             foreach ($currentEvent->getCategoryCollection() as $currentCategory) {
-                $allCategories[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($currentCategory->getCategoryId())->getTitle();
+                $allCategories[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByIdWithFallback($currentCategory->getCategoryId())->getTitle();
             }
 
             $allCampuses = [];
@@ -252,13 +257,18 @@ foreach ($typeList as $type) {
                 $modifier = 'school';
             }
 
+            /* Event author can now return as null when it doesn't exist anymore
+             */
+            $authorName = $currentEvent->getAuthor() ? $currentEvent->getAuthor()->getFullName() : 'Unknown User';
+            $authorId = $currentEvent->getAuthor() ? $currentEvent->getAuthor()->getId() : '';
+
             $this->setVar([
                 'CLEANUP_EVENT_ID' => $currentEvent->getId(),
                 'CLEANUP_EVENT_TITLE' => $currentEvent->getTitle(),
+                'CLEANUP_EVENT_AUTHOR' => $authorName,
+                'CLEANUP_EVENT_AUTHOR_ID' => $authorId,
                 'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
                 'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
-                'CLEANUP_EVENT_AUTHOR' => $currentEvent->getAuthor()->getFullName(),
-                'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent->getAuthor()->getId(),
                 'CLEANUP_EVENT_EVENTTYPE' => $currentEvent->getType()->getType(),
                 'CLEANUP_EVENT_USERS' => implode('<br />', $allUsers),
                 'CLEANUP_EVENT_CATEGORIES' => implode('<br />', $allCategories),
