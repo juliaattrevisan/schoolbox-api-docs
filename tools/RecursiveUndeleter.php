@@ -328,9 +328,9 @@ class RecursiveUndeleter
         $errors = [];
         $this->getCommandLinePerform($opts);
         $this->getCommandLineThreshold($opts);
-        $this->getCommandLineMapperClass($errors, $opts);
-        $this->getCommandLineIds($errors, $opts);
-        $this->getCommandLineTimestampWindow($errors, $opts);
+        $errors = $this->getCommandLineMapperClass($errors, $opts);
+        $errors = $this->getCommandLineIds($errors, $opts);
+        $errors = $this->getCommandLineTimestampWindow($errors, $opts);
 
         $red    = self::COLOUR_RED;
         $green  = self::COLOUR_GREEN;
@@ -390,15 +390,16 @@ EXAMPLE
      *
      * @param string[] $errors
      * @param array    $opts
+     * @return string[]
      */
-    private function getCommandLineIds(&$errors, array $opts)
+    private function getCommandLineIds(array $errors, array $opts)
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
         if(isset($opts['i'], $opts['id'])) {
             $errors[] = "{$red}not specify IDs using both the short '{$yellow}-i{$red}' and long '{$yellow}--id{$red}' option syntax";
-            return;
+            return $errors;
         }
 
         $idString = null;
@@ -410,21 +411,22 @@ EXAMPLE
         }
         else {
             $errors[] = "{$red}specify IDs using either the short '{$yellow}-i{$red}' or long '{$yellow}--id{$red}' option syntax";
-            return;
+            return $errors;
         }
 
         if(!is_string($idString)) {
             $errors[] = 'not specify the ID argument multiple times';
-            return;
+            return $errors;
         }
 
         // Ensure it only contains integers and commas
         if('*' !== $idString && preg_match('/[^0-9,]/', $idString, $matches)) {
             $errors[] = "only use integers and commas when specifying IDs - no spaces (or '*' for all)";
-            return;
+            return $errors;
         }
 
         $this->rootIds = explode(',', $idString);
+        return $errors;
     }
 
     /**
@@ -432,15 +434,16 @@ EXAMPLE
      *
      * @param string[] $errors
      * @param array    $opts
+     * @return string[]
      */
-    private function getCommandLineTimestampWindow(&$errors, array $opts)
+    private function getCommandLineTimestampWindow(array $errors, array $opts)
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
         if(isset($opts['w'], $opts['window'])) {
             $errors[] = "{$red}not specify timestamp window using both the short '{$yellow}-w{$red}' and long '{$yellow}--window{$red}' option syntax";
-            return;
+            return $errors;
         }
 
         $window = null;
@@ -453,13 +456,14 @@ EXAMPLE
 
         if(null !== $window && preg_match('/\D+/', $window)){
             $errors[] = 'use only integers (seconds) when specifying the deletedAt timestamp window width, eg \'120\'';
-            return;
+            return $errors;
         }
         if(null === $window){
             $this->deletedAtWindow = self::DEFAULT_DELETED_AT_WINDOW;
         } else {
             $this->deletedAtWindow = (int)$window;
         }
+        return $errors;
     }
 
 
@@ -475,10 +479,11 @@ EXAMPLE
 
 
     /**
-     * @param       $errors
+     * @param string[] $errors
      * @param array $opts
+     * @return string[]
      */
-    private function getCommandLineMapperClass(&$errors, array $opts)
+    private function getCommandLineMapperClass(array $errors, array $opts)
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
@@ -486,13 +491,12 @@ EXAMPLE
         // Did user provide both short and long options?
         if(isset($opts['m'], $opts['mapper'])) {
             $errors[] = "{$red}specify mapper using either the short '{$yellow}-m{$red}' or long '{$yellow}--mapper{$red}' option syntax, but not both";
-            return;
+            return $errors;
         }
         // Did user provide neither short nor long option
         if(!isset($opts['m']) && !isset($opts['mapper'])) {
             $errors[] = "{$red}specify mapper using either the short '{$yellow}-m{$red}' or long '{$yellow}--mapper{$red}' option syntax";
-
-            return;
+            return $errors;
         }
 
         // What mapper are we targeting?
@@ -507,8 +511,8 @@ EXAMPLE
         }
         else {
             $errors[] = 'not specify the mapper argument multiple times';
-            return;
         }
+        return $errors;
     }
 
 
