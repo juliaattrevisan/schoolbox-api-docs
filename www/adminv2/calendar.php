@@ -51,6 +51,8 @@ $this->setBlock(TEMPLATE_content, 'cleanup', 'cleanup_block');
 $this->setBlock('cleanup', 'cleanup_has_no_events', 'cleanup_has_no_events_block');
 $this->setBlock('cleanup', 'cleanup_has_events', 'cleanup_has_events_block');
 $this->setBlock('cleanup_has_events', 'cleanup_event', 'cleanup_event_block');
+$this->setBlock('cleanup_event', 'has_event_author', 'has_event_author_block');
+$this->setBlock('cleanup_event', 'no_event_author', 'no_event_author_block');
 
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
@@ -210,7 +212,9 @@ foreach ($typeList as $type) {
 
         $this->setVar([
             'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
-            'CLEANUP_HAS_DATES_TO' => $to->getLocalShort()
+            'CLEANUP_HAS_DATES_TO' => $to->getLocalShort(),
+            'has_event_author_block' => '',
+            'no_event_author_block' => '',
         ]);
 
         $eventMapper = new \Schoolbox\Calendar\EventMapper();
@@ -257,16 +261,9 @@ foreach ($typeList as $type) {
                 $modifier = 'school';
             }
 
-            /* Event author can now return as null when it doesn't exist anymore
-             */
-            $authorName = $currentEvent->getAuthor() ? $currentEvent->getAuthor()->getFullName() : 'Unknown User';
-            $authorId = $currentEvent->getAuthor() ? $currentEvent->getAuthor()->getId() : '';
-
             $this->setVar([
                 'CLEANUP_EVENT_ID' => $currentEvent->getId(),
                 'CLEANUP_EVENT_TITLE' => $currentEvent->getTitle(),
-                'CLEANUP_EVENT_AUTHOR' => $authorName,
-                'CLEANUP_EVENT_AUTHOR_ID' => $authorId,
                 'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
                 'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
                 'CLEANUP_EVENT_EVENTTYPE' => $currentEvent->getType()->getType(),
@@ -276,7 +273,33 @@ foreach ($typeList as $type) {
                 'CLEANUP_EVENT_MODIFIER' => $modifier,
             ]);
 
+            /* Event author can now return as null when it doesn't exist anymore
+             */
+            if ($currentEvent->getAuthor() instanceof \Schoolbox\User) {
+                $this->setVar([
+                    'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent->getAuthor()->getId(),
+                    'CLEANUP_EVENT_AUTHOR_NAME' => $currentEvent->getAuthor()->getFullName(),
+                ]);
+
+                $this->parse('has_event_author_block', 'has_event_author');
+            }
+            else {
+                $this->setVar([
+                    'CLEANUP_EVENT_AUTHOR_ID' => '',
+                    'CLEANUP_EVENT_AUTHOR_NAME' => 'Unknown User',
+                ]);
+
+                $this->parse('no_event_author_block', 'no_event_author');
+            }
+
             $this->parse('cleanup_event_block', 'cleanup_event', true);
+
+            /* Clear children after parsing out the parent
+             */
+            $this->setVar([
+                'has_event_author_block' => '',
+                'no_event_author_block' => '',
+            ]);
         }
 
         if ($allEvents->count()) {

@@ -221,7 +221,12 @@
                                         </td>
                                         <td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
                                         <td>{CLEANUP_EVENT_EVENTTYPE}</td>
-                                        <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
+                                        <!-- BEGIN has_event_author -->
+                                        <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR_NAME}</a></td>
+                                        <!-- END has_event_author -->
+                                        <!-- BEGIN no_event_author -->
+                                        <td>{CLEANUP_EVENT_AUTHOR_NAME}</td>
+                                        <!-- END no_event_author -->
                                         <td>{CLEANUP_EVENT_START}</td>
                                         <td>{CLEANUP_EVENT_END}</td>
                                         <td>
