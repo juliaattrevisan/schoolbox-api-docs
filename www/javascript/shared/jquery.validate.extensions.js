@@ -85,9 +85,9 @@
     $.validator.addMethod('datepickerDate', function(value, element) {
 
         if ($(element).data('datepicker-date-only')) {
-            var datepickerMoment = moment(value, dateDisplayFormats.momentJs);
+            var datepickerMoment = moment(value, dateDisplayFormats.momentJs, true);
         } else {
-            var datepickerMoment = moment(value, dateDisplayFormats.momentJs + ' h:mma');
+            var datepickerMoment = moment(value, dateDisplayFormats.momentJs + ' h:mma', true);
         }
 
         return datepickerMoment.isValid();
