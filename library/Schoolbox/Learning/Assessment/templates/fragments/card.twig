@@ -1,33 +1,49 @@
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
-<li class="actions-small-1">
+<li class="actions-small-1" data-assessment>
     <div class="list-item">
         <div class="card wrap-down small-12">
             <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
+
             {% if student %}
                 {% set route = routeLookupIfAuthorized('learningAssessment.getSummary',{assessmentId: assessable.id, studentId: student.id, student: student, assessment: assessable}) %}
             {% else %}
                 {% set route = routeLookupIfAuthorized('learningAssessment.getPreview',{assessmentId: assessable.id, assessment: assessable}) %}
             {% endif %}
 
-            {% if route %}
-                <a href="{{ route }}">
+            {% block link %}
+                {% if route %}
+                    <a href="{{ route }}">
+                        <h3 data-assessment-title>{{ assessable.title }}</h3>
+                    </a>
+                {% else %}
                     <h3 data-assessment-title>{{ assessable.title }}</h3>
-                </a>
-            {% else %}
-                <h3 data-assessment-title>{{ assessable.title }}</h3>
-            {% endif %}
+                {% endif %}
+            {% endblock link %}
 
+            {% block meta %}
             <p class="meta">
-                {{ dueDate.dueDate(assessable, USER) }}
+                {{ dueDate.dueDate(assessable, student ?: USER) }}
                 {% if student %}
                     <br>
                     <a href="{% if route %}{{ route }}{% else %}#{% endif %}" class="meta">{% include '@learningAssessment/fragments/statusLine.twig' with {assessable: assessable} %}</a>
                 {% endif %}
             </p>
+            {% endblock meta %}
 
         </div>
     </div>
+
+    {% block nav %}
+    <nav>
+        {% if student %}
+            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                assessment: assessable,
+                participant: assessable.getParticipant(student)
+            } only %}
+        {% endif %}
+    </nav>
+    {% endblock nav %}
 </li>
 

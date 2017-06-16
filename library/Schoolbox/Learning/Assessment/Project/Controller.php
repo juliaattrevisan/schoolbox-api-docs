@@ -16,8 +16,8 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 
 class Controller extends Assessment\Controller
 {
@@ -129,9 +129,25 @@ class Controller extends Assessment\Controller
              */
             foreach ($currentAssessment->getAllParticipants() as $currentParticipant) {
 
-                /* $currentParticipant has an IResponse for $currentAssessment
+                /* Special case for Tasks
+                 *
+                 * Find out if self-assessed tasks are currently in the state of Completed since
+                 * Students can revert from Completed to Incomplete (orange diamond to grey square)
+                 *
+                 * Second half of the if() clause determines when a teacher marks a task as complete
+                 * even if the student hasn't marked it as complete by themselves ie. teacher transitions
+                 * from grey square to green circle on behalf of the student
                  */
-                if ($currentParticipant->getAllResponses()->count()) {
+                if ($currentAssessment instanceof Task) {
+                    if ($currentAssessment->isFeedbackRequired($currentParticipant) || $currentAssessment->isReviewComplete($currentParticipant)) {
+                        $assessmentCounts['completed'][$currentAssessment->getId()]++;
+                        $participantCounts['completed'][$currentParticipant->getUser()->getId()]++;
+                    }
+                }
+                elseif ($currentParticipant->getAllResponses()->count()) {
+
+                    /* $currentParticipant has an IResponse for $currentAssessment
+                     */
                     $assessmentCounts['completed'][$currentAssessment->getId()]++;
                     $participantCounts['completed'][$currentParticipant->getUser()->getId()]++;
                 }
