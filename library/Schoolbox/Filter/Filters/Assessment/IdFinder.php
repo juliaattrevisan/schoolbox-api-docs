@@ -546,13 +546,16 @@ class IdFinder extends Filter\AbstractIdFinder
         // Term alias
         $t = $dateColumn === self::DATE_COL_DUE ? 'td' : 'tc';
 
+        // Note the +1 for the actual finish date. This is because `term.actual_finish` is date only, whereas assessment dates
+        // include a time component. If assessment is due at 11pm on the 10th, and term finishes on the 10th, we want to match
+        // all assessments that are due before the end of the 10th, which is the start of the 11th, ie 'YYYY/MM/11 00:00:00'
         $joinClause = "
-        JOIN term $t ON (a.$dateColumn >= $t.start  AND ($t.actual_finish IS NULL OR a.$dateColumn < $t.actual_finish))";
+        JOIN term $t ON (a.$dateColumn >= $t.start  AND ($t.actual_finish IS NULL OR a.$dateColumn < ($t.actual_finish + 1)))";
 
-            $builder = $this->getMapper()->getPredicateBuilder();
-                $builder->equals("$t.id", $termIds->getAll());
+        $builder = $this->getMapper()->getPredicateBuilder();
+        $builder->equals("$t.id", $termIds->getAll());
 
-             return [$joinClause, implode(' AND ', $builder->getWhere()), $builder->getParams() ];
+        return [$joinClause, implode(' AND ', $builder->getWhere()), $builder->getParams() ];
     }
 
 
@@ -589,7 +592,6 @@ class IdFinder extends Filter\AbstractIdFinder
      */
     private function getClauseUnitImplSpec(Collection $unitImpSpcIds = null)
     {
-
         if (null === $unitImpSpcIds || !$unitImpSpcIds->count()) {
             $joinClause  = '';
             $whereClause = 'TRUE';
