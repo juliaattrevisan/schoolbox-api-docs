@@ -166,11 +166,12 @@ class RoleAccessMapper extends Mapper
 
     /**
      * @param User $user
-     * @param int  $serviceIdentifier
-     * @param int  $service
+     * @param int  $folderId
+     * @param bool $cache
      * @return RoleAccess
+     * @throws Mapper\Exception
      */
-    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true)
+    public function getAccess(User $user, $folderId, $cache = true)
     {
         // let's avoid fatal errors in the face of unexpected failure
         if (!$user->getRole() instanceof Role) {
@@ -179,21 +180,21 @@ class RoleAccessMapper extends Mapper
             return $ra;
         }
 
-        if ($serviceIdentifier != 0)
+        // Ensure we take role-permission from NNIAN
+        if ($folderId != 0)
         {
-            $folder = Folder\Mapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
+            $folderMapper = Folder\Mapper::getInstance();
+            $folder = $folderMapper->findCheaplyById($folderId, ['deleted' => true]);
 
             if ($folder->getInherit())
             {
                 // Folder inherits, find its NNIAN
-                $permissionFolder = Folder\Mapper::getInstance()->findNearestNonInheritingAncestralNode(
-                    $folder
-                );
-                $serviceIdentifier = $permissionFolder->getId();
+                $permissionFolder = $folderMapper->findNearestNonInheritingAncestralNode($folder);
+                $folderId         = $permissionFolder->getId();
             }
         }
 
-        // Setup cache array for this user/service/sid if it doesn't already exist)
+        // Setup cache array for this user's role and folder if it doesn't already exist)
 
         if (!isset($this->cachedPermissions[$user->getRole()->getId()])) {
             $this->cachedPermissions[$user->getRole()->getId()] = [];
@@ -202,22 +203,20 @@ class RoleAccessMapper extends Mapper
 
         // Permission check #1 - Cached results
 
-        if (isset($this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier]) && $cache) {
+        if ($cache && isset($this->cachedPermissions[$user->getRole()->getId()][$folderId])) {
             // Found cached result, return it
-            return $this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier];
+            return $this->cachedPermissions[$user->getRole()->getId()][$folderId];
         }
 
-
-        $result =  $this->findOneByColumnList(
-            array(
-                'cid' => $serviceIdentifier,
-                'gid' => $user->getRole()->getId()
-            )
-        );
+        /** @var RoleAccess $roleAccess */
+        $roleAccess = $this->findOneByColumnList([
+            'cid' => $folderId,
+            'gid' => $user->getRole()->getId(),
+        ]);
         if($cache) {
-            $this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier] = $result;
+            $this->cachedPermissions[$user->getRole()->getId()][$folderId] = $roleAccess;
         }
-        return $result;
+        return $roleAccess;
     }
 
 
