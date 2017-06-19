@@ -193,7 +193,7 @@ function setValue(element, options, state, trigger, date) {
         element.val(v);
     }
 
-    setPickerValue(pId, value.format(momentFormats.database));
+    setPickerValue(pId, value);
 
     if (trigger === true) {
         element.trigger('change');
@@ -209,14 +209,26 @@ function setValue(element, options, state, trigger, date) {
 
 }
 
-function setPickerValue(pickerId, value) {
-    $("#adtp-modal-" + pickerId).attr('data-datepicker-value', value);
+/**
+ * Update picker value with date
+ *
+ * @param {object} date (moment.js object)
+ */
+function setPickerValue(pickerId, date) {
+
+    var newDate = date.isValid() ? date : moment();
+    $("#adtp-modal-" + pickerId).attr('data-datepicker-value', newDate.format(momentFormats.databaseShort));
+
 }
 
+/**
+ * Get picker value as a string
+ *
+ * @param {object} date (moment.js object)
+ */
 function getPickerValue(pickerId) {
     return $("#adtp-modal-" + pickerId).attr('data-datepicker-value');
 }
-
 
 
 function checkAllDaySwitch(state, pickerId) {
@@ -419,15 +431,17 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
     $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" data-datepicker-value class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
 
-    setPickerValue(pickerId, (element.val() ? moment(element.val(), convertFormat(options.displayFormat)) : moment()).format(momentFormats.database));
+    setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)));
 
     // Create click event to open the modal for the element
 
     element.change(function () {
+        var inputValue = moment(element.val(), convertFormat(options.displayFormat));
+
         if (window.pickerInstance[pickerId] !== undefined) {
-            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
+            window.pickerInstance[pickerId].setDate(inputValue.toISOString());
         }
-        setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)).format(momentFormats.database));
+        setPickerValue(pickerId, inputValue);
     });
 
     element
