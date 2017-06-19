@@ -413,24 +413,10 @@ abstract class AbstractController extends BaseController
         $folders   = new Collection($files->getColumnValues('folder'));
         $folderIds = array_unique($folders->getColumnValues('id'));
 
-        // If files are across multiple folders, set aggregate permission to the minimum found.
-        $minAccess = null;
-        $access    = Access::getInstance();
-        $firstLoop = true;
-        foreach($folderIds as $folderId){
-            // First folder?
-            if($firstLoop){
-                $minAccess = $access->getFolderAccess($this->getUser(), $folderId);
-                $firstLoop = false;
-            } else {
-                $minAccess = min($minAccess, $access->getFolderAccess($this->getUser(), $folderId));
-            }
-        }
-
         $data = [
             'files'  => $fileIds,
             'user'   => $this->getUser(),
-            'access' => $minAccess,
+            'access' => Access::getInstance()->getMinFolderAccess($this->getUser(), $folderIds),
             'namespace' => $this->namespace
         ];
 
