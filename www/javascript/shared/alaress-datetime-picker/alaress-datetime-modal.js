@@ -152,12 +152,14 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             requestDataByDate(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate(), 'calendar');
 
-            var mo = instance.currentMonth + 1,
-                yr = instance.currentYear;
+            if(twigVars.type == 'duework') {
+                var mo = instance.currentMonth + 1,
+                    yr = instance.currentYear;
 
-            requestHeat(mo, yr, function () {
-                applyHeatEverywhere(instance);
-            });
+                requestHeat(mo, yr, function () {
+                    applyHeatEverywhere(instance);
+                });
+            }
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -181,28 +183,34 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             $('#calendarResponse' + twigVars.id + '-events').removeClass('hide');
         },
         onMonthChange: function(selectedDates, dateStr, instance) {
-            var mo = instance.currentMonth + 1,
-                yr = instance.currentYear;
+            if(twigVars.type == 'duework') {
+                var mo = instance.currentMonth + 1,
+                    yr = instance.currentYear;
 
-            requestHeat(mo, yr, function () {
-                applyHeatEverywhere(instance);
-            });
+                requestHeat(mo, yr, function () {
+                    applyHeatEverywhere(instance);
+                });
+            }
         },
         onYearChange: function(selectedDates, dateStr, instance) {
-            var mo = instance.currentMonth + 1,
-                yr = instance.currentYear;
+            if(twigVars.type == 'duework') {
+                var mo = instance.currentMonth + 1,
+                    yr = instance.currentYear;
 
-            requestHeat(mo, yr, function () {
-                applyHeatEverywhere(instance);
-            });
+                requestHeat(mo, yr, function () {
+                    applyHeatEverywhere(instance);
+                });
+            }
         },
         onValueUpdate: function(selectedDates, dateStr, instance) {
-            var mo = instance.currentMonth + 1,
-                yr = instance.currentYear;
+            if(twigVars.type == 'duework') {
+                var mo = instance.currentMonth + 1,
+                    yr = instance.currentYear;
 
-            requestHeat(mo, yr, function () {
-                applyHeatEverywhere(instance);
-            });
+                requestHeat(mo, yr, function () {
+                    applyHeatEverywhere(instance);
+                });
+            }
         }
 
     });
@@ -277,10 +285,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
             var  monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
 
-                // trigger a fetch for any heat data that might be absent
-            for (var year in monthsToFetch) {
-                for (var monthIndex in monthsToFetch[year]) {
-                    requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
+            // For duework requests, trigger a fetch for any heat data that might be absent
+            if(twigVars.type == 'duework') {
+                for (var year in monthsToFetch) {
+                    for (var monthIndex in monthsToFetch[year]) {
+                        requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
+                    }
                 }
             }
 
