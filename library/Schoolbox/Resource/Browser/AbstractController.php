@@ -154,7 +154,7 @@ abstract class AbstractController extends BaseController
      */
     protected function getFolderData($folderId)
     {
-        $access = $this->getAccess([$folderId]);
+        $access = $this->getAccess($folderId);
 
         // special case for root, just let that through to the keeper
         if ($access < UserAccess::ACCESS_READ && $folderId != 0) {
@@ -370,7 +370,7 @@ abstract class AbstractController extends BaseController
             'type'   => 'file',
             'tree'   => $this->getBreadcrumbs($file->getFolder()),
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
-            'access' => $this->getAccess([ $folderId ]),
+            'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace
         ];
 
@@ -413,10 +413,24 @@ abstract class AbstractController extends BaseController
         $folders   = new Collection($files->getColumnValues('folder'));
         $folderIds = array_unique($folders->getColumnValues('id'));
 
+        // If files are across multiple folders, set aggregate permission to the minimum found.
+        $minAccess = null;
+        $access    = Access::getInstance();
+        $firstLoop = true;
+        foreach($folderIds as $folderId){
+            // First folder?
+            if($firstLoop){
+                $minAccess = $access->getFolderAccess($this->getUser(), $folderId);
+                $firstLoop = false;
+            } else {
+                $minAccess = min($minAccess, $access->getFolderAccess($this->getUser(), $folderId));
+            }
+        }
+
         $data = [
             'files'  => $fileIds,
             'user'   => $this->getUser(),
-            'access' => Access::getInstance()->getFolderAccess($this->getUser(), [$folderIds]),
+            'access' => $minAccess,
             'namespace' => $this->namespace
         ];
 
@@ -482,10 +496,10 @@ abstract class AbstractController extends BaseController
 
     /**
      * Implements access right checks for the given folder type
-     * @param array $folderIds
+     * @param int $folderId
      * @return int
      */
-    abstract protected function getAccess(array $folderIds);
+    abstract protected function getAccess($folderId);
 
     /**
      * @param  string $tab

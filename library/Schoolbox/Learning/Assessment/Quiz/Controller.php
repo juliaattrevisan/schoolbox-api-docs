@@ -215,7 +215,7 @@ class Controller extends Assessment\Controller
          * you should end up at the attempts list rather than be magically prompted
          * to attempt the quiz
          */
-        $access = $this->getAccess()->getFolderAccess($sessionUser, [$assessment->getContext()->getFolder()->getId()]);
+        $access = $this->getAccess()->getFolderAccess($sessionUser, $assessment->getContext()->getFolder()->getId());
 
         if ($access >= UserAccess::ACCESS_WRITE) {
             $this->getResponse()->redirect->to($attemptsListUrl);

@@ -848,7 +848,7 @@ class SubmissionBox implements ISoftDeletable, IAssessableDataModel
 
         /* Access level for $user on $submissionBox
          */
-        $boxLevel = $access->getFolderAccess($user, [$this->getCategory()->getId()]);
+        $boxLevel = $access->getFolderAccess($user, $this->getCategory()->getId());
 
         if ($boxLevel >= $requiredAccessLevel) {
             return true;

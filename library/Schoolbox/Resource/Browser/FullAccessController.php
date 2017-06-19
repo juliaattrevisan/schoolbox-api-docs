@@ -17,10 +17,10 @@ class FullAccessController extends AbstractController
 {
 
     /**
-     * @param array $folderIds
+     * @param int $folderId
      * @return int
      */
-    protected function getAccess(array $folderIds)
+    protected function getAccess($folderId)
     {
         // you'll always have access to the folders
         return UserAccess::ACCESS_FULL;

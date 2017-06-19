@@ -224,7 +224,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 try {
                                     $folder = $this->getFolderMapper()->findByCode($class['code']);
-                                    $hasLink = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]) >= UserAccess::ACCESS_READ;
+                                    $hasLink = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ;
                                 }
                                 catch (MapperException $e) {
                                     $hasLink = false;

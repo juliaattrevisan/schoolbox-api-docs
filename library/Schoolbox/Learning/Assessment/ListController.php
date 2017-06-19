@@ -114,7 +114,7 @@ class ListController extends Web\Controller\Base
             $hasContextWrite = false;
         } else {
             // perms check
-            $hasContextWrite = $this->getAccess()->getFolderAccess($this->getUser(), [ $context->getFolder()->getId() ], false);
+            $hasContextWrite = $this->getAccess()->getFolderAccess($this->getUser(), $context->getFolder()->getId(), false);
         }
 
         $data = [

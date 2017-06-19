@@ -355,7 +355,7 @@ class Controller extends Base\Base
             }
 
             // Make sure the user has access to the folder before we return it
-            if ($this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]) < UserAccess::ACCESS_WRITE) {
+            if ($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
                 continue;
             }
 
@@ -383,7 +383,7 @@ class Controller extends Base\Base
      * @var int      $post['course_spec_id']
      * @var int      $post['course_impl_id']
      * @var int      $post['component_id']
-     * @var string   $post['ownerships']
+     * @var string   $post['ownerships']            Comma-separated list of folderId:userId, eg '176:151,43:151'
      * @var array    $post['unit']
      * @var int      $post['unit'][]['unit_spec_id']
      * @var int|null $post['unit'][]['unit_impl_id']
@@ -427,14 +427,14 @@ class Controller extends Base\Base
             $courseSpec = $e->getDeletedObject();
         }
 
-        if ($this->getAccess()->getFolderAccess($this->getUser(), [$courseSpec->getFolder()->getId()]) < READ_ACCESS) {
+        if ($this->getAccess()->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId()) < READ_ACCESS) {
             $this->sendError('You do not have permission to import this course');
         }
 
         // Test each homepage for write access
         foreach ($ownerships as $ownership) {
-            $homepage = explode(':', $ownership)[0];
-            if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+            $folderId = explode(':', $ownership)[0];
+            if ($this->getAccess()->getFolderAccess($this->getUser(), $folderId) < WRITE_ACCESS) {
                 $this->sendError('You do not have permission to import this unit');
             }
         }

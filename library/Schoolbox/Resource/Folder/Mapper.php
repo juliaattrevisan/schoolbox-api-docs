@@ -1455,7 +1455,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // Make sure user has write permission to the folder
 
-            if (Access::getInstance()->getFolderAccess($deletor, [$id]) >= WRITE_ACCESS) {
+            if (Access::getInstance()->getFolderAccess($deletor, $id) >= WRITE_ACCESS) {
 
                 // If the folder has children, then we will only allow superusers to delete it
 
@@ -1508,9 +1508,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // Check folder access
 
-        if (Access::getInstance()->getFolderAccess($mover, [$source]) < WRITE_ACCESS ||
-            Access::getInstance()->getFolderAccess($mover, [$destination]) < WRITE_ACCESS ||
-            Access::getInstance()->getFolderAccess($mover, [$movedFolder->getParent()->getId()]) < WRITE_ACCESS
+        if (Access::getInstance()->getFolderAccess($mover, $source) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($mover, $destination) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($mover, $movedFolder->getParent()->getId()) < WRITE_ACCESS
         ) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }

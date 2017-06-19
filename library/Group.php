@@ -459,7 +459,7 @@ class Group extends DeprecatedModel
         }
 
         if ($this->_service == HOMEPAGE_SERVICE) {
-            return Access::getInstance()->getFolderAccess($user, array($relationID), $cache);
+            return Access::getInstance()->getFolderAccess($user, $relationID, $cache);
         } else {
             return $this->legacyGetPermission($relationID, $user);
         }

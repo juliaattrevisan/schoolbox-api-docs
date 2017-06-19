@@ -223,7 +223,7 @@ class Controller extends BaseController
             // Can I even import into $unitImplementation's folder?
             $accessLevel = $this->access->getFolderAccess(
                 $this->getUser(),
-                [$unitImplementation->getCourse()->getFolder()->getId()]
+                $unitImplementation->getCourse()->getFolder()->getId()
             );
             $isAllowed = $accessLevel >= UserAccess::ACCESS_WRITE;
 
