@@ -86,6 +86,36 @@ class Access
 
 
     /**
+     * Returns the minimum access level across the collection of specified folders. Checks perms from:
+     * * CMS
+     * * GROUP
+     * * ROLE
+     *
+     * @param User  $user
+     * @param int[] $folderIds
+     * @param bool  $cache
+     * @return int
+     */
+    public function getMinFolderAccess(User $user, array $folderIds, $cache = true)
+    {
+        if (0 === count($folderIds)) {
+            // Technically could throw an InvalidArgException, but this simplifies callers' code.
+            return UserAccess::ACCESS_DENY;
+        }
+
+        // We must iterate all, rather than from index 1+ (ie fencepost alg.) to robustly account for different indexing
+        $minAccess = null;
+        foreach ($folderIds as $folderId) {
+            $accessLevel = $this->getFolderAccess($user, $folderId, $cache);
+            $minAccess   = null === $minAccess
+                ? $accessLevel
+                : min($minAccess, $accessLevel);
+        }
+
+        return $minAccess;
+    }
+
+    /**
      * Return the specified user's access level for the given folder, respects permissions:
      * * CMS
      * * GROUP
