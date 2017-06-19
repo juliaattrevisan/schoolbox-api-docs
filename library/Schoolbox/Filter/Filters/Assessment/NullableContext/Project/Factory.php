@@ -119,7 +119,7 @@ class Factory extends Filter\AbstractFactory
             // Are all available options unchecked ?
             if(!($inNone || $inClass || $inGroup || $inUnitImplImportedToClass || $inUnitImplImportedToGroup)){
                 // For consistency, this must logically equate to the filter not reducing the full set.
-                $inNone = $inClass = $inGroup = $inUnitImplImportedToClass = $inUnitImplImportedToGroup = true;
+                $inClass = $inGroup = $inUnitImplImportedToClass = $inUnitImplImportedToGroup = true;
             }
         }
         // Which folders do we need to fetch ?
@@ -129,7 +129,7 @@ class Factory extends Filter\AbstractFactory
         $projects = $this->projectMapper->createCollection();
 
         // Are we not getting projects for either classes or groups?
-        if (!$getClasses && $getGroups) {
+        if (!$getClasses && !$getGroups) {
             // Bug out early.
             return $projects;
         }
