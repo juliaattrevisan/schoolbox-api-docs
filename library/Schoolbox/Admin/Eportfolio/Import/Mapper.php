@@ -23,7 +23,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('owner_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_STRING);
-        $this->uses('updated_at', self::TYPE_DATETIME);
-        $this->uses('created_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
 }

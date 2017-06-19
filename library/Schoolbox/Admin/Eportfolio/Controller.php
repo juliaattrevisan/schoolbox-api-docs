@@ -8,11 +8,22 @@
 namespace Schoolbox\Admin\Eportfolio;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
+use Aura\Web\Request\Values;
+use Component\Eportfolio\Textbox as EportfolioTextbox;
 use Component\Eportfolio\TextboxMapper as EportfolioTextboxMapper;
+use Component_Config;
+use Component_ConfigDefinition;
+use Component_ConfigMapper;
+use Component_ControllerAbstract;
+use Component_Eportfolio_Factory;
 use Component_Eportfolio_TextboxController as ComponentEportfolioTextboxController;
+use Component_InstanceMapper;
 use Eportfolio\Page as EportfolioPage;
 use Eportfolio\PageMapper as EportfolioPageMapper;
+use Eportfolio\Permission as EportfolioPermission;
 use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
+use Exception;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
@@ -24,12 +35,8 @@ use Schoolbox\Admin\Eportfolio\Import\Mapper as EportfolioImportMapper;
 use Schoolbox\Admin\Eportfolio\Import\Log\Mapper as EportfolioImportLogMapper;
 use Schoolbox\Admin\Eportfolio\Import\Model as EportfolioImport;
 use Schoolbox\Admin\Eportfolio\Import\Log\Model as EportfolioImportLog;
+use SitePage;
 
-/**
- * Controller for managing school terms through the admin section.
- *
- * @package Schoolbox\Admin\Terms
- */
 class Controller extends Base
 {
     /** @var EportfolioPageMapper $eportfolioPageMapper */
@@ -87,7 +94,7 @@ class Controller extends Base
 
         $options = [];
 
-        /** @var \Eportfolio\Page $page */
+        /** @var EportfolioPage $page */
         foreach ($pages as $page) {
             $options[] = [
                 'pageId' => $page->getPageId(),
@@ -129,21 +136,20 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         // Do the import in a detached state so it doesn't time out
+
         $eportfolioImport = new EportfolioImport();
         $eportfolioImport->setOwnerId($this->getUser()->getId());
-        $eportfolioImport->setCreatedAt(\Alaress_Date_Format::now());
-        $eportfolioImport->setUpdatedAt(\Alaress_Date_Format::now());
         $this->eportfolioImportMapper->save($eportfolioImport);
         $id = $eportfolioImport->getId();
 
         $this->getResponse()->content->set([
             'template' => '@adminEportfolio/importResults.twig',
-            'data'     => array(
+            'data' => array(
                 'pageCurrent' => 'eportfolio',
                 'id' => $id
             ),
             'postOutput' => [
-                function() use ($post, $id) {
+                function () use ($post, $id) {
                     $this->deployCallback($post, $id);
                 }
             ],
@@ -152,7 +158,8 @@ class Controller extends Base
 
     /**
      * Callback that does the actual copying of ePortfolio records
-     * @param \Aura\Web\Request\Values $post
+     *
+     * @param Values $post
      * @param int $id ID of the import for logging purposes
      */
     private function deployCallback($post, $id)
@@ -171,10 +178,12 @@ class Controller extends Base
         }
 
         $nothingWrong = true;
+
         if (isset($user)) {
-            $destinationUsers = new Collection();
 
             // Load each destination user
+
+            $destinationUsers = new Collection();
 
             if (!empty($post['destinationUserId'])) {
                 $destinationUserArray = explode(',', $post['destinationUserId']);
@@ -192,7 +201,7 @@ class Controller extends Base
 
             if (is_array($post['role'])) {
                 foreach ($post['role'] as $roleId) {
-                    $destinationUsers = $destinationUsers->mergeUnique($this->userMapper->findByColumn('group_id', $roleId),'id');
+                    $destinationUsers = $destinationUsers->mergeUnique($this->userMapper->findByColumn('group_id', $roleId), 'id');
                 }
             }
 
@@ -202,18 +211,18 @@ class Controller extends Base
                 foreach ($post['campus'] as $campusId) {
                     $campus = new Campus();
                     $campus->setId($campusId);
-                    $destinationUsers = $destinationUsers->mergeUnique($this->campusMapper->findUsersInCampus($campus),'id');
+                    $destinationUsers = $destinationUsers->mergeUnique($this->campusMapper->findUsersInCampus($campus), 'id');
                 }
             }
 
             // We now had a list of destination users, lets make this party happen
 
-            $page = new \SitePage(false);
+            $page = new SitePage(false);
             $page->setDi($this->getDi());
 
             // Preload the component list for each page
 
-            $factory = new \Component_Eportfolio_Factory($user, $page);
+            $factory = new Component_Eportfolio_Factory($user, $page);
             $eportfolioList = array();
 
             /** @var EportfolioPage $page */
@@ -234,13 +243,13 @@ class Controller extends Base
                 $eportfolioList[] = array($page, $factory->buildComponentList($page->getPageId()));
             }
 
-            /** @var \Schoolbox\User $destUser */
+            /** @var User $destUser */
             foreach ($destinationUsers as $destUser) {
                 try {
                     $this->importSingleUser($post, $id, $user, $destUser, $eportfolioList);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // Something done went wrong - abort
-                    $this->log('Something went wrong: '.$e->getMessage(), $id);
+                    $this->log('Something went wrong: ' . $e->getMessage(), $id);
                     $nothingWrong = false;
                 }
             }
@@ -256,12 +265,12 @@ class Controller extends Base
     /**
      * Imports a single user.
      *
-     * @param \Aura\Web\Request\Values $post POST data
+     * @param Values $post POST data
      * @param int $logId
      * @param User $srcUser
      * @param User $destUser
      * @param array $eportfolioList A list of pages to import.
-     *                              In the format: [EportfolioPage, \Component_ControllerAbstract[]]
+     *                              In the format: [EportfolioPage, Component_ControllerAbstract[]]
      */
     private function importSingleUser($post, $logId, User $srcUser, User $destUser, $eportfolioList)
     {
@@ -296,7 +305,7 @@ class Controller extends Base
                 foreach ($eportfolioList as $eportfolio) {
 
                     /** @var EportfolioPage $page */
-                    /** @var \Component_ControllerAbstract[] $componentList */
+                    /** @var Component_ControllerAbstract[] $componentList */
                     list($page, $componentList) = $eportfolio;
 
                     // Check this user doesn't already have this page.
@@ -305,7 +314,7 @@ class Controller extends Base
 
                         $existingPageList = $this->eportfolioPageMapper->findByColumnList(
                             [
-                                'uid'        => $destUserId,
+                                'uid' => $destUserId,
                                 'page_title' => $page->getPageTitle(),
                             ]
                         );
@@ -343,24 +352,27 @@ class Controller extends Base
                         $newInstance
                             ->setIdentifier($newPage->getPageId())
                             ->setSequence($i++);
-                        \Component_InstanceMapper::getInstance()->create($newInstance);
+                        Component_InstanceMapper::getInstance()->create($newInstance);
 
                         // Copy each config
+
+                        /** @var Component_ConfigDefinition $configDefinition */
                         foreach ($newInstance->getConfig() as $configDefinition) {
-                            /** @var \Component_Config $config */
-                            /** @var \Component_ConfigDefinition $configDefinition */
-                            $config = new \Component_Config();
-                            $config
-                                ->setConfigDefinitionId($configDefinition->getId())
+
+                            /** @var Component_Config $config */
+                            $config = new Component_Config();
+
+                            $config->setConfigDefinitionId($configDefinition->getId())
                                 ->setInstanceId($newInstance->getId())
                                 ->setValue($configDefinition->getValue());
-                            \Component_ConfigMapper::getInstance()->create($config);
+
+                            Component_ConfigMapper::getInstance()->create($config);
                         }
 
                         // Clone a new textbox for any textbox components
                         if ($component instanceof ComponentEportfolioTextboxController) {
                             try {
-                                /** @var \Component\Eportfolio\Textbox $textbox */
+                                /** @var EportfolioTextbox $textbox */
                                 $textbox = EportfolioTextboxMapper::getInstance()->findOneByColumn(
                                     'component_instance_id',
                                     $component->getInstance()->getId()
@@ -378,7 +390,7 @@ class Controller extends Base
                     // Copy only the allow parents permission.
                     $parentPermission = 0;
 
-                    /** @var \Eportfolio\Permission $perm */
+                    /** @var EportfolioPermission $perm */
                     foreach (EportfolioPermissionMapper::getInstance()->findParentSetting($page->getPageId()) as $perm) {
                         $parentPermission = $perm->getValue();
                     }
@@ -402,14 +414,11 @@ class Controller extends Base
      * @param $id
      * @param $status
      */
-    private function log($message, $id, $status=null) {
-        // Use actual time instead of request time
-        $time = new \Alaress_Date_Format(time(), \Alaress_Date_Format::TIMESTAMP);
+    private function log($message, $id, $status = null)
+    {
         $log = new EportfolioImportLog();
         $log->setImportId($id);
         $log->setResult($message);
-        $log->setUpdatedAt($time);
-        $log->setCreatedAt($time);
         $this->eportfolioImportLogMapper->save($log);
 
         if ($status != null) {
