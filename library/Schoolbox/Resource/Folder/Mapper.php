@@ -763,8 +763,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
 
             // Folder Codes: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
-            $folderCode = $codeMapper->hydrate($row, 'cc');
-            if ($folderCode) {
+            if ($row['cc.code']) {
+                $folderCode = $codeMapper->hydrate($row, 'cc');
                 $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
             }
 
