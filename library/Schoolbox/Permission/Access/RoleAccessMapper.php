@@ -11,8 +11,7 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -23,7 +22,7 @@ class RoleAccessMapper extends Mapper
     /**
      * Cached permissions
      * Nested array structure $cachedPermissions[role][cid]
-     * @var array
+     * @var RoleAccess[][]
      */
     protected $cachedPermissions = [];
 
@@ -32,63 +31,32 @@ class RoleAccessMapper extends Mapper
     */
     protected function mapping()
     {
-
         $this->hasTable('perms');
         $this->hasModel(RoleAccess::class);
 
-        $this->hasMap(array(
-            'column'     => 'cid',
-            'property'   => 'category',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'category'
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'gid',
-            'property'   => 'role',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'role'
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'type',
-            'property'   => 'type',
-            'type'       => self::TYPE_INTEGER
-        ));
-
-        $this->hasJoin('category', array(
-            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-            'this_key'  => 'cid',
-            'other_key' => 'id'
-        ));
-
-        $this->hasJoin('role', array(
-            'mapper'    => '\\Schoolbox\\RoleMapper',
-            'this_key'  => 'gid',
-            'other_key' => 'id'
-        ));
-
+        $this->joins('cid', Folder\Mapper::class, 'id', self::TYPE_MODEL, null, 'category', 'category');
+        $this->joins('gid', RoleMapper::class, 'id', self::TYPE_MODEL, null, 'role', 'role');
+        $this->uses('type', self::TYPE_INTEGER);
     }
 
     /**
      * Gets all role permissions for $category.
      *
-     * @param FolderModel $category
-     *
+     * @param Folder\Model $category
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
      */
-    public function getGroupPermissions(FolderModel $category)
+    public function getGroupPermissions(Folder\Model $category)
     {
         return $this->findAllForFolder($category);
     }
 
     /**
-     * @param FolderModel $category
+     * @param Folder\Model $category
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
      */
-    public function findAllForFolder(FolderModel $category)
+    public function findAllForFolder(Folder\Model $category)
     {
         // Get permissions for all roles, regardless of whether there's one in
         // the database for this category.
@@ -106,7 +74,7 @@ class RoleAccessMapper extends Mapper
             'categoryId' => $category->getId()
         ));
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $roleAccess = $this->hydrate($row, 'ra');
@@ -121,7 +89,7 @@ class RoleAccessMapper extends Mapper
     /**
     * Save category permissions, optionally recursively
     *
-    * @param FolderModel $category
+    * @param Folder\Model $category
     * @param int[] $perms - assoc array of role IDs and permission levels
     * @param bool $recursive
     * @return bool
@@ -142,7 +110,7 @@ class RoleAccessMapper extends Mapper
     /**
     * Recursive helper function for generating a collection of permissions
     *
-    * @param FolderModel $category
+    * @param Folder\Model $category
     * @param int[] $perms Maps role to permission level
     * @param bool $recursive
     * @return Collection|RoleAccess[]
@@ -163,7 +131,7 @@ class RoleAccessMapper extends Mapper
 
         // if recursing, locate children and generate permissions for them as well
         if ($recursive) {
-            $children = FolderMapper::getInstance()->findByParent($category->getId());
+            $children = Folder\Mapper::getInstance()->findByParent($category->getId());
             if ($children->count()) {
                 foreach ($children as $subCategory) {
                     // recursive call
@@ -208,12 +176,12 @@ class RoleAccessMapper extends Mapper
 
         if ($serviceIdentifier != 0)
         {
-            $folder = FolderMapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
+            $folder = Folder\Mapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
 
             if ($folder->getInherit())
             {
                 // Folder inherits, find its NNIAN
-                $permissionFolder = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode(
+                $permissionFolder = Folder\Mapper::getInstance()->findNearestNonInheritingAncestralNode(
                     $folder
                 );
                 $serviceIdentifier = $permissionFolder->getId();
