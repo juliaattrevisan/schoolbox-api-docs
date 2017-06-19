@@ -94,7 +94,7 @@ $this->setVar([
  */
 $canDeleteAttempt = false;
 
-$perm = Access::getInstance()->getFolderAccess($_SESSION['user'], [$assess['category_id']]);
+$perm = Access::getInstance()->getFolderAccess($_SESSION['user'], $assess['category_id']);
 
 if ($perm >= UserAccess::ACCESS_WRITE) {
     $canDeleteAttempt = true;

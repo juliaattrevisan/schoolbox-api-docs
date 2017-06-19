@@ -66,7 +66,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
-            $accessType = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
+            $accessType = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId());
             switch ($accessType) {
                 case UserAccess::ACCESS_READ:
                     $userAccess[$folder->getId()] = Array('read' => true);

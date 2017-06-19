@@ -242,7 +242,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $folder = $assessment->getBaseContext()->getFolder();
 
-        $perms = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
+        $perms = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId());
         /* If you're a staff, get redirected to a Status overview
          */
         if ($perms >= UserAccess::ACCESS_WRITE) {

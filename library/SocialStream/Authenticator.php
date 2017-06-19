@@ -81,7 +81,7 @@ class Authenticator
             $accessor = Access::getInstance();
             //If we are dealing with a post, check its permission, else check permission of component for rendering purposes
             $homepageID = $this->getNewPost()->getHomepageId() ? $this->getNewPost()->getHomepageId() : $this->getInstance()->getIdentifier();
-            $permission = $accessor->getFolderAccess($this->getCurrentUser(), [$homepageID]);
+            $permission = $accessor->getFolderAccess($this->getCurrentUser(), $homepageID);
         }
 
         return $permission;

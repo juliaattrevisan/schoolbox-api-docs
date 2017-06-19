@@ -108,7 +108,7 @@ class Contents
          */
         $this->setAccess(Access::getInstance());
         $this->setCategory($category);
-        $this->setPermission($this->getAccess()->getFolderAccess($_SESSION['user'], [$category->getId()]));
+        $this->setPermission($this->getAccess()->getFolderAccess($_SESSION['user'], $category->getId()));
         $this->setFilterOptions($filterOptions);
 
 

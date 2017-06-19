@@ -62,7 +62,7 @@ class Controller extends AbstractController
             'type'      => 'link',
             'tree'      => $this->getBreadcrumbs($link->getFolder()),
             'host'      => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
-            'access'    => Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]),
+            'access'    => Access::getInstance()->getFolderAccess($this->getUser(), $folderId),
             'namespace' => $this->namespace
         ];
 
@@ -87,7 +87,7 @@ class Controller extends AbstractController
 
         $data['parent'] = FolderMapper::getInstance()->findCheaplyById($data['folder']->getParent()->getId());
         $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($data['folder']);
-        $data['access'] = Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]);
+        $data['access'] = Access::getInstance()->getFolderAccess($this->getUser(), $folderId);
 
         $admins = UserAccessMapper::getInstance()->findAdminsInCategory($data['folder']);
 
@@ -123,9 +123,13 @@ class Controller extends AbstractController
         return $folder;
     }
 
-    protected function getAccess(array $folderIds)
+
+    /**
+     * @inheritdoc
+     */
+    protected function getAccess($folderId)
     {
         // find out if we have access to the requested folder
-        return Access::getInstance()->getFolderAccess($this->getUser(), $folderIds);
+        return Access::getInstance()->getFolderAccess($this->getUser(), $folderId);
     }
 } 

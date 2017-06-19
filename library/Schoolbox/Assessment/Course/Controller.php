@@ -167,7 +167,7 @@ class Controller extends Base\Base
         // Check proposed Course
         if(!$courseExists){
             // Does user have WRITE+ access to Course Folder?
-            $courseFolderAccess = $this->getAccess()->getFolderAccess($this->getUser(), [$courseFolder->getId()]);
+            $courseFolderAccess = $this->getAccess()->getFolderAccess($this->getUser(), $courseFolder->getId());
             if($courseFolderAccess < UserAccess::ACCESS_WRITE){
                 $errors[] = 'Course Folder permission error: '.$courseFolder->getId();
             }
@@ -182,7 +182,7 @@ class Controller extends Base\Base
         // Check the proposed Unit
         if(!$unitExists){
             // Does user have WRITE+ access to the Unit folder?
-            $unitFolderAccess = $this->getAccess()->getFolderAccess($this->getUser(), [$unitFolder->getId()]);
+            $unitFolderAccess = $this->getAccess()->getFolderAccess($this->getUser(), $unitFolder->getId());
             if($unitFolderAccess < UserAccess::ACCESS_WRITE){
                 $errors[] = 'Unit Folder permission error: '.$unitFolder->getId();
             }
@@ -371,7 +371,7 @@ class Controller extends Base\Base
          */
         $encodedReturnUrls = [];
 
-        $folderAccess[$courseSpec->getFolder()->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $courseSpec->getFolder()->getId() ]);
+        $folderAccess[$courseSpec->getFolder()->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId());
 
         foreach($courseSpec->getUnits() as $unitSpec){
             $unitSpecId = $unitSpec->getId();
@@ -379,7 +379,7 @@ class Controller extends Base\Base
             $options = ['order' => ['sequence' => 'ASC']];
             $assessments = $this->getAssessmentMapperProxy()->findAllByUnitSpecificationId($unitSpecId, $options);
             $unitSpec->setAssessables($assessments);
-            $folderAccess[$folderId] = $this->getAccess()->getFolderAccess($this->getUser(), [$folderId ]);
+            $folderAccess[$folderId] = $this->getAccess()->getFolderAccess($this->getUser(), $folderId);
             $encodedReturnUrls[$unitSpecId] = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
         }
 
@@ -497,7 +497,7 @@ class Controller extends Base\Base
         if(!$parentFolderId && "0" !== $parentFolderId){
             $errors[] = "select a faculty or class for $folderName to live in";
         } else {
-            $access = $this->getAccess()->getFolderAccess($user = $this->getUser(), [$parentFolderId]);
+            $access = $this->getAccess()->getFolderAccess($user = $this->getUser(), $parentFolderId);
             if ($access < UserAccess::ACCESS_WRITE) {
                 $errors[] = "select a Faculty / Subject for which you have write access";
             } else {
@@ -740,7 +740,7 @@ class Controller extends Base\Base
         // Check that the initiating user has write access to the newly-created folder, and if not,
         // explicitly give it to them. This covers the case where the template allows you to create a folder
         // to which you don't have appropriate access
-        if ($this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]) < UserAccess::ACCESS_WRITE) {
+        if ($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
             $ua = $this->getUserAccessMapper()->createModel();
             $ua->setUser($this->getUser())
                 ->setAccessLevel(UserAccess::ACCESS_WRITE)
@@ -847,7 +847,7 @@ class Controller extends Base\Base
      */
     protected function confirmAccess($folderId, $min = UserAccess::ACCESS_READ)
     {
-        return $this->getAccess()->getFolderAccess($this->getUser(), [$folderId]) >= $min;
+        return $this->getAccess()->getFolderAccess($this->getUser(), $folderId) >= $min;
     }
 
     /**

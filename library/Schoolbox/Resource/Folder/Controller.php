@@ -112,7 +112,7 @@ class Controller extends BaseController
     public function getFolderModify($id)
     {
         $access = $this->getAccess();
-        $userAccess = $access->getFolderAccess($this->getUser(), [$id]);
+        $userAccess = $access->getFolderAccess($this->getUser(), $id);
         $folderMapper = $this->getFolderMapper();
         $homepageConfigMapper = $this->getHomepageConfigMapper();
         $homepageTemplateMapper = $this->getHomepageTemplateMapper();
@@ -212,7 +212,7 @@ class Controller extends BaseController
         $roleMapper = $this->getRoleMapper();
         $errorMapper = $this->getErrorMapper();
 
-        if ($access->getFolderAccess($this->getUser(), [$parentId]) < UserAccess::ACCESS_WRITE) {
+        if ($access->getFolderAccess($this->getUser(), $parentId) < UserAccess::ACCESS_WRITE) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
@@ -301,7 +301,7 @@ class Controller extends BaseController
 
         // Make sure they have access to delete the folder
 
-        if ($access->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
+        if ($access->getFolderAccess($this->getUser(), $folder->getId()) < WRITE_ACCESS) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
         }
 
@@ -339,10 +339,10 @@ class Controller extends BaseController
                 throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
             }
 
-            if ($access->getFolderAccess($this->getUser(), [$source->getId()]) < WRITE_ACCESS)
+            if ($access->getFolderAccess($this->getUser(), $source->getId()) < WRITE_ACCESS)
                 throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
-            if ($access->getFolderAccess($this->getUser(), [$destination->getId()]) < WRITE_ACCESS)
+            if ($access->getFolderAccess($this->getUser(), $destination->getId()) < WRITE_ACCESS)
                 throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
             // Move the folder
@@ -441,13 +441,13 @@ class Controller extends BaseController
         // Is this an UPDATE ?
         if (is_numeric($postData['categoryID'])) {
             // check this user has write access
-            if ($access->getFolderAccess($user, [ $postData['categoryID'] ]) < UserAccess::ACCESS_WRITE) {
+            if ($access->getFolderAccess($user, $postData['categoryID']) < UserAccess::ACCESS_WRITE) {
                 throw new OutOfBoundsException("I find your lack of access disturbing.");
             }
             $model->setId($postData['categoryID']);
         }
         // Or is action INSERT ?
-        elseif ($access->getFolderAccess($user, [ $postData['parent'] ]) < UserAccess::ACCESS_WRITE) {
+        elseif ($access->getFolderAccess($user, $postData['parent']) < UserAccess::ACCESS_WRITE) {
             // check this user has access to the parent folder
             throw new OutOfBoundsException("I find your lack of access disturbing.");
         }
@@ -770,7 +770,7 @@ class Controller extends BaseController
         {
             $folder = $folderMapper->findById($this->getRequest()->post["id"]);
 
-            if ($access->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
+            if ($access->getFolderAccess($this->getUser(), $folder->getId()) < WRITE_ACCESS) {
                 throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, null);
             }
         }
@@ -825,7 +825,7 @@ class Controller extends BaseController
                 $folder->setColour($colourList[$colourIndex]->getHexColour());
                 $colourIndex = ($colourIndex + 1) % $colourList->count();
             }
-            $accessType = Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]);
+            $accessType = Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId());
             switch ($accessType) {
                 case UserAccess::ACCESS_READ:
                     $userAccess[$folder->getId()] = Array('read' => true);

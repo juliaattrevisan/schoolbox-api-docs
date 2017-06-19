@@ -77,7 +77,7 @@ if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted
 
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
-if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), [$folder->getId()])) < READ_ACCESS) {
+if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < READ_ACCESS) {
     error(14);
 }
 

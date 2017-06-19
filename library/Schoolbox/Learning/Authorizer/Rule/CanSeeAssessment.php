@@ -89,7 +89,7 @@ class CanSeeAssessment implements IAuthorizationRule
             throw new InvalidArgumentException("Cannot check auth, activity does not have folder hydrated");
         }
 
-        $access = $this->access->getFolderAccess($user, [ $folderId ]);
+        $access = $this->access->getFolderAccess($user, $folderId);
 
         if ($access >= UserAccess::ACCESS_WRITE) {
             return true;
