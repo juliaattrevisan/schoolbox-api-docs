@@ -241,10 +241,10 @@ class External_User implements External_UserInterface
     /**
      * @inheritdoc
      *
-     * @param $externalUserId
+     * @param array $externalUserIds
      * @return mixed
      */
-    public function getHousemasterEmails($externalUserId)
+    public function getHousemasterEmails($externalUserIds)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }

@@ -849,7 +849,7 @@ class External_Tass_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getHousemasterEmails($externalUserId)
+    public function getHousemasterEmails($externalUserIds)
     {
         return false;
     }

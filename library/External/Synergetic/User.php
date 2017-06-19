@@ -1170,22 +1170,40 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getHousemasterEmails($externalUserId)
+    public function getHousemasterEmails($externalUserIds)
     {
+        if (!is_array($externalUserIds) || count($externalUserIds) == 0) {
+            return [];
+        }
+
+        $fileYearSemester = $this->findFileYearAndSemester();
+
+        $bindings = [
+            'FileYear' => $fileYearSemester['year']
+        ];
+
+        $count = 0;
+        $placeholders = "";
+
+        /** @var int $externalUserId */
+        foreach ($externalUserIds as $externalUserId) {
+            if (!empty($placeholders)) {
+                $placeholders .= ",";
+            }
+
+            $placeholders .= ":id{$count}";
+            $bindings[":id{$count}"] = $externalUserId;
+            $count++;
+        }
+
         $sql = "
-            SELECT OccupEmail FROM Community 
+            SELECT DISTINCT OccupEmail FROM Community 
             JOIN luHouse ON HeadOfHouseID = Community.ID
             JOIN StudentYears ON StudentYears.House = luHouse.Code
-            WHERE StudentYears.ID = :ID AND FileYear = :FileYear AND FileSemester = :FileSemester
+            WHERE StudentYears.ID IN ({$placeholders}) AND FileYear = :FileYear
         ";
 
-        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
-
-        return $this->getConnector()->executeQuery($sql, [
-            'ID' => $externalUserId,
-            'FileYear' => $fileYearSemester['year'],
-            'FileSemester' => $fileYearSemester['semester'],
-        ])->fetchColumn();
+        return $this->getConnector()->executeQuery($sql, $bindings)->fetchColumnArray('OccupEmail');
     }
 
     /**
