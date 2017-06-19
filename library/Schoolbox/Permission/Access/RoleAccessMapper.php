@@ -24,7 +24,7 @@ class RoleAccessMapper extends Mapper
      * Nested array structure $cachedPermissions[role][cid]
      * @var RoleAccess[][]
      */
-    protected $cachedPermissions = [];
+    private $cachedPermissions = [];
 
     /**
     * @return void
@@ -55,16 +55,19 @@ class RoleAccessMapper extends Mapper
      * @param Folder\Model $category
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
+     * @throws Mapper\DefinitionException If unable to locate a named join mapper
      */
     public function findAllForFolder(Folder\Model $category)
     {
+        $roleMapper = $this->getJoinMapper('role');
+
         // Get permissions for all roles, regardless of whether there's one in
         // the database for this category.
         $query = "
             SELECT
                 {$this->getColumnString('ra')},
                 {$this->getJoinColumnString('role', 'r')}
-            FROM `{$this->getJoinMapper('role')->getTable()}` `r`
+            FROM `{$roleMapper->getTable()}` `r`
             LEFT JOIN {$this->getTable()} `ra` ON r.id=ra.gid AND ra.cid=:categoryId
             ORDER BY r.id
         ";
@@ -78,9 +81,11 @@ class RoleAccessMapper extends Mapper
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $roleAccess = $this->hydrate($row, 'ra');
-            $role = $this->getJoinMapper('role')->hydrate($row, 'r');
-            $roleAccess->setRole($role);
-            $collection->add($roleAccess);
+            $role = $roleMapper->hydrate($row, 'r');
+            if($roleAccess && $role){
+                $roleAccess->setRole($role);
+                $collection->add($roleAccess);
+            }
         }
 
         return $collection;
