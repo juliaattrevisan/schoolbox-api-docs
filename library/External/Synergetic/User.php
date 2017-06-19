@@ -1172,6 +1172,8 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getHousemasterEmails($externalUserIds)
     {
+        // Make sure an array of user ID's was passed
+
         if (!is_array($externalUserIds) || count($externalUserIds) == 0) {
             return [];
         }
@@ -1182,18 +1184,29 @@ class External_Synergetic_User implements External_UserInterface
             'FileYear' => $fileYearSemester['year']
         ];
 
+        // Create SQL parameter bindings for external ID's
+
         $count = 0;
         $placeholders = "";
 
         /** @var int $externalUserId */
         foreach ($externalUserIds as $externalUserId) {
-            if (!empty($placeholders)) {
-                $placeholders .= ",";
-            }
 
-            $placeholders .= ":id{$count}";
-            $bindings[":id{$count}"] = $externalUserId;
-            $count++;
+            // Make sure the external user ID is valid so we don't blow up the query string
+
+            if (self::isExternalIdValid($externalUserId)) {
+                if (!empty($placeholders)) {
+                    $placeholders .= ",";
+                }
+
+                $placeholders .= ":id{$count}";
+                $bindings[":id{$count}"] = $externalUserId;
+                $count++;
+            }
+        }
+
+        if ($count == 0) {
+            return [];
         }
 
         $sql = "

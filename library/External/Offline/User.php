@@ -158,7 +158,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function getHousemasterEmails($externalUserIds)
     {
-        // Return nothing
+        return [];
     }
 
     /**

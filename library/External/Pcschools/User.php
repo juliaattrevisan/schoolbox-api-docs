@@ -1029,7 +1029,7 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getHousemasterEmails($externalUserIds)
     {
-        return false;
+        return [];
     }
 
     /**

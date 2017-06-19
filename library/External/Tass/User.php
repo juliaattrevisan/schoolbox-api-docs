@@ -851,7 +851,7 @@ class External_Tass_User implements External_UserInterface
      */
     public function getHousemasterEmails($externalUserIds)
     {
-        return false;
+        return [];
     }
 
     /**

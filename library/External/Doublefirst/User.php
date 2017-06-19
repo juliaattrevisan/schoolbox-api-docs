@@ -1177,7 +1177,7 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function getHousemasterEmails($externalUserIds)
     {
-        // Return nothing
+        return [];
     }
 
     /**

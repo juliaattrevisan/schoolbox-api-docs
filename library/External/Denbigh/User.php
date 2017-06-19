@@ -96,7 +96,7 @@ class External_Denbigh_User implements External_UserInterface {
      */
     public function getHousemasterEmails($externalUserIds)
     {
-        // Return nothing
+        return [];
     }
 
     public function getParent($externalUserId) {
