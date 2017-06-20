@@ -153,7 +153,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
             requestDataByDate(momentDate.format('YYYY-MM-DD'), 'calendar');
 
-            if (twigVars.type == 'duework') {
+            if (isDueWorkType(twigVars.type)) {
                 var mo = instance.currentMonth + 1,
                     yr = instance.currentYear;
 
@@ -184,7 +184,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             $('#calendarResponse' + twigVars.id + '-events').removeClass('hide');
         },
         onMonthChange: function (selectedDates, dateStr, instance) {
-            if (twigVars.type == 'duework') {
+            if (isDueWorkType(twigVars.type)) {
                 var mo = instance.currentMonth + 1,
                     yr = instance.currentYear;
 
@@ -194,7 +194,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             }
         },
         onYearChange: function (selectedDates, dateStr, instance) {
-            if (twigVars.type == 'duework') {
+            if (isDueWorkType(twigVars.type)) {
                 var mo = instance.currentMonth + 1,
                     yr = instance.currentYear;
 
@@ -204,7 +204,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             }
         },
         onValueUpdate: function (selectedDates, dateStr, instance) {
-            if (twigVars.type == 'duework') {
+            if (isDueWorkType(twigVars.type)) {
                 var mo = instance.currentMonth + 1,
                     yr = instance.currentYear;
 
@@ -287,7 +287,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             var monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
 
             // For duework requests, trigger a fetch for any heat data that might be absent
-            if (twigVars.type == 'duework') {
+            if (isDueWorkType(twigVars.type)) {
                 for (var year in monthsToFetch) {
                     for (var monthIndex in monthsToFetch[year]) {
                         requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
@@ -484,7 +484,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         setRequestDate(date);
 
-        if (twigVars.type == 'duework') { // Fetch student assessments
+        if (isDueWorkType(twigVars.type)) { // Fetch student assessments
 
             loadingResponse(target);
 
@@ -508,7 +508,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     console.log('Failed to retrieve appointments for specified date');
                 });
         }
-        else if (twigVars.type == 'event') { // Fetch events
+        else if (isEventType(twigVars.type)) { // Fetch events
 
             loadingResponse(target);
 
@@ -1135,4 +1135,17 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     }
 
+    /**
+     * Check if this is a due work datepicker
+     */
+    function isDueWorkType(type) {
+        return type === 'duework';
+    }
+
+    /**
+     * Check if this is an event datepicker
+     */
+    function isEventType(type) {
+        return type === 'event';
+    }
 };
