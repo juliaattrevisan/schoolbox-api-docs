@@ -49,7 +49,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     if (twigVars.timetable) {
 
         // Converting JS date to database short format
-        var initialDate = momentDate.format('YYYY-MM-DD');
+        var initialDate = momentDate.format(momentFormats.databaseShort);
 
         // Set initial value to the timetable picker
         setTimetablePickerValue(initialDate);
@@ -151,7 +151,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 $modal.find('.flatpickr-time').show();
             }
 
-            requestDataByDate(momentDate.format('YYYY-MM-DD'), 'calendar');
+            requestDataByDate(momentDate.format(momentFormats.databaseShort), 'calendar');
 
             if (isDueWorkType(twigVars.type)) {
                 var mo = instance.currentMonth + 1,
