@@ -127,7 +127,11 @@ foreach($categoryList as $category) {
             $return->setComment($result[0]['comment']);
 
             if(!$dryRun) {
-                $markbookExternal->setMark($return);
+                try {
+                    $markbookExternal->setMark($return);
+                } catch (\Exception $e) {
+                    $log->warning("Could not set mark for student #{$result[0]['owner']}!");
+                }
             }
         }
     }
@@ -171,7 +175,11 @@ foreach($categoryList as $category) {
             $return->getUser()->setId($studentID);
 
             if(!$dryRun) {
-                $markbookExternal->setMark($return);
+                try {
+                    $markbookExternal->setMark($return);
+                } catch (\Exception $e) {
+                    $log->warning("Could not set mark for student #{$studentID}!");
+                }
             }
         }
     }
