@@ -320,9 +320,9 @@ class Group extends DeprecatedModel
 
         $this->db->delete('userGroups', 'cid', $relationID);
 
-        /* Delete groups calendar */
-        $query = "DELETE FROM event WHERE access = 2 AND sid = '$relationID'";
-        $this->db->query($query);
+        // Do not delete group events anymore.
+        // Quoting the disband group dialog:
+        // "All members of the group will be removed, but all homepage content will remain."
     }
 
     function getMemberList($relationID)
