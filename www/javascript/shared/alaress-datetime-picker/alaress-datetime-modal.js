@@ -30,13 +30,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var momentFormat = pickerOptions.enableTime ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
     var momentDate = moment(twigVars.date, momentFormat);
 
-    $(document).on('open.fndtn.reveal', $modal, function () {
-
-        updateCalendarResponse();
-        resetTimetablePicker();
-
-    });
-
     // Timetable picker
     var $byTimetable = $('#byTimetable-' + twigVars.id);
 
@@ -49,6 +42,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     // Listen for the modal open
     $(document).on('open.fndtn.reveal', $modal, function () {
+        updateCalendarResponse();
         resetTimetablePicker();
     });
 
