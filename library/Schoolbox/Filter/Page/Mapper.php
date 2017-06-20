@@ -101,8 +101,9 @@ class Mapper extends \Schoolbox\Mapper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $id = (int)$row["p.{$this->getIdentifierColumn()}"];
             if (!$pageFilters->offsetExists($id)) {
-                $pageFilters[$id]                                 = $this->hydrate($row, 'p');
-                $pageFilters[$id]->getFilter()->getPages()[$page] = $pageFilters[$id];
+                $pageFilters[$id] = $this->hydrate($row, 'p');
+                $filterPages      = $pageFilters[$id]->getFilter()->getPages();
+                $filterPages->setOffset($page, $pageFilters[$id]);
             }
             $pageFilter = $pageFilters[$id];
 
