@@ -221,13 +221,16 @@
                                         </td>
                                         <td><a href='/calendar/modify.php?eventID={CLEANUP_EVENT_ID}'>{CLEANUP_EVENT_TITLE}</a></td>
                                         <td>{CLEANUP_EVENT_EVENTTYPE}</td>
-                                        <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR}</a></td>
+                                        <!-- BEGIN has_event_author -->
+                                        <td><a href="/search/user/{CLEANUP_EVENT_AUTHOR_ID}">{CLEANUP_EVENT_AUTHOR_NAME}</a></td>
+                                        <!-- END has_event_author -->
+                                        <!-- BEGIN no_event_author -->
+                                        <td>{CLEANUP_EVENT_AUTHOR_NAME}</td>
+                                        <!-- END no_event_author -->
                                         <td>{CLEANUP_EVENT_START}</td>
                                         <td>{CLEANUP_EVENT_END}</td>
                                         <td>
-                                            {CLEANUP_EVENT_USERS}
-                                            {CLEANUP_EVENT_CATEGORIES}
-                                            {CLEANUP_EVENT_CAMPUSES}
+                                            {CLEANUP_EVENT_APPLIES_TO}
                                         </td>
                                     </tr>
                                     <!-- END cleanup_event -->
@@ -241,8 +244,9 @@
                 <!-- END cleanup_has_events -->
 
                 <!-- BEGIN cleanup_has_no_events -->
-                <div class="alert-box">
-                    No events found within the selected date range.
+                <div class="empty-state">
+                    <i class="icon-calendar"></i>
+                    <p>No events found within the selected date range.</p>
                 </div>
                 <!-- END cleanup_has_no_events -->
             </div>

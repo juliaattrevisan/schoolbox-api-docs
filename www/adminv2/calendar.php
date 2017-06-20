@@ -19,20 +19,20 @@ $this->checkList(
     $userHandler->getCampusList(),
     '',
     TEMPLATE_content,
-    array(
+    [
         'id' => 'CAMPUSID',
         'name' => 'CAMPUSNAME'
-    )
+    ]
 );
 $this->checkList(
     'user_group_check_list',
     $userHandler->getGroupList(),
     '',
     TEMPLATE_content,
-    array(
+    [
         'id' => 'USERGROUPID',
         'name' => 'USERGROUPNAME'
-    )
+    ]
 );
 
 /* Stolen from Settings
@@ -51,6 +51,8 @@ $this->setBlock(TEMPLATE_content, 'cleanup', 'cleanup_block');
 $this->setBlock('cleanup', 'cleanup_has_no_events', 'cleanup_has_no_events_block');
 $this->setBlock('cleanup', 'cleanup_has_events', 'cleanup_has_events_block');
 $this->setBlock('cleanup_has_events', 'cleanup_event', 'cleanup_event_block');
+$this->setBlock('cleanup_event', 'has_event_author', 'has_event_author_block');
+$this->setBlock('cleanup_event', 'no_event_author', 'no_event_author_block');
 
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
@@ -67,29 +69,22 @@ if ($this->arg[0]) {
     $selectedType = 'Import';
 }
 
-$typeList = array(
-    array(
-        'type' => 'Import'
-    ),
-    array(
-        'type' => 'Subscribe'
-    ),
-    array(
-        'type' => 'Cleanup'
-    ),
-);
+$typeList = [
+    ['type' => 'Import'],
+    ['type' => 'Subscribe'],
+    ['type' => 'Cleanup']
+];
 
 
 foreach ($typeList as $type) {
+
     /* Navigation stuff
-              */
-    $this->setVar(
-        array(
-            'SETTING_TAB_NAME' => $type['type'],
-            'SETTING_TAB_URL' => urlencode($type['type']),
-            'SETTING_TAB_CURRENT' => '',
-        )
-    );
+     */
+    $this->setVar([
+        'SETTING_TAB_NAME' => $type['type'],
+        'SETTING_TAB_URL' => urlencode($type['type']),
+        'SETTING_TAB_CURRENT' => '',
+    ]);
 
     if ($selectedType == $type['type']) {
         $this->setVar('SETTING_TAB_CURRENT', 'active');
@@ -102,7 +97,8 @@ foreach ($typeList as $type) {
      */
     if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
         $this->parse('import_block', 'import');
-    } elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
+    }
+    elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
 
         /* Subscribe page
          */
@@ -122,6 +118,7 @@ foreach ($typeList as $type) {
 
             /* Inject individual templates just like before -_-
              */
+            /** @var \Calendar_Api_Config_Connector_Abstract $stubInstance */
             foreach ($allConnectors as $currentConnector => $stubInstance) {
 
                 /* Render titles etc
@@ -213,85 +210,113 @@ foreach ($typeList as $type) {
             $to = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
         }
 
-        $this->setVar(
-            array(
-                'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
-                'CLEANUP_HAS_DATES_TO' => $to->getLocalShort()
-            )
-        );
+        $this->setVar([
+            'CLEANUP_HAS_DATES_FROM' => $from->getLocalShort(),
+            'CLEANUP_HAS_DATES_TO' => $to->getLocalShort(),
+            'has_event_author_block' => '',
+            'no_event_author_block' => '',
+        ]);
 
         $eventMapper = new \Schoolbox\Calendar\EventMapper();
         $allEvents = $eventMapper->findEventsBetween($from->getDatabaseDate(), $to->getDatabaseDate());
 
+        /** @var \Schoolbox\Calendar\Event $currentEvent */
         foreach ($allEvents as $currentEvent) {
 
             /* Auxiliary collections
              */
-            $allUsers = array();
+            $allUsers = [];
 
+            /** @var \Schoolbox\User $currentUser */
             foreach ($currentEvent->getUserCollection() as $currentUser) {
-                $allUsers[] = \Schoolbox\UserMapper::getInstance()->findById($currentUser->getUserId())->getFullName();
+                $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($currentUser->getId());
+
+                if ($user instanceof \Schoolbox\User) {
+                    $allUsers[] = $user->getFullName();
+                }
             }
 
-            $allCategories = array();
+            $allCategories = [];
 
+            /** @var \Schoolbox\Calendar\Relation\Category $currentCategory */
             foreach ($currentEvent->getCategoryCollection() as $currentCategory) {
-                $allCategories[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($currentCategory->getCategoryId())->getTitle();
+                $allCategories[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByIdWithFallback($currentCategory->getCategoryId())->getTitle();
             }
 
-            $allCampuses = array();
+            $allCampuses = [];
 
+            /** @var \Schoolbox\Campus $currentCampus */
             foreach ($currentEvent->getCampusCollection() as $currentCampus) {
                 $allCampuses[] = $currentCampus->getName();
             }
 
+            /* Combine all three of the auxiliary collections
+             */
+            $appliesTo = [];
+            $appliesTo = array_merge($allUsers, $allCategories, $allCampuses);
+            $appliesTo = implode('<br />', $appliesTo);
+
             /* Special selection modifiers for javascript control
              */
+            $modifier = '';
+
             if ($currentEvent->isPersonalLevel()) {
                 $modifier = 'personal';
-            } else {
-                if ($currentEvent->isGroupLevel()) {
-                    $modifier = 'group';
-                } else {
-                    if ($currentEvent->isCampusLevel()) {
-                        $modifier = 'school';
-                    }
-                }
+            } elseif ($currentEvent->isGroupLevel()) {
+                $modifier = 'group';
+            } elseif ($currentEvent->isCampusLevel()) {
+                $modifier = 'school';
             }
 
-            $this->setVar(
-                array(
-                    'CLEANUP_EVENT_ID' => $currentEvent->getId(),
-                    'CLEANUP_EVENT_TITLE' => $currentEvent->getTitle(),
-                    'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
-                    'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
-                    'CLEANUP_EVENT_AUTHOR' => $currentEvent->getAuthor()->getFullName(),
+            $this->setVar([
+                'CLEANUP_EVENT_ID' => $currentEvent->getId(),
+                'CLEANUP_EVENT_TITLE' => $currentEvent->getTitle(),
+                'CLEANUP_EVENT_START' => $currentEvent->getStartDateTime()->getShort(),
+                'CLEANUP_EVENT_END' => $currentEvent->getEndDateTime()->getShort(),
+                'CLEANUP_EVENT_EVENTTYPE' => $currentEvent->getType()->getType(),
+                'CLEANUP_EVENT_APPLIES_TO' => $appliesTo,
+                'CLEANUP_EVENT_MODIFIER' => $modifier,
+            ]);
+
+            /* Event author can now return as null when it doesn't exist anymore
+             */
+            if ($currentEvent->getAuthor() instanceof \Schoolbox\User) {
+                $this->setVar([
                     'CLEANUP_EVENT_AUTHOR_ID' => $currentEvent->getAuthor()->getId(),
-                    'CLEANUP_EVENT_EVENTTYPE' => $currentEvent->getType()->getType(),
-                    'CLEANUP_EVENT_USERS' => implode('<br />', $allUsers),
-                    'CLEANUP_EVENT_CATEGORIES' => implode('<br />', $allCategories),
-                    'CLEANUP_EVENT_CAMPUSES' => implode('<br />', $allCampuses),
-                    'CLEANUP_EVENT_MODIFIER' => $modifier,
-                )
-            );
+                    'CLEANUP_EVENT_AUTHOR_NAME' => $currentEvent->getAuthor()->getFullName(),
+                ]);
+
+                $this->parse('has_event_author_block', 'has_event_author');
+            }
+            else {
+                $this->setVar([
+                    'CLEANUP_EVENT_AUTHOR_ID' => '',
+                    'CLEANUP_EVENT_AUTHOR_NAME' => 'Unknown User',
+                ]);
+
+                $this->parse('no_event_author_block', 'no_event_author');
+            }
 
             $this->parse('cleanup_event_block', 'cleanup_event', true);
+
+            /* Clear children after parsing out the parent
+             */
+            $this->setVar([
+                'has_event_author_block' => '',
+                'no_event_author_block' => '',
+            ]);
         }
 
         if ($allEvents->count()) {
             $this->parse('cleanup_has_events_block', 'cleanup_has_events');
 
-            $this->setVar(
-                array(
-                    'cleanup_has_no_events_block' => ''
-                )
-            );
+            $this->setVar([
+                'cleanup_has_no_events_block' => ''
+            ]);
         } else {
-            $this->setVar(
-                array(
-                    'cleanup_has_events_block' => ''
-                )
-            );
+            $this->setVar([
+                'cleanup_has_events_block' => ''
+            ]);
 
             $this->parse('cleanup_has_no_events_block', 'cleanup_has_no_events');
         }
