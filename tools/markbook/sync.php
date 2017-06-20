@@ -94,13 +94,23 @@ foreach($categoryList as $category) {
         if(is_array($markbook) && count($markbook) >= 1) {
             $log->info("Updating existing assessment: {$submissionBox->getName()}");
             if(!$dryRun) {
-                $markbookExternal->updateAssessment($submissionBox);
+                try {
+                    $markbookExternal->updateAssessment($submissionBox);
+                } catch (\Exception $e) {
+                    $log->warning("Could not update assessment!");
+                    continue;
+                }
             }
         }
         elseif( !$updateOnly) {
             $log->info("Creating new assessment: {$submissionBox->getName()}");
             if(!$dryRun) {
-                $markbookExternal->createAssessment($submissionBox);
+                try {
+                    $markbookExternal->createAssessment($submissionBox);
+                } catch (\Exception $e) {
+                    $log->warning("Could not create assessment!");
+                    continue;
+                }
             }
         }
         else {
@@ -149,13 +159,23 @@ foreach($categoryList as $category) {
         if(is_array($markbook) && count($markbook) >= 1) {
             $log->info("Updating existing assessment: {$activity->getName()}");
             if(!$dryRun) {
-                $markbookExternal->updateAssessment($activity);
+                try {
+                    $markbookExternal->updateAssessment($activity);
+                } catch (\Exception $e) {
+                    $log->warning("Could not create assessment!");
+                    continue;
+                }
             }
         }
         elseif( !$updateOnly) {
             $log->info("Creating new assessment: {$activity->getName()}");
             if(!$dryRun) {
-                $markbookExternal->createAssessment($activity);
+                try {
+                    $markbookExternal->createAssessment($activity);
+                } catch (\Exception $e) {
+                    $log->warning("Could not create assessment!");
+                    continue;
+                }
             }
         }
         else {
