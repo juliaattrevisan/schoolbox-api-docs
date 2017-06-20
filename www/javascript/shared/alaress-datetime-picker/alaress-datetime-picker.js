@@ -212,7 +212,8 @@ function setValue(element, options, state, trigger, date) {
 /**
  * Update picker value with date
  *
- * @param {object} date (moment.js object)
+ * @param {number} pickerId
+ * @param {object} date - Moment.js object
  */
 function setPickerValue(pickerId, date) {
 
@@ -224,7 +225,7 @@ function setPickerValue(pickerId, date) {
 /**
  * Get picker value as a string
  *
- * @param {object} date (moment.js object)
+ * @param {number} pickerId
  */
 function getPickerValue(pickerId) {
     return $("#adtp-modal-" + pickerId).attr('data-datepicker-value');
