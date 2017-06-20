@@ -26,8 +26,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var dictMostLoaded = 'Heaviest Workload';
     var dictTop5Loaded = '5 Heaviest Workloads';
     var dictNoWorkToday = 'Your students have nothing due this day';
-
     var heatCache = {};
+    var momentFormat = pickerOptions.enableTime ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
+    var momentDate = moment(twigVars.date, momentFormat);
 
     $(document).on('open.fndtn.reveal', $modal, function () {
 
@@ -48,7 +49,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     if (twigVars.timetable) {
 
         // Converting JS date to database short format
-        var initialDate = twigVars.date.getFullYear() + '-' + ('0' + (twigVars.date.getMonth() + 1)).slice(-2) + '-' + twigVars.date.getDate();
+        var initialDate = momentDate.format('YYYY-MM-DD');
 
         // Set initial value to the timetable picker
         setTimetablePickerValue(initialDate);
@@ -150,7 +151,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 $modal.find('.flatpickr-time').show();
             }
 
-            requestDataByDate(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate(), 'calendar');
+            requestDataByDate(momentDate.format('YYYY-MM-DD'), 'calendar');
 
             if (twigVars.type == 'duework') {
                 var mo = instance.currentMonth + 1,
