@@ -11,8 +11,7 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -23,105 +22,78 @@ class RoleAccessMapper extends Mapper
     /**
      * Cached permissions
      * Nested array structure $cachedPermissions[role][cid]
-     * @var array
+     * @var RoleAccess[][]
      */
-    protected $cachedPermissions = [];
+    private $cachedPermissions = [];
 
     /**
     * @return void
     */
     protected function mapping()
     {
-
         $this->hasTable('perms');
         $this->hasModel(RoleAccess::class);
 
-        $this->hasMap(array(
-            'column'     => 'cid',
-            'property'   => 'category',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'category'
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'gid',
-            'property'   => 'role',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'role'
-        ));
-
-        $this->hasMap(array(
-            'column'     => 'type',
-            'property'   => 'type',
-            'type'       => self::TYPE_INTEGER
-        ));
-
-        $this->hasJoin('category', array(
-            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-            'this_key'  => 'cid',
-            'other_key' => 'id'
-        ));
-
-        $this->hasJoin('role', array(
-            'mapper'    => '\\Schoolbox\\RoleMapper',
-            'this_key'  => 'gid',
-            'other_key' => 'id'
-        ));
-
+        $this->joins('cid', Folder\Mapper::class, 'id', self::TYPE_MODEL, null, 'category', 'category');
+        $this->joins('gid', RoleMapper::class, 'id', self::TYPE_MODEL, null, 'role', 'role');
+        $this->uses('type', self::TYPE_INTEGER);
     }
 
     /**
      * Gets all role permissions for $category.
      *
-     * @param FolderModel $category
-     *
+     * @param Folder\Model $category
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
      */
-    public function getGroupPermissions(FolderModel $category)
+    public function getGroupPermissions(Folder\Model $category)
     {
         return $this->findAllForFolder($category);
     }
 
     /**
-     * @param FolderModel $category
+     * @param Folder\Model $category
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
+     * @throws Mapper\DefinitionException If unable to locate a named join mapper
      */
-    public function findAllForFolder(FolderModel $category)
+    public function findAllForFolder(Folder\Model $category)
     {
-        // Get permissions for all roles, regardless of whether there's one in
-        // the database for this category.
+        $roleMapper = $this->getJoinMapper('role');
+
+        $builder = $this->getPredicateBuilder();
+        $builder->equals('ra.cid', $category->getId());
+        $whereClause = implode(' AND ', $builder->getWhere());
+
+        // Get all permissions for the specified folder
         $query = "
             SELECT
                 {$this->getColumnString('ra')},
                 {$this->getJoinColumnString('role', 'r')}
-            FROM `{$this->getJoinMapper('role')->getTable()}` `r`
-            LEFT JOIN {$this->getTable()} `ra` ON r.id=ra.gid AND ra.cid=:categoryId
+            FROM {$this->getTable()} `ra`
+            JOIN `{$roleMapper->getTable()}` `r` ON r.id = ra.gid
+            WHERE {$whereClause}
             ORDER BY r.id
         ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute(array(
-            'categoryId' => $category->getId()
-        ));
+        $statement->execute($builder->getParams());
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $roleAccess = $this->hydrate($row, 'ra');
-            $role = $this->getJoinMapper('role')->hydrate($row, 'r');
+            $role = $roleMapper->hydrate($row, 'r');
             $roleAccess->setRole($role);
             $collection->add($roleAccess);
         }
-
         return $collection;
     }
 
     /**
     * Save category permissions, optionally recursively
     *
-    * @param FolderModel $category
+    * @param Folder\Model $category
     * @param int[] $perms - assoc array of role IDs and permission levels
     * @param bool $recursive
     * @return bool
@@ -142,7 +114,7 @@ class RoleAccessMapper extends Mapper
     /**
     * Recursive helper function for generating a collection of permissions
     *
-    * @param FolderModel $category
+    * @param Folder\Model $category
     * @param int[] $perms Maps role to permission level
     * @param bool $recursive
     * @return Collection|RoleAccess[]
@@ -163,7 +135,7 @@ class RoleAccessMapper extends Mapper
 
         // if recursing, locate children and generate permissions for them as well
         if ($recursive) {
-            $children = FolderMapper::getInstance()->findByParent($category->getId());
+            $children = Folder\Mapper::getInstance()->findByParent($category->getId());
             if ($children->count()) {
                 foreach ($children as $subCategory) {
                     // recursive call
@@ -193,11 +165,12 @@ class RoleAccessMapper extends Mapper
 
     /**
      * @param User $user
-     * @param int  $serviceIdentifier
-     * @param int  $service
+     * @param int  $folderId
+     * @param bool $cache
      * @return RoleAccess
+     * @throws Mapper\Exception
      */
-    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true)
+    public function getAccess(User $user, $folderId, $cache = true)
     {
         // let's avoid fatal errors in the face of unexpected failure
         if (!$user->getRole() instanceof Role) {
@@ -206,21 +179,21 @@ class RoleAccessMapper extends Mapper
             return $ra;
         }
 
-        if ($serviceIdentifier != 0)
+        // Ensure we take role-permission from NNIAN
+        if ($folderId != 0)
         {
-            $folder = FolderMapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
+            $folderMapper = Folder\Mapper::getInstance();
+            $folder = $folderMapper->findCheaplyById($folderId, ['deleted' => true]);
 
             if ($folder->getInherit())
             {
                 // Folder inherits, find its NNIAN
-                $permissionFolder = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode(
-                    $folder
-                );
-                $serviceIdentifier = $permissionFolder->getId();
+                $permissionFolder = $folderMapper->findNearestNonInheritingAncestralNode($folder);
+                $folderId         = $permissionFolder->getId();
             }
         }
 
-        // Setup cache array for this user/service/sid if it doesn't already exist)
+        // Setup cache array for this user's role and folder if it doesn't already exist)
 
         if (!isset($this->cachedPermissions[$user->getRole()->getId()])) {
             $this->cachedPermissions[$user->getRole()->getId()] = [];
@@ -229,22 +202,20 @@ class RoleAccessMapper extends Mapper
 
         // Permission check #1 - Cached results
 
-        if (isset($this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier]) && $cache) {
+        if ($cache && isset($this->cachedPermissions[$user->getRole()->getId()][$folderId])) {
             // Found cached result, return it
-            return $this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier];
+            return $this->cachedPermissions[$user->getRole()->getId()][$folderId];
         }
 
-
-        $result =  $this->findOneByColumnList(
-            array(
-                'cid' => $serviceIdentifier,
-                'gid' => $user->getRole()->getId()
-            )
-        );
+        /** @var RoleAccess $roleAccess */
+        $roleAccess = $this->findOneByColumnList([
+            'cid' => $folderId,
+            'gid' => $user->getRole()->getId(),
+        ]);
         if($cache) {
-            $this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier] = $result;
+            $this->cachedPermissions[$user->getRole()->getId()][$folderId] = $roleAccess;
         }
-        return $result;
+        return $roleAccess;
     }
 
 
