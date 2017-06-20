@@ -7,7 +7,7 @@
         userSelections:     Filter\Selection\Model[] - A set of filter selections made by the current user, indexed by selection.key
 #}
 
-<div class="checklist" data-component="{{ definition.filter.id }}" {% if isUserConfigurable %}style="margin: 0 15px; min-width: 100px;"{% endif %}>
+<div class="checklist filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
 
     {{ block('scripts') }}
 
