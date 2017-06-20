@@ -103,6 +103,11 @@ class Access
             return UserAccess::ACCESS_DENY;
         }
 
+        // Intentionally ordered after the empty array check. Not even SU's have an access level to the void.
+        if ($user->isSuperuser()) {
+            return UserAccess::ACCESS_FULL;
+        }
+
         // We must iterate all, rather than from index 1+ (ie fencepost alg.) to robustly account for different indexing
         $minAccess = null;
         foreach ($folderIds as $folderId) {
