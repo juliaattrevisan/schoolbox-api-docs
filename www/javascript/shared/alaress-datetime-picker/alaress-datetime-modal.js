@@ -7,7 +7,7 @@
 // Picker settings
 
 // Build datepicker options here... again...
-$.fn.alaressDateTimeModal = function(twigVars) {
+$.fn.alaressDateTimeModal = function (twigVars) {
 
     var $picker = $('#' + twigVars.element); // The input
     var $modal = $('#adtp-modal-' + twigVars.id);
@@ -23,11 +23,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         endDay: getValue($picker, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
         endPeriod: getValue($picker, 'data-datepicker-endofperiod') // Should allday change time to 23:59:59
     };
-    var dictMostLoaded  = 'Heaviest Workload';
-    var dictTop5Loaded  = '5 Heaviest Workloads';
+    var dictMostLoaded = 'Heaviest Workload';
+    var dictTop5Loaded = '5 Heaviest Workloads';
     var dictNoWorkToday = 'Your students have nothing due this day';
-
     var heatCache = {};
+    var momentFormat = pickerOptions.enableTime ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
+    var momentDate = moment(twigVars.date, momentFormat);
 
     // Timetable picker
     var $byTimetable = $('#byTimetable-' + twigVars.id);
@@ -39,84 +40,48 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         submit: $byTimetable.find('[data-adtp-tt-submit]')
     };
 
+    // Listen for the modal open
+    $(document).on('open.fndtn.reveal', $modal, function () {
+        resetTimetablePicker();
+    });
+
     if (twigVars.timetable) {
 
-        buildCycles();
-        revealTimetable();
-        resetTimetable();
+        // Converting JS date to database short format
+        var initialDate = momentDate.format(momentFormats.databaseShort);
 
-        // On first load request data by date for the timetable
-        requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'timetable');
-
-        // Update the selected date
-        var selectedDate = moment(twigVars.date).format('dddd, MMM D, Y');
-        $byTimetable.find('[data-tt-selected-date]').text(selectedDate);
+        // Set initial value to the timetable picker
+        setTimetablePickerValue(initialDate);
+        resetTimetablePicker();
 
         // Listen for changes to campus
         timetable.campus.change(function () {
 
-            var selectedCampus = $(this).val();
-
-            buildCycles();
-            resetTimetable();
+            resetCycles($('#byTimetable-' + twigVars.id).find('[data-adtp-tt-submit]').attr('data-timetable-value'));
             revealTimetable();
+            revealByCampus();
 
-            // Show the correct days for the selected campus, hide others
-            $byTimetable.find('[data-tt-day]').each(function() {
-                if ($(this).attr('data-campus') == selectedCampus) {
-                    $(this).removeClass('hide');
-                } else {
-                    $(this).addClass('hide');
-                }
-            });
-
-            // Show the correct period dropdown for the selected campus, hide others
-            $byTimetable.find('[data-tt-period]').each(function() {
-                if ($(this).attr('data-campus') == selectedCampus) {
-                    $(this).removeClass('hide');
-                } else {
-                    $(this).addClass('hide');
-                }
-            });
-
-            // Update time radios to correct times
-            updateTimeControls($byTimetable.find('[data-tt-period][data-campus=' + selectedCampus + ']'));
-
-            // Reset the selected radio back to the first one
-            $byTimetable.find('[data-adtp-tt-period-start]').prop('checked', true);
         });
 
         // Listen for changes to term
-        timetable.term.change(function() {
+        timetable.term.change(function () {
             buildCycles();
-            resetTimetable();
         });
 
         // Attach week cycle functionality to prev & next buttons
-        $byTimetable.find('[data-tt-next]').click(function() {
+        $byTimetable.find('[data-tt-next]').click(function () {
             changeCycle($(this), false);
         });
-        $byTimetable.find('[data-tt-prev]').click(function() {
+        $byTimetable.find('[data-tt-prev]').click(function () {
             changeCycle($(this), true);
         });
 
         // Selecting a day
-        $byTimetable.on('click', '[data-tt-day]:not(.disabled)', function() {
+        $byTimetable.on('click', '[data-tt-day]:not(.disabled)', function () {
 
-            var selectedDate = moment($(this).attr('data-date')).format('dddd, MMM D, Y');
-
-            // Add selected class & remove others with the class
-            $(this).parents('.day-picker').find('[data-tt-day]').removeClass('selected');
-            $(this).addClass('selected');
-
-            // Update the selected date
-            $(this).closest('[data-adtp]').find('[data-tt-selected-date]').text(selectedDate);
-
-            // Unhide the event calendar (in the case it was hidden via expanding due work)
-            $('#timetableResponse' + twigVars.id + '-events').removeClass('hide');
-
-            // Load events
-            requestDataByDay($(this));
+            setTimetablePickerValue($(this).attr('data-date'));
+            resetDays();
+            requestDataByDate($(this).attr('data-date'), 'timetable');
 
         });
 
@@ -124,16 +89,19 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         $byTimetable.find('[data-tt-day].active').trigger('click');
 
         // Catch period select change
-        $byTimetable.find('[data-tt-period]').change(function() {
+        $byTimetable.find('[data-tt-period]').change(function () {
             updateTimeControls($(this));
+        });
+
+        // If input value gets changed from outside, reset the timetable picker
+        $picker.change(function () {
+            resetTimetablePicker();
         });
 
     }
 
-
     // Setup calendar
     var newDate, latestDate;
-
 
     // Accommodating the "start of the week" SB config
     Flatpickr.localize(Flatpickr.l10ns.default);
@@ -182,14 +150,16 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $modal.find('.flatpickr-time').show();
             }
 
-            requestDataByDate(encodeURIComponent(twigVars.date.getFullYear() + '-' + (twigVars.date.getMonth() + 1) + '-' + twigVars.date.getDate()), 'calendar');
+            requestDataByDate(momentDate.format(momentFormats.databaseShort), 'calendar');
 
-            var mo = instance.currentMonth + 1,
-                yr = instance.currentYear;
+            if (isDueWorkType(twigVars.type)) {
+                var mo = instance.currentMonth + 1,
+                    yr = instance.currentYear;
 
-            requestHeat(mo, yr, function () {
-                applyHeatEverywhere(instance);
-            });
+                requestHeat(mo, yr, function () {
+                    applyHeatEverywhere(instance);
+                });
+            }
         },
         onChange: function (selectedDates, dateStr, instance) {
 
@@ -204,7 +174,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 var selectedObj = new Date(selectedDates);
                 newDate = selectedObj.getFullYear() + '-' + (selectedObj.getMonth() + 1) + '-' + selectedObj.getDate();
                 if (newDate !== latestDate) {
-                    requestDataByDate(encodeURIComponent(dateSplit[0]), 'calendar');
+                    requestDataByDate(dateSplit[0], 'calendar');
                 }
                 latestDate = newDate;
             }
@@ -212,29 +182,35 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             // Unhide the event calendar (in the case it was hidden via expanding due work)
             $('#calendarResponse' + twigVars.id + '-events').removeClass('hide');
         },
-        onMonthChange: function(selectedDates, dateStr, instance) {
-            var mo = instance.currentMonth + 1,
-                yr = instance.currentYear;
+        onMonthChange: function (selectedDates, dateStr, instance) {
+            if (isDueWorkType(twigVars.type)) {
+                var mo = instance.currentMonth + 1,
+                    yr = instance.currentYear;
 
-            requestHeat(mo, yr, function () {
-                applyHeatEverywhere(instance);
-            });
+                requestHeat(mo, yr, function () {
+                    applyHeatEverywhere(instance);
+                });
+            }
         },
-        onYearChange: function(selectedDates, dateStr, instance) {
-            var mo = instance.currentMonth + 1,
-                yr = instance.currentYear;
+        onYearChange: function (selectedDates, dateStr, instance) {
+            if (isDueWorkType(twigVars.type)) {
+                var mo = instance.currentMonth + 1,
+                    yr = instance.currentYear;
 
-            requestHeat(mo, yr, function () {
-                applyHeatEverywhere(instance);
-            });
+                requestHeat(mo, yr, function () {
+                    applyHeatEverywhere(instance);
+                });
+            }
         },
-        onValueUpdate: function(selectedDates, dateStr, instance) {
-            var mo = instance.currentMonth + 1,
-                yr = instance.currentYear;
+        onValueUpdate: function (selectedDates, dateStr, instance) {
+            if (isDueWorkType(twigVars.type)) {
+                var mo = instance.currentMonth + 1,
+                    yr = instance.currentYear;
 
-            requestHeat(mo, yr, function () {
-                applyHeatEverywhere(instance);
-            });
+                requestHeat(mo, yr, function () {
+                    applyHeatEverywhere(instance);
+                });
+            }
         }
 
     });
@@ -260,56 +236,65 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
 
     /**
-     * Build cycles dynamically
+     * Build cycles dynamically for all campuses and selected term
      */
     function buildCycles() {
 
-        var selectedCampus = 'campus_' + timetable.campus.find(':selected').val(),
-            daysInCycle = timetable.campus.find(':selected').attr('data-days'),
+        var daysInCycle = timetable.campus.find(':selected').attr('data-days'),
             termDuration = timetable.term.find(':selected').attr('data-duration'),
             selectedTerm = timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
-            termEnd = timetable.term.find(':selected').attr('data-end-date'),
-            monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd)),
-            selectedDate = moment(timetable.submit.attr('data-timetable-value'));
+            termEnd = timetable.term.find(':selected').attr('data-end-date');
 
         // Don't try to divide by zero
         if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
 
             var optionsHtml = '';
+            var activeDate = moment(getTimetablePickerValue(), momentFormats.databaseShort);
 
-            $.each(twigVars.timetableVars[selectedCampus].cycles[selectedTerm], function(index, value) {
+            $.each(twigVars.timetableVars, function (campus, terms) {
+                $.each(terms.cycles[selectedTerm], function (cycle, value) {
 
-                var valueKeys = Object.keys(value);
-                var startDate = moment(value[valueKeys[0]]);
-                var endDate   = moment(value[valueKeys[valueKeys.length - 1]]);
-                var hideClass = 'hide';
+                    var valueKeys = Object.keys(value);
+                    var startDate = moment(value[valueKeys[0]]);
+                    var endDate = moment(value[valueKeys[valueKeys.length - 1]]);
+                    var hideClass = 'hide';
 
-                if (index == 1 && !selectedDate.isBetween(termStart, termEnd, 'day', '[]')) {
-                    // if this date is outside the bounds of the term, display the first week
-                    hideClass = '';
+                    if (cycle == 1 && !activeDate.isBetween(termStart, termEnd, 'day', '[]')) {
+                        // if this date is outside the bounds of the term, display the first week
+                        hideClass = '';
 
-                } else if (selectedDate.isBetween(startDate, endDate, 'day', '[]')) {
-                    // show this week if the selected date is in this week
-                    hideClass = '';
-                }
+                    } else if (activeDate.isBetween(startDate, endDate, 'day', '[]')) {
+                        // show this week if the selected date is in this week
+                        hideClass = '';
+                    }
 
-                optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + index + '" data-cycle-start="' + startDate.format('YYYY-MM-DD') + '" data-cycle-end="' + endDate.format('YYYY-MM-DD') + '">';
-                optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Week</span> ' + index + '</div>';
-                optionsHtml += '<div class="adtp-tt-week-date">' + startDate.format('MMM D') + ' - ' + endDate.format('MMM D') + '</div>';
-                optionsHtml += '</div>';
+                    optionsHtml += '<div class="adtp-tt-week ' + hideClass + '" data-adtp-tt-cycle="' + cycle + '" data-cycle-start="' + startDate.format(momentFormats.databaseShort) + '" data-cycle-end="' + endDate.format(momentFormats.databaseShort) + '" data-parent-campus="' + campus + '" data-parent-term="' + selectedTerm + '">';
+                    optionsHtml += '<div class="adtp-tt-week-number"><span class="adtp-tt-week-bold">Week</span> ' + cycle + '</div>';
+                    optionsHtml += '<div class="adtp-tt-week-date">' + startDate.format('MMM D') + ' - ' + endDate.format('MMM D') + '</div>';
+                    optionsHtml += '</div>';
 
+                });
             });
 
             $byTimetable.find('[data-tt-weeks]').html(optionsHtml);
 
-            addDatesToDays();
+            /**
+             * Reveal one cycle of all just been built
+             */
+            resetCycles();
 
-            // trigger a fetch for any heat data that might be absent
-            for (var year in monthsToFetch) {
-                for (var monthIndex in monthsToFetch[year]) {
-                    requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
+            // For duework requests, trigger a fetch for any heat data that might be absent
+            if (isDueWorkType(twigVars.type)) {
+
+                var monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
+
+                for (var year in monthsToFetch) {
+                    for (var monthIndex in monthsToFetch[year]) {
+                        requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
+                    }
                 }
+
             }
 
             revealTimetable();
@@ -320,6 +305,100 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
     }
 
+    /**
+     * Update selected term
+     */
+    function resetTerms() {
+
+        var activeDate = moment(getTimetablePickerValue(), momentFormats.databaseShort);
+        // Hide all terms
+        timetable.term.val([]);
+
+        timetable.term.find('option').each(function () {
+            var termStart = moment($(this).attr('data-start-date'), momentFormats.databaseShort),
+                termEnd = moment($(this).attr('data-end-date'), momentFormats.databaseShort);
+
+            if (activeDate.isBetween(termStart, termEnd, 'day', '[]')) {
+                $(this).prop('selected', true);
+            }
+        });
+
+        /**
+         * Build cycles for the active term
+         */
+        buildCycles();
+
+    }
+
+    /**
+     * Reveal cycle
+     */
+    function resetCycles() {
+
+        var activeDate = moment(getTimetablePickerValue(), momentFormats.databaseShort),
+            $selectedCampus = timetable.campus.find(':selected'),
+            $selectedTerm = timetable.term.find(':selected'),
+            termStart = moment($selectedTerm.attr('data-start-date'), momentFormats.databaseShort),
+            termEnd = moment($selectedTerm.attr('data-end-date'), momentFormats.databaseShort);
+
+        // Hide all cycles
+        $byTimetable.find('[data-adtp-tt-cycle]').addClass('hide');
+
+        // If the input date falls into the term, check which cycle to select. Otherwise go with the first one.
+        if (activeDate.isBetween(termStart, termEnd, 'day', '[]')) {
+            $byTimetable.find('[data-parent-campus="campus_' + $selectedCampus.val() + '"]').each(function () {
+                $(this).addClass('hide');
+                var cycleStart = moment($(this).attr('data-cycle-start'), momentFormats.databaseShort),
+                    cycleEnd = moment($(this).attr('data-cycle-end'), momentFormats.databaseShort);
+
+                if (activeDate.isBetween(cycleStart, cycleEnd, 'day', '[]')) {
+                    $(this).removeClass('hide');
+                }
+            });
+        }
+        else {
+            $('[data-parent-campus="campus_' + $selectedCampus.val() + '"][data-adtp-tt-cycle= 1]').removeClass('hide');
+        }
+
+        /**
+         * Populate dates for the active cycle
+         */
+        addDatesToDays();
+
+    }
+
+    /**
+     * Hide/display campus related input
+     */
+    function revealByCampus() {
+
+        var selectedCampus = timetable.campus.find(':selected').val();
+
+        // Show the correct days for the selected campus, hide others
+        $byTimetable.find('[data-tt-day]').each(function () {
+            if ($(this).attr('data-campus') == selectedCampus) {
+                $(this).removeClass('hide');
+            } else {
+                $(this).addClass('hide');
+            }
+        });
+
+        // Show the correct period dropdown for the selected campus, hide others
+        $byTimetable.find('[data-tt-period]').each(function () {
+            if ($(this).attr('data-campus') == selectedCampus) {
+                $(this).removeClass('hide');
+            } else {
+                $(this).addClass('hide');
+            }
+        });
+
+        // Update time radios to correct times
+        updateTimeControls($byTimetable.find('[data-tt-period][data-campus=' + selectedCampus + ']'));
+
+        // Reset the selected radio back to the first one
+        $byTimetable.find('[data-adtp-tt-period-start]').prop('checked', true);
+
+    }
 
     /**
      * Show the timetable picker
@@ -359,26 +438,22 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         $byTimetable.find('[data-adtp-tt-error]').removeClass('hide');
     }
 
-
     /**
      * Reset the timetable day selectors
      * Only show selected day as active
+     *
+     * @param date {string}
      */
-    function resetTimetable() {
+    function resetDays() {
 
-        var selectedDate = moment(timetable.submit.attr('data-timetable-value')).format('YYYY-MM-DD'); // The currently selected date
-
-        // Remove selected on all days for a blank slate
+        // Remove selected on all days for a blank state
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
 
-        // Loop through cycle days and check if currently set date matches
-        $byTimetable.find('[data-tt-day]').each(function() {
-            if (selectedDate == $(this).attr('data-date')) {
-                $(this).addClass('selected');
-            }
-        });
-    }
+        var activeDate = moment(getTimetablePickerValue(), momentFormats.databaseShort);
+        $byTimetable.find('[data-date=' + activeDate.format(momentFormats.databaseShort) + ']').addClass('selected');
+        $byTimetable.find('[data-tt-selected-date]').text(activeDate.format(momentFormats.nice));
 
+    }
 
     /**
      * Checks if time is 11:59pm
@@ -387,6 +462,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @returns {boolean}
      */
     function hasTime(value) {
+
         var v = moment(value);
         if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
             return false;
@@ -395,108 +471,58 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             return false;
         }
         return true;
-    }
 
+    }
 
     /**
      * Get event data based on date
      *
-     * @param date
-     * @param target
+     * @param date (database short format)
+     * @param target (calendar | timetable)
      */
     function requestDataByDate(date, target) {
 
-        if (twigVars.type == 'duework') { // Fetch student assessments
+        var urlDate = encodeURIComponent(date);
+
+        setRequestDate(date);
+
+        if (isDueWorkType(twigVars.type)) { // Fetch student assessments
 
             loadingResponse(target);
 
             var folder = $('*[name = "folderId"]').val();
 
-            $.get((twigVars.routeLookup.getDueByDate).replace(/{folderId}/g, folder).replace(/{date}/g, date))
+            $.get((twigVars.routeLookup.getDueByDate).replace(/{folderId}/g, folder).replace(/{date}/g, urlDate))
 
-                .done(function (data) {
-                    appendResponse(data, 'duework', target);
+                .done(function (urlDate) {
+                    appendResponse(urlDate, 'duework', target);
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
                 });
 
             // Pull in events as well
-            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
-                .done(function (data) {
-                    appendResponse(data, 'events', target);
+            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, urlDate))
+                .done(function (urlDate) {
+                    appendResponse(urlDate, 'events', target);
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
                 });
         }
-        else if (twigVars.type == 'event') { // Fetch events
+        else if (isEventType(twigVars.type)) { // Fetch events
 
             loadingResponse(target);
 
-            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
-                .done(function (data) {
-                    appendResponse(data, 'events', target);
+            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, urlDate))
+                .done(function (urlDate) {
+                    appendResponse(urlDate, 'events', target);
                 })
                 .fail(function () {
                     console.log('Failed to retrieve appointments for specified date');
                 });
         }
     }
-
-
-    /**
-     * Get event data based on timetable day
-     *
-     * @param element
-     */
-    function requestDataByDay(element) {
-
-        var day = element.attr('data-tt-day'),
-            date = element.attr('data-date');
-
-        // Update the date data attr on the submit button
-        timetable.submit.attr('data-timetable-value', date);
-
-        if (twigVars.type == 'duework') { // Fetch student assessments
-
-            var folder = $('*[name = "folderId"]').val();
-
-            // Show loader
-            loadingResponse('timetable');
-
-            $.get((twigVars.routeLookup.getDueByDate).replace(/{date}/g, date).replace(/{folderId}/g, folder))
-                .done(function (data) {
-                    appendResponse(data, 'duework', 'timetable');
-                })
-                .fail(function () {
-                    console.log('Failed to retrieve student work for specified day');
-                });
-
-            // Pull in events as well
-            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
-                .done(function (data) {
-                    appendResponse(data, 'events', 'timetable');
-                })
-                .fail(function () {
-                    console.log('Failed to retrieve appointments for specified date');
-                });
-        }
-        else if (twigVars.type == 'event') { // Fetch events
-
-            // Show loader
-            loadingResponse('timetable');
-
-            $.get((twigVars.routeLookup.getByDate).replace(/_date_/g, date))
-                .done(function (data) {
-                    appendResponse(data, 'events', 'timetable');
-                })
-                .fail(function () {
-                    console.log('Failed to retrieve student work for specified day');
-                });
-        }
-    }
-
 
     /**
      * Show loader in response div
@@ -504,9 +530,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param target
      */
     function loadingResponse(target) {
+
         $('#' + target + 'Response' + twigVars.id + '-duework').html('');
         $('#' + target + 'Response' + twigVars.id + '-events').html('');
         $('#' + target + 'Response' + twigVars.id + ' .loader').removeClass('hide');
+
     }
 
 
@@ -522,7 +550,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         var $pickerResponse = $('#' + target + 'Response' + twigVars.id); // The event container
         var $pickerResponseDueWork = $('#' + target + 'Response' + twigVars.id + '-duework');
         var $pickerResponseEvents = $('#' + target + 'Response' + twigVars.id + '-events');
-        var displayDate = moment(data.date).format('MMMM DD, YYYY'); // The selected date in a nice format
         var html = '';
 
         // Clear out any old response display
@@ -599,10 +626,10 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 html += '</div>';
 
             }
-            
+
             $pickerResponseDueWork.append(html);
 
-            $pickerResponse.find('[data-show-full-due]').click(function() {
+            $pickerResponse.find('[data-show-full-due]').click(function () {
                 var listDiv = $(this).data('show-full-due');
                 $(this).parents('[data-adtp-top-due]').addClass('hide');
                 $('#' + listDiv).removeClass('hide');
@@ -610,7 +637,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 $('[data-due-work-title]').text(dictTop5Loaded);
             });
 
-            $pickerResponse.find('[data-hide-full-due]').click(function() {
+            $pickerResponse.find('[data-hide-full-due]').click(function () {
                 var listDiv = $(this).data('hide-full-due');
                 $pickerResponseDueWork.find('[data-adtp-top-due]').removeClass('hide');
                 $('#' + listDiv).addClass('hide');
@@ -653,7 +680,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 eventColor: '#def',
                 height: 0, // Height is calculated below on render
                 defaultDate: moment(data.date),
-                viewRender: function() {
+                viewRender: function () {
                     // Calculate the height available and set it
                     setFullCalendarHeight(target);
                 }
@@ -671,7 +698,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
                 });
 
                 // If it was hidden because the full due work list was expanded (quickly before the calendar loaded)
-                $pickerResponse.find('[data-hide-full-due]').one('click', function() {  // purposefully `one`, not `on`
+                $pickerResponse.find('[data-hide-full-due]').one('click', function () {  // purposefully `one`, not `on`
                     setTimeout(function () {
                         $calendarDiv.fullCalendar('render');
                     }, 80);
@@ -694,9 +721,12 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function changeCycle($button, prev) {
 
-        var $currentWeek = $button.closest('[data-tt-week-selector]').find('[data-adtp-tt-cycle]:visible');
+        var $currentWeek = $button.closest('[data-tt-week-selector]').find('[data-adtp-tt-cycle]:visible'),
+            // Scroll only through the cycles that belong to the same campus
+            currentCampus = $currentWeek.attr('data-parent-campus');
 
-        if ( (prev && $currentWeek.prev().length) || (!prev && $currentWeek.next().length) ) {
+        if ((prev && $currentWeek.prev().length && $currentWeek.prev().attr('data-parent-campus') === currentCampus)
+            || (!prev && $currentWeek.next().length && $currentWeek.next().attr('data-parent-campus') === currentCampus)) {
 
             // Hide the current cycle title
             $currentWeek.addClass('hide');
@@ -710,27 +740,34 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
             $newCycle.removeClass('hide');
 
+            /**
+             * Populate dates for the active cycle
+             */
             addDatesToDays();
-            resetTimetable();
+            applyHeatToTimetable();
 
         }
     }
-
 
     /**
      * Add date data attributes to day selectors on timetable picker
      */
     function addDatesToDays() {
+
         iterateVisibleTimetableDays(
             function (dayMoment) {
-                $(this).attr('data-date', dayMoment.format('YYYY-MM-DD')).removeClass('disabled');
+                $(this).attr('data-date', dayMoment.format(momentFormats.databaseShort)).removeClass('disabled');
             },
             function () {
                 $(this).removeAttr('data-date').addClass('disabled');
             }
         );
-    }
 
+        /**
+         * Check any of the days need to be selected
+         */
+        resetDays();
+    }
 
     /**
      * Iterate the timetable days and apply the given callbacks to them accordingly
@@ -739,10 +776,11 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      * @param {Function} ifNotDate
      */
     function iterateVisibleTimetableDays(ifDate, ifNotDate) {
+
         // Change the date data attributes on each day
-        var cycleNumber    = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle') || 1;
+        var cycleNumber = $byTimetable.find('[data-adtp-tt-cycle]').not('.hide').attr('data-adtp-tt-cycle') || 1;
         var selectedCampus = 'campus_' + timetable.campus.find(':selected').val();
-        var selectedTerm   = timetable.term.find(':selected').val();
+        var selectedTerm = timetable.term.find(':selected').val();
 
         $byTimetable.find('[data-tt-days] > div').each(function () {
 
@@ -760,7 +798,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
             }
         });
     }
-
 
     /**
      * Update the time radios based on what period is selected
@@ -798,7 +835,7 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
         var intervalLength = 0; // Run this immediately (an interval will be set after the first run)
 
-        var calcInterval = setInterval(function() {
+        var calcInterval = setInterval(function () {
 
             var $dueWorkCard = $('#' + target + 'Response' + twigVars.id + '-duework'), // The 'heaviest workload' card (with the 'mini' heading)
                 dueWorkHeightInner = $dueWorkCard.height();                             // Height of the card above, excluding padding & margins
@@ -834,14 +871,13 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function applyHeatToTimetable() {
         iterateVisibleTimetableDays(function (dayMoment) {
-            var yr  = dayMoment.year();
-            var mo  = dayMoment.month() + 1;
+            var yr = dayMoment.year();
+            var mo = dayMoment.month() + 1;
             var day = dayMoment.date();
 
             applyHeatToDay($(this), yr, mo, day);
         });
     }
-
 
     /**
      * Adds heatmap to a month view of flatpickr
@@ -850,25 +886,23 @@ $.fn.alaressDateTimeModal = function(twigVars) {
      */
     function applyHeatToCalendar(instance) {
         // loop through all days and set a heatmap height
-        $(instance.days.childNodes).each(function() {
+        $(instance.days.childNodes).each(function () {
             var dt = $(this)[0].dateObj;
 
             var day = dt.getDate(),
-                mo  = dt.getMonth() + 1,
-                yr  = dt.getUTCFullYear();
+                mo = dt.getMonth() + 1,
+                yr = dt.getUTCFullYear();
 
             applyHeatToDay($(this), yr, mo, day);
         });
     }
-
 
     /**
      * Ergh... the fact that this function even exists.....
      *
      * @param {Flatpickr} instance
      */
-    function applyHeatEverywhere(instance)
-    {
+    function applyHeatEverywhere(instance) {
         applyHeatToCalendar(instance);
         applyHeatToTimetable();
     }
@@ -923,7 +957,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         }
     }
 
-
     /**
      * Retrieve heat data from they server, then apply it according to the onSuccess callback
      *
@@ -972,7 +1005,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
 
     }
 
-
     /**
      * Append a tool tip regarding heatmap
      */
@@ -985,7 +1017,6 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         $monthDiv.append($('<a class="icon-help" />').attr('title', tt));
     }
 
-
     /**
      * Return a collection of years & months for given start and end dates (usually term start and end)
      *
@@ -996,15 +1027,15 @@ $.fn.alaressDateTimeModal = function(twigVars) {
     function interpolateMonths(startMoment, endMoment) {
         var i,
             monthsToFetch = {},
-            startYear  = startMoment.year(),
+            startYear = startMoment.year(),
             startMonth = startMoment.month() + 1,
-            endYear    = endMoment.year(),
-            endMonth   = endMoment.month() + 1
+            endYear = endMoment.year(),
+            endMonth = endMoment.month() + 1
             ;
 
         // these are likely the same, but not a guarantee
         monthsToFetch[startYear] = [];
-        monthsToFetch[endYear]   = [];
+        monthsToFetch[endYear] = [];
 
         if (endMonth < startMonth) {
             // compensate for year-wrapping
@@ -1025,4 +1056,100 @@ $.fn.alaressDateTimeModal = function(twigVars) {
         return monthsToFetch;
     }
 
+    /**
+     * Set value to the timetable picker
+     *
+     * @param date (database short format)
+     */
+    function setTimetablePickerValue(date) {
+
+        var $button = $byTimetable.find('[data-timetable-value]');
+        $button.attr('data-timetable-value', date);
+
+    }
+
+    /**
+     * Get timetable picker value
+     */
+    function getTimetablePickerValue() {
+
+        var $button = $byTimetable.find('[data-timetable-value]');
+        return $button.attr('data-timetable-value');
+
+    }
+
+    /**
+     * Set data request date to the response container
+     *
+     * @param {string} date (database short format)
+     */
+    function setRequestDate(date) {
+
+        var $response = $('#timetableResponse' + twigVars.id);
+        $response.attr('data-adtp-response-date', date);
+
+    }
+
+    /**
+     * Get latest data request date
+     */
+    function getRequestDate() {
+
+        var $response = $('#timetableResponse' + twigVars.id);
+        return $response.attr('data-adtp-response-date');
+
+    }
+
+    /**
+     * Visualise the timetable for a given date
+     */
+    function resetTimetablePicker() {
+
+        if (twigVars.timetable) {
+
+            var timetableDate = moment(getTimetablePickerValue(), momentFormats.databaseShort),
+                activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
+                requestDate = moment(getRequestDate(), momentFormats.databaseShort);
+
+            // The picker value has been changed externally
+            if (timetableDate.diff(activeDate)) {
+                // Set new value
+                setTimetablePickerValue(activeDate.format(momentFormats.databaseShort));
+                // And request data for the new date
+                requestDataByDate(activeDate.format(momentFormats.databaseShort), 'timetable');
+            }
+            // Some data has already been requested
+            else if (requestDate.isValid()) {
+                // But check if the data request needs to be updated
+                if (requestDate.diff(timetableDate)) {
+                    requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
+                }
+                // The data matches the date, don't re-request
+            }
+            else {
+                // Request data for the current timetable value
+                requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
+            }
+
+            resetTerms();
+
+        }
+
+    }
+
+    /**
+     * Check if this is a due work datepicker
+     * @param {string} type - The datepicker type (usually 'event' or 'duework')
+     */
+    function isDueWorkType(type) {
+        return type === 'duework';
+    }
+
+    /**
+     * Check if this is an event datepicker
+     * @param {string} type - The datepicker type (usually 'event' or 'duework')
+     */
+    function isEventType(type) {
+        return type === 'event';
+    }
 };

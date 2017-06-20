@@ -39,6 +39,12 @@ convertFormat = function (format) {
     });
 };
 
+var momentFormats = {
+    database: 'YYYY-MM-DD HH:mm:ss',
+    databaseShort: 'YYYY-MM-DD',
+    nice: 'dddd, MMM D, Y'
+};
+
 //Use global counter in case multiple alaressDateTimePicker() have been called from one page
 
 var pickerCounter = 0;
@@ -187,6 +193,8 @@ function setValue(element, options, state, trigger, date) {
         element.val(v);
     }
 
+    setPickerValue(pId, value);
+
     if (trigger === true) {
         element.trigger('change');
     }
@@ -200,6 +208,29 @@ function setValue(element, options, state, trigger, date) {
     $(element).removeClass('error');
 
 }
+
+/**
+ * Update picker value with date
+ *
+ * @param {number} pickerId
+ * @param {object} date - Moment.js object
+ */
+function setPickerValue(pickerId, date) {
+
+    var newDate = date.isValid() ? date : moment();
+    $("#adtp-modal-" + pickerId).attr('data-datepicker-value', newDate.format(momentFormats.databaseShort));
+
+}
+
+/**
+ * Get picker value as a string
+ *
+ * @param {number} pickerId
+ */
+function getPickerValue(pickerId) {
+    return $("#adtp-modal-" + pickerId).attr('data-datepicker-value');
+}
+
 
 function checkAllDaySwitch(state, pickerId) {
 
@@ -399,21 +430,26 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     element.attr('data-datepicker-id', pickerId);
 
     var modalSize = (options.type == 'event' || options.type == 'duework') ? 'pickerDouble' : 'pickerSingle';
-    $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
+    $('body').append('<div data-reveal id="adtp-modal-' + pickerId + '" data-datepicker-value class="adtp reveal-modal no-pad ' + modalSize + '" data-adtp></div>');
+
+    setPickerValue(pickerId, moment(element.val(), convertFormat(options.displayFormat)));
 
     // Create click event to open the modal for the element
 
     element.change(function () {
+        var inputValue = moment(element.val(), convertFormat(options.displayFormat));
+
         if (window.pickerInstance[pickerId] !== undefined) {
-            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
+            window.pickerInstance[pickerId].setDate(inputValue.toISOString());
         }
+        setPickerValue(pickerId, inputValue);
     });
 
     element
         .on('blur', function (e) {
             massageDateValue(e, options.staller);
         })
-        .on('focus', function() {
+        .on('focus', function () {
             // Temporarily disable JS validation on this field so that it doesn't harass the user that
             // things like 'today' aren't valid dates
             disableValidation(element);
@@ -430,7 +466,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var originalValue;
 
         if (element.val().length > 0) {
-            originalValue = moment( element.val(), convertFormat(options.displayFormat));
+            originalValue = moment(element.val(), convertFormat(options.displayFormat));
         }
         // if no value has been passed, use today
         else {
@@ -457,7 +493,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             // if datetime, pass date only
             // AJAX in the modal contents if they haven't already been loaded
-            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format('YYYY-MM-DD HH:mm:ss')), function () {
+            $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format(momentFormats.database)), function () {
 
                 // Capture open of modal
                 $(document).on('opened.fndtn.reveal', '#adtp-modal-' + pickerId, function () {
