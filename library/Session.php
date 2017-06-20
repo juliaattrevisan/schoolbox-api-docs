@@ -509,7 +509,7 @@ class Session
 
                                 if ($cat instanceof Folder) {
                                     if (Access::getInstance()->getFolderAccess($_SESSION['user'],
-                                            [$cat->getId()]) >= UserAccess::ACCESS_READ
+                                            $cat->getId()) >= UserAccess::ACCESS_READ
                                     ) {
                                         if (!in_array($cat->getId(), $subjectIDList)) {
                                             $subject['id'] = $cat->getId();

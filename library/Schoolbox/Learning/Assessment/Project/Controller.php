@@ -202,7 +202,7 @@ class Controller extends Assessment\Controller
         $subActivities = $project->getAssessables();
 
         // obtain user access level
-        $access = $this->getAccess()->getFolderAccess($this->getUser(), [ $project->getBaseContext()->getFolder()->getId() ]);
+        $access = $this->getAccess()->getFolderAccess($this->getUser(), $project->getBaseContext()->getFolder()->getId());
 
         if ($access < UserAccess::ACCESS_WRITE) {
             // if you have read or less, you have additional restrictions
@@ -295,7 +295,7 @@ class Controller extends Assessment\Controller
         $subActivities = $project->getAssessables();
 
         // obtain user access level
-        $access = $this->getAccess()->getFolderAccess($this->getUser(), [ $project->getBaseContext()->getFolder()->getId() ]);
+        $access = $this->getAccess()->getFolderAccess($this->getUser(), $project->getBaseContext()->getFolder()->getId());
 
         if ($access < UserAccess::ACCESS_WRITE) {
             // if you have read or less, you have additional restrictions

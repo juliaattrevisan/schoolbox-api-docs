@@ -49,7 +49,7 @@ class Visibility
      */
     public function isVisibleToUser(IAssessable $assessment, User $user, $showClosed)
     {
-        $folderAccessLevel = $this->getAccess()->getFolderAccess($user, [$assessment->getBaseContext()->getFolder()->getId()]);
+        $folderAccessLevel = $this->getAccess()->getFolderAccess($user, $assessment->getBaseContext()->getFolder()->getId());
 
         // Are we hiding assessments past their close date and we are past the close date ?
         if (!$showClosed && !$assessment->getCloseAt()->isNull() && $assessment->isPastClose()){

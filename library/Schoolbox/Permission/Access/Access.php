@@ -27,7 +27,9 @@ class Access
     /**
      * Cache folder access calls
      *
-     * @var array
+     * Indexed by user.id, then folder.id
+     *
+     * @var int[][]
      */
     protected $cachedFolderAccess = [];
 
@@ -65,7 +67,7 @@ class Access
      */
     public function isInstructor(User $user, Folder $folder)
     {
-        return $this->getFolderAccess($user, [$folder->getId()]) >= UserAccess::ACCESS_WRITE;
+        return $this->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_WRITE;
     }
 
     /**
@@ -79,102 +81,120 @@ class Access
      */
     public function isLearner(User $user, Folder $folder)
     {
-        return $this->getFolderAccess($user, [$folder->getId()]) == UserAccess::ACCESS_READ;
+        return $this->getFolderAccess($user, $folder->getId()) == UserAccess::ACCESS_READ;
     }
 
 
     /**
-     * @param User $user
-     * @param array $folderIds
-     * @param bool $cache Whether to use cached results or get them from DB again
+     * Returns the minimum access level across the collection of specified folders. Checks perms from:
+     * * CMS
+     * * GROUP
+     * * ROLE
+     *
+     * @param User  $user
+     * @param int[] $folderIds
+     * @param bool  $cache
      * @return int
      */
-    public function getFolderAccess(User $user, array $folderIds, $cache = true)
+    public function getMinFolderAccess(User $user, array $folderIds, $cache = true)
     {
+        if (0 === count($folderIds)) {
+            // Technically could throw an InvalidArgException, but this simplifies callers' code.
+            return UserAccess::ACCESS_DENY;
+        }
 
-
-        // Superusers always have full access
-
+        // Intentionally ordered after the empty array check. Not even SU's have an access level to the void.
         if ($user->isSuperuser()) {
             return UserAccess::ACCESS_FULL;
         }
 
+        // We must iterate all, rather than from index 1+ (ie fencepost alg.) to robustly account for different indexing
+        $minAccess = null;
+        foreach ($folderIds as $folderId) {
+            $accessLevel = $this->getFolderAccess($user, $folderId, $cache);
+
+            // Short-circuit if any level is DENY. Cannot get less than this.
+            if(UserAccess::ACCESS_DENY === $accessLevel) {
+                return UserAccess::ACCESS_DENY;
+            }
+
+            // First iteration ?
+            $minAccess = null === $minAccess ? $accessLevel : min($minAccess, $accessLevel);
+        }
+
+        return $minAccess;
+    }
+
+    /**
+     * Return the specified user's access level for the given folder, respects permissions:
+     * * CMS
+     * * GROUP
+     * * ROLE
+     *
+     * @param User $user
+     * @param int  $folderId
+     * @param bool $cache Whether to use cached results or get them from DB again
+     * @return int
+     */
+    public function getFolderAccess(User $user, $folderId, $cache = true)
+    {
+        // Superusers always have full access
+        if ($user->isSuperuser()) {
+            return UserAccess::ACCESS_FULL;
+        }
+
+        /** @var int[] $accessLevels Derived from different permission systems */
         $accessLevels = [];
 
         /* check cache before we proceed for shortcuts */
-        if($cache && count($folderIds) == 1 && isset($this->cachedFolderAccess[$user->getId()][$folderIds[0]])){
-            return $this->cachedFolderAccess[$user->getId()][$folderIds[0]];
+        if($cache && isset($this->cachedFolderAccess[$user->getId()][$folderId])){
+            return $this->cachedFolderAccess[$user->getId()][$folderId];
         }
 
-        // Check CMS access level
+        // Check CMS service access level
+        $userAccessMapper = UserAccessMapper::getInstance();
+        try {
+            /* Note there is no folderId specified for the CMS service. The effect of this is that if the user
+             * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
+             * We don't need to cache the value locally, we can rely on the Query Cache to do it for us.
+             */
+            $groupAccessLevel = $userAccessMapper->getAccess($user, null, UserAccess::SERVICE_CMS)->getAccessLevel();
+            $accessLevels[] = $groupAccessLevel;
 
-        try
-        {
-            if(!isset($this->cachedFolderAccess[$user->getId()][0]) ) {
-                $accessLevels[] = UserAccessMapper::getInstance()
-                    ->getAccess($user, null, UserAccess::SERVICE_CMS)
-                    ->getAccessLevel();
-
-                // Short-circuit if access is full
-                if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
-                    $this->cachedFolderAccess[$user->getId()][0] = UserAccess::ACCESS_FULL;
-                    return UserAccess::ACCESS_FULL;
-                }
-            }
-            else if( $this->cachedFolderAccess[$user->getId()][0] == UserAccess::ACCESS_FULL ) {
-                // Cached full access found
+            // Short-circuit if full access
+            if (UserAccess::ACCESS_FULL === $groupAccessLevel) {
+                $this->cachedFolderAccess[$user->getId()][$folderId] = UserAccess::ACCESS_FULL;
                 return UserAccess::ACCESS_FULL;
             }
-            else {
-                // cms access cached as denied, falling through to next check
-            }
-        }
-        catch (Mapper\Exception $e)
-        {
-            $this->cachedFolderAccess[$user->getId()][0] = UserAccess::ACCESS_DENY;
+        } catch (Mapper\Exception $e) {
+            $accessLevels[] = UserAccess::ACCESS_DENY;
         }
 
-        if (count($folderIds) != 1) {
-            $accessLevels[] = UserAccessMapper::getInstance()
-                ->userHasMinimumAccessToAll($user->getId(), $folderIds, UserAccess::ACCESS_WRITE)
-                ? UserAccess::ACCESS_WRITE
-                : UserAccess::ACCESS_DENY;
-        } else {
-            // Check user access level
-            try
-            {
-                $accessLevels[] = UserAccessMapper::getInstance()
-                    ->getAccess($user, $folderIds[0], UserAccess::SERVICE_HOMEPAGE, $cache)
-                    ->getAccessLevel();
+        // Check Group access level
+        try {
+            $groupAccessLevel = $userAccessMapper->getAccess($user, $folderId, UserAccess::SERVICE_HOMEPAGE)->getAccessLevel();
+            $accessLevels[] = $groupAccessLevel;
 
-                // Short-circuit if access is full
-
-                if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
-                        $this->cachedFolderAccess[$user->getId()][$folderIds[0]] = UserAccess::ACCESS_FULL;
-                        return UserAccess::ACCESS_FULL;
-                }
-            } catch (Mapper\Exception $e) {
-                // Noop
+            // Short-circuit if full access
+            if (UserAccess::ACCESS_FULL === $groupAccessLevel) {
+                $this->cachedFolderAccess[$user->getId()][$folderId] = UserAccess::ACCESS_FULL;
+                return UserAccess::ACCESS_FULL;
             }
-
-            // Check role access level
-
-            try {
-                $accessLevels[] = RoleAccessMapper::getInstance()
-                    ->getAccess($user, $folderIds[0], $cache)
-                    ->getType();
-            } catch (Mapper\Exception $e) {
-                // Noop
-            }
+        } catch (Mapper\Exception $e) {
+            $accessLevels[] = UserAccess::ACCESS_DENY;
         }
 
-        if (empty($accessLevels)) {
-            $this->cachedFolderAccess[$user->getId()][$folderIds[0]] = UserAccess::ACCESS_DENY;
-            return UserAccess::ACCESS_DENY;
+
+        // Check role access level
+        $roleAccessMapper = RoleAccessMapper::getInstance();
+        try {
+            $roleAccessLevel = $roleAccessMapper->getAccess($user, $folderId, $cache)->getType();
+            $accessLevels[] = $roleAccessLevel;
+        } catch (Mapper\Exception $e) {
+            $accessLevels[] = UserAccess::ACCESS_DENY;
         }
 
         $maxLevel = max($accessLevels);
-        return $this->cachedFolderAccess[$user->getId()][$folderIds[0]] = $maxLevel;
-
+        return $this->cachedFolderAccess[$user->getId()][$folderId] = $maxLevel;
     }
 }

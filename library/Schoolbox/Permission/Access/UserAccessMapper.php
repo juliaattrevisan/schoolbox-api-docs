@@ -584,10 +584,10 @@ class UserAccessMapper extends Mapper
 
 
     /**
-     * @param User $user
-     * @param int  $serviceIdentifier
-     * @param int  $service
-     * @param bool $cache
+     * @param User     $user
+     * @param null|int $serviceIdentifier
+     * @param int      $service
+     * @param bool     $cache
      * @return UserAccess
      * @throws Mapper\Exception
      */

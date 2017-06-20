@@ -43,7 +43,7 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         $this->setContextPermission(UserAccess::ACCESS_FULL);
 
         if($this->isUsingAltSource()){
-            $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(),[$this->getSource()->getId()]), $this->getMaximumPermission()));
+            $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(),$this->getSource()->getId()), $this->getMaximumPermission()));
         } else {
             $this->setContentPermission(UserAccess::ACCESS_FULL);
         }

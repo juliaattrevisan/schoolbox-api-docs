@@ -94,7 +94,7 @@ class RubricContext
         ];
 
         // Hide total mark from students and parents
-        $accessLevel = $access->getFolderAccess($currentUser, [ $dueWork->getBaseContext()->getFolder()->getId() ]);
+        $accessLevel = $access->getFolderAccess($currentUser, $dueWork->getBaseContext()->getFolder()->getId());
         if ($accessLevel < UserAccess::ACCESS_WRITE) {
             unset($context['rubric']['total']);
         }

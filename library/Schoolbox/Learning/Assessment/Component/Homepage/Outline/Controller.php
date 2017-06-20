@@ -140,8 +140,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 if (isset($assessments[$unitImpl->getId()])) {
                     $unitImpl->setAssessables($assessments[$unitImpl->getId()]);
                 }
-//                $unitId = $unitImpl->getSpecification()->getFolder()->getId();
-//                $this->accessList[$unitId] = Access::getInstance()->getFolderAccess($this->getUser(), [$unitId]);
+//                $unitFolderId = $unitImpl->getSpecification()->getFolder()->getId();
+//                $this->accessList[$unitId] = Access::getInstance()->getFolderAccess($this->getUser(), $unitFolderId);
             }
 
             // TODO get permissions working, I guess

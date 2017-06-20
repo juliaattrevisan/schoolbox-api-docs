@@ -87,7 +87,7 @@ class Node extends AbstractNode
      */
     protected function hasPermission($nodeId, $minimumLevel)
     {
-        return $this->getAccess()->getFolderAccess($_SESSION['user'], [$nodeId]) >= $minimumLevel;
+        return $this->getAccess()->getFolderAccess($_SESSION['user'], $nodeId) >= $minimumLevel;
     }
 
 
