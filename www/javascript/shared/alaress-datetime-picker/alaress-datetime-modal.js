@@ -1139,6 +1139,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     /**
      * Check if this is a due work datepicker
+     * @param {string} type - The datepicker type (usually 'event' or 'duework')
      */
     function isDueWorkType(type) {
         return type === 'duework';
@@ -1146,6 +1147,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     /**
      * Check if this is an event datepicker
+     * @param {string} type - The datepicker type (usually 'event' or 'duework')
      */
     function isEventType(type) {
         return type === 'event';
