@@ -13,12 +13,11 @@ namespace Schoolbox\Calendar\Event;
 
 use Schoolbox\Campus;
 use Schoolbox\User;
-use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Calendar\Relation\Category as RelationCategory;
+use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Access
 {
@@ -95,10 +94,9 @@ class Access
          */
         if ($event->isGroupLevel()) {
 
-            $userAccessMapper = UserAccessMapper::getInstance();
-
             /* Loop through the groups selected for this event
              */
+            $groupIds = [];
             foreach ($groups as $group) {
 
                 if ($group instanceof RelationCategory) {
@@ -106,23 +104,11 @@ class Access
                 } else {
                     $groupId = $group;
                 }
+                $groupIds[] = $groupId;
+            }
 
-                try {
-                    $access = $userAccessMapper->getAccess($user, $groupId);
-                    /* TODO: write access should only be able to edit if they
-                     * are author or owner. The logic to show the modify button
-                     * will need to change first
-                     */
-                    if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
-                        return true;
-                    }
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    /* User didn't have access for this group but might
-                     * for another one in this loop
-                     */
-                }
-
-
+            if (FolderAccess::getInstance()->getMinFolderAccess($user, $groupIds) >= UserAccess::ACCESS_WRITE) {
+                return true;
             }
         }
 
