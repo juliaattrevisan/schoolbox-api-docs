@@ -40,10 +40,10 @@ convertFormat = function (format) {
 };
 
 var momentFormats = {
-        database: 'YYYY-MM-DD HH:mm:ss',
-        databaseShort: 'YYYY-MM-DD',
-        nice: 'dddd, MMM D, Y'
-    };
+    database: 'YYYY-MM-DD HH:mm:ss',
+    databaseShort: 'YYYY-MM-DD',
+    nice: 'dddd, MMM D, Y'
+};
 
 //Use global counter in case multiple alaressDateTimePicker() have been called from one page
 
@@ -448,7 +448,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         .on('blur', function (e) {
             massageDateValue(e, options.staller);
         })
-        .on('focus', function() {
+        .on('focus', function () {
             // Temporarily disable JS validation on this field so that it doesn't harass the user that
             // things like 'today' aren't valid dates
             disableValidation(element);
@@ -465,7 +465,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var originalValue;
 
         if (element.val().length > 0) {
-            originalValue = moment( element.val(), convertFormat(options.displayFormat));
+            originalValue = moment(element.val(), convertFormat(options.displayFormat));
         }
         // if no value has been passed, use today
         else {
