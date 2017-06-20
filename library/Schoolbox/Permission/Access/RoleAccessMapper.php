@@ -61,33 +61,32 @@ class RoleAccessMapper extends Mapper
     {
         $roleMapper = $this->getJoinMapper('role');
 
-        // Get permissions for all roles, regardless of whether there's one in
-        // the database for this category.
+        $builder = $this->getPredicateBuilder();
+        $builder->equals('ra.cid', $category->getId());
+        $whereClause = implode(' AND ', $builder->getWhere());
+
+        // Get all permissions for the specified folder
         $query = "
             SELECT
                 {$this->getColumnString('ra')},
                 {$this->getJoinColumnString('role', 'r')}
-            FROM `{$roleMapper->getTable()}` `r`
-            LEFT JOIN {$this->getTable()} `ra` ON r.id=ra.gid AND ra.cid=:categoryId
+            FROM {$this->getTable()} `ra`
+            JOIN `{$roleMapper->getTable()}` `r` ON r.id = ra.gid
+            WHERE {$whereClause}
             ORDER BY r.id
         ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute(array(
-            'categoryId' => $category->getId()
-        ));
+        $statement->execute($builder->getParams());
 
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $roleAccess = $this->hydrate($row, 'ra');
             $role = $roleMapper->hydrate($row, 'r');
-            if($roleAccess && $role){
-                $roleAccess->setRole($role);
-                $collection->add($roleAccess);
-            }
+            $roleAccess->setRole($role);
+            $collection->add($roleAccess);
         }
-
         return $collection;
     }
 
