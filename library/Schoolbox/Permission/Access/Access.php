@@ -107,9 +107,14 @@ class Access
         $minAccess = null;
         foreach ($folderIds as $folderId) {
             $accessLevel = $this->getFolderAccess($user, $folderId, $cache);
-            $minAccess   = null === $minAccess
-                ? $accessLevel
-                : min($minAccess, $accessLevel);
+
+            // Short-circuit if any level is DENY. Cannot get less than this.
+            if(UserAccess::ACCESS_DENY === $accessLevel) {
+                return UserAccess::ACCESS_DENY;
+            }
+
+            // First iteration ?
+            $minAccess = null === $minAccess ? $accessLevel : min($minAccess, $accessLevel);
         }
 
         return $minAccess;
