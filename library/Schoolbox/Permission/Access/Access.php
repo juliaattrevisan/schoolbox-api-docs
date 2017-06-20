@@ -149,6 +149,10 @@ class Access
         // Check CMS service access level
         $userAccessMapper = UserAccessMapper::getInstance();
         try {
+            /* Note there is no folderId specified for the CMS service. The effect of this is that if the user
+             * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
+             * We don't need to cache the value locally, we can rely on the Query Cache to do it for us.
+             */
             $groupAccessLevel = $userAccessMapper->getAccess($user, null, UserAccess::SERVICE_CMS)->getAccessLevel();
             $accessLevels[] = $groupAccessLevel;
 
