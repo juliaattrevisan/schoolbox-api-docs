@@ -83,9 +83,9 @@ class Component extends Filter\AbstractComponent
             $unitSpec->getCourse()->getUnits()->setOffset($unitSpec->getId(), $unitSpec);
         }
 
-        // Sort unitSpecs inside courseSpecs by unitSpec.folder.name
+        // Sort unitSpecs inside courseSpecs by unitSpec.id
         foreach ($this->courseSpecs as $courseSpec) {
-            $courseSpec->getUnits()->sortBy('title', 'ASC', null, true);
+            $courseSpec->getUnits()->sortBy('id', 'ASC', null, true);
         }
 
         // Sort Courses by title
