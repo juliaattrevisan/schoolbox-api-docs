@@ -244,13 +244,14 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             termDuration = timetable.term.find(':selected').attr('data-duration'),
             selectedTerm = timetable.term.find(':selected').val(),
             termStart = timetable.term.find(':selected').attr('data-start-date'),
-            termEnd = timetable.term.find(':selected').attr('data-end-date'),
-            activeDate = moment(getTimetablePickerValue(), momentFormats.databaseShort);
+            termEnd = timetable.term.find(':selected').attr('data-end-date');
 
         // Don't try to divide by zero
         if ((daysInCycle !== undefined && daysInCycle > 0) && (termDuration !== undefined && termDuration > 0)) {
 
             var optionsHtml = '';
+            var activeDate = moment(getTimetablePickerValue(), momentFormats.databaseShort);
+
             $.each(twigVars.timetableVars, function (campus, terms) {
                 $.each(terms.cycles[selectedTerm], function (cycle, value) {
 
@@ -283,15 +284,17 @@ $.fn.alaressDateTimeModal = function (twigVars) {
              */
             resetCycles();
 
-            var monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
-
             // For duework requests, trigger a fetch for any heat data that might be absent
             if (isDueWorkType(twigVars.type)) {
+
+                var monthsToFetch = interpolateMonths(moment(termStart), moment(termEnd));
+
                 for (var year in monthsToFetch) {
                     for (var monthIndex in monthsToFetch[year]) {
                         requestHeat(monthsToFetch[year][monthIndex], year, applyHeatToTimetable);
                     }
                 }
+
             }
 
             revealTimetable();
