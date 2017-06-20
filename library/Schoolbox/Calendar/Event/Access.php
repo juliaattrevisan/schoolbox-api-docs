@@ -107,7 +107,7 @@ class Access
                 $groupIds[] = $groupId;
             }
 
-            if (FolderAccess::getInstance()->getFolderAccess($user, $groupIds) >= UserAccess::ACCESS_WRITE) {
+            if (FolderAccess::getInstance()->getMinFolderAccess($user, $groupIds) >= UserAccess::ACCESS_WRITE) {
                 return true;
             }
         }
