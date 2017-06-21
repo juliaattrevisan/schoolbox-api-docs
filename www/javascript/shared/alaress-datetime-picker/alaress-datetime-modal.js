@@ -37,6 +37,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var timetable = {
         campus: $byTimetable.find('[data-adtp-tt-campus]'),
         term: $byTimetable.find('[data-adtp-tt-term]'),
+        period: $byTimetable.find('[data-adtp-tt-period]'),
         submit: $byTimetable.find('[data-adtp-tt-submit]')
     };
 
@@ -54,6 +55,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Set initial value to the timetable picker
         setTimetablePickerValue(initialDate);
         resetTimetablePicker();
+        renderAllDayOption();
 
         // Listen for changes to campus
         timetable.campus.change(function () {
@@ -804,6 +806,17 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 ifNotDate.call(this);
             }
         });
+    }
+
+    /**
+     * If the input supports All Day, add this option to the period selector
+    */
+    function renderAllDayOption() {
+        if (pickerOptions.allDaySwitch === true) {
+            timetable.period.each(function () {
+                $(this).prepend('<option value="allday">All Day</option>');
+            });
+        }
     }
 
     /**
