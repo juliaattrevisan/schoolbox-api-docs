@@ -42,6 +42,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     // Listen for the modal open
     $(document).on('open.fndtn.reveal', $modal, function () {
+        updateCalendarResponse();
         resetTimetablePicker();
     });
 
@@ -484,7 +485,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         var urlDate = encodeURIComponent(date);
 
-        setRequestDate(date);
+        setRequestDate(date, target);
 
         if (isDueWorkType(twigVars.type)) { // Fetch student assessments
 
@@ -1082,20 +1083,23 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * Set data request date to the response container
      *
      * @param {string} date (database short format)
+     * @param {string} target (calendar | timetable)
      */
-    function setRequestDate(date) {
+    function setRequestDate(date, target) {
 
-        var $response = $('#timetableResponse' + twigVars.id);
+        var $response = $('#' + target + 'Response' + twigVars.id);
         $response.attr('data-adtp-response-date', date);
 
     }
 
     /**
-     * Get latest data request date
+     * Get date for the latest data request
+     *
+     * @param {string} target (calendar | timetable)
      */
-    function getRequestDate() {
+    function getRequestDate(target) {
 
-        var $response = $('#timetableResponse' + twigVars.id);
+        var $response = $('#' + target + 'Response' + twigVars.id);
         return $response.attr('data-adtp-response-date');
 
     }
@@ -1107,32 +1111,53 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         if (twigVars.timetable) {
 
-            var timetableDate = moment(getTimetablePickerValue(), momentFormats.databaseShort),
-                activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
-                requestDate = moment(getRequestDate(), momentFormats.databaseShort);
-
-            // The picker value has been changed externally
-            if (timetableDate.diff(activeDate)) {
-                // Set new value
-                setTimetablePickerValue(activeDate.format(momentFormats.databaseShort));
-                // And request data for the new date
-                requestDataByDate(activeDate.format(momentFormats.databaseShort), 'timetable');
-            }
-            // Some data has already been requested
-            else if (requestDate.isValid()) {
-                // But check if the data request needs to be updated
-                if (requestDate.diff(timetableDate)) {
-                    requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
-                }
-                // The data matches the date, don't re-request
-            }
-            else {
-                // Request data for the current timetable value
-                requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
-            }
-
+            updateTimetableResponse();
             resetTerms();
 
+        }
+
+    }
+
+    /**
+     * Update requested data for the currently active date (in calendar picker)
+     */
+    function updateCalendarResponse() {
+
+        var activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
+            requestDate = moment(getRequestDate('calendar'), momentFormats.databaseShort);
+        if (requestDate.diff(activeDate)) {
+            requestDataByDate(activeDate.format(momentFormats.databaseShort), 'calendar');
+        }
+
+    }
+
+    /**
+     * Update requested data for the currently active date (in timetable picker)
+     */
+    function updateTimetableResponse() {
+
+        var timetableDate =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
+            activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
+            requestDate = moment(getRequestDate('timetable'), momentFormats.databaseShort);
+
+        // The picker value has been changed externally
+        if (timetableDate.diff(activeDate)) {
+            // Set new value
+            setTimetablePickerValue(activeDate.format(momentFormats.databaseShort));
+            // And request data for the new date
+            requestDataByDate(activeDate.format(momentFormats.databaseShort), 'timetable');
+        }
+        // Some data has already been requested
+        else if (requestDate.isValid()) {
+            // But check if the data request needs to be updated
+            if (requestDate.diff(timetableDate)) {
+                requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
+            }
+            // The data matches the date, don't re-request
+        }
+        else {
+            // Request data for the current timetable value
+            requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
         }
 
     }
