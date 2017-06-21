@@ -80,16 +80,20 @@
 
 
     /**
-     * Validator for a datepicker (format: dd/mm/yyyy)
+     * Validator for a datepicker (format: local date  | local datetime)
      */
     $.validator.addMethod('datepickerDate', function(value, element) {
 
         var datepickerMoment;
 
-        if (typeof $(element).attr('data-datepicker-time') == 'undefined') { // Date only field
-            datepickerMoment = moment(value, dateDisplayFormats.momentJs, true);
-        } else {
-            datepickerMoment = moment(value, dateDisplayFormats.momentJsDatetime, true);
+        // If the field is date only or allday event value is on
+        if (typeof $(element).attr('data-datepicker-time') == 'undefined' ||
+            $('#'+$(element).attr('data-datepicker-alldayinput')).val() == 1
+        ) {
+            datepickerMoment = moment(value, dateDisplayFormats.momentJs, true); // Date
+        }
+        else {
+            datepickerMoment = moment(value, dateDisplayFormats.momentJsDatetime, true); // Datetime
         }
 
         return datepickerMoment.isValid();
