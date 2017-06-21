@@ -10,11 +10,9 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\GenericCollection;
 
 /**
  * No conversion. A int is converted to the same int (representing a folder.id)
- * @method null|Collection|int[] getSelectedItems(GenericCollection $availableSelections = null)
  */
 abstract class KeyConverter extends AbstractKeyConverter
 {

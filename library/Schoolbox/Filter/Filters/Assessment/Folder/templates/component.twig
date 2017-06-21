@@ -1,0 +1,21 @@
+{# Implementation common to folder filters #}
+
+{% extends '@filters/_component.twig' %}
+
+{% block scripts %}
+    <script>
+        $(function() {
+
+            var $component = $('[data-component="{{ definition.filter.id }}"]');
+
+            // Ensure if a folder is both a class and a group, they are either both selected, or neither selected
+            // This solves issue of later checkedState clobbering first.
+            $component.on('change', 'input[type=checkbox]', function(){
+                var $checkbox    = $(this);
+                var checkedState = $checkbox.prop('checked');
+                var filter_key   = $checkbox.data('duplicate-checkbox');
+                $component.find('input[type=checkbox][data-duplicate-checkbox=' + filter_key + ']').prop('checked', checkedState);
+            });
+        });
+    </script>
+{% endblock %}

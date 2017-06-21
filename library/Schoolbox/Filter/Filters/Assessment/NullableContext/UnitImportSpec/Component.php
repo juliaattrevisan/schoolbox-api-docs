@@ -83,9 +83,9 @@ class Component extends Filter\AbstractComponent
             $unitSpec->getCourse()->getUnits()->setOffset($unitSpec->getId(), $unitSpec);
         }
 
-        // Sort unitSpecs inside courseSpecs by unitSpec.folder.name
+        // Sort unitSpecs inside courseSpecs by unitSpec.id
         foreach ($this->courseSpecs as $courseSpec) {
-            $courseSpec->getUnits()->sortBy('title', 'ASC', null, true);
+            $courseSpec->getUnits()->sortBy('id', 'ASC', null, true);
         }
 
         // Sort Courses by title
@@ -112,7 +112,7 @@ class Component extends Filter\AbstractComponent
 
             $selected = $option->getDefaults()[$roleType]->getSelected();
 
-            // Is this the 'On Folder' abstract option?
+            // Is this the '(none)' abstract option?
             if (Definition::KEY_NONE === $option->getKey()) {
                 $key                       = $option->getKey();
                 $availableSelections[$key] = $this->createSelection($key, $selected);

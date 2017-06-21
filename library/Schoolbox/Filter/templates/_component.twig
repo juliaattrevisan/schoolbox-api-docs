@@ -7,26 +7,40 @@
         userSelections:     Filter\Selection\Model[] - A set of filter selections made by the current user, indexed by selection.key
 #}
 
-{# Are any options available? #}
-{% if 0 == roleSelections | length %}
-    {# By default, no available concrete options would mean no entities ever match #}
-    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
-{% else %}
+<div class="checklist filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
 
-    {# Concrete component template to define #}
-    {% set filterName = filterName ?: 'undefined' %}
+    {{ block('scripts') }}
 
-    <div class="checklist" data-component="{{ definition.filter.id }}" {% if isUserConfigurable %}style="margin: 0 15px; min-width: 100px;"{% endif %}>
+    {% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %}
 
-        {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}</h4>{% endif %}
+    {% if isUserConfigurable %}
+        <h4 data-filter-name>{{ block('filterName') }}{% if isDisabled %}<span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>{% endif %}</h4>
+    {% endif %}
 
-        {% for selection in roleSelections %}
-            {% include '@filters/_selectionCheckbox.twig' with {
-                roleSelection:      selection,
-                userSelection:      userSelections[selection.key],
-                label:              definition.label(selection.key)
-            } only %}
-        {% endfor %}
-    </div>
-{% endif %}
+    {# Are any options available? #}
+    {% if 0 == roleSelections | length %}
+        {# By default, no available concrete options would mean no entities ever match #}
+        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
+
+        {% if isUserConfigurable %}
+            <div class="empty-state">
+                <i class="icon-info"></i>
+                <p>No options available. No results possible.<br>
+                Please contact your administrator if you think this is in error.
+                </p>
+            </div>
+        {% endif %}
+    {% else %}
+        {% block userOptions %}
+            {% for selection in roleSelections %}
+                {% include '@filters/_selectionCheckbox.twig' with {
+                    roleSelection:      selection,
+                    userSelection:      userSelections[selection.key],
+                    label:              definition.label(selection.key),
+                    disabled:           isDisabled
+                } only %}
+            {% endfor %}
+        {% endblock %}
+    {% endif %}
+</div>
 

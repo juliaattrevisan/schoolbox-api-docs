@@ -73,8 +73,10 @@ class Factory extends Filter\AbstractFactory
      */
     protected function buildKeyConverterArgs(Filter\Model $filter)
     {
+        $workTypeIds = $this->getWorkTypes()->getColumnValues('id');
+
         return array_merge(parent::buildKeyConverterArgs($filter), [
-            'workTypes' => $this->getWorkTypes(),
+            'workTypes' => new Collection(array_combine($workTypeIds, $workTypeIds)),
         ]);
     }
 

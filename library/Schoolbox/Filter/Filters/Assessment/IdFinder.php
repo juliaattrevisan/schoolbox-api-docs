@@ -8,8 +8,6 @@
 namespace Schoolbox\Filter\Filters\Assessment;
 
 use Schoolbox\Collection;
-use Schoolbox\Assessment\Term;
-use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
 use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
@@ -81,14 +79,14 @@ class IdFinder extends Filter\AbstractIdFinder
         $termsDue       = $completeFilters[TermFilter\Due\Definition::class];
         $termsClose     = $completeFilters[TermFilter\Close\Definition::class];
         $weightings     = $completeFilters[WeightingType\Definition::class];
-        $workTypes      = $completeFilters[WorkTypeFilter\Definition::class];
+        $workTypeIds    = $completeFilters[WorkTypeFilter\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)               = $this->getClauseAType($aTypes);
         list($temporalWhere, $temporalParams)       = $this->getClauseTemporalState($temporalStates);
         list($termDJoin, $termDWhere, $termDParams) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         list($termCJoin, $termCWhere, $termCParams) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams)     = $this->getClauseWeighting($weightings);
-        list($workTypeWhere,  $workTypeParams)      = $this->getClauseWorkType($workTypes);
+        list($workTypeWhere,  $workTypeParams)      = $this->getClauseWorkType($workTypeIds);
         list($deletedWhere)                         = $this->getClauseDeleted($deleted);
 
         // Merge all the params
@@ -528,16 +526,16 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'TermClose' filter
      *
-     * @param Collection|Term\Model[] $terms      (can also be NULL, but storm doesn't like that type-hint)
-     * @param string                  $dateColumn ['due_date'|'close_date']
+     * @param Collection|int[] $termIds    (can also be NULL, but storm doesn't like that type-hint)
+     * @param string           $dateColumn ['due_date'|'close_date']
      * @return string[]
      * @throws Filter\BrokenFilterException If filter cannot be constructed
      * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
      */
-    private function getClauseTerm(Collection $terms = null, $dateColumn)
+    private function getClauseTerm(Collection $termIds = null, $dateColumn)
     {
         // Is this filter being applied ?
-        if (null === $terms) {
+        if (null === $termIds) {
             return ['', 'TRUE', []];
         }
 
@@ -548,13 +546,16 @@ class IdFinder extends Filter\AbstractIdFinder
         // Term alias
         $t = $dateColumn === self::DATE_COL_DUE ? 'td' : 'tc';
 
+        // Note the +1 for the actual finish date. This is because `term.actual_finish` is date only, whereas assessment dates
+        // include a time component. If assessment is due at 11pm on the 10th, and term finishes on the 10th, we want to match
+        // all assessments that are due before the end of the 10th, which is the start of the 11th, ie 'YYYY/MM/11 00:00:00'
         $joinClause = "
-        JOIN term $t ON (a.$dateColumn >= $t.start  AND ($t.actual_finish IS NULL OR a.$dateColumn < $t.actual_finish))";
+        JOIN term $t ON (a.$dateColumn >= $t.start  AND ($t.actual_finish IS NULL OR a.$dateColumn < ($t.actual_finish + 1)))";
 
-            $builder = $this->getMapper()->getPredicateBuilder();
-                $builder->equals("$t.id", $terms->getAll());
+        $builder = $this->getMapper()->getPredicateBuilder();
+        $builder->equals("$t.id", $termIds->getAll());
 
-             return [$joinClause, implode(' AND ', $builder->getWhere()), $builder->getParams() ];
+        return [$joinClause, implode(' AND ', $builder->getWhere()), $builder->getParams() ];
     }
 
 
@@ -591,7 +592,6 @@ class IdFinder extends Filter\AbstractIdFinder
      */
     private function getClauseUnitImplSpec(Collection $unitImpSpcIds = null)
     {
-
         if (null === $unitImpSpcIds || !$unitImpSpcIds->count()) {
             $joinClause  = '';
             $whereClause = 'TRUE';
@@ -701,13 +701,13 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'WorkType' filter
      *
-     * @param Collection|WorkType\Model[] $workTypes
+     * @param Collection|int[] $workTypeIds
      * @return mixed[]
      */
-    private function getClauseWorkType(Collection $workTypes = null)
+    private function getClauseWorkType(Collection $workTypeIds = null)
     {
         // If no workTypes selected, don't filter
-        if (null === $workTypes) {
+        if (null === $workTypeIds) {
             return ['TRUE', []];
         }
 
@@ -716,16 +716,16 @@ class IdFinder extends Filter\AbstractIdFinder
         // There are two ways to specify that you want assessments without a workType.
         // The first is by passing an empty Collection, the latter is by inserting NULL in that collection.
         // Need to support both.
-        if (!$workTypes->count()) {
+        if (!$workTypeIds->count()) {
             $builder->isNull('a.work_type_id');
         }
 
         // If Collection is empty, this will never execute - so no need to wrap
-        foreach ($workTypes as $workType) {
-            if (null === $workType) {
+        foreach ($workTypeIds as $workTypeId) {
+            if (null === $workTypeId) {
                 $builder->isNull('a.work_type_id');
             } else {
-                $builder->equals('a.work_type_id', $workType->getId());
+                $builder->equals('a.work_type_id', $workTypeId);
             }
         }
         return ['(' . implode(' OR ', $builder->getWhere()) . ')', $builder->getParams()];

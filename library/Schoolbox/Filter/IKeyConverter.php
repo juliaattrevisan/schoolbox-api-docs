@@ -29,20 +29,17 @@ interface IKeyConverter
 
 
     /**
-     * For the user's posted selections, generate a collection of items they represent.
+     * For the user's posted selections (either checked or not checked), generate a collection
+     * of items they represent.
      *
      * If the set of selections is the logical full set of that item type, and either all are
      * selected or none are selected, then return NULL to inform the DB query generator
      * that it can skip this filter entirely.
      *
-     * If $availableSelections is null, then the filter is not being uses, so return NULL
-     * to indicate not to apply this filter
-     *
-     *
-     * @param null|GenericCollection|Selection\Model[] $availableSelections Indexed by setting.key
-     * @return null|Collection (intentionally not GenericCollection)
+     * @param GenericCollection|Selection\Model[] $availableSelections Indexed by setting.key
+     * @return null|Collection|int[]|string[] (intentionally not GenericCollection as it only contains scalars)
      */
-    public function getSelectedItems(GenericCollection $availableSelections = null);
+    public function getSelectedItems(GenericCollection $availableSelections);
 
 
     /**
@@ -50,7 +47,7 @@ interface IKeyConverter
      *
      * If the selected set of items equals the full possible set, we can forgo the filter check in our DB query for a performance boost
      *
-     * @return Collection (intentionally not a GenericCollection)
+     * @return Collection|int[]|string[] (intentionally not a GenericCollection)
      */
     public function getAllPossibleItems();
 }

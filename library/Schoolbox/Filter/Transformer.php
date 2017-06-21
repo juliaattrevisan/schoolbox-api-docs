@@ -11,10 +11,10 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
 /**
- * Encapsulates the transform of filter Selection models into filters (Collections of disparate entities)
- * eg Term Models, WorkType Models, AssessmentType strings etc
+ * Encapsulates the transform of filter Selection models into filters (Collections of integers or string representing selected filter options)
+ * eg Term Model Ids, WorkType Model Ids, AssessmentType strings etc
  *
- * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter::class) should return a set of 3 Term models.
+ * Eg, a user selects Terms 2017, 2015 + 2010 -> getSelectedItems(TermFilter::class) should return a set of 3 Term model ids.
  */
 class Transformer
 {
@@ -44,7 +44,6 @@ class Transformer
     /**
      * @param GenericCollection|IKeyConverter[]                  $keyConverters       Indexed by filter.id
      * @param Collection|GenericCollection[]|Selection\Model[][] $selectionsPerFilter Indexed by filter.id, then selection.key
-     *
      */
     public function __construct(GenericCollection $keyConverters, Collection $selectionsPerFilter)
     {
@@ -66,7 +65,7 @@ class Transformer
      * @param string $filterClass
      * @return null|Collection|mixed[]
      */
-    public function getSelectedItems($filterClass)
+    protected function getSelectedItems($filterClass)
     {
         // Was the requested filter not injected into this transformer?
         if (!$this->filtersByClass->offsetExists($filterClass)) {
@@ -88,11 +87,17 @@ class Transformer
     {
         $filters = [];
 
-        foreach ($this->getSelectionsPerFilter() as $filterId => $selections) {
-            $instance        = $this->keyConverters[$filterId]->getFilter();
-            $class           = $instance->getClass();
+        /* Note: We iterate key-converters not the selections.
+         *       This means we skip any selections that do not have a corresponding keyConverter.
+         *       This is because the selections reflect was was sent by the client, but we don't rely on that,
+         *       the key-converters are built by the system and reflect which filters are enabled.
+         */
+        foreach ($this->keyConverters as $keyConverter) {
+            $filter          = $keyConverter->getFilter();
+            $class           = $filter->getClass();
             $filters[$class] = $this->getSelectedItems($class);
         }
+
         return $filters;
     }
 
@@ -100,7 +105,7 @@ class Transformer
      */
 
     /**
-     * @return Collection|Selection\Model[][]|GenericCollection[]
+     * @return Collection|GenericCollection[]|Selection\Model[][]
      */
     protected function getSelectionsPerFilter()
     {

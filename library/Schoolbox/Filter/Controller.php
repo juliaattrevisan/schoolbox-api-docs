@@ -68,7 +68,7 @@ class Controller extends BaseController
             'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
-        ]));
+        ])->setTitle('Filterable pages'));
     }
 
 
@@ -106,7 +106,7 @@ class Controller extends BaseController
             'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
-        ]));
+        ])->setTitle(ucfirst($page) . ' filters'));
     }
 
 

@@ -90,22 +90,9 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     public function convertSelectionsToFilters(Collection $selectionsPerFilter, $page)
     {
         $keyConverters        = $this->buildEnabledKeyConverters($page);
-        $selectionTransformer = $this->buildTransformer($keyConverters, $selectionsPerFilter);
+        $selectionTransformer = new Transformer($keyConverters, $selectionsPerFilter);
 
         return $selectionTransformer->getByClass();
-    }
-
-
-    /**
-     * Build a transformer of the desired type
-     *
-     * @param IKeyConverter[]|GenericCollection                  $keyConverters       Indexed by filter.id
-     * @param Collection|GenericCollection[]|Selection\Model[][] $selectionsPerFilter Indexed by filter.id then selection.key
-     * @return Transformer
-     */
-    protected function buildTransformer(GenericCollection $keyConverters, Collection $selectionsPerFilter)
-    {
-        return new Transformer($keyConverters, $selectionsPerFilter);
     }
 
 

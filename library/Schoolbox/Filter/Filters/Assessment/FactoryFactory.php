@@ -11,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
 use Schoolbox\Assessment\Term;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -146,14 +145,5 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
         }
 
         return $filters;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildTransformer(GenericCollection $keyConverters, Collection $selectionsPerFilter)
-    {
-        return new Transformer($keyConverters, $selectionsPerFilter);
     }
 }

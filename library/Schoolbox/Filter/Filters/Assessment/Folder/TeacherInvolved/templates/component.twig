@@ -7,6 +7,7 @@
         groups:         Folder\Model[]
 
 #}
+{% extends '@filterDefinitions/Assessment/Folder/templates/component.twig' %}
 
 {% set hasClasses = classes | length %}
 {% set hasGroups  = groups | length %}
@@ -20,41 +21,9 @@
     {% set filterName  = 'Group' %}
 {% endif %}
 
+{% block filterName %}{{ filterName }}{% endblock %}
 
-
-{# Are any options available? #}
-{% if 0 == roleSelections | length %}
-    {# By default, no available concrete options would mean no entities ever match #}
-    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
-
-    {% if isUserConfigurable %}
-    <h4>Class / Group</h4>
-    <div data-alert class="alert-box alert">
-        Warning. No Classes or Groups. No results possible.
-    </div>
-    {% endif %}
-{% else %}
-
-    <script>
-        $(function() {
-
-            var $component = $('[data-component="{{ definition.filter.id }}"]');
-
-            // Ensure if a folder is both a class and a group, they are either both selected, or neither selected
-            // This solves issue of later checkedState clobbering first.
-            $component.on('change', 'input[type=checkbox]', function(){
-                var $checkbox    = $(this);
-                var checkedState = $checkbox.prop('checked');
-                var filter_key   = $checkbox.data('duplicate-checkbox');
-                $component.find('input[type=checkbox][data-duplicate-checkbox=' + filter_key + ']').prop('checked', checkedState);
-            });
-        });
-    </script>
-
-    <div class="checklist" data-component="{{ definition.filter.id }}" {% if isUserConfigurable %}style="margin: 0 15px; min-width: 100px;"{% endif %}>
-
-        {% if isUserConfigurable %}<h4 data-filter-name>{{ filterName }}</h4>{% endif %}
-
+{% block userOptions %}
         {% if hasClasses %}
             {% if hasGroups and isUserConfigurable %}<h4>Classes</h4>{% endif %}
             {% for classFolder in classes %}
@@ -64,6 +33,7 @@
                     roleSelection:      selection,
                     userSelection:      userSelections[selection.key],
                     label:              classFolder.nameWithCodes,
+                    disabled:           isDisabled,
                     idSuffix:           '_class'
                 } only %}
 
@@ -82,10 +52,9 @@
                     roleSelection:      selection,
                     userSelection:      userSelections[selection.key],
                     label:              groupFolder.name,
+                    disabled:           isDisabled,
                     idSuffix:           '_group'
                 } only %}
             {% endfor %}
         {% endif %}
-    </div>
-
-{% endif %}
+{% endblock %}

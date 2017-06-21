@@ -10,58 +10,54 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
-use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\WorkType;
+
 
 /**
- * Converts between concrete keys (workType.ids) and WorkType models
- * @method null|GenericCollection|WorkType\Model[] getSelectedItems(GenericCollection $availableSelections = null)
+ * Converts between concrete keys (workType.ids or KEY_NONE) and workType.id or NULL
  */
 class KeyConverter extends AbstractKeyConverter
 {
 
     /**
-     * All WorkTypes known to the system (regardless of whether they are available)
+     * All WorkType IDs known to the system (regardless of whether they are available)
      *
-     * @var GenericCollection|WorkType\Model[]
+     * @var Collection|int[]
      */
-    private $workTypes;
+    private $workTypeIds;
 
 
     /**
-     * @param Filter\Model $filter
-     * @param Collection   $workTypes
+     * @param Filter\Model     $filter
+     * @param Collection|int[] $workTypeIds
      */
-    public function __construct(Filter\Model $filter, Collection $workTypes)
+    public function __construct(Filter\Model $filter, Collection $workTypeIds)
     {
         parent::__construct($filter);
-        $this->workTypes = $workTypes->shallowClone();
+        $this->workTypeIds = $workTypeIds->shallowClone();
     }
 
 
     /**
-     * Given a concrete key (such as returned from a user's filter panel selections), return the corresponding item
-     *
-     * @param string $key
-     * @return mixed|WorkType\Model
-     * @throws \InvalidArgumentException
+     * @inheritdoc
      */
     public function getItem($key)
     {
         $this->assertValidKey($key);
-
-        return $this->workTypes[$key];
+        if(Definition::KEY_NONE === $key){
+            return null;
+        }
+        return (int)$key;
     }
 
 
     /**
      * Return all available concrete items
      *
-     * @return GenericCollection|WorkType\Model[]
+     * @return Collection|int[]
      */
     public function getAllPossibleItems()
     {
-        return $this->workTypes->shallowClone();
+        return $this->workTypeIds->shallowClone();
     }
 
 
@@ -70,7 +66,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey($key)
     {
-        if ($key !== Definition::KEY_NONE && !$this->workTypes->offsetExists($key)) {
+        if ($key !== Definition::KEY_NONE && !$this->workTypeIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No WorkType found for key: $key");
         }
     }

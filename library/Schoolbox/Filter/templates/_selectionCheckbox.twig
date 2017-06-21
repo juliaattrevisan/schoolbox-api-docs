@@ -6,6 +6,7 @@
         userSelection: null|Selection\Model  - This user's current selection (used if we 'clear' filters). Null if not user-configurable
         label:         string                - Label to render out
         idSuffix:      string                - (optional) suffix to ensure ID uniqueness
+        disabled:      bool                  - (optional) If true and userSelection exists, set value in hidden field, and disable checkbox
 #}
 {% set idSuffix = idSuffix ?: '' %}
 
@@ -13,7 +14,7 @@
 {% if not userSelection %}
     <input type="hidden" name="filter_selection[{{ roleSelection.filter.id }}][{{ roleSelection.key }}]" value="{{ roleSelection.selected ? '1' : '0' }}">
 {% else %}
-    <input type="hidden" name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]" value="0">
+    <input type="hidden" name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]" value="{% if userSelection.selected and disabled %}1{% else %}0{% endif %}">
     <input
             id="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}"
             type="checkbox"
@@ -22,6 +23,7 @@
             data-value-original="{% if userSelection.selected %}1{% else %}0{% endif %}"
             data-value-default="{% if roleSelection.selected %}1{% else %}0{% endif %}"
             {% if userSelection.selected %}checked{% endif %}
+            {% if disabled %}disabled data-disabled{% endif %}
             {{ block('extraAttrs') }}
     >
     <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}">{{ label }}</label>

@@ -1,4 +1,5 @@
 {% extends '@filters/_component.twig' %}
 
-{% set filterName = locale.unit.proper ~ ' Specification' %}
+{% block filterName %}{{ locale.unit.proper ~ ' Specification' }}{% endblock %}
+
 
