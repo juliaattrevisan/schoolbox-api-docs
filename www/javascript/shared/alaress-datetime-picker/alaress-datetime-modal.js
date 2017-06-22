@@ -56,8 +56,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         setTimetablePickerValue(initialDate);
         resetTimetablePicker();
         renderAllDayOption();
-        selectAllDay();
-        deselectAllDay();
 
         // Listen for changes to campus
         timetable.campus.change(function () {
@@ -144,9 +142,13 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 $('#hideTime' + twigVars.id).click(function () {
                     if ($('#hideTime' + twigVars.id).is(':checked')) {
                         checkAllDaySwitch(true, twigVars.id);
+                        // Set initial value for allday in timetable
+                        selectTimetableAllDay();
                     }
                     else {
                         checkAllDaySwitch(false, twigVars.id);
+                        // Set initial value for allday in timetable
+                        deselectTimetableAllDay();
                     }
                 });
             }
@@ -399,7 +401,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         });
 
         // Update time radios to correct times
-        updateTimeControls($byTimetable.find('[data-tt-period][data-campus=' + selectedCampus + ']'));
+        updateTimeControls($byTimetable.find('[data-adtp-tt-period][data-campus=' + selectedCampus + ']'));
 
         // Reset the selected radio back to the first one
         $byTimetable.find('[data-adtp-tt-period-start]').prop('checked', true);
@@ -825,7 +827,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     /**
      * Select 'allday' in the period dropdown
      */
-    function selectAllDay() {
+    function selectTimetableAllDay() {
         var activeCampus = timetable.campus.find(':selected').val();
         $byTimetable.find('[data-adtp-tt-period][data-campus=' + activeCampus + ']').val('allday').trigger('change');
     }
@@ -833,7 +835,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     /**
      * Deselect 'allday' in the period dropdown
      */
-    function deselectAllDay () {
+    function deselectTimetableAllDay () {
         var activeCampus,
             activePeriod;
 

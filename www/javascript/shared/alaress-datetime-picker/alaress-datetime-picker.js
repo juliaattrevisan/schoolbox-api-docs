@@ -551,29 +551,32 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     var newDate = moment($(this).attr('data-timetable-value'));
                     var selectedCampus = $timetablePicker.find('[data-adtp-tt-campus]').val();
+                    var timetableAllDay;
 
                     if (options.enableTime === true) {
 
-                        var selectedPeriod = $timetablePicker.find('[data-tt-period][data-campus=' + selectedCampus + ']').val();
+                        var selectedPeriod = $timetablePicker.find('[data-adtp-tt-period][data-campus=' + selectedCampus + ']').val();
 
                         if (selectedPeriod == 'allday') {
 
                             if (options.endDay) {
                                 newDate = newDate.endOf('day');
+                                timetableAllDay = true;
+
                             } else {
                                 newDate = newDate.startOf('day');
+                                timetableAllDay = false;
                             }
 
                         } else {
 
                             var periodTime = $timetablePicker.find('[name*="periodTime' + pickerId + '"]:checked').val();
-                            var newTime = moment($timetablePicker.find('[data-tt-period][data-campus=' + selectedCampus + '] option:selected').attr('data-' + periodTime + '-time'), 'h:mma');
-
+                            var newTime = moment($timetablePicker.find('[data-adtp-tt-period][data-campus=' + selectedCampus + '] option:selected').attr('data-' + periodTime + '-time'), 'h:mma');
                             newDate = newDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
                         }
                     }
 
-                    setValue(element, options, false, true, newDate);
+                    setValue(element, options, timetableAllDay, true, newDate);
 
                     if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
