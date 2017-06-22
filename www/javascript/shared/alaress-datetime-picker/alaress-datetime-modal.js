@@ -37,7 +37,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var timetable = {
         campus: $byTimetable.find('[data-adtp-tt-campus]'),
         term: $byTimetable.find('[data-adtp-tt-term]'),
-        period: $byTimetable.find('[data-adtp-tt-period]'),
+        periods: $byTimetable.find('[data-adtp-tt-period]'), // there may be multiple period selectors, one per each campus
         submit: $byTimetable.find('[data-adtp-tt-submit]')
     };
 
@@ -56,6 +56,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         setTimetablePickerValue(initialDate);
         resetTimetablePicker();
         renderAllDayOption();
+        selectAllDay();
+        deselectAllDay();
 
         // Listen for changes to campus
         timetable.campus.change(function () {
@@ -91,8 +93,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // trigger the pre-loaded day
         $byTimetable.find('[data-tt-day].active').trigger('click');
 
+
         // Catch period select change
-        $byTimetable.find('[data-tt-period]').change(function () {
+        $byTimetable.find('[data-adtp-tt-period]').change(function () {
             updateTimeControls($(this));
         });
 
@@ -813,9 +816,32 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     */
     function renderAllDayOption() {
         if (pickerOptions.allDaySwitch === true) {
-            timetable.period.each(function () {
-                $(this).prepend('<option value="allday">All Day</option>');
+            timetable.periods.each(function () {
+                $(this).prepend('<option value="allday" selected>All Day</option>');
             });
+        }
+    }
+
+    /**
+     * Select 'allday' in the period dropdown
+     */
+    function selectAllDay() {
+        var activeCampus = timetable.campus.find(':selected').val();
+        $byTimetable.find('[data-adtp-tt-period][data-campus=' + activeCampus + ']').val('allday').trigger('change');
+    }
+
+    /**
+     * Deselect 'allday' in the period dropdown
+     */
+    function deselectAllDay () {
+        var activeCampus,
+            activePeriod;
+
+        activeCampus = timetable.campus.find(':selected').val();
+        activePeriod = $byTimetable.find('[data-adtp-tt-period][data-campus=' + activeCampus + '] option:selected');
+        if(activePeriod.val() == 'allday') {
+            activePeriod.next().prop('selected', true);
+            activePeriod.parent().trigger('change');
         }
     }
 
