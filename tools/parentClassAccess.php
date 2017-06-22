@@ -146,6 +146,7 @@ if ($loadStudents) {
                 ]);
             }
         } catch (MapperException $e) {
+            $log->warning($e->getTraceAsString());
         }
     }
 }
