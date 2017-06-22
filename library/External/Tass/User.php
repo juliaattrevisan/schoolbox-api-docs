@@ -267,7 +267,7 @@ class External_Tass_User implements External_UserInterface
              */
             if ($parent['StudentContactAddressNumber'] == '1') {
                 foreach ($parents as $key2 => $parent2) {
-                    if ($parent['StudentContactID'] = $parent2['StudentContactID'] && ($parent2['StudentContactAddressNumber'] = '4' OR $parent2['StudentContactAddressNumber'] = '5')) {
+                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($parent2['StudentContactAddressNumber'] == '4' OR $parent2['StudentContactAddressNumber'] == '5')) {
                         unset($parents[$key]);
                     }
                 }
