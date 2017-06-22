@@ -232,7 +232,7 @@ function getPickerValue(pickerId) {
 }
 
 
-function checkAllDaySwitch(state, pickerId) {
+function setCalendarAllDay(state, pickerId) {
 
     var $timeDiv = $('#pickerCalendar' + pickerId).closest('#adtp-modal-' + pickerId).find('.flatpickr-time');
 
@@ -501,10 +501,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     // Check and refresh visibility of time and allDaySwitch state
                     // Hide time picker if allday hidden field is set to 1
                     if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
-                        checkAllDaySwitch(true, pickerId);
+                        setCalendarAllDay(true, pickerId);
                     }
                     else if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 0) {
-                        checkAllDaySwitch(false, pickerId);
+                        setCalendarAllDay(false, pickerId);
                     }
 
                 });

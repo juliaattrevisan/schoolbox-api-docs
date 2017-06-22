@@ -55,7 +55,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Set initial value to the timetable picker
         setTimetablePickerValue(initialDate);
         resetTimetablePicker();
-        renderAllDayOption();
+        renderTimetableAllDay();
 
         // Listen for changes to campus
         timetable.campus.change(function () {
@@ -123,32 +123,15 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         onReady: function (selectedDates, dateStr, instance) {
             renderAllDaySwitch();
             renderHeatMapHelp();
-
-            // Hide time picker if allday hidden field is set to 1
-            if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 1) {
-                checkAllDaySwitch(true, twigVars.id);
-            }
-            else if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 0) {
-                checkAllDaySwitch(false, twigVars.id);
-            }
-            else if (hasTime(instance.input.value) === false) {
-                checkAllDaySwitch(true, twigVars.id);
-            }
-            else {
-                checkAllDaySwitch(false, twigVars.id);
-            }
+            detectCalendarAllDay(instance);
 
             if (pickerOptions.allDaySwitch === true) {
                 $('#hideTime' + twigVars.id).click(function () {
                     if ($('#hideTime' + twigVars.id).is(':checked')) {
-                        checkAllDaySwitch(true, twigVars.id);
-                        // Set initial value for allday in timetable
-                        selectTimetableAllDay();
+                        setCalendarAllDay(true, twigVars.id);
                     }
                     else {
-                        checkAllDaySwitch(false, twigVars.id);
-                        // Set initial value for allday in timetable
-                        deselectTimetableAllDay();
+                        setCalendarAllDay(false, twigVars.id);
                     }
                 });
             }
@@ -242,6 +225,30 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         $timeDiv.after(html);
     }
 
+    function detectCalendarAllDay(instance) {
+
+        var allDay;
+
+        // Hide time picker if allday hidden field is set to 1
+        if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 1) {
+            allDay = true;
+        }
+        else if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 0) {
+            allDay = false;
+        }
+        else if (instance && hasTime(instance.input.value) === false) {
+            allDay = true;
+        }
+        else {
+            allDay = false;
+        }
+
+        setCalendarAllDay(allDay, twigVars.id);
+
+        // Set timetable allday here for now, until sync time is in place
+        allDay === true ? selectTimetableAllDay() : deselectTimetableAllDay();
+
+    }
 
     /**
      * Build cycles dynamically for all campuses and selected term
@@ -816,26 +823,47 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     /**
      * If the input supports All Day, add this option to the period selector
     */
-    function renderAllDayOption() {
+    function renderTimetableAllDay() {
+
         if (pickerOptions.allDaySwitch === true) {
             timetable.periods.each(function () {
                 $(this).prepend('<option value="allday" selected>All Day</option>');
             });
         }
+
+    }
+
+
+    function setTimetableAllDay() {
+
+        if (pickerOptions.allDaySwitch === true) {
+            console.log($('#hideTime' + twigVars.id));
+
+            if ($('#hideTime' + twigVars.id).is(':checked')) {
+                selectTimetableAllDay();
+            }
+            else {
+                deselectTimetableAllDay();
+            }
+        }
+
     }
 
     /**
      * Select 'allday' in the period dropdown
      */
     function selectTimetableAllDay() {
+
         var activeCampus = timetable.campus.find(':selected').val();
         $byTimetable.find('[data-adtp-tt-period][data-campus=' + activeCampus + ']').val('allday').trigger('change');
+
     }
 
     /**
      * Deselect 'allday' in the period dropdown
      */
     function deselectTimetableAllDay () {
+
         var activeCampus,
             activePeriod;
 
@@ -845,6 +873,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             activePeriod.next().prop('selected', true);
             activePeriod.parent().trigger('change');
         }
+
     }
 
     /**
