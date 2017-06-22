@@ -553,6 +553,8 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     var selectedCampus = $timetablePicker.find('[data-adtp-tt-campus]').val();
                     var timetableAllDay;
 
+                    timetableAllDay = false;
+
                     if (options.enableTime === true) {
 
                         var selectedPeriod = $timetablePicker.find('[data-adtp-tt-period][data-campus=' + selectedCampus + ']').val();
@@ -565,7 +567,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                             } else {
                                 newDate = newDate.startOf('day');
-                                timetableAllDay = false;
                             }
 
                         } else {
@@ -577,11 +578,13 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     }
 
                     setValue(element, options, timetableAllDay, true, newDate);
+                    // Set allday state on the calendar picker
+                    setCalendarAllDay(timetableAllDay, pickerId);
 
                     if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
-                            setValue(item, getOptions(item), false, true);
+                            setValue(item, getOptions(item), timetableAllDay, true);
                         });
                     }
                     $modal.foundation('reveal', 'close');

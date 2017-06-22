@@ -45,6 +45,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     $(document).on('open.fndtn.reveal', $modal, function () {
         updateCalendarResponse();
         resetTimetablePicker();
+        setTimetableAllDay();
     });
 
     if (twigVars.timetable) {
@@ -248,6 +249,15 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         // Set timetable allday here for now, until sync time is in place
         allDay === true ? selectTimetableAllDay() : deselectTimetableAllDay();
 
+    }
+
+    function getCalendarAllDay() {
+        if (pickerOptions.allDaySwitch === true) {
+            if ($('#hideTime' + twigVars.id).is(':checked')) {
+                return true;
+            }
+        }
+        return false
     }
 
     /**
@@ -833,19 +843,12 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     }
 
-
+    /**
+     * 'Copy' timetable allday value form the calendar
+     */
     function setTimetableAllDay() {
 
-        if (pickerOptions.allDaySwitch === true) {
-            console.log($('#hideTime' + twigVars.id));
-
-            if ($('#hideTime' + twigVars.id).is(':checked')) {
-                selectTimetableAllDay();
-            }
-            else {
-                deselectTimetableAllDay();
-            }
-        }
+        getCalendarAllDay() ? selectTimetableAllDay() : deselectTimetableAllDay();
 
     }
 
