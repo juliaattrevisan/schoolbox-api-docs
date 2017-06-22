@@ -16,9 +16,11 @@ use HouseResidentialMapper;
 use Monolog\Logger;
 use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
 use Schoolbox\Campus;
+use Schoolbox\CampusCollection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
@@ -422,13 +424,14 @@ class Controller extends Base
         $user->setSuperuser(isset($post['superuser']));
         $user->setUsername($post['modusername']);
 
-        if (is_array($post['campus']) && count($post['campus']) || $post['defaultCampus']) {
+
+        if (is_array($post['campus'])) {
+
+            $user->setCampusCollection(new GenericCollection(Campus::class));
+            
             foreach ($post['campus'] as $campusId) {
                 $campus = new Campus();
                 $campus->setId($campusId);
-                if ($campusId == $post['defaultCampus']) {
-                    $user->setDefaultCampus($campus);
-                }
                 $user->getCampusCollection()->add($campus);
             }
         }
