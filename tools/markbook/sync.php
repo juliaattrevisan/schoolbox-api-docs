@@ -98,6 +98,7 @@ foreach($categoryList as $category) {
                     $markbookExternal->updateAssessment($submissionBox);
                 } catch (\Exception $e) {
                     $log->warning("Could not update assessment!");
+                    $log->warning($e->getTraceAsString());
                     continue;
                 }
             }
@@ -109,6 +110,7 @@ foreach($categoryList as $category) {
                     $markbookExternal->createAssessment($submissionBox);
                 } catch (\Exception $e) {
                     $log->warning("Could not create assessment!");
+                    $log->warning($e->getTraceAsString());
                     continue;
                 }
             }
@@ -141,6 +143,7 @@ foreach($categoryList as $category) {
                     $markbookExternal->setMark($return);
                 } catch (\Exception $e) {
                     $log->warning("Could not set mark for student #{$result[0]['owner']}!");
+                    $log->warning($e->getTraceAsString());
                 }
             }
         }
@@ -163,6 +166,7 @@ foreach($categoryList as $category) {
                     $markbookExternal->updateAssessment($activity);
                 } catch (\Exception $e) {
                     $log->warning("Could not create assessment!");
+                    $log->warning($e->getTraceAsString());
                     continue;
                 }
             }
@@ -174,6 +178,7 @@ foreach($categoryList as $category) {
                     $markbookExternal->createAssessment($activity);
                 } catch (\Exception $e) {
                     $log->warning("Could not create assessment!");
+                    $log->warning($e->getTraceAsString());
                     continue;
                 }
             }
@@ -199,6 +204,7 @@ foreach($categoryList as $category) {
                     $markbookExternal->setMark($return);
                 } catch (\Exception $e) {
                     $log->warning("Could not set mark for student #{$studentID}!");
+                    $log->warning($e->getTraceAsString());
                 }
             }
         }
