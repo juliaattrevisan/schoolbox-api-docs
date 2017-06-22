@@ -111,12 +111,16 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
 
-        // Hydrate result type -_-
-        $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
-        $resultType = $workType->getExternalResultType();
-        if (!empty($resultType)) {
-            $resultType = $this->getDatabase()->quote($resultType);
-        } else {
+        $resultType = null;
+        if (!empty($assessment->getType())) {
+            // Hydrate result type -_-
+            $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
+            $resultType = $workType->getExternalResultType();
+            if (!empty($resultType)) {
+                $resultType = $this->getDatabase()->quote($resultType);
+            }
+        }
+        if (empty($resultType)) {
             $resultType = 'OGRaw';
         }
 
