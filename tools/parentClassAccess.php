@@ -45,7 +45,7 @@ $classHandler = new \External_Class();
 
 $log = new Logger(STDOUT, STDERR);
 
-$options = getopt("f:", ['students']);
+$options = getopt("f:", ['students', 'dry-run']);
 
 if (!isset($options['f'])) {
     $log->error("No import filename specified");
@@ -58,6 +58,7 @@ if (!file_exists($options['f'])) {
 }
 
 $loadStudents = isset($options['students']);
+$dryRun       = isset($options['dry-run']);
 
 /**
  * @param UserMapper $userMapper
@@ -66,8 +67,9 @@ $loadStudents = isset($options['students']);
  * @param int $externalId
  * @param string $role
  * @param int $folderId
+ * @param bool $dryRun
  */
-function loadUserAccess($userMapper, $userAccessMapper, $log, $externalId, $role, $folderId)
+function loadUserAccess($userMapper, $userAccessMapper, $log, $externalId, $role, $folderId, $dryRun)
 {
     // This would typically happen for a non-existent spouse, just do nothing in this case
 
@@ -83,12 +85,14 @@ function loadUserAccess($userMapper, $userAccessMapper, $log, $externalId, $role
         if (!isset($usersAdded[$user->getId()])) {
             // Give student access to the class
 
-            $userAccess = $userAccessMapper->createModel();
-            $userAccess->setUser($user);
-            $userAccess->setServiceIdentifier($folderId);
-            $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
-            $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
-            $userAccessMapper->save($userAccess);
+            if (!$dryRun) {
+                $userAccess = $userAccessMapper->createModel();
+                $userAccess->setUser($user);
+                $userAccess->setServiceIdentifier($folderId);
+                $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
+                $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
+                $userAccessMapper->save($userAccess);
+            }
 
             $log->info("\tAdded:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
             $usersAdded[$user->getId()] = true;
@@ -155,13 +159,16 @@ foreach ($classes as $folderId => $codes) {
 
         $log->info("Removing parent access from '{$folders[$folderId]->getTitle()}'");
 
-        foreach ($parents as $parent) {
-            $userAccessMapper->deleteByColumnList([
-                'uid' => $parent->getId(),
-                'sid' => $folderId
-            ]);
+        if (!$dryRun) {
+            foreach ($parents as $parent) {
+                $userAccessMapper->deleteByColumnList([
+                    'uid' => $parent->getId(),
+                    'sid' => $folderId
+                ]);
+            }
         }
     } catch (MapperException $e) {
+        $log->warning($e->getTraceAsString());
     }
 }
 
@@ -182,15 +189,15 @@ foreach ($classes as $folderId => $codes) {
 
                 if (is_array($students)) {
                     foreach ($students as $student) {
-                        loadUserAccess($userMapper, $userAccessMapper, $log, $student['synergy_id'], Role::STUDENT, $folderId);
+                        loadUserAccess($userMapper, $userAccessMapper, $log, $student['synergy_id'], Role::STUDENT, $folderId, $dryRun);
                     }
                 }
             }
 
             if (is_array($parents)) {
                 foreach ($parents as $parent) {
-                    loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactID'], Role::PARENT, $folderId);
-                    loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactSpouseID'], Role::PARENT, $folderId);
+                    loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactID'], Role::PARENT, $folderId, $dryRun);
+                    loadUserAccess($userMapper, $userAccessMapper, $log, $parent['StudentContactSpouseID'], Role::PARENT, $folderId, $dryRun);
                 }
             }
         }
