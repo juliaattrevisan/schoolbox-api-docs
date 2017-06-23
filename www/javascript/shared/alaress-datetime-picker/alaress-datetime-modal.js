@@ -226,6 +226,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         $timeDiv.after(html);
     }
 
+    /**
+     * Determine if the calendar AllDay should be set to on or off, set it
+     * Also set timetable picker AllDay value the same way
+     */
     function detectCalendarAllDay(instance) {
 
         var allDay;
@@ -868,8 +872,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         var activePeriods;
 
+        // Selected periods for all the campuses, no matter hidden or not
         activePeriods = $byTimetable.find('[data-adtp-tt-period] option:selected');
         activePeriods.each(function() {
+            // If the value is allday, deselect it and select the period that's coming next
             if($(this).val() == 'allday') {
                 $(this).prop('selected', false);
                 $(this).next().prop('selected', true);
