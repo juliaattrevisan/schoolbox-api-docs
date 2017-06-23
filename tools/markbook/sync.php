@@ -94,13 +94,25 @@ foreach($categoryList as $category) {
         if(is_array($markbook) && count($markbook) >= 1) {
             $log->info("Updating existing assessment: {$submissionBox->getName()}");
             if(!$dryRun) {
-                $markbookExternal->updateAssessment($submissionBox);
+                try {
+                    $markbookExternal->updateAssessment($submissionBox);
+                } catch (\Exception $e) {
+                    $log->warning("Could not update assessment!");
+                    $log->warning($e->getTraceAsString());
+                    continue;
+                }
             }
         }
         elseif( !$updateOnly) {
             $log->info("Creating new assessment: {$submissionBox->getName()}");
             if(!$dryRun) {
-                $markbookExternal->createAssessment($submissionBox);
+                try {
+                    $markbookExternal->createAssessment($submissionBox);
+                } catch (\Exception $e) {
+                    $log->warning("Could not create assessment!");
+                    $log->warning($e->getTraceAsString());
+                    continue;
+                }
             }
         }
         else {
@@ -127,7 +139,12 @@ foreach($categoryList as $category) {
             $return->setComment($result[0]['comment']);
 
             if(!$dryRun) {
-                $markbookExternal->setMark($return);
+                try {
+                    $markbookExternal->setMark($return);
+                } catch (\Exception $e) {
+                    $log->warning("Could not set mark for student #{$result[0]['owner']}!");
+                    $log->warning($e->getTraceAsString());
+                }
             }
         }
     }
@@ -145,13 +162,25 @@ foreach($categoryList as $category) {
         if(is_array($markbook) && count($markbook) >= 1) {
             $log->info("Updating existing assessment: {$activity->getName()}");
             if(!$dryRun) {
-                $markbookExternal->updateAssessment($activity);
+                try {
+                    $markbookExternal->updateAssessment($activity);
+                } catch (\Exception $e) {
+                    $log->warning("Could not create assessment!");
+                    $log->warning($e->getTraceAsString());
+                    continue;
+                }
             }
         }
         elseif( !$updateOnly) {
             $log->info("Creating new assessment: {$activity->getName()}");
             if(!$dryRun) {
-                $markbookExternal->createAssessment($activity);
+                try {
+                    $markbookExternal->createAssessment($activity);
+                } catch (\Exception $e) {
+                    $log->warning("Could not create assessment!");
+                    $log->warning($e->getTraceAsString());
+                    continue;
+                }
             }
         }
         else {
@@ -171,7 +200,12 @@ foreach($categoryList as $category) {
             $return->getUser()->setId($studentID);
 
             if(!$dryRun) {
-                $markbookExternal->setMark($return);
+                try {
+                    $markbookExternal->setMark($return);
+                } catch (\Exception $e) {
+                    $log->warning("Could not set mark for student #{$studentID}!");
+                    $log->warning($e->getTraceAsString());
+                }
             }
         }
     }
