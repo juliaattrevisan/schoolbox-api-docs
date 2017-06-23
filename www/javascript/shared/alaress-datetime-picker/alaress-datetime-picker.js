@@ -75,6 +75,7 @@ function getOptions(element) {
 
     // Build datepicker options form the element data attributes
     var elementOptions = {
+        id : getValue(element, 'data-datepicker-id'),
         noButton: getValue(element, 'data-datepicker-nobutton'),
         buttonText: buttonText === true ? '' : (buttonText || 'Select Date'),
         displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
@@ -586,6 +587,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
                             setValue(item, getOptions(item), timetableAllDay, true);
+                            setCalendarAllDay(timetableAllDay, getOptions(item).id);
                         });
                     }
                     $modal.foundation('reveal', 'close');
