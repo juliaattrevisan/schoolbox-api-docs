@@ -561,13 +561,14 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                         if (selectedPeriod == 'allday') {
 
+                            timetableAllDay = true;
                             if (options.endDay) {
                                 newDate = newDate.endOf('day');
-                                timetableAllDay = true;
 
                             } else {
                                 newDate = newDate.startOf('day');
                             }
+
 
                         } else {
 
