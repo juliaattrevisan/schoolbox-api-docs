@@ -409,7 +409,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         });
 
         // Show the correct period dropdown for the selected campus, hide others
-        $byTimetable.find('[data-tt-period]').each(function () {
+        $byTimetable.find('[data-adtp-tt-period]').each(function () {
             if ($(this).attr('data-campus') == selectedCampus) {
                 $(this).removeClass('hide');
             } else {
