@@ -44,6 +44,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     // Listen for the modal open
     $('#adtp-modal-wrapper-' + twigVars.id).on('open.fndtn.reveal', function () {
+        resetCalendar();
         updateCalendarResponse();
         resetTimetablePicker();
         setCalendarAllDay(isInputAllDay(), twigVars.id);
@@ -1193,6 +1194,16 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             resetTerms();
 
         }
+
+    }
+
+    /**
+     * Reset Calendar picker for the currently active date
+     */
+    function resetCalendar() {
+
+        var activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort);
+            window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());
 
     }
 

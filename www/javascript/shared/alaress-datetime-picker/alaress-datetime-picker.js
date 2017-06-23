@@ -581,9 +581,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
         } else if ($modal.data('status') === 'loaded') {
 
-            // Update picker values, in case element field value has changed
-            window.pickerInstance[pickerId].setDate(moment(element.val(), convertFormat(options.displayFormat)).toISOString());
-
             $modal.foundation('reveal', 'open');
 
         }
