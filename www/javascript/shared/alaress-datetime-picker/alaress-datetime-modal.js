@@ -853,29 +853,29 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     }
 
     /**
-     * Select 'allday' in the period dropdown
+     * Select 'allday' in the period dropdown for all campuses
      */
     function selectTimetableAllDay() {
 
-        var activeCampus = timetable.campus.find(':selected').val();
-        $byTimetable.find('[data-adtp-tt-period][data-campus=' + activeCampus + ']').val('allday').trigger('change');
+        $byTimetable.find('[data-adtp-tt-period]').val('allday').trigger('change');
 
     }
 
     /**
-     * Deselect 'allday' in the period dropdown
+     * Deselect 'allday' in the period dropdown for all campuses
      */
     function deselectTimetableAllDay () {
 
-        var activeCampus,
-            activePeriod;
+        var activePeriods;
 
-        activeCampus = timetable.campus.find(':selected').val();
-        activePeriod = $byTimetable.find('[data-adtp-tt-period][data-campus=' + activeCampus + '] option:selected');
-        if(activePeriod.val() == 'allday') {
-            activePeriod.next().prop('selected', true);
-            activePeriod.parent().trigger('change');
-        }
+        activePeriods = $byTimetable.find('[data-adtp-tt-period] option:selected');
+        activePeriods.each(function() {
+            if($(this).val() == 'allday') {
+                $(this).prop('selected', false);
+                $(this).next().prop('selected', true);
+                $(this).parent().trigger('change');
+            }
+        });
 
     }
 
