@@ -787,7 +787,13 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
             var dayNumber = $(this).attr('data-tt-day');
 
-            if (dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]) {
+            // Verify every key is there
+            if (selectedCampus in twigVars.timetableVars
+                && 'cycles' in twigVars.timetableVars[selectedCampus]
+                && selectedTerm in twigVars.timetableVars[selectedCampus].cycles
+                && cycleNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm]
+                && dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]
+            ) {
                 var dayMoment = moment(twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]);
 
                 if (ifDate) {
