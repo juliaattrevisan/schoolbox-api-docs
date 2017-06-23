@@ -28,7 +28,8 @@
 </script>
 
 {# Crumbs: Learning > Grades > Report #}
-{{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], ['Report']) }}
+
+{{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], [subject.name]) }}
 
 <div class="row">
     <div class="small-12 columns">
