@@ -131,10 +131,8 @@
 
 			$('[data-calendar-date]').each(function() {
 				if ($(this).find('[data-reveal-id]:not([style*="display: none"])').length === 0) {
-					$(this).find('h2').hide();
                     $(this).hide();
 				} else {
-					$(this).find('h2').show();
                     $(this).show();
 				}
 			});
