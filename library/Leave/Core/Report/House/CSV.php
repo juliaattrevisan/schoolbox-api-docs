@@ -1,5 +1,4 @@
 <?php
-
 /**
  * CSV Export method for the House Report
  *
@@ -31,34 +30,33 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
      */
     public function render()
     {
-        header("Content-type: text/csv");
-        header("Cache-Control: no-store, no-cache");
+        header('Content-type: text/csv');
+        header('Cache-Control: no-store, no-cache');
         header('Content-Disposition: attachment; filename="House Report.csv"');
-        $this->setStream(fopen("php://output", 'wb'));
-
+        $this->stream = fopen('php://output', 'wb');
         $this->renderHeadings();
         $this->renderSubheadings();
         $this->renderRequests();
-
-        fclose($this->getStream());
+        fclose($this->stream);
     }
 
 
-    /* For each day that the person is on leave within the prescribed period of time, show an 'L' char.
+    /**
+     * For each day that the person is on leave within the prescribed period of time, show an 'L' char.
      * If they are starting or ending their leave on this day, show the time instead.
      *
      * Render 3 columns each per day. Skip morning of first day if viewing multiple days.
      *
      * Morning: 00:00:00 to 09:59:59
-     * Day: 10:00:00 to 18:59:59
-     * Night: 19:00:00 to 21:59:59
+     * Day:     10:00:00 to 18:59:59
+     * Night:   19:00:00 to 21:59:59
      */
     protected function renderHeadings()
     {
         $fieldList = ['Name', 'Year', 'Boarding Status'];
 
         for ($j = 0; $j < $this->getRange(); $j++) {
-            $headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimestamp(), 'U');
+            $headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimeStamp(), 'U');
             $headerDate->addDays($j);
 
             $fieldList[] = $headerDate->getLongDateOnly();
@@ -72,9 +70,8 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
 
         $fieldList[] = 'Authorised By';
 
-        /* Stream it
-         */
-        fputcsv($this->getStream(), $fieldList);
+        // Stream it
+        fputcsv($this->stream, $fieldList);
     }
 
 
@@ -85,8 +82,7 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
     {
         $fieldList = ['', '', ''];
 
-        /* Skip AM for Friday if not single-day view
-         */
+        // Skip AM for Friday if not single-day view
         for ($j = 0; $j < $this->getRange(); $j++) {
             if ($j || 1 === $this->getRange()) {
                 $fieldList[] = 'AM';
@@ -96,9 +92,8 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
             $fieldList[] = 'Bed';
         }
 
-        /* Stream it!
-         */
-        fputcsv($this->getStream(), $fieldList);
+        // Stream it!
+        fputcsv($this->stream, $fieldList);
     }
 
 
@@ -143,42 +138,18 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
                             $fieldList[] = $currentPeriod['night'][$i]['display'];
                         }
 
-                        /* Authorisation
-                         */
+                        // Authorisation
                         if (isset($currentPerson['request_authorisation_user_id'])) {
                             $fieldList[] = implode(' / ', $currentPerson['request_authorisation_user_id']);
                         } else {
                             $fieldList[] = '';
                         }
 
-                        /* Stream it
-                         */
-                        fputcsv($this->getStream(), $fieldList);
+                        // Stream it
+                        fputcsv($this->stream, $fieldList);
                     }
                 }
             }
         }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @param resource $stream
-     */
-    protected function setStream($stream)
-    {
-        $this->stream = $stream;
-    }
-
-
-    /**
-     * Get stream
-     *
-     * @return mixed
-     */
-    protected function getStream()
-    {
-        return $this->stream;
     }
 }
