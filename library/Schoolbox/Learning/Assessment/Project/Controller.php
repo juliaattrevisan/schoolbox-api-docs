@@ -284,7 +284,7 @@ class Controller extends Assessment\Controller
 
         // Calculate summary totals for display purposes
         foreach (Assessment\AssessmentType::getStringValues() as $type) {
-            if (Assessment\AssessmentType::TYPE_PROJECT == $type) {
+            if (Assessment\AssessmentType::TYPE_PROJECT === $type) {
                 continue;
             }
 
