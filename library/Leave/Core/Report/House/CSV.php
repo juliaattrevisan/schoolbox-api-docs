@@ -15,14 +15,6 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
      */
     private $stream;
 
-    protected $decoration = [
-        'pendingStart' => '',
-        'pendingEnd'   => ' ',
-
-        'approvedStart' => '',
-        'approvedEnd'   => ' ',
-    ];
-
 
     /**
      * Setup Hook for descendant classes
