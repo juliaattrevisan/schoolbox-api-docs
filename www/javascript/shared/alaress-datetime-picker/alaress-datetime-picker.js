@@ -219,7 +219,7 @@ function setValue(element, options, state, trigger, date) {
 function setPickerValue(pickerId, date) {
 
     if(date.isValid()) {
-        $("#adtp-modal-" + pickerId).attr('data-datepicker-value', date.format(momentFormats.databaseShort));
+        $("#adtp-modal-" + pickerId).attr('data-datepicker-value', date.format(momentFormats.databaseShort)).trigger('change');
     }
 
 }

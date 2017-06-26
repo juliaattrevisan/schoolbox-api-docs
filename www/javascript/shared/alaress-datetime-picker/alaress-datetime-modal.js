@@ -102,11 +102,15 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         });
 
         // If input value gets changed from outside, reset the timetable picker
-        $picker.change(function () {
+        $modal.change(function () {
             resetTimetablePicker();
         });
 
     }
+
+    $modal.change(function () {
+        updateCalendarResponse();
+    });
 
     // Setup calendar
     var newDate, latestDate;
