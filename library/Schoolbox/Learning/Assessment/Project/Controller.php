@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Project;
 
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Application\Exception as Application;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -268,6 +269,8 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @level 165
      * @param Participant $participant
+     * @throws ServiceNotFound If unable to find web renderer
+     * @throws Application\Exception If project in future and user has <= READ access
      */
     public function getSummary(Participant $participant)
     {
@@ -349,7 +352,7 @@ class Controller extends Assessment\Controller
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                "@learningAssessment/fragments/project/summary/student.twig",
+                '@learningAssessment/fragments/project/summary/student.twig',
                 $twigData
             )
         );
