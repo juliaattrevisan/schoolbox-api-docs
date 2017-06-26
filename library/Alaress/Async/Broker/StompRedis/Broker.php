@@ -11,7 +11,7 @@ namespace Alaress\Async\Broker\StompRedis;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Broker\IConsumer;
-use OutOfBoundsException;
+use Alaress\Async\Broker\PayloadMissingException;
 use Predis\ClientInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
@@ -76,7 +76,7 @@ abstract class Broker implements IBroker
             $this->stomp->subscribeWithAck($this->queue, self::ACK_MODE, function (Frame $frame, AckResolver $resolver) use ($consumer) {
                 // payload from STOMP is a key for collecting a redis payload
                 if (!$this->redis->exists($frame->body)) {
-                    throw new OutOfBoundsException("No payload for `{$frame->body}` exists");
+                    throw new PayloadMissingException("No payload for `{$frame->body}` exists");
                 }
 
                 $gzip    = $this->redis->get($frame->body);
