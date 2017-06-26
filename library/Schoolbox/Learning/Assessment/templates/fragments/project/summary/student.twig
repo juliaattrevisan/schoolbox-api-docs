@@ -75,7 +75,7 @@
     <div class="small-6 island">
 
         {% if assessment.isFeedbackVisibleToUser(USER) %}
-            <h2 class="subheader">Project Grade</h2>
+            <h2 class="subheader">{{ locale.project }} {{ locale.grades }}</h2>
             <section>
                 <div class="grade content">
                     <span class="{{ urgency.marks(assessment.normalisedMark(student, true)) }}">
