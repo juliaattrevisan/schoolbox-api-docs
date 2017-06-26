@@ -27,14 +27,16 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
 
     protected $rangePeriods = array('morning', 'day', 'night');
 
+
     /**
-     * Set up blocks and stuff
-     * @param array $data extra data for descendant classes
-     * @return void
+     * @inheritdoc
      */
-    protected function setup(array $data) {
+    public function __construct(SitePage $page, array $data)
+    {
+        parent::__construct($page, $data);
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
     }
+
 
     /**
      * Facade method

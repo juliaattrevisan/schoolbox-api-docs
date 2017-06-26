@@ -17,13 +17,11 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
 
 
     /**
-     * Setup Hook for descendant classes
-     *
-     * @param array $data extra data for descendant classes
-     * @return void
+     * @inheritdoc
      */
-    protected function setup(array $data)
+    public function __construct(SitePage $page, array $data)
     {
+        parent::__construct($page, $data);
         $this->getPage()->setAjax(true);
     }
 
