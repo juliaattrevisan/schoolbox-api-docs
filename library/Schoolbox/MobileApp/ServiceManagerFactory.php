@@ -21,17 +21,13 @@ class ServiceManagerFactory
 
     const TEMP_CERT_FILENAME = '/sbapns.pem';
 
-    /**
-     * @var IConfigLoader
-     */
+    /** @var IConfigLoader */
     private $conf;
-    /**
-     * @var LoggerInterface
-     */
+
+    /** @var LoggerInterface */
     private $log;
-    /**
-     * @var RegistryMapper
-     */
+
+    /** @var RegistryMapper */
     private $registryMapper;
 
 
@@ -64,7 +60,7 @@ class ServiceManagerFactory
             if (in_array(Registry::PROVIDER_GOOGLE, $providers)) {
                 try {
                     $services[] = $this->buildGoogleService();
-                    $log->debug("Added GCM service");
+                    $log->debug('Added GCM service');
                 } catch (OutOfBoundsException $e) {
                     $log->debug($e->getMessage());
                 }
@@ -73,14 +69,14 @@ class ServiceManagerFactory
             if (in_array(Registry::PROVIDER_APPLE, $providers)) {
                 try {
                     $services[] = $this->buildAppleService();
-                    $log->debug("Added APNS service");
+                    $log->debug('Added APNS service');
                 } catch (OutOfBoundsException $e) {
                     $log->debug($e->getMessage());
                 }
             }
 
         } else {
-            $log->debug("Push notifications are not enabled");
+            $log->debug('Push notifications are not enabled');
         }
 
         // return this anyway, even if it's empty
@@ -99,7 +95,7 @@ class ServiceManagerFactory
         if ($conf->get('push_gcm_api_key')) {
             return new Cloud\Google\GCM($this->registryMapper, $conf->get('push_gcm_api_key'));
         }
-        throw new OutOfBoundsException("GCM is not enabled");
+        throw new OutOfBoundsException('GCM is not enabled');
     }
 
 
@@ -120,19 +116,19 @@ class ServiceManagerFactory
             // since this is on-construction, check the file in play and see if it needs updating
             if ($this->apnsCertRequiresUpdate($conf->get('push_apns_cert_path'))) {
                 // copy the cert from storage
-                $fp = fopen($tempCert, 'w');
+                $fp = fopen($tempCert, 'wb');
                 Storage\Mapper::getInstance()->findByHash($conf->get('push_apns_cert_path'))->pipe($fp);
                 fclose($fp);
-                $log->debug("Updated Apple cert");
+                $log->debug('Updated Apple cert');
 
             } else {
-                $log->debug("Apple cert is up to date");
+                $log->debug('Apple cert is up to date');
             }
 
             return new Cloud\Apple\APNS($this->registryMapper, Apns\Client\Message::PRODUCTION_URI, $tempCert, $conf->get('push_apns_cert_key') ?: null);
         }
 
-        throw new OutOfBoundsException("APNS is not enabled");
+        throw new OutOfBoundsException('APNS is not enabled');
     }
 
 
@@ -150,7 +146,7 @@ class ServiceManagerFactory
         if (!filesize($tempCert)) {
             return true;
         }
-        if (sha1_file($tempCert) != $hashInStorage) {
+        if (sha1_file($tempCert) !== $hashInStorage) {
             return true;
         }
 
