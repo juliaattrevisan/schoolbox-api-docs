@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Error;
 
 class Controller extends Assessment\Controller
 {
@@ -280,21 +281,6 @@ class Controller extends Assessment\Controller
         $project = $participant->getAssessable();
         $student = $participant->getUser();
 
-        $counts = [];
-
-        // Calculate summary totals for display purposes
-        foreach (Assessment\AssessmentType::getStringValues() as $type) {
-            if (Assessment\AssessmentType::TYPE_PROJECT === $type) {
-                continue;
-            }
-
-            $counts[$type]              = 0;
-            $counts["{$type}Completed"] = 0;
-        }
-
-        $counts['total']          = 0;
-        $counts['totalCompleted'] = 0;
-
         $subActivities = $project->getAssessables();
 
         // obtain user access level
@@ -303,8 +289,8 @@ class Controller extends Assessment\Controller
         if ($access < UserAccess::ACCESS_WRITE) {
             // if you have read or less, you have additional restrictions
             if ($project->getPublishAt()->isFuture()) {
-                // project is not
-                throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+                // un-published projects are not visible to learners
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PERM_PAGE_VIEW);
             }
 
             // this isn't cached in the factory method... for some reason...
@@ -319,27 +305,6 @@ class Controller extends Assessment\Controller
             $project->setAssessables($subActivities);
         }
 
-        /** @var IAssessable $subActivity */
-        foreach ($subActivities as $subActivity) {
-
-            if (!$subActivity->isParticipant($student)) {
-                // This student isn't a participant.
-                // This is fine - when PBL is implemented not all students
-                // will participate in all sub-assessments
-                continue;
-            }
-
-            $type = Assessment\AssessmentType::objectToString($subActivity);
-
-            // If the student has submitted at least one response we will assume it is completed
-            $counts[$type]++;
-            $counts['total']++;
-
-            if ($participant->getAllResponses()->count() > 0) {
-                $counts["{$type}Completed"]++;
-                $counts['totalCompleted']++;
-            }
-        }
 
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
@@ -347,7 +312,6 @@ class Controller extends Assessment\Controller
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($project, $this->getUser())->add([ $project->getTitle(), '' ]),
             'student'     => $student,
             'assessment'  => $project,
-            'counts'      => $counts,
         ];
 
         $this->getResponse()->content->set(
