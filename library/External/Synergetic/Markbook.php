@@ -238,7 +238,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         }
         return [
             'Heading' => $this->getDatabase()->quote($assessment->getName()),
-            'HdgAbbrev1' => $this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(), 10)),
+            'HdgAbbrev1' => $this->getDatabase()->quote(mb_substr($assessment->getName(), 0, 10)),
             'HdgAbbrev2' => $this->getMarkbookIdentifier($assessment),
             'WeightingFactor' => $weight,
         ];
