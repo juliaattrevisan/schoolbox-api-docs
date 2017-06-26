@@ -42,7 +42,7 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 		header("Content-type: text/csv");
 		header("Cache-Control: no-store, no-cache");
 		header('Content-Disposition: attachment; filename="House Report.csv"');
-		$this->setStream(fopen("php://output",'w'));
+		$this->setStream(fopen("php://output",'wb'));
 
 		$this->renderHeadings();
 		$this->renderSubheadings();
