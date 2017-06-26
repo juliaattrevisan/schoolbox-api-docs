@@ -1,14 +1,60 @@
 <?php
 /**
- * Tass implementation of external events
+ * TASS Scheduler Events related queries
  *
- * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
 namespace Schoolbox\External\Connector\Tass\Base;
 
-class ExternalEvents extends \Schoolbox\External\Connector\Offline\Base\ExternalEvents
+use Alaress_Date_Format;
+use Schoolbox\External\Connector\IExternalEvents;
+use Schoolbox\External\Connector\Base;
+
+class ExternalEvents extends Base implements IExternalEvents
 {
+    /**
+     * @inheritdoc
+     */
+    public function getExternalEvents($user, $startDate, $endDate)
+    {
+        $start =    new Alaress_Date_Format($startDate, 'U');
+        $end =      new Alaress_Date_Format($endDate, 'U');
+
+        $query = "
+            select  ec.event_id as id,
+                    ec.entry_code as owner,
+                    ec.event_name as comment,
+                    ec.room_code as room,
+                    case 
+                        when ec.start_time is not null then ec.start_date + ec.start_time 
+                        else ec.start_date 
+                    end as start,
+                    case 
+                        when ec.end_time is not null then ec.end_date + ec.end_time 
+                        else ec.end_date 
+                    end as finish,
+                    ec.campus_code as location,
+                    '' as team
+            from    eventcalendar ec
+            where   ec.entry_code = :staffExternalId AND
+                    case 
+                        when ec.start_time is not null then ec.start_date + ec.start_time 
+                        else ec.start_date 
+                    end <= :endTime AND
+                    case 
+                        when ec.end_time is not null then ec.end_date + ec.end_time 
+                        else ec.end_date 
+                    end >= :startTime
+                    
+        ";
+
+        return $this->databaseExternal->executeQueryIterator($query, [
+            'staffExternalId'   => $user->getExternalId,
+            'startTime'         => $start->getDatabase(),
+            'endTime'           => $end->getDatabase()
+        ]);
+    }
 }
