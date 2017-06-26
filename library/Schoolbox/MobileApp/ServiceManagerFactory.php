@@ -13,7 +13,6 @@ use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Alaress\Async\Notification\Cloud;
-use Schoolbox\MobileApp;
 use Schoolbox\Resource\Storage;
 use ZendService\Apple\Apns;
 
@@ -85,7 +84,7 @@ class ServiceManagerFactory
         }
 
         // return this anyway, even if it's empty
-        return new MobileApp\ServiceManager($services, $log);
+        return new ServiceManager($services, $log);
     }
 
 
