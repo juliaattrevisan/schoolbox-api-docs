@@ -839,8 +839,11 @@ class Leave_Controller extends Controller
             error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
-        $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/Y H:i:s');
-        $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/Y H:i:s');
+        $startString = trim("{$data['request']['start']['date']} {$data['request']['start']['time']}");
+        $endString   = trim("{$data['request']['finish']['date']} {$data['request']['finish']['time']}");
+
+        $start = new Alaress_Date_Format($startString, 'd/m/Y g:ia');
+        $finish = new Alaress_Date_Format($endString, 'd/m/Y g:ia');
 
         $request->setStart($start);
         $request->setFinish($finish);
