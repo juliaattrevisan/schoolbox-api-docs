@@ -682,8 +682,8 @@ class Leave_Controller extends Controller
         $this->getPage()->setBlock(TEMPLATE_content, 'travel_drop', 'travel_drop_block');
         $this->getPage()->dropDown(
             'travel_drop',
-            $this->getTravelTypes(),
-            $request->getTravelType()->getId(),
+            $this->travelTypes,
+            $request->getTravelType() ? $request->getTravelType()->getId() : null,
             TEMPLATE_content,
             array(
                 'name' => 'TRAVEL_DROP_NAME',
