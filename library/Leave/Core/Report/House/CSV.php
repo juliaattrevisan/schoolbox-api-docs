@@ -1,13 +1,10 @@
 <?php
 /**
- * Leave_Core_Report_House_CSV
- *
- * Export method for the House Report
+ * CSV Export method for the House Report
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
 
 
@@ -51,10 +48,10 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 		fclose($this->getStream());
 	}
 
-	/* For each day that the person is on leave within the prescribed period of time, show an
-	 * icon. If they are starting or ending their leave on this day, show the time as well
+	/* For each day that the person is on leave within the prescribed period of time, show an 'L' char.
+     * If they are starting or ending their leave on this day, show the time instead.
 	 *
-	 * Render 3 columns each day for 3 days
+	 * Render 3 columns each per day. Skip morning of first day if viewing multiple days.
 	 *
 	 * Morning: 00:00:00 to 09:59:59
 	 * Day: 10:00:00 to 18:59:59
@@ -67,11 +64,10 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 			$headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimestamp(), 'U');
 			$headerDate->addDays($j);
 
-			/* Skip AM for Friday if using Weekend view
-			 */
 			$fieldList[] = $headerDate->getLongDateOnly();
 			$fieldList[] = '';
 
+            // Don't render AM column if first of multiple days
 			if ($j || 1 === $this->getRange()) {
 				$fieldList[] = '';
 			}
@@ -115,40 +111,50 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 
 			if (is_array($allPeople) && count($allPeople)) {
 				foreach($allPeople as $userId => $currentPerson) {
-					$fieldList = array();
 
-					/* Personal details
-					 */
-					$fieldList[] = $currentPerson['user_name'];
-					$fieldList[] = $currentPerson['user_year'];
-					$fieldList[] = $currentPerson['user_boarding_status'];
+                    /* A user may have multiple, potentially overlapping requests, for the report period.
+                     * If so, we print each request on its own row, we do not aggregate as some fields are
+                     * should not be aggregated, eg 'host', etc
+                     */
+                    $countRequests = count($currentPerson['request_id']);
+                    /** @noinspection ForeachInvariantsInspection */
+                    for ($i = 0; $i < $countRequests; $i++) {
 
-					/* Periods
-					 */
-					for ($j = 0; $j < count($currentPerson['periods']); $j++) {
-						$currentPeriod = $currentPerson['periods'][$j]['request_period'];
+                        $fieldList = [];
 
-						if ($j || 1 === $this->getRange()) {
-							$fieldList[] = $currentPeriod['morning'][0]['display'];
-						}
+                        // Personal details (but only for first iteration)
+                        $fieldList[] = $i ? '' : $currentPerson['user_name'];
+                        $fieldList[] = $i ? '' : $currentPerson['user_year'];
+                        $fieldList[] = $i ? '' : $currentPerson['user_boarding_status'];
 
-						$fieldList[] = $currentPeriod['day'][0]['display'];
-						$fieldList[] = $currentPeriod['night'][0]['display'];
-					}
+                        // Periods
+                        /** @var string[][][][] $currentPerson ['periods'] */
+                        foreach ($currentPerson['periods'] as $j => $period) {
+                            $currentPeriod = $period['request_period'];
 
-					/* Authorisation
-					 */
-					if (isset($currentPerson['request_authorisation_user_id'])) {
-						$fieldList[] = implode(' / ', $currentPerson['request_authorisation_user_id']);
-					}
-					else {
-						$fieldList[] = '';
-					}
+                            // Don't print AM column for first day, unless only showing a single day
 
-					/* Stream it
-					 */
-					fputcsv($this->getStream(), $fieldList);
-				}
+                            if ($j || 1 === $this->getRange()) {
+                                $fieldList[] = $currentPeriod['morning'][$i]['display'];
+                            }
+
+                            $fieldList[] = $currentPeriod['day'][$i]['display'];
+                            $fieldList[] = $currentPeriod['night'][$i]['display'];
+                        }
+
+                        /* Authorisation
+                         */
+                        if (isset($currentPerson['request_authorisation_user_id'])) {
+                            $fieldList[] = implode(' / ', $currentPerson['request_authorisation_user_id']);
+                        } else {
+                            $fieldList[] = '';
+                        }
+
+                        /* Stream it
+                         */
+                        fputcsv($this->getStream(), $fieldList);
+                    }
+                }
 			}
 		}
 	}
