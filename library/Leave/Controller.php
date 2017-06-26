@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Error;
 
 class Leave_Controller extends Controller
 {
@@ -181,7 +182,7 @@ class Leave_Controller extends Controller
     public function renderSummary()
     {
         if (!$this->hasReportingPermission()) {
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewSummary.html');
@@ -323,7 +324,7 @@ class Leave_Controller extends Controller
     public function executeCreateRequest()
     {
         if(!$this->hasCreatePermission()){
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         return array();
@@ -564,7 +565,7 @@ class Leave_Controller extends Controller
     public function processCreateRequest($data)
     {
         if(!$this->hasCreatePermission()){
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         if (!is_array($data) || empty($data['request'])) {
@@ -672,7 +673,7 @@ class Leave_Controller extends Controller
             throw new SchoolboxNotFoundException('User\'s house not found');
         }
         if (!$this->hasApprovePermission($house->getId())) {
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
@@ -835,7 +836,7 @@ class Leave_Controller extends Controller
         }
 
         if (!$this->hasApprovePermission($request->getUser()->getResidentialHouse()->getId())) {
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/Y H:i:s');
@@ -915,7 +916,7 @@ class Leave_Controller extends Controller
         }
 
         if (!$this->hasReportingPermission()) {
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $requestList = $this->getRequestMapper()->findAllByHouseId($house->getId());
@@ -1185,7 +1186,7 @@ class Leave_Controller extends Controller
             throw new SchoolboxNotFoundException('User\'s house not found');
         }
         if (!($this->hasViewPermission($user->getId(), $house->getId()))) {
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
@@ -1279,7 +1280,7 @@ class Leave_Controller extends Controller
                 $this->getPage()->setVar('previous_request_list_block', '');
             }
 //        else {
-//            error(19);
+//            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
 //        }
     }
 
@@ -1307,7 +1308,7 @@ class Leave_Controller extends Controller
             throw new SchoolboxNotFoundException('User\'s house not found');
         }
         if (!$this->hasApprovePermission($house->getId())) {
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $requestList = $data['requestList'];
@@ -1415,7 +1416,7 @@ class Leave_Controller extends Controller
         }
 
         if (!$this->hasReportingPermission()) {
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
         switch($timespan){
@@ -1506,7 +1507,7 @@ class Leave_Controller extends Controller
     public function executeCateringReport($date)
     {
         if (!$this->hasReportingPermission()) {
-            error(19);
+            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
         /* Collate results for each day
            */
