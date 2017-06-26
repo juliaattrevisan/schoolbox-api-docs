@@ -16,7 +16,6 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 class Controller extends BaseController
 {
-
     /** @var Mapper $filterMapper */
     private $filterMapper;
 
@@ -68,6 +67,7 @@ class Controller extends BaseController
             'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
+            'pageCurrent' => basename($this->getRequest()->query->get('page')),
         ])->setTitle('Filterable pages'));
     }
 

@@ -7,16 +7,15 @@
             PAGE_MARK_BOOK           string
             PAGE_PENDING_ASSESSMENTS string
             ENTITY_ASSESSMENTS       string
+            pageCurrent              string
 #}
 
-<div class="row">
-    {{ renderAdminNavigation(pageCurrent) }}
-</div>
 
-<h2 class="subheader">Filterable Pages</h2>
+{{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
     <div class="small-12 island">
+        <h2 class="subheader">Filterable Pages</h2>
         <section>
             <ul class="information-list">
                 {% for page, pageFilters in filtersPerPage %}
