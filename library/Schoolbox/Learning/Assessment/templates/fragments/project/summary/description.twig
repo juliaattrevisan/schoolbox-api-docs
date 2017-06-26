@@ -1,70 +1,14 @@
-{% import '@learning/macro/dueDate.twig' as dueDate %}
+{#
+    Displays a project's description if it is non-empty.
 
-<ul class="meta">
-    {% if assessment.baseContext is not unitSpecification %}
-    <li class="icon-calendar">{{ dueDate.dueDate(assessment, user) }}</li>
-    {% endif %}
-    {% if user.role.isStaff %}
-        <li class="icon-progress">Mark Calculated as {{ assessment.summator.title }}</li>
+    data:
+        'assessment'   Project
+#}
 
-        {% if student.id %}
-        <li class="icon-staff-students">{{ student.fullname }}</li>
-        {% endif %}
-    {% endif %}
-</ul>
-
-{% if assessment.description|length %}
+{% if assessment.description | length %}
 <section class="content">
     <article>
         {{ assessment.description | purify }}
     </article>
 </section>
 {% endif %}
-
-<script>
-    $(function () {
-
-        $('[data-more]').each(function() {
-            var maximumHeight = $(this).data('more');
-            var description = $(this).find('.description:first');
-            var more = $(this).find('.more:first');
-
-            if (description.height() > maximumHeight) {
-
-                {# Description was too long, truncate it and display read more link #}
-
-                description.data('original', description.height());
-                description.height(maximumHeight);
-                description.css({'overflow': 'hidden'});
-
-                {# Store reference to the description on the more link #}
-
-                more.data('description', description);
-                more.removeClass('hide');
-
-                $(more).click(function(e) {
-                    e.preventDefault();
-
-                    if ($(this).data('description').height() == maximumHeight) {
-                        {# Expand to original height #}
-                        $(this).data('description').height('auto');
-                        $(this).find('a:first').html('Hide Full Description');
-                        $(this).find('a:first').removeClass('icon-down-arrow');
-                        $(this).find('a:first').addClass('icon-up-arrow');
-                    } else {
-                        {# Collapse #}
-                        $(this).data('description').height(maximumHeight);
-                        $(this).find('a:first').html('Show Full Description');
-                        $(this).find('a:first').removeClass('icon-up-arrow');
-                        $(this).find('a:first').addClass('icon-down-arrow');
-                    }
-                });
-
-            } else {
-
-                {# Description was short enough to display, hide the read more link #}
-                $(more).hide();
-            }
-        })
-    });
-</script>
