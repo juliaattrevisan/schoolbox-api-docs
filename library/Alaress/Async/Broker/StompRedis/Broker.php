@@ -74,16 +74,20 @@ abstract class Broker implements IBroker
 
         try {
             $this->stomp->subscribeWithAck($this->queue, self::ACK_MODE, function (Frame $frame, AckResolver $resolver) use ($consumer) {
+
+                $resolve = new Resolver($resolver);
+
                 // payload from STOMP is a key for collecting a redis payload
                 if (!$this->redis->exists($frame->body)) {
-                    throw new PayloadMissingException("No payload for `{$frame->body}` exists");
+                    $consumer->onException(new PayloadMissingException($frame->body, $resolve));
+                    return;
                 }
 
                 $gzip    = $this->redis->get($frame->body);
                 $serial  = gzuncompress($gzip);
                 $payload = unserialize($serial);
 
-                $consumer->onMessage($payload, new Resolver($resolver));
+                $consumer->onMessage($payload, $resolve);
             });
 
         } catch (\Exception $e) {
