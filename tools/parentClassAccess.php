@@ -117,7 +117,10 @@ if ($handle) {
             }
 
             for ($i = 1; $i < count($row); $i++) {
-                $classes[$row[0]][] = $row[$i];
+                $code = $row[$i];
+                if (strlen(trim($code)) > 0) {
+                    $classes[$row[0]][] = $row[$i];
+                }
             }
         }
     }
