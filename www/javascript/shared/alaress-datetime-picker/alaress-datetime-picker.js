@@ -398,7 +398,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var $label = element.closest('label');
 
         if ($label.length) {
-            // in this case, the DOM needs to be rearranged so that the flex button is adjacent tot he label, not inside
+            // in this case, the DOM needs to be rearranged so that the flex button is adjacent to the label, not inside
             $label.attr('for', element.attr('id'));
             element.detach();
             $label.after(element);
