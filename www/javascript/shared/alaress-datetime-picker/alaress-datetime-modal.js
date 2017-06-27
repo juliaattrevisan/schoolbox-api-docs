@@ -102,14 +102,18 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         });
 
         // If input value gets changed from outside, reset the timetable picker
-        $modal.change(function () {
-            resetTimetablePicker();
+        $picker.change(function () {
+            if (isInputValueValid) {
+                resetTimetablePicker();
+            }
         });
 
     }
 
-    $modal.change(function () {
-        updateCalendarResponse();
+    $picker.change(function () {
+        if (isInputValueValid) {
+            updateCalendarResponse();
+        }
     });
 
     // Setup calendar
@@ -172,7 +176,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 var selectedObj = new Date(selectedDates);
                 newDate = selectedObj.getFullYear() + '-' + (selectedObj.getMonth() + 1) + '-' + selectedObj.getDate();
                 if (newDate !== latestDate) {
+                    alert('on change' + dateSplit[0]);
                     requestDataByDate(dateSplit[0], 'calendar');
+
                 }
                 latestDate = newDate;
             }
@@ -501,7 +507,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * @param target (calendar | timetable)
      */
     function requestDataByDate(date, target) {
-
         var urlDate = encodeURIComponent(date);
 
         setRequestDate(date, target);
@@ -1219,6 +1224,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         var activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
             requestDate = moment(getRequestDate('calendar'), momentFormats.databaseShort);
         if (requestDate.diff(activeDate)) {
+            alert('active date' + activeDate.format(momentFormats.databaseShort));
             requestDataByDate(activeDate.format(momentFormats.databaseShort), 'calendar');
         }
 
@@ -1269,5 +1275,12 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function isEventType(type) {
         return type === 'event';
+    }
+
+    function isInputValueValid() {
+
+        var value = moment($picker.val().momentFormat);
+        return value.isValid();
+
     }
 };
