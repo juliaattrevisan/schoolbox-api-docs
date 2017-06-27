@@ -103,7 +103,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // If input value gets changed from outside, reset the timetable picker
         $picker.change(function () {
-            if (isInputValueValid) {
+            if (isInputValueValid()) {
                 resetTimetablePicker();
             }
         });
@@ -111,7 +111,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     }
 
     $picker.change(function () {
-        if (isInputValueValid) {
+        if (isInputValueValid()) {
             updateCalendarResponse();
         }
     });
@@ -176,9 +176,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 var selectedObj = new Date(selectedDates);
                 newDate = selectedObj.getFullYear() + '-' + (selectedObj.getMonth() + 1) + '-' + selectedObj.getDate();
                 if (newDate !== latestDate) {
-                    alert('on change' + dateSplit[0]);
                     requestDataByDate(dateSplit[0], 'calendar');
-
                 }
                 latestDate = newDate;
             }
@@ -1211,8 +1209,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function resetCalendar() {
 
-        var activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort);
+        var activeDate = moment(getInputValue(), dateDisplayFormats.momentJs);
+        if(activeDate.isValid()) {
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());
+        }
 
     }
 
@@ -1221,10 +1221,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function updateCalendarResponse() {
 
-        var activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
+        var activeDate = moment(getInputValue(), dateDisplayFormats.momentJs),
             requestDate = moment(getRequestDate('calendar'), momentFormats.databaseShort);
-        if (requestDate.diff(activeDate)) {
-            alert('active date' + activeDate.format(momentFormats.databaseShort));
+        if (activeDate.isValid() && requestDate.diff(activeDate)) {
             requestDataByDate(activeDate.format(momentFormats.databaseShort), 'calendar');
         }
 
@@ -1235,24 +1234,20 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function updateTimetableResponse() {
 
-        var timetableDate =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
-            activeDate = moment(getPickerValue(twigVars.id), momentFormats.databaseShort),
+        var activeDate = moment(getInputValue(), dateDisplayFormats.momentJs),
+            timetableDate =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
             requestDate = moment(getRequestDate('timetable'), momentFormats.databaseShort);
 
         // The picker value has been changed externally
-        if (timetableDate.diff(activeDate)) {
+        if (activeDate.isValid() && timetableDate.diff(activeDate)) {
             // Set new value
             setTimetablePickerValue(activeDate.format(momentFormats.databaseShort));
             // And request data for the new date
             requestDataByDate(activeDate.format(momentFormats.databaseShort), 'timetable');
         }
-        // Some data has already been requested
-        else if (requestDate.isValid()) {
-            // But check if the data request needs to be updated
-            if (requestDate.diff(timetableDate)) {
-                requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
-            }
-            // The data matches the date, don't re-request
+        // Some data has already been requested, check if the data request needs to be updated
+        else if (requestDate.isValid() && requestDate.diff(timetableDate)) {
+            requestDataByDate(timetableDate.format(momentFormats.databaseShort), 'timetable');
         }
         else {
             // Request data for the current timetable value
@@ -1277,10 +1272,21 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         return type === 'event';
     }
 
+    /**
+     * Get input field value
+     */
+    function getInputValue() {
+
+        return $picker.val();
+
+    }
+
+    /**
+     * Check if the current value of the input field is valid
+     */
     function isInputValueValid() {
 
-        var value = moment($picker.val().momentFormat);
-        return value.isValid();
+        return moment(getInputValue(), dateDisplayFormats.momentJs).isValid();
 
     }
 };
