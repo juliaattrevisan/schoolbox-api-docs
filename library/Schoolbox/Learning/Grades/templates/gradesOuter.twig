@@ -27,7 +27,7 @@
     });
 </script>
 
-{# Crumbs: Learning > Grades > Report #}
+{# Crumbs: Learning > Grades > {subject.name} #}
 
 {{ bread.crumbs(['Learning', '/learning/classes'], [locale.grades.properPlural, routeLookup('learningGrades.getGrades', {userId: student.id, termCode: term.code})], [subject.name]) }}
 
