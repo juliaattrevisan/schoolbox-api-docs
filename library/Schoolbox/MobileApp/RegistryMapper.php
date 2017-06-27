@@ -41,6 +41,8 @@ class RegistryMapper extends Mapper
         $this->uses('provider',   self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('touched_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+
+        $this->joins('app_id', AppMapper::class, 'app_id', null, null, 'app', 'app');
     }
 
 
@@ -66,11 +68,13 @@ class RegistryMapper extends Mapper
      *
      * @return string
      */
-    protected function getSelectString()
+    public function getSelectString()
     {
         return "
             SELECT {$this->getColumnString()},
-            {$this->getJoinColumnString('user_id', 'u')}
+            {$this->getJoinColumnString('user_id', 'u')},
+            {$this->getJoinColumnString('app', 'a')},
+            {$this->getJoinMapper('app')->getJoinColumnString('pem', 'p')}
         ";
     }
 
@@ -81,10 +85,12 @@ class RegistryMapper extends Mapper
      *
      * @return string
      */
-    protected function getFromString()
+    public function getFromString()
     {
         return "
             FROM {$this->table}
+            LEFT JOIN {$this->getJoinSql('app', '', 'a')}
+            LEFT JOIN {$this->getJoinMapper('app')->getJoinSql('pem', 'a', 'p')}
             LEFT JOIN {$this->getJoinSql('user_id', '', 'u', true)}
         ";
     }

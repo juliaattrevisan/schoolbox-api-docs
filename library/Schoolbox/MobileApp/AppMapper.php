@@ -8,6 +8,7 @@
 
 namespace Schoolbox\MobileApp;
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\Mapper;
 
 
@@ -19,8 +20,10 @@ class AppMapper extends Mapper
      */
     protected function mapping()
     {
+        $this->hasTable('mobile_app');
+
         $this->uses('app_id', self::TYPE_STRING, self::COLUMN_IDENTIFIER, 'id');
-        $this->joins('pem_hash', \Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'pem', 'hash');
+        $this->joins('pem_hash', Storage\Mapper::class, 'hash', null, null, 'pem', 'pem');
     }
 
 }
