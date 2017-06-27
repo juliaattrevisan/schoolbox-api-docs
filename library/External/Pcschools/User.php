@@ -697,6 +697,7 @@ class External_Pcschools_User implements External_UserInterface
                     T.STAFF_ROOM AS StaffRoom,
                     T.INTERNAL_PH_EXT AS StaffExtension,
                     T.MOBILE AS StaffMobilePhone,
+                    T.MOBILE AS StaffDefaultMobilePhone,
                     T_CAMPUS.DESCRIPTION AS StaffCampusDescription,
                     T.STATUS AS StaffCategoryDescription,
                     '' AS StaffDepartment,
