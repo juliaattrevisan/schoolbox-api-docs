@@ -441,6 +441,7 @@ class External_Doublefirst_User implements External_UserInterface
                             '' AS StaffRoom,
                             '' AS StaffExtension,
                             tMobile.TelephoneNumber AS StaffMobilePhone,
+                            tMobile.TelephoneNumber AS StaffDefaultMobilePhone,
                             '' AS StaffCampusDescription,
                             cat.Description AS StaffCategoryDescription,
                             '' AS StaffDepartment,
