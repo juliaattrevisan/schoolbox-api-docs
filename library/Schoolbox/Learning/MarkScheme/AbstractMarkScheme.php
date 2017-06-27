@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use RangeException;
-use Schoolbox\Learning\Assessment\Participant;
 
 abstract class AbstractMarkScheme implements IMarkScheme
 {
@@ -20,13 +19,14 @@ abstract class AbstractMarkScheme implements IMarkScheme
      *
      * @var bool
      */
-    protected $quantitative = false;
+    const QUANTITATIVE = false;
 
     /**
      * Bounds checks a normalised mark
      *
      * @param float $normalisedMark
-     * @throws RangeException
+     * @throws RangeException If $normalisedMark is outside 0.0 to 100.0
+     * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
     protected function validateNormalisedMark($normalisedMark)
     {
@@ -37,12 +37,12 @@ abstract class AbstractMarkScheme implements IMarkScheme
     /**
      * Validates normalised mark type
      *
-     * @param float $normalisedMark
-     * @throws \InvalidArgumentException if $normalisedMark isn't a numeric type
+     * @param float|int $normalisedMark
+     * @throws \InvalidArgumentException If $normalisedMark isn't a numeric type
      */
     protected function validateNormalisedMarkType($normalisedMark)
     {
-        if(!(is_double($normalisedMark) || is_int($normalisedMark))){
+        if(!(is_float($normalisedMark) || is_int($normalisedMark))){
             $type = gettype($normalisedMark);
             $msg = "Normalised mark type must be float or int: $normalisedMark ($type)";
             throw new \InvalidArgumentException($msg);
@@ -77,7 +77,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
      */
     public function isQuantitative()
     {
-        return $this->quantitative;
+        return static::QUANTITATIVE;
     }
 
     /**
@@ -85,34 +85,6 @@ abstract class AbstractMarkScheme implements IMarkScheme
      */
     public function isQualitative()
     {
-        return !$this->quantitative;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPublishedNormalisedMark(Participant $participant)
-    {
-        $feedback = $participant->findMostRecentPublishedFeedback();
-        return $feedback ? $feedback->getNormalisedMark() : null;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getPublishedHumanReadableMark(Participant $participant)
-    {
-        $feedback = $participant->findMostRecentPublishedFeedback();
-        return $feedback ? $feedback->getHumanReadableMark() : null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMostRecentHumanReadableMark(Participant $participant)
-    {
-        $feedback = $participant->findMostRecentFeedback();
-        return $feedback ? $feedback->getHumanReadableMark() : null;
+        return !static::QUANTITATIVE;
     }
 }

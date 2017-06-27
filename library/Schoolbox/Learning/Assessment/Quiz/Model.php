@@ -19,6 +19,7 @@ use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
@@ -83,48 +84,76 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Feedback is required if latest attempt exists, is submitted, and is unreviewed.
+
+     *
      * @inheritdoc
      */
     public function isFeedbackRequired(Participant $participant)
     {
         $this->assertSameAssessment($participant);
 
-        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
+        // Participant mark taken from latest attempt
+        $authoritativeResponse = $participant->findMostRecentSubmittedResponse();
 
-        // Does quiz have most recent response and it is not reviewed ?
-        return $latestSubmittedResponse && !$latestSubmittedResponse->hasPublishedFeedback();
+        // Does participant have a response, and does is it not reviewed?
+        return $authoritativeResponse && !$authoritativeResponse->hasPublishedFeedback();
     }
 
     /**
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return null|string
+     * A Quiz is configured to take the mark from the most recently reviewed attempt
+     *
+     * @inheritdoc
      */
-    public function getHumanReadableMark(User $user, $publishedOnly)
+    public function getNormalisedMark(Participant $participant, $publishedOnly)
     {
-        $markScheme = $this->getMarkScheme();
+        // Determine which QuizAttempt we are taking the mark from
+        /** @var Attempt\Model $authoritativeAttempt */
+        $authoritativeAttempt = $this->getAuthoritativeResponse($participant, $publishedOnly);
 
-        // Special Case: If a Quiz has sections with questions pools, the total marks available may change per attempt
-        if ($markScheme instanceof TotalMarkFractional) {
-            $participant = $this->getParticipant($user);
+        if(null === $authoritativeAttempt){
+            return null;
+        }
+        return IMarkScheme::NORMALISED_MARK_MAX * $authoritativeAttempt->getMarksGiven() / $authoritativeAttempt->getMarksAvailable();
+    }
 
-            $feedback = $publishedOnly
-                ? $participant->findMostRecentPublishedFeedback()
-                : $participant->findMostRecentFeedback();
+    /**
+     * @inheritdoc
+     */
+    public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
+    {
+        $this->assertSameAssessment($participant);
 
-            $response = $feedback
-                ? $feedback->getResponse()
-                : null;
+        /** @var Attempt\Model $latestAttempt */
+        $latestAttempt = null;
+        foreach($participant->getAllResponses() as $attempt){
 
-            // Response
-            if (!isset($response)) {
-                return null;
+            // Skip responses that are not submitted yet (ie still in progress), or have no feedback, or not published if $publishedOnly
+            if(!$attempt->isSubmitted() || !$attempt->hasFeedback() || ($publishedOnly && !$attempt->getAllFeedback()[0]->isPublished())){
+                continue;
             }
 
-            return $markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
+            // Submitted later? Or submitted at same time but created later?
+            // (the latter handles case when minor release auto-finished a bunch of attempts)
+            if(!$latestAttempt
+                || $attempt->getSubmittedAt()->gt($latestAttempt->getSubmittedAt())
+                || ($attempt->getSubmittedAt()->eq($latestAttempt->getSubmittedAt()) && $attempt->getCreatedAt()->gt($latestAttempt->getCreatedAt()))
+            ){
+                $latestAttempt = $attempt;
+            }
         }
+        return $latestAttempt;
+    }
 
-        return parent::getHumanReadableMark($user, $publishedOnly);
+    /**
+     * @inheritdoc
+     */
+    public function getAuthoritativeFeedback(Participant $participant, $publishedOnly)
+    {
+        $attempt = $this->getAuthoritativeResponse($participant, $publishedOnly);
+        return $attempt && $attempt->hasFeedback()
+            ? $attempt->getAllFeedback()->first()
+            : null;
     }
 
     /**

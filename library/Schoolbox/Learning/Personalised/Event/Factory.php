@@ -191,7 +191,7 @@ class Factory
         $className = [$resourceType];
         if ($assessable->isParticipant($student)) {
             $participantObject = $assessable->getParticipant($student);
-            $feedback          = $participantObject->findMostRecentPublishedFeedback();
+            $feedback          = $participantObject->getAuthoritativeFeedback(true);
 
             if ($feedback instanceof IFeedback) {
 

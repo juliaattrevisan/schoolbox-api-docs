@@ -78,11 +78,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Average is null
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Average is null
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -113,11 +113,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -159,7 +159,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Average is
          *      = [98 + null + 77 + 100 + (100 * 12/20)] / 4
@@ -167,7 +167,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 335/4
          *      = 83.75
          */
-        $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(83.75, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -193,14 +193,14 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = [100 + 60] / 2
          *      = 80
          */
-        $this->assertEquals(80, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(80, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Average is
          *      = [100 + (100 * 12/20)] / 2
          *      = [100 + 60] / 2
          *      = 80 (most recent feedback also happens to be most recent published feedback)
          */
-        $this->assertEquals(80, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(80, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -229,14 +229,14 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = [177 + 60] / 3
          *      = 79
          */
-        $this->assertEquals(79, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(79, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Average is
          *      = [null + 77 + 100 + (100 * 5/20)] / 3
          *      = [177 + 60] / 3
          *      = 79 (most recent feedback also happens to be most recent published feedback)
          */
-        $this->assertEquals(79, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(79, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -266,14 +266,14 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = [275 + 60] / 4
          *      = 83.75
          */
-        $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(83.75, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Average is
          *      = [98 + 77 + 100 + (100 * 12/20)] / 4
          *      = [275 + 60] / 4
          *      = 83.75
          */
-        $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(83.75, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -304,11 +304,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Weighted Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Weighted Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -349,7 +349,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Weighted Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Weighted Average is
          *      = [(98*6) + (null*0) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
@@ -357,7 +357,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 2338 / 29
          *      = 80.620689655
          */
-        $this->assertEquals(80.620689655, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(80.620689655, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
     }
 
     /**
@@ -384,7 +384,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 980 / 13
          *      = 75.38461538462
          */
-        $this->assertEquals(75.38461538462, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
+        $this->assertEquals(75.38461538462, $project->getNormalisedMark(new Participant($this->hodes, $project), true), '', $this->delta);
 
         /* Most Recent Weighted Average is
          *      = [(100*5) + ((100 * 12/20)*8)] / 13
@@ -392,7 +392,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 980 / 13
          *      = 75.38461538462
          */
-        $this->assertEquals(75.38461538462, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(75.38461538462, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
     }
 
     /**
@@ -422,7 +422,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 1750 / 23
          *      = 76.08695652174
          */
-        $this->assertEquals(76.08695652174, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(76.08695652174, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Weighted Average is
          *      = [(77*10) + (100*5) + ((100 * 12/20)*8)] / 23
@@ -430,7 +430,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 1750 / 23
          *      = 76.08695652174
          */
-        $this->assertEquals(76.08695652174, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(76.08695652174, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -461,7 +461,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 2338 / 29
          *      = 80.62068965517
          */
-        $this->assertEquals(80.62068965517, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(80.62068965517, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Weighted Average is
          *      = [(98*6) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
@@ -469,7 +469,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 2338 / 29
          *      = 80.62068965517
         */
-        $this->assertEquals(80.62068965517, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(80.62068965517, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /** Really go to town */
@@ -504,8 +504,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         *       = 3866/58
         *       = 66.655172414
         */
-        $this->assertEquals(65.962962963, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
-        $this->assertEquals(66.655172414, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(65.962962963, $project->getNormalisedMark(new Participant($this->hodes, $project), true), '', $this->delta);
+        $this->assertEquals(66.655172414, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
     }
 
     /**
@@ -534,8 +534,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Most Recent Published Weighted Average is: 0
          * Most Recent Weighted Average is: 0
          */
-        $this->assertEquals(0.00000000000, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(0.00000000000, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(0.00000000000, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(0.00000000000, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -572,8 +572,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 76*4/4
          *      = 76
          */
-        $this->assertEquals(0, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(76.00000000000, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(0, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(76.00000000000, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -605,8 +605,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 76*4/4
          *      = 76
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -640,8 +640,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      = 76*4/4
          *      = 76
          */
-        $this->assertEquals(0, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(76.00000000000, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(0, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(76.00000000000, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -672,11 +672,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Maximum is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Maximum is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -717,11 +717,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Maximum
          */
-        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(100, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
     }
 
     /**
@@ -744,11 +744,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
+        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), true), '', $this->delta);
 
         /* Most Recent Maximum
          */
-        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
     }
 
     /**
@@ -774,11 +774,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(98, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(98, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Maximum
          */
-        $this->assertEquals(98, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(98, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -805,11 +805,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(100, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Maximum
         */
-        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(100, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /** Really go to town */
@@ -830,8 +830,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 7: Weight 22, NormalisedMark: P,96 UP,96
          */
 
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -855,8 +855,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -882,8 +882,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -919,8 +919,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -946,8 +946,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
          */
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(96, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1017,8 +1017,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork));
 
-        $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(44, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(55, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1184,8 +1184,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork1)->add($dueWork2));
 
-        $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(73, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(44, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(73, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
 
@@ -1217,11 +1217,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Minimum is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Unpublished Minimum is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1262,12 +1262,12 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Minimum
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Minimum
          * Minimum of (98, null, 77, 100, 60)
          */
-        $this->assertEquals(60, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(60, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
     }
 
     /**
@@ -1288,13 +1288,13 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      12/20 = 60 (Quiz 99762)
          *      77 (Due Work 7889)
          */
-        $this->assertEquals(60, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
+        $this->assertEquals(60, $project->getNormalisedMark(new Participant($this->hodes, $project), true), '', $this->delta);
 
         /* Most Recent Minimum
          *      12/20 = 60 (Quiz 99762)
          *      77 (Due Work 7889)
          */
-        $this->assertEquals(60, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(60, $project->getNormalisedMark(new Participant($this->hodes, $project), false), '', $this->delta);
     }
 
     /**
@@ -1313,11 +1313,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      77 (Due Work 7889)
          *      98 (Due Work 9912)
          */
-        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Minimum
          */
-        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1338,11 +1338,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          *      98 (Due Work 9912)
          *      100 (Due Work 4236)
          */
-        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
         /* Most Recent Minimum
         */
-        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(77, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /** Really go to town */
@@ -1362,8 +1362,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  4, NormalisedMark: P,null UP,null
          * Due Work 7: Weight 22, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(18, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(18, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1387,8 +1387,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(18, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(18, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1414,8 +1414,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
          */
-        $this->assertEquals(18, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(18, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1451,8 +1451,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(18, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1490,8 +1490,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
          * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
          */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(18, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(18, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1561,8 +1561,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork));
 
-        $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(44, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(55, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1726,8 +1726,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables((new GenericCollection(IAssessable::class))->add($dueWork)->add($dueWork2));
 
-        $this->assertEquals(41, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(41, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(55, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -2552,6 +2552,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setAssessable($quiz)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
+            ->setSubmittedAt($this->today)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today)
             ->setMarksAvailable($marksAvailable)

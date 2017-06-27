@@ -1,7 +1,7 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
 
-{% set attempt = participant.findMostRecentResponse %}
+{% set attempt = participant.authoritativeResponse(false) %}
 {% set review  = attempt.findMostRecentFeedback %}
 
 {% set actionStyle = review.published or not attempt.submitted ? 'display:none;' : '' %}

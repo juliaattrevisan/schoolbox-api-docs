@@ -122,9 +122,10 @@ class Project extends AbstractAssessment implements AssessmentContext
      *
      * @inheritDoc
      */
-    public function getNormalisedMark(User $user, $publishedOnly)
+    public function getNormalisedMark(Participant $participant, $publishedOnly)
     {
-        return $this->getSummator()->summate($this->assessables, $user, $publishedOnly);
+        $this->assertSameAssessment($participant);
+        return $this->getSummator()->summate($this->assessables, $participant->getUser(), $publishedOnly);
     }
 
 
@@ -435,6 +436,26 @@ class Project extends AbstractAssessment implements AssessmentContext
             throw new \DomainException("Project (a.id: {$this->id}) participant (u.id: {$participant->getUser()->getId()}) not found in project's sub-assessments");
         }
         return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
+    {
+        // Project do not have responses
+        return null;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getAuthoritativeFeedback(Participant $participant, $publishedOnly)
+    {
+        // Project do not have feedback
+        return null;
     }
 
 

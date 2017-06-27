@@ -20,36 +20,6 @@ class NoneTest extends \PHPUnit_Framework_TestCase
         $markScheme->getHumanReadableMark($normalised);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function test_getHumanReadable_Empty()
-    {
-        $normalised = '';
-        $markScheme = new None();
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_getHumanReadable_TooLow()
-    {
-        $normalised = -20.0;
-        $markScheme = new None();
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_getHumanReadable_TooHigh()
-    {
-        $normalised = 120.0;
-        $markScheme = new None();
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
 
     /**
      * @dataProvider provider_normalised

@@ -48,20 +48,24 @@ class Factory
     /**
      * @param IAssessable $assessable
      * @return IMarkScheme
+     * @throws \DomainException If MarkType is invalid for the assessment
+     * @throws \InvalidArgumentException If assessment class not registered
      */
     public function spawnMarkSchemeFor(IAssessable $assessable)
     {
         if ($assessable instanceof Task) {
             return $this->spawnForTask($assessable);
-        } elseif ($assessable instanceof Quiz) {
-            return $this->spawnForQuiz($assessable);
-        } elseif ($assessable instanceof DueWork) {
-            return $this->spawnForDueWork($assessable);
-        } elseif ($assessable instanceof Project) {
-            return $this->spawnForProject($assessable);
-        } else {
-            throw new \InvalidArgumentException('Unknown IAssessable class: ' . get_class($assessable));
         }
+        if ($assessable instanceof Quiz) {
+            return $this->spawnForQuiz($assessable);
+        }
+        if ($assessable instanceof DueWork) {
+            return $this->spawnForDueWork($assessable);
+        }
+        if ($assessable instanceof Project) {
+            return $this->spawnForProject($assessable);
+        }
+        throw new \InvalidArgumentException('Unknown IAssessable class: ' . get_class($assessable));
     }
 
     /**
@@ -87,7 +91,7 @@ class Factory
     {
         switch ($quiz->getMarkType()->getId()) {
             case MarkType::TYPE_TOTAL:
-                return new TotalMarkFractional();
+                return new TotalMarkFractional(null);
             default:
                 throw new \DomainException("Invalid MarkType for Quiz: " . $quiz->getMarkType()->getName());
         }
@@ -134,16 +138,20 @@ class Factory
     /**
      * @param IAssessable $assessable
      * @return string[] Indexed by MarkType.id
+     * @throws \UnexpectedValueException If $assessment class is not registered
      */
     public static function getAvailableMarkTypes(IAssessable $assessable)
     {
         if ($assessable instanceof Project) {
             return self::$markTypesProject;
-        } elseif ($assessable instanceof DueWork) {
+        }
+        if ($assessable instanceof DueWork) {
             return self::$markTypesDueWork;
-        } elseif ($assessable instanceof Quiz) {
+        }
+        if ($assessable instanceof Quiz) {
             return self::$markTypesQuiz;
-        } elseif ($assessable instanceof Task) {
+        }
+        if ($assessable instanceof Task) {
             return self::$markTypesTask;
         }
         throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));

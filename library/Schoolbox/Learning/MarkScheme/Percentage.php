@@ -20,18 +20,16 @@ class Percentage extends AbstractMarkScheme
      *
      * @var bool
      */
-    protected $quantitative = true;
+    const QUANTITATIVE = true;
 
     /**
-     * Returns a string representation of a normalised Mark
-     *
-     * @param float          $normalisedMark
-     * @param IResponse|null $response
-     * @return string|null
+     * @inheritdoc
+     * @throws RangeException If $normalisedMark is outside 0.0 to 100.0
+     * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if(is_null($normalisedMark)){
+        if(null === $normalisedMark){
             return null;
         }
         $this->validateNormalisedMark($normalisedMark);

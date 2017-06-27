@@ -19,8 +19,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
@@ -349,101 +347,14 @@ abstract class AbstractAssessment implements IAssessable
     }
 
 
-    /**
-     * Get the Human Readable Mark value for a particular User
-     *
-     * Optionally get the Published Human Readable Mark or the
-     * currently-unpublished Human Readable Mark
-     *
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return string|null
-     * @throws \UnexpectedValueException
-     */
-    public function getHumanReadableMark(User $user, $publishedOnly)
-    {
-        $response = null;
-
-        // Special Case: Completion depends only presence of $response and/or $feedback
-        if ($this->markScheme instanceof Completion) {
-            $participant = $this->getParticipant($user);
-
-            $feedback = $publishedOnly
-                ? $participant->findMostRecentPublishedFeedback()
-                : $participant->findMostRecentFeedback();
-
-            if ($feedback) {
-                $response = $feedback->getResponse();
-            } else {
-                $response = $participant->findMostRecentResponse();
-
-                // Was this Assessment self-assessed ?
-                if ($response && $response->getSubmittedBy()->getId() === $response->getSubmittedOnBehalfOf()->getId()) {
-                    if($publishedOnly){
-                        // Ignore any unpublished teacher feedback
-                        $response = clone $response;
-                        $response->setAllFeedback(new GenericCollection(IFeedback::class));
-                    }
-                } else {
-                    $response = null;
-                }
-            }
-        }
-
-        return $this->markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
-    }
-
-    /**
-     * Get the Normalised Mark value for a particular User
-     *
-     * Optionally get the Published Normalised Mark or the
-     * currently-unpublished Normalised Mark
-     *
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return float|null
-     * @throws \UnexpectedValueException
-     */
-    public function getNormalisedMark(User $user, $publishedOnly)
-    {
-        return $this->getMark($user, $publishedOnly, true);
-    }
-
-    /**
-     * Get the Mark for a particular User
-     *
-     * This is a macro method which can extract the normalised/human-readable
-     * versions of the Mark. Also accounts for whether the Mark was in a Feedback
-     * that was Published, or not.
-     *
-     * @param User $user
-     * @param $publishedOnly
-     * @param $normalised
-     * @return float|null|string
-     * @throws \UnexpectedValueException
-     */
-    protected function getMark(User $user, $publishedOnly, $normalised)
-    {
-        $participant = $this->getParticipant($user);
-
-        $feedback = $publishedOnly
-            ? $participant->findMostRecentPublishedFeedback()
-            : $participant->findMostRecentFeedback();
-
-        if($feedback){
-            return $normalised
-                ? $feedback->getNormalisedMark()
-                : $feedback->getHumanReadableMark();
-        }
-        return null;
-    }
-
     /* Traversals
      */
 
     /**
+     * Intentionally checks ID, not just type, for cases such as project where sub-assessable set is relevant.
+     *
      * @param Participant $participant
-     * @throws \DomainException if participant's assessment is not this assessment
+     * @throws \DomainException If participant's assessment is not this assessment
      */
     protected function assertSameAssessment(Participant $participant)
     {
@@ -461,11 +372,23 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->assertSameAssessment($participant);
 
-        $latestSubmittedResponse = $participant->findMostRecentSubmittedResponse();
-        $latestPublishedFeedback = $participant->findMostRecentPublishedFeedback();
+        $hasSubmittedResponse = false;
+        foreach($participant->getAllResponses() as $response){
+            if($response->isSubmitted()){
+                $hasSubmittedResponse = true;
+                break;
+            }
+        }
+        $hasPublishedFeedback = false;
+        foreach($participant->getAllFeedbacks() as $feedback){
+            if($feedback->isPublished()){
+                $hasPublishedFeedback = true;
+                break;
+            }
+        }
 
         // No Submitted Responses and No Published Feedback?
-        return !$latestSubmittedResponse && !$latestPublishedFeedback;
+        return !$hasSubmittedResponse && !$hasPublishedFeedback;
     }
 
 
@@ -518,6 +441,17 @@ abstract class AbstractAssessment implements IAssessable
 
         // Default case
         return $this->hasPublishedFeedback($participant);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHumanReadableMark(Participant $participant, $publishedOnly)
+    {
+        $normalisedMark        = $this->getNormalisedMark($participant, $publishedOnly);
+        $authoritativeResponse = $this->getAuthoritativeResponse($participant, $publishedOnly);
+
+        return $this->getMarkScheme()->getHumanReadableMark($normalisedMark, $authoritativeResponse);
     }
 
 

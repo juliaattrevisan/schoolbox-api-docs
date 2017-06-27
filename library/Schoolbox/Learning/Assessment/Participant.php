@@ -72,11 +72,15 @@ class Participant
      * Represented as GREY SQUARE
      *
      * @return bool
-     * @throws DomainException
      */
     public function isResponseRequired()
     {
-        return $this->assessable->isResponseRequired($this);
+        try{
+            return $this->assessable->isResponseRequired($this);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            return null;
+        }
     }
 
 
@@ -88,12 +92,16 @@ class Participant
      * This is a teacher-perspective function. ie, does the teacher need to do anything?
      * eg, Give a mark? Publish a draft? Mark off as 'complete' ?
      *
-     * @throws DomainException
      * @return bool
      */
     public function isFeedbackRequired()
     {
-        return $this->assessable->isFeedbackRequired($this);
+        try{
+            return $this->assessable->isFeedbackRequired($this);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            return null;
+        }
     }
 
 
@@ -101,12 +109,16 @@ class Participant
      * Has the teacher marked this participant as not-explicitly-incomplete, and
      * the student has not subsequently submitted/re-submitted.
      *
-     * @throws DomainException
      * Represented in UI as GREEN CIRCLE
      */
     public function isReviewComplete()
     {
-        return $this->assessable->isReviewComplete($this);
+        try{
+            return $this->assessable->isReviewComplete($this);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            return null;
+        }
     }
 
 
@@ -252,37 +264,106 @@ class Participant
         if (!$this->getAssessable()->isFeedbackVisibleToUser($viewingUser)) {
             return null;
         }
-        return $this->findMostRecentPublishedFeedback();
+        $publishedOnly = true;
+        return $this->getAuthoritativeFeedback($publishedOnly);
     }
 
     /**
-     * Returns this Participant's published Human-Readable mark
+     * Return authoritative normalised mark -  (includes draft marks)
+     *
+     * @return null|float
+     */
+    public function getNormalisedMark()
+    {
+        try{
+            $normalisedMark = $this->assessable->getNormalisedMark($this, false);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            $normalisedMark = null;
+        }
+        return $normalisedMark;
+    }
+
+    /**
+     * Return authoritative published normalised mark
+     *
+     * @return null|float
+     */
+    public function getPublishedNormalisedMark()
+    {
+        try{
+            $normalisedMark = $this->assessable->getNormalisedMark($this, true);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            $normalisedMark = null;
+        }
+        return $normalisedMark;
+    }
+
+    /**
+     * Return authoritative human-readable mark - whether published or not
+     *
+     * @return null|string
+     */
+    public function getHumanReadableMark()
+    {
+        try{
+            $humanReadableMark = $this->assessable->getHumanReadableMark($this, false);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            $humanReadableMark = null;
+        }
+        return $humanReadableMark;
+    }
+
+    /**
+     * Return authoritative published human-readable mark -  (does NOT include draft marks)
      *
      * @return null|string
      */
     public function getPublishedHumanReadableMark()
     {
-        return $this->assessable->getMarkScheme()->getPublishedHumanReadableMark($this);
+        try{
+            $humanReadable = $this->assessable->getHumanReadableMark($this, true);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            $humanReadable = null;
+        }
+        return $humanReadable;
     }
 
     /**
-     * Returns this Participant's published normalised mark
+     * Return the IResponse responsible for the participant's assessment mark
      *
-     * @return null|int
+     * @param $publishedOnly
+     * @return null|IResponse
      */
-    public function getPublishedNormalisedMark()
+    public function getAuthoritativeResponse($publishedOnly)
     {
-        return $this->assessable->getMarkScheme()->getPublishedNormalisedMark($this);
+        try{
+            $response = $this->assessable->getAuthoritativeResponse($this, $publishedOnly);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            $response = null;
+        }
+        return $response;
     }
 
     /**
-     * Returns this Participant's most recent Human-Readable mark (includes draft marks)
+     * Get the IFeedback responsible for the participant's assessment mark
      *
-     * @return null|string
+     * @param $publishedOnly
+     * @return null|IFeedback
      */
-    public function getMostRecentHumanReadableMark()
+    public function getAuthoritativeFeedback($publishedOnly)
     {
-        return $this->assessable->getMarkScheme()->getMostRecentHumanReadableMark($this);
+        try{
+            $feedback = $this->assessable->getAuthoritativeFeedback($this, $publishedOnly);
+        } catch (DomainException $e){
+            // Impossible to throw when calling $this->assessable($this)
+            $feedback = null;
+        }
+        return $feedback;
     }
 
 

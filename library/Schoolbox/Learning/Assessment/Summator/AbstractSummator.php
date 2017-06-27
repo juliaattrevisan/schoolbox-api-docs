@@ -14,7 +14,6 @@ namespace Schoolbox\Learning\Assessment\Summator;
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
 abstract class AbstractSummator implements ISummator
@@ -46,25 +45,14 @@ abstract class AbstractSummator implements ISummator
 
         /** @var IAssessable $currentAssessable */
         foreach ($allAssessables as $currentAssessable) {
-            if ($currentAssessable->isParticipant($user)) {
-                /** @var Participant $participant */
-                $participant = $currentAssessable->getParticipant($user);
+            $participant = $currentAssessable->getParticipantIfExtant($user);
+            if ($participant) {
+                $normMark = $publishedOnly
+                    ? $participant->getPublishedNormalisedMark()
+                    : $participant->getNormalisedMark();
 
-                /* Only use numeric marks in Average computation
-                 * to prevent Tasks from influencing your result
-                 */
-                if ($publishedOnly) {
-                    $feedback = $participant->findMostRecentPublishedFeedback();
-                } else {
-                    $feedback = $participant->findMostRecentFeedback();
-                }
-
-                if ($feedback) {
-                    $val = $feedback->getNormalisedMark();
-
-                    if (!is_null($val)) {
-                        $this->aggregate($val, $currentAssessable->getWeight());
-                    }
+                if (null !== $normMark) {
+                    $this->aggregate($normMark, $currentAssessable->getWeight());
                 }
             }
         }
@@ -88,18 +76,13 @@ abstract class AbstractSummator implements ISummator
         $this->reset();
         foreach ($assessable->getAllParticipants() as $participant) {
 
-            if ($publishedOnly) {
-                $feedback = $participant->findMostRecentPublishedFeedback();
-            } else {
-                $feedback = $participant->findMostRecentFeedback();
-            }
-            if ($feedback) {
-                $val = $feedback->getNormalisedMark();
+            $normMark = $publishedOnly
+                ? $participant->getPublishedNormalisedMark()
+                : $participant->getNormalisedMark();
 
-                if (isset($val)) {
-                    // Weight doesn't matter within the context of a single assessment
-                    $this->aggregate($val, $assessable->getWeight());
-                }
+            if (null !== $normMark) {
+                // Weight doesn't matter within the context of a single assessment
+                $this->aggregate($normMark, $assessable->getWeight());
             }
         }
         return $this->finalise();
