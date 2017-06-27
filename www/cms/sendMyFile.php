@@ -67,7 +67,7 @@ if (is_numeric($_GET['id'])) {
     header("Pragma: ");
     header("Cache-control: private");
     header("Content-Ranges: none");
-    header("Content-Disposition: $attach filename=\"" . $file->getBasename() . "\"");
+    header("Content-Disposition: $attach filename=\"" . $file->getFilename() . "\"");
     header("Content-Length: {$file->getSize()}");
     fpassthru($file->readStream());
     exit;
