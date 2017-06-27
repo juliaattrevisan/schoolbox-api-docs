@@ -259,6 +259,7 @@ class External_Denbigh_User implements External_UserInterface {
             'StaffRoom' => '',
             'StaffExtension' => '',
             'StaffMobilePhone' => '',
+            'StaffDefaultMobilePhone' => '',
             'StaffCampusDescription' => '',
             'StaffCategoryDescription' => '',
             'StaffDepartment' => ''
