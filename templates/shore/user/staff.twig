@@ -1,0 +1,20 @@
+{% extends '@core/user/staff.twig' %}
+
+{% block details %}
+    {% if externalUser.StaffMobilePhone %}
+        <dt class="no-margin small-6 medium-3">Mobile Phone</dt>
+        <dd class="no-margin small-6 medium-9">{{ externalUser.StaffMobilePhone }}</dd>
+    {% endif %}
+    {% if externalUser.StaffDepartment %}
+        <dt class="no-margin small-6 medium-3">Department</dt>
+        <dd class="no-margin small-6 medium-9">{{ externalUser.StaffDepartment }}</dd>
+    {% endif %}
+    {% if externalUser.StaffExtension %}
+        <dt class="no-margin small-6 medium-3">Telephone Extension</dt>
+        <dd class="no-margin small-6 medium-9">{{ externalUser.StaffExtension }}</dd>
+    {% endif %}
+    {% if externalUser.StaffCampusDescription %}
+        <dt class="no-margin small-6 medium-3">Campus</dt>
+        <dd class="no-margin small-6 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
+    {% endif %}
+{% endblock %}
