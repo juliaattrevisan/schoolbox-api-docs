@@ -186,8 +186,16 @@ $(function() {
                 'remote.tooLong': true
             },
             'repeat_until': {
-                datepickerDate: true,
-                'afterStart': true
+                datepickerDate: {
+                    depends: function() {
+                        return $('#repeatUntilSelect').val() !== ''
+                    }
+                },
+                'afterStart': {
+                    depends: function() {
+                        return $('#repeatUntilSelect').val() !== ''
+                    }
+                }
             }
         },
         submitHandler: function() {
