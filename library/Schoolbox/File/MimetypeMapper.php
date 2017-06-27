@@ -146,7 +146,7 @@ class MimetypeMapper extends Schoolbox\Mapper {
             // unless a callback is defined, the default behaviour is to ensure that SOME kind of valid mime is returned
             $callback = function ($self, $model, $row) {
                 // if it correctly hydrated an entity, return it
-                if ($model->getFileTypeID()) {
+                if (($model instanceof Mimetype) && $model->getFileTypeID()) {
                     return $model;
                 }
 
