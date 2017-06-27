@@ -552,9 +552,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     var newDate = moment($(this).attr('data-timetable-value'));
                     var selectedCampus = $timetablePicker.find('[data-adtp-tt-campus]').val();
-                    var timetableAllDay;
-
-                    timetableAllDay = false;
+                    var timetableAllDay = false;
 
                     if (options.enableTime === true) {
 

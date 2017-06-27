@@ -839,11 +839,12 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     */
     function renderTimetableAllDay() {
 
-        if (pickerOptions.allDaySwitch === true) {
             timetable.periods.each(function () {
-                $(this).prepend('<option value="allday" selected>All Day</option>');
+                if (pickerOptions.allDaySwitch === true) {
+                    $(this).prepend('<option value="allday" selected>All Day</option>');
+                }
+                updateTimeControls($(this));
             });
-        }
 
     }
 
