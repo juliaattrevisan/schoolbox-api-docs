@@ -11,6 +11,7 @@
      - statusIncomplete: a string representing the 'incomplete' state
      - statusPending:    a string representing the 'pending/attempted' state
      - statusReviewed:   a string representing the 'reviewed' state
+     - writable:         bool   Whether current user has WRITE+ perm to the assessment's folder
 
 #}
 {% extends '@learningAssessment/status.twig' %}
@@ -45,7 +46,11 @@
             } only %}
 
             <div class="small-1">
-                {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme, writable: writable } %}
+                {% include '@learningAssessment/fragments/progressTick.twig' with {
+                    assessment:  participant.assessable,
+                    participant: participant,
+                    writable:    writable
+                } only %}
             </div>
         </div>
         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="user-completions-{{ participant.user.id }}">

@@ -1,0 +1,18 @@
+{#
+    Renders an input where teachers can insert feedback comment
+
+    Usage: [
+        participant:  Participant
+        tabindex:     int
+    ]
+#}
+{% set latestFeedback = participant.findMostRecentFeedback %}
+
+<label>Comment
+    <textarea
+            tabindex="{{ tabIndex }}"
+            name="comment"
+            placeholder="Feedback for {{ participant.user.firstName }}"
+            rows="3"
+    >{{ latestFeedback.comment }}</textarea>
+</label>

@@ -219,16 +219,97 @@
 <div class="row mark-scheme" id="assessment-status">
     <div class="small-12 island">
         <section class="content">
-            {% include '@learningMarkScheme/'~markScheme~'.twig' with {
-                markScheme: assessment.markScheme,
-                fbUrl: routeLookup('learningFeedback.postResponseFeedback', {
-                    assessmentId: assessment.id,
-                    studentId: participant.user.id,
-                    responseId: response.id,
-                    participant: participant
-                }),
-                feedbackAttachzone: attachzone
-            } %}
+
+            {% if assessment.useRubric and rubricContext %}
+                <div class="small-12 island">
+                    {% include '@rubric/grid-markable.twig' with {
+                    rubric: rubricContext.rubric,
+                    markType: rubricContext.markType
+                    } only %}
+                </div>
+
+                {% if assessment.markType.id != MARK_TYPE_NONE %}
+                    <p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
+                {% endif %}
+
+                <script type="text/javascript">
+                    $(function () {
+
+                        // cache this stuff, it doesn't change
+                        var $status                 = $('#assessment-status'),
+                            $markInput              = $status.find('[data-mark-input]'),
+                            $assignFromRubricButton = $('#use-rubric-value'),
+                            $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
+                            $finalSummary           = $rb.find('[data-final-summary]');
+
+
+                        function refreshAssignFromRubricButton() {
+                            var currentRubricValue = $.trim($finalSummary.text());
+                            var currentMarkInput   = $markInput.val();
+
+                            $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
+                        }
+
+
+                        {##
+                         # Use the rubric value in the mark input field
+                         #
+                         # Disabled upon load, since values are the same
+                         # at this point in time. Also disables when copying
+                         # the rubric mark value in.
+                         #}
+                        $assignFromRubricButton.on('click', function(e) {
+
+                            e.preventDefault();
+                            $(this).prop('disabled', true);
+
+                            $status
+                                .find('[data-mark-input]')
+                                .val($.trim($finalSummary.text()))
+                                .change();
+                        });
+
+                        // listen for this
+                        $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton);
+                        $markInput.on('change', refreshAssignFromRubricButton);
+
+                        // do it on pageload anyway
+                        refreshAssignFromRubricButton();
+                    });
+                </script>
+            {% endif %}
+
+            {% if 'None' != assessment.markScheme %}
+                <div class="small-12 medium-3 column">
+                    <label>{{ locale.grades.proper }}
+                        {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+                            participant: participant,
+                            markScheme:  assessment.markScheme
+                            tabIndex:    1,
+                            fbUrl:       routeLookup('learningFeedback.postResponseFeedback', {
+                                assessmentId: assessment.id,
+                                studentId:    participant.user.id,
+                                responseId:   response.id,
+                                participant:  participant
+                            }),
+                        } only %}
+                    </label>
+                </div>
+            {% endif %}
+
+            <div class="small-12{% if 'None' != assessment.markScheme %} medium-9{% endif %} column">
+                {% include '@learningMarkScheme/fragments/comment.twig' with {
+                    participant: participant,
+                    tabIndex:    2
+                } only %}
+            </div>
+
+            {# Maybe files may be uploaded here? #}
+            {% if feedbackAttachzone %}
+                <div class="small-12 columns">
+                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                </div>
+            {% endif %}
         </section>
     </div>
 </div>

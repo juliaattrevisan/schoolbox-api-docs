@@ -11,6 +11,7 @@
      - statusIncomplete: a string representing the 'incomplete' state
      - statusPending:    a string representing the 'pending'    state
      - statusReviewed:   a string representing the 'reviewed'   state
+     - errors:           string[]  Admin-configured submission states, eg 'Absent', 'Pending', 'Not Submitted' etc
 
 #}
 {% extends '@learningAssessment/status.twig' %}
@@ -80,10 +81,124 @@
 
 
 {% block grading %}
-    {% include '@learningMarkScheme/'~markScheme~'.twig' with {
-        markScheme: assessment.markScheme,
-        fbUrl: routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant })
-    } %}
+    <div class="small-12 column">
+        <form method="post" action="{{ routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant }) }}">
+
+            <input type="hidden" name="responseId" value="{{ response.id }}" />
+
+            <div class="row">
+                {% if 'None' != assessment.markScheme %}
+                <div class="small-12 medium-3 column">
+                    <label>{{ locale.grades.proper }}
+                    {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+                        participant: participant,
+                        markScheme:  assessment.markScheme,
+                        tabIndex:    (loop.index0 * 2) + 1,
+                        errors:      errors
+                    } only %}
+                    </label>
+                </div>
+                {% endif %}
+
+                <div class="small-12{% if 'None' != assessment.markScheme %} medium-9{% endif %} column">
+                    {% include '@learningMarkScheme/fragments/comment.twig' with {
+                        participant: participant,
+                        tabIndex:   (loop.index0 * 2) + 2
+                    } only %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block action_bar %}
+
+    {% if participant.allFeedbacks | length and not participant.findMostRecentFeedback.published %}
+        {% set savedStatusText = 'Saved as Draft' %}
+    {% else %}
+        {% set actionStyle     = 'display:none;' %}
+        {% set publishHide     = 'hide' %}
+        {% set publishDisabled = 'disabled="disabled"' %}
+    {% endif %}
+
+    {#
+    If there's any files, rubric marks, or crocoodoc annotated doc
+    attached to the feedback - tell the user that this feedback also includes those.
+    #}
+    {% if (latestFeedback.allFiles.count > 0) or (rubricMarks[participant.user.id] and latestFeedback) %}
+
+        {# If we're going to be displaying something here - override the hide on .component-action #}
+        {% set actionStyle = '' %}
+
+        {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
+
+        {# Check if this feedback has a crocodoc annotation attached to it #}
+        {% set hasCrocodoc = false %}
+        {% if (latestFeedback and latestFeedback.response.allFiles.count > 0) or (not latestFeedback and participant.findMostRecentResponse().allFiles.count > 0) %}
+            {% if latestFeedback %}
+                {% set allFiles = latestFeedback.response.allFiles %}
+            {% else %}
+                {% set allFiles = participant.findMostRecentResponse().allFiles %}
+            {% endif %}
+
+            {% for currentFile in allFiles %}
+                {% if currentFile.crocodocId %}
+                    {% set hasCrocodoc = true %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {# Annotated document/Crocodoc #}
+        {% if hasCrocodoc %}
+            {% set attachedMsg = attachedMsg ~ 'annotated document' %}
+        {% endif %}
+
+        {# Rubric #}
+        {% if rubricMarks[participant.user.id] %}
+            {% if hasCrocodoc and latestFeedback.allFiles.count > 0 %}
+                {% set attachedMsg = attachedMsg ~ ', ' %}
+            {% elseif hasCrocodoc and latestFeedback.allFiles.count == 0 %}
+                {% set attachedMsg = attachedMsg ~ ' and ' %}
+            {% endif %}
+            {% set attachedMsg = attachedMsg ~ 'rubric' %}
+        {% endif %}
+
+        {# Files #}
+        {% if latestFeedback.allFiles.count > 0 %}
+
+            {% if hasCrocodoc or rubricMarks[participant.user.id] %}
+                {% set attachedMsg = attachedMsg ~ ' and ' %}
+            {% endif %}
+
+            {% set attachedMsg = attachedMsg ~ latestFeedback.allFiles.count ~ ' file' %}
+
+            {% if latestFeedback.allFiles.count > 1 %}
+                {% set attachedMsg = attachedMsg ~ 's' %}
+            {% endif %}
+
+        {% endif %}
+
+        {% set attachedMsg = attachedMsg ~ '</a>.' %}
+
+    {% endif %}
+
+
+    <div class="small-12 column no-pad">
+        <div class="component-action" data-interaction-draft="{{ participant.user.id }}" {% if latestFeedback.published %}data-published="true"{% endif %} style="{{ actionStyle }}">
+            <section>
+                {% if attachedMsg %}
+                    <div class="component-action-info" data-feedback-attach-info>{{ attachedMsg|capitalize|raw }}</div>
+                {% endif %}
+
+                <div>
+                    {%- spaceless %}
+                        <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{{ savedStatusText }}</span>
+                        <a class="button {{ publishHide }}" data-draft="publish" {{ publishDisabled }}>Publish</a>
+                    {% endspaceless -%}
+                </div>
+            </section>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}

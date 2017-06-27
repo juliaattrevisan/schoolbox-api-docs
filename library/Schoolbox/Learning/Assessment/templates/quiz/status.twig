@@ -13,7 +13,11 @@
      - statusReviewed:   a string representing the 'reviewed' state
 
 #}
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/assessmentResponse.twig' as assessmentResponse %}
+
 {% extends '@learningAssessment/status.twig' %}
+
 
 {% set labelIncomplete = 'Not Attempted' %}
 {% set labelPending    = 'Review required' %}
@@ -38,21 +42,21 @@
 
 {% block config %}
 
-    {% set latestResponse    = participant.findMostRecentResponse %}
-    {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
+    {% set latestAttempt     = participant.authoritativeResponse(false) %}
+    {% set latestReview      = latestAttempt.findMostRecentFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
-    {% set isPublished  = latestFeedback.published %}
-    {% set canPublish   = latestFeedback and not isPublished %}
+    {% set isPublished  = latestReview.published %}
+    {% set canPublish   = latestReview and not isPublished %}
 
-    {% if not latestResponse %}
+    {% if not latestAttempt %}
         {% set pActionSummary    = '' %}
     {% endif %}
 
-    {% if latestResponse %}
-        {% if latestResponse.isSubmitted %}
-            {% if latestFeedback %}
-                {% if latestFeedback.publishedAt.lt(latestResponse.submittedAt) %}
+    {% if latestAttempt %}
+        {% if latestAttempt.isSubmitted %}
+            {% if latestReview %}
+                {% if latestReview.publishedAt.lt(latestAttempt.submittedAt) %}
                     {# Feedback Required
                      # Published feedback is outdated - attempt was finished more recently
                      #}
@@ -91,10 +95,10 @@
 
     {% set pStatusText %}
         {%- spaceless %}
-            {% if not latestResponse %}
+            {% if not latestAttempt %}
                 Not attempted
             {% else %}
-                {% if latestResponse.submittedAt.isNull %}
+                {% if latestAttempt.submittedAt.isNull %}
                     Attempt in progress
                 {% else %}
                     {% if multipleResponses %}
@@ -102,7 +106,7 @@
                     {% else %}
                         Attempted
                     {% endif %}
-                    {% if latestResponse.submittedOnTime %}
+                    {% if latestAttempt.submittedOnTime %}
                         on time
                     {% else %}
                         late
@@ -116,9 +120,57 @@
 {% endblock %}
 
 
-{% block grading %}
-    {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+{% block meta %}
+    {% if participant.allResponses | length %}
+        <div class="small-12 large-4 column content">
+            {% set urgencyClass = latestReview ? urgency.marks(latestReview.normalisedMark) : '' %}
+
+            {% if latestAttempt %}
+                {% if latestAttempt.submitted %}
+                    {% if latestReview %}
+                        <span class="grade {{ urgencyClass }}">
+                            <span>{{ latestReview.humanReadableMark }}</span>
+                         </span>
+                    {% else %}
+                        {#<a href="#" class="button expand">Review</a>#}
+                        <h4>Awaiting Review</h4>
+                    {% endif %}
+                {% else %}
+                    <h4>In Progress</h4>
+                {% endif %}
+            {% else %}
+                &ndash;
+            {% endif %}
+        </div>
+        <div class="small-12 large-8 column content">
+            {% if latestAttempt.submitted %}
+                Finished <time title="{{ latestAttempt.submittedAt.local }}"><strong>{{ latestAttempt.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestAttempt.duration.hms }}</strong>
+                {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}
+
+
+{% block action_bar %}
+    {% set actionStyle = latestReview.published or not latestAttempt.submitted ? 'display:none;' : '' %}
+    <div class="row">
+        <div class="small-12 column">
+            <div class="component-action">
+                <section>
+                    <div style="{{ actionStyle }}" data-interaction-draft="{{ participant.user.id }}">
+                        {%- spaceless %}
+                            <a class="button" data-interaction-delete="{{ attempt.id }}" href="#" >Delete Attempt</a>
+                            <a class="button" data-interaction-review="{{ attempt.id }}" href="{{ assessmentResponse.localUrl(attempt) }}">Review Attempt</a>
+                        {% endspaceless -%}
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
 
 
 {% block scripts %}

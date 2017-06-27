@@ -1,0 +1,29 @@
+{#
+    Renders a text input where teachers. Combo box data attr picked up by plugin to insert submission-states.
+
+    Usage: [
+        participant:  Participant    a fully hydrated participant object
+        tabIndex:     int
+        placeholder:  string         the placeholder text
+        limit:        float          JS validation
+        maxLength:    int            how big can this input be?
+        inputTitle:   string         the tooltip to display on this input
+    ]
+#}
+
+<input
+        tabindex="{{ tabIndex }}"
+        placeholder="{{ placeholder }}"
+        data-validation-limit="{{ limit }}"
+        class="no-margin"
+        id="mark-{{ participant.user.id }}" name="mark"
+        type="text"
+        maxlength="{{ maxLength }}"
+        value="{{ participant.humanReadableMark(false) }}"
+        title="{{ inputTitle }}"
+        data-mark-input
+        data-combobox
+/>
+
+
+

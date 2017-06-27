@@ -148,12 +148,13 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="small-12 column">
-                        {% block grading %}{% endblock %}
-                    </div>
+
+                    {# Child templates to populate #}
+                    {{ block('grading') }}
+                    {{ block('meta') }}
+                    {{ block('action_bar') }}
                 </li>
                 {% endblock %}
-
             {% endfor %}
             </ul>
         </section>

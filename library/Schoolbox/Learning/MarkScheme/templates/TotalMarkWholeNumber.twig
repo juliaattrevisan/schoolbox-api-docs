@@ -1,12 +1,19 @@
-{% extends '@learningMarkScheme/commentable.twig' %}
+{#
+    Text-input for 'total-mark' markScheme.
 
-{% block grading %}
+    Usage: [
+        markScheme:  MarkScheme\TotalMarkWholeNumber
+        tabIndex:    int
+    ]
+#}
 
-    {% set inclusion = {
-        maxLength: 16,
-        inputTitle: 'Maximum Mark: ' ~ markScheme.totalMark,
-        placeholder: 'Mark out of ' ~ markScheme.totalMark
-    } %}
+{% include '@learningMarkScheme/fragments/text-input.twig' with {
+    participant: participant,
+    tabIndex:    tabIndex,
+    placeholder: 'Mark out of ' ~ markScheme.totalMark,
+    limit:       markScheme.totalMark,
+    maxLength:   16,
+    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark
+} only %}
 
-    {% include '@learningMarkScheme/text-input.twig' with inclusion %}
-{% endblock %}
+
