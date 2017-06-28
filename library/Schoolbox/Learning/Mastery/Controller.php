@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Mastery;
 
 use Alaress\Web\Controller\Base;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Collection;
 use Schoolbox\Error;
@@ -65,6 +66,7 @@ class Controller extends Base
      * @api /learning/mastery/{classId}
      * @param Folder\Model $class
      * @throws ApplicationException
+     * @throws ServiceNotFound If unable to fetch WebOutput from DI
      */
     public function getMastery(Folder\Model $class)
     {
@@ -76,6 +78,7 @@ class Controller extends Base
      * @param Folder\Model $class
      * @param Term\Model $term
      * @throws ApplicationException
+     * @throws ServiceNotFound If unable to fetch WebOutput from DI
      */
     public function getMasteryForTerm(Folder\Model $class, Term\Model $term)
     {
@@ -116,17 +119,14 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@learningMastery/mastery.twig',
-            'data' => [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningMastery/mastery.twig', [
                 'class'        => $class,
                 'markbook'     => $markbook,
                 'terms'        => $terms,
                 'currentTerm'  => $term,
                 'previousTerm' => $previousTerm,
                 'nextTerm'     => $nextTerm
-            ]
-        ]);
+        ])->setTitle("{$class->getTitle()} Mastery Report"));
     }
 
     /* Getters/Setters
