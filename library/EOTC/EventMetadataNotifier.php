@@ -120,10 +120,10 @@ class EventMetadataNotifier extends AbstractModuleNotifier
     /**
      * This is a callback method for deriving the time for a recurring reminder trigger
      *
-     * @param Realtime\Schedule\Event $event
+     * @param Realtime\Schedule\Event\Event $event
      * @return int
      */
-    public function getNextReminderTime(Realtime\Schedule\Event $event)
+    public function getNextReminderTime(Realtime\Schedule\Event\Event $event)
     {
         /** @var EventMetadata $object */
         $object = $event->getObject();
