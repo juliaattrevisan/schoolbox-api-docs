@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
@@ -367,7 +368,7 @@ NAME
        $class - recursively undelete a graph of models in the database
 
 SYNOPSIS
-       {$green}php $file {$yellow}[OPTION]...{$white}
+       {$green}$file {$yellow}[OPTION]...{$white}
 
 DESCRIPTION
        Recursively undelete a graph of models in the database.
@@ -392,7 +393,7 @@ DESCRIPTION
 
 EXAMPLE
        Example to undelete folder with ID = 123:
-            {$green}php $file {$yellow}-t '$table' -i 123 -p{$white}
+            {$green}$file {$yellow}-t '$table' -i 123 -p{$white}
 ";
             echo $helpMsg;
             exit(1);
