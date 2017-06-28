@@ -259,7 +259,7 @@ class Participant
      *
      * @return null|IFeedback
      */
-    public function findMostRecentVisibleFeedback(User $viewingUser)
+    public function findAuthoritativeVisibleFeedback(User $viewingUser)
     {
         if (!$this->getAssessable()->isFeedbackVisibleToUser($viewingUser)) {
             return null;

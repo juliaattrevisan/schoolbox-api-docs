@@ -381,7 +381,7 @@ class Controller extends Base
             $graphAssessments[] = $assessment->getTitle();
 
             $participant = $assessment->getParticipantIfExtant($viewee);
-            $feedback    = $participant ? $participant->findMostRecentVisibleFeedback($this->getUser()) : null;
+            $feedback    = $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null;
 
             if($feedback) {
                 $graphScatter[] = (float)$feedback->getNormalisedMark();
