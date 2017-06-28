@@ -113,11 +113,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Published Average is null (nothing to calculate)
          */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
+        $this->assertEquals(null, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
 
-        /* Most Recent Average is null (nothing to calculate)
-         */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        // Quiz auto-marked to 60.0 (this constitutes a draft mark)
+        $this->assertEquals(60.0, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -306,9 +305,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          */
         $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
-        /* Most Recent Weighted Average is null (nothing to calculate)
-         */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        // Quiz is auto-marked to 60.0 (this constitutes a draft-mark)
+        $this->assertEquals(60.0, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -674,9 +672,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          */
         $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
-        /* Most Recent Maximum is null (nothing to calculate)
-         */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        // Quiz is auto-marked to 60.0 (this constitutes a draft-mark)
+        $this->assertEquals(60.0, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -1219,9 +1216,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          */
         $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), true));
 
-        /* Most Recent Unpublished Minimum is null (nothing to calculate)
-         */
-        $this->assertEquals(null, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
+        // Quiz is auto-marked to 60.0 (this constitutes a draft-mark)
+        $this->assertEquals(60.0, $project->getNormalisedMark(new Participant($this->hodes, $project), false));
     }
 
     /**
@@ -2491,7 +2487,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Spawn a Quiz.
      * * Quiz has 5 questions each of 5 marks, for total of 25.0
-     * * Quiz has 1 attempt of 4 questions worth 20.0 marks. He was given 12.0 marks total. ie 60.0
+     * * Quiz has 1 attempt of 4 questions worth 20.0 marks. David Rhodes was given 12.0 marks total. ie 60.0
      *
      * For now, since we are not updating the Quiz DB schema, a QuizAttempt has 0:1 QuizFeedback
      *

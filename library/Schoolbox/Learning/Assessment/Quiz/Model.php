@@ -20,7 +20,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
@@ -119,6 +118,16 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Get the attempt responsible for the participant's mark.
+     *
+     * If not $publishedOnly (ie including drafts), then include un-reviewed attempts.
+     * If $publishedOnly (ie not including drafts), then filter out un-reviewed attempts.
+     *
+     * Note that this means a draft quiz mark does not require teacher action, this is similar to self-assessable tasks.
+     *
+     * This is because as soon as a attempt is finished, the system auto-marks it. This is functionally
+     * equivalent to the teacher providing draft marks.
+     *
      * @inheritdoc
      */
     public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
@@ -129,8 +138,13 @@ class Model extends AbstractAssessment
         $latestAttempt = null;
         foreach ($participant->getAllResponses() as $attempt) {
 
-            // Skip responses that are not submitted yet (ie still in progress), or have no feedback, or not published if $publishedOnly
-            if (!$attempt->isSubmitted() || !$attempt->hasFeedback() || ($publishedOnly && !$attempt->getAllFeedback()[0]->isPublished())) {
+            // Skip responses that are not submitted yet (ie still in progress)
+            if (!$attempt->isSubmitted()) {
+                continue;
+            }
+
+            // If published-only, skip if no published feedback
+            if ($publishedOnly && (!$attempt->hasFeedback() || !$attempt->getAllFeedback()[0]->isPublished())) {
                 continue;
             }
 
