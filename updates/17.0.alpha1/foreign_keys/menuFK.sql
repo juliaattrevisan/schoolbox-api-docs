@@ -24,7 +24,7 @@ WHERE luCampus.id is null;
 
 DELETE menu_top_role FROM menu_top_role
   LEFT JOIN menu_top ON menu_top.id = menu_top_role.menu_top_id
-WHERE groups.id is null;
+WHERE menu_top.id is null;
 
 DELETE menu_top_role FROM menu_top_role
   LEFT JOIN groups ON groups.id = menu_top_role.role_id
