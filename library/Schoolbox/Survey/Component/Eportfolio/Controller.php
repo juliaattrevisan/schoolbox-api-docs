@@ -71,6 +71,9 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
         $maximumQuestions = 0;
 
+        $maximumQuestionsPerSection = (int)$this->config['size'];
+        $showAllQuestions           = $maximumQuestionsPerSection === 0;
+
         if ($this->survey instanceof Survey) {
 
             $responses = $this->surveyMapper->getMatrix(
@@ -105,9 +108,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
                     // The number of questions is restricted by the components configuration
 
-                    if ($this->config['size'] >= 0
-                        && count($answersRenderArray[$sectionTitle]) < $this->config['size'])
-                    {
+                    if ($showAllQuestions || count($answersRenderArray[$sectionTitle]) < $maximumQuestionsPerSection) {
 
                         // Unserialize the persons selected answer(s) and store them with the question for rendering
 
