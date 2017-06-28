@@ -841,8 +841,8 @@ class Leave_Controller extends Controller
         $startString = trim("{$data['request']['start']['date']} {$data['request']['start']['time']}");
         $endString   = trim("{$data['request']['finish']['date']} {$data['request']['finish']['time']}");
 
-        $start = new Alaress_Date_Format($startString, 'd/m/Y g:ia');
-        $finish = new Alaress_Date_Format($endString, 'd/m/Y g:ia');
+        $start = Alaress_Date_Format::newLocal($startString);
+        $finish = Alaress_Date_Format::newLocal($endString);
 
         $request->setStart($start);
         $request->setFinish($finish);
