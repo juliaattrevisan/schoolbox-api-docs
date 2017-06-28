@@ -25,8 +25,8 @@ use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 interface IAssessable extends ISoftDeletable
 {
     const MARK_VISIBILITY_PRIVATE = 0;
-    const MARK_VISIBILITY_PARENT_STUDENT = 2;
     const MARK_VISIBILITY_STUDENT = 1;
+    const MARK_VISIBILITY_PARENT_STUDENT = 2;
 
     /**
      * Creates a clone of this assessment.

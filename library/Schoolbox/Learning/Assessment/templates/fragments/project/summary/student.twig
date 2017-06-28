@@ -1,4 +1,14 @@
+{#
+    Displays a student's project participation.
+
+    Usage:
+            'breadcrumbs'   Collection|string[][]
+            'student'       User
+            'assessment'    Project
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learning/macro/urgency.twig' as urgency %}
+
 {{ bread.crumbsArray(breadcrumbs) }}
 
 {% set labelIncomplete = 'Incomplete' %}
@@ -59,8 +69,27 @@
 </div>
 
 <div class="row">
+    <div class="small-6 island">
+        {% include '@learningAssessment/fragments/project/summary/meta.twig' with {assessment: assessment, student: student} only %}
+    </div>
+    <div class="small-6 island">
+
+        {% if assessment.isFeedbackVisibleToUser(USER) %}
+            <h2 class="subheader">{{ locale.project }} {{ locale.grades }}</h2>
+            <section>
+                <div class="grade content">
+                    <span class="{{ urgency.marks(assessment.normalisedMark(student, true)) }}">
+                        {{ assessment.humanReadableMark(student, true) }}
+                    </span>
+                </div>
+            </section>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
     <div class="small-12 island">
-        {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment, user: USER} %}
+        {% include '@learningAssessment/fragments/project/summary/description.twig' with {assessment: assessment} only %}
 
         {% if assessment.assessables|length %}
             <h2 class="subheader">Activities</h2>

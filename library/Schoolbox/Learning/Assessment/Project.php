@@ -485,13 +485,19 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
-     * Projects have no concept of mark visibility - marks are always visible.
+     * A project mark is visible if all sub-assessment marks are visible.
      *
      * @param User $viewingUser
      * @return bool
      */
     public function isFeedbackVisibleToUser(User $viewingUser)
     {
+        // Does user lack visibility to any sub-assessment's feedback ?
+        foreach ($this->assessables as $subAssessable) {
+            if (!$subAssessable->isFeedbackVisibleToUser($viewingUser)) {
+                return false;
+            }
+        }
         return true;
     }
 
