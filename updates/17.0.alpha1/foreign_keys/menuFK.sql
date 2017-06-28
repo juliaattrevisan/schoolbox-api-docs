@@ -15,8 +15,16 @@ DELETE menu_side_role FROM menu_side_role
 WHERE groups.id is null;
 
 DELETE menu_top_campus FROM menu_top_campus
+  LEFT JOIN menu_top ON menu_top.id = menu_top_campus.menu_top_id
+WHERE menu_top.id is null;
+
+DELETE menu_top_campus FROM menu_top_campus
   LEFT JOIN luCampus ON luCampus.id = menu_top_campus.campus_id
 WHERE luCampus.id is null;
+
+DELETE menu_top_role FROM menu_top_role
+  LEFT JOIN menu_top ON menu_top.id = menu_top_role.menu_top_id
+WHERE groups.id is null;
 
 DELETE menu_top_role FROM menu_top_role
   LEFT JOIN groups ON groups.id = menu_top_role.role_id
