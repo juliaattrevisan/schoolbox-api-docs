@@ -37,7 +37,7 @@ error_reporting(E_ALL);
 restore_error_handler();
 restore_exception_handler();
 
-$opts      = getopt('v', [ 'perform' ], $_);
+$opts      = getopt('v', [ 'perform' ]);
 $perform   = isset($opts['perform']);
 $threshold = 0;
 

@@ -22,7 +22,7 @@ use Schoolbox\UserMapper;
 /** @var array $fields */
 $fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
 
-$opts = getopt('v', $fields, $_);
+$opts = getopt('v', $fields);
 
 foreach ($fields as $k => $name) {
     if (!isset($opts[$name])) {
