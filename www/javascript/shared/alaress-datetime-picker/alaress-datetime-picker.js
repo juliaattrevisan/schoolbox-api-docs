@@ -75,6 +75,7 @@ function getOptions(element) {
 
     // Build datepicker options form the element data attributes
     var elementOptions = {
+        id : getValue(element, 'data-datepicker-id'),
         noButton: getValue(element, 'data-datepicker-nobutton'),
         buttonText: buttonText === true ? '' : (buttonText || 'Select Date'),
         displayFormat: dateDisplayFormats.localDateTime, //Default display datetime format
@@ -232,7 +233,7 @@ function getPickerValue(pickerId) {
 }
 
 
-function checkAllDaySwitch(state, pickerId) {
+function setCalendarAllDay(state, pickerId) {
 
     var $timeDiv = $('#pickerCalendar' + pickerId).closest('#adtp-modal-' + pickerId).find('.flatpickr-time');
 
@@ -501,10 +502,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     // Check and refresh visibility of time and allDaySwitch state
                     // Hide time picker if allday hidden field is set to 1
                     if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
-                        checkAllDaySwitch(true, pickerId);
+                        setCalendarAllDay(true, pickerId);
                     }
                     else if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 0) {
-                        checkAllDaySwitch(false, pickerId);
+                        setCalendarAllDay(false, pickerId);
                     }
 
                 });
@@ -551,34 +552,40 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     var newDate = moment($(this).attr('data-timetable-value'));
                     var selectedCampus = $timetablePicker.find('[data-adtp-tt-campus]').val();
+                    var timetableAllDay = false;
 
                     if (options.enableTime === true) {
 
-                        var selectedPeriod = $timetablePicker.find('[data-tt-period][data-campus=' + selectedCampus + ']').val();
+                        var selectedPeriod = $timetablePicker.find('[data-adtp-tt-period][data-campus=' + selectedCampus + ']').val();
 
                         if (selectedPeriod == 'allday') {
 
+                            timetableAllDay = true;
                             if (options.endDay) {
                                 newDate = newDate.endOf('day');
+
                             } else {
                                 newDate = newDate.startOf('day');
                             }
 
+
                         } else {
 
                             var periodTime = $timetablePicker.find('[name*="periodTime' + pickerId + '"]:checked').val();
-                            var newTime = moment($timetablePicker.find('[data-tt-period][data-campus=' + selectedCampus + '] option:selected').attr('data-' + periodTime + '-time'), 'h:mma');
-
+                            var newTime = moment($timetablePicker.find('[data-adtp-tt-period][data-campus=' + selectedCampus + '] option:selected').attr('data-' + periodTime + '-time'), 'h:mma');
                             newDate = newDate.hours(newTime.hours()).minutes(newTime.minutes()).seconds(0);
                         }
                     }
 
-                    setValue(element, options, false, true, newDate);
+                    setValue(element, options, timetableAllDay, true, newDate);
+                    // Set allday state on the calendar picker
+                    setCalendarAllDay(timetableAllDay, pickerId);
 
                     if (options.allDayInput !== false) {
                         var linkedElements = getLinkedElements(element, options);
                         linkedElements.forEach(function (item) {
-                            setValue(item, getOptions(item), false, true);
+                            setValue(item, getOptions(item), timetableAllDay, true);
+                            setCalendarAllDay(timetableAllDay, getOptions(item).id);
                         });
                     }
                     $modal.foundation('reveal', 'close');
