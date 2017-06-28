@@ -72,7 +72,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * @var \Schoolbox\Collection $data['houseList']
      * @var HouseResidential      $data['houseList'][]
      */
-    public function __construct($page, $data)
+    public function __construct(SitePage $page, $data)
     {
         $this->setPage($page);
         $this->setCurrentHouse($data['house']);
