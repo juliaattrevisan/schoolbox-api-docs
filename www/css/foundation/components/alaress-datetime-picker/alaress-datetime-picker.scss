@@ -181,17 +181,18 @@ input.datepicker-input {
     // Medium up
     @media #{$medium-up} {
 
-        .flatpickr-calendar {
-            margin-left: 0;
-            margin-right: 0;
-        }
-
         &.pickerSingle {
-            width: 435px;
+            width: 390px;
         }
 
         &.pickerDouble {
             width: 750px;
+
+            // Uncenter the flatpickr
+            .flatpickr-calendar {
+                margin-left: 0;
+                margin-right: 0;
+            }
         }
     }
 

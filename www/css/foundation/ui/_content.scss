@@ -134,7 +134,7 @@ $progress-meter-color: $accent-foreground;
 // $include-html-reveal-classes: $include-html-classes;
 
 // We use these to control the style of the reveal overlay.
-// $reveal-overlay-bg: rgba($black, .45);
+$reveal-overlay-bg: rgba($black, .6);
 // $reveal-overlay-bg-old: $black;
 
 // We use these to control the style of the modal itself.
@@ -146,11 +146,12 @@ $reveal-modal-padding: rem-calc(($base-font-size - 2));
 // $reveal-box-shadow: 0 0 10px rgba($black,.4);
 
 // We use these to style the reveal close button
-// $reveal-close-font-size: rem-calc(40);
-// $reveal-close-top: rem-calc(8);
+$reveal-close-font-size: 3rem;
+$reveal-close-top: -3rem;
+$reveal-close-right: -2rem;
 // $reveal-close-side: rem-calc(11);
-$reveal-close-color: $content-ui-foreground;
-// $reveal-close-weight: $font-weight-bold;
+$reveal-close-color: $white;
+$reveal-close-weight: $font-weight-normal;
 
 // We use this to set the default radius used throughout the core.
 $reveal-radius: 0;
@@ -1259,8 +1260,6 @@ tr:hover{
 }
 
 // Reveal
-
-// Headers: don't overlap the close X
 .reveal-modal {
     margin-top: 10vh !important; // foundation hardcodes an inline 100px -_-
     &:focus {
@@ -1286,9 +1285,7 @@ tr:hover{
 	}
 
 	.close-reveal-modal {
-		font-size: 2rem;
-		font-weight: $font-weight-normal;
-		top: 0.4rem;
+		right: $reveal-close-right;
 	}
 }
 
