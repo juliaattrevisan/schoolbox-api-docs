@@ -5,7 +5,6 @@
  * @author      Alex Tworowsky <aetworowsky@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Error;
