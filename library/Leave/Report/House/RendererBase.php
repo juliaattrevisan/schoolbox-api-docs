@@ -72,7 +72,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * @var \Schoolbox\Collection $data['houseList']
      * @var HouseResidential      $data['houseList'][]
      */
-    public function __construct($page, $data)
+    public function __construct(SitePage $page, $data)
     {
         $this->setPage($page);
         $this->setCurrentHouse($data['house']);
@@ -88,20 +88,6 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
         /* Execute data recombination
          */
         $this->recombination();
-
-        /* Setup hook if data bundle extended by descendants
-         */
-        $this->setup($data);
-    }
-
-
-    /**
-     * Setup Hook for descendant classes
-     * @param array $data extra data for descendant classes
-     * @return void
-     */
-    protected function setup(array $data){
-
     }
 
     /**
