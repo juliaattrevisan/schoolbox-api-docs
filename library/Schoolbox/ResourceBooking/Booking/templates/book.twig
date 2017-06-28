@@ -186,8 +186,16 @@ $(function() {
                 'remote.tooLong': true
             },
             'repeat_until': {
-                datepickerDate: true,
-                'afterStart': true
+                datepickerDate: {
+                    depends: function() {
+                        return $('#repeatUntilSelect').val() !== ''
+                    }
+                },
+                'afterStart': {
+                    depends: function() {
+                        return $('#repeatUntilSelect').val() !== ''
+                    }
+                }
             }
         },
         submitHandler: function() {
@@ -391,11 +399,13 @@ $(function() {
                             </select>
                         </label>
 
-                        <label id="repeatUntil"l>
-                            Repeat Until
-                            <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
-                            <input name="repeat_until" id="repeat_until" data-datepicker type="text" size="15" maxlength="30" value="" />
-                        </label>
+                        <div id="repeatUntil"> {# This ID must be on a div wrapping the label, because the input will be taken out of the label via JS #}
+                            <label>
+                                Repeat Until
+                                <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
+                                <input name="repeat_until" id="repeat_until" data-datepicker type="text" size="15" maxlength="30" value="" />
+                            </label>
+                        </div>
                     </div>
                 </fieldset>
                 {% elseif recurrence %}
