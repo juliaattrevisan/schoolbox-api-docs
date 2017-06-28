@@ -144,6 +144,11 @@ class Controller extends Base
      */
     public function getModify($user)
     {
+        // Check for non-existent user
+        if ($user->getId() == NULL) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+        
         if ($this->getConfigLoader()->get('external_enable') && $this->getConfigLoader()->get('external_type') == 'synergetic' && $user->getExternalId() > 0) {
             $externalUser = $this->di->get('externalUser');
             $fileSemester = $externalUser->getCurrentSemester($user->getExternalId());
