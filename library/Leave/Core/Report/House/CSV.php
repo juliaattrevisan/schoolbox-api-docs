@@ -55,9 +55,9 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
     {
         $fieldList = ['Name', 'Year', 'Boarding Status'];
 
-        for ($j = 0; $j < $this->getRange(); $j++) {
-            $headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimeStamp(), Alaress_Date_Format::TIMESTAMP);
-            $headerDate->addDays($j);
+        $headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimeStamp(), Alaress_Date_Format::TIMESTAMP);
+
+        for ($j = 0; $j < $this->getRange(); $j++, $headerDate->addDays(1)) {
 
             $fieldList[] = $headerDate->getLongDateOnly();
             $fieldList[] = '';
