@@ -69,7 +69,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
         $rounded = round($normalisedMark * $denominator / IMarkScheme::NORMALISED_MARK_MAX
                 / $this->getGranularityNumerator()) * $this->getGranularityNumerator();
 
-        $total = round($denominator / $this->getGranularityDenominator())  * $this->getGranularityDenominator();
+        $total = round($denominator / $this->getGranularityDenominator()) * $this->getGranularityDenominator();
 
         return "$rounded / $total";
     }
@@ -83,10 +83,10 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      */
     protected function deriveDenominator(IResponse $response = null)
     {
-        if($response instanceof QuizAttempt\Model){
+        if ($response instanceof QuizAttempt\Model) {
             return $response->getMarksAvailable();
         }
-        if(null === $this->totalMark) {
+        if (null === $this->totalMark) {
             $message = 'Unable to derive a human readable mark without a denominator. Either total mark or QuizAttempt required';
             throw new \DomainException($message);
         }

@@ -29,7 +29,7 @@ class Percentage extends AbstractMarkScheme
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if(null === $normalisedMark){
+        if (null === $normalisedMark) {
             return null;
         }
         $this->validateNormalisedMark($normalisedMark);

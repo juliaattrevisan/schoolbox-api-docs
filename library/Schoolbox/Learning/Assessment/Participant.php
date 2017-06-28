@@ -75,9 +75,9 @@ class Participant
      */
     public function isResponseRequired()
     {
-        try{
+        try {
             return $this->assessable->isResponseRequired($this);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             return null;
         }
@@ -96,9 +96,9 @@ class Participant
      */
     public function isFeedbackRequired()
     {
-        try{
+        try {
             return $this->assessable->isFeedbackRequired($this);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             return null;
         }
@@ -113,9 +113,9 @@ class Participant
      */
     public function isReviewComplete()
     {
-        try{
+        try {
             return $this->assessable->isReviewComplete($this);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             return null;
         }
@@ -275,9 +275,9 @@ class Participant
      */
     public function getNormalisedMark()
     {
-        try{
+        try {
             $normalisedMark = $this->assessable->getNormalisedMark($this, false);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             $normalisedMark = null;
         }
@@ -291,9 +291,9 @@ class Participant
      */
     public function getPublishedNormalisedMark()
     {
-        try{
+        try {
             $normalisedMark = $this->assessable->getNormalisedMark($this, true);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             $normalisedMark = null;
         }
@@ -307,9 +307,9 @@ class Participant
      */
     public function getHumanReadableMark()
     {
-        try{
+        try {
             $humanReadableMark = $this->assessable->getHumanReadableMark($this, false);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             $humanReadableMark = null;
         }
@@ -323,9 +323,9 @@ class Participant
      */
     public function getPublishedHumanReadableMark()
     {
-        try{
+        try {
             $humanReadable = $this->assessable->getHumanReadableMark($this, true);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             $humanReadable = null;
         }
@@ -340,9 +340,9 @@ class Participant
      */
     public function getAuthoritativeResponse($publishedOnly)
     {
-        try{
+        try {
             $response = $this->assessable->getAuthoritativeResponse($this, $publishedOnly);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             $response = null;
         }
@@ -357,9 +357,9 @@ class Participant
      */
     public function getAuthoritativeFeedback($publishedOnly)
     {
-        try{
+        try {
             $feedback = $this->assessable->getAuthoritativeFeedback($this, $publishedOnly);
-        } catch (DomainException $e){
+        } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             $feedback = null;
         }

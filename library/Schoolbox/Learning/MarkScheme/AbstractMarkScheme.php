@@ -42,7 +42,7 @@ abstract class AbstractMarkScheme implements IMarkScheme
      */
     protected function validateNormalisedMarkType($normalisedMark)
     {
-        if(!(is_float($normalisedMark) || is_int($normalisedMark))){
+        if (!(is_float($normalisedMark) || is_int($normalisedMark))) {
             $type = gettype($normalisedMark);
             $msg = "Normalised mark type must be float or int: $normalisedMark ($type)";
             throw new \InvalidArgumentException($msg);

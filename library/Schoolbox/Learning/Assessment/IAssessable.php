@@ -245,6 +245,7 @@ interface IAssessable extends ISoftDeletable
      */
     public function getParticipantIfExtant(User $user);
 
+
     /**
      * Gets the normalised mark, regardless of MarkScheme
      *
@@ -255,11 +256,12 @@ interface IAssessable extends ISoftDeletable
      */
     public function getNormalisedMark(Participant $participant, $publishedOnly);
 
+
     /**
      * Gets the normalised mark, transformed into human-readable form by this assessment's MarkScheme
      *
      * @param Participant $participant
-     * @param bool $publishedOnly
+     * @param bool        $publishedOnly
      * @return string|null
      * @throws DomainException If participant assessment is not this assessment
      */

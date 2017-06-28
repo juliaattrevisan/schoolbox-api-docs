@@ -243,8 +243,10 @@ class Model extends AbstractAssessment
      */
     public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
     {
-        // DueWork mark always comes from feedback
+        // DueWork mark is cached on the feedback
         $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+
+        // If no feedback, or feedback is floating, return null.
         return $feedback && $feedback->getResponse() ? $feedback->getResponse() : null;
     }
 
@@ -256,7 +258,7 @@ class Model extends AbstractAssessment
     {
         $this->assertSameAssessment($participant);
 
-        // For now, dueWork takes the mark from latest feedback
+        // DueWork takes the mark from latest feedback
         return $publishedOnly
             ? $participant->findMostRecentPublishedFeedback()
             : $participant->findMostRecentFeedback();
@@ -290,7 +292,7 @@ class Model extends AbstractAssessment
     public function getHumanReadableMark(Participant $participant, $publishedOnly)
     {
         $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
-        return  $feedback ? $feedback->getHumanReadableMark() : null;
+        return $feedback ? $feedback->getHumanReadableMark() : null;
     }
 
 

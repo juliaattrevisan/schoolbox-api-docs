@@ -25,7 +25,7 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
     public function __construct($totalMark)
     {
         // Is it an integer, or float with no fractional part?
-        if(is_int($totalMark) || (is_float($totalMark) && 0.0 === $totalMark % 1.0)){
+        if (is_int($totalMark) || (is_float($totalMark) && 0.0 === $totalMark % 1.0)) {
             parent::__construct((int)$totalMark);
         } else {
             throw new \InvalidArgumentException("Total mark whole number must not contain fractional component: $totalMark");

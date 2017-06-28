@@ -96,12 +96,12 @@ class Model extends AbstractAssessment
         // Participant mark taken from latest attempt
         $authoritativeResponse = $participant->findMostRecentSubmittedResponse();
 
-        // Does participant have a response, and does is it not reviewed?
+        // Does participant have a submitted attempt, and is it not reviewed?
         return $authoritativeResponse && !$authoritativeResponse->hasPublishedFeedback();
     }
 
     /**
-     * A Quiz is configured to take the mark from the most recently reviewed attempt
+     * A Quiz takes the mark from the most recently reviewed attempt
      *
      * @inheritdoc
      */
@@ -111,11 +111,12 @@ class Model extends AbstractAssessment
         /** @var Attempt\Model $authoritativeAttempt */
         $authoritativeAttempt = $this->getAuthoritativeResponse($participant, $publishedOnly);
 
-        if(null === $authoritativeAttempt){
+        if (null === $authoritativeAttempt) {
             return null;
         }
         return IMarkScheme::NORMALISED_MARK_MAX * $authoritativeAttempt->getMarksGiven() / $authoritativeAttempt->getMarksAvailable();
     }
+
 
     /**
      * @inheritdoc
@@ -126,19 +127,19 @@ class Model extends AbstractAssessment
 
         /** @var Attempt\Model $latestAttempt */
         $latestAttempt = null;
-        foreach($participant->getAllResponses() as $attempt){
+        foreach ($participant->getAllResponses() as $attempt) {
 
             // Skip responses that are not submitted yet (ie still in progress), or have no feedback, or not published if $publishedOnly
-            if(!$attempt->isSubmitted() || !$attempt->hasFeedback() || ($publishedOnly && !$attempt->getAllFeedback()[0]->isPublished())){
+            if (!$attempt->isSubmitted() || !$attempt->hasFeedback() || ($publishedOnly && !$attempt->getAllFeedback()[0]->isPublished())) {
                 continue;
             }
 
             // Submitted later? Or submitted at same time but created later?
-            // (the latter handles case when minor release auto-finished a bunch of attempts)
-            if(!$latestAttempt
+            // (the latter test handles the case where cron auto-finished a bunch of attempts)
+            if (!$latestAttempt
                 || $attempt->getSubmittedAt()->gt($latestAttempt->getSubmittedAt())
                 || ($attempt->getSubmittedAt()->eq($latestAttempt->getSubmittedAt()) && $attempt->getCreatedAt()->gt($latestAttempt->getCreatedAt()))
-            ){
+            ) {
                 $latestAttempt = $attempt;
             }
         }

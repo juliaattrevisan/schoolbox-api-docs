@@ -30,7 +30,7 @@ class Completion extends AbstractMarkScheme
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
         // Does the response not exist, or is not submitted, or explicitly marked as incomplete?
-        if(!$response || !$response->isSubmitted() || ($response instanceof TaskResponse && !$response->getMarkedComplete())){
+        if (!$response || !$response->isSubmitted() || ($response instanceof TaskResponse && !$response->getMarkedComplete())) {
             return self::HUMAN_READABLE_INCOMPLETE;
         }
         return self::HUMAN_READABLE_COMPLETE;

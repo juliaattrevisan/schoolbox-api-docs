@@ -373,15 +373,15 @@ abstract class AbstractAssessment implements IAssessable
         $this->assertSameAssessment($participant);
 
         $hasSubmittedResponse = false;
-        foreach($participant->getAllResponses() as $response){
-            if($response->isSubmitted()){
+        foreach ($participant->getAllResponses() as $response) {
+            if ($response->isSubmitted()) {
                 $hasSubmittedResponse = true;
                 break;
             }
         }
         $hasPublishedFeedback = false;
-        foreach($participant->getAllFeedbacks() as $feedback){
-            if($feedback->isPublished()){
+        foreach ($participant->getAllFeedbacks() as $feedback) {
+            if ($feedback->isPublished()) {
                 $hasPublishedFeedback = true;
                 break;
             }

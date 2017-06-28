@@ -89,7 +89,7 @@ class Model extends AbstractAssessment
         // No concept of 'publishing' task marks
 
         // Can a student mark themselves as completing this task?
-        if($this->isSelfAssessable){
+        if ($this->isSelfAssessable) {
             return $participant->findMostRecentResponse();
         }
         // Else only a teacher can mark the task, which always generates a feedback and response
@@ -105,7 +105,7 @@ class Model extends AbstractAssessment
     {
         $this->assertSameAssessment($participant);
 
-        // For now, the authoritative task feedback is always the latest one
+        // The authoritative task feedback is always the latest one
         return $publishedOnly
             ? $participant->findMostRecentPublishedFeedback()
             : $participant->findMostRecentFeedback();
