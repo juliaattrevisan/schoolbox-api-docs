@@ -119,7 +119,7 @@
                 {#due date is always relevant#}
                 {% include '@course/import/date.twig' with {
                     assessmentDate: assessment.dueAt,
-                    unitDate: unitImpl.dueDate,
+                    unitDate: unitImpl.dueDate.endOfDay,
                     endOfDay: true,
                     inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                     dateProperty: 'due',
@@ -131,7 +131,7 @@
                 {% if acceptingResponses %}
                     {% include '@course/import/date.twig' with {
                         assessmentDate: assessment.closeAt,
-                        unitDate: unitImpl.dueDate,
+                        unitDate: unitImpl.dueDate.endOfDay,
                         endOfDay: true,
                         inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                         dateProperty: 'close',
