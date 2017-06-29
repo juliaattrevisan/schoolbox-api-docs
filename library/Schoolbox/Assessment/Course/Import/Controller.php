@@ -965,7 +965,8 @@ class Controller extends Base\Base
                     $owner,
                 ],
             ],
-            'unitsImpls'          => $courseImpl->getUnits(),
+            'unit
+            Impls'          => $courseImpl->getUnits(),
             'ownerships'          => "{$courseImpl->getFolder()->getId()}:{$owner->getId()}",
             'returnUrlName'       => Redirect::RETURN_URL,
             'encodedReturnUrl'    => $this->getRequest()->query->get(Redirect::RETURN_URL),
