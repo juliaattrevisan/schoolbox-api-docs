@@ -36,7 +36,5 @@
            {% endif %}
            {% if disabled %}disabled{% endif %}
     />
-    {% if not unitDate.isNull %}
-        <span class="course-use-unit-date" data-course-unit-date="{{ unitDate.local }}">Use Unit Date</span>
-    {% endif %}
+    <a class="course-use-unit-date hide" data-course-unit-date="{{ unitDate.local }}">Use Unit Date</a>
 </div>

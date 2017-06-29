@@ -21,10 +21,22 @@
      */
     $(function () {
 
+        // Reveal 'use unit date' if input value differs form the unit date value
+        $('#import_assessments').find('[data-datepicker]').change(function() {
+            var $useUnitDate = $(this).parent().next('[data-course-unit-date]');
+            if ($(this).val() !== $useUnitDate.attr('data-course-unit-date')) {
+                $useUnitDate.removeClass('hide');
+            }
+            else {
+               $useUnitDate.addClass('hide');
+            }
+        });
+
+        // Copy unit date into the field
         $('[data-course-unit-date]').click(function() {
             var date = $(this).attr('data-course-unit-date');
             var $input = $(this).prev('.input-group').find('input');
-            $input.val(date);
+            $input.val(date).trigger('change');
         });
 
     });
