@@ -61,7 +61,7 @@ class Result extends Base
             'likeKeyword' => '%'.$mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword()).'%',
         ]);
 
-        $results = new Collection();
+        $results = $mapper->createCollection();
 
         /* Count folders manually, rather than leaving it to the buildSearchResult's iterator
          * It can't tell that this is a 1:N join
@@ -90,7 +90,7 @@ class Result extends Base
 
             /* Reassign var
              */
-            $folder = $results->getOffset($folder->getId());
+            $folder = $results[$folder->getId()];
 
             $code = $code_mapper->hydrate($row, 'cc');
 
