@@ -142,11 +142,13 @@ if ($loadStudents) {
 
             $log->info("Removing student access from '{$folders[$folderId]->getTitle()}'");
 
-            foreach ($students as $student) {
-                $userAccessMapper->deleteByColumnList([
-                    'uid' => $student->getId(),
-                    'sid' => $folderId
-                ]);
+            if (!$dryRun) {
+                foreach ($students as $student) {
+                    $userAccessMapper->deleteByColumnList([
+                        'uid' => $student->getId(),
+                        'sid' => $folderId
+                    ]);
+                }
             }
         } catch (MapperException $e) {
             $log->warning($e->getTraceAsString());
