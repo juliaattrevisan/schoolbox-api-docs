@@ -75,6 +75,7 @@
         {% if showArchive or modify %}
             <div class="component-action">
                 <section>
+                    <a href="/feed/news-homepage-rss.php?user={{ USER.key }}&category={{ code }}" class="button">RSS</a>
                     {% if showArchive %}
                         <a href="/homepage/newsArchive/{{ code }}" class="button">View Archive</a>
                     {% endif %}
