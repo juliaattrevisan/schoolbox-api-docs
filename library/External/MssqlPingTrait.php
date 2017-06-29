@@ -16,7 +16,12 @@ trait External_MssqlPingTrait
      */
     public function isResponsive()
     {
-        return MSSQL::getInstance()->isResponsive();
+        try {
+            return MSSQL::getInstance()->isResponsive();
+        } catch (\Alaress\Database\Exception $e) {
+            // Something failed in connection - I know not what
+            return false;
+        }
     }
 
     /**
