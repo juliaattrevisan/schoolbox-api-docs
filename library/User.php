@@ -402,7 +402,9 @@ class User extends DeprecatedModel
 
     public function getGroupList()
     {
-        $query = "SELECT * FROM groups ORDER BY name";
+        $query = "SELECT * FROM groups
+                  WHERE deleted_at IS NULL
+                  ORDER BY name";
         return $this->db->getAll($query);
     }
 
