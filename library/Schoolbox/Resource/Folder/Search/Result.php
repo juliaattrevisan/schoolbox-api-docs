@@ -38,6 +38,7 @@ class Result extends Base
      */
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
+        /** @var Folder\Code\Mapper $code_mapper */
         $code_mapper = $mapper->getJoinMapper('codes');
         $homepageConfig_mapper = $mapper->getJoinMapper('homepages');
 
@@ -94,8 +95,8 @@ class Result extends Base
 
             $code = $code_mapper->hydrate($row, 'cc');
 
-            if (strlen($code->getCode())) {
-                $folder->getCodes()->add($code);
+            if ($code) {
+                $folder->getCodes()->setOffset($code->getCode(), $code);
             }
 
             /* Accumulate homepage configs
