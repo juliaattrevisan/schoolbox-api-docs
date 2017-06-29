@@ -69,3 +69,9 @@ input[type="submit"][readonly] {
     margin: -0.8rem 0 1rem 0;
     display: block;
 }
+// Medium down
+@media #{$medium-down} {
+    .course-use-unit-date {
+        margin: 0 0 1rem 0;
+    }
+}
