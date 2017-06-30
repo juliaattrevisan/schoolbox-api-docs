@@ -871,19 +871,25 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function deselectTimetableAllDay () {
 
-        var activePeriods;
+        var $periodList = $byTimetable.find('[data-adtp-tt-period]'),
+            activePeriods = $periodList.find('option:selected');
 
         // Selected periods for all the campuses, no matter hidden or not
-        activePeriods = $byTimetable.find('[data-adtp-tt-period] option:selected');
-        activePeriods.each(function() {
-            // If the value is allday, deselect it and select the period that's coming next
-            if($(this).val() == 'allday') {
-                $(this).prop('selected', false);
-                $(this).next().prop('selected', true);
-                $(this).parent().trigger('change');
-            }
-        });
-
+        if (activePeriods.length > 0) {
+            activePeriods.each(function () {
+                // If the value is allday, deselect it and select the period that's coming next
+                if ($(this).val() == 'allday') {
+                    $(this).prop('selected', false);
+                    $(this).next().prop('selected', true);
+                    $(this).parent().trigger('change');
+                }
+            });
+        }
+        // If nothing is selected, select the first option
+        // TODO: this behaviour will change when tt gets synced by time
+        else {
+            $periodList.val($periodList.find('option:first').val());
+        }
     }
 
     /**
