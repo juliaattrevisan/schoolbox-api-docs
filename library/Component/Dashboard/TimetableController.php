@@ -327,6 +327,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $this->parse("campus_timetable_block", 'campus_timetable', true);
             }
         }
+
         return true;
     }
 }
