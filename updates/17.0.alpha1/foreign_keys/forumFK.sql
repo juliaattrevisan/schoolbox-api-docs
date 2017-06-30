@@ -9,8 +9,8 @@ SET userID = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
 WHERE `user`.id is null;
 
 ALTER TABLE `forumThread`
-  CHANGE COLUMN `categoryID` `categoryID` INT(11) UNSIGNED NULL DEFAULT NULL ,
-  CHANGE COLUMN `userID` `userID` INT(11) UNSIGNED NULL DEFAULT NULL ;
+  CHANGE COLUMN `categoryID` `categoryID` INT(11) UNSIGNED NOT NULL,
+  CHANGE COLUMN `userID` `userID` INT(11) UNSIGNED NOT NULL;
 
 ALTER TABLE `forumThread`
   ADD CONSTRAINT `fk_forumThread_folder_id`
@@ -41,7 +41,7 @@ REFERENCES `forumThread` (`threadID`)
   ON UPDATE NO ACTION;
 
 ALTER TABLE `forumPost`
-  CHANGE COLUMN `userID` `userID` INT(11) UNSIGNED NULL DEFAULT NULL ;
+  CHANGE COLUMN `userID` `userID` INT(11) UNSIGNED NOT NULL;
 
 ALTER TABLE `forumPost`
   ADD CONSTRAINT `fk_forumPost_user_id`

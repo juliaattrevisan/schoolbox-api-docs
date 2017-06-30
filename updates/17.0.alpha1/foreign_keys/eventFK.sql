@@ -84,7 +84,7 @@ REFERENCES `luEventType` (`eventTypeID`)
   ON UPDATE NO ACTION;
 
 ALTER TABLE `event_campus`
-  CHANGE COLUMN `event_id` `event_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  CHANGE COLUMN `event_id` `event_id` INT(11) UNSIGNED NOT NULL,
   CHANGE COLUMN `campus_id` `campus_id` TINYINT UNSIGNED NOT NULL;
 
 ALTER TABLE `event_campus`
@@ -102,7 +102,7 @@ REFERENCES `luCampus` (`id`)
 
 
 ALTER TABLE `event_group`
-  CHANGE COLUMN `event_id` `event_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+  CHANGE COLUMN `event_id` `event_id` INT(11) UNSIGNED NOT NULL,
   CHANGE COLUMN `group_id` `group_id` INT(11) UNSIGNED NOT NULL;
 
 ALTER TABLE `event_group`
