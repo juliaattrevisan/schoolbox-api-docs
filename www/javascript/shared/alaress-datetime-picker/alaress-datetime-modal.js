@@ -42,7 +42,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     };
 
     // Listen for the modal open
-    $(document).on('open.fndtn.reveal', $modal, function () {
+    $('#adtp-modal-wrapper-' + twigVars.id).on('open.fndtn.reveal', function () {
         updateCalendarResponse();
         resetTimetablePicker();
         setTimetableAllDay();
