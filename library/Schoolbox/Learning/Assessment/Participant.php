@@ -268,15 +268,17 @@ class Participant
         return $this->getAuthoritativeFeedback($publishedOnly);
     }
 
+
     /**
-     * Return authoritative normalised mark -  (includes draft marks)
+     * Return authoritative normalised mark - optionally filtered to just published marks.
      *
+     * @param bool $publishedOnly Should we ignore draft marks?
      * @return null|float
      */
-    public function getNormalisedMark()
+    public function getNormalisedMark($publishedOnly)
     {
         try {
-            $normalisedMark = $this->assessable->getNormalisedMark($this, false);
+            $normalisedMark = $this->assessable->getNormalisedMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             $normalisedMark = null;
@@ -284,31 +286,17 @@ class Participant
         return $normalisedMark;
     }
 
-    /**
-     * Return authoritative published normalised mark
-     *
-     * @return null|float
-     */
-    public function getPublishedNormalisedMark()
-    {
-        try {
-            $normalisedMark = $this->assessable->getNormalisedMark($this, true);
-        } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            $normalisedMark = null;
-        }
-        return $normalisedMark;
-    }
 
     /**
-     * Return authoritative human-readable mark - whether published or not
+     * Return authoritative human-readable mark - optionally filtered to just published marks.
      *
+     * @param bool $publishedOnly Should we ignore draft marks?
      * @return null|string
      */
-    public function getHumanReadableMark()
+    public function getHumanReadableMark($publishedOnly)
     {
         try {
-            $humanReadableMark = $this->assessable->getHumanReadableMark($this, false);
+            $humanReadableMark = $this->assessable->getHumanReadableMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             $humanReadableMark = null;
@@ -316,21 +304,6 @@ class Participant
         return $humanReadableMark;
     }
 
-    /**
-     * Return authoritative published human-readable mark -  (does NOT include draft marks)
-     *
-     * @return null|string
-     */
-    public function getPublishedHumanReadableMark()
-    {
-        try {
-            $humanReadable = $this->assessable->getHumanReadableMark($this, true);
-        } catch (DomainException $e) {
-            // Impossible to throw when calling $this->assessable($this)
-            $humanReadable = null;
-        }
-        return $humanReadable;
-    }
 
     /**
      * Return the IResponse responsible for the participant's assessment mark

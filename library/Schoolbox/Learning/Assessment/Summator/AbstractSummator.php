@@ -47,10 +47,7 @@ abstract class AbstractSummator implements ISummator
         foreach ($allAssessables as $currentAssessable) {
             $participant = $currentAssessable->getParticipantIfExtant($user);
             if ($participant) {
-                $normMark = $publishedOnly
-                    ? $participant->getPublishedNormalisedMark()
-                    : $participant->getNormalisedMark();
-
+                $normMark = $participant->getNormalisedMark($publishedOnly);
                 if (null !== $normMark) {
                     $this->aggregate($normMark, $currentAssessable->getWeight());
                 }
@@ -76,9 +73,7 @@ abstract class AbstractSummator implements ISummator
         $this->reset();
         foreach ($assessable->getAllParticipants() as $participant) {
 
-            $normMark = $publishedOnly
-                ? $participant->getPublishedNormalisedMark()
-                : $participant->getNormalisedMark();
+            $normMark = $participant->getNormalisedMark($publishedOnly);
 
             if (null !== $normMark) {
                 // Weight doesn't matter within the context of a single assessment

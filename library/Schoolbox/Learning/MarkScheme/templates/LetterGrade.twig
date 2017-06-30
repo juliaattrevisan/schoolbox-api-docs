@@ -1,7 +1,7 @@
 {% extends '@learningMarkScheme/commentable.twig' %}
 
 {% block grading %}
-    {% set humanReadableMark = participant.humanReadableMark %}
+    {% set humanReadableMark = participant.humanReadableMark(false) %}
     <label>{{ locale.grades.proper }}
         <select data-mark-input name="mark" tabindex="{{ tabIndex.mark }}">
 

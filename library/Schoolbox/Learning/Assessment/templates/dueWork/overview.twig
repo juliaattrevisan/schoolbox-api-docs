@@ -67,7 +67,7 @@
                                 {% endfor %}
                             {% endfor %}
                         {% else %}
-                            <td>{{ participant.publishedHumanReadableMark }}</td>
+                            <td>{{ participant.humanReadableMark(true) }}</td>
                         {% endif %}
                     </tr>
                     {% endfor %}

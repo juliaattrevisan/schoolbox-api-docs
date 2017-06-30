@@ -265,7 +265,7 @@ class Markbook
         // Only collate stats for assessments whose feedback may be viewed by this user
         if ($assessment->isFeedbackVisibleToUser($this->viewingUser)) {
             foreach ($assessment->getAllParticipants() as $participant) {
-                $normMarks[] = $participant->getPublishedNormalisedMark();
+                $normMarks[] = $participant->getNormalisedMark(true);
             }
         }
 
