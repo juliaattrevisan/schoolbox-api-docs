@@ -81,37 +81,50 @@ class ClassList
      */
     public function getClassList(Term $term, Alaress_Date_Format $now)
     {
+        /** @var array $classTypes */
         $classTypes = [];
+
+        /** @var GenericCollection|Folder[] $folderList */
         $folderList = $this->folderMapper->createCollection();
+
+        /** @var bool $isTermCurrent */
         $isTermCurrent = $term->contains($now);
 
-        // Are we looking at current Classes, or historical?
+        // Are we looking at current classes, or historical?
 
         if ($isTermCurrent) {
 
-            // Convert external subjects to folders
+            // Iterate all subjects from the SIS and try to find folders with that class code
 
             foreach ($this->user->getSubjectCollection() as $subject) {
                 try {
+                    /** @var Folder $folder */
                     $folder = $this->folderMapper->findByCode($subject['code']);
+
                     $folderList = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]), 'id');
                     $classTypes[$folder->getId()] = $subject['classType'];
                 } catch (MapperException $e) {
                     // Not found
                 }
             }
-            
-        } else {
 
-            // Is user a teacher or student?
+            // Add in other folders with feedback during the term, this will pick up archived classes
 
             if ($this->user->getRole()->isStaff()) {
-                $folderList = $this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term);
+                $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term));
             } elseif ($this->user->getRole()->isStudent()) {
-                $folderList = $this->folderMapper
+                $folderList = $folderList->mergeUnique($this->folderMapper
                     ->findFoldersWithResponses($this->user, $term)
-                    ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id');
+                    ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id')
+                );
             }
+
+        } elseif ($this->user->getRole()->isStaff()) {
+            $folderList = $this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term);
+        } elseif ($this->user->getRole()->isStudent()) {
+            $folderList = $this->folderMapper
+                ->findFoldersWithResponses($this->user, $term)
+                ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id');
         }
 
         $courseSpecs = $this->getCourseSpecsHavingUnitsInTerm($folderList, $term);
