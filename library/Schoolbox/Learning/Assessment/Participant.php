@@ -79,6 +79,9 @@ class Participant
             return $this->assessable->isResponseRequired($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
             return null;
         }
     }
@@ -100,6 +103,9 @@ class Participant
             return $this->assessable->isFeedbackRequired($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
             return null;
         }
     }
@@ -117,6 +123,9 @@ class Participant
             return $this->assessable->isReviewComplete($this);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
             return null;
         }
     }
@@ -278,12 +287,14 @@ class Participant
     public function getNormalisedMark($publishedOnly)
     {
         try {
-            $normalisedMark = $this->assessable->getNormalisedMark($this, $publishedOnly);
+            return $this->assessable->getNormalisedMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
-            $normalisedMark = null;
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
         }
-        return $normalisedMark;
     }
 
 
@@ -296,12 +307,14 @@ class Participant
     public function getHumanReadableMark($publishedOnly)
     {
         try {
-            $humanReadableMark = $this->assessable->getHumanReadableMark($this, $publishedOnly);
+            return $this->assessable->getHumanReadableMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
-            $humanReadableMark = null;
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
         }
-        return $humanReadableMark;
     }
 
 
@@ -314,12 +327,14 @@ class Participant
     public function getAuthoritativeResponse($publishedOnly)
     {
         try {
-            $response = $this->assessable->getAuthoritativeResponse($this, $publishedOnly);
+            return $this->assessable->getAuthoritativeResponse($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
-            $response = null;
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
         }
-        return $response;
     }
 
     /**
@@ -331,12 +346,14 @@ class Participant
     public function getAuthoritativeFeedback($publishedOnly)
     {
         try {
-            $feedback = $this->assessable->getAuthoritativeFeedback($this, $publishedOnly);
+            return $this->assessable->getAuthoritativeFeedback($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
-            $feedback = null;
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
         }
-        return $feedback;
     }
 
 
