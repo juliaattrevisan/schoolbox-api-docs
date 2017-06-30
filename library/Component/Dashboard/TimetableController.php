@@ -60,7 +60,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         }
 
         if (!($_SESSION['timetable'] && Cfg::get('external_enable'))) {
-           return false;
+            return false;
         }
 
         $timetableHandler = $this->externalTimetable;
@@ -81,7 +81,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         $this->dayName[$campus_id] = $timetableHandler->getDayName($day_number);
                         $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser());
                         $this->timetable[$campus_id] = $timetableHandler->getTimetableForDate(
-                           $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
+                            $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
                         );
                     }
                 }
@@ -179,17 +179,18 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                          * whether it has something on or not
                          */
                         if ($current_period['PeriodNumber'] == $period['periodNumber']
-                            && $current_period['PeriodNumberSeq'] == $period['periodSequence']) {
+                            && $current_period['PeriodNumberSeq'] == $period['periodSequence']
+                        ) {
                             $this->setVar(
                                 array(
-                                    'PERIOD_CLASS'    => 'timetable-subject-active',
+                                    'PERIOD_CLASS' => 'timetable-subject-active',
                                     'PERIOD_TH_CLASS' => 'timetable-period-active'
                                 )
                             );
                         } else {
                             $this->setVar(
                                 array(
-                                    'PERIOD_CLASS'    => '',
+                                    'PERIOD_CLASS' => '',
                                     'PERIOD_TH_CLASS' => ''
                                 )
                             );
@@ -199,7 +200,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                          * Otherwise empty cell
                          */
                         if (count($period['class']) > 0) {
-                            foreach($period['class'] as $class) {
+                            foreach ($period['class'] as $class) {
                                 $description = $class['description'];
                                 $this->setVar('PERIOD_CODE', '(' . $class['code'] . ')');
                                 $this->setVar('PERIOD_ROOM', $class['room']);
@@ -226,12 +227,19 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     $folder = $this->getFolderMapper()->findByCode($class['code']);
                                     $hasLink = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ;
 
+                                    // If the class description is blank, fall back to the folder name
+
                                     if (empty($description)) {
                                         $description = $folder->getTitle();
                                     }
-                                }
-                                catch (MapperException $e) {
+                                } catch (MapperException $e) {
                                     $hasLink = false;
+                                }
+
+                                // If both the class description and folder name as blank, fall back to "Unknown Class"
+
+                                if (empty($description)) {
+                                    $description = "Unknown Class";
                                 }
 
                                 $this->setVar('PERIOD_DESC', $description);
@@ -243,7 +251,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     && $this->getUser()->getRole()->isStaff()
                                 ) {
                                     $showAttendance = false;
-                                    if(Cfg::get('external_type') == 'synergetic' && $class['AttendanceEnabled']) {
+                                    if (Cfg::get('external_type') == 'synergetic' && $class['AttendanceEnabled']) {
                                         $showAttendance = true;
 
                                         $encodedClass = urlencode(urlencode(urlencode($class['code'])));
@@ -251,31 +259,32 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                         $this->setVar(
                                             array(
-                                                'ATTENDANCE_CLASS_CODE'        => $classLink,
-                                                'ATTENDANCE_ATTENDANCE_DATE'   => $now->getDatabaseDate(),
+                                                'ATTENDANCE_CLASS_CODE' => $classLink,
+                                                'ATTENDANCE_ATTENDANCE_DATE' => $now->getDatabaseDate(),
                                                 'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                                'ATTENDANCE_TIMETABLE_CODE'    => $campus_list[$campus_id]->getExtTimetableCode(),
-                                                'ATTENDANCE_ICON'              => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
+                                                'ATTENDANCE_TIMETABLE_CODE' => $campus_list[$campus_id]->getExtTimetableCode(),
+                                                'ATTENDANCE_ICON' => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
                                             )
                                         );
+                                    } else {
+                                        if (Cfg::get('external_type') == 'tass') {
+                                            $showAttendance = true;
+                                            list($year, $subject, $class) = explode('-', $class['code']);
+                                            list($cmp_code, $timetableCode) = explode('-', $campus_list[$campus_id]->getExtTimetableCode());
+                                            $this->setVar(
+                                                array(
+                                                    'ATTENDANCE_CLASS_CODE' => $class,
+                                                    'ATTENDANCE_SUBJECT_CODE' => $subject,
+                                                    'ATTENDANCE_ATTENDANCE_DATE' => $now->getUsingFormat('d/m/Y'),
+                                                    'ATTENDANCE_ATTENDANCE_DAY' => $this->dayNumber[$campus_id],
+                                                    'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
+                                                    'ATTENDANCE_TIMETABLE_CODE' => $timetableCode,
+                                                    'ATTENDANCE_ICON' => 'icon-class-list',
+                                                )
+                                            );
+                                        }
                                     }
-                                    else if(Cfg::get('external_type') == 'tass') {
-                                        $showAttendance = true;
-                                        list($year, $subject, $class) = explode('-',$class['code']);
-                                        list($cmp_code, $timetableCode) = explode('-',$campus_list[$campus_id]->getExtTimetableCode());
-                                        $this->setVar(
-                                            array(
-                                                'ATTENDANCE_CLASS_CODE'        => $class,
-                                                'ATTENDANCE_SUBJECT_CODE'      => $subject,
-                                                'ATTENDANCE_ATTENDANCE_DATE'   => $now->getUsingFormat('d/m/Y'),
-                                                'ATTENDANCE_ATTENDANCE_DAY'    => $this->dayNumber[$campus_id],
-                                                'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                                'ATTENDANCE_TIMETABLE_CODE'    => $timetableCode,
-                                                'ATTENDANCE_ICON'              => 'icon-class-list',
-                                            )
-                                        );
-                                    }
-                                    if($showAttendance) {
+                                    if ($showAttendance) {
                                         if ($hasLink) {
                                             $this->parse('period_class_link_attendance_block', 'period_class_link_attendance');
                                         } else {
@@ -285,10 +294,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 }
 
                                 if ($hasLink) {
-                                    $this->parse('period_class_link_block', 'period_class_link',true);
-                                }
-                                else {
-                                    $this->parse('period_class_block', 'period_class',true);
+                                    $this->parse('period_class_link_block', 'period_class_link', true);
+                                } else {
+                                    $this->parse('period_class_block', 'period_class', true);
                                 }
 
                                 /* Clear children after parsing out the parent
