@@ -200,7 +200,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                          */
                         if (count($period['class']) > 0) {
                             foreach($period['class'] as $class) {
-                                $this->setVar('PERIOD_DESC', $class['description']);
+                                $description = $class['description'];
                                 $this->setVar('PERIOD_CODE', '(' . $class['code'] . ')');
                                 $this->setVar('PERIOD_ROOM', $class['room']);
                                 // Yes you really do need to double url-encode this
@@ -225,10 +225,17 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 try {
                                     $folder = $this->getFolderMapper()->findByCode($class['code']);
                                     $hasLink = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ;
+
+                                    if (empty($description)) {
+                                        $description = $folder->getTitle();
+                                    }
                                 }
                                 catch (MapperException $e) {
                                     $hasLink = false;
                                 }
+
+                                $this->setVar('PERIOD_DESC', $description);
+
 
                                 // Link to Attendance Records
                                 if (strlen($class['code'])
