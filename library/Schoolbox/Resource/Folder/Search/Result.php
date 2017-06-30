@@ -64,11 +64,6 @@ class Result extends Base
 
         $results = $mapper->createCollection();
 
-        /* Count folders manually, rather than leaving it to the buildSearchResult's iterator
-         * It can't tell that this is a 1:N join
-         */
-        $i = 0;
-
         // Handle offset properly:
         // any folders found after offset+limit get skipped,
         // any before offset get sliced off the start
@@ -85,8 +80,6 @@ class Result extends Base
              */
             if (!($results->getOffset($folder->getId()) instanceof Folder\Model)) {
                 $results->setOffset($folder->getId(), $folder);
-
-                $i++;
             }
 
             /* Reassign var
