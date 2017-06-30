@@ -389,7 +389,7 @@ DESCRIPTION
               duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
 
        {$yellow}-v, --verbose{$white}
-              verbosity:   how much activity will be logged.
+              verbosity:   whether to print verbose output or not.
 
 EXAMPLE
        Example to undelete folder with ID = 123:
