@@ -46,10 +46,10 @@ class ClassList
 
 
     /**
-     * @param User                        $user
-     * @param FolderMapper                $folderMapper
-     * @param Timetable_ColourMapper      $timetableColourMapper
-     * @param CourseSpecification\Mapper  $courseSpecMapper
+     * @param User $user
+     * @param FolderMapper $folderMapper
+     * @param Timetable_ColourMapper $timetableColourMapper
+     * @param CourseSpecification\Mapper $courseSpecMapper
      * @param CourseImplementation\Mapper $courseImplMapper
      */
     public function __construct(
@@ -59,11 +59,11 @@ class ClassList
         CourseSpecification\Mapper $courseSpecMapper,
         CourseImplementation\Mapper $courseImplMapper
     ) {
-        $this->user                  = $user;
-        $this->folderMapper          = $folderMapper;
+        $this->user = $user;
+        $this->folderMapper = $folderMapper;
         $this->timetableColourMapper = $timetableColourMapper;
-        $this->courseSpecMapper      = $courseSpecMapper;
-        $this->courseImplMapper      = $courseImplMapper;
+        $this->courseSpecMapper = $courseSpecMapper;
+        $this->courseImplMapper = $courseImplMapper;
     }
 
 
@@ -71,7 +71,7 @@ class ClassList
      * Returns a set of of classes, along with subsidiary data, suitable for
      * rendering on the classes component or page
      *
-     * @param Term                $term
+     * @param Term $term
      * @param Alaress_Date_Format $now
      * @return array
      * @var Term                          return['term']
@@ -83,8 +83,8 @@ class ClassList
      */
     public function getClassList(Term $term, Alaress_Date_Format $now)
     {
-        $classTypes    = [];
-        $folderList    = $this->folderMapper->createCollection();
+        $classTypes = [];
+        $folderList = $this->folderMapper->createCollection();
         $isTermCurrent = $term->contains($now);
 
         // Are we looking at current Classes, or historical ?
@@ -92,8 +92,8 @@ class ClassList
             /* Convert external subjects to folders */
             foreach ($this->user->getSubjectCollection() as $subject) {
                 try {
-                    $folder                       = $this->folderMapper->findByCode($subject['code']);
-                    $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]), 'id');
+                    $folder = $this->folderMapper->findByCode($subject['code']);
+                    $folderList = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]), 'id');
                     $classTypes[$folder->getId()] = $subject['classType'];
                 } catch (MapperException $e) {
                     //not found
@@ -116,10 +116,10 @@ class ClassList
         $this->applyFolderColours($folderList);
 
         return [
-            'term'       => $term,
-            'classList'  => $folderList,
+            'term' => $term,
+            'classList' => $folderList,
             'classTypes' => $classTypes,
-            'courses'    => $courseSpecs,
+            'courses' => $courseSpecs,
         ];
     }
 
@@ -130,7 +130,7 @@ class ClassList
      * Filters to only return CourseSpecs that have units imported to class folder for specified term
      *
      * @param GenericCollection|Folder[] $folderList
-     * @param Term                       $term
+     * @param Term $term
      * @return Collection|CourseSpecification\Model[][] Grouped by folder.id
      */
     protected function getCourseSpecsHavingUnitsInTerm(GenericCollection $folderList, Term $term)
@@ -152,7 +152,7 @@ class ClassList
          */
         foreach ($courseImplsPerClass as $folderId => $courseImpls) {
             $courseSpecsPerFolder[$folderId] = $this->courseSpecMapper->createCollection();
-            $hasUnitsInTerm                  = false;
+            $hasUnitsInTerm = false;
             foreach ($courseImpls as $courseImpl) {
                 foreach ($courseImpl->getUnits() as $unitImpl) {
                     if ($unitImpl->getOpenDate()->compareDateOnly($term->getStart()) >= 0) {
@@ -163,7 +163,7 @@ class ClassList
                     }
                 }
                 if ($hasUnitsInTerm) {
-                    $courseSpecId                                   = $courseImpl->getSpecification()->getId();
+                    $courseSpecId = $courseImpl->getSpecification()->getId();
                     $courseSpecsPerFolder[$folderId][$courseSpecId] = $courseImpl->getSpecification();
                 }
             }
@@ -180,7 +180,7 @@ class ClassList
     protected function applyFolderColours(GenericCollection $folderList)
     {
         /* Get Timetable colours to use as random colours for null set folders */
-        $colourList  = $this->timetableColourMapper->findAll();
+        $colourList = $this->timetableColourMapper->findAll();
         $colourIndex = 0;
 
         foreach ($folderList as $folder) {
