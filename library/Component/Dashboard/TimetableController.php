@@ -32,9 +32,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     /** @var Collection $colourList */
     protected $colourList;
 
-    /** @var string $templateFile The html file to load */
-    protected $templateFile = 'timetable';
-
     /** @var ConfigMapper $configMapper */
     protected $configMapper;
     
@@ -102,15 +99,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     */
-    function __call($name, $arguments)
-    {
-        // TODO: Implement __call() method.
-    }
-
-    /**
      * @param String $templateHandle
      * @return bool
      */
@@ -119,7 +107,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $periodCount = 0;
         $timetableCount = 0;
 
-        if (!$this->loadTemplate($templateHandle, $this->getTemplateFile())) {
+        if (!$this->loadTemplate($templateHandle, 'timetable')) {
             return false;
         }
 
@@ -195,6 +183,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         $this->setVar("PERIOD_NAME", $period['periodName']);
                         $this->setVar("PERIOD_START", $period['periodStart']);
                         $this->setVar("PERIOD_END", $period['periodEnd']);
+
                         $periodCount++;
 
                         // Always highlight the current cell, regardless of whether it has something on or not
@@ -273,15 +262,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                         $encodedClass = urlencode(urlencode(urlencode($class['code'])));
                                         $classLink = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
 
-                                        $this->setVar(
-                                            array(
-                                                'ATTENDANCE_CLASS_CODE' => $classLink,
-                                                'ATTENDANCE_ATTENDANCE_DATE' => $now->getDatabaseDate(),
-                                                'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                                'ATTENDANCE_TIMETABLE_CODE' => $campus_list[$campus_id]->getExtTimetableCode(),
-                                                'ATTENDANCE_ICON' => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
-                                            )
-                                        );
+                                        $this->setVar([
+                                            'ATTENDANCE_CLASS_CODE' => $classLink,
+                                            'ATTENDANCE_ATTENDANCE_DATE' => $now->getDatabaseDate(),
+                                            'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
+                                            'ATTENDANCE_TIMETABLE_CODE' => $campus_list[$campus_id]->getExtTimetableCode(),
+                                            'ATTENDANCE_ICON' => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
+                                        ]);
                                         
                                     } elseif ($this->configMapper->get('external_type') == 'tass') {
                                         $showAttendance = true;
@@ -293,13 +280,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                         list($cmp_code, $timetableCode) = explode('-', $campus_list[$campus_id]->getExtTimetableCode());
                                         
                                         $this->setVar([
-                                                'ATTENDANCE_CLASS_CODE' => $class,
-                                                'ATTENDANCE_SUBJECT_CODE' => $subject,
-                                                'ATTENDANCE_ATTENDANCE_DATE' => $now->getUsingFormat('d/m/Y'),
-                                                'ATTENDANCE_ATTENDANCE_DAY' => $this->dayNumber[$campus_id],
-                                                'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                                'ATTENDANCE_TIMETABLE_CODE' => $timetableCode,
-                                                'ATTENDANCE_ICON' => 'icon-class-list',
+                                            'ATTENDANCE_CLASS_CODE' => $class,
+                                            'ATTENDANCE_SUBJECT_CODE' => $subject,
+                                            'ATTENDANCE_ATTENDANCE_DATE' => $now->getUsingFormat('d/m/Y'),
+                                            'ATTENDANCE_ATTENDANCE_DAY' => $this->dayNumber[$campus_id],
+                                            'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
+                                            'ATTENDANCE_TIMETABLE_CODE' => $timetableCode,
+                                            'ATTENDANCE_ICON' => 'icon-class-list',
                                         ]);
                                     }
                                     
@@ -341,23 +328,5 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             }
         }
         return true;
-    }
-
-    // Getters & Setters
-
-    /**
-     * @param string $templateFile
-     */
-    protected function setTemplateFile($templateFile)
-    {
-        $this->templateFile = $templateFile;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getTemplateFile()
-    {
-        return $this->templateFile;
     }
 }
