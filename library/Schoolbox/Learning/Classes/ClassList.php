@@ -111,11 +111,16 @@ class ClassList
             // Add in other folders with feedback during the term, this will pick up archived classes
 
             if ($this->user->getRole()->isStaff()) {
-                $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term));
+                $folderList = $folderList->mergeUnique(
+                    $this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term),
+                    'id'
+                );
             } elseif ($this->user->getRole()->isStudent()) {
-                $folderList = $folderList->mergeUnique($this->folderMapper
-                    ->findFoldersWithResponses($this->user, $term)
-                    ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id')
+                $folderList = $folderList->mergeUnique(
+                    $this->folderMapper
+                        ->findFoldersWithResponses($this->user, $term)
+                        ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id'),
+                    'id'
                 );
             }
 
