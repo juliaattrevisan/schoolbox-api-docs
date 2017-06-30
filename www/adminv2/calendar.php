@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Calendar\Relation;
+
 if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
@@ -227,9 +229,9 @@ foreach ($typeList as $type) {
              */
             $allUsers = [];
 
-            /** @var \Schoolbox\User $currentUser */
+            /** @var Relation\Personal $currentUser */
             foreach ($currentEvent->getUserCollection() as $currentUser) {
-                $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($currentUser->getId());
+                $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($currentUser->getUserId());
 
                 if ($user instanceof \Schoolbox\User) {
                     $allUsers[] = $user->getFullName();
