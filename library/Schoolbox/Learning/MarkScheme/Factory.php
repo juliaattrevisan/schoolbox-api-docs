@@ -91,7 +91,7 @@ class Factory
     {
         switch ($quiz->getMarkType()->getId()) {
             case MarkType::TYPE_TOTAL:
-                return new TotalMarkFractional(null);
+                return new TotalMarkFractional();
             default:
                 throw new \DomainException("Invalid MarkType for Quiz: " . $quiz->getMarkType()->getName());
         }

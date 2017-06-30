@@ -33,6 +33,16 @@ class TotalMarkFractional extends TotalMarkAbstract
     const GRANULARITY_NUMERATOR   = 0.05;
     const GRANULARITY_DENOMINATOR = 0.05;
 
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct($totalMark = null)
+    {
+        parent::__construct($totalMark);
+    }
+
+
     /**
      * Quiz marks are allowed to be outside the normal mark bounds.
      *
