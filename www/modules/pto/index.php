@@ -5,12 +5,11 @@ use Zend\Uri\Uri;
 /** @var Schoolbox\User $user */
 $user = $_SESSION["user"];
 
-// The PTO destination URL
-$remoteUrl = "https://bookings.parentteacheronline.com.au?school=[school]&Type=[type]&P1=[username]&P2=[epoch]&P3=[hash]";
+new \Schoolbox\PTO\Loader($user, date("U"), Config::get('pto_school'));
 
-$keys['epoch'] = date("U");
-$keys['school'] = Config::get('pto_school');
-$keys['username'] = $_SESSION["user"]->getUsername();
+// The PTO destination URL
+
+
 $keys['type'] =                                                                         // Try to work out user type
     $user->getRole()->isStudent() || $user->getRole()->isParent() ? 'S' :               // Student/Parent
         $user->getRole()->isStaff() ? 'T' :                                             // Teacher
