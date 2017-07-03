@@ -23,8 +23,13 @@ class Loader
      */
     const REMOTE_URL = "https://bookings.parentteacheronline.com.au?school=[school]&Type=[type]&P1=[username]&P2=[epoch]&P3=[hash]";
 
+    /** @var User */
     private $user;
+
+    /** @var string */
     private $epoch;
+
+    /** @var string */
     private $school;
 
     /**
@@ -79,11 +84,27 @@ class Loader
         return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$this->getEpoch()}{$ptoKey}");
     }
 
+    /**
+     * Generate the remote url
+     *
+     * @return string
+     */
+    public function generateRemoteUrl()
+    {
+        return strtr(self::REMOTE_URL, [
+            'epoch' => $this->getEpoch(),
+            'school' => $this->getSchool(),
+            'username' => $this->getUser()->getUsername(),
+            'type' => $this->determineUserType(),
+            'hash' => $this->generateHash()
+        ]);
+    }
+
     /* Getters/Setters
      */
 
     /**
-     * @return mixed
+     * @return User
      */
     private function getUser()
     {
@@ -91,7 +112,7 @@ class Loader
     }
 
     /**
-     * @param mixed $user
+     * @param User $user
      */
     private function setUser($user)
     {
@@ -99,7 +120,7 @@ class Loader
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     private function getEpoch()
     {
@@ -107,7 +128,7 @@ class Loader
     }
 
     /**
-     * @param mixed $epoch
+     * @param string $epoch
      */
     private function setEpoch($epoch)
     {
@@ -115,7 +136,7 @@ class Loader
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     private function getSchool()
     {
@@ -123,14 +144,10 @@ class Loader
     }
 
     /**
-     * @param mixed $school
+     * @param string $school
      */
     private function setSchool($school)
     {
         $this->school = $school;
     }
-
-
-
-
 }
