@@ -1,14 +1,36 @@
 {# Inline Grader for a particular Response
- #
- # This lets you create Associated Feedback along with grade, comment and
- # assorted feedback files etc.
+
+This lets you create Associated Feedback along with grade, comment and assorted feedback files etc.
+
+TODO - This is DW-only. Should be in the DueWork Response namespace, or named more appropriately.
+
+Usage:
+    assessment        DueWork\Model                  The DueWork being assessed
+    breadcrumbs       Collection|string[][]          An array of label + URL pairs
+    response          null|DueWork\Submission
+    latestFeedback    null|DueWork\Feedback
+    attachzone        array
+    selectedFileHash  string
+    markScheme        string
+    carousel          StudentCarousel
+    submissionStates  Collection|DueWork_Error[]
+    responseList      Collection|DueWork\Submission
+    file              null|File\Model
+    subfragment       null|string[]
+    errors            string[]
+    participant       Participant
+    plagscanEnabled   bool
+    rubricContext     null|array
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% include '@learningResponse/inlineGrading/participantCarousel.twig' %}
+{% include '@learningResponse/inlineGrading/participantCarousel.twig' with {
+    carousel:    carousel,
+    participant: participant
+} only %}
 
 {% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
 
@@ -19,38 +41,20 @@
 
         $.fn.dynamicFeedback({
             errors: {{ errors | json_encode | raw }},
-            statusIncomplete: '{{ statusIncomplete }}',
-            statusPending: '{{ statusPending }}',
-            statusReviewed: '{{ statusReviewed }}',
-
-            {# Special behaviour of the Publish button on this screen
-             # Publishing on this screen should be synonymous with the
-             # old "Save And Continue" behaviour
-             #}
-            publishText: 'Publish And Continue',
 
             onPublishCallback: function() {
-                var destination = '';
-
-                if (nextUrl.data('value') != undefined) {
-                    destination = nextUrl.data('value');
-                }
-                else {
-                    destination = '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}'
-                }
-
                 {# Go to next available person in the carousel
                  # If there is nobody, just visit Status screen
                  #}
-                window.location.href = destination;
+                window.location.href = nextUrl.data('value') !== undefined
+                    ? nextUrl.data('value')
+                    : '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}';
             }
         });
 
-        {# Go to the happy place
-         #}
+        {# When a different response is selected from dropdown, navigate to its URL #}
         $('#response-selector').change(function(event) {
             event.preventDefault();
-
             window.location.href = $(this).find('option:selected').attr('data-url');
         });
 
@@ -84,10 +88,9 @@
                         {# If there are no submissions remaining, go to next person
                          # Otherwise just refresh screen
                          #}
+                        var destination;
                         if ($('#response-selector').find('option').length < 2) {
-                            var destination = '';
-
-                            if (nextUrl.data('value') != undefined) {
+                            if (nextUrl.data('value') !== undefined) {
                                 destination = nextUrl.data('value');
                             }
                             else {
@@ -95,7 +98,6 @@
                             }
                         }
                         else {
-
                             {# Reload summary screen to find what is now the most
                              # recent submission
                              #}
@@ -118,7 +120,6 @@
         });
         {% endif %}
     });
-
 </script>
 
 <div class="actions-small-1 row">
@@ -139,19 +140,17 @@
         <a class="icon-more" title="" data-dropdown="header-options"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li>
-            <a class="icon-delete" data-delete="{{ deleteRoute }}">Delete Submission</a>
-        </li>
+        <li><a class="icon-delete" data-delete="{{ deleteRoute }}">Delete Submission</a></li>
     </ul>
     {% endif %}
 </div>
 
-<div id='toaster' class="toast" data-alert></div>
+
 
 {% if responseList|length > 1 %}
 <div class="row">
     <div class="small-12 columns">
-        <select id="response-selector">
+        <select id="response-selector" title="Select a Submission">
             {% for currentResponse in responseList %}
                 {% set viewRoute = routeLookupIfAuthorized('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id, responseId: currentResponse.id, response: currentResponse}) %}
 
@@ -216,104 +215,123 @@
         <h2 class="subheader">Feedback</h2>
     </div>
 </div>
-<div class="row mark-scheme" id="assessment-status">
+<div class="row mark-scheme" id="assessment-status" data-participant>
     <div class="small-12 island">
         <section class="content">
 
-            {% if assessment.useRubric and rubricContext %}
-                <div class="small-12 island">
-                    {% include '@rubric/grid-markable.twig' with {
-                    rubric: rubricContext.rubric,
-                    markType: rubricContext.markType
-                    } only %}
-                </div>
+            <form method="post" data-feedback-form action="{{ routeLookup('learningFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
+                <input type="hidden" name="responseId" value="{{ response.id }}" />
 
-                {% if assessment.markType.id != MARK_TYPE_NONE %}
-                    <p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
-                {% endif %}
+                <div class="row">
 
-                <script type="text/javascript">
-                    $(function () {
+                    {% if assessment.useRubric and rubricContext %}
+                        <div class="small-12 island">
+                            {% include '@rubric/grid-markable.twig' with {
+                                rubric:   rubricContext.rubric,
+                                markType: rubricContext.markType
+                            } only %}
+                        </div>
 
-                        // cache this stuff, it doesn't change
-                        var $status                 = $('#assessment-status'),
-                            $markInput              = $status.find('[data-mark-input]'),
-                            $assignFromRubricButton = $('#use-rubric-value'),
-                            $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
-                            $finalSummary           = $rb.find('[data-final-summary]');
+                        <script type="text/javascript">
+                            $(function () {
 
-
-                        function refreshAssignFromRubricButton() {
-                            var currentRubricValue = $.trim($finalSummary.text());
-                            var currentMarkInput   = $markInput.val();
-
-                            $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
-                        }
+                                // cache this stuff, it doesn't change
+                                var $status                 = $('#assessment-status'),
+                                    $markInput              = $status.find('[data-mark-input]'),
+                                    $assignFromRubricButton = $('#use-rubric-value'),
+                                    $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
+                                    $finalSummary           = $rb.find('[data-final-summary]');
 
 
-                        {##
-                         # Use the rubric value in the mark input field
-                         #
-                         # Disabled upon load, since values are the same
-                         # at this point in time. Also disables when copying
-                         # the rubric mark value in.
-                         #}
-                        $assignFromRubricButton.on('click', function(e) {
+                                function refreshAssignFromRubricButton() {
+                                    var currentRubricValue = $.trim($finalSummary.text());
+                                    var currentMarkInput   = $markInput.val();
 
-                            e.preventDefault();
-                            $(this).prop('disabled', true);
+                                    $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
+                                }
 
-                            $status
-                                .find('[data-mark-input]')
-                                .val($.trim($finalSummary.text()))
-                                .change();
-                        });
 
-                        // listen for this
-                        $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton);
-                        $markInput.on('change', refreshAssignFromRubricButton);
+                                {##
+                                 # Use the rubric value in the mark input field
+                                 #
+                                 # Disabled upon load, since values are the same
+                                 # at this point in time. Also disables when copying
+                                 # the rubric mark value in.
+                                 #}
+                                $assignFromRubricButton.on('click', function(e) {
 
-                        // do it on pageload anyway
-                        refreshAssignFromRubricButton();
-                    });
-                </script>
-            {% endif %}
+                                    e.preventDefault();
+                                    $(this).prop('disabled', true);
 
-            {% if 'None' != assessment.markScheme %}
-                <div class="small-12 medium-3 column">
-                    <label>{{ locale.grades.proper }}
-                        {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+                                    $status
+                                        .find('[data-mark-input]')
+                                        .val($.trim($finalSummary.text()))
+                                        .change();
+                                });
+
+                                // listen for this
+                                $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton);
+                                $markInput.on('change', refreshAssignFromRubricButton);
+
+                                // do it on pageload anyway
+                                refreshAssignFromRubricButton();
+                            });
+                        </script>
+                    {% endif %}
+
+                    {% if 'none' != assessment.markType.slug %}
+                        <div class="small-12 medium-3 column">
+                            <label>{{ locale.grades.proper }}
+                                {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+                                    participant: participant,
+                                    markScheme:  assessment.markScheme,
+                                    tabIndex:    1
+                                } only %}
+                            </label>
+
+                            {% if assessment.useRubric and rubricContext %}
+                                <p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="small-12{% if 'none' != assessment.markType.slug %} medium-9{% endif %} column">
+                        {% include '@learningMarkScheme/fragments/comment.twig' with {
                             participant: participant,
-                            markScheme:  assessment.markScheme
-                            tabIndex:    1,
-                            fbUrl:       routeLookup('learningFeedback.postResponseFeedback', {
-                                assessmentId: assessment.id,
-                                studentId:    participant.user.id,
-                                responseId:   response.id,
-                                participant:  participant
-                            }),
+                            tabIndex:    2
                         } only %}
-                    </label>
-                </div>
-            {% endif %}
+                    </div>
 
-            <div class="small-12{% if 'None' != assessment.markScheme %} medium-9{% endif %} column">
-                {% include '@learningMarkScheme/fragments/comment.twig' with {
-                    participant: participant,
-                    tabIndex:    2
-                } only %}
-            </div>
+                    {# Maybe files may be uploaded here? #}
+                    {% if attachzone %}
+                        <div class="small-12 columns">
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
+                        </div>
+                    {% endif %}
 
-            {# Maybe files may be uploaded here? #}
-            {% if feedbackAttachzone %}
-                <div class="small-12 columns">
-                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                    <div class="small-12 column no-pad">
+                        <div class="component-action" data-action-bar="{{ participant.user.id }}" {% if latestFeedback.published %}data-published="true"{% endif %} style="{{ actionStyle }}">
+                            <section>
+                                {% if participant.allFeedbacks | length and not participant.findMostRecentFeedback.published %}
+                                    {% set savedStatusText = 'Saved as Draft' %}
+                                {% endif %}
+
+                                <div>
+                                    {%- spaceless %}
+                                        <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{{ savedStatusText }}</span>
+                                        <a class="button" data-draft="publish">Publish and Continue</a>
+                                    {% endspaceless -%}
+                                </div>
+                            </section>
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
+            </form>
         </section>
     </div>
 </div>
 
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
-<div class="toast" data-alert data-save-draft></div>
+<div id='toaster' class="toast" data-alert data-save-draft></div>
+
 

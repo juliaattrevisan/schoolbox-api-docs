@@ -71,10 +71,6 @@
                 statusPending: 'pending',
                 statusReviewed: 'reviewed',
 
-                /* The text to display on the publish button
-                 */
-                publishText: 'Publish',
-
                 /* A callback to execute upon successful completion of Publish action
                  */
                 onPublishCallback: function() {}
@@ -100,10 +96,6 @@
             /* Feedback States
              */
             $('[data-combobox]').combobox(config.errors);
-
-            /* Set initial state of the Publish button
-             */
-            $(config.assessmentList).find('[data-draft="publish"]').text(config.publishText);
         }
 
         /**
@@ -153,11 +145,10 @@
                     var $actionBar = $li.find('[data-action-bar]');
 
                     if ($actionBar.find('.component-action-info').length) {
-                        $btnPublish.text(config.publishText).addClass('hide');
+                        $btnPublish.addClass('hide');
                         $btnDrafted.text('');
                     } else {
                         $actionBar.slideUp(function () {
-                            $btnPublish.text(config.publishText);
                             $btnDrafted.text('');
                         });
                     }
@@ -185,7 +176,7 @@
 
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
-                    $btnPublish.removeAttr('disabled').text(config.publishText);
+                    $btnPublish.removeAttr('disabled');
 
                 }).always(function () {
 

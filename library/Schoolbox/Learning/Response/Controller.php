@@ -137,7 +137,6 @@ class Controller extends Base
         try {
 
             $data = [
-                'MARK_TYPE_NONE' => MarkType::TYPE_NONE,
                 'assessment' => $assessment,
                 'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                     ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
@@ -167,10 +166,6 @@ class Controller extends Base
                 /* Plagscan status
                  */
                 'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-
-                // A bool that can be used from a twig fragment to determine if it has been called from the inline
-                // grader or quick mark screen
-                'inlineGrader' => true,
             ];
 
             if($assessment instanceof DueWork){
