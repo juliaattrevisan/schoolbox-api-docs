@@ -118,7 +118,7 @@ class Controller extends Base\Base
      * @param Folder              $targetClass
      * @param int                 $componentId The component instance this action was initiated from
      */
-    public function getImportToComponentForm(CourseSpecification $courseSpec, Folder $targetClass, $componentId)
+    public function getImportToComponentForm(CourseSpecification $courseSpec = null, Folder $targetClass, $componentId)
     {
         // Clean up URL if logical null $componentId supplied
         if (!$componentId) {
@@ -143,7 +143,7 @@ class Controller extends Base\Base
      * @param CourseSpecification $courseSpec
      * @param Folder|null         $targetClass
      */
-    public function getImportToClassForm(CourseSpecification $courseSpec, Folder $targetClass = null)
+    public function getImportToClassForm(CourseSpecification $courseSpec = null, Folder $targetClass = null)
     {
         $this->getImportForm($courseSpec, $targetClass, null);
     }
@@ -157,7 +157,7 @@ class Controller extends Base\Base
      * @param Folder|null         $targetClass
      * @param int|null            $componentId The component instance this action was initiated from
      */
-    protected function getImportForm(CourseSpecification $courseSpec, Folder $targetClass = null, $componentId)
+    protected function getImportForm(CourseSpecification $courseSpec = null, Folder $targetClass = null, $componentId)
     {
         // Ensure that if present, the component instance is an extant CourseOutline
         $componentInstance = null;
