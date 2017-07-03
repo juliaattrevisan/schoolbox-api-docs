@@ -26,11 +26,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Submission;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
-use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
-use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
 class Module extends BaseModule
