@@ -98,7 +98,14 @@ class EventNotifier extends AbstractModuleNotifier
     {
         /** @var Event $object */
         $object   = $event->getObject();
-        $next     = EventMapper::getInstance()->findNextInSeries($object->getSeriesId(), $object->getStartDateTime()->addMinutes(1));
+
+        try {
+            $next = EventMapper::getInstance()->findNextInSeries($object->getSeriesId(), $object->getStartDateTime()->addMinutes(1));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // this event is not part of a series, don't try to reschedule
+            return -1;
+        }
+
         $nextTime = $next->getStartDateTime()->getUnixTimestamp();
         $now      = Alaress_Date_Format::now()->getUnixTimestamp();
 
