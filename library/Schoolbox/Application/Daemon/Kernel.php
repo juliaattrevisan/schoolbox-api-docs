@@ -252,6 +252,10 @@ EOL;
 			// this is fine to be let through
 			return;
 		}
+        if (strpos($errStr, 'LaravelDate creation raised') === 0) {
+		    // iiiiignore.
+            return;
+        }
 		if(strpos($errStr, 'Undefined index') === 0) {
             $this->logger()->error("$errStr in $errFile:$errLine");
 			return;
