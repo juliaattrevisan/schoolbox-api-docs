@@ -1,14 +1,16 @@
 CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
-
     /**
      * Ignore non-numeric key presses
      * Allows (9) Tab character for field switching
      * Allows (8) Backspace character for modification
+     * Allows (46) Delete character for modification
+     * Allows (37) Left Arrow for navigation
+     * Allows (39) Right Arrow for navigation
      *
      * @param event
      */
     function disableNonNumeric(event) {
-        var allowedControlKeys = [8, 9];
+        var allowedControlKeys = [8, 9, 46, 37, 39];
 
         /* Allow control keys
          */
