@@ -15,5 +15,5 @@ try {
     ));
 }
 catch (\DomainException $e) {
-    $this->error(2);
+    error(2);
 }
