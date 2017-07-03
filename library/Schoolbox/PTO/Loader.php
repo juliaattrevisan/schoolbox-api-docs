@@ -127,10 +127,12 @@ class Loader
 
     /**
      * @param string $ptoKey
+     * @return $this
      */
     private function setPtoKey($ptoKey)
     {
         $this->ptoKey = $ptoKey;
+        return $this;
     }
 
     /**
@@ -143,10 +145,12 @@ class Loader
 
     /**
      * @param User $user
+     * @return $this
      */
     private function setUser($user)
     {
         $this->user = $user;
+        return $this;
     }
 
     /**
@@ -159,10 +163,12 @@ class Loader
 
     /**
      * @param string $epoch
+     * @return $this
      */
     private function setEpoch($epoch)
     {
         $this->epoch = $epoch;
+        return $this;
     }
 
     /**
@@ -175,9 +181,11 @@ class Loader
 
     /**
      * @param string $school
+     * @return $this
      */
     private function setSchool($school)
     {
         $this->school = $school;
+        return $this;
     }
 }
