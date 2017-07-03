@@ -531,7 +531,7 @@
                                                         </div>
                                                     </div>
                                                     <nav>
-                                                        {% if not teacher.getEmail() == NULL and not teacher.getEmail() == "" %}
+                                                        {% if not teacher.email is empty %}
                                                             <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.getEmail() }}" title="Email {{ teacher.getEmail() }}"></a>
                                                         {% endif %}
                                                     </nav>
