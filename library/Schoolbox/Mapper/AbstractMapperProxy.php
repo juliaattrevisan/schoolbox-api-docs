@@ -318,7 +318,12 @@ abstract class AbstractMapperProxy
     {
         $model = $this->mapper->findByCrocodocId($crocodocId);
 
-        return $this->transformModels(new Collection([$model]))->first();
+        /* Manually construct all the missing pieces :/
+         */
+        $transformed = $this->transformModels(new Collection([$model]))->first();
+        $transformed->getAssessable()->setContext($model->getSubmissionBox()->getCategory());
+
+        return $transformed;
     }
 
     /* Getters / Setters

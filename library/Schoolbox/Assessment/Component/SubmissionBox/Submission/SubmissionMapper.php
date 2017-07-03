@@ -178,7 +178,7 @@ class SubmissionMapper extends BaseMapper
         try {
             $submissionFileMapper = $this->getJoinMapper('file');
 
-            return $submissionFileMapper->findOneByColumn('uuid', $crocodocId)->getSubmission();
+            return $this->findById($submissionFileMapper->findOneByColumn('uuid', $crocodocId)->getSubmission()->getId());
         }
         catch (MapperException $e) {
             return null;
