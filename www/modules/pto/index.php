@@ -1,21 +1,11 @@
 <?php
 
-use Zend\Uri\Uri;
+$ptoLoader = new \Schoolbox\PTO\Loader($_SESSION["user"], date("U"), Config::get('pto_school'));
 
-/** @var Schoolbox\User $user */
-$user = $_SESSION["user"];
-
-new \Schoolbox\PTO\Loader($user, date("U"), Config::get('pto_school'));
-
-
-// Replace placeholders in PTO url
-foreach ($keys as $key => $value) {
-    $remoteUrl = str_replace("[{$key}]", $value, $remoteUrl);
+try {
+    $remoteUrl = $ptoLoader->generateRemoteUrl();
 }
-
-// Ensure URL is valid
-$url = new Uri($remoteUrl);
-if (!$url->isValid()) {
+catch (\DomainException $e) {
     $this->error(2);
 }
 

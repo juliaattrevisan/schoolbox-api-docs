@@ -3,6 +3,8 @@
 namespace Schoolbox\PTO;
 
 use Schoolbox\User;
+use Zend\Stdlib\Exception\DomainException;
+use Zend\Uri\Uri;
 
 /**
  * Loader
@@ -87,17 +89,26 @@ class Loader
     /**
      * Generate the remote url
      *
+     * @throws \DomainException
      * @return string
      */
     public function generateRemoteUrl()
     {
-        return strtr(self::REMOTE_URL, [
+        $remoteUrl = strtr(self::REMOTE_URL, [
             'epoch' => $this->getEpoch(),
             'school' => $this->getSchool(),
             'username' => $this->getUser()->getUsername(),
             'type' => $this->determineUserType(),
             'hash' => $this->generateHash()
         ]);
+
+        $url = new Uri($remoteUrl);
+
+        if (!$url->isValid()) {
+            throw new \DomainException('Invalid remote url generated');
+        }
+
+        return $remoteUrl;
     }
 
     /* Getters/Setters
