@@ -198,8 +198,28 @@ class Module extends BaseModule
                 }
             }
 
+            /* No response found
+             * This can happen when there really isn't a response that meets the params specified,
+             * or when a previously-associated feedback became floating.
+             */
             if (!$response) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+
+                /* If a crocodoc id exists, it may have been in a Response which had an Associated
+                 * Feedback that got converted into a Floating Feedback. This was a misbehaviour that
+                 * was repaired previously, but there might be some orphaned data as a result.
+                 *
+                 * In this case, look for a Response that contained the crocodoc id. If you can't find
+                 * one, then die with GENERIC_NOT_FOUND.
+                 */
+                if (strlen($params['crocodocId'])) {
+                    $response = $this->getResponseMapperProxy()->findByCrocodocId($params['crocodocId']);
+                }
+
+                /* Still didn't find it? Then it really didn't exist
+                 */
+                if (!$response) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
             }
         }
         catch (OutOfBoundsException $e) {

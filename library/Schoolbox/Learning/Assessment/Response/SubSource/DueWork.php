@@ -38,4 +38,9 @@ class DueWork extends AbstractSubSource
     {
         return $assessment instanceof DueWorkObject;
     }
+
+    public function findByCrocodocId($crocodocId)
+    {
+        // TODO: Implement findByCrocodocId() method.
+    }
 }

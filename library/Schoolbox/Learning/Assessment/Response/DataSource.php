@@ -140,4 +140,12 @@ class DataSource implements IResponseDataSource
             }
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function findByCrocodocId($crocodocId)
+    {
+        // TODO: Implement findByCrocodocId() method.
+    }
 }
