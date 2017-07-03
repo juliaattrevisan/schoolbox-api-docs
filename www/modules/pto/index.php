@@ -1,6 +1,8 @@
 <?php
-use \Schoolbox\PTO\Loader as PTOLoader;
-use \Schoolbox\Config\Loader as ConfigLoader;
+
+use Schoolbox\PTO\Loader as PTOLoader;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $ptoLoader = new PTOLoader(new ConfigLoader(), $_SESSION["user"], date('U'));
 
@@ -13,5 +15,5 @@ try {
     ]);
 }
 catch (\DomainException $e) {
-    error(2);
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }

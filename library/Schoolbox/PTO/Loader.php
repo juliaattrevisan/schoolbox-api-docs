@@ -15,7 +15,6 @@ use Schoolbox\User;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Zend\Uri\Uri;
 
-
 class Loader
 {
     /**
@@ -83,7 +82,7 @@ class Loader
 
     /**
      * Generate hash for all the params
-     * 
+     *
      * @return string
      */
     private function generateHash()
