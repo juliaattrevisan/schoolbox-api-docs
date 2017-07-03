@@ -16,7 +16,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use Schoolbox\Resource\Search\MapperResult\Base;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder;
 
 class Result extends Base
 {
@@ -32,12 +32,13 @@ class Result extends Base
      * Get all the search results
      *
      * @param User $user
-     * @param Mapper $mapper
+     * @param Folder\Mapper|Mapper $mapper
      * @param Sanitiser $sanitiser
      * @return Collection
      */
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
+        /** @var Folder\Code\Mapper $code_mapper */
         $code_mapper = $mapper->getJoinMapper('codes');
         $homepageConfig_mapper = $mapper->getJoinMapper('homepages');
 
@@ -61,12 +62,7 @@ class Result extends Base
             'likeKeyword' => '%'.$mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword()).'%',
         ]);
 
-        $results = new Collection();
-
-        /* Count folders manually, rather than leaving it to the buildSearchResult's iterator
-         * It can't tell that this is a 1:N join
-         */
-        $i = 0;
+        $results = $mapper->createCollection();
 
         // Handle offset properly:
         // any folders found after offset+limit get skipped,
@@ -82,20 +78,18 @@ class Result extends Base
 
             /* Accumulate folder codes here
              */
-            if (!($results->getOffset($folder->getId()) instanceof Folder)) {
+            if (!($results->getOffset($folder->getId()) instanceof Folder\Model)) {
                 $results->setOffset($folder->getId(), $folder);
-
-                $i++;
             }
 
             /* Reassign var
              */
-            $folder = $results->getOffset($folder->getId());
+            $folder = $results[$folder->getId()];
 
             $code = $code_mapper->hydrate($row, 'cc');
 
-            if (strlen($code->getCode())) {
-                $folder->getCodes()->add($code);
+            if ($code) {
+                $folder->getCodes()->setOffset($code->getCode(), $code);
             }
 
             /* Accumulate homepage configs
