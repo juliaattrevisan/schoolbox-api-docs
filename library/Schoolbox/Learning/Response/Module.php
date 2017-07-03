@@ -192,9 +192,11 @@ class Module extends BaseModule
             $responses = $this->getResponseMapperProxy()->findForAssessment($assessment);
             $response = false;
 
-            foreach ($responses as $currentResponse) {
-                if ($currentResponse->getId() == $feedback->getResponse()->getId()) {
-                    $response = $currentResponse;
+            if ($feedback->getResponse() instanceof IResponse) {
+                foreach ($responses as $currentResponse) {
+                    if ($currentResponse->getId() == $feedback->getResponse()->getId()) {
+                        $response = $currentResponse;
+                    }
                 }
             }
 
