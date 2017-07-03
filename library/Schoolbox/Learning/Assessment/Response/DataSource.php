@@ -144,8 +144,12 @@ class DataSource implements IResponseDataSource
     /**
      * @inheritdoc
      */
-    public function findByCrocodocId($crocodocId)
+    public function findByCrocodocId(IAssessable $assessment, $crocodocId)
     {
-        // TODO: Implement findByCrocodocId() method.
+        foreach ($this->subSources as $subSource) {
+            if ($subSource->recognizes($assessment)) {
+                return $subSource->findByCrocodocId($assessment, $crocodocId);
+            }
+        }
     }
 }
