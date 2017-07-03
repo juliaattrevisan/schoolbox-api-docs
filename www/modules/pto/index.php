@@ -6,14 +6,14 @@ $ptoLoader = new PTOLoader(new ConfigLoader(), $_SESSION["user"], date('U'));
 
 try {
     $remoteUrl = $ptoLoader->generateRemoteUrl();
+
+    // Whack it in a pretty frame
+    $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
+    $this->setVar(array(
+        'REMOTE_URL' => addslashes($remoteUrl),
+        'FRAME_HEIGHT' => $height,
+    ));
 }
 catch (\DomainException $e) {
     $this->error(2);
 }
-
-// Whack it in a pretty frame
-$this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
-$this->setVar(array(
-    'REMOTE_URL' => addslashes($url->toString()),
-    'FRAME_HEIGHT' => $height,
-));
