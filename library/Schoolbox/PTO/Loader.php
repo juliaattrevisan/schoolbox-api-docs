@@ -83,6 +83,8 @@ class Loader
 
     /**
      * Generate hash for all the params
+     * 
+     * @return string
      */
     private function generateHash()
     {
