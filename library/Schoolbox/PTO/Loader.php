@@ -25,8 +25,8 @@ class Loader
      */
     const REMOTE_URL = "https://bookings.parentteacheronline.com.au?school=[school]&Type=[type]&P1=[username]&P2=[epoch]&P3=[hash]";
 
-    /** @var ConfigLoader */
-    private $configLoader;
+    /** @var string */
+    private $ptoKey;
 
     /** @var User */
     private $user;
@@ -43,14 +43,14 @@ class Loader
      * @param ConfigLoader $configLoader
      * @param User $user
      * @param string $epoch
-     * @param string $school
      */
-    public function __construct(ConfigLoader $configLoader, User $user, $epoch, $school)
+    public function __construct(ConfigLoader $configLoader, User $user, $epoch)
     {
-        $this->setConfigLoader($configLoader);
         $this->setUser($user);
         $this->setEpoch($epoch);
-        $this->setSchool($school);
+
+        $this->setSchool($configLoader->get('pto_school'));
+        $this->setPtoKey($configLoader->get('pto_key'));
     }
 
     /**
@@ -86,7 +86,7 @@ class Loader
      */
     private function generateHash()
     {
-        return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$this->getEpoch()}{$this->getConfigLoader()->get('pto_key')}");
+        return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$this->getEpoch()}{$this->getPtoKey()}");
     }
 
     /**
@@ -113,24 +113,24 @@ class Loader
 
         return $remoteUrl;
     }
-    
+
     /* Getters/Setters
      */
 
     /**
-     * @return ConfigLoader
+     * @return string
      */
-    private function getConfigLoader()
+    private function getPtoKey()
     {
-        return $this->configLoader;
+        return $this->ptoKey;
     }
 
     /**
-     * @param ConfigLoader $configLoader
+     * @param string $ptoKey
      */
-    private function setConfigLoader($configLoader)
+    private function setPtoKey($ptoKey)
     {
-        $this->configLoader = $configLoader;
+        $this->ptoKey = $ptoKey;
     }
 
     /**
