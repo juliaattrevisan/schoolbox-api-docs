@@ -1,6 +1,8 @@
 <?php
+use \Schoolbox\PTO\Loader as PTOLoader;
+use \Schoolbox\Config\Loader as ConfigLoader;
 
-$ptoLoader = new \Schoolbox\PTO\Loader(new \Schoolbox\Config\Loader(), $_SESSION["user"], date("U"), Config::get('pto_school'));
+$ptoLoader = new PTOLoader(new ConfigLoader(), $_SESSION["user"], date('U'), Config::get('pto_school'));
 
 try {
     $remoteUrl = $ptoLoader->generateRemoteUrl();

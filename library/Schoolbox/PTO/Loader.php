@@ -1,11 +1,4 @@
 <?php
-
-namespace Schoolbox\PTO;
-
-use Schoolbox\User;
-use Schoolbox\Config\Loader as ConfigLoader;
-use Zend\Uri\Uri;
-
 /**
  * Loader
  *
@@ -16,6 +9,13 @@ use Zend\Uri\Uri;
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+namespace Schoolbox\PTO;
+
+use Schoolbox\User;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Zend\Uri\Uri;
+
+
 class Loader
 {
     /**
