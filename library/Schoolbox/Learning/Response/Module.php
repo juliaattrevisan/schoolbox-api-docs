@@ -212,7 +212,7 @@ class Module extends BaseModule
                  * one, then die with GENERIC_NOT_FOUND.
                  */
                 if (strlen($params['crocodocId'])) {
-                    $response = $this->getResponseMapperProxy()->findByCrocodocId($params['crocodocId']);
+                    $response = $this->getResponseMapperProxy()->findByCrocodocId($assessment, $params['crocodocId']);
                 }
 
                 /* Still didn't find it? Then it really didn't exist
