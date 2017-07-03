@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\PTO;
 
+use DomainException;
 use Schoolbox\User;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Zend\Uri\Uri;
@@ -26,29 +27,23 @@ class Loader
     /** @var string */
     private $ptoKey;
 
-    /** @var User */
-    private $user;
-
-    /** @var string */
-    private $epoch;
-
     /** @var string */
     private $school;
 
+    /** @var User */
+    private $user;
+
     /**
-     * Loader constructor.
+     * Loader constructor
      *
      * @param ConfigLoader $configLoader
      * @param User $user
-     * @param string $epoch
      */
-    public function __construct(ConfigLoader $configLoader, User $user, $epoch)
+    public function __construct(ConfigLoader $configLoader, User $user)
     {
-        $this->setUser($user);
-        $this->setEpoch($epoch);
-
-        $this->setSchool($configLoader->get('pto_school'));
         $this->setPtoKey($configLoader->get('pto_key'));
+        $this->setSchool($configLoader->get('pto_school'));
+        $this->setUser($user);
     }
 
     /**
@@ -82,33 +77,36 @@ class Loader
     /**
      * Generate hash for all the params
      *
+     * @param string $epoch
      * @return string
      */
-    private function generateHash()
+    private function generateHash($epoch)
     {
-        return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$this->getEpoch()}{$this->getPtoKey()}");
+        return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$epoch}{$this->getPtoKey()}");
     }
 
     /**
      * Generate the remote url
      *
-     * @throws \DomainException
+     * @throws DomainException
      * @return string
      */
     public function generateRemoteUrl()
     {
+        $epoch = date('U');
+
         $remoteUrl = strtr(self::REMOTE_URL, [
-            'epoch' => $this->getEpoch(),
+            'epoch' => $epoch,
             'school' => $this->getSchool(),
             'username' => $this->getUser()->getUsername(),
             'type' => $this->determineUserType(),
-            'hash' => $this->generateHash()
+            'hash' => $this->generateHash($epoch)
         ]);
 
         $url = new Uri($remoteUrl);
 
         if (!$url->isValid()) {
-            throw new \DomainException('Invalid remote url generated');
+            throw new DomainException('Invalid remote url generated');
         }
 
         return $remoteUrl;
@@ -150,24 +148,6 @@ class Loader
     private function setUser($user)
     {
         $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    private function getEpoch()
-    {
-        return $this->epoch;
-    }
-
-    /**
-     * @param string $epoch
-     * @return $this
-     */
-    private function setEpoch($epoch)
-    {
-        $this->epoch = $epoch;
         return $this;
     }
 
