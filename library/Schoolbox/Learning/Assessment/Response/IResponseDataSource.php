@@ -58,10 +58,11 @@ interface IResponseDataSource
      * Primarily used to rescue once-Associated Feedback when it was inadvertently converted
      * into a Floating Feedback
      *
+     * @param IAssessable $assessment
      * @param $crocodocId
      * @return mixed
      */
-    public function findByCrocodocId($crocodocId);
+    public function findByCrocodocId(IAssessable $assessment, $crocodocId);
 
     /**
      * Saves a response.

@@ -42,7 +42,7 @@ class Quiz extends AbstractSubSource
     /**
      * @inheritdoc
      */
-    public function findByCrocodocId($crocodocId)
+    public function findByCrocodocId(IAssessable $assessment, $crocodocId)
     {
         return null;
     }

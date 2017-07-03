@@ -39,7 +39,10 @@ class DueWork extends AbstractSubSource
         return $assessment instanceof DueWorkObject;
     }
 
-    public function findByCrocodocId($crocodocId)
+    /**
+     * @inheritdoc
+     */
+    public function findByCrocodocId(IAssessable $assessment, $crocodocId)
     {
         // TODO: Implement findByCrocodocId() method.
     }
