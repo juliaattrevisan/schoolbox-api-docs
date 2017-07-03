@@ -308,6 +308,19 @@ abstract class AbstractMapperProxy
         return new Builder($this->database, $this->mapper->getTable());
     }
 
+    /**
+     * Pass-through to the deeper mapper within
+     *
+     * @param $crocodocId
+     * @return object
+     */
+    public function findByCrocodocId($crocodocId)
+    {
+        $model = $this->mapper->findByCrocodocId($crocodocId);
+
+        return $this->transformModels(new Collection([$model]))->first();
+    }
+
     /* Getters / Setters
      */
 

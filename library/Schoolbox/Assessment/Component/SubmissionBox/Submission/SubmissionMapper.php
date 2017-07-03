@@ -19,6 +19,8 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * A mapper for a student's submission to a due work.
@@ -165,6 +167,23 @@ class SubmissionMapper extends BaseMapper
         }
     }
 
+    /**
+     * Find a particular record that contains $crocodocId
+     *
+     * @param $crocodocId
+     * @return SubmissionFile|null
+     */
+    public function findByCrocodocId($crocodocId)
+    {
+        try {
+            $submissionFileMapper = $this->getJoinMapper('file');
+
+            return $submissionFileMapper->findOneByColumn('uuid', $crocodocId)->getSubmission();
+        }
+        catch (MapperException $e) {
+            return null;
+        }
+    }
 
     /**
      * Soft deletes all Files for the specified Submission
