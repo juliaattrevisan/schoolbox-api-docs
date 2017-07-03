@@ -126,7 +126,6 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         onReady: function (selectedDates, dateStr, instance) {
             renderAllDaySwitch();
             renderHeatMapHelp();
-            setCalendarAllDay(isInputAllDay(), twigVars.id);
 
             if (pickerOptions.allDaySwitch === true) {
                 $('#hideTime' + twigVars.id).click(function () {
@@ -242,7 +241,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         else if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 0) {
             allDay = false;
         }
-        else if (hasTime(moment($picker.val(), dateDisplayFormats.momentJsDatetime)) === false) {
+        else if (hasTime(moment($picker.val(), dateDisplayFormats.momentJsDatetime)) === false && pickerOptions.allDaySwitch) {
             allDay = true;
         }
         else {
