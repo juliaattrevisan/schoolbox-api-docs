@@ -53,6 +53,7 @@
                             {% endif %}
 
                             {% if showDetails %}
+                                {% block details %}
                                 {% if externalUser.StaffDepartment %}
                                     <dt class="small-12 medium-3">Department:</dt>
                                     <dd class="small-12 medium-9">{{ externalUser.StaffDepartment }}</dd>
@@ -77,6 +78,7 @@
                                     <dt class="small-12 medium-3">Campus:</dt>
                                     <dd class="small-12 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
                                 {% endif %}
+                                {% endblock %}
                             {% endif %}
                         </dl>
                     </div>

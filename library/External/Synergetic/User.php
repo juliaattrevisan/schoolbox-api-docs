@@ -436,6 +436,7 @@ class External_Synergetic_User implements External_UserInterface
                         StaffRoom,
                         StaffExtension,
                         StaffMobilePhone,
+                        StaffDefaultMobilePhone,
                         StaffCampusDescription,
                         StaffCategoryDescription,
                         luDepartment.Description AS StaffDepartment,

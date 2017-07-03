@@ -185,6 +185,7 @@ class External_Isams_User implements External_UserInterface
                             ''                  AS StaffRoom,
                             ''                  AS StaffExtension,
                             ''                  AS StaffMobilePhone,
+                            ''                  AS StaffDefaultMobilePhone,
                             Campus              AS StaffCampusDescription,
                             DivisionID          AS StaffCategoryDescription,
                             ''                  AS StaffDepartment,

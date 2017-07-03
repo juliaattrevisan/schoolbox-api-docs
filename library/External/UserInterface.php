@@ -309,6 +309,7 @@ interface External_UserInterface {
      * StaffRoom,
      * StaffExtension,
      * StaffMobilePhone,
+     * StaffDefaultMobilePhone,
      * StaffCampusDescription,
      * StaffCategoryDescription,
      * StaffDepartment,

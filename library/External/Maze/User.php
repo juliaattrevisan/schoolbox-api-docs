@@ -403,6 +403,7 @@ class External_Maze_User implements External_UserInterface {
 				'' AS StaffRoom,
 				'' AS StaffExtension,
 				MOBILE AS StaffMobilePhone,
+				MOBILE AS StaffDefaultMobilePhone,
 				'' AS StaffVoiceMail,
 				'' AS StaffCampusDescription,
 				SF_POSITION AS StaffCategoryDescription,

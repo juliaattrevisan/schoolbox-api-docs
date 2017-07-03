@@ -286,6 +286,7 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS StaffRoom,
                 '' AS StaffExtension,
                 t.Mobile AS StaffMobilePhone,
+                t.Mobile AS StaffDefaultMobilePhone,
                 '' AS StaffCampusDescription,
                 '' AS StaffCategoryDescription,
                 '' AS StaffDepartment,
