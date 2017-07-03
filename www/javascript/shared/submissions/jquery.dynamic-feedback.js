@@ -127,7 +127,7 @@
                 e.preventDefault();
 
                 var $form      = $(this).closest('form'),
-                    $actionBar = $form.find('[data-interaction-draft]');
+                    $actionBar = $form.find('[data-action-bar]');
 
                 var $btnDrafted = $actionBar.find('[data-draft=drafted]'),
                     $btnPublish = $actionBar.find('[data-draft=publish]');
@@ -149,7 +149,7 @@
                     // Get handle to participant row
                     var $li = $form.closest('[data-participant]');
 
-                    var $actionBar = $li.find('[data-interaction-draft]');
+                    var $actionBar = $li.find('[data-action-bar]');
 
                     if ($actionBar.find('.component-action-info').length) {
                         $btnPublish.text(config.publishText).addClass('hide');
@@ -208,8 +208,8 @@
             }
 
             var $form = $(this).closest('form');
-            $form.find('[data-interaction-draft]').slideDown();
-            $form.find('[data-interaction-draft] [data-draft=publish]').removeClass('hide');
+            $form.find('[data-action-bar]').slideDown();
+            $form.find('[data-action-bar] [data-draft=publish]').removeClass('hide');
         }
 
         /**
@@ -249,7 +249,7 @@
                     // If this was just published and this is the first change afterwards - removing any info about being linked to a response & having attachments
                     if ($form.find('[data-published="true"]').length) {
                         $form.find('[data-feedback-attach-info]').html('');
-                        $form.find('[data-interaction-draft][data-published=true]').removeAttr('data-published');
+                        $form.find('[data-action-bar][data-published=true]').removeAttr('data-published');
                     }
                 })
                 .fail(function (xhr) {
@@ -275,8 +275,8 @@
             });
 
             if(openActionBar){
-                this.find('[data-interaction-draft]').slideDown();
-                this.find('[data-interaction-draft] [data-draft=publish]').removeClass('hide');
+                this.find('[data-action-bar]').slideDown();
+                this.find('[data-action-bar] [data-draft=publish]').removeClass('hide');
             }
         }
     }

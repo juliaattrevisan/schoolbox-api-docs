@@ -184,7 +184,7 @@
 
 
     <div class="small-12 column no-pad">
-        <div class="component-action" data-interaction-draft="{{ participant.user.id }}" {% if latestFeedback.published %}data-published="true"{% endif %} style="{{ actionStyle }}">
+        <div class="component-action" data-action-bar="{{ participant.user.id }}" {% if latestFeedback.published %}data-published="true"{% endif %} style="{{ actionStyle }}">
             <section>
                 {% if attachedMsg %}
                     <div class="component-action-info" data-feedback-attach-info>{{ attachedMsg|capitalize|raw }}</div>

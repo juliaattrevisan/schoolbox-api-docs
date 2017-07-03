@@ -20,7 +20,7 @@
         labelSelector: '[data-participant-name]',
         unavailableTextSelector: '[data-mass-unavailable]',
         availableTextSelector: '[data-mass-available]',
-        actionBarSelector: '[data-interaction-draft]'
+        actionBarSelector: '[data-action-bar]'
     };
 
     function Bulky(element, options) {
@@ -133,7 +133,7 @@
 
         this.submitButton.on('click', function (e) {
             e.preventDefault();
-            opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function () { return opt.userList.find('[data-interaction-draft="' + this.id + '"]').get(); }));
+            opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function () { return opt.userList.find('[data-action-bar="' + this.id + '"]').get(); }));
         });
 
         this.element.on('click', '.button', function () {

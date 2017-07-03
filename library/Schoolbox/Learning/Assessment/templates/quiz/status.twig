@@ -172,7 +172,7 @@
         <div class="small-12 column">
             <div class="component-action">
                 <section>
-                    <div style="{{ actionStyle }}" data-interaction-draft="{{ participant.user.id }}">
+                    <div style="{{ actionStyle }}" data-action-bar="{{ participant.user.id }}">
                         {%- spaceless %}
                             <a class="button" data-interaction-delete="{{ attempt.id }}" href="#" >Delete Attempt</a>
                             <a class="button" data-interaction-review="{{ attempt.id }}" href="{{ assessmentResponse.localUrl(attempt) }}">Review Attempt</a>
