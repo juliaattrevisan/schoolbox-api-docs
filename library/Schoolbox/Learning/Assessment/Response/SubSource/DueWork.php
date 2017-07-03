@@ -45,7 +45,10 @@ class DueWork extends AbstractSubSource
     public function findByCrocodocId(IAssessable $assessment, $crocodocId)
     {
         if ($this->recognizes($assessment)) {
-            return $this->mapperProxy->findByCrocodocId($crocodocId);
+            $model = $this->mapperProxy->findByCrocodocId($crocodocId);
+            $model->setAssessable($assessment);
+
+            return $model;
         }
 
         return null;
