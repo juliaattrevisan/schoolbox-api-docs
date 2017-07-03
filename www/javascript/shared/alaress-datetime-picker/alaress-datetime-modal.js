@@ -28,6 +28,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     var dictNoWorkToday = 'Your students have nothing due this day';
     var heatCache = {};
     var momentFormat = pickerOptions.enableTime ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
+    // Initial input value as moment.js object
     var momentDate = moment(twigVars.date, momentFormat);
 
     // Timetable picker
@@ -45,6 +46,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     $(document).on('open.fndtn.reveal', $modal, function () {
         updateCalendarResponse();
         resetTimetablePicker();
+        setCalendarAllDay(isInputAllDay(), twigVars.id);
         setTimetableAllDay();
     });
 
@@ -124,7 +126,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         onReady: function (selectedDates, dateStr, instance) {
             renderAllDaySwitch();
             renderHeatMapHelp();
-            detectCalendarAllDay(instance);
+            setCalendarAllDay(isInputAllDay(), twigVars.id);
 
             if (pickerOptions.allDaySwitch === true) {
                 $('#hideTime' + twigVars.id).click(function () {
@@ -227,10 +229,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     }
 
     /**
-     * Determine if the calendar AllDay should be set to on or off, set it
-     * Also set timetable picker AllDay value the same way
+     * Is the input value all day, or not
      */
-    function detectCalendarAllDay(instance) {
+    function isInputAllDay() {
 
         var allDay;
 
@@ -241,27 +242,14 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         else if (pickerOptions.allDayInput !== false && $('#' + pickerOptions.allDayInput).val() == 0) {
             allDay = false;
         }
-        else if (instance && hasTime(instance.input.value) === false) {
+        else if (hasTime(moment($picker.val(), dateDisplayFormats.momentJsDatetime)) === false) {
             allDay = true;
         }
         else {
             allDay = false;
         }
 
-        setCalendarAllDay(allDay, twigVars.id);
-
-        // Set timetable allday here for now, until sync time is in place
-        allDay === true ? selectTimetableAllDay() : deselectTimetableAllDay();
-
-    }
-
-    function getCalendarAllDay() {
-        if (pickerOptions.allDaySwitch === true) {
-            if ($('#hideTime' + twigVars.id).is(':checked')) {
-                return true;
-            }
-        }
-        return false
+        return allDay;
     }
 
     /**
@@ -487,16 +475,15 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     /**
      * Checks if time is 11:59pm
      *
-     * @param value
+     * @param value {object}
      * @returns {boolean}
      */
     function hasTime(value) {
 
-        var v = moment(value);
-        if (pickerOptions.endDay === true && v.hours() == 23 && v.minutes() == 59 && (v.seconds() == 59 || v.second() == 0)) {
+        if (pickerOptions.endDay === true && value.hours() == 23 && value.minutes() == 59 && (value.seconds() == 59 || value.second() == 0)) {
             return false;
         }
-        if (v.hours() == 0 && v.minutes() == 0 && v.seconds() == 0) {
+        if (value.hours() == 0 && value.minutes() == 0 && value.seconds() == 0) {
             return false;
         }
         return true;
@@ -849,11 +836,11 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     }
 
     /**
-     * 'Copy' timetable allday value form the calendar
+     * Select or deselect timetable allDay value
      */
     function setTimetableAllDay() {
 
-        getCalendarAllDay() ? selectTimetableAllDay() : deselectTimetableAllDay();
+        isInputAllDay() ? selectTimetableAllDay() : deselectTimetableAllDay();
 
     }
 
