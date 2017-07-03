@@ -23,6 +23,9 @@
 {% set labelPending    = 'Review required' %}
 {% set labelReviewed   = 'Reviewed' %}
 
+{# Override default route #}
+{% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) %}
+
 {% block headerOptions %}
     <li>
         <a class="icon-class-list" href="{{ routeLookup('learningQuiz.getQuizReviewHorizontal', { assessmentId: assessment.id }) }}">Review horizontally</a>
@@ -117,6 +120,17 @@
     {% endset %}
 
     {{ parent() }}
+{% endblock %}
+
+
+{% block extra_nav_items %}
+    {% set attempt = participant.findMostRecentResponse %}
+    {% if attempt and not attempt.submitted %}
+        <form id="form-quiz-submit-{{ attempt.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
+            <input type="hidden" name="attemptId" value="{{ attempt.id }}">
+        </form>
+        <li><a data-quiz-submit="{{ attempt.id }}" class="icon-tick" href="#" title="Mark As Submitted">Mark As Submitted</a></li>
+    {% endif %}
 {% endblock %}
 
 
@@ -223,6 +237,16 @@
     </div>
 
     <script type="text/javascript">
+        $(function() {
+
+            // Finish incomplete quiz attempt
+            $('[data-quiz-submit]').click(function(e) {
+                e.preventDefault();
+                var attemptId = $('[data-quiz-submit]').attr('data-quiz-submit');
+                $('#form-quiz-submit-' + attemptId).submit();
+            });
+        });
+
         $(function () {
 
             var $participantList  = $('#assessment-status');
