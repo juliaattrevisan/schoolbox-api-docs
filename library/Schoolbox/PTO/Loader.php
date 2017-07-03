@@ -3,7 +3,7 @@
 namespace Schoolbox\PTO;
 
 use Schoolbox\User;
-use Zend\Stdlib\Exception\DomainException;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Zend\Uri\Uri;
 
 /**
@@ -25,6 +25,9 @@ class Loader
      */
     const REMOTE_URL = "https://bookings.parentteacheronline.com.au?school=[school]&Type=[type]&P1=[username]&P2=[epoch]&P3=[hash]";
 
+    /** @var ConfigLoader */
+    private $configLoader;
+
     /** @var User */
     private $user;
 
@@ -37,12 +40,14 @@ class Loader
     /**
      * Loader constructor.
      *
+     * @param ConfigLoader $configLoader
      * @param User $user
      * @param string $epoch
      * @param string $school
      */
-    public function __construct(User $user, $epoch, $school)
+    public function __construct(ConfigLoader $configLoader, User $user, $epoch, $school)
     {
+        $this->setConfigLoader($configLoader);
         $this->setUser($user);
         $this->setEpoch($epoch);
         $this->setSchool($school);
@@ -81,9 +86,7 @@ class Loader
      */
     private function generateHash()
     {
-        $ptoKey = \Config::get('pto_key');
-
-        return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$this->getEpoch()}{$ptoKey}");
+        return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$this->getEpoch()}{$this->getConfigLoader()->get('pto_key')}");
     }
 
     /**
@@ -110,9 +113,25 @@ class Loader
 
         return $remoteUrl;
     }
-
+    
     /* Getters/Setters
      */
+
+    /**
+     * @return ConfigLoader
+     */
+    private function getConfigLoader()
+    {
+        return $this->configLoader;
+    }
+
+    /**
+     * @param ConfigLoader $configLoader
+     */
+    private function setConfigLoader($configLoader)
+    {
+        $this->configLoader = $configLoader;
+    }
 
     /**
      * @return User
