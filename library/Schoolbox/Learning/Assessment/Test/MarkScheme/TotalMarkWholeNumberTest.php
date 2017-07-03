@@ -31,26 +31,6 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
         new TotalMarkWholeNumber($input);
     }
 
-    /**
-     * @expectedException RangeException
-     */
-    public function test_Zero_Denominator()
-    {
-        $input = 0;
-        new TotalMarkWholeNumber($input);
-    }
-
-    /**
-     * @expectedException \BadMethodCallException
-     */
-    public function test_setDenominator()
-    {
-        $input = 50;
-        $markScheme = new TotalMarkWholeNumber(50);
-        $markScheme->setTotalMark($input);
-    }
-
-
 
     /**
      * @dataProvider provider_normalisedToHumanReadable

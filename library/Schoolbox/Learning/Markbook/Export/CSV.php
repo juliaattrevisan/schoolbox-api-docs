@@ -244,7 +244,7 @@ class CSV implements IExporter
         if ($participants[$assessment->getId()]->keyExists($userId)) {
             $participant = $participants[$assessment->getId()][$userId];
 
-            $humanReadableMark = $participant->getPublishedHumanReadableMark();
+            $humanReadableMark = $participant->getHumanReadableMark(true);
 
             if ($this->hasTotalMarkColumn($assessment)) {
                 $row[] = $this->parseNumerator($humanReadableMark);
@@ -253,7 +253,7 @@ class CSV implements IExporter
                 $row[] = $humanReadableMark;
             }
             if ($this->hasNormalizedMarkColumn($assessment)) {
-                $row[] = $participant->getPublishedNormalisedMark();
+                $row[] = $participant->getNormalisedMark(true);
             }
             if ($this->hasCommentColumn($assessment)) {
                 $row[] = $this->retrieveCommentField($assessment, $participant->getUser());

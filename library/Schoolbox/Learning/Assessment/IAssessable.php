@@ -230,7 +230,7 @@ interface IAssessable extends ISoftDeletable
      *
      * @param User $user
      * @return Participant
-     * @throws \UnexpectedValueException
+     * @throws \UnexpectedValueException  If user is not a participant of this Assessment
      */
     public function getParticipant(User $user);
 
@@ -245,19 +245,53 @@ interface IAssessable extends ISoftDeletable
      */
     public function getParticipantIfExtant(User $user);
 
-    /**
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return string|null
-     */
-    public function getHumanReadableMark(User $user, $publishedOnly);
 
     /**
-     * @param User $user
-     * @param bool $publishedOnly
+     * Gets the normalised mark, regardless of MarkScheme
+     *
+     * @param Participant $participant
+     * @param bool        $publishedOnly
      * @return float|null
+     * @throws DomainException If participant assessment is not this assessment
      */
-    public function getNormalisedMark(User $user, $publishedOnly);
+    public function getNormalisedMark(Participant $participant, $publishedOnly);
+
+
+    /**
+     * Gets the normalised mark, transformed into human-readable form by this assessment's MarkScheme
+     *
+     * @param Participant $participant
+     * @param bool        $publishedOnly
+     * @return string|null
+     * @throws DomainException If participant assessment is not this assessment
+     */
+    public function getHumanReadableMark(Participant $participant, $publishedOnly);
+
+
+    /**
+     * Return the IResponse responsible for the participant's assessment mark
+     *
+     * In the case of a floating feedback without any response, then this returns null.
+     *
+     * @param Participant $participant
+     * @param bool        $publishedOnly
+     * @return null|IResponse
+     * @throws DomainException If participant assessment is not this assessment
+     */
+    public function getAuthoritativeResponse(Participant $participant, $publishedOnly);
+
+
+    /**
+     * Get the IFeedback responsible for the participant's assessment mark
+     *
+     * Will return null if participant does not have a published mark
+     *
+     * @param Participant $participant
+     * @param bool        $publishedOnly
+     * @return null|IFeedback
+     * @throws DomainException If participant assessment is not this assessment
+     */
+    public function getAuthoritativeFeedback(Participant $participant, $publishedOnly);
 
     /* Traversals
      */

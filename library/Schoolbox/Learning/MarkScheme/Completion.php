@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use Schoolbox\Learning\Assessment\IResponse;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 
 class Completion extends AbstractMarkScheme
@@ -23,22 +22,18 @@ class Completion extends AbstractMarkScheme
      *
      * @var bool
      */
-    protected $quantitative = false;
+    const QUANTITATIVE = false;
 
     /**
-     * Returns a string representation of a normalised Mark
-     *
-     * @param mixed          $normalisedMark ignored, even if invalid
-     * @param IResponse|null $response       Most recent submitted IResponse
-     * @return string|null
+     * @inheritdoc
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if (null === $response || ($response instanceof TaskResponse && !$response->getMarkedComplete())){
+        // Does the response not exist, or is not submitted, or explicitly marked as incomplete?
+        if (!$response || !$response->isSubmitted() || ($response instanceof TaskResponse && !$response->getMarkedComplete())) {
             return self::HUMAN_READABLE_INCOMPLETE;
-        } else {
-            return self::HUMAN_READABLE_COMPLETE;
         }
+        return self::HUMAN_READABLE_COMPLETE;
     }
 
     /**
@@ -52,32 +47,7 @@ class Completion extends AbstractMarkScheme
     {
         if (null === $response || ($response instanceof TaskResponse && !$response->getMarkedComplete())){
             return self::NORMALISED_MARK_MIN;
-        } else {
-            return self::NORMALISED_MARK_MAX;
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPublishedNormalisedMark(Participant $participant)
-    {
-        return $this->getNormalisedMark(null, $participant->findMostRecentSubmittedResponse());
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPublishedHumanReadableMark(Participant $participant)
-    {
-        return $this->getHumanReadableMark(null, $participant->findMostRecentSubmittedResponse());
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMostRecentHumanReadableMark(Participant $participant)
-    {
-        return $this->getHumanReadableMark(null, $participant->findMostRecentSubmittedResponse());
+        return self::NORMALISED_MARK_MAX;
     }
 }

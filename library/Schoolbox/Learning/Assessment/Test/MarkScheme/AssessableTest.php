@@ -38,8 +38,8 @@ use \InvalidArgumentException;
 
 /**
  * Tests IAssessable:
- * * getHumanReadableMark(User $user, bool $publishedOnly):string|null
- * * getNormalisedMark(User $user, bool $publishedOnly):float|null
+ * * getHumanReadableMark(Participant $participant, bool $publishedOnly):string|null
+ * * getNormalisedMark(Participant $participant, bool $publishedOnly):float|null
  *
  * Metrics to test:
  * * IAssessable {Project, Task, Quiz, DueWork}
@@ -68,7 +68,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Task_Completion_getHumanReadable(Task $task, User $student, $expected)
     {
-        $actual = $task->getHumanReadableMark($student, false);
+        $actual = $task->getHumanReadableMark($task->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -84,7 +84,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // A student-assessed response is always published
         // A teacher-assessed feedback can be unpublished
 
-        $actual = $task->getHumanReadableMark($student, true);
+        $actual = $task->getHumanReadableMark($task->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: $expected, Actual: $actual";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -97,7 +97,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Quiz_TotalMarkFraction_getHumanReadable(Quiz $quiz, User $student, $expected)
     {
-        $actual = $quiz->getHumanReadableMark($student, false);
+        $actual = $quiz->getHumanReadableMark($quiz->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -110,7 +110,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Quiz_TotalMarkFraction_getHumanReadable_PublishedOnly(Quiz $quiz, User $student, $expected)
     {
-        $actual = $quiz->getHumanReadableMark($student, true);
+        $actual = $quiz->getHumanReadableMark($quiz->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -123,7 +123,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Quiz_TotalMarkFraction_getNormalised(Quiz $quiz, User $student, $expected)
     {
-        $actual = $quiz->getNormalisedMark($student, false);
+        $actual = $quiz->getNormalisedMark($quiz->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -136,7 +136,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Quiz_TotalMarkFraction_getNormalised_PublishedOnly(Quiz $quiz, User $student, $expected)
     {
-        $actual = $quiz->getNormalisedMark($student, true);
+        $actual = $quiz->getNormalisedMark($quiz->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -149,7 +149,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_None_getHumanReadable(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getHumanReadableMark($student, false);
+        $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -162,7 +162,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_None_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getHumanReadableMark($student, true);
+        $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -175,7 +175,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_Percent_getHumanReadable(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getHumanReadableMark($student, false);
+        $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -188,7 +188,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_Percent_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getHumanReadableMark($student, true);
+        $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -201,7 +201,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_TotalMark_getHumanReadable(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getHumanReadableMark($student, false);
+        $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -214,7 +214,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_TotalMark_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getHumanReadableMark($student, true);
+        $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -227,7 +227,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_LetterGrade_getHumanReadable(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getHumanReadableMark($student, false);
+        $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -240,7 +240,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_LetterGrade_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getHumanReadableMark($student, true);
+        $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -253,7 +253,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_None_getNormalised(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getNormalisedMark($student, false);
+        $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -266,7 +266,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_None_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getNormalisedMark($student, true);
+        $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -279,7 +279,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_Percent_getNormalised(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getNormalisedMark($student, false);
+        $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -292,7 +292,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_Percent_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getNormalisedMark($student, true);
+        $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -305,7 +305,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_TotalMark_getNormalised(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getNormalisedMark($student, false);
+        $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -318,7 +318,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_TotalMark_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getNormalisedMark($student, true);
+        $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -331,7 +331,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_LetterGrade_getNormalised(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getNormalisedMark($student, false);
+        $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -344,7 +344,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_DueWork_LetterGrade_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
-        $actual = $dueWork->getNormalisedMark($student, true);
+        $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -360,9 +360,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
-        $this->assertEquals($expected, $actual, $message);
+        $this->assertEquals($expected, $actual, $message, 0.1);
     }
 
     /**
@@ -377,9 +377,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
-        $this->assertEquals($expected, $actual, $message);
+        $this->assertEquals($expected, $actual, $message, 0.1);
     }
 
     /**
@@ -394,7 +394,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -411,7 +411,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -428,7 +428,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -446,7 +446,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -463,7 +463,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -480,7 +480,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -497,7 +497,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -514,7 +514,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -531,7 +531,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -548,7 +548,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -565,7 +565,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -582,7 +582,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -599,7 +599,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -616,7 +616,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -633,7 +633,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -650,7 +650,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -667,7 +667,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -684,7 +684,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -701,7 +701,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -718,7 +718,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -735,7 +735,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
 
-        $actual = $project->getNormalisedMark($student, false);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -752,7 +752,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
 
-        $actual = $project->getNormalisedMark($student, true);
+        $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -769,7 +769,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -786,7 +786,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -799,7 +799,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Minimum_LetterGrade_getHR(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -812,7 +812,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Minimum_LetterGrade_getHR_publishedOnly(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -825,7 +825,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Minimum_Percentage_getHR(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -838,7 +838,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Minimum_Percentage_getHR_publishedOnly(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -855,7 +855,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -872,7 +872,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -885,7 +885,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Maximum_LetterGrade_getHR(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -898,7 +898,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Maximum_LetterGrade_getHR_publishedOnly(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -911,7 +911,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Maximum_Percentage_getHR(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -924,7 +924,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Maximum_Percentage_getHR_publishedOnly(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -941,7 +941,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -958,7 +958,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -971,7 +971,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Average_LetterGrade_getHR(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -984,7 +984,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Average_LetterGrade_getHR_publishedOnly(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -997,7 +997,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Average_Percentage_getHR(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -1010,7 +1010,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_Average_Percentage_getHR_publishedOnly(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -1027,7 +1027,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -1044,7 +1044,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
         $project->setMarkScheme(new None());
 
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -1057,7 +1057,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_WeightedAverage_LetterGrade_getHR(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -1070,7 +1070,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_WeightedAverage_LetterGrade_getHR_publishedOnly(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -1083,7 +1083,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_WeightedAverage_Percentage_getHR(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, false);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -1096,7 +1096,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Project_WeightedAverage_Percentage_getHR_publishedOnly(Project $project, User $student, $expected)
     {
-        $actual = $project->getHumanReadableMark($student, true);
+        $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -1143,7 +1143,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$quiz, $this->getDummyStudent(1), null],
                 [$quiz, $this->getDummyStudent(2), '1 / 2'],
                 [$quiz, $this->getDummyStudent(3), '1 / 2'],
-                [$quiz, $this->getDummyStudent(4), '1 / 2'],
+                [$quiz, $this->getDummyStudent(4), '2 / 2'],
                 [$quiz, $this->getDummyStudent(5), '2 / 2'],
             ];
         }
@@ -1181,7 +1181,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$quiz, $this->getDummyStudent(1), null],
                 [$quiz, $this->getDummyStudent(2), 50.0],
                 [$quiz, $this->getDummyStudent(3), 50.0],
-                [$quiz, $this->getDummyStudent(4), 50.0],
+                [$quiz, $this->getDummyStudent(4), 100.0],
                 [$quiz, $this->getDummyStudent(5), 100.0],
             ];
         }
@@ -1501,7 +1501,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             [$project, $this->getDummyStudent(2), 50.0],
             [$project, $this->getDummyStudent(3), 50.0],
             [$project, $this->getDummyStudent(4), 50.0],
-            [$project, $this->getDummyStudent(5), 100.0],
+            [$project, $this->getDummyStudent(5), 100],
             [$project, $this->getDummyStudent(6), 50.0],
             [$project, $this->getDummyStudent(7), 100.0],
             [$project, $this->getDummyStudent(8), 50.0],
@@ -1547,7 +1547,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
                 [$project, $this->getDummyStudent(3), 50.0],
-                [$project, $this->getDummyStudent(4), 50.0],
+                [$project, $this->getDummyStudent(4), 100.0],
                 [$project, $this->getDummyStudent(5), 100.0],
                 [$project, $this->getDummyStudent(6), 50.0],
                 [$project, $this->getDummyStudent(7), 100.0],
@@ -1595,7 +1595,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
                 [$project, $this->getDummyStudent(3), 50.0],
-                [$project, $this->getDummyStudent(4), 50.0],
+                [$project, $this->getDummyStudent(4), 75.0],
                 [$project, $this->getDummyStudent(5), 100.0],
                 [$project, $this->getDummyStudent(6), 50.0],
                 [$project, $this->getDummyStudent(7), 100.0],
@@ -1643,7 +1643,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
                 [$project, $this->getDummyStudent(3), 50.0],
-                [$project, $this->getDummyStudent(4), 50.0],
+                [$project, $this->getDummyStudent(4), 60.0],
                 [$project, $this->getDummyStudent(5), 100.0],
                 [$project, $this->getDummyStudent(6), 50.0],
                 [$project, $this->getDummyStudent(7), 100.0],
@@ -1786,7 +1786,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
                 [$project, $this->getDummyStudent(3), 'Acceptable'],
-                [$project, $this->getDummyStudent(4), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Excellent'],
                 [$project, $this->getDummyStudent(5), 'Excellent'],
                 [$project, $this->getDummyStudent(6), 'Acceptable'],
                 [$project, $this->getDummyStudent(7), 'Excellent'],
@@ -1839,7 +1839,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
                 [$project, $this->getDummyStudent(3), '50 %'],
-                [$project, $this->getDummyStudent(4), '50 %'],
+                [$project, $this->getDummyStudent(4), '100 %'],
                 [$project, $this->getDummyStudent(5), '100 %'],
                 [$project, $this->getDummyStudent(6), '50 %'],
                 [$project, $this->getDummyStudent(7), '100 %'],
@@ -1891,7 +1891,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
                 [$project, $this->getDummyStudent(3), 'Acceptable'],
-                [$project, $this->getDummyStudent(4), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Very Good'],
                 [$project, $this->getDummyStudent(5), 'Excellent'],
                 [$project, $this->getDummyStudent(6), 'Acceptable'],
                 [$project, $this->getDummyStudent(7), 'Excellent'],
@@ -1944,7 +1944,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
                 [$project, $this->getDummyStudent(3), '50 %'],
-                [$project, $this->getDummyStudent(4), '50 %'],
+                [$project, $this->getDummyStudent(4), '75 %'],
                 [$project, $this->getDummyStudent(5), '100 %'],
                 [$project, $this->getDummyStudent(6), '50 %'],
                 [$project, $this->getDummyStudent(7), '100 %'],
@@ -1997,7 +1997,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
                 [$project, $this->getDummyStudent(3), 'Acceptable'],
-                [$project, $this->getDummyStudent(4), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Good'],
                 [$project, $this->getDummyStudent(5), 'Excellent'],
                 [$project, $this->getDummyStudent(6), 'Acceptable'],
                 [$project, $this->getDummyStudent(7), 'Excellent'],
@@ -2050,7 +2050,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
                 [$project, $this->getDummyStudent(3), '50 %'],
-                [$project, $this->getDummyStudent(4), '50 %'],
+                [$project, $this->getDummyStudent(4), '60 %'],
                 [$project, $this->getDummyStudent(5), '100 %'],
                 [$project, $this->getDummyStudent(6), '50 %'],
                 [$project, $this->getDummyStudent(7), '100 %'],
@@ -2083,9 +2083,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     /**
      * Generates a task.
      * * student 1: none
-     * * student 2: self-assessed
-     * * student 3: teacher-assessed
-     * * student 4: self-assessed then teacher-assessed
+     * * student 2: self-assessed as complete
+     * * student 3: teacher-assessed as complete
+     * * student 4: self-assessed as complete then teacher-assessed as complete
      *
      * In all cases, QuizReviews are unpublished
      *
@@ -2093,7 +2093,10 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     private function getDummyTask()
     {
-        $task = (new Task())->setId(1)->setMarkScheme(new Completion());
+        $task = (new Task())
+            ->setId(1)
+            ->setIsSelfAssessable(true)
+            ->setMarkScheme(new Completion());
 
         $student1 = $this->getDummyStudent(1);
         $student2 = $this->getDummyStudent(2);
@@ -2203,7 +2206,6 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $student4 = $this->getDummyStudent(4);
         $student5 = $this->getDummyStudent(5);
 
-
         $participant1 = $this->getDummyParticipant($student1->getId(), $quiz);
         $participant2 = $this->getDummyParticipant($student2->getId(), $quiz);
         $participant3 = $this->getDummyParticipant($student3->getId(), $quiz);
@@ -2215,64 +2217,82 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // student 2: 1 attempt + 1 published feedback (1/2)
         $attempt2 = (new QuizAttempt())
             ->setId(2)
+            ->setSubmittedOnBehalfOf($student2)
             ->setMarksGiven(1.0)
             ->setMarksAvailable(2.0)
+            ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $feedback2 = (new QuizFeedback())
             ->setId(2)
+            ->setReviewee($student2)
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         // student 3: 1 attempt + 1 unpublished feedback (1/2)
         $attempt3 = (new QuizAttempt())
             ->setId(3)
+            ->setSubmittedOnBehalfOf($student3)
             ->setMarksGiven(1.0)
             ->setMarksAvailable(2.0)
+            ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $feedback3 = (new QuizFeedback())
             ->setId(3)
+            ->setReviewee($student3)
             ->setPublishedAt($this->getDummyDate(null))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         // student 4: 2 attempt + 1 published feedback (1/2) + 1 unpublished feedback (2/2)
         $attempt4a = (new QuizAttempt())
             ->setId(4)
+            ->setSubmittedOnBehalfOf($student4)
             ->setMarksGiven(1.0)
             ->setMarksAvailable(2.0)
+            ->setSubmittedAt($this->getDummyDate('2016-08-08 00:00:00'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 00:00:00'));
         $feedback4a = (new QuizFeedback())
             ->setId(4)
+            ->setReviewee($student4)
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
 
         $attempt4b = (new QuizAttempt())
             ->setId(5)
+            ->setSubmittedOnBehalfOf($student4)
             ->setMarksGiven(2.0)
             ->setMarksAvailable(2.0)
+            ->setSubmittedAt($this->getDummyDate('2016-08-09 00:00:00'))
             ->setUpdatedAt($this->getDummyDate('2016-08-09 00:00:00'));
         $feedback4b = (new QuizFeedback())
             ->setId(5)
+            ->setReviewee($student4)
             ->setPublishedAt($this->getDummyDate(null))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         // student 5: 2 attempt + 1 published feedback (1/3) + 1 unpublished feedback (2/2)
         $attempt5a = (new QuizAttempt())
             ->setId(6)
+            ->setSubmittedOnBehalfOf($student5)
             ->setMarksGiven(1.0)
             ->setMarksAvailable(3.0)
+            ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $feedback5a = (new QuizFeedback())
             ->setId(6)
+            ->setReviewee($student5)
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         $attempt5b = (new QuizAttempt())
             ->setId(7)
+            ->setSubmittedOnBehalfOf($student5)
             ->setMarksGiven(2.0)
             ->setMarksAvailable(2.0)
+            ->setSubmittedAt($this->getDummyDate('2016-08-09 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-09 21:03:19'));
         $feedback5b = (new QuizFeedback())
             ->setId(7)
+            ->setReviewee($student5)
             ->setPublishedAt($this->getDummyDate(null))
             ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
 
@@ -2405,15 +2425,18 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // student 2: 1 submission
         $submission2 = (new DueWorkSubmission())
             ->setId(2)
+            ->setSubmittedOnBehalfOf($student2)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         // student 3: 1 submission + 1 published feedback (50.0)
         $submission3 = (new DueWorkSubmission())
             ->setId(3)
+            ->setSubmittedOnBehalfOf($student3)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         $feedback3 = (new DueWorkFeedback())
             ->setId(3)
+            ->setReviewee($student3)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2422,10 +2445,12 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // student 4: 1 submission + 1 unpublished feedback (50.0)
         $submission4 = (new DueWorkSubmission())
             ->setId(4)
+            ->setSubmittedOnBehalfOf($student4)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         $feedback4 = (new DueWorkFeedback())
             ->setId(4)
+            ->setReviewee($student4)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2434,16 +2459,19 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // student 5: 1 submission + 1 published feedback (50.0) + 1 later unpublished feedback (100.0)
         $submission5 = (new DueWorkSubmission())
             ->setId(5)
+            ->setSubmittedOnBehalfOf($student5)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         $feedback5a = (new DueWorkFeedback())
             ->setId(5)
+            ->setReviewee($student5)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $feedback5b = (new DueWorkFeedback())
             ->setId(6)
+            ->setReviewee($student5)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
@@ -2452,13 +2480,16 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // student 6: 2 submission + 1 published floating feedback (50.0)
         $submission6a = (new DueWorkSubmission())
             ->setId(5)
+            ->setSubmittedOnBehalfOf($student6)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $submission6b = (new DueWorkSubmission())
             ->setId(6)
+            ->setSubmittedOnBehalfOf($student6)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         $feedback6 = (new DueWorkFeedback())
             ->setId(7)
+            ->setReviewee($student6)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2467,19 +2498,23 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // student 7: 2 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
         $submission7a = (new DueWorkSubmission())
             ->setId(7)
+            ->setSubmittedOnBehalfOf($student7)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $submission7b = (new DueWorkSubmission())
             ->setId(8)
+            ->setSubmittedOnBehalfOf($student7)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         $feedback7a = (new DueWorkFeedback())
             ->setId(8)
+            ->setReviewee($student7)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $feedback7b = (new DueWorkFeedback())
             ->setId(9)
+            ->setReviewee($student7)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
@@ -2488,6 +2523,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // student 8: 0 submission + 1 published floating feedback (50.0)
         $feedback8 = (new DueWorkFeedback())
             ->setId(10)
+            ->setReviewee($student8)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
@@ -2496,12 +2532,14 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // student 9: 0 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
         $feedback9a = (new DueWorkFeedback())
             ->setId(11)
+            ->setReviewee($student9)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $feedback9b = (new DueWorkFeedback())
             ->setId(12)
+            ->setReviewee($student9)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
             ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
@@ -2601,7 +2639,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Returns a project composed of 1 Task (weight=0), 1 Quiz (weight=200) + 1 DueWork (weight=800)
+     * Returns a project composed of 1 Task (weight=0), 1 Quiz (weight=1) + 1 DueWork (weight=4)
      *
      * student 1: Task: -
      *            Quiz: -
@@ -2635,13 +2673,13 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function getDummyProject()
     {
-        $project = (new Project(new Minimum()))
+        $project = (new Project())
             ->setId(4)
             ->setGradeGroup($this->getDummyLetterGradeGroup());
 
         $task = $this->getDummyTask()->setWeight(0);
-        $dueWork = $this->getDummyDueWork()->setWeight(800);
-        $quiz = $this->getDummyQuiz()->setWeight(200);
+        $dueWork = $this->getDummyDueWork()->setWeight(4);
+        $quiz = $this->getDummyQuiz()->setWeight(1);
 
         $project->getAssessables()
             ->add($task)

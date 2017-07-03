@@ -439,7 +439,7 @@ class CohortAnalysis
                     $this->completions[$unitSpecId][$assessmentId][$userId] = $participant->isResponseRequired() ? self::INCOMPLETE : self::COMPLETE;
                 }
 
-                $normMark = $participant->getPublishedNormalisedMark();
+                $normMark = $participant->getNormalisedMark(true);
                 // Does user not yet have a mark, or this mark is higher ?
                 if(null === $this->grades[$unitSpecId][$assessmentId][$userId] || $normMark > $this->grades[$unitSpecId][$assessmentId][$userId]){
                     $this->grades[$unitSpecId][$assessmentId][$userId] = $normMark;

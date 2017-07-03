@@ -198,7 +198,7 @@ class Markbook
 
         // Not all assessables are used in stats:
         // only ones for which feedback is visible are usable.
-        $visibleAssessments = $this->getAssessments()->filter(function(IAssessable $assessable) {
+        $visibleAssessments = $this->topLevelAssessments->filter(function(IAssessable $assessable) {
             return $assessable->isFeedbackVisibleToUser($this->viewingUser);
         });
 
@@ -217,7 +217,7 @@ class Markbook
         // Render as whatever the default grade group is
 
         $this->normalisedMean = $weightedSummator->summateAllAssessables(
-            $this->getAssessments(),
+            $visibleAssessments,
             true,
             new Average()
         );
@@ -265,7 +265,7 @@ class Markbook
         // Only collate stats for assessments whose feedback may be viewed by this user
         if ($assessment->isFeedbackVisibleToUser($this->viewingUser)) {
             foreach ($assessment->getAllParticipants() as $participant) {
-                $normMarks[] = $assessment->getNormalisedMark($participant->getUser(), true);
+                $normMarks[] = $participant->getNormalisedMark(true);
             }
         }
 

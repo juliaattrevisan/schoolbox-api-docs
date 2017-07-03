@@ -15,6 +15,8 @@
 {% set labelPending    = 'Self-Assessed' %}
 {% set labelReviewed   = 'Teacher-Assessed' %}
 
+{% set participant = assessment.participantIfExtant(student) %}
+
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 
 {% autoescape 'js' %}
@@ -78,8 +80,8 @@
             <h2 class="subheader">{{ locale.project }} {{ locale.grades }}</h2>
             <section>
                 <div class="grade content">
-                    <span class="{{ urgency.marks(assessment.normalisedMark(student, true)) }}">
-                        {{ assessment.humanReadableMark(student, true) }}
+                    <span class="{{ urgency.marks(assessment.normalisedMark(participant, true)) }}">
+                        {{ assessment.humanReadableMark(participant, true) }}
                     </span>
                 </div>
             </section>

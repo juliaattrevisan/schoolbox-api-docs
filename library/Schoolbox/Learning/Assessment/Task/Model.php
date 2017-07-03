@@ -74,13 +74,41 @@ class Model extends AbstractAssessment
     /**
      * Tasks always return null.
      *
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return null
+     * @inheritdoc
      */
-    public function getNormalisedMark(User $user, $publishedOnly)
+    public function getNormalisedMark(Participant $participant, $publishedOnly)
     {
         return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
+    {
+        // No concept of 'publishing' task marks
+
+        // Can a student mark themselves as completing this task?
+        if ($this->isSelfAssessable) {
+            return $participant->findMostRecentResponse();
+        }
+        // Else only a teacher can mark the task, which always generates a feedback and response
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getResponse() : null;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getAuthoritativeFeedback(Participant $participant, $publishedOnly)
+    {
+        $this->assertSameAssessment($participant);
+
+        // The authoritative task feedback is always the latest one
+        return $publishedOnly
+            ? $participant->findMostRecentPublishedFeedback()
+            : $participant->findMostRecentFeedback();
     }
 
     /**

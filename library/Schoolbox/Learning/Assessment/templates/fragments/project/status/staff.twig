@@ -185,7 +185,7 @@
                                                 <div class="card small-12">
 
                                                     {# cache to prevent repeated traversals #}
-                                                    {% set publishedHumanReadableMark = participant.publishedHumanReadableMark %}
+                                                    {% set publishedHumanReadableMark = participant.humanReadableMark(true) %}
 
                                                     {% if publishedHumanReadableMark is not null %}
                                                         <span class="neutral label right">

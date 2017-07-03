@@ -237,6 +237,34 @@ class Model extends AbstractAssessment
         }
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
+    {
+        // DueWork mark is cached on the feedback
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+
+        // If no feedback, or feedback is floating, return null.
+        return $feedback && $feedback->getResponse() ? $feedback->getResponse() : null;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getAuthoritativeFeedback(Participant $participant, $publishedOnly)
+    {
+        $this->assertSameAssessment($participant);
+
+        // DueWork takes the mark from latest feedback
+        return $publishedOnly
+            ? $participant->findMostRecentPublishedFeedback()
+            : $participant->findMostRecentFeedback();
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -245,17 +273,26 @@ class Model extends AbstractAssessment
         return 'dueWork';
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function getNormalisedMark(Participant $participant, $publishedOnly)
+    {
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getNormalisedMark() : null;
+    }
+
+
     /**
      * DueWork does not use the MarkScheme. It merely returns the cached value.
      *
-     * @param User $user
-     * @param bool $publishedOnly
-     * @return string|null
+     * @inheritdoc
      */
-    public function getHumanReadableMark(User $user, $publishedOnly)
+    public function getHumanReadableMark(Participant $participant, $publishedOnly)
     {
-        $normalised = false;
-        return $this->getMark($user, $publishedOnly, $normalised);
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getHumanReadableMark() : null;
     }
 
 

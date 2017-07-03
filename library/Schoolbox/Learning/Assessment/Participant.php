@@ -72,11 +72,18 @@ class Participant
      * Represented as GREY SQUARE
      *
      * @return bool
-     * @throws DomainException
      */
     public function isResponseRequired()
     {
-        return $this->assessable->isResponseRequired($this);
+        try {
+            return $this->assessable->isResponseRequired($this);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
     }
 
 
@@ -88,12 +95,19 @@ class Participant
      * This is a teacher-perspective function. ie, does the teacher need to do anything?
      * eg, Give a mark? Publish a draft? Mark off as 'complete' ?
      *
-     * @throws DomainException
      * @return bool
      */
     public function isFeedbackRequired()
     {
-        return $this->assessable->isFeedbackRequired($this);
+        try {
+            return $this->assessable->isFeedbackRequired($this);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
     }
 
 
@@ -101,12 +115,19 @@ class Participant
      * Has the teacher marked this participant as not-explicitly-incomplete, and
      * the student has not subsequently submitted/re-submitted.
      *
-     * @throws DomainException
      * Represented in UI as GREEN CIRCLE
      */
     public function isReviewComplete()
     {
-        return $this->assessable->isReviewComplete($this);
+        try {
+            return $this->assessable->isReviewComplete($this);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
     }
 
 
@@ -247,42 +268,92 @@ class Participant
      *
      * @return null|IFeedback
      */
-    public function findMostRecentVisibleFeedback(User $viewingUser)
+    public function findAuthoritativeVisibleFeedback(User $viewingUser)
     {
         if (!$this->getAssessable()->isFeedbackVisibleToUser($viewingUser)) {
             return null;
         }
-        return $this->findMostRecentPublishedFeedback();
+        $publishedOnly = true;
+        return $this->getAuthoritativeFeedback($publishedOnly);
     }
 
+
     /**
-     * Returns this Participant's published Human-Readable mark
+     * Return authoritative normalised mark - optionally filtered to just published marks.
      *
+     * @param bool $publishedOnly Should we ignore draft marks?
+     * @return null|float
+     */
+    public function getNormalisedMark($publishedOnly)
+    {
+        try {
+            return $this->assessable->getNormalisedMark($this, $publishedOnly);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
+    }
+
+
+    /**
+     * Return authoritative human-readable mark - optionally filtered to just published marks.
+     *
+     * @param bool $publishedOnly Should we ignore draft marks?
      * @return null|string
      */
-    public function getPublishedHumanReadableMark()
+    public function getHumanReadableMark($publishedOnly)
     {
-        return $this->assessable->getMarkScheme()->getPublishedHumanReadableMark($this);
+        try {
+            return $this->assessable->getHumanReadableMark($this, $publishedOnly);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
+    }
+
+
+    /**
+     * Return the IResponse responsible for the participant's assessment mark
+     *
+     * @param $publishedOnly
+     * @return null|IResponse
+     */
+    public function getAuthoritativeResponse($publishedOnly)
+    {
+        try {
+            return $this->assessable->getAuthoritativeResponse($this, $publishedOnly);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
     }
 
     /**
-     * Returns this Participant's published normalised mark
+     * Get the IFeedback responsible for the participant's assessment mark
      *
-     * @return null|int
+     * @param $publishedOnly
+     * @return null|IFeedback
      */
-    public function getPublishedNormalisedMark()
+    public function getAuthoritativeFeedback($publishedOnly)
     {
-        return $this->assessable->getMarkScheme()->getPublishedNormalisedMark($this);
-    }
-
-    /**
-     * Returns this Participant's most recent Human-Readable mark (includes draft marks)
-     *
-     * @return null|string
-     */
-    public function getMostRecentHumanReadableMark()
-    {
-        return $this->assessable->getMarkScheme()->getMostRecentHumanReadableMark($this);
+        try {
+            return $this->assessable->getAuthoritativeFeedback($this, $publishedOnly);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
     }
 
 

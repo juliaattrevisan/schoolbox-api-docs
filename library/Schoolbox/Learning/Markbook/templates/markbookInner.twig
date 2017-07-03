@@ -143,10 +143,10 @@
                                         writable: writable[assessment.id]
                                     } only %}
                                 {% else %}
-                                    {% set normalisedMark = assessment.getNormalisedMark(student, true) %}
+                                    {% set normalisedMark = participant.normalisedMark(false) %}
                                     {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
                                         ? (pendingLabel ?: "Pending")
-                                        : assessment.getHumanReadableMark(student, true) | default('–')
+                                        : participant.humanReadableMark(true) | default('–')
                                     %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"

@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use Schoolbox\Learning\Assessment\IResponse;
-use Schoolbox\Learning\Assessment\Participant;
 
 /**
  * A MarkScheme is used for conversion between HumanReadable and Normalised Marks.
@@ -49,8 +48,8 @@ interface IMarkScheme
      *
      * If a Participant has no Response and/or Feedback, $normalisedMark and $humanReadable will be null
      *
-     * @param float|null     $normalisedMark
-     * @param IResponse|null $response          Most recent submitted response
+     * @param null|float     $normalisedMark
+     * @param IResponse|null $response          The response we wish to get the mark from
      * @return string|null
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null);
@@ -72,28 +71,4 @@ interface IMarkScheme
      * @return string
      */
     public static function getTitle();
-
-    /**
-     * Return the published normalised mark for the specified participant
-     *
-     * @param Participant $participant
-     * @return int|null
-     */
-    public function getPublishedNormalisedMark(Participant $participant);
-
-    /**
-     * Return the published human-readable mark for the specified participant
-     *
-     * @param Participant $participant
-     * @return string|null
-     */
-    public function getPublishedHumanReadableMark(Participant $participant);
-
-    /**
-     * Return the most recent human-readable mark (including drafts) for the specified participant
-     *
-     * @param Participant $participant
-     * @return string|null
-     */
-    public function getMostRecentHumanReadableMark(Participant $participant);
 }

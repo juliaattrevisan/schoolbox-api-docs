@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\MarkScheme;
 
 use \InvalidArgumentException;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\Quiz\Attempt as QuizAttempt;
 
 /**
  * Common logic for 'TotalMark' schemes
@@ -18,7 +19,9 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     const TITLE = 'Total Mark';
 
     /**
-     * @var int|float
+     * Quiz can set this to NULL, but then must supply an IResponse to getHumanReadable()
+     *
+     * @var null|int|float
      */
     private $totalMark;
 
@@ -27,16 +30,17 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      *
      * @var bool
      */
-    protected $quantitative = true;
+    const QUANTITATIVE = true;
 
     /**
-     * @param int|float $totalMark
+     * @param null|int|float $totalMark
+     * @throws \RangeException If $totalMark is negative
      */
     public function __construct($totalMark)
     {
-        $this->validateTotalMark($totalMark);
-
-        // Intentional bypass of setter(). Subclasses throw BadMethodException.
+        if($totalMark < 0){
+            throw new \RangeException("Total mark cannot be negative: $totalMark");
+        }
         $this->totalMark = $totalMark;
     }
 
@@ -47,24 +51,46 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      *
      * @param float|null     $normalisedMark
      * @param IResponse|null $response
-     * @throws InvalidArgumentException if normalised mark is outside valid range
      * @return string|null
+     * @throws \RangeException If normalised mark is outside valid range
+     * @throws \DomainException If unable to derive a denominator
+     * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        if(is_null($normalisedMark)){
+        if (null === $normalisedMark) {
             return null;
         }
 
         $this->validateNormalisedMark($normalisedMark);
 
-        $rounded = (round($normalisedMark * $this->getTotalMark() / IMarkScheme::NORMALISED_MARK_MAX
-                / $this->getGranularityNumerator())) * $this->getGranularityNumerator();
+        $denominator = $this->deriveDenominator($response);
 
-        $total = (round($this->getTotalMark() / $this->getGranularityDenominator()))
-                * $this->getGranularityDenominator();
+        $rounded = round($normalisedMark * $denominator / IMarkScheme::NORMALISED_MARK_MAX
+                / $this->getGranularityNumerator()) * $this->getGranularityNumerator();
+
+        $total = round($denominator / $this->getGranularityDenominator()) * $this->getGranularityDenominator();
 
         return "$rounded / $total";
+    }
+
+    /**
+     * Return the denominator to use for total mark calculations
+     *
+     * @param IResponse|null $response
+     * @return float|int|null
+     * @throws \DomainException If unable to derive a denominator
+     */
+    protected function deriveDenominator(IResponse $response = null)
+    {
+        if ($response instanceof QuizAttempt\Model) {
+            return $response->getMarksAvailable();
+        }
+        if (null === $this->totalMark) {
+            $message = 'Unable to derive a human readable mark without a denominator. Either total mark or QuizAttempt required';
+            throw new \DomainException($message);
+        }
+        return $this->totalMark;
     }
 
     /**
@@ -73,6 +99,9 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @param string         $humanReadableMark
      * @param IResponse|null $response
      * @return float|null Returns null if denominator = 0
+     * @throws InvalidArgumentException If unable to parse numerator from human-readable mark
+     * @throws \RangeException If evaluated normalised mark is below 0 or above 100
+     * @throws \DomainException If unable to derive a denominator
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
@@ -82,20 +111,18 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
             throw new InvalidArgumentException("Unable to parse numerator: $humanReadableMark");
         }
 
+        $denominator = $this->deriveDenominator($response);
+
         // Prevent divide by 0 Errors
-        if(0 == $this->getTotalMark()){
+        if (0 === (int)$denominator) {
             return null;
         }
 
-        $floatVal = floatval($matches[1] / $this->getTotalMark() * self::NORMALISED_MARK_MAX);
+        $floatVal = (float)($matches[1] / $denominator * self::NORMALISED_MARK_MAX);
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
     }
 
-    /**
-     * @param float $totalMark
-     */
-    abstract protected function validateTotalMark($totalMark);
 
     /* Getters / Setters
      */
@@ -108,17 +135,6 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
         return $this->totalMark;
     }
 
-    /**
-     * Type depends on subclass
-     *
-     * @param int|float $totalMark
-     * @return static
-     */
-    protected function setTotalMark($totalMark)
-    {
-        $this->totalMark = $totalMark;
-        return $this;
-    }
 
     /**
      * @return float
@@ -129,9 +145,4 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @return float
      */
     abstract protected function getGranularityDenominator();
-
-    /**
-     * @return int|float
-     */
-    abstract protected function getTotalMarkMin();
 }
