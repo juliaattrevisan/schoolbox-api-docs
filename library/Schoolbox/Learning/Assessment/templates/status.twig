@@ -171,7 +171,7 @@
                 }
             } else {
                 $li.slideUp(function () {
-                    if (assessmentList.find('li[data-status]:visible').length == 0) {
+                    if (assessmentList.find('li[data-status]:visible').length === 0) {
                         emptyFilter.slideDown();
                     } else {
                         emptyFilter.slideUp();
