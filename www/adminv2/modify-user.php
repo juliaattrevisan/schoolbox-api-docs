@@ -9,7 +9,6 @@
  * '---''(_/--'  `-'\_)
  *
  */
-.
 if (is_numeric($this->arg[0])) {
     $url = $this->getDi()->get('router')->generate('adminUser.getModify', ['userId' => $this->arg[0]]);
 } else {
