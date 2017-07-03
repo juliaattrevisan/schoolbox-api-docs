@@ -39,8 +39,6 @@ class Loader
         $this->setUser($user);
         $this->setEpoch($epoch);
         $this->setSchool($school);
-
-        $keys['username'] = $_SESSION["user"]->getUsername();
     }
 
     /**
@@ -69,6 +67,16 @@ class Loader
         /* Leave it up to PTO to work out
          */
         return '*';
+    }
+
+    /**
+     * Generate hash for all the params
+     */
+    private function generateHash()
+    {
+        $ptoKey = \Config::get('pto_key');
+
+        return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$this->getEpoch()}{$ptoKey}");
     }
 
     /* Getters/Setters
