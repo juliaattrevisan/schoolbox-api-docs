@@ -222,16 +222,6 @@ function setPickerValue(pickerId, date) {
 
 }
 
-/**
- * Get picker value as a string
- *
- * @param {number} pickerId
- */
-function getPickerValue(pickerId) {
-    return $("#adtp-modal-" + pickerId).attr('data-datepicker-value');
-}
-
-
 function setCalendarAllDay(state, pickerId) {
 
     var $timeDiv = $('#pickerCalendar' + pickerId).closest('#adtp-modal-' + pickerId).find('.flatpickr-time');
