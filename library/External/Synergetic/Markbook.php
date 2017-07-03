@@ -9,7 +9,6 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -47,9 +46,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Returns the assessment information if found in remote system
      *
      * @param Activity $assessment
+     * @param int|null $year
+     * @param int|null $semester
      * @return array
      */
-    public function getAssessment(Activity $assessment)
+    public function getAssessment(Activity $assessment, $year = null, $semester = null)
     {
         $query = "SELECT FileType,
                         FileYear,
@@ -67,6 +68,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                   FROM StaffAssessmentMarkBook
                   WHERE HdgAbbrev2 = '" . $this->getMarkbookIdentifier($assessment) . "'";
 
+        if (!empty($year)) {
+            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+        }
+
+        if (!empty($semester)) {
+            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+        }
+
         return $this->getDatabase()->getAll($query);
     }
 
@@ -82,13 +91,43 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     }
 
     /**
-     * Creates a new assessment item in the markbook
-     *
-     * @param \Schoolbox\User
-     * @param Activity $assessment
-     * @return bool
+     * @inheritdoc
      */
-    public function createAssessment(Activity $assessment)
+    public function createOrUpdateAssessment(Activity $assessment, $year = null, $semester = null)
+    {
+        $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
+
+        $query = "
+            SELECT COUNT(*) AS result 
+            FROM StaffAssessmentMarkBook 
+            WHERE HdgAbbrev2 = '{$assessmentFieldValues["HdgAbbrev2"]}'
+        ";
+
+        if (!empty($year)) {
+            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+        }
+
+        if (!empty($semester)) {
+            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+        }
+
+        $result = $this->getDatabase()->getRow($query);
+
+        // If the markbook already exists, do an update
+
+        if ($result['result'] > 0) {
+            return $this->updateAssessment($assessment, $year, $semester);
+        }
+
+        // Otherwise create only
+
+        return $this->createAssessment($assessment, $year, $semester);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createAssessment(Activity $assessment, $year = null, $semester = null)
     {
         $result = false;
 
@@ -108,19 +147,26 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
-        $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
+        // If file year/semester were supplied, used them- otherwise go for the defaults
 
-        $resultType = null;
-        if (!empty($assessment->getType())) {
-            // Hydrate result type -_-
-            $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
-            $resultType = $workType->getExternalResultType();
-            if (!empty($resultType)) {
-                $resultType = $this->getDatabase()->quote($resultType);
-            }
+        if (!empty($year)) {
+            $fileYear = $year;
+        } else {
+            $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         }
-        if (empty($resultType)) {
+
+        if (!empty($semester)) {
+            $fileSemester = $semester;
+        } else {
+            $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
+        }
+
+        // Hydrate result type -_-
+        $workType   = SubmissionBox\WorkTypeMapper::getInstance()->findById($assessment->getType());
+        $resultType = $workType->getExternalResultType();
+        if (!empty($resultType)) {
+            $resultType = $this->getDatabase()->quote($resultType);
+        } else {
             $resultType = 'OGRaw';
         }
 
@@ -168,17 +214,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         return $result;
     }
 
-
     /**
-     * Updates an existing markbook assessment
-     *
-     * @param string
-     * @param Activity $assessment
-     * @return bool
+     * @inheritdoc
      */
-    public function updateAssessment(Activity $assessment)
+    public function updateAssessment(Activity $assessment, $year = null, $semester = null)
     {
         $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
+
         $query = "UPDATE StaffAssessmentMarkBook SET
                         Heading = '{$assessmentFieldValues["Heading"]}',
                         HdgAbbrev1 = '{$assessmentFieldValues["HdgAbbrev1"]}',
@@ -186,16 +228,26 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                   WHERE
                         HdgAbbrev2 = '{$assessmentFieldValues["HdgAbbrev2"]}'
                     ";
+
+        if (!empty($year)) {
+            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+        }
+
+        if (!empty($semester)) {
+            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+        }
+
         return $this->getDatabase()->query($query);
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function deleteAssessment(Activity $assessment)
+    public function deleteAssessment(Activity $assessment, $year = null, $semester = null)
     {
         $identifier = $this->getMarkbookIdentifier($assessment);
-        $queries[] = "
+
+        $query = "
             DELETE studentBook
             FROM StudentAssessmentMarkBook studentBook
             INNER JOIN StaffAssessmentMarkBook staffBook
@@ -207,11 +259,33 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 AND studentBook.ClassCode    = staffBook.ClassCode
             WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
         ";
-        $queries[] = "
+
+        if (!empty($year)) {
+            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+        }
+
+        if (!empty($semester)) {
+            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+        }
+
+        $queries[] = $query;
+
+        $query = "
             DELETE staffBook
             FROM StaffAssessmentMarkBook staffBook
             WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
         ";
+
+        if (!empty($year)) {
+            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+        }
+
+        if (!empty($semester)) {
+            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+        }
+
+        $queries[] = $query;
+
         foreach ($queries as $query) {
             $this->getDatabase()->query($query);
         }
@@ -238,20 +312,16 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         }
         return [
             'Heading' => $this->getDatabase()->quote($assessment->getName()),
-            'HdgAbbrev1' => $this->getDatabase()->quote(mb_substr($assessment->getName(), 0, 10, 'UTF-8')),
+            'HdgAbbrev1' => $this->getDatabase()->quote(TextFormatter::cutString($assessment->getName(), 10)),
             'HdgAbbrev2' => $this->getMarkbookIdentifier($assessment),
             'WeightingFactor' => $weight,
         ];
     }
 
     /**
-     * Creates or updates the mark for a student in the remote markbook
-     *
-     * @param QuizAttempt|ReturnedWork $result
-     * @return bool
-     * @throws Exception
+     * @inheritdoc
      */
-    public function setMark($result)
+    public function setMark($result, $year = null, $semester = null)
     {
         $activity = new Activity;
 
@@ -304,7 +374,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $assessmentRemoteList = $this->getAssessment($activity);
+        $assessmentRemoteList = $this->getAssessment($activity, $year, $semester);
 
         // If assessment box does not exist, create it first
 
@@ -356,6 +426,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                               ID = '" . $student->getExternalId() . "' AND
                               MarkBookSeq = '{$assessmentRemote['MarkBookSeq']}'
                          ";
+
+                    if (!empty($year)) {
+                        $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+                    }
+
+                    if (!empty($semester)) {
+                        $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+                    }
                 }
             } else if (isset($mark) || !empty($comment)) {
 

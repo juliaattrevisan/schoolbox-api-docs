@@ -1,8 +1,10 @@
 <?php
 /**
  * Provides the offline version of the MarkbookInterface
- * This is used by all connectors if it is not implemented.  The purpose is just to do nothing, because we have no
+ *
+ * This is used by all connectors if it is not implemented. The purpose is just to do nothing, because we have no
  * markbook to integrate with.
+ *
  * At the time of writing this is only implemented for Synergetic so this version will be used for all other systems
  *
  * @author      James Leckie <jleckie@alaress.com.au>
@@ -10,66 +12,53 @@
  */
 
 use \Schoolbox\Assessment\Activity;
-use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 
 class External_Offline_Markbook implements External_MarkbookInterface
 {
     /**
-     * Returns the assessment information if found in remote system
-     *
-     * @param Activity $assessment
-     * @return array
+     * @inheritdoc
      */
-    public function getAssessment(Activity $assessment)
+    public function getAssessment(Activity $assessment, $year = null, $semester = null)
     {
-        // NOOP
-        return array();
+        return [];
     }
 
     /**
-     * Creates a new assessment item in the markbook
-     *
-     * @param Activity $assessment
-     * @return array
+     * @inheritdoc
      */
-    public function createAssessment(Activity $assessment)
+    public function createOrUpdateAssessment(Activity $assessment, $year = null, $semester = null)
     {
-        // NOOP
-        return array();
+        return [];
     }
 
     /**
-     * Updates an existing markbook assessment
-     *
-     * @param Activity $assessment
-     * @return array
+     * @inheritdoc
      */
-    public function updateAssessment(Activity $assessment)
+    public function createAssessment(Activity $assessment, $year = null, $semester = null)
     {
-        // NOOP
-        return array();
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function updateAssessment(Activity $assessment, $year = null, $semester = null)
+    {
+        return [];
     }
 
     /**
      * @inheritDoc
      */
-    public function deleteAssessment(Activity $assessment)
+    public function deleteAssessment(Activity $assessment, $year = null, $semester = null)
     {
-        // NOOP
-        return false;
+        return [];
     }
 
     /**
-     * Creates or updates the mark for a student in the remote markbook
-     *
-     * @param ReturnedWork|QuizAttempt $returnedWork
-     * @return bool
+     * @inheritdoc
      */
-    public function setMark($returnedWork)
+    public function setMark($returnedWork, $year = null, $semester = null)
     {
-        // NOOP
-        return false;
     }
-
-} 
+}
