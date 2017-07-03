@@ -317,17 +317,17 @@
             <h2 class="subheader">Year Levels</h2>
             <p class="meta">Select the year levels you want included in the report</p>
 
-            {# Superusers get an additional option to only show records in which they are involved #}
+            {# Pastoral moderators get an additional option to only show records in which they are involved #}
 
             {% if moderator %}
                 <section>
                     <div class="small-12 columns content">
                         <div class="checklist">
                             <label>
-                                Super User / {{ locale.pastoral.proper }} Moderator Filter
+                                {{ locale.pastoral.proper }} Moderator Filter
                             </label>
                             <p class="meta">
-                                As you are logged in as either a superuser or {{ locale.pastoral }} moderator you have access to view all
+                                As you are logged in as a {{ locale.pastoral }} moderator you have access to view all
                                 records in the system. To filter the report to show only those incidents in which you are
                                 involved tick the checkbox below.
                             </p>

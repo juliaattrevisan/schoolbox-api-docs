@@ -230,7 +230,7 @@ class Controller extends Base
             array(
                 'template' => '@pastoralReportBuilder/modify.twig',
                 'data' => [
-                    'moderator'             => $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL),
+                    'moderator'             => $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0,
                     'years'                 => $this->userMapper->getYearLevels(),
                     'types'                 => $this->pastoralTypeMapper->findAll()->sortBy('name', 'asc'),
                     'severities'            => $severities,
