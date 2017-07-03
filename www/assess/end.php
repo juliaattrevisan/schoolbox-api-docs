@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
@@ -203,7 +204,13 @@ $visibility = new Visibility(Access::getInstance());
 
 /** @var \Schoolbox\User $currentUser */
 $currentUser = $_SESSION['user'];
-if ($visibility->isVisibleToUser($assessment, $currentUser, true)) {
+
+//var_dump($visibility->isVisibleToUser($assessment, $currentUser, true));
+//var_dump($assessment);
+var_dump($assessment->getMarkVisibility());
+//var_dump($assessment->getMarkVisibility() != 2);
+
+if ($visibility->isVisibleToUser($assessment, $currentUser, true) && $assessment->getMarkVisibility() != IAssessable::MARK_VISIBILITY_PRIVATE ) {
     $this->parse('has_marks_block', 'has_marks');
     $this->parse('view_attempt_block', 'view_attempt');
 
@@ -215,6 +222,7 @@ if ($visibility->isVisibleToUser($assessment, $currentUser, true)) {
         )
     );
 }
+
 
 $folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
 $folder    = $folderMap->findById($assess['category_id']);
@@ -229,6 +237,11 @@ if (isset($_GET["returnUrl"])) {
 } else {
     $url = sprintf('/learning/grades/%d/%s/%d', $_SESSION['id'], $term->getCode(), $folder->getId());
 }
+
+$variable = $this->template->getVars();
+
+//var_dump( array_keys ($variable));
+//var_dump ( $variable["contentTpl" ]);
 
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
@@ -247,3 +260,4 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => 'active'
     ],
 ]);
+
