@@ -82,7 +82,7 @@
 
 {% block grading %}
     <div class="small-12 column">
-        <form method="post" action="{{ routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant }) }}">
+        <form data-feedback-form method="post" action="{{ routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant }) }}">
 
             <input type="hidden" name="responseId" value="{{ response.id }}" />
 

@@ -126,8 +126,9 @@
             $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                var $form      = $(this).closest('form'),
-                    $actionBar = $form.find('[data-action-bar]');
+                var $participant = $(this).closest('[data-participant]'),
+                    $form      = $participant.find('[data-feedback-form]'),
+                    $actionBar = $participant.find('[data-action-bar]');
 
                 var $btnDrafted = $actionBar.find('[data-draft=drafted]'),
                     $btnPublish = $actionBar.find('[data-draft=publish]');
@@ -179,11 +180,11 @@
                     // on new feedback creation
                     $actionBar.attr('data-published', true);
 
-                    toast.call($form, 'Feedback published', true, false);
+                    toast.call($participant, 'Feedback published', true, false);
                     config.onPublishCallback();
 
                 }).fail(function (xhr) {
-                    toast.call($form, xhr.responseText, false, false);
+                    toast.call($participant, xhr.responseText, false, false);
                     $btnPublish.removeAttr('disabled').text(config.publishText);
 
                 }).always(function () {
@@ -213,7 +214,7 @@
         }
 
         /**
-         * Save Feedback contents upon blur
+         * Save Draft Feedback contents upon blur or after timeout
          */
         function doASaveActionNao() {
             // do a preval comparison to find out if we can skip AJAX
@@ -226,7 +227,9 @@
             // update the pre-value
             $this.data('preval', $this.val());
 
-            var $form = $this.closest('form');
+            var $participant = $this.closest('[data-participant]'),
+                $form        = $participant.find('[data-feedback-form]'),
+                $actionBar   = $participant.find('[data-action-bar]');
 
             var data = {
                 type: $form.attr('method'),
@@ -234,8 +237,8 @@
                 data: $form.serializeArray()
             };
 
-            $form.find('[data-draft]').attr('disabled', 'disabled');
-            $form.find('[data-draft="drafted"]').text('Saving...');
+            $actionBar.find('[data-draft]').attr('disabled', 'disabled');
+            $actionBar.find('[data-draft="drafted"]').text('Saving...');
 
             $(config.formSaveLabel).toastActivate({
                 text: 'Autosaving...'
@@ -243,20 +246,23 @@
 
             $.ajax($form.attr('action'), data)
                 .done(function () {
-                    toast.call($form, 'Draft saved', true, true);
-                    $form.find('[data-draft="drafted"]').text('Saved as draft');
+                    toast.call($participant, 'Draft saved', true, true);
+                    $actionBar.find('[data-draft="drafted"]').text('Saved as draft');
+
+                    // Show the action bar
+                    $actionBar.show();
 
                     // If this was just published and this is the first change afterwards - removing any info about being linked to a response & having attachments
-                    if ($form.find('[data-published="true"]').length) {
-                        $form.find('[data-feedback-attach-info]').html('');
-                        $form.find('[data-action-bar][data-published=true]').removeAttr('data-published');
+                    if ($actionBar.find('[data-published="true"]').length) {
+                        $actionBar.find('[data-feedback-attach-info]').html('');
+                        $actionBar.find('[data-published=true]').removeAttr('data-published');
                     }
                 })
                 .fail(function (xhr) {
-                    toast.call($form, xhr.responseText, false, false);
+                    toast.call($participant, xhr.responseText, false, false);
                 })
                 .always(function () {
-                    $form.find('[data-draft=publish]').removeAttr("disabled");
+                    $actionBar.find('[data-draft=publish]').removeAttr("disabled");
                 });
         }
 
