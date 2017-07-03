@@ -531,14 +531,16 @@
                                                         </div>
                                                     </div>
                                                     <nav>
-                                                        <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.getEmail() }}" title="Email {{ teacher.getEmail() }}"></a>
+                                                        {% if not teacher.email is empty %}
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.getEmail() }}" title="Email {{ teacher.getEmail() }}"></a>
+                                                        {% endif %}
                                                     </nav>
                                                 </li>
                                             {% endfor %}
                                         {% endfor %}
                                     </ul>
                                 </div>
-                                {% if session.user.getRole().isStaff() and config.mail_enable %}
+                                {% if session.user.getRole().isStaff() and config.mail_enable  %}
                                     <div class="component-action">
                                         <section>
                                             <form action="/mail/createMail.php" method="post">
