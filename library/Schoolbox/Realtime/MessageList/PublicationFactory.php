@@ -17,7 +17,7 @@ use Schoolbox\UserMapper;
 
 class PublicationFactory extends ListFactory implements IPublicationFactory
 {
-    /** @var MobileApp\ServiceManager */
+    /** @var MobileApp\IServiceManager */
     private $cloudManager;
 
     /** @var UserMapper */
@@ -27,16 +27,16 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
     private $mailer;
 
     /**
-     * @param string                   $instanceId
-     * @param ClientInterface          $redis
-     * @param MobileApp\ServiceManager $cloudManager
-     * @param UserMapper               $userMapper
-     * @param Mailer                   $mailer
+     * @param string                    $instanceId
+     * @param ClientInterface           $redis
+     * @param MobileApp\IServiceManager $cloudManager
+     * @param UserMapper                $userMapper
+     * @param Mailer                    $mailer
      */
     public function __construct(
         $instanceId,
         ClientInterface $redis,
-        MobileApp\ServiceManager $cloudManager,
+        MobileApp\IServiceManager $cloudManager,
         UserMapper $userMapper,
         Mailer $mailer
     ) {

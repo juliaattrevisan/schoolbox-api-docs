@@ -16,7 +16,7 @@ use OverflowException;
 use Psr\Log\LoggerInterface;
 use RangeException;
 
-class ServiceManager
+class ServiceManager implements IServiceManager
 {
 
     /** @var ServiceInterface[] */

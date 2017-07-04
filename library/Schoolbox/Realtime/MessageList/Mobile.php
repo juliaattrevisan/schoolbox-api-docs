@@ -16,7 +16,7 @@ use Schoolbox\MobileApp;
 
 class Mobile implements QueueInterface
 {
-    /** @var MobileApp\ServiceManager */
+    /** @var MobileApp\IServiceManager */
     private $cloudManager;
 
     /** @var int */
@@ -24,10 +24,10 @@ class Mobile implements QueueInterface
 
 
     /**
-     * @param MobileApp\ServiceManager $cloudManager
+     * @param MobileApp\IServiceManager $cloudManager
      * @param int                      $userId
      */
-    public function __construct(MobileApp\ServiceManager $cloudManager, $userId)
+    public function __construct(MobileApp\IServiceManager $cloudManager, $userId)
     {
         $this->cloudManager = $cloudManager;
         $this->userId       = $userId;
