@@ -338,8 +338,9 @@ class External_Humanedge_User implements External_UserInterface
             LEFT JOIN Campus c ON t.CampusID = c.ID
         ";
 
-        $queryDebug = "SELECT * FROM Campus";
-        new \Alaress_Probe($this->getDatabase()->getAll($queryDebug));
+//        $queryDebug = "SELECT * FROM PersonPhone";
+//        $queryDebug = "SELECT Distinct TABLE_NAME FROM information_schema.TABLES";
+//        new \Alaress_Probe($this->getDatabase()->getAll($queryDebug));
 
         return $this->getDatabase()->getAll($query);
     }
