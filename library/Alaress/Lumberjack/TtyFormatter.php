@@ -24,7 +24,9 @@ class TtyFormatter extends CliFormatter
     public function __construct($out, $porcelain = false, $outputContext = false)
     {
         parent::__construct($porcelain, $outputContext);
-        if (posix_isatty($out)) {
+
+        // yes I know using the @scream is bad, but I need warnings to *not* show up here if the given resource cannot be tty'd
+        if (@posix_isatty($out)) {
             try {
                 if (!getcwd()) {
                     // there's this bizarre quirk where SOMETIMES cwd might not be set
