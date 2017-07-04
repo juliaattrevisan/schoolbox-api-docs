@@ -313,7 +313,7 @@ class External_Humanedge_User implements External_UserInterface
     {
         $query = "
             SELECT      
-                t.ID AS StaffID,
+                t.PersonID AS StaffID,
                 t.Code AS SchoolStaffCode,
                 t.Title AS StaffTitle,
                     CASE WHEN (LEN(t.PreferredName)>0) 
