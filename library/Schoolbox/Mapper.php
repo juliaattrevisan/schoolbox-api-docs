@@ -2705,7 +2705,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function hasModel($model)
     {
-        if (!is_string($model) || !class_exists($model, true)) {
+        if (!is_string($model) || !(class_exists($model) || interface_exists($model))) {
             return false;
         }
         $this->model = $model;
