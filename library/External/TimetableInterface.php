@@ -61,35 +61,6 @@ interface External_TimetableInterface
      */
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null);
 
-    /**
-     * Return a user's timetable for a specific day
-     *
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
-     *
-     * Has the structure for each period
-     *
-     * periodName
-     * periodStart
-     * periodEnd
-     * periodNumber
-     * periodSequence
-     * description
-     * code
-     * room
-     * staffID
-     * staffTitle
-     * staffFirstname
-     * staffSurname
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param Schoolbox\Campus $campus
-     * @param $dayNumber
-     * @return mixed
-     */
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber);
-
 
     /**
      * Return a user's timetable for a specific date
