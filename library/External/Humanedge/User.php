@@ -337,6 +337,7 @@ class External_Humanedge_User implements External_UserInterface
             FROM Staff t
             LEFT JOIN Campus c ON t.CampusID = c.ID
             WHERE t.Deceased = 'N'
+            AND t.IsTeachingStaff = 'Y'
         ";
 
 //        $queryDebug = "SELECT * FROM PersonPhone";
