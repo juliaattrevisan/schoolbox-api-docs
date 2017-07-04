@@ -77,14 +77,11 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 $currentDate = date("Y-m-d", $currentTimestamp);
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                // Building the timetable is an expensive process,
-                // so only do when necessary, and only once for each day/campus
-                if (!isset($dayTimetable[$currentDate][$campusId])) {
-                    $dayTimetable[$currentDate][$campusId] = $this->buildTimetable($campus, $date);
-                }
+                $dayTimetable = $this->buildTimetable($campus, $date);
+
                 // Load events for this campus
-                if (isset($dayTimetable[$currentDate][$campusId])) {
-                    foreach ($dayTimetable[$currentDate][$campusId] as $period) {
+                if (isset($dayTimetable)) {
+                    foreach ($dayTimetable as $period) {
                         // Has this exact class code for this time been added?
                         // Don't add it again, but do add that it belongs to this campus.
                         if (isset($period['description'])) {
