@@ -216,7 +216,7 @@ HELP;
 
     foreach ($folderList as $folder) {
 
-        $action = str_pad("Processing folder: ", 36, " ");
+        $action = str_pad("Processing folder: ", 34, " ");
 
         if (!empty($folder->getCodeString())) {
 
@@ -316,7 +316,7 @@ HELP;
                         $mark = 'Unmarked';
                     }
 
-                    $name = str_pad("{$student['firstname']} {$student['lastname']}:", 22, " ");
+                    $name = str_pad("{$student['firstname']} {$student['lastname']}:", 26, " ");
                     $log->info("        {$name}{$mark}");
 
                     if (!$opts['dryRun']) {
