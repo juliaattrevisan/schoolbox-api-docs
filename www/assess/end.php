@@ -205,11 +205,6 @@ $visibility = new Visibility(Access::getInstance());
 /** @var \Schoolbox\User $currentUser */
 $currentUser = $_SESSION['user'];
 
-//var_dump($visibility->isVisibleToUser($assessment, $currentUser, true));
-//var_dump($assessment);
-var_dump($assessment->getMarkVisibility());
-//var_dump($assessment->getMarkVisibility() != 2);
-
 if ($visibility->isVisibleToUser($assessment, $currentUser, true) && $assessment->getMarkVisibility() != IAssessable::MARK_VISIBILITY_PRIVATE ) {
     $this->parse('has_marks_block', 'has_marks');
     $this->parse('view_attempt_block', 'view_attempt');
@@ -237,11 +232,6 @@ if (isset($_GET["returnUrl"])) {
 } else {
     $url = sprintf('/learning/grades/%d/%s/%d', $_SESSION['id'], $term->getCode(), $folder->getId());
 }
-
-$variable = $this->template->getVars();
-
-//var_dump( array_keys ($variable));
-//var_dump ( $variable["contentTpl" ]);
 
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
