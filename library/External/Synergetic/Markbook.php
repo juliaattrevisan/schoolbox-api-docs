@@ -612,8 +612,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     ID = :studentID
         ";
 
-        $statement = $this->getConnector()->prepareQuery($sql, $bindings);
-        return $statement->fetchColumn();
+        $query = $this->getConnector()->executeQuery($sql, $bindings);
+        return $query->fetchColumn();
     }
 
     /**
