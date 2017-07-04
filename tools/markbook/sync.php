@@ -293,15 +293,21 @@ HELP;
                         continue;
                     }
 
+                    // Create some fake user objects
+
+                    $owner = new User();
+                    $owner->setId($result[0]['owner']);
+
+                    $marker = new User();
+                    $marker->setId($result[0]['marker']);
+
                     // Pretending to be a mapper even though we don't have one yet
 
                     $return = new ReturnedWork();
                     $return->setSubmissionBox($submissionBox->getSubmissionBox());
                     $return->setNormalizedMark($result[0]['norm_mark']);
-                    $return->setMarker(new User);
-                    $return->getMarker()->setId($result[0]['marker']);
-                    $return->setOwner(new User);
-                    $return->getOwner()->setId($result[0]['owner']);
+                    $return->setMarker($marker);
+                    $return->setOwner($owner);
                     $return->setComment($result[0]['comment']);
 
                     $mark = $result[0]['norm_mark'];
