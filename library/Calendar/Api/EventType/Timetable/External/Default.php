@@ -186,11 +186,10 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
     protected function buildTimetable($campus, $day, $date = null)
     {
         try {
-            $timetable = $this->getExternalTimetable()->getDayTimetable(
+            $timetable = $this->getExternalTimetable()->getTimetableForDate(
                 $this->getUser()->getExternalId(),
                 $this->getUser()->getId(),
                 $campus,
-                $day,
                 $date
             );
         } catch (Schoolbox\External\Exception $e) {
