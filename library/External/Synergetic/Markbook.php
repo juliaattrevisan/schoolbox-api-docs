@@ -27,6 +27,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /** @var External_User */
     private $externalUser;
 
+    // These prefixes are prefixed on the "markbook abbeviated heading 2" to signify which table the ID which follows it relate to
+
+    // TODO: These sort of shenanigans will screw us- we should stop being lazy and track these links back to the immutable MarkbookSeq internally in Schoolbox
+
     const ASSESSMENT_PREFIX = 'Q-';
     const SUBMISSION_PREFIX = 'W-';
 
@@ -97,6 +101,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function getMarkbookIdentifier(Activity $assessment)
     {
+        // TODO: These sort of shenanigans can screw us- we should stop being lazy and track these links back to the immutable MarkbookSeq internally in Schoolbox
+
         return ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
     }
 
@@ -181,7 +187,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
         }
 
-        // Hydrate result type -_-
+        // Hydrate result type
+
         $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
         $resultType = $workType->getExternalResultType();
 
@@ -412,6 +419,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $dueDate = $quiz->getFinish();
 
         } else {
+
             throw new Exception('Unknown object passed');
         }
 
