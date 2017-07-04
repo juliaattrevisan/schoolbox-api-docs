@@ -68,7 +68,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
-        /** @var Calendar_Event_Type_Day[] $addedEvents */
+        /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
             foreach ($this->getUser()->getCampusCollection() as $campus) {
