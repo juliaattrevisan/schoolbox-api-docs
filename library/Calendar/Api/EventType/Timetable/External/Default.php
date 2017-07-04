@@ -73,10 +73,6 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         while ($currentTimestamp < $endTimestamp) {
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
-                $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
-                if ($dayNumber <= 0) {
-                    continue;
-                }
 
                 $currentDate = date("Y-m-d", $currentTimestamp);
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
