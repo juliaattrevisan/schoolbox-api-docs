@@ -83,12 +83,12 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
                 // Building the timetable is an expensive process,
                 // so only do when necessary, and only once for each day/campus
-                if (!isset($dayTimetable[$dayNumber][$campusId])) {
-                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campus, $dayNumber, $date);
+                if (!isset($dayTimetable[$currentDate][$campusId])) {
+                    $dayTimetable[$currentDate][$campusId] = $this->buildTimetable($campus, $date);
                 }
                 // Load events for this campus
-                if (isset($dayTimetable[$dayNumber][$campusId])) {
-                    foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
+                if (isset($dayTimetable[$currentDate][$campusId])) {
+                    foreach ($dayTimetable[$currentDate][$campusId] as $period) {
                         // Has this exact class code for this time been added?
                         // Don't add it again, but do add that it belongs to this campus.
                         if (isset($period['description'])) {
@@ -180,12 +180,11 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      * Builds the timetable for a given campus for a given day.
      *
      * @param \Schoolbox\Campus $campus
-     * @param int $day
      * @param Alaress_Date_Format $date
      *
      * @return array
      */
-    protected function buildTimetable($campus, $day, Alaress_Date_Format $date)
+    protected function buildTimetable($campus, Alaress_Date_Format $date)
     {
         try {
             $timetable = $this->getExternalTimetable()->getTimetableForDate(
