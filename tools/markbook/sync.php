@@ -251,7 +251,7 @@ HELP;
 
                 $action = str_pad("Submission Box:", 30, " ");
 
-                $log->info("\t{$action}{$submissionBox->getName()} ({$submissionBox->getId()})");
+                $log->info("    {$action}{$submissionBox->getName()} ({$submissionBox->getId()})");
 
                 // Check if we are allowed to create new markbook entries
 
@@ -260,7 +260,7 @@ HELP;
                     // Creation allowed
 
                     $action = str_pad("Action:", 30, " ");
-                    $log->info("\t{$action}Create/Update");
+                    $log->info("    {$action}Create/Update");
 
                     if (!$opts['dryRun']) {
                         $markbookExternal->createOrUpdateAssessment($submissionBox, $year, $semester);
@@ -271,7 +271,7 @@ HELP;
                     // No creation of new assessments in markbook is allowed
 
                     $action = str_pad("Action:", 30, " ");
-                    $log->info("\t{$action}Update Only");
+                    $log->info("    {$action}Update Only");
 
                     if (!$opts['dryRun']) {
                         $markbookExternal->updateAssessment($submissionBox, $year, $semester);
@@ -283,7 +283,7 @@ HELP;
                 $action = str_pad("Students Found:", 30, " ");
 
                 $classList = $markbookHandler->getStudentListByBoxId($submissionBox->getId());
-                $log->info("\t{$action}" . count($classList));
+                $log->info("    {$action}" . count($classList));
 
                 /** @var User $student */
                 foreach ($classList as $student) {
@@ -306,7 +306,7 @@ HELP;
                     $return->setComment($result[0]['comment']);
 
                     $name = str_pad("{$student['firstname']} {$student['lastname']}:", 22, " ");
-                    $log->info("\t\t{$name}{$result[0]['norm_mark']}");
+                    $log->info("        {$name}{$result[0]['norm_mark']}");
 
                     if (!$opts['dryRun']) {
                         $markbookExternal->setMark($return, $year, $semester);
@@ -336,7 +336,7 @@ HELP;
 
                 $action = str_pad("Quiz: ", 30, " ");
 
-                $log->info("\t{$action}{$quiz->getTitle()} ({$quiz->getId()})");
+                $log->info("    {$action}{$quiz->getTitle()} ({$quiz->getId()})");
 
                 $markbook = $markbookExternal->getAssessment($activity, $year, $semester);
 
@@ -344,7 +344,7 @@ HELP;
 
                     $action = str_pad("Updating assessment:", 30, " ");
 
-                    $log->info("\t{$action}{$activity->getName()}");
+                    $log->info("    {$action}{$activity->getName()}");
 
                     if (!$opts['dryRun']) {
                         $markbookExternal->updateAssessment($activity, $year, $semester);
@@ -354,7 +354,7 @@ HELP;
 
                     $action = str_pad("Creating assessment:", 30, " ");
 
-                    $log->info("\t{$action}{$activity->getName()}");
+                    $log->info("    {$action}{$activity->getName()}");
 
                     if (!$opts['dryRun']) {
                         $markbookExternal->createAssessment($activity, $year, $semester);
@@ -373,7 +373,7 @@ HELP;
                 $action = str_pad("Students Found:", 30, " ");
 
                 $classList = $attemptMapper->getAllAttempts($quiz->getId(), array('most_recent' => true));
-                $log->info("\t{$action}" . count($classList));
+                $log->info("    {$action}" . count($classList));
 
                 foreach ($classList as $studentID => $result) {
 
