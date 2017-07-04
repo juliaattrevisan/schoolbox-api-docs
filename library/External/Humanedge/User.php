@@ -325,13 +325,14 @@ class External_Humanedge_User implements External_UserInterface
                 t.Email AS StaffOccupEmail,
                 '' AS StaffExtension,
                 t.CampusID AS StaffCampusDescription,
-                t.Position AS StaffCategory,
+                '' AS StaffCategory,
                 '' AS StaffCategoryType,
                 t.Mobile AS StaffDefaultMobilePhone,
                 '' AS StaffVoiceMail,
                 t.TeachingDepartment AS StaffDepartmentDescription,
                 '' AS StaffJobPositionStartDate,
                 '' AS StaffJobPositionEndDate,
+                t.Position AS JobPositionDescription,
                 '' AS JobPositionDescriptionAlternate
             FROM Staff t
         ";
@@ -339,7 +340,7 @@ class External_Humanedge_User implements External_UserInterface
 //        $query = "SELECT TOP 100 * FROM Staff";
         $rows = $this->getDatabase()->getAll($query);
 
-        new \Alaress_Probe($rows);
+//        new \Alaress_Probe($rows);
 
         return $rows;
     }
