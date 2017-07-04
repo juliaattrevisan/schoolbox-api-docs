@@ -30,6 +30,11 @@ class Model implements IColumnType {
 
             $model = $mapper->createModel();
 
+            if (!$model) {
+                // the model failed to instantiate, so return null accordingly
+                return null;
+            }
+
             // Figure out the identifier property to set on the model.
             $id_property = $this->getIdentifierProperty();
 
