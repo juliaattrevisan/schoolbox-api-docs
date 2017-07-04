@@ -85,9 +85,10 @@ class ServiceManager implements IServiceManager
     protected function pushToService(ServiceInterface $service, $tokens, $data, $unreadCount = 0)
     {
         $provider = $service->getProviderName();
+        $appId    = $service->getAppIdentifier();
 
         try {
-            $this->log->info("Sending data to " . count($tokens) . " $provider devices");
+            $this->log->info(sprintf('Sending data to %d device%s on "%s" (%s)', count($tokens), count($tokens) === 1 ? '' : 's', $appId, $provider));
             $service->send($tokens, $data, $unreadCount);
 
         } catch (OutOfBoundsException $e) {
