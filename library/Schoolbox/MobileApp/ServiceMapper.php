@@ -14,7 +14,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage;
 use ZendService\Apple\Apns;
 
 
@@ -110,7 +110,7 @@ class ServiceMapper extends Mapper
 
         switch ($provider) {
             case Registry::PROVIDER_APPLE:
-                /** @var IStorage $storageObj */
+                /** @var Storage\Model $storageObj */
                 $storageObj = $this->hydrateJoin($row, 'cert', 'cert');
 
                 return new Cloud\Apple\APNS($rm, $appId,Apns\Client\Message::PRODUCTION_URI, $this->getPemPath($storageObj), $key);
@@ -140,9 +140,9 @@ class ServiceMapper extends Mapper
     /**
      * Return the path APNS should use for the PEM file held by the given storage object
      *
-     * @param IStorage $storage
+     * @param Storage\Model $storage
      */
-    private function getPemPath(IStorage $storage)
+    private function getPemPath(Storage\Model $storage)
     {
         $hash = $storage->getHash();
 
