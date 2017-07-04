@@ -336,15 +336,11 @@ class Controller extends BaseController
      */
     public function testPush($userId = null)
     {
-        /** @var IConfigLoader $conf */
-        $conf = $this->getDi()->get('config');
-
         $write = fopen('php://memory', 'r+');
 
         $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);
 
-        $factory = new MobileApp\ServiceManagerFactory($conf, $log, MobileApp\RegistryMapper::getInstance());
-        $cloudManager = $factory->build([ MobileApp\Registry::PROVIDER_APPLE, MobileApp\Registry::PROVIDER_GOOGLE ]);
+        $cloudManager = new MobileApp\ServiceManager($log, MobileApp\RegistryMapper::getInstance());
 
         $redis = Redis::getClientInstance();
         $keys  = $redis->keys('msg*:m:*');

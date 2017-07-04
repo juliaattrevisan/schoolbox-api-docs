@@ -17,7 +17,6 @@ use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\MobileApp;
 use Schoolbox\MobileApp\RegistryMapper;
-use Schoolbox\MobileApp\ServiceManagerFactory;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
@@ -80,7 +79,7 @@ class WorkerFactory
     public function build(LoopInterface $loop, $instanceId)
     {
         // set list factory dependencies
-        $cloudManager = (new ServiceManagerFactory($this->conf, $this->log, $this->registryMapper))->build([ MobileApp\Registry::PROVIDER_APPLE, MobileApp\Registry::PROVIDER_GOOGLE ]);
+        $cloudManager = new MobileApp\ServiceManager($this->log, $this->registryMapper);
 
         // factory for configuring instant emails
         $twigFactory = new TwigEmailFactory(new CoreContext($this->conf), $this->log);
