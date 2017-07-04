@@ -13,6 +13,7 @@ namespace Schoolbox\Realtime\Schedule;
 use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
+use Alaress\Async\Broker\PayloadMissingException;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\IClock;
@@ -114,6 +115,18 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     public function onException(\Exception $e)
     {
+        if ($e instanceof PayloadMissingException) {
+            $this->log->warning("Could not schedule: {$e->getMessage()}. Dropping message.");
+
+            try {
+                // drop the message
+                $e->getResolver()->acknowledge();
+            } catch (DuplicateResolutionException $e) {
+                // do nothing, this message was just double broken.
+            }
+            return;
+        }
+
         $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()));
         // we need the daemon to crash if there's a database issue
         if ($e instanceof PDOException || $e instanceof External\Exception) {
