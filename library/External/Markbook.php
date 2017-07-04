@@ -100,9 +100,11 @@ class External_Markbook implements External_MarkbookInterface
 
     /**
      * @param External_Offline_Markbook $offline
+     * @return self
      */
-    public function setOffline(External_Offline_Markbook $offline)
+    public function setOffline($offline)
     {
         $this->offline = $offline;
+        return $this;
     }
 }

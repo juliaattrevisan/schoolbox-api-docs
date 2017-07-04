@@ -9,25 +9,22 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
 class External_Synergetic_Markbook implements External_MarkbookInterface
 {
+    use External_MssqlConnector;
+    use External_Synergetic_ValidateExternalIdTrait;
     use External_Synergetic_ValidateExternalIdTrait;
 
-    /**
-     * @var MSSQL
-     */
-    private $database;
-
-    /**
-     * @var External_User
-     */
+    /** @var External_User */
     private $externalUser;
 
     const ASSESSMENT_PREFIX = 'Q-';
@@ -38,7 +35,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
+
+        $this->setupDatabase();
         $this->setExternalUser(new External_User);
     }
 
@@ -52,31 +51,42 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function getAssessment(Activity $assessment, $year = null, $semester = null)
     {
-        $query = "SELECT FileType,
-                        FileYear,
-                        FileSemester,
-                        StaffID,
-                        ClassCampus,
-                        ClassCode,
-                        MarkBookSeq,
-                        Heading,
-                        HdgAbbrev1,
-                        HdgAbbrev2,
-                        ResultType,
-                        MarkOutOf,
-                        WeightingFactor
-                  FROM StaffAssessmentMarkBook
-                  WHERE HdgAbbrev2 = '" . $this->getMarkbookIdentifier($assessment) . "'";
+        $bindings = [
+            'markbookIdentifier' => $this->getMarkbookIdentifier($assessment)
+        ];
+
+        // TODO: Using HdgAbbrev2 is stupid- this can be modified by users in Synergetic. This should be modified to use MarkBookSeq which is immutable.
+
+        $sql = "
+            SELECT    FileType,
+                      FileYear,
+                      FileSemester,
+                      StaffID,
+                      ClassCampus,
+                      ClassCode,
+                      MarkBookSeq,
+                      Heading,
+                      HdgAbbrev1,
+                      HdgAbbrev2,
+                      ResultType,
+                      MarkOutOf,
+                      WeightingFactor
+            FROM      StaffAssessmentMarkBook
+            WHERE     HdgAbbrev2 = :markbookIdentifier
+        ";
 
         if (!empty($year)) {
-            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+            $sql .= " AND FileYear = :fileYear";
+            $bindings['fileYear'] = $year;
         }
 
         if (!empty($semester)) {
-            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+            $sql .= " AND FileSemester = :fileSemester";
+            $bindings['fileSemester'] = $semester;
         }
 
-        return $this->getDatabase()->getAll($query);
+        $statement = $this->getConnector()->executeQuery($sql, $bindings);
+        return $statement->fetchAll();
     }
 
     /**
@@ -97,25 +107,31 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     {
         $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
 
-        $query = "
-            SELECT COUNT(*) AS result 
-            FROM StaffAssessmentMarkBook 
-            WHERE HdgAbbrev2 = '{$assessmentFieldValues["HdgAbbrev2"]}'
+        $bindings = [
+            'markbookIdentifier' => $assessmentFieldValues["HdgAbbrev2"]
+        ];
+
+        $sql = "
+            SELECT    COUNT(*) AS result 
+            FROM      StaffAssessmentMarkBook 
+            WHERE     HdgAbbrev2 = :markbookIdentifier
         ";
 
         if (!empty($year)) {
-            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+            $sql .= " AND FileYear = :fileYear";
+            $bindings['fileYear'] = $year;
         }
 
         if (!empty($semester)) {
-            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+            $sql .= " AND FileSemester = :fileSemester";
+            $bindings['fileSemester'] = $semester;
         }
 
-        $result = $this->getDatabase()->getRow($query);
+        $statement = $this->getConnector()->executeQuery($sql, $bindings);
 
         // If the markbook already exists, do an update
 
-        if ($result['result'] > 0) {
+        if ($statement->fetch()) {
             return $this->updateAssessment($assessment, $year, $semester);
         }
 
@@ -129,20 +145,24 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function createAssessment(Activity $assessment, $year = null, $semester = null)
     {
+        /** @var bool $result */
         $result = false;
 
         /** Fix the hydrations */
         $folder = $assessment->getCategory();
+
         /** @var int $folderId */
         $folderId = $folder instanceof Folder ? $folder->getId() : $folder;
         $folder = FolderMapper::getInstance()->findById($folderId);
 
         $externalClass = new External_Synergetic_Class();
+
         if ($assessment->getOwner() instanceof Schoolbox\User) {
             $owner = $assessment->getOwner();
         } else {
             $owner = UserMapper::getInstance()->findById($assessment->getOwner());
         }
+
         if (!$this->isExternalIdValid($owner->getExternalId())) {
             return false;
         }
@@ -162,14 +182,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         }
 
         // Hydrate result type -_-
-        $workType   = SubmissionBox\WorkTypeMapper::getInstance()->findById($assessment->getType());
+        $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
         $resultType = $workType->getExternalResultType();
-        if (!empty($resultType)) {
-            $resultType = $this->getDatabase()->quote($resultType);
-        } else {
+
+        if (empty($resultType)) {
             $resultType = 'OGRaw';
         }
 
+        /** @var FolderCode $classCode */
         foreach ($folder->getCodes() as $classCode) {
 
             $class = $externalClass->getClass($classCode->getCode(), $owner);
@@ -178,36 +198,54 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $staffID = $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
 
                 $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
-                $query = "INSERT INTO StaffAssessmentMarkBook (
-                            FileType,
-                            FileYear,
-                            FileSemester,
-                            StaffID,
-                            ClassCampus,
-                            ClassCode,
-                            MarkBookSeq,
-                            Heading,
-                            HdgAbbrev1,
-                            HdgAbbrev2,
-                            ResultType,
-                            MarkOutOf,
-                            WeightingFactor
-                        ) VALUES (
-                          '{$class['FileType']}',
-                          '{$fileYear}',
-                          '{$fileSemester}',
-                          '{$staffID}',
-                          '{$class['ClassCampus']}',
-                          '{$class['ClassCode']}',
-                          '',
-                          '{$assessmentFieldValues["Heading"]}',
-                          '{$assessmentFieldValues["HdgAbbrev1"]}',
-                          '{$assessmentFieldValues["HdgAbbrev2"]}',
-                          '{$resultType}',
-                          '100',
-                          '{$assessmentFieldValues["WeightingFactor"]}'
-                        )";
-                $result = $this->getDatabase()->query($query);
+
+                $sql = "
+                    INSERT INTO StaffAssessmentMarkBook (
+                        FileType,
+                        FileYear,
+                        FileSemester,
+                        StaffID,
+                        ClassCampus,
+                        ClassCode,
+                        MarkBookSeq,
+                        Heading,
+                        HdgAbbrev1,
+                        HdgAbbrev2,
+                        ResultType,
+                        MarkOutOf,
+                        WeightingFactor
+                    ) VALUES (
+                        :fileType,
+                        :fileYear,
+                        :fileSemester,
+                        :staffID,
+                        :classCampus,
+                        :classCode,
+                        '',
+                        :heading,
+                        :headingAbbreviation1,
+                        :headingAbbreviation2,
+                        :resultType,
+                        '100',
+                        :weightingFactor
+                    )
+                ";
+
+                $statement = $this->getConnector()->prepareQuery($sql, [
+                    'fileType' => $class['FileType'],
+                    'fileYear' => $fileYear,
+                    'fileSemester' => $fileSemester,
+                    'staffID' => $staffID,
+                    'classCampus' => $class['ClassCampus'],
+                    'classCode' => $class['ClassCode'],
+                    'heading' => $assessmentFieldValues["Heading"],
+                    'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
+                    'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
+                    'resultType' => $resultType,
+                    'weightingFactor' => $assessmentFieldValues["WeightingFactor"]
+                ]);
+
+                $result = $statement->execute();
             }
         }
 
@@ -221,23 +259,34 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     {
         $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
 
-        $query = "UPDATE StaffAssessmentMarkBook SET
-                        Heading = '{$assessmentFieldValues["Heading"]}',
-                        HdgAbbrev1 = '{$assessmentFieldValues["HdgAbbrev1"]}',
-                        WeightingFactor = '{$assessmentFieldValues["WeightingFactor"]}'
-                  WHERE
-                        HdgAbbrev2 = '{$assessmentFieldValues["HdgAbbrev2"]}'
-                    ";
+        $bindings = [
+            'heading' => $assessmentFieldValues["Heading"],
+            'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
+            'headingAbbreviation2' => $assessmentFieldValues["HdgAbbrev2"],
+            'weightingFactor' => $assessmentFieldValues["WeightingFactor"]
+        ];
+
+        $sql = "
+            UPDATE  StaffAssessmentMarkBook 
+            SET     Heading = :heading,
+                    HdgAbbrev1 = :headingAbbreviation1,
+                    WeightingFactor = :weightingFactor
+            WHERE   HdgAbbrev2 = :headingAbbreviation2
+        ";
 
         if (!empty($year)) {
-            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+            $sql .= " AND FileYear = :fileYear";
+            $bindings['fileYear'] = $year;
         }
 
         if (!empty($semester)) {
-            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+            $sql .= " AND FileSemester = :fileSemester";
+            $bindings['fileSemester'] = $semester;
         }
 
-        return $this->getDatabase()->query($query);
+        $statement = $this->getConnector()->prepareQuery($sql, $bindings);
+
+        return $statement->execute();
     }
 
     /**
@@ -245,9 +294,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function deleteAssessment(Activity $assessment, $year = null, $semester = null)
     {
-        $identifier = $this->getMarkbookIdentifier($assessment);
+        $bindings = [
+            'headingAbbreviation2' => $this->getMarkbookIdentifier($assessment),
+        ];
 
-        $query = "
+        $sql = "
             DELETE studentBook
             FROM StudentAssessmentMarkBook studentBook
             INNER JOIN StaffAssessmentMarkBook staffBook
@@ -257,38 +308,32 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 AND studentBook.FileSemester = staffBook.FileSemester
                 AND studentBook.ClassCampus  = staffBook.ClassCampus
                 AND studentBook.ClassCode    = staffBook.ClassCode
-            WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
+            WHERE staffBook.HdgAbbrev2 = :headingAbbreviation2
         ";
 
         if (!empty($year)) {
-            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
+            $sql .= " AND FileYear = :fileYear";
+            $bindings['fileYear'] = $year;
         }
 
         if (!empty($semester)) {
-            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
+            $sql .= " AND FileSemester = :fileSemester";
+            $bindings['fileSemester'] = $semester;
         }
 
-        $queries[] = $query;
+        $this->getConnector()->executeQuery($sql, $bindings);
 
-        $query = "
+        $bindings = [
+            'headingAbbreviation2' => $this->getMarkbookIdentifier($assessment),
+        ];
+
+        $sql = "
             DELETE staffBook
             FROM StaffAssessmentMarkBook staffBook
-            WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
+            WHERE staffBook.HdgAbbrev2 = :headingAbbreviation2
         ";
 
-        if (!empty($year)) {
-            $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
-        }
-
-        if (!empty($semester)) {
-            $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
-        }
-
-        $queries[] = $query;
-
-        foreach ($queries as $query) {
-            $this->getDatabase()->query($query);
-        }
+        $this->getConnector()->executeQuery($sql, $bindings);
     }
 
     /**
@@ -310,9 +355,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         } elseif ($assessment->getAssessment() instanceof Quiz) {
             $weight = $assessment->getAssessment()->getWeight();
         }
+
         return [
-            'Heading' => $this->getDatabase()->quote($assessment->getName()),
-            'HdgAbbrev1' => $this->getDatabase()->quote(mb_substr($assessment->getName(), 0, 10, 'UTF-8')),
+            'Heading' => $assessment->getName(),
+            'HdgAbbrev1' => mb_substr($assessment->getName(), 0, 10, 'UTF-8'),
             'HdgAbbrev2' => $this->getMarkbookIdentifier($assessment),
             'WeightingFactor' => $weight,
         ];
@@ -368,6 +414,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         } else {
             throw new Exception('Unknown object passed');
         }
+
         $activity->setOwner($student);
 
         if (!($this->isExternalIdValid($student->getExternalId()) && $this->isExternalIdValid($marker->getExternalId()))) {
@@ -383,102 +430,139 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $assessmentRemoteList = $this->getAssessment($activity);
         }
 
-        $success = true;
+        $result = true;
 
         foreach ($assessmentRemoteList as $assessmentRemote) {
 
             if ($this->doesMarkExist($assessmentRemote['FileType'],
-                $assessmentRemote['FileYear'],
-                $assessmentRemote['FileSemester'],
-                $assessmentRemote['ClassCampus'],
-                $assessmentRemote['ClassCode'],
-                $assessmentRemote['MarkBookSeq'],
-                $student->getExternalId())
+                    $assessmentRemote['FileYear'],
+                    $assessmentRemote['FileSemester'],
+                    $assessmentRemote['ClassCampus'],
+                    $assessmentRemote['ClassCode'],
+                    $assessmentRemote['MarkBookSeq'],
+                    $student->getExternalId())
             ) {
-                if (isset($mark) || !empty($comment)) {
-
-                    if (isset($mark)) {
-                        $mark = round($mark);
-                    }
-
-                    $query = "UPDATE StudentAssessmentMarkBook SET
-                            Result = '{$mark}',
-                            TopicComment = '" . $this->getDatabase()->quote($comment) . "'
-                          WHERE
-                              FileType = '{$assessmentRemote['FileType']}' AND
-                              FileYear = '{$assessmentRemote['FileYear']}' AND
-                              FileSemester = '{$assessmentRemote['FileSemester']}' AND
-                              ClassCampus = '{$assessmentRemote['ClassCampus']}' AND
-                              ClassCode = '{$assessmentRemote['ClassCode']}' AND
-                              ID = '" . $student->getExternalId() . "' AND
-                              MarkBookSeq = '{$assessmentRemote['MarkBookSeq']}'
-                         ";
-
-                } else {
-
-                    $query = "DELETE FROM StudentAssessmentMarkBook
-                          WHERE
-                              FileType = '{$assessmentRemote['FileType']}' AND
-                              FileYear = '{$assessmentRemote['FileYear']}' AND
-                              FileSemester = '{$assessmentRemote['FileSemester']}' AND
-                              ClassCampus = '{$assessmentRemote['ClassCampus']}' AND
-                              ClassCode = '{$assessmentRemote['ClassCode']}' AND
-                              ID = '" . $student->getExternalId() . "' AND
-                              MarkBookSeq = '{$assessmentRemote['MarkBookSeq']}'
-                         ";
-
-                    if (!empty($year)) {
-                        $query .= " AND FileYear = '{$this->getDatabase()->quote($year)}'";
-                    }
-
-                    if (!empty($semester)) {
-                        $query .= " AND FileSemester = '{$this->getDatabase()->quote($semester)}'";
-                    }
-                }
-            } else if (isset($mark) || !empty($comment)) {
-
                 if (isset($mark)) {
                     $mark = round($mark);
                 }
 
-                $query = "INSERT INTO StudentAssessmentMarkBook (
-                              FileType,
-                              FileYear,
-                              FileSemester,
-                              ClassCampus,
-                              ClassCode,
-                              ID,
-                              StaffID,
-                              MarkBookSeq,
-                              Result,
-                              TopicComment,
-                              ResultDate,
-                              ModifiedByID,
-                              ModifiedDate
-                              ) VALUES (
-                                '{$assessmentRemote['FileType']}',
-                                '{$assessmentRemote['FileYear']}',
-                                '{$assessmentRemote['FileSemester']}',
-                                '{$assessmentRemote['ClassCampus']}',
-                                '{$assessmentRemote['ClassCode']}',
-                                '" . $student->getExternalId() . "',
-                                '0',
-                                '{$assessmentRemote['MarkBookSeq']}',
-                                '{$mark}',
-                                '" . $this->getDatabase()->quote($comment) . "',
-                                CONVERT(datetime, '" . $this->getDatabase()->quote($dueDate->getDatabase()) . "', 20),
-                                '" . $marker->getExternalId() . "',
-                                CURRENT_TIMESTAMP
-                              )
+                if (isset($mark) || !empty($comment)) {
+
+                    $bindings = [
+                        'mark' => $mark,
+                        'topicComment' => $comment,
+                        'fileType' => $assessmentRemote['FileType'],
+                        'fileYear' => $assessmentRemote['FileYear'],
+                        'fileSemester' => $assessmentRemote['FileSemester'],
+                        'classCampus' => $assessmentRemote['ClassCampus'],
+                        'classCode' => $assessmentRemote['ClassCode'],
+                        'ID' => $student->getExternalId(),
+                        'markbookSeq' => $assessmentRemote['MarkBookSeq'],
+                    ];
+
+                    $sql = "
+                        UPDATE  StudentAssessmentMarkBook 
+                        SET     Result = :mark,
+                                TopicComment = :topicComment
+                        WHERE   FileType = :fileType AND
+                                FileYear = :fileYear AND
+                                FileSemester = :fileSemester AND
+                                ClassCampus = :classCampus AND
+                                ClassCode = :classCode AND
+                                ID = :ID AND
+                                MarkBookSeq = :markbookSeq
+                    ";
+
+                } else {
+
+                    $bindings = [
+                        'fileType' => $assessmentRemote['FileType'],
+                        'fileYear' => $assessmentRemote['FileYear'],
+                        'fileSemester' => $assessmentRemote['FileSemester'],
+                        'classCampus' => $assessmentRemote['ClassCampus'],
+                        'classCode' => $assessmentRemote['ClassCode'],
+                        'ID' => $student->getExternalId(),
+                        'markbookSeq' => $assessmentRemote['MarkBookSeq'],
+                    ];
+
+                    $sql = "
+                        DELETE FROM StudentAssessmentMarkBook
+                        WHERE       FileType = :fileType AND
+                                    FileYear = :fileYear AND
+                                    FileSemester = :fileSemester AND
+                                    ClassCampus = :classCampus AND
+                                    ClassCode = :classCode AND
+                                    ID = :ID AND
+                                    MarkBookSeq = :markbookSeq
+                    ";
+
+                    if (!empty($year)) {
+                        $sql .= " AND FileYear = :fileYear";
+                        $bindings['fileYear'] = $year;
+                    }
+
+                    if (!empty($semester)) {
+                        $sql .= " AND FileSemester = :fileSemester";
+                        $bindings['fileSemester'] = $semester;
+                    }
+                }
+
+            } else if (isset($mark) || !empty($comment)) {
+
+                $bindings = [
+                    'fileType' => $assessmentRemote['FileType'],
+                    'fileYear' => $assessmentRemote['FileYear'],
+                    'fileSemester' => $assessmentRemote['FileSemester'],
+                    'classCampus' => $assessmentRemote['ClassCampus'],
+                    'classCode' => $assessmentRemote['ClassCode'],
+                    'externalID' => $student->getExternalId(),
+                    'markbookSeq' => $assessmentRemote['MarkBookSeq'],
+                    'mark' => $mark,
+                    'topicComment' => $comment,
+                    'resultDate' => $dueDate,
+                    'markerExternalId' => $marker->getExternalId()
+                ];
+
+                $sql = "
+                    INSERT INTO StudentAssessmentMarkBook (
+                        FileType,
+                        FileYear,
+                        FileSemester,
+                        ClassCampus,
+                        ClassCode,
+                        ID,
+                        StaffID,
+                        MarkBookSeq,
+                        Result,
+                        TopicComment,
+                        ResultDate,
+                        ModifiedByID,
+                        ModifiedDate
+                    ) VALUES (
+                        :fileType,
+                        :fileYear,
+                        :fileSemester,
+                        :classCampus,
+                        :classCode,
+                        :externalID,
+                        '0',
+                        :markbookSeq,
+                        :mark,
+                        :topicComment,
+                        :resultDate,
+                        :markerExternalId,
+                        CURRENT_TIMESTAMP
+                    )
                 ";
             }
 
-            if (isset($query)) {
-                $success = $this->getDatabase()->query($query);
+            if (isset($sql) && isset($bindings)) {
+                $statement = $this->getConnector()->prepareQuery($sql, $bindings);
+                $result = $statement->execute();
             }
         }
 
-        return $success;
+        return $result;
     }
 
     /**
@@ -499,36 +583,30 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $query = "SELECT COUNT(*) as result
-                    FROM StudentAssessmentMarkBook
-                    WHERE
-                        FileType = '{$fileType}' AND
-                        FileYear = '{$fileYear}' AND
-                        FileSemester = '{$fileSemester}' AND
-                        ClassCampus = '{$classCampus}' AND
-                        ClassCode = '{$classCode}' AND
-                        MarkBookSeq = '{$assessmentID}' AND
-                        ID = '{$studentID}'
-                 ";
+        $bindings = [
+            'fileType' => $fileType,
+            'fileYear' => $fileYear,
+            'fileSemester' => $fileSemester,
+            'classCampus' => $classCampus,
+            'classCode' => $classCode,
+            'markbookSeq' => $assessmentID,
+            'studentID' => $studentID
+        ];
 
-        $result = $this->getDatabase()->getRow($query);
-        return $result['result'] > 0;
-    }
+        $sql = "
+            SELECT  COUNT(*) AS result
+            FROM    StudentAssessmentMarkBook
+            WHERE   FileType = :fileType AND
+                    FileYear = :fileYear AND
+                    FileSemester = :fileSemester AND
+                    ClassCampus = :classCampus AND
+                    ClassCode = :classCode AND
+                    MarkBookSeq = :markbookSeq AND
+                    ID = :studentID
+        ";
 
-    /**
-     * @param MSSQL $database
-     */
-    public function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    public function getDatabase()
-    {
-        return $this->database;
+        $statement = $this->getConnector()->prepareQuery($sql, $bindings);
+        return $statement->fetchColumn();
     }
 
     /**
