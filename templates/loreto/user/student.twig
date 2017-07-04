@@ -41,6 +41,19 @@
 {% endif %}
 {% endblock details_houseCoord %}
 
+{% block details_coach %}
+    {% if studentCoach %}
+        <dt class="small-12 medium-3">Coach:</dt>
+        <dd class="small-12 medium-9">
+            {% if studentCoach.getId() %}
+                <a href="{{ session.mailhandle }}{{ studentCoach.getEmail() }}">{{ studentCoach.formatName() }}</a>
+            {% else %}
+                {{ studentCoach.formatName() }}
+            {% endif %}
+        </dd>
+    {% endif %}
+{% endblock details_coach %}
+
 {% block details_tutorGroup %}
 {% if showClasses %}
     {% if externalUser.StudentTutorDescription %}
