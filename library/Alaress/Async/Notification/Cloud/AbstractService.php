@@ -32,15 +32,20 @@ abstract class AbstractService implements ServiceInterface
     /** @var RegistryMapper */
     private $registryMapper;
 
+    /** @var string */
+    private $appIdentifier;
+
 
     /**
      * AbstractService constructor.
      *
      * @param RegistryMapper $registryMapper
+     * @param string         $appIdentifier
      */
-    public function __construct(RegistryMapper $registryMapper)
+    public function __construct(RegistryMapper $registryMapper, $appIdentifier)
     {
         $this->registryMapper = $registryMapper;
+        $this->appIdentifier = $appIdentifier;
         $this->decorator = new Decorator();
     }
 
@@ -66,6 +71,15 @@ abstract class AbstractService implements ServiceInterface
             $this->setLog(new Logger(null));
         }
         return $this->log;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getAppIdentifier()
+    {
+        return $this->appIdentifier;
     }
 
 
