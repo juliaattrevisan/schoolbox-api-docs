@@ -342,6 +342,7 @@ class Controller extends BaseController
 
         $cloudManager = new MobileApp\ServiceManager($log, MobileApp\RegistryMapper::getInstance());
 
+        // just grab... anything
         $redis = Redis::getClientInstance();
         $keys  = $redis->keys('msg*:m:*');
         $data  = $redis->get($keys[1]);
