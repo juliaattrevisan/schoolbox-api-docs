@@ -116,4 +116,13 @@ interface IStorage
      * @return resource file stream
      */
     public function readStream();
+
+    /**
+     * Pipe the content of this file to the given resource handle.
+     * Returns the number of bytes written.
+     *
+     * @param resource $to
+     * @return int
+     */
+    public function pipe($to);
 } 
