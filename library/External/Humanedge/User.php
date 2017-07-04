@@ -311,7 +311,37 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        return [];
+        $query = "
+            SELECT      
+                t.ID AS StaffID,
+                t.Code AS SchoolStaffCode,
+                t.Title AS StaffTitle,
+                    CASE WHEN (LEN(t.PreferredName)>0) 
+                    THEN t.PreferredName 
+                    ELSE t.FirstName END 
+                    AS StaffPreferredName,
+                t.LastName AS StaffSurname,
+                t.PhoneHome AS StaffOccupPhone,
+                t.Email AS StaffOccupEmail,
+                '' AS StaffExtension,
+                t.CampusID AS StaffCampusDescription,
+                t.Position AS StaffCategory,
+                '' AS StaffCategoryType,
+                t.Mobile AS StaffDefaultMobilePhone,
+                '' AS StaffVoiceMail,
+                t.TeachingDepartment AS StaffDepartmentDescription,
+                '' AS StaffJobPositionStartDate,
+                '' AS StaffJobPositionEndDate,
+                '' AS JobPositionDescriptionAlternate
+            FROM Staff t
+        ";
+
+//        $query = "SELECT TOP 100 * FROM Staff";
+        $rows = $this->getDatabase()->getAll($query);
+
+        new \Alaress_Probe($rows);
+
+        return $rows;
     }
 
     /**
