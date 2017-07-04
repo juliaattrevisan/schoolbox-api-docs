@@ -20,7 +20,6 @@ class SubmissionReturn extends DeprecatedModel
         parent::__construct();
     }
 
-
     /**
      * @deprecated
      *
@@ -29,14 +28,21 @@ class SubmissionReturn extends DeprecatedModel
      */
     function getByBoxID($box_id)
     {
-        $query = "SELECT r.*,user.title, user.firstname, user.lastname, user.id AS uid, username, user.synergy_id, user.group_id, local_email, alt_email
-                  FROM ( `" . $this->_table . "` r,  user)
-                  WHERE r.deleted_at IS NULL
-                  AND r.published_at IS NOT NULL
-                  AND user.id = r.owner 
-                  AND box_id = " . $this->db->smartQuote($box_id) . " 
-                  AND user.deleted_at IS NULL
-                  ORDER BY lastname, firstname DESC ";
+        $query = "SELECT DISTINCT   user.title, 
+                                    user.firstname, 
+                                    user.lastname, 
+                                    user.id AS uid, 
+                                    user.synergy_id, 
+                                    user.group_id 
+                  FROM              `" . $this->_table . "` r
+                  JOIN              user ON user.id = r.owner
+                  WHERE             r.deleted_at IS NULL AND
+                                    r.published_at IS NOT NULL AND
+                                    box_id = " . $this->db->smartQuote($box_id) . " AND 
+                                    user.deleted_at IS NULL
+                  ORDER BY          lastname, 
+                                    firstname DESC ";
+
         return $this->db->getAll($query);
     }
 
@@ -53,7 +59,7 @@ class SubmissionReturn extends DeprecatedModel
         $allReturns  = $this->getByBoxID($boxId);
         if (is_array($allReturns)) {
             foreach ($allReturns as $return) {
-                $studentList[$return['uid']] = array(
+                $studentList[] = array(
                     'title'      => $return['title'],
                     'firstname'  => $return['firstname'],
                     'lastname'   => $return['lastname'],

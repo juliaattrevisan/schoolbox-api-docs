@@ -408,7 +408,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $student = UserMapper::getInstance()->findById($result->getUser()->getId());
             $marker = $activity->getAssessment()->getUser();
 
-            // TODO Some old handler action needs to be deprecated
+            // TODO: Some old handler action needs to be deprecated
 
             $evAttempt = new Assess_Attempt();
             $total = $evAttempt->getTotalMarks($result->getQuiz()->getId(), $result->getId());
@@ -526,7 +526,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     'markbookSeq' => $assessmentRemote['MarkBookSeq'],
                     'mark' => $mark,
                     'topicComment' => $comment,
-                    'resultDate' => $dueDate,
+                    'resultDate' => $dueDate->getDatabase(),
                     'markerExternalId' => $marker->getExternalId()
                 ];
 

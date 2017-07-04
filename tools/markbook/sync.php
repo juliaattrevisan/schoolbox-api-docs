@@ -280,7 +280,7 @@ HELP;
 
                 // Retrieve the class list for the submission box
 
-                $action = str_pad("Students Found:", 30, " ");
+                $action = str_pad("Submission Returns Found:", 30, " ");
 
                 $classList = $markbookHandler->getStudentListByBoxId($submissionBox->getId());
                 $log->info("    {$action}" . count($classList));
@@ -305,8 +305,14 @@ HELP;
                     $return->getOwner()->setId($result[0]['owner']);
                     $return->setComment($result[0]['comment']);
 
+                    $mark = $result[0]['norm_mark'];
+
+                    if (empty($mark)) {
+                        $mark = 'Unmarked';
+                    }
+
                     $name = str_pad("{$student['firstname']} {$student['lastname']}:", 22, " ");
-                    $log->info("        {$name}{$result[0]['norm_mark']}");
+                    $log->info("        {$name}{$mark}");
 
                     if (!$opts['dryRun']) {
                         $markbookExternal->setMark($return, $year, $semester);
