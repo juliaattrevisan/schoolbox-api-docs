@@ -12,15 +12,16 @@ namespace Schoolbox\MobileApp;
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 use InvalidArgumentException;
 use OutOfBoundsException;
-use OverflowException;
 use Psr\Log\LoggerInterface;
 use RangeException;
+use Schoolbox\Collection;
 
+/**
+ * Class ServiceManager
+ * @package Schoolbox\MobileApp
+ */
 class ServiceManager implements IServiceManager
 {
-
-    /** @var ServiceInterface[] */
-    protected $services = array();
 
     /** @var RegistryMapper */
     protected $registryMapper;
@@ -30,55 +31,13 @@ class ServiceManager implements IServiceManager
 
 
     /**
-     * @param ServiceInterface[] $services
      * @param RegistryMapper     $registryMapper
      * @param LoggerInterface    $log
      */
-    public function __construct(array $services, LoggerInterface $log, RegistryMapper $registryMapper = null)
+    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper)
     {
-        $this->registryMapper = $registryMapper ?: RegistryMapper::getInstance();
+        $this->registryMapper = $registryMapper;
         $this->log = $log;
-
-        foreach ($services as $service) {
-            // ensure typesafety
-            $this->addService($service);
-        }
-    }
-
-
-    /**
-     * @param ServiceInterface $service
-     * @return self
-     */
-    public function addService(ServiceInterface $service)
-    {
-        $provider = $service->getProviderName();
-
-        // can't set it more than once
-        if (array_key_exists($provider, $this->services)) {
-            throw new OverflowException("Cannot redeclare service '$provider'.");
-        }
-
-        // apply our logger to this server
-        $service->setLog($this->log);
-
-        // index by provider name
-        $this->services[$provider] = $service;
-        $this->log->debug("Added cloud notification provider '$provider'");
-        return $this;
-    }
-
-
-    /**
-     * You should only do this if a service cannot be used, eg. the API key in config is invalid.
-     *
-     * @param string $provider
-     */
-    protected function dropService($provider) {
-        if (array_key_exists($provider, $this->services)) {
-            $this->services[$provider] = null;
-            $this->log->debug("Dropped cloud notification provider '$provider'");
-        }
     }
 
 
@@ -88,13 +47,9 @@ class ServiceManager implements IServiceManager
      */
     public function push($userId, $data)
     {
-        if (count($this->services) == 0) {
-            return;
-        }
+        $registrations = $this->registryMapper->findByColumn('user_id', $userId);
 
-        $registered = $this->registryMapper->findByColumn('user_id', $userId)->groupBy('provider');
-
-        if (count($registered) == 0) {
+        if (count($registrations) === 0) {
             $this->log->notice("Received push for user $userId, but they have no devices registered");
             return;
         }
@@ -102,15 +57,20 @@ class ServiceManager implements IServiceManager
         // TODO retrieve the list of unread messages for this user - until SA-359 is complete, this is not possible...
         $unreadCount = 1;
 
-        foreach ($registered as $provider => $registries) {
+        foreach ($this->findRegistrationsByUser($userId) as $appId => $appRegistrations) {
+            // TODO verify that this doesn't repeat work in CLI context
+            $service = ServiceMapper::getInstance()->findById($appId);
+            $tokens  = $appRegistrations->getColumnValues('token');
+
+            // ensure the log is set
+            $service->setLog($this->log);
+
             try {
-                $service = $this->getService($provider);
-                $tokens  = $registries->getColumnValues('token');
                 $this->pushToService($service, $tokens, $data, $unreadCount);
 
             } catch (InvalidArgumentException $e) {
                 // service not available
-                $this->log->notice("Failed push to '$provider': {$e->getMessage()}", [ $e ]);
+                $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ $e ]);
             }
         }
     }
@@ -132,8 +92,7 @@ class ServiceManager implements IServiceManager
 
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use
-            $this->dropService($provider);
-            $this->log->warning("Dropping unusable service '$provider': {$e->getMessage()}", [ $e ]);
+            $this->log->warning("Service '{$service->getProviderName()}' unusable: {$e->getMessage()}", [ $e ]);
 
         } catch (RangeException $e) {
             // TODO implement backoff-and-retry.
@@ -144,17 +103,16 @@ class ServiceManager implements IServiceManager
 
 
     /**
-     * @param string $providerName
-     * @throws InvalidArgumentException
-     * @return ServiceInterface
+     * @param int $userId
+     * @return Collection|Collection[]|Registry[][]
      */
-    protected function getService($providerName)
+    private function findRegistrationsByUser($userId)
     {
-        if (isset($this->services[$providerName])) {
-            return $this->services[$providerName];
-        }
+        $registrations = RegistryMapper::getInstance()->findByColumn('user_id', 6);
 
-        throw new InvalidArgumentException("Provider '$providerName' not available.");
+        return $registrations->groupByCallback(function (Registry $registration) {
+            return $registration->getService()->getAppIdentifier();
+        });
     }
 
 }
