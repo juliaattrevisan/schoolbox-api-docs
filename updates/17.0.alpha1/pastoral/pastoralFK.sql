@@ -1,3 +1,4 @@
+-- Pastoral record FKs
 DELETE pastoral FROM pastoral
   LEFT JOIN user ON user.id = pastoral.student_id
 WHERE user.id is null;
@@ -5,7 +6,6 @@ WHERE user.id is null;
 ALTER TABLE `pastoral`
   CHANGE COLUMN `owner_id` `owner_id` INT(11) UNSIGNED NULL DEFAULT NULL ,
   CHANGE COLUMN `student_id` `student_id` INT(11) UNSIGNED NOT NULL ;
-
 
 ALTER TABLE `pastoral`
   ADD CONSTRAINT `fk_pastoral_student_id`
@@ -43,6 +43,7 @@ REFERENCES `lu_pastoral_category` (`id`)
   ON UPDATE NO ACTION;
 
 
+-- Pastoral access FKs
 ALTER TABLE `pastoral_access`
   CHANGE COLUMN `role_id` `role_id` INT(11) UNSIGNED NULL DEFAULT NULL ,
   CHANGE COLUMN `user_id` `user_id` INT(11) UNSIGNED NULL DEFAULT NULL ;
@@ -89,6 +90,8 @@ REFERENCES `pastoral_group` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+-- Pastoral group FKs
 ALTER TABLE `pastoral_group`
   CHANGE COLUMN `name` `name` VARCHAR(255) CHARACTER SET 'utf8mb4' NOT NULL ,
   CHANGE COLUMN `user_id` `user_id` INT(11) UNSIGNED NOT NULL ;
@@ -106,6 +109,8 @@ REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+-- Pastoral group member FKs
 ALTER TABLE `pastoral_group_member`
   CHANGE COLUMN `user_id` `user_id` INT(11) UNSIGNED NOT NULL ,
   CHANGE COLUMN `group_id` `group_id` INT(11) NOT NULL,
@@ -145,6 +150,7 @@ REFERENCES `user` (`id`)
   ON UPDATE NO ACTION;
 
 
+-- Pastoral comment FKs
 ALTER TABLE `pastoral_comment`
   CHANGE COLUMN `owner_id` `owner_id` INT(11) UNSIGNED NOT NULL ;
 
@@ -161,6 +167,8 @@ REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+-- Pastoral category lookup FKs
 UPDATE lu_pastoral_category
   LEFT JOIN lu_pastoral_type ON lu_pastoral_type.id = lu_pastoral_category.pastoral_type_id
 SET lu_pastoral_category.pastoral_type_id = NULL
@@ -175,6 +183,8 @@ REFERENCES `lu_pastoral_type` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+-- Pastoral type lookup FKs
 UPDATE lu_pastoral_type
   LEFT JOIN lu_pastoral_document_classification ON lu_pastoral_document_classification.id = lu_pastoral_type.pastoral_document_classification_id
 SET lu_pastoral_type.pastoral_document_classification_id = NULL
