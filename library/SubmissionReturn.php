@@ -53,7 +53,7 @@ class SubmissionReturn extends DeprecatedModel
         $allReturns  = $this->getByBoxID($boxId);
         if (is_array($allReturns)) {
             foreach ($allReturns as $return) {
-                $studentList[] = array(
+                $studentList[$return['uid']] = array(
                     'title'      => $return['title'],
                     'firstname'  => $return['firstname'],
                     'lastname'   => $return['lastname'],
@@ -63,6 +63,7 @@ class SubmissionReturn extends DeprecatedModel
                 );
             }
         }
+
         return $studentList;
     }
 
