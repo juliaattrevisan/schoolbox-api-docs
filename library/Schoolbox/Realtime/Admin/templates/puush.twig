@@ -26,18 +26,20 @@
                     <th>User</th>
                     <th>App Token</th>
                     <th>Device</th>
+                    <th>App</th>
                     <th>Created</th>
                     <th>Last Used</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for reg in registry %}
+                {% for registration in registry %}
                     <tr>
-                        <td><a href="{{ routeLookup('adminMessages.testPush', { userId: reg.user.id }) }}">{{ reg.user.formatName }}</a></td>
-                        <td><span class="tkn" title="{{ reg.token }}">{{ reg.token }}</span></td>
-                        <td><span class="tkn" title="{{ reg.deviceId }}">{{ reg.deviceId }}</span> ({{ reg.provider }})</td>
-                        <td title="{{ reg.createdAt.database }}">{{ reg.createdAt.local }}</td>
-                        <td title="{{ reg.touchedAt.database }}">{{ reg.touchedAt.local }}</td>
+                        <td><a href="{{ routeLookup('adminMessages.testPush', { userId: registration.user.id }) }}">{{ registration.user.formatName }}</a></td>
+                        <td><span class="tkn" title="{{ registration.token }}">{{ registration.token }}</span></td>
+                        <td><span class="tkn" title="{{ registration.deviceId }}">{{ registration.deviceId }}</span></td>
+                        <td><span class="tkn" title="{{ registration.service.appIdentifier }}">{{ registration.service.appIdentifier }}</span> ({{ registration.service.providerName }})</td>
+                        <td title="{{ registration.createdAt.database }}">{{ registration.createdAt.local }}</td>
+                        <td title="{{ registration.touchedAt.database }}">{{ registration.touchedAt.local }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
