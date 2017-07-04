@@ -314,6 +314,8 @@ HELP;
 
                     if (empty($mark)) {
                         $mark = 'Unmarked';
+                    } else {
+                        $mark = round($mark);
                     }
 
                     $name = str_pad("{$student['firstname']} {$student['lastname']}:", 26, " ");
