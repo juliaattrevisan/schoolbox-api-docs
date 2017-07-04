@@ -47,7 +47,6 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             return $stack;
         }
 
-        $dayTimetable     = array();
         $currentTimestamp = $startTimestamp;
 
         // Colors come from the timetable color mapper.
