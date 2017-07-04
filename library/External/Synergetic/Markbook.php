@@ -433,13 +433,29 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // If assessment box does not exist, create it first
 
         if (!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1) {
-            $this->createAssessment($activity);
+            $this->createAssessment($activity, $year, $semester);
             $assessmentRemoteList = $this->getAssessment($activity);
         }
 
         $result = true;
 
         foreach ($assessmentRemoteList as $assessmentRemote) {
+
+            if (!empty($year)) {
+                $fileYear = $year;
+            } else {
+                $fileYear = $assessmentRemote['FileYear'];
+            }
+
+            if (!empty($semester)) {
+                $fileSemester = $semester;
+            } else {
+                $fileSemester = $assessmentRemote['FileSemester'];
+            }
+
+            if (isset($mark)) {
+                $mark = round($mark);
+            }
 
             if ($this->doesMarkExist($assessmentRemote['FileType'],
                     $assessmentRemote['FileYear'],
@@ -449,9 +465,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     $assessmentRemote['MarkBookSeq'],
                     $student->getExternalId())
             ) {
-                if (isset($mark)) {
-                    $mark = round($mark);
-                }
 
                 if (isset($mark) || !empty($comment)) {
 
@@ -459,8 +472,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         'mark' => $mark,
                         'topicComment' => $comment,
                         'fileType' => $assessmentRemote['FileType'],
-                        'fileYear' => $assessmentRemote['FileYear'],
-                        'fileSemester' => $assessmentRemote['FileSemester'],
+                        'fileYear' => $fileYear,
+                        'fileSemester' => $fileSemester,
                         'classCampus' => $assessmentRemote['ClassCampus'],
                         'classCode' => $assessmentRemote['ClassCode'],
                         'ID' => $student->getExternalId(),
@@ -484,8 +497,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
                     $bindings = [
                         'fileType' => $assessmentRemote['FileType'],
-                        'fileYear' => $assessmentRemote['FileYear'],
-                        'fileSemester' => $assessmentRemote['FileSemester'],
+                        'fileYear' => $fileYear,
+                        'fileSemester' => $fileSemester,
                         'classCampus' => $assessmentRemote['ClassCampus'],
                         'classCode' => $assessmentRemote['ClassCode'],
                         'ID' => $student->getExternalId(),
@@ -518,8 +531,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
                 $bindings = [
                     'fileType' => $assessmentRemote['FileType'],
-                    'fileYear' => $assessmentRemote['FileYear'],
-                    'fileSemester' => $assessmentRemote['FileSemester'],
+                    'fileYear' => $fileYear,
+                    'fileSemester' => $fileSemester,
                     'classCampus' => $assessmentRemote['ClassCampus'],
                     'classCode' => $assessmentRemote['ClassCode'],
                     'externalID' => $student->getExternalId(),

@@ -30,12 +30,13 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 
 // Get command line options
 
-$options = getopt('p::h', array('start::', 'end::', 'year::', 'semester::', 'update-only', 'dry-run'));
+$options = getopt('p::h::help', array('start::', 'end::', 'year::', 'semester::', 'update-only', 'dry-run'));
 
 // Setup kernel
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Markbook Syncrhonisation Tool', [
     'verbose'  => [true, true, true, true],
+    'help' => isset($options['h']) || isset($options['help']) ? true : false,
     'parentId' => isset($options['p']) ? $options['p'] : 0,
     'year' => isset($options['year']) ? $options['year'] : false,
     'semester' => isset($options['semester']) ? $options['semester'] : false,
@@ -91,21 +92,19 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
 // Display help if requested
 
-    if (isset($options['h'])) {
+    if ($opts['help']) {
         echo <<<HELP
     
 Syncs existing markbook data from Schoolbox into remote system
 
-Usage: sync.php -p[folderID] [--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
-    -p:                  the ID of parent folder to start the traversal, defaults to 0 
-    --year               Synergetic FileYear into which to export the markbook, format --year=2016 (must be used with semester parameter)
-    --semester           Synergetic FileSemester into which to export the markbook, --semester=1 (must be used with year parameter)
-    --start              work due after this date, format --start=2016-04-20, defaults to current semester
-    --end                work due before this date, format --end=2016-08-15, defualts to current semester
-    --dry-run:           if set, don't actually update anything, but show what
-                         would be updated.
-    --update-only:       if set, will not create any new items in the remote system, only
-                         updates existing settings
+Usage: sync.php -p=[folderID] [--year=yyyy] [--semester=s] [--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
+    -p=xxx               the ID of parent folder to start the traversal, defaults to 0, format --p=237 
+    --year=yyyy          Synergetic FileYear into which to export the markbook, format --year=2016 (must be used with semester parameter)
+    --semester=s         Synergetic FileSemester into which to export the markbook, --semester=1 (must be used with year parameter)
+    --start=yyyy-mm-dd   work due after this date, format --start=2016-04-20, defaults to current semester
+    --end=yyyy-mm-dd     work due before this date, format --end=2016-08-15, defualts to current semester
+    --dry-run:           if set, don't actually update anything, but show what would be updated.
+    --update-only:       if set, will not create any new items in the remote system, only updates existing settings
                          
 
 HELP;
