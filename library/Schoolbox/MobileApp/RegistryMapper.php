@@ -10,9 +10,11 @@
 namespace Schoolbox\MobileApp;
 
 
+use Alaress\Async\Notification\Cloud\ServiceInterface;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -20,6 +22,7 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\MobileApp
  * @method Collection|Registry[] findAll($options = [])
+ * @method Collection|Registry[] findByColumn($columnName, $columnValue, $options = array())
  * @method Registry hydrate(array $row, $alias = '', $callback = null)
  */
 class RegistryMapper extends Mapper
@@ -38,11 +41,10 @@ class RegistryMapper extends Mapper
 
         $this->uses('app_token',  self::TYPE_STRING, null, 'token');
         $this->uses('device_id',  self::TYPE_STRING);
-        $this->uses('provider',   self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('touched_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
 
-        $this->joins('app_id', AppMapper::class, 'app_id', null, null, 'app', 'app');
+        $this->joins('app_id', ServiceMapper::class, 'app_id', null, null, 'service', 'service');
     }
 
 
@@ -66,6 +68,7 @@ class RegistryMapper extends Mapper
     /**
      * Return the first part of the string required to select from this mapper
      *
+     * @throws \Schoolbox\Mapper\DefinitionException
      * @return string
      */
     public function getSelectString()
@@ -73,8 +76,8 @@ class RegistryMapper extends Mapper
         return "
             SELECT {$this->getColumnString()},
             {$this->getJoinColumnString('user_id', 'u')},
-            {$this->getJoinColumnString('app', 'a')},
-            {$this->getJoinMapper('app')->getJoinColumnString('pem', 'p')}
+            {$this->getJoinColumnString('service', 's')},
+            {$this->getJoinMapper('service')->getJoinColumnString('cert', 'cert')}
         ";
     }
 
@@ -83,14 +86,15 @@ class RegistryMapper extends Mapper
      * It seems we're going down this road...
      * To prevent cataclysmic backward-incompatibility, in the core, the FROM is absorbed into the SELECT... for now...
      *
+     * @throws Mapper\DefinitionException
      * @return string
      */
     public function getFromString()
     {
         return "
             FROM {$this->table}
-            LEFT JOIN {$this->getJoinSql('app', '', 'a')}
-            LEFT JOIN {$this->getJoinMapper('app')->getJoinSql('pem', 'a', 'p')}
+            LEFT JOIN {$this->getJoinSql('service', '', 's')}
+            LEFT JOIN {$this->getJoinMapper('service')->getJoinSql('cert', 's', 'cert')}
             LEFT JOIN {$this->getJoinSql('user_id', '', 'u', true)}
         ";
     }
@@ -105,8 +109,15 @@ class RegistryMapper extends Mapper
         $c = new Collection();
 
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            /** @var ServiceInterface $service */
+            $service = $this->hydrateJoin($r, 'service', 's');
+
+            /** @var User $user */
+            $user = $this->hydrateJoin($r, 'user_id', 'u');
+
             $reg = $this->hydrate($r);
-            $reg->setUser($this->hydrateJoin($r, 'user_id', 'u'));
+            $reg->setUser($user);
+            $reg->setService($service);
 
             $c->add($reg);
         }
