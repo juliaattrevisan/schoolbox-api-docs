@@ -336,7 +336,7 @@ class Controller extends BaseController
      */
     public function testPush($userId = null)
     {
-        $write = fopen('php://memory', 'r+');
+        $write = fopen('php://memory', 'rb+');
 
         $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);
 
@@ -365,45 +365,12 @@ class Controller extends BaseController
             $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll([ 'order' => [ 'user_id' => 'asc' ] ]);
         }
 
-        $log->warning("-- END --");
+        $log->warning('-- END --');
         rewind($write);
 
         $content['data']['logs'] = explode("\n", trim(stream_get_contents($write)));
 
         $this->getResponse()->content->set($content);
     }
-
-
-    /**
-     * @param string $hashInStorage
-     * @return bool
-     */
-    function _apnsCertRequiresUpdate($hashInStorage)
-    {
-        $tempCert = $this->_getTempCertFilename();
-
-        if (!is_readable($tempCert)) {
-            return true;
-        }
-        if (!filesize($tempCert)) {
-            return true;
-        }
-        if (sha1_file($tempCert) != $hashInStorage) {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * @return string
-     */
-    function _getTempCertFilename()
-    {
-        return sys_get_temp_dir() . '/sbapns.pem';
-    }
-
-
 
 }
