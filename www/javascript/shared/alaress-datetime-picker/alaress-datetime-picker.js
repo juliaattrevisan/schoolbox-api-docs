@@ -496,20 +496,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             // AJAX in the modal contents if they haven't already been loaded
             $modal.load('/picker/datetime/type/' + options.type + '/element/' + element.attr('id') + '/id/' + pickerId + '/value/' + encodeURIComponent(originalValue.format(momentFormats.database)), function () {
 
-                // Capture open of modal
-                $(document).on('opened.fndtn.reveal', '#adtp-modal-' + pickerId, function () {
-
-                    // Check and refresh visibility of time and allDaySwitch state
-                    // Hide time picker if allday hidden field is set to 1
-                    if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 1) {
-                        setCalendarAllDay(true, pickerId);
-                    }
-                    else if (options.allDayInput !== false && $('#' + options.allDayInput).val() == 0) {
-                        setCalendarAllDay(false, pickerId);
-                    }
-
-                });
-
                 // Capture closure of modal
                 $(document).on('closed.fndtn.reveal', '#adtp-modal-' + pickerId, function () {
                     // Open back the parent modal, if any
