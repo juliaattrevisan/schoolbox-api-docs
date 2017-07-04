@@ -324,7 +324,7 @@ class External_Humanedge_User implements External_UserInterface
                 t.PhoneHome AS StaffOccupPhone,
                 t.Email AS StaffOccupEmail,
                 '' AS StaffExtension,
-                t.CampusID AS StaffCampusDescription,
+                c.Name AS StaffCampusDescription,
                 '' AS StaffCategory,
                 '' AS StaffCategoryType,
                 t.Mobile AS StaffDefaultMobilePhone,
@@ -335,14 +335,13 @@ class External_Humanedge_User implements External_UserInterface
                 t.Position AS JobPositionDescription,
                 '' AS JobPositionDescriptionAlternate
             FROM Staff t
+            LEFT JOIN Campus c ON t.CampusID = c.ID
         ";
 
-//        $query = "SELECT TOP 100 * FROM Staff";
-        $rows = $this->getDatabase()->getAll($query);
+        $queryDebug = "SELECT * FROM Campus";
+        new \Alaress_Probe($this->getDatabase()->getAll($queryDebug));
 
-//        new \Alaress_Probe($rows);
-
-        return $rows;
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
