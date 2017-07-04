@@ -381,6 +381,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
             // Handle submission box result
 
+            // TODO: Someone with a better understanding of learning needs to kill this deprecated function call
+
             $box = SubmissionBoxMapper::getInstance()->findById($result->getSubmissionBox()->getId());
             $activity->setSubmissionBox($box);
             $activity->setCategory($box->getCategory());
@@ -453,7 +455,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $fileSemester = $assessmentRemote['FileSemester'];
             }
 
-            if (isset($mark)) {
+            if (isset($mark) && is_numeric($mark)) {
                 $mark = round($mark);
             }
 
