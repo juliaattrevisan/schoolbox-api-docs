@@ -78,12 +78,13 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                     continue;
                 }
 
-                $currentDate =  date("Y-m-d", $currentTimestamp);
+                $currentDate = date("Y-m-d", $currentTimestamp);
+                $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
                 // Building the timetable is an expensive process,
                 // so only do when necessary, and only once for each day/campus
                 if (!isset($dayTimetable[$dayNumber][$campusId])) {
-                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campus, $dayNumber, $currentDate);
+                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campus, $dayNumber, $date);
                 }
                 // Load events for this campus
                 if (isset($dayTimetable[$dayNumber][$campusId])) {
@@ -180,10 +181,11 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      *
      * @param \Schoolbox\Campus $campus
      * @param int $day
+     * @param Alaress_Date_Format $date
      *
      * @return array
      */
-    protected function buildTimetable($campus, $day, $date = null)
+    protected function buildTimetable($campus, $day, Alaress_Date_Format $date)
     {
         try {
             $timetable = $this->getExternalTimetable()->getTimetableForDate(
