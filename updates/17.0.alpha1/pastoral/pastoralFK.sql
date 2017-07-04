@@ -28,6 +28,11 @@ REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+UPDATE pastoral
+  LEFT JOIN lu_pastoral_category ON lu_pastoral_category.id = pastoral.category_id
+  SET pastoral.category_id = NULL
+WHERE lu_pastoral_category.id IS NULL;
+
 ALTER TABLE `pastoral`
   ADD INDEX `fk_pastoral_category_id_idx` (`category_id` ASC);
 ALTER TABLE `pastoral`
