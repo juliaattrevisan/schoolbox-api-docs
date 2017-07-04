@@ -1,0 +1,66 @@
+{# Permissions #}
+{% set isSuperuser = session.user.isSuperUser() %}
+{% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
+{% set isSelf = session.user.getId() == user.getId() %}
+{% set isParent = session.user.getRole().isParent() %}
+
+{# details: show to SU + staff + self, or other parents if externalUser.DirectoryIncludeFlag #}
+{% set showDetails = isSuperuser or isStaff or isSelf or(isParent and externalUser.DirectoryIncludeFlag) %}
+{# emails: staff may view emails #}
+{% set showEmail = showDetails or isStaff %}
+{% set showButtons = isStaff or isSelf %}
+{% set showTitle = user.hasPositionTitle() %}
+
+<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ user.formatName() }}</h1>
+        </div>
+    </div>
+    <nav>
+        {% if routeLookupIfAuthorized('adminUser.getModify') %}
+            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User"></a>
+        {% endif %}
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="profile content">
+                <div class="row no-margin">
+                    <div class="small-12 medium-2 columns no-pad">
+                        <img class="full-width" src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=constrain200"/>
+                    </div>
+
+                    <div class="small-12 medium-10 columns">
+                        <dl class="profile">
+			{# LK: Removed all parent contact details #}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <ul class="flex-list flex-wrap buttons">
+                {% if eportfolioAuth %}
+                    {% block buttons_eportfolio %}
+                        <li>
+                            <a href="/eportfolio/{{ user.getId() }}/profile"
+                               class="no-margin icon-eportfolio"
+                            >ePortfolio</a>
+                        </li>
+                    {% endblock buttons_eportfolio %}
+                {% endif %}
+
+                {% if showButtons %}
+                    {% block buttons_calendar %}
+                        <li>
+                            <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                               class="no-margin icon-calendar"
+                            >Calendar</a>
+                        </li>
+                    {% endblock buttons_calendar %}
+                {% endif %}
+            </ul>
+        </section>
+    </div>
+</div>
