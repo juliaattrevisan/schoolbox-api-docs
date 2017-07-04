@@ -22,7 +22,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 {
     use External_MssqlConnector;
     use External_Synergetic_ValidateExternalIdTrait;
-    use External_Synergetic_ValidateExternalIdTrait;
 
     /** @var External_User */
     private $externalUser;
