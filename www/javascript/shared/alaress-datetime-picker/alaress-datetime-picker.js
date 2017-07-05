@@ -208,20 +208,6 @@ function setValue(element, options, state, trigger, date) {
 
 }
 
-/**
- * Update picker value with date
- *
- * @param {number} pickerId
- * @param {object} date - Moment.js object
- */
-function setPickerValue(pickerId, date) {
-
-    if(date.isValid()) {
-        $("#adtp-modal-" + pickerId).attr('data-datepicker-value', date.format(momentFormats.databaseShort)).trigger('change');
-    }
-
-}
-
 function setCalendarAllDay(state, pickerId) {
 
     var $timeDiv = $('#pickerCalendar' + pickerId).closest('#adtp-modal-' + pickerId).find('.flatpickr-time');
@@ -238,7 +224,6 @@ function setCalendarAllDay(state, pickerId) {
     }
 
 }
-
 
 /**
  * Massages the datetime picker's value into a valid format, or errors out if it cannot.
