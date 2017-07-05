@@ -68,24 +68,24 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         // Get current day and period. Don't output a timetable if it has the same code as another that has already been added
 
-        $checked_campus_list = [];
+        $checkedCampusList = [];
 
         foreach ($this->getUser()->getCampusCollection() as $campus) {
             if ($campus instanceof Campus) {
 
-                $campus_id = $campus->getId();
-                $campus_code = $campus->getExtTimetableCode();
+                $campusId = $campus->getId();
+                $campusCode = $campus->getExtTimetableCode();
 
-                if (!isset($checked_campus_list[$campus_code])) {
+                if (!isset($checkedCampusList[$campusCode])) {
 
-                    $checked_campus_list[$campus_code] = true;
-                    $day_number = $timetableHandler->getDayNumber($campus);
+                    $checkedCampusList[$campusCode] = true;
+                    $dayNumber = $timetableHandler->getDayNumber($campus);
 
-                    if ($day_number) {
-                        $this->dayNumber[$campus_id] = $day_number;
-                        $this->dayName[$campus_id] = $timetableHandler->getDayName($day_number);
-                        $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser());
-                        $this->timetable[$campus_id] = $timetableHandler->getTimetableForDate(
+                    if ($dayNumber) {
+                        $this->dayNumber[$campusId] = $dayNumber;
+                        $this->dayName[$campusId] = $timetableHandler->getDayName($dayNumber);
+                        $this->currentPeriod[$campusId] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser());
+                        $this->timetable[$campusId] = $timetableHandler->getTimetableForDate(
                             $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
                         );
                     }
@@ -130,16 +130,16 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             return false;
         }
         
-        $campus_list = [];
+        $campusList = [];
         
         foreach ($this->getUser()->getCampusCollection() as $campus) {
-            $campus_list[$campus->getId()] = $campus;
+            $campusList[$campus->getId()] = $campus;
         }
 
         $this->setVar("campus_timetable_block", '');
         $now = new Alaress_Date_Format(time(), 'U');
 
-        foreach ($this->timetable as $campus_id => $timetable) {
+        foreach ($this->timetable as $campusId => $timetable) {
             $classCount = 0;
 
             // Find out if the current campus timetable has any classes associated with the timetable definition. If not, skip its rendering altogether
@@ -153,14 +153,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             if (is_array($timetable) && !empty($timetable) && $classCount) {
                 
                 if ($timetableCount > 1) {
-                    $this->setVar("CAMPUS_NAME", $campus_list[$campus_id]->getName());
+                    $this->setVar("CAMPUS_NAME", $campusList[$campusId]->getName());
                     $this->parse('timetable_campus_name_block', 'timetable_campus_name');
                 } else {
                     $this->setVar('timetable_campus_name_block', '');
                 }
                 
-                $this->setVar("DAYNAME", $this->dayName[$campus_id]);
-                $current_period = $this->currentPeriod[$campus_id];
+                $this->setVar("DAYNAME", $this->dayName[$campusId]);
+                $currentPeriod = $this->currentPeriod[$campusId];
                 
                 // Setup colour map
                 
@@ -188,7 +188,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                         // Always highlight the current cell, regardless of whether it has something on or not
                         
-                        if ($current_period['PeriodNumber'] == $period['periodNumber'] && $current_period['PeriodNumberSeq'] == $period['periodSequence']) {
+                        if ($currentPeriod['PeriodNumber'] == $period['periodNumber'] && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence']) {
                             $this->setVar([
                                 'PERIOD_CLASS' => 'timetable-subject-active',
                                 'PERIOD_TH_CLASS' => 'timetable-period-active'
@@ -267,7 +267,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                             'ATTENDANCE_CLASS_CODE' => $classLink,
                                             'ATTENDANCE_ATTENDANCE_DATE' => $now->getDatabaseDate(),
                                             'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
-                                            'ATTENDANCE_TIMETABLE_CODE' => $campus_list[$campus_id]->getExtTimetableCode(),
+                                            'ATTENDANCE_TIMETABLE_CODE' => $campusList[$campusId]->getExtTimetableCode(),
                                             'ATTENDANCE_ICON' => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
                                         ]);
                                         
@@ -278,13 +278,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                         list($year, $subject, $class) = explode('-', $class['code']);
 
                                         /** @noinspection PhpUnusedLocalVariableInspection */
-                                        list($cmp_code, $timetableCode) = explode('-', $campus_list[$campus_id]->getExtTimetableCode());
+                                        list($cmpCode, $timetableCode) = explode('-', $campusList[$campusId]->getExtTimetableCode());
                                         
                                         $this->setVar([
                                             'ATTENDANCE_CLASS_CODE' => $class,
                                             'ATTENDANCE_SUBJECT_CODE' => $subject,
                                             'ATTENDANCE_ATTENDANCE_DATE' => $now->getUsingFormat('d/m/Y'),
-                                            'ATTENDANCE_ATTENDANCE_DAY' => $this->dayNumber[$campus_id],
+                                            'ATTENDANCE_ATTENDANCE_DAY' => $this->dayNumber[$campusId],
                                             'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
                                             'ATTENDANCE_TIMETABLE_CODE' => $timetableCode,
                                             'ATTENDANCE_ICON' => 'icon-class-list',
