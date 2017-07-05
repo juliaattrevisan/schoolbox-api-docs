@@ -15,13 +15,14 @@
 
 {# Replace array syntax for jQuery. eg 'unit[5][a][367]' => 'unit-5-a-367' #}
 {% set id = inputPrefix | replace({'][': '-'}) | replace({'[': '-', ']': ''}) %}
-
+{% if assessmentDate.valid and not assessmentDate.isNull %}{% set date = endOfDay ? assessmentDate.endOfDay.local : assessmentDate.local %}{% else %}{% set date = unitDate.local %}{% endif %}
+{% set class = date != unitDate.local ? '' : 'hide' %}
 <div class="small-12 medium-3 large-2 columns">
     <label for="{{ inputPrefix }}_{{ dateProperty }}_date">{{ dateLabel }} Date</label>
     <input id="{{ id }}_{{ dateProperty }}_date"
            name="{{ inputPrefix }}[dates][{{ dateProperty }}]"
            type="text"
-           value="{% if assessmentDate.valid and not assessmentDate.isNull %}{{ endOfDay ? assessmentDate.endOfDay.local : assessmentDate.local }}{% else %}{{ unitDate.local }}{% endif %}"
+           value="{{ date }}"
            data-role="{{ dateProperty }}_date"
            data-datepicker
            data-datepicker-time
@@ -36,4 +37,5 @@
            {% endif %}
            {% if disabled %}disabled{% endif %}
     />
+    <a class="course-use-unit-date {{ class }}" data-course-unit-date="{{ unitDate.local }}">Use Unit Date</a>
 </div>

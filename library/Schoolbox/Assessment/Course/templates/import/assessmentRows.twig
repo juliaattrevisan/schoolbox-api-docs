@@ -14,6 +14,35 @@
         hideRows:        bool                - If true, hide the list of Assessments. (eg Project is un-checked)
         unitSpec:        UnitSpecification   - The unitSpec we are currently in
 #}
+
+<script type="text/javascript">
+
+    /* Use Unit Date for @course/import/date.twig
+     */
+    $(function () {
+
+        // Reveal 'use unit date' if input value differs form the unit date value
+        $('#import_assessments').find('[data-datepicker]').change(function() {
+            var $useUnitDate = $(this).parent().next('[data-course-unit-date]');
+            if ($(this).val() !== $useUnitDate.attr('data-course-unit-date')) {
+                $useUnitDate.removeClass('hide');
+            }
+            else {
+               $useUnitDate.addClass('hide');
+            }
+        });
+
+        // Copy unit date into the field
+        $('[data-course-unit-date]').click(function() {
+            var date = $(this).attr('data-course-unit-date');
+            var $input = $(this).prev('.input-group').find('input');
+            $input.val(date).trigger('change');
+        });
+
+    });
+
+</script>
+
 {% import "@learningAssessment/fragments/project/macro/icon.twig" as icon %}
 
 <ul class="information-list {% if depth %}no-pad{% endif %}" {% if project %}data-project="{{ project.id }}"{% endif %} style="{% if hideRows %}display: none;{% endif %}">
@@ -77,7 +106,7 @@
                 {% if acceptingResponses %}
                     {% include '@course/import/date.twig' with {
                     assessmentDate: assessment.openAt,
-                    unitDate: displayStartDate,
+                    unitDate: unitImpl.openDate,
                     inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                     dateProperty: 'open',
                     dateSyncProperty: 'due',
@@ -90,7 +119,7 @@
                 {#due date is always relevant#}
                 {% include '@course/import/date.twig' with {
                     assessmentDate: assessment.dueAt,
-                    unitDate: displayEndDate,
+                    unitDate: unitImpl.dueDate.endOfDay,
                     endOfDay: true,
                     inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                     dateProperty: 'due',
@@ -102,7 +131,7 @@
                 {% if acceptingResponses %}
                     {% include '@course/import/date.twig' with {
                         assessmentDate: assessment.closeAt,
-                        unitDate: displayEndDate,
+                        unitDate: unitImpl.dueDate.endOfDay,
                         endOfDay: true,
                         inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                         dateProperty: 'close',

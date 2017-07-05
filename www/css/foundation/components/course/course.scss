@@ -64,3 +64,14 @@ input[type="submit"][readonly] {
         }
     }
 }
+
+.course-use-unit-date {
+    margin: -0.8rem 0 1rem 0;
+    display: block;
+}
+// Medium down
+@media #{$small-only} {
+    .course-use-unit-date {
+        margin: 0 0 1rem 0;
+    }
+}
