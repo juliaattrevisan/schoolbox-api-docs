@@ -93,36 +93,23 @@ class ClassList
 
             foreach ($this->user->getSubjectCollection() as $subject) {
                 try {
-                    $folder = $this->folderMapper->findByCode($subject['code']);
-                    $folderList = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]), 'id');
+                    $folder                       = $this->folderMapper->findByCode($subject['code']);
+                    $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]), 'id');
                     $classTypes[$folder->getId()] = $subject['classType'];
                 } catch (MapperException $e) {
                     // Not found
                 }
             }
+        }
 
-            // Add in other folders with feedback during the term, this will pick up archived classes
+        // Add in other folders with feedback during the term, this will pick up archived classes
 
-            if ($this->user->getRole()->isStaff()) {
-                $folderList = $folderList->mergeUnique(
-                    $this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term),
-                    'id'
-                );
-            } elseif ($this->user->getRole()->isStudent()) {
-                $folderList = $folderList->mergeUnique(
-                    $this->folderMapper
-                        ->findFoldersWithResponses($this->user, $term)
-                        ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id'),
-                    'id'
-                );
-            }
-
-        } elseif ($this->user->getRole()->isStaff()) {
-            $folderList = $this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term);
+        if ($this->user->getRole()->isStaff()) {
+            $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithFeedbacksFromTeacher($this->user, $term), 'id');
         } elseif ($this->user->getRole()->isStudent()) {
-            $folderList = $this->folderMapper
-                ->findFoldersWithResponses($this->user, $term)
-                ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id');
+            /** @var GenericCollection|Folder[] $folderList */
+            $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithResponses($this->user, $term), 'id');
+            $folderList = $folderList->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($this->user, $term), 'id');
         }
 
         $courseSpecs = $this->getCourseSpecsHavingUnitsInTerm($folderList, $term);
