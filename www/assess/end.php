@@ -224,12 +224,6 @@ $term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate(
     new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT)
 );
 
-if (isset($_GET["returnUrl"])) {
-    $url = \Schoolbox\Learning\Assessment\Redirect::decode($_GET["returnUrl"]);
-} else {
-    $url = sprintf('/learning/grades/%d/%s/%d', $_SESSION['id'], $term->getCode(), $folder->getId());
-}
-
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text'  => 'Learning',
@@ -238,7 +232,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text'  => $folder->getName(),
-        'href'  => $url,
+        'href'  => "/homepage/{$folder->getId()}",
         'class' => ''
     ],
     [
