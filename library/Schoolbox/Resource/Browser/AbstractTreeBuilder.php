@@ -315,9 +315,19 @@ abstract class AbstractTreeBuilder
      */
     protected function generateFileArray(Resource\AbstractFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
     {
+        /* Folders in the root node of My Files have no Parent folder hydrated
+         * generateNodeArray() can deal with this, but need to check here first
+         */
+        if ($file->getFolder() instanceof Folder\Model) {
+            $folderId = $file->getFolder()->getId();
+        }
+        else {
+            $folderId = null;
+        }
+
         return $this->generateNodeArray(
             $file->getId(),
-            $file->getFolder()->getId(),
+            $folderId,
             'file',
             $name ?: $file->getTitle(),
             null,
