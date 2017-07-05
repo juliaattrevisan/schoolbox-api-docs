@@ -20,7 +20,7 @@ class Sync extends Base implements ISync
     protected $companyCode;
 
     /** @var External_Tass_Helper $helper */
-    private $helper;
+    protected $helper;
 
     /**
      * @inheritdoc
