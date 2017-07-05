@@ -24,7 +24,6 @@ class Sync extends BaseSync
     public function findAllParents()
     {
         // Attempt to create separate accounts for parent and spouse
-        $companyCode = $this->database->smartQuote($this->companyCode);
 
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
@@ -84,7 +83,7 @@ class Sync extends BaseSync
                 ON f.entity_code = p.par_code AND f.entity_gender = 'M'
             LEFT JOIN persondefs pd
                 ON pd.person_num = f.person_num
-            WHERE p.cmpy_code = $companyCode
+            WHERE p.cmpy_code = :companyCode
             AND   p.f_name IS NOT NULL
             AND   s.given_name IS NOT NULL
             AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
@@ -124,7 +123,7 @@ class Sync extends BaseSync
                 ON f.entity_code = p.par_code AND f.entity_gender = 'F'
             LEFT JOIN persondefs pd
                 ON pd.person_num = f.person_num
-            WHERE p.cmpy_code = $companyCode
+            WHERE p.cmpy_code = :companyCode
             AND   p.m_name IS NOT NULL
             AND   s.given_name IS NOT NULL
             AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
@@ -135,18 +134,8 @@ class Sync extends BaseSync
             ORDER BY student_contact_id ASC, tass_addnum DESC
         ";
 
-        return new Iterator\Guardian(
-            $this->database->getIterator($query)
-                ->addMap([$this->database, 'trimRow'])
-                ->addMap(function ($row) {
-                    list($firstName, $surname)        = preg_split("/\\s+/", $row['student_contact_preferred'], 2);
-                    $row['student_contact_preferred'] = $firstName;
-                    if (strlen(trim($surname)) > 0) {
-                        $row['student_contact_surname'] = $surname;
-                    }
-                    return $row;
-                })
-        );
+        $iterator = $this->databaseExternal->executeQueryIterator($query, ['companyCode' => $this->companyCode,]);
+        return new Iterator\Guardian($iterator);
     }
 
 }
