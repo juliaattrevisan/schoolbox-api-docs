@@ -280,7 +280,7 @@ class Controller extends Base
         }
 
         return $navigableTerms->sortByCallback(function (Term $term1, Term $term2) {
-            return $term1->compare($term2);
+            return $term2->compare($term1);
         });
     }
 
