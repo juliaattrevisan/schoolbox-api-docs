@@ -47,7 +47,6 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
             return $stack;
         }
 
-        $dayTimetable     = array();
         $currentTimestamp = $startTimestamp;
 
         // Colors come from the timetable color mapper.
@@ -68,26 +67,19 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
-        /** @var Calendar_Event_Type_Day[] $addedEvents */
+        /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
-                $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
-                if ($dayNumber <= 0) {
-                    continue;
-                }
 
-                $currentDate =  date("Y-m-d", $currentTimestamp);
+                $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                // Building the timetable is an expensive process,
-                // so only do when necessary, and only once for each day/campus
-                if (!isset($dayTimetable[$dayNumber][$campusId])) {
-                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campus, $dayNumber, $currentDate);
-                }
+                $dayTimetable = $this->buildTimetable($campus, $date);
+
                 // Load events for this campus
-                if (isset($dayTimetable[$dayNumber][$campusId])) {
-                    foreach ($dayTimetable[$dayNumber][$campusId] as $period) {
+                if (isset($dayTimetable)) {
+                    foreach ($dayTimetable as $period) {
                         // Has this exact class code for this time been added?
                         // Don't add it again, but do add that it belongs to this campus.
                         if (isset($period['description'])) {
@@ -108,13 +100,13 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
                             if ($startTime && $endTime) {
                                 // Set the start and end time
-                                $event->setStartTime(new Alaress_Date_Format($startTime, 'U'));
-                                $event->setEndTime(new Alaress_Date_Format($endTime, 'U'));
+                                $event->setStartTime(new Alaress_Date_Format($startTime, Alaress_Date_Format::TIMESTAMP));
+                                $event->setEndTime(new Alaress_Date_Format($endTime, Alaress_Date_Format::TIMESTAMP));
                                 $event->setAllday(false);
                             } else {
                                 // No start and end time - show this as an all day event
-                                $event->setStartTime(new Alaress_Date_Format($currentDate, 'Y-m-d'));
-                                $event->setEndTime(new Alaress_Date_Format($currentDate, 'Y-m-d'));
+                                $event->setStartTime(clone $date);
+                                $event->setEndTime(clone $date);
                                 $event->setAllday(true);
                             }
 
@@ -179,18 +171,17 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      * Builds the timetable for a given campus for a given day.
      *
      * @param \Schoolbox\Campus $campus
-     * @param int $day
+     * @param Alaress_Date_Format $date
      *
      * @return array
      */
-    protected function buildTimetable($campus, $day, $date = null)
+    protected function buildTimetable($campus, Alaress_Date_Format $date)
     {
         try {
-            $timetable = $this->getExternalTimetable()->getDayTimetable(
+            $timetable = $this->getExternalTimetable()->getTimetableForDate(
                 $this->getUser()->getExternalId(),
                 $this->getUser()->getId(),
                 $campus,
-                $day,
                 $date
             );
         } catch (Schoolbox\External\Exception $e) {
