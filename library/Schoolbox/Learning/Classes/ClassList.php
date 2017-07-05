@@ -81,13 +81,8 @@ class ClassList
      */
     public function getClassList(Term $term, Alaress_Date_Format $now)
     {
-        /** @var array $classTypes */
-        $classTypes = [];
-
-        /** @var GenericCollection|Folder[] $folderList */
-        $folderList = $this->folderMapper->createCollection();
-
-        /** @var bool $isTermCurrent */
+        $classTypes    = [];
+        $folderList    = $this->folderMapper->createCollection();
         $isTermCurrent = $term->contains($now);
 
         // Are we looking at current classes, or historical?
@@ -98,9 +93,7 @@ class ClassList
 
             foreach ($this->user->getSubjectCollection() as $subject) {
                 try {
-                    /** @var Folder $folder */
                     $folder = $this->folderMapper->findByCode($subject['code']);
-
                     $folderList = $folderList->mergeUnique(new GenericCollection(Folder::class, [$folder]), 'id');
                     $classTypes[$folder->getId()] = $subject['classType'];
                 } catch (MapperException $e) {
