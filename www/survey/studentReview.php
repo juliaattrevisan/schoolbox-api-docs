@@ -237,7 +237,7 @@ $trail->renderIntoSitePage(
         ],
         [
             'text'  => $survey['title'],
-            'href'  => '/survey/summary/' . $survey['assess_id'],
+            'href'  => '/survey/intro/' . $survey['assess_id'],
             'class' => ''
         ],
         [
