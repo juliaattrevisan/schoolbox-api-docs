@@ -70,7 +70,7 @@ input[type="submit"][readonly] {
     display: block;
 }
 // Medium down
-@media #{$medium-down} {
+@media #{$small-only} {
     .course-use-unit-date {
         margin: 0 0 1rem 0;
     }
