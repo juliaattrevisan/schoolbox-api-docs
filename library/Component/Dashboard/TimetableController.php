@@ -205,7 +205,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         if (count($period['class']) > 0) {
                             
                             foreach ($period['class'] as $class) {
-                                $description = $class['description'];
                                 $this->setVar('PERIOD_CODE', '(' . $class['code'] . ')');
                                 $this->setVar('PERIOD_ROOM', $class['room']);
                                 
@@ -226,6 +225,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 $this->setVar('PERIOD_COLOUR', Scrub::text($subjectColourMap[$class['code']]));
 
+                                // Set the class' description
+                                $description = $class['description'];
                                 try {
                                     $folder = $this->getFolderMapper()->findByCode($class['code']);
                                     $hasLink = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ;
@@ -233,11 +234,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     // If the class description is blank, fall back to the folder name
 
                                     if (empty($description)) {
-                                        $description = $folder->getTitle();
+                                        $description = $folder->getName();
                                     }
                                     
                                 } catch (MapperException $e) {
-                                    
+
                                     $hasLink = false;
                                 }
 
