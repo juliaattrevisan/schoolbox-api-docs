@@ -410,14 +410,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
     // Create click event to open the modal for the element
 
-    element.change(function () {
-        var inputValue = moment(element.val(), convertFormat(options.displayFormat));
-
-        if (window.pickerInstance[pickerId] !== undefined) {
-            window.pickerInstance[pickerId].setDate(inputValue.toISOString());
-        }
-    });
-
     element
         .on('blur', function (e) {
             massageDateValue(e, options.staller);
