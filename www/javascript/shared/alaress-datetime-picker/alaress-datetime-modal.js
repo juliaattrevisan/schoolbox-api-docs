@@ -1208,8 +1208,8 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function resetCalendar() {
 
-        var activeDate = moment(getInputValue(), dateDisplayFormats.momentJs);
-        if(isInputValueValid) {
+        var activeDate = moment(getInputValue(), dateDisplayFormats.momentJsDatetime);
+        if (isInputValueValid()) {
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());
             if (isDueWorkType(twigVars.type) || isEventType(twigVars.type)) {
                 updateCalendarResponse();
