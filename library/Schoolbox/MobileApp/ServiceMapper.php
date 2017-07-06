@@ -115,6 +115,11 @@ class ServiceMapper extends Mapper
                 /** @var Storage\Model $storageObj */
                 $storageObj = $this->hydrateJoin($row, 'cert', 'cert');
 
+                if (!$storageObj) {
+                    // invalid PEM reference
+                    throw new Mapper\Exception('No PEM certificate given for APNS service.');
+                }
+
                 return new Cloud\Apple\APNS($rm, $appId,Apns\Client\Message::PRODUCTION_URI, $this->getPemPath($storageObj), $key);
 
             case Registry::PROVIDER_GOOGLE:
