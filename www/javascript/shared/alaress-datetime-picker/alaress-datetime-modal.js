@@ -1208,14 +1208,19 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function resetCalendar() {
 
-        var activeDate = moment(getInputValue(), dateDisplayFormats.momentJsDatetime);
         if (isInputValueValid()) {
+
+            // Create a moment object from the input value
+            var activeDate = moment(getInputValue(), dateDisplayFormats.momentJsDatetime);
+
+            // Set date on flatpickr to the input date
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());
+
+            // If this datepicker shows due work or events - update the response
             if (isDueWorkType(twigVars.type) || isEventType(twigVars.type)) {
                 updateCalendarResponse();
             }
         }
-
     }
 
     /**
