@@ -45,10 +45,11 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     // Listen for the modal open
     $('#adtp-modal-wrapper-' + twigVars.id).on('open.fndtn.reveal', function () {
         resetCalendar();
-        updateCalendarResponse();
-        resetTimetablePicker();
         setCalendarAllDay(isInputAllDay(), twigVars.id);
-        setTimetableAllDay();
+        if (twigVars.timetable) {
+            resetTimetablePicker();
+            setTimetableAllDay();
+        }
     });
 
     if (twigVars.timetable) {
@@ -101,18 +102,16 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             updateTimeControls($(this));
         });
 
-        // If input value gets changed from outside, reset the timetable picker
-        $picker.change(function () {
-            if (isInputValueValid()) {
-                resetTimetablePicker();
-            }
-        });
-
     }
+
+    // If input value gets changed from outside, reset the timetable picker
 
     $picker.change(function () {
         if (isInputValueValid()) {
-            updateCalendarResponse();
+            resetCalendar();
+            if (twigVars.timetable) {
+                resetTimetablePicker();
+            }
         }
     });
 
@@ -152,7 +151,9 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 $modal.find('.flatpickr-time').show();
             }
 
-            requestDataByDate(momentDate.format(momentFormats.databaseShort), 'calendar');
+            if (isDueWorkType(twigVars.type) || isEventType(twigVars.type)) {
+                requestDataByDate(momentDate.format(momentFormats.databaseShort), 'calendar');
+            }
 
             if (isDueWorkType(twigVars.type)) {
                 var mo = instance.currentMonth + 1,
@@ -1195,12 +1196,10 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function resetTimetablePicker() {
 
-        if (twigVars.timetable) {
-
+        if (isDueWorkType(twigVars.type) || isEventType(twigVars.type)) {
             updateTimetableResponse();
-            resetTerms();
-
         }
+        resetTerms();
 
     }
 
@@ -1210,8 +1209,11 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     function resetCalendar() {
 
         var activeDate = moment(getInputValue(), dateDisplayFormats.momentJs);
-        if(activeDate.isValid()) {
+        if(isInputValueValid) {
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());
+            if (isDueWorkType(twigVars.type) || isEventType(twigVars.type)) {
+                updateCalendarResponse();
+            }
         }
 
     }
@@ -1235,7 +1237,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     function updateTimetableResponse() {
 
         var activeDate = moment(getInputValue(), dateDisplayFormats.momentJs),
-            timetableDate =  moment(getTimetablePickerValue(), momentFormats.databaseShort),
+            timetableDate = moment(getTimetablePickerValue(), momentFormats.databaseShort),
             requestDate = moment(getRequestDate('timetable'), momentFormats.databaseShort);
 
         // The picker value has been changed externally
