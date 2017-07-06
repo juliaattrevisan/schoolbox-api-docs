@@ -1,0 +1,39 @@
+<div class="small-12 column content">
+    <dl class="inline-dl">
+        <dt class="small-12 medium-4">App ID</dt>
+        <dd class="small-12 medium-8"><p>{{ app.appIdentifier }}</p></dd>
+
+        <dt class="small-12 medium-4">Provider</dt>
+        <dd class="small-12 medium-8"><p>Apple</p></dd>
+
+        <dt class="small-12 medium-4">Apple Push Notification Service Certificate</dt>
+        <dd class="small-12 medium-8">
+            <p>
+                <em>Installed</em>
+                (<a href="#" data-open="change-{{ app.appIdentifier }}">Change</a>)
+            </p>
+        </dd>
+    </dl>
+    <div class="row">
+        <div class="small-12 column">
+            <form style="display:none;" id="change-{{ app.appIdentifier }}" action="{{ routeLookup('adminMessages.postModifyApp') }}" method="post">
+                <input type="hidden" name="app" value="{{ app.appIdentifier }}" />
+                <input type="hidden" name="provider" value="apns" />
+                <div class="row">
+                    <div class="small-12 medium-6 column">
+                        <label>New APNS Certificate File</label>
+                        {% include 'sub/attachzone.twig' %}
+                    </div>
+                    <div class="small-12 medium-6 column">
+                        <label>New APNS Certificate Passphrase
+                            <input type="text" name="key" value="" />
+                        </label>
+                    </div>
+                    <div class="small-12 column">
+                        <input type="submit" value="Install New Certificate">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
