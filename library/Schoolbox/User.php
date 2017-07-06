@@ -1113,6 +1113,7 @@ class User implements JsonSerializable, ISoftDeletable
                 }
             }
         }
+        return $this;
     }
 
     /**
