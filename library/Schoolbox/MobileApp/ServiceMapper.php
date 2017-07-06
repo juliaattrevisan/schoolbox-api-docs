@@ -41,7 +41,7 @@ class ServiceMapper extends Mapper
         $this->hasTable('mobile_app');
 
         $this->uses('app_id', self::TYPE_STRING, self::COLUMN_IDENTIFIER, 'appIdentifier');
-        $this->uses('provider', self::TYPE_STRING);
+        $this->uses('provider', self::TYPE_STRING, null, 'providerName');
         $this->uses('key', self::TYPE_STRING);
         $this->joins('cert_hash', \Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'certificate', 'cert');
     }
