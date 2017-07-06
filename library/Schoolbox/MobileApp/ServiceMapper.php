@@ -138,6 +138,20 @@ class ServiceMapper extends Mapper
 
 
     /**
+     * Do not raise a notification
+     *
+     * @param object $object
+     * @param string $verb
+     * @param object $previous
+     * @return bool
+     */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        return false;
+    }
+
+
+    /**
      * Return the path APNS should use for the PEM file held by the given storage object
      *
      * @param Storage\Model $storage
