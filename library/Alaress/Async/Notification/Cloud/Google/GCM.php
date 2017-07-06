@@ -48,6 +48,13 @@ class GCM extends AbstractService
         $this->apiKey = $apiKey;
     }
 
+    /**
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->apiKey;
+    }
 
     /**
      * @return string
