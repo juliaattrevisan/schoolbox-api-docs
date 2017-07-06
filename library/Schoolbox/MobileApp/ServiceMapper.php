@@ -12,6 +12,7 @@ use Alaress\Async\Notification\Cloud;
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 use PDO;
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
@@ -22,6 +23,7 @@ use ZendService\Apple\Apns;
  * Class ServiceMapper
  * @package Schoolbox\MobileApp
  * @method ServiceInterface findById($identifierValue)
+ * @method Collection|ServiceInterface[] findAll($options = array())
  */
 class ServiceMapper extends Mapper
 {
