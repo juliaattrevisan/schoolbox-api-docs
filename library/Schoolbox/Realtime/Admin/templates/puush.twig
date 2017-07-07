@@ -1,15 +1,23 @@
 <style type="text/css">
     .tkn {
-        max-width: 500px;
+        max-width: 15vw;
         display: block;
         overflow-x: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 </style>
+
+{% import 'sub/breadcrumbs.twig' as bread  %}
+{{ bread.crumbs(
+    [ 'Admin', '/adminv2/home' ],
+    [ 'Messages', '/adminv2/messages' ],
+    [ 'App Registrations', '/adminv2/messages/puush']
+) }}
+
 <div class="row">
     <div class="small-12 island">
-        <h1>Push Notifications</h1>
+        <h1>App Registrations</h1>
         <h2 class="subheader">{% if user.id %}Attempting push to {{ user.formatName }} (user {{ user.id }}){% else %}Configuration Result{% endif %}</h2>
         <section class="content">
             <ul class="no-margin">
@@ -37,7 +45,7 @@
                         <td><a href="{{ routeLookup('adminMessages.testPush', { userId: registration.user.id }) }}">{{ registration.user.formatName }}</a></td>
                         <td><span class="tkn" title="{{ registration.token }}">{{ registration.token }}</span></td>
                         <td><span class="tkn" title="{{ registration.deviceId }}">{{ registration.deviceId }}</span></td>
-                        <td><span class="tkn" title="{{ registration.service.appIdentifier }}">{{ registration.service.appIdentifier }}</span> ({{ registration.service.providerName }})</td>
+                        <td><a href="{{ routeLookup('adminMessages.getApps') }}" class="tkn" title="{{ registration.service.appIdentifier }}">{{ registration.service.appIdentifier }}</a> ({{ registration.service.providerName }})</td>
                         <td title="{{ registration.createdAt.database }}">{{ registration.createdAt.local }}</td>
                         <td title="{{ registration.touchedAt.database }}">{{ registration.touchedAt.local }}</td>
                     </tr>
