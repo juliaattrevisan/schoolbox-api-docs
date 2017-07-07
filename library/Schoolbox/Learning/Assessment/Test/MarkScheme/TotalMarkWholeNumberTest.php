@@ -13,6 +13,27 @@ use \RangeException;
 
 class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @dataProvider provider_validStringDenominators
+     * @param string $validStringTotalMark
+     */
+    public function test_valid_string_Denominator($validStringTotalMark)
+    {
+        new TotalMarkWholeNumber($validStringTotalMark);
+    }
+
+
+    /**
+     * @dataProvider provider_invalidStringDenominators
+     * @param string $invalidStringTotalMark
+     * @expectedException InvalidArgumentException
+     */
+    public function test_invalid_string_Denominator($invalidStringTotalMark)
+    {
+        new TotalMarkWholeNumber($invalidStringTotalMark);
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
@@ -126,6 +147,32 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
             ['1',   $totalMark, 1.0],
             ['45',  $totalMark, 45.0],
             ['100', $totalMark, 100.0],
+        ];
+    }
+
+    public function provider_validStringDenominators()
+    {
+        return [
+            ['1'],
+            ['1.0'],
+            ['20'],
+            ['20.00000'],
+            ['2000000'],
+            ['2000000.00000'],
+        ];
+    }
+
+    public function provider_invalidStringDenominators()
+    {
+        return [
+            ['1.1'],
+            ['1.1001'],
+            ['1.01'],
+            ['20.003'],
+            ['20.000001'],
+            ['2000000.4'],
+            ['2000000.300000'],
+            ['2000000.300000'],
         ];
     }
 
