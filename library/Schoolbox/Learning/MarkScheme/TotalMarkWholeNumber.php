@@ -22,14 +22,50 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
     const GRANULARITY_NUMERATOR   = 0.25;
     const GRANULARITY_DENOMINATOR = 1.00;
 
+
+    /**
+     * @param float|int|string|null $totalMark
+     * @throws \InvalidArgumentException If $totalMark is of wrong data type or contains fractional component
+     * @throws \RangeException If $totalMark is negative
+     */
     public function __construct($totalMark)
     {
-        // Is it an integer, or float with no fractional part?
-        if (is_int($totalMark) || (is_float($totalMark) && 0.0 === $totalMark % 1.0)) {
-            parent::__construct((int)$totalMark);
-        } else {
+        parent::__construct($this->validate($totalMark));
+    }
+
+
+    /**
+     * Validates and returns the $totalMark as null or int
+     *
+     * Does not perform negative check.
+     *
+     * @param float|int|string|null $totalMark
+     * @return null|int
+     * @throws \InvalidArgumentException If $totalMark is invalid type or contains fractional component
+     */
+    private function validate($totalMark)
+    {
+        // null or int ?
+        if(null === $totalMark || is_int($totalMark)){
+            return $totalMark;
+        }
+
+        // string (eg '4' or '4.0')?
+        if(is_string($totalMark)){
+            $totalMark = (float)$totalMark;
+        }
+
+        // float ?
+        if(is_float($totalMark)){
+            // No fractional component ?
+            if(0.0 === fmod($totalMark, 1.0)){
+                return (int)$totalMark;
+            }
             throw new \InvalidArgumentException("Total mark whole number must not contain fractional component: $totalMark");
         }
+
+        $type = gettype($totalMark);
+        throw new \InvalidArgumentException("Total mark whole number must be null or numeric scalar: ($type)$totalMark");
     }
 
     /* Getters / Setters
