@@ -35,6 +35,16 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider provider_invalidRangeStringDenominators
+     * @param string $totalMark
+     * @expectedException RangeException
+     */
+    public function test_invalid_range_string_Denominator($totalMark)
+    {
+        new TotalMarkWholeNumber($totalMark);
+    }
+
+    /**
      * @expectedException InvalidArgumentException
      */
     public function test_Fractional_Denominator()
@@ -165,6 +175,9 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
     public function provider_invalidStringDenominators()
     {
         return [
+            ['0.001'],
+//            ['1x'],
+//            ['1 x'],
             ['1.1'],
             ['1.1001'],
             ['1.01'],
@@ -173,6 +186,13 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
             ['2000000.4'],
             ['2000000.300000'],
             ['2000000.300000'],
+        ];
+    }
+
+    public function provider_invalidRangeStringDenominators()
+    {
+        return [
+            ['0'],        // Note, this means if rubric and total mark, rubric descriptors must have marks
         ];
     }
 

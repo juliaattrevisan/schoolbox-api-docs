@@ -33,6 +33,20 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
         parent::__construct($this->validate($totalMark));
     }
 
+    /**
+     * @inheritdoc
+     * @throws \RangeException If $totalMark is less than 1
+     */
+    protected function rangeCheck($totalMark)
+    {
+        if(null === $totalMark){
+            return;
+        }
+        if($totalMark < 1){
+            throw new \RangeException("Total mark cannot be less than 1: $totalMark");
+        }
+    }
+
 
     /**
      * Validates and returns the $totalMark as null or int
