@@ -4,7 +4,7 @@ Usage:
     assessments: IAssessable[],
     limit:       int,
 #}
-{% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <ul class="information-list">
     {% for assessment in assessments %}
@@ -17,7 +17,7 @@ Usage:
                     <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}
                 </p>
                 <p class="meta">
-                    <span class="{{ urgency.datetime(assessment, student) }}">Due {{ assessment.dueAt.relativeTime }}</span> on {{ assessment.dueAt.local }}
+                    {{ dueDate.dueDate(assessment, student) }}
                 </p>
             </div>
         </li>
