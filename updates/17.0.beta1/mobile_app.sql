@@ -36,9 +36,16 @@ INSERT INTO mobile_app
 
 SET sql_mode = '';
 
-
+/* Add the new column */
 ALTER TABLE `mobile_app_registry`
-  ADD COLUMN `app_id` VARCHAR(128) NOT NULL AFTER `provider`,
+  ADD COLUMN `app_id` VARCHAR(128) NULL AFTER `provider`;
+
+/* Inject the appropriate app ID data */
+UPDATE `mobile_app_registry` SET app_id = 'apns_default' WHERE provider = 'APNS';
+UPDATE `mobile_app_registry` SET app_id = 'gcm_default'  WHERE provider = 'GCM';
+
+/** Now that the data is in, enforce the foreign key */
+ALTER TABLE `mobile_app_registry`
   ADD FOREIGN KEY (`app_id`) REFERENCES `mobile_app`(`app_id`) ON UPDATE NO ACTION ON DELETE NO ACTION,
   CHARSET=ASCII;
 
