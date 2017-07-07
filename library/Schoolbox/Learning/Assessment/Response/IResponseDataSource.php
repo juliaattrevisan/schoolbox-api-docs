@@ -60,7 +60,7 @@ interface IResponseDataSource
      *
      * @param IAssessable $assessment
      * @param $crocodocId
-     * @return mixed
+     * @return IResponse
      */
     public function findByCrocodocId(IAssessable $assessment, $crocodocId);
 
