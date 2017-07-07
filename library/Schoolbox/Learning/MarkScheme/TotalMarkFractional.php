@@ -42,6 +42,17 @@ class TotalMarkFractional extends TotalMarkAbstract
         parent::__construct($totalMark);
     }
 
+    /**
+     * @inheritdoc
+     * @throws \RangeException If $totalMark is negative
+     */
+    protected function rangeCheck($totalMark)
+    {
+        if($totalMark < 0){
+            throw new \RangeException("Total mark cannot be negative: $totalMark");
+        }
+    }
+
 
     /**
      * Quiz marks are allowed to be outside the normal mark bounds.

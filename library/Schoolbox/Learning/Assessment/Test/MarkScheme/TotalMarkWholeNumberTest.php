@@ -13,6 +13,37 @@ use \RangeException;
 
 class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @dataProvider provider_validStringDenominators
+     * @param string $validStringTotalMark
+     */
+    public function test_valid_string_Denominator($validStringTotalMark)
+    {
+        new TotalMarkWholeNumber($validStringTotalMark);
+    }
+
+
+    /**
+     * @dataProvider provider_invalidStringDenominators
+     * @param string $invalidStringTotalMark
+     * @expectedException InvalidArgumentException
+     */
+    public function test_invalid_string_Denominator($invalidStringTotalMark)
+    {
+        new TotalMarkWholeNumber($invalidStringTotalMark);
+    }
+
+    /**
+     * @dataProvider provider_invalidRangeStringDenominators
+     * @param string $totalMark
+     * @expectedException RangeException
+     */
+    public function test_invalid_range_string_Denominator($totalMark)
+    {
+        new TotalMarkWholeNumber($totalMark);
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
@@ -126,6 +157,42 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
             ['1',   $totalMark, 1.0],
             ['45',  $totalMark, 45.0],
             ['100', $totalMark, 100.0],
+        ];
+    }
+
+    public function provider_validStringDenominators()
+    {
+        return [
+            ['1'],
+            ['1.0'],
+            ['20'],
+            ['20.00000'],
+            ['2000000'],
+            ['2000000.00000'],
+        ];
+    }
+
+    public function provider_invalidStringDenominators()
+    {
+        return [
+            ['0.001'],
+//            ['1x'],
+//            ['1 x'],
+            ['1.1'],
+            ['1.1001'],
+            ['1.01'],
+            ['20.003'],
+            ['20.000001'],
+            ['2000000.4'],
+            ['2000000.300000'],
+            ['2000000.300000'],
+        ];
+    }
+
+    public function provider_invalidRangeStringDenominators()
+    {
+        return [
+            ['0'],        // Note, this means if rubric and total mark, rubric descriptors must have marks
         ];
     }
 

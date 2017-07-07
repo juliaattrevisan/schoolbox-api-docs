@@ -38,11 +38,16 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      */
     public function __construct($totalMark)
     {
-        if($totalMark < 0){
-            throw new \RangeException("Total mark cannot be negative: $totalMark");
-        }
+        $this->rangeCheck($totalMark);
         $this->totalMark = $totalMark;
     }
+
+
+    /**
+     * @param null|int|float $totalMark
+     * @throws \RangeException If $totalMark outside valid range
+     */
+    protected abstract function rangeCheck($totalMark);
 
     /**
      * Returns a string representation of a normalised Mark
