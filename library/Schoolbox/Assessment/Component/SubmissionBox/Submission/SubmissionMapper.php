@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Learning\InlineGrader\FindableCrocodoc;
 
 /**
  * A mapper for a student's submission to a due work.
@@ -30,7 +31,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @method Submission findById($id)
  * @method Submission hydrate(array $row, $alias = '', $callback = null)
  */
-class SubmissionMapper extends BaseMapper
+class SubmissionMapper extends BaseMapper implements FindableCrocodoc
 {
     /**
      * @return void
