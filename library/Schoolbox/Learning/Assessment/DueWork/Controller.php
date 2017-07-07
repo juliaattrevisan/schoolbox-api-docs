@@ -130,13 +130,13 @@ class Controller extends Assessment\Controller
         // Only display download link if there are actually files to download
 
         $twigData = [
-            'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
-            'type'        => Assessment\AssessmentType::objectToString($assessment),
-            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
-            'assessment'  => $assessment,
-            'download'    => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks' =>  Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'errors'         => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+            'type'           => Assessment\AssessmentType::objectToString($assessment),
+            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
+            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
+            'assessment'     => $assessment,
+            'download'       => $this->hasDownloadableSubmissionFiles($assessment),
+            'rubricMarks'    => Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
         ];
 
         $this->getResponse()->content->set(

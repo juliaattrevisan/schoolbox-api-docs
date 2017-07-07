@@ -81,7 +81,6 @@ class Controller extends Assessment\Controller
 
         $twigData = [
             'type'        => Assessment\AssessmentType::objectToString($assessment),
-            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
             'writable'    => Access::getInstance()->isInstructor($this->getUser(), $assessment->getContext()->getFolder()),

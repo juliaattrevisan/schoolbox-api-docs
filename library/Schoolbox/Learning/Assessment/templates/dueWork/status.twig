@@ -12,6 +12,7 @@
      - statusPending:    a string representing the 'pending'    state
      - statusReviewed:   a string representing the 'reviewed'   state
      - errors:           string[]  Admin-configured submission states, eg 'Absent', 'Pending', 'Not Submitted' etc
+     - markSchemeName:   string    filename of markScheme template fragment
 
 #}
 {% extends '@learningAssessment/status.twig' %}
@@ -87,10 +88,10 @@
             <input type="hidden" name="responseId" value="{{ response.id }}" />
 
             <div class="row">
-                {% if 'None' != assessment.markScheme %}
+                {% if 'none' != markSchemeName | lower %}
                 <div class="small-12 medium-3 column">
                     <label>{{ locale.grades.proper }}
-                    {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+                    {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                         participant: participant,
                         markScheme:  assessment.markScheme,
                         tabIndex:    (loop.index0 * 2) + 1,
@@ -100,7 +101,7 @@
                 </div>
                 {% endif %}
 
-                <div class="small-12{% if 'None' != assessment.markScheme %} medium-9{% endif %} column">
+                <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                     {% include '@learningMarkScheme/fragments/comment.twig' with {
                         participant: participant,
                         tabIndex:   (loop.index0 * 2) + 2

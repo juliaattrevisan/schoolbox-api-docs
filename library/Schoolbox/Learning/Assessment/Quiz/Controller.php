@@ -103,7 +103,6 @@ class Controller extends Assessment\Controller
         $returnUrlSuffix = Redirect::queryString($baseUrl);
 
         $twigData = [
-            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment' => $assessment,
 
