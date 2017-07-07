@@ -7,6 +7,9 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Config\ConfigMapper;
+
+
 if(!isset($this)) {
     require_once __DIR__ . '/../../../library/Bootstrap.php';
     SitePage::localRedir('/adminv2/messages');
@@ -32,12 +35,15 @@ $this->setBlock(TEMPLATE_content, 'global_online', 'global_online_block');
 $this->setBlock(TEMPLATE_content, 'global_offline', 'global_offline_block');
 $this->setBlock(TEMPLATE_content, 'digest_offline', 'digest_offline_block');
 $this->setBlock(TEMPLATE_content, 'digest_online', 'digest_online_block');
+$this->setBlock(TEMPLATE_content, 'push_online', 'push_online_block');
+$this->setBlock(TEMPLATE_content, 'push_offline', 'push_offline_block');
 $this->setBlock('digest_online', 'role_digest', 'role_digest_block');
 $this->setBlock('role_digest', 'day_check', 'day_check_block');
 
 // global setting
 
-$enabled = \Schoolbox\Config\ConfigMapper::getInstance()->get('messaging_enabled');
+$enabled = ConfigMapper::getInstance()->get('messaging_enabled');
+$pushing = ConfigMapper::getInstance()->get('push_notifications_enabled');
 
 if($enabled) {
     $this->setVar(array(
@@ -130,6 +136,17 @@ if($enabled) {
         $this->setVar('day_check_block', '');
     }
 
+    if ($pushing) {
+        $this->parse('push_online_block', 'push_online');
+        $this->setVar('push_offline_block', '');
+
+    } else {
+        // messaging online, but push offline:
+        $this->setVar('push_online_block', '');
+        $this->setVar('PUSH_OFFLINE', 'Enable push notifications to set app settings.');
+        $this->parse('push_offline_block', 'push_offline');
+    }
+
     $this->parse('digest_online_block', 'digest_online');
     $this->setVar('digest_offline_block', '');
 
@@ -146,4 +163,8 @@ if($enabled) {
 
     $this->parse('global_offline_block', 'global_offline');
     $this->setVar('global_online_block', '');
+
+    $this->setVar('PUSH_OFFLINE', 'Enable messaging and push notifications to set to set app settings.');
+    $this->parse('push_offline_block', 'push_offline');
+    $this->setVar('push_online_block', '');
 }
