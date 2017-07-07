@@ -23,6 +23,20 @@ class Module extends BaseModule
 {
     protected $basename = 'adminMessages';
 
+
+    /**
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
+     */
+    protected function registerRoutes()
+    {
+        $this->register('GET', '/apps', 'getApps');
+        $this->register('GET', '/apps/new', 'getCreateAppForm');
+        $this->register('POST', '/apps', 'postModifyApp');
+    }
+
+
     /**
      * @param Router $router
      * @param string $basePath

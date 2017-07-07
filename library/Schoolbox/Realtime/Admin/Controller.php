@@ -11,7 +11,6 @@ namespace Schoolbox\Realtime\Admin;
 
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -19,13 +18,13 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Resource;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\RoleMapper;
-use Alaress\Async\Notification\Cloud;
 use Alaress\Redis;
 use Schoolbox\MobileApp;
-use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
-use ZendService\Apple\Apns;
 use Schoolbox\Config\ConfigMapper;
 
 class Controller extends BaseController
@@ -161,6 +160,109 @@ class Controller extends BaseController
         }
 
         return $this->config;
+    }
+
+
+    /**
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getApps()
+    {
+        $apps = MobileApp\ServiceMapper::getInstance()->findAll();
+
+        $zones = [];
+
+        foreach ($apps->filterBy('providerName', MobileApp\Registry::PROVIDER_APPLE) as $app) {
+            $appId = $app->getAppIdentifier();
+            $zones[$appId] = (new Zone($appId))->getTwigContext();
+        }
+
+        $data = [
+            'pageCurrent' => 'messages',
+            'apps'        => $apps,
+            'attachzones' => $zones,
+            'providers'   => [
+                'apns' => 'Apple Push Notification Service',
+                'gcm'  => 'Google Cloud Messaging'
+            ],
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps'));
+    }
+
+
+    /**
+     */
+    public function getCreateAppForm()
+    {
+        $provider = strtoupper($this->getRequest()->query->get('provider'));
+
+        $data = [];
+
+        if ($provider === 'APNS') {
+            $data['attachzone'] = (new Zone('apns'))->getTwigContext();
+        }
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@adminMessages/providers/{$provider}/create.twig", $data));
+    }
+
+
+    /**
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postModifyApp()
+    {
+        $resolutions = [];
+
+        $rq   = $this->getRequest();
+        $post = $rq->post;
+
+        $provider    = strtoupper($post->get('provider'));
+        $appId       = trim($post->get('app'));
+        $key         = trim($post->get('key'));
+        $certificate = null;
+
+        if ($provider === MobileApp\Registry::PROVIDER_GOOGLE) {
+            // require key for GCM
+            if (empty($key)) {
+                $resolutions[] = "specify the {$provider} API key";
+            }
+        } elseif ($provider === MobileApp\Registry::PROVIDER_APPLE) {
+            // require a certificate for APNS
+            try {
+                $certificate = (new CollectorFactory())->build($post->get('attachment', []))->getFirst();
+
+                if (empty($certificate)) {
+                    // yes this looks contrived but it saves on duplicating the error message
+                    throw new Resource\Exception();
+                }
+
+            } catch (Resource\Exception $e) {
+                // no file supplied
+                $resolutions[] = "provide the {$provider} certificate";
+            }
+        }
+
+        if (empty($appId)) {
+            $resolutions[] = "specify the {$provider} app identifier";
+        }
+
+        if (count($resolutions)) {
+            $this->sendError('Could not register app', $resolutions);
+            return;
+        }
+
+        MobileApp\ServiceMapper::getInstance()->save(new MobileApp\ServiceDTO(
+            $appId, $provider, $key, $certificate
+        ));
+
+        if ($this->getRequest()->isXhr()) {
+            // respond with an empty 200 OK
+            $this->getResponse()->content->set($this->buildJsonOutput(null));
+            return;
+        }
+
+        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
     }
 
 
