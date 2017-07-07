@@ -22,15 +22,15 @@ INSERT INTO mobile_app
     SELECT
         'apns_default',
         'APNS',
-        MAX(CASE WHEN `name` = 'push_apns_cert_key' THEN NULLIF('', `value`) ELSE NULL END),
-        MAX(CASE WHEN `name` = 'push_apns_cert_path' THEN NULLIF('', `value`) ELSE NULL END)
+        MAX(CASE WHEN `name` = 'push_apns_cert_key' THEN `value` ELSE '' END),
+        MAX(CASE WHEN `name` = 'push_apns_cert_path' THEN NULLIF(`value`, '') ELSE NULL END)
     FROM `config`;
 
 INSERT INTO mobile_app
     SELECT
         'gcm_default',
         'GCM',
-        MAX(CASE WHEN `name` = 'push_gcm_api_key' THEN NULLIF('', `value`) ELSE NULL END),
+        MAX(CASE WHEN `name` = 'push_gcm_api_key' THEN NULLIF(`value`, '') ELSE NULL END),
         NULL
     FROM `config`;
 
