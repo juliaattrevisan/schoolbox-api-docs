@@ -33,10 +33,19 @@
     });
 </script>
 
-{{ renderAdminNavigation(pageCurrent) }}
-
 {# TODO insert messaging-specific breadcrumbs #}
+{% import 'sub/breadcrumbs.twig' as bread  %}
+{{ bread.crumbs(
+    [ 'Admin', '/adminv2/home' ],
+    [ 'Messages', '/adminv2/messages' ],
+    [ 'Push Providers', '/adminv2/messages/apps']
+) }}
 
+<div class="row">
+    <div class="small-12 column">
+        <h1>Push Providers</h1>
+    </div>
+</div>
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Registered Apps</h2>
