@@ -38,7 +38,7 @@ SET sql_mode = '';
 
 
 ALTER TABLE `mobile_app_registry`
-  ADD COLUMN `app_id` VARCHAR(128) NULL AFTER `provider`,
+  ADD COLUMN `app_id` VARCHAR(128) NOT NULL AFTER `provider`,
   ADD FOREIGN KEY (`app_id`) REFERENCES `mobile_app`(`app_id`) ON UPDATE NO ACTION ON DELETE NO ACTION,
   CHARSET=ASCII;
 
