@@ -19,6 +19,10 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Learning\InlineGrader\FindableCrocodoc;
 
 /**
  * A mapper for a student's submission to a due work.
@@ -27,7 +31,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as
  * @method Submission findById($id)
  * @method Submission hydrate(array $row, $alias = '', $callback = null)
  */
-class SubmissionMapper extends BaseMapper
+class SubmissionMapper extends BaseMapper implements FindableCrocodoc
 {
     /**
      * @return void
@@ -165,6 +169,30 @@ class SubmissionMapper extends BaseMapper
         }
     }
 
+    /**
+     * Find a particular record that contains $crocodocId
+     *
+     * @param $crocodocId
+     * @return Submission|null
+     */
+    public function findByCrocodocId($crocodocId)
+    {
+        try {
+            $submissionFileMapper = $this->getJoinMapper('files');
+
+            /** @var Submission $submission */
+            $submission = $submissionFileMapper->findOneByColumn('uuid', $crocodocId)->getSubmission();
+
+            $existingFiles = $submissionFileMapper->findByColumn('student_submission_id', $submission->getId());
+
+            $submission->setFiles($existingFiles);
+
+            return $submission;
+        }
+        catch (MapperException $e) {
+            return null;
+        }
+    }
 
     /**
      * Soft deletes all Files for the specified Submission

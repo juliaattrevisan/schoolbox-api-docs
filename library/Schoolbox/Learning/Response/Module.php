@@ -26,11 +26,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Submission;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use \Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
-use \Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
-use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 
 class Module extends BaseModule
@@ -192,14 +190,36 @@ class Module extends BaseModule
             $responses = $this->getResponseMapperProxy()->findForAssessment($assessment);
             $response = false;
 
-            foreach ($responses as $currentResponse) {
-                if ($currentResponse->getId() == $feedback->getResponse()->getId()) {
-                    $response = $currentResponse;
+            if ($feedback->getResponse() instanceof IResponse) {
+                foreach ($responses as $currentResponse) {
+                    if ($currentResponse->getId() == $feedback->getResponse()->getId()) {
+                        $response = $currentResponse;
+                    }
                 }
             }
 
+            /* No response found
+             * This can happen when there really isn't a response that meets the params specified,
+             * or when a previously-associated feedback became floating.
+             */
             if (!$response) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+
+                /* If a crocodoc id exists, it may have been in a Response which had an Associated
+                 * Feedback that got converted into a Floating Feedback. This was a misbehaviour that
+                 * was repaired previously, but there might be some orphaned data as a result.
+                 *
+                 * In this case, look for a Response that contained the crocodoc id. If you can't find
+                 * one, then die with GENERIC_NOT_FOUND.
+                 */
+                if (strlen($params['crocodocId'])) {
+                    $response = $this->getResponseMapperProxy()->findByCrocodocId($assessment, $params['crocodocId']);
+                }
+
+                /* Still didn't find it? Then it really didn't exist
+                 */
+                if (!$response) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
             }
         }
         catch (OutOfBoundsException $e) {

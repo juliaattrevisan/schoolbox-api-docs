@@ -38,4 +38,12 @@ class Task extends AbstractSubSource
     {
         return $assessment instanceof TaskObject;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function findByCrocodocId(IAssessable $assessment, $crocodocId)
+    {
+        return null;
+    }
 }
