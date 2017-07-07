@@ -18,6 +18,7 @@
 <div class="row">
     <div class="small-12 island">
         <h1>App Registrations</h1>
+        {% if logs | length %}
         <h2 class="subheader">{% if user.id %}Attempting push to {{ user.formatName }} (user {{ user.id }}){% else %}Configuration Result{% endif %}</h2>
         <section class="content">
             <ul class="no-margin">
@@ -26,6 +27,7 @@
                 {% endfor %}
             </ul>
         </section>
+        {% endif %}
         {% if registry %}
             <h2 class="subheader">Applications Registered</h2>
             <table>
