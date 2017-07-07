@@ -464,14 +464,16 @@ class Controller extends BaseController
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ $e ]);
             }
+
+            $log->warning('-- END --');
+
         } else {
             $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll([ 'order' => [ 'user_id' => 'asc' ] ]);
         }
 
-        $log->warning('-- END --');
         rewind($write);
 
-        $content['data']['logs'] = explode("\n", trim(stream_get_contents($write)));
+        $content['data']['logs'] = array_filter(explode("\n", trim(stream_get_contents($write))));
 
         $this->getResponse()->content->set($content);
     }
