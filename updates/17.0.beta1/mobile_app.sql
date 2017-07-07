@@ -42,3 +42,7 @@ ALTER TABLE `mobile_app_registry`
   ADD FOREIGN KEY (`app_id`) REFERENCES `mobile_app`(`app_id`) ON UPDATE NO ACTION ON DELETE NO ACTION,
   CHARSET=ASCII;
 
+/* hide the old config options (don't delete right away, we might need them) */
+UPDATE `config`
+SET hidden = 'true'
+WHERE `name` LIKE '%push_gcm%' OR `name` LIKE '%push_apns%';
