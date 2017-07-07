@@ -49,52 +49,19 @@
     {% set latestReview      = latestAttempt.findMostRecentFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
-    {% set isPublished  = latestReview.published %}
-    {% set canPublish   = latestReview and not isPublished %}
+    {% set isPublished       = latestReview.published %}
+    {% set canPublish        = latestReview and not isPublished %}
 
     {% if not latestAttempt %}
         {% set pActionSummary    = '' %}
     {% endif %}
 
-    {% if latestAttempt %}
-        {% if latestAttempt.isSubmitted %}
-            {% if latestReview %}
-                {% if latestReview.publishedAt.lt(latestAttempt.submittedAt) %}
-                    {# Feedback Required
-                     # Published feedback is outdated - attempt was finished more recently
-                     #}
-                    {% set pStatusClass = statusPending %}
-                    {% set pTooltip     = labelPending %}
-                {% else %}
-                    {# No feedback required
-                     # Published feedback is more recent than latest finished attempt
-                     #}
-                    {% set pStatusClass = statusReviewed %}
-                    {% set pTooltip = labelReviewed %}
-                {% endif %}
-            {% else %}
-                {# Feedback Required
-                 # No published feedback ever existed
-                 #}
-                {% set pStatusClass = statusPending %}
-                {% set pTooltip = labelPending %}
-            {% endif %}
-        {% else %}
-            {# Feedback Required
-             # Current attempt is being undertaken, and -will- require feedback or other kind
-             # of teacher intervention (this situation is not Reviewed or Not Attempted which is
-             # where Bagius' light turns green)
-             #}
-            {% set pStatusClass = statusPending %}
-            {% set pTooltip = 'Review will be required when this attempt is finished' %}
-        {% endif %}
-    {% else %}
-        {# No Feedback Required
-         # Not Attempted yet
-         #}
-        {% set pStatusClass = statusIncomplete %}
-        {% set pTooltip = 'Not attempted' %}
-    {% endif %}
+    {# Progress icon #}
+    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.reviewRequired ? statusPending : statusReviewed) %}
+
+    {# Progress icon tool tip #}
+    {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.reviewRequired ? labelPending  : labelReviewed)  %}
+    {% set pTooltip     = latestAttempt and not latestAttempt.isSubmitted ? 'Review will be required when this attempt is finished' : pTooltip %}
 
     {% set pStatusText %}
         {%- spaceless %}
