@@ -159,7 +159,15 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
             $file->setStorage($store);
 
             $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-            $file->setFolder($this->hydrateJoin($r, $this->getFolderFieldname(), 'c'));
+
+            if ($file->getFolder() && $file->getFolder()->getId() === '0') {
+                // root folder
+                $folder = $this->getJoinMapper($this->getFolderFieldname())->findById(0);
+            } else {
+                $folder = $this->hydrateJoin($r, $this->getFolderFieldname(), 'c');
+            }
+
+            $file->setFolder($folder);
 
             $c->add($file);
         }
