@@ -204,17 +204,15 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             }
 
             if ($allEvents !== null) {
-                foreach ($allEvents->children() as $currentEvent) {
-                    /*
-                     * $currentEvent \Sabre\VObject\Component\VEvent
-                     */
-
+                foreach ($allEvents->getComponents() as $currentEvent) {
                     /* gloop returns a whole bunch of stuff all mixed up
                      *
                      * We only want to deal with Sabre\VObject\Component\VEvent objects
                      * as they seem to be the calendar items themselves
                      */
                     if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
+                        /** @var $currentEvent \Sabre\VObject\Component\VEvent */
+
                         $isAdded = true;
                         if (is_callable($filterFunction)) {
                             $isAdded = $filterFunction($currentEvent, $decodedConfig);
