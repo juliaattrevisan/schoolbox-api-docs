@@ -194,6 +194,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                     array($source, $startTimestamp, $endTimestamp),
                     $cache->getCachedTime()
                 );
+                /** @var \Sabre\VObject\Document $allEvents */
                 $allEvents        = unserialize($serializedEvents);
             } catch (Exception $e) {
                 /* Some google calendars don't follow sabre's expected format?
@@ -203,7 +204,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             }
 
             if ($allEvents !== null) {
-                foreach ($allEvents->children as $currentEvent) {
+                foreach ($allEvents->children() as $currentEvent) {
                     /*
                      * $currentEvent \Sabre\VObject\Component\VEvent
                      */
