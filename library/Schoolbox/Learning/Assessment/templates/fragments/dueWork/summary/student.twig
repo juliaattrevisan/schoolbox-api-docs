@@ -7,11 +7,23 @@
     });
 </script>
 
-<div class="row">
+<div class="row actions-small-1">
     <div class="small-12 columns">
         <h1>{{ participant.assessable.title }}</h1>
         {% include '@learningAssessment/meta.twig' with {assessment: participant.assessable, submissionsBlocked: submissionsBlocked, student: participant.user, user: USER, icon: 'icon-due-work'} %}
     </div>
+    {% set viewRoute   = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: participant.assessable.id, assessment: participant.assessable}) %}
+    {% if viewRoute %}
+    <nav>
+        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul data-dropdown-content id="header-options" class="f-dropdown">
+        <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
+        {% if isRouteAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: participant.assessable.id, assessment: participant.assessable}) %}
+            <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: participant.assessable.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
+        {% endif %}
+    </ul>
+    {% endif %}
 </div>
 
 <div class="row">
