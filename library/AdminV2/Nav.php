@@ -27,7 +27,7 @@ class AdminV2_Nav
         'rubric-results'   => 'Rubrics',
         'terms'            => 'Terms',
         'course-builder'   => 'Course Builder',
-        'messages'         => 'Messages',
+        'messages'         => 'Notifications',
         'lists'            => 'Lists',
         'lti'              => 'LTI Providers',
         'cleanup'          => 'Cleanup',
