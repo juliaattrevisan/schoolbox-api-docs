@@ -282,24 +282,6 @@ class Calendar extends DeprecatedModel
     }
 
 
-    function getCampusList($type = 1)
-    {
-        $query = "SELECT id, name FROM luCampus";
-        if (!$_SESSION['su']) {
-            $query .= ", userAccess WHERE (luCampus.id = userAccess.sid OR userAccess.sid = 0) AND
-				userAccess.service = '2' AND uid = " . $_SESSION['id'] . " AND type > $type";
-        }
-        $campusList = $this->db->getAll($query);
-        if (is_array($campusList)) {
-            foreach ($campusList as $campus) {
-                $data['CAMPUS_NAME'] = $campus['name'];
-                $data['CAMPUS_ID']   = $campus['id'];
-                $output[]            = $data;
-            }
-        }
-        return $output;
-    }
-
     /**
      * Used on the Calendar screens to filter events
      *
@@ -338,19 +320,6 @@ class Calendar extends DeprecatedModel
     }
 
 
-    function getGroupList()
-    {
-        $query     = "SELECT * FROM groups";
-        $groupList = $this->db->getAll($query);
-        if (is_array($groupList)) {
-            foreach ($groupList as $group) {
-                $data['GROUP_ID']   = $group['id'];
-                $data['GROUP_NAME'] = $group['name'];
-                $output[]           = $data;
-            }
-        }
-        return $output;
-    }
 
     /**
      * Get an event by its id

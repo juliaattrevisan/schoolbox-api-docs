@@ -72,15 +72,23 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 
         /* Permissions for this connector
          */
-        $calendarHandler = new Calendar();
+        $userHandler = new User();
 
         /* Campus permissions
          */
-        $page->checkList('campus_list', $calendarHandler->getCampusList(), $this->getCampus(), 'configFragment');
+        $page->checkList('campus_list', $userHandler->getCampusList(), $this->getCampus(), 'configFragment',
+            [
+                'id' => 'CAMPUS_ID',
+                'name' => 'CAMPUS_NAME'
+            ]);
 
         /* Group permissions
          */
-        $page->checkList('group_list', $calendarHandler->getGroupList(), $this->getGroups());
+        $page->checkList('group_list', $userHandler->getGroupList(), $this->getGroups(), TEMPLATE_content,
+            [
+                'id' => 'GROUP_ID',
+                'name' => 'GROUP_NAME'
+            ]);
     }
 
     /**
