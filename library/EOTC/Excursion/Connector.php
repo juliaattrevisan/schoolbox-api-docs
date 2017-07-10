@@ -82,19 +82,19 @@ class Connector
              * Generate a unique identifier per event (probably use the primary key
              * of the eotc_event table)
              */
-            'EventCode' => $this->generateIdentifier($event['id']),
+            'EventCode' => $this->generateIdentifier($event->getId()),
 
             /* EOTC Event description goes here
              */
-            'Description' => $event['description'],
+            'Description' => $event->getDetail(),
 
             /* A value that exists in dbo.spsEventTypes
              */
-            'EventTypeCode' => $event['eventTypeCode'],
+            'EventTypeCode' => 'TESTTYPE',
 
             /* I guess this is a synergetic id?
              */
-            'OrganiserID' => $event['tic']['id'],
+            'OrganiserID' => $event->getTeacherInCharge()->getExternalId(),
         ];
 
         $outputs = [
