@@ -27,6 +27,13 @@ class Connector
     const DEFAULT_STATUS = 'PLANNING';
 
     /**
+     * One of the options in lu.AttendeeType
+     * This distinguishes staff from students in Synweb
+     */
+    const ATTENDEE_STAFF = 'STAFF';
+    const ATTENDEE_STUDENT = 'ATTENDEE';
+
+    /**
      * An instance of MSSQL
      *
      * @var IConnector
@@ -192,11 +199,11 @@ class Connector
         new \Alaress_Probe('<h1>Attendees</h1>');
 
         foreach ($event->getMetadata()->getStaffAttendees() as $currentAttendee) {
-            $this->insertAttendee($event, $currentAttendee, 'STAFF');
+            $this->insertAttendee($event, $currentAttendee, self::ATTENDEE_STAFF);
         }
 
         foreach ($event->getMetadata()->getStudentAttendees() as $currentAttendee) {
-            $this->insertAttendee($event, $currentAttendee, 'ATTENDEE');
+            $this->insertAttendee($event, $currentAttendee, self::ATTENDEE_STUDENT);
         }
     }
 
