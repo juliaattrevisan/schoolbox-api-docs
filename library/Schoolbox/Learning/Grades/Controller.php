@@ -120,6 +120,22 @@ class Controller extends Base
 
 
     /**
+     * Redirect user to their own grades page for the current term
+     */
+    public function getGradesForCurrentUser()
+    {
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate(
+                'learningGrades.getGrades', [
+                    'userId'   => $this->getUser()->getId(),
+                    'termCode' => $this->getTermMapper()->findForToday()->getCode()
+                ]
+            )
+        );
+    }
+
+
+    /**
      * Display the grade summary page. With a list of classes/groups that have student interactions
      * for the specified Viewee and Term
      *
