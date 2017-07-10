@@ -400,29 +400,30 @@ class EventMapper extends Calendar\EventMapper {
      */
     protected function postSave($event)
     {
-        new \Alaress_Probe($event);
-
-        /* Spin up a database factory
+        /* Sync to External DB
          */
-        $factory = new Factory();
+        if ($event->getMetadata()->getStatus()->isApproved()) {
 
-        /* Spawn the one we want
-         */
-        $db = $factory->createMssql();
+            /* Spin up a database factory
+             */
+            $factory = new Factory();
 
-        /* Connect to the place we want
-         */
-        $db->connect(
-            '172.31.15.10',
-            'Synergetic_AUVIC_ALARESS_PRD',
-            'sa',
-            'Synergetic#1'
-        );
+            /* Spawn the one we want
+             */
+            $db = $factory->createMssql();
 
-        $excursionConnector = new ExcursionConnector($db);
-        $excursionConnector->sync($event);
+            /* Connect to the place we want
+             */
+            $db->connect(
+                '172.31.15.10',
+                'Synergetic_AUVIC_ALARESS_PRD',
+                'sa',
+                'Synergetic#1'
+            );
 
-        die();
+            $excursionConnector = new ExcursionConnector($db);
+            $excursionConnector->sync($event);
+        }
     }
 
     /**
