@@ -93,7 +93,7 @@
                                 </nav>
                             {% endif %}
 
-                            <article>{{ comment.getBody | purify }}</article>
+                            <article><p>{{ comment.getBody | nl2br }}</p></article>
                         </li>
 
                     {% endfor %}
