@@ -2,6 +2,9 @@
 
 namespace Page;
 
+use AcceptanceTester;
+use Codeception\Exception\TestRuntimeException;
+
 /**
  * Class Datepicker
  *
@@ -16,9 +19,17 @@ class Datepicker
     // include url of current page
     public static $URL = '';
 
+    /**
+     * @var AcceptanceTester
+     */
     protected $tester;
 
-    public function __construct(\AcceptanceTester $i)
+    /**
+     * Constructor
+     *
+     * @param AcceptanceTester $i
+     */
+    public function __construct(AcceptanceTester $i)
     {
         $this->tester = $i;
     }
@@ -46,9 +57,9 @@ class Datepicker
 
     /**
      * Check if the calendar picker date is the same as the input value
-     * @param AcceptanceTester $i
      * @param $inputField
      * @param $value
+     * @throws TestRuntimeException if wait() fails
      */
     public function checkCalendarDate($inputField, $value) {
         $i = $this->tester;
@@ -66,9 +77,9 @@ class Datepicker
 
     /**
      * Check if time is displayed correctly by the calendar picker
-     * @param AcceptanceTester $i
      * @param $inputField
      * @param $value
+     * @throws TestRuntimeException if wait() fails
      */
     public function checkCalendarTime($inputField, $value) {
         $i = $this->tester;
@@ -81,9 +92,9 @@ class Datepicker
 
     /**
      * Check AllDay is ticked for date only input
-     * @param AcceptanceTester $i
      * @param $inputField
      * @param $value
+     * @throws TestRuntimeException if wait() fails
      */
     public function checkCalendarAllDay($inputField, $value) {
         $i = $this->tester;
