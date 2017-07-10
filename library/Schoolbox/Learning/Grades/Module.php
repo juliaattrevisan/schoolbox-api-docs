@@ -93,6 +93,7 @@ class Module extends BaseModule
 
 
         // Overview and single class pages
+        $this->register('GET', '', 'getGradesForCurrentUser', new Rule\IsLoggedIn());
         $this->register('GET', '/{userId:\d+}{/termCode}',                         'getGrades',           $permissions, $loadVieweeTerm);
         $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}',         'getGradesForSubject', $permissions, $loadVieweeTermFolder);
 
