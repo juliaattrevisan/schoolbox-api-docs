@@ -187,12 +187,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateCourseSpecification']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCourseSpecification']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'unMuteClassNotifications']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCourseSpecification']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'hardDeleteCategoryCodes']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCategoryCodes']);
@@ -206,7 +207,26 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Update a units course specification
+     * Validate a units been dragged into a folder which has a course specification
+     *
+     * @param Model $folder
+     * @return bool
+     */
+    public function validateCourseSpecification(Model $folder)
+    {
+        // This only applies to units
+
+        if ($folder->hasUnitSpecification()) {
+            return $this->findParentCourseSpecification($folder) instanceof CourseSpecification\Model;
+        }
+
+        // Other folders always get a clean bill of health
+
+        return true;
+    }
+
+    /**
+     * Update units course specification
      *
      * @param Model $folder
      * @return bool
@@ -219,23 +239,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // Iterate up through its parents until we find one that has a course specification
 
-            $parent = $this->findById($folder->getParent()->getId());
+            $courseSpecification = $this->findParentCourseSpecification($folder);
 
-            do {
+            if ($courseSpecification instanceof CourseSpecification\Model) {
+                $folder->getUnitSpecification()->setCourse($courseSpecification);
+                UnitSpecification\Mapper::getInstance()->save($folder->getUnitSpecification());
+            }
 
-                $parent = $this->findById($parent->getParent()->getId());
-
-                if ($parent->getCourseSpecification() instanceof CourseSpecification\Model) {
-
-                    // Found a course specification, use its course ID and get out of here
-
-                    $folder->getUnitSpecification()->setCourse($parent->getCourseSpecification());
-                    return true;
-                }
-
-            } while ($parent->getId() != 0);
-
-            // We didn't find a course specification- this thing isn't where its supposed to be
+            // We didn't find a course specification- this unit isn't where its supposed to be
 
             return false;
         }
@@ -244,6 +255,37 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         return true;
     }
+
+    /**
+     * Find course specification of closest parent
+     *
+     * @param Model $folder
+     * @return bool|CourseSpecification\Model
+     */
+    private function findParentCourseSpecification($folder)
+    {
+        // Iterate up through its parents until we find one that has a course specification
+
+        $parent = $this->findById($folder->getParent()->getId());
+
+        do {
+
+            $parent = $this->findById($parent->getParent()->getId());
+
+            if ($parent->getCourseSpecification() instanceof CourseSpecification\Model) {
+
+                // Found a course specification, use its course ID and get out of here
+
+                return $parent->getCourseSpecification();
+            }
+
+        } while ($parent->getId() != 0);
+
+        // If we get here we didn't find anything with a course specification
+
+        return false;
+    }
+
 
     /**
      * Post soft-delete callback to soft-delete the CourseSpec linked to this Folder if one exists
