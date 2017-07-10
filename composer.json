@@ -72,6 +72,7 @@
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
-        "phpunit/phpunit": "~4.8.35"
+        "phpunit/phpunit": "~4.8.35",
+        "codeception/codeception": "^2.3"
     }
 }
