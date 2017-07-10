@@ -601,7 +601,7 @@ class Controller extends Base
     /**
      * Show options
      *
-     * @api /adminv2/lists/save
+     * @api /adminv2/lists
      * @level 160
      *
      * @param string $table Arbitrary value to identify a table. Does not need to be the actual table name.
