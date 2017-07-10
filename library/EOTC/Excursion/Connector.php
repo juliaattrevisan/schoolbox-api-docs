@@ -66,6 +66,7 @@ class Connector
      *
      * @param EOTCEvent $event
      * @return int
+     * @throws \DomainException
      */
     private function insertExcursion(EOTCEvent $event)
     {
@@ -106,6 +107,10 @@ class Connector
         ];
 
         $statement = $this->getDb()->executeStoredProcedure('spiExcursions', $inputs, $outputs);
+
+        if (!is_numeric($eventsSeq)) {
+            throw new \DomainException('Could not save Excursion: maybe need a unique EventCode identifier?');
+        }
 
         new \Alaress_Probe($inputs, $outputs, $eventsSeq);
 
