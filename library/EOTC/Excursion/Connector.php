@@ -191,41 +191,57 @@ class Connector
     {
         new \Alaress_Probe('<h1>Attendees</h1>');
 
-        foreach ($event['attendees'] as $currentAttendee) {
-            $newEventCurrentSeq = null;
-            $message = null;
-
-            $inputs = [
-                'ID' => (int)$currentAttendee['id'],
-                'EventCode' => $this->generateIdentifier($event['id']),
-
-                /* Provides dialog that asks you to confirm uniqueness of attendees
-                 * but changing this option does nothing to the outcome
-                 */
-                'VerifyOnlyFlag' => 0,
-
-                /* One of the options in lu.AttendeeType
-                 */
-                'AttendeeType' => $currentAttendee['attendeeType']
-            ];
-
-            $outputs = [
-                'NewEventCurrentSeq' => [
-                    'value' => &$newEventCurrentSeq,
-                    'type' => \PDO::PARAM_INT,
-                    'length' => 8
-                ],
-                'Message' => [
-                    'value' => &$message,
-                    'type' => \PDO::PARAM_STR,
-                    'length' => 200
-                ]
-            ];
-
-            $statement = $this->getDb()->executeStoredProcedure('spiCommunityEventsCurrent', $inputs, $outputs);
-
-            new \Alaress_Probe($currentAttendee, $inputs, $outputs, $newEventCurrentSeq, $message);
+        foreach ($event->getMetadata()->getStaffAttendees() as $currentAttendee) {
+            $this->insertAttendee($event, $currentAttendee, 'STAFF');
         }
+
+        foreach ($event->getMetadata()->getStudentAttendees() as $currentAttendee) {
+            $this->insertAttendee($event, $currentAttendee, 'ATTENDEE');
+        }
+    }
+
+    /**
+     * Insert an attendee of $event
+     *
+     * @param EOTCEvent $event
+     * @param \Schoolbox\User $currentAttendee
+     * @param string $attendeeType
+     */
+    private function insertAttendee(EOTCEvent $event, \Schoolbox\User $currentAttendee, $attendeeType)
+    {
+        $newEventCurrentSeq = null;
+        $message = null;
+
+        $inputs = [
+            'ID' => (int)$currentAttendee->getExternalId(),
+            'EventCode' => $this->generateIdentifier($event->getId()),
+
+            /* Provides dialog that asks you to confirm uniqueness of attendees
+             * but changing this option does nothing to the outcome
+             */
+            'VerifyOnlyFlag' => 0,
+
+            /* One of the options in lu.AttendeeType
+             */
+            'AttendeeType' => $attendeeType
+        ];
+
+        $outputs = [
+            'NewEventCurrentSeq' => [
+                'value' => &$newEventCurrentSeq,
+                'type' => \PDO::PARAM_INT,
+                'length' => 8
+            ],
+            'Message' => [
+                'value' => &$message,
+                'type' => \PDO::PARAM_STR,
+                'length' => 200
+            ]
+        ];
+
+        $statement = $this->getDb()->executeStoredProcedure('spiCommunityEventsCurrent', $inputs, $outputs);
+
+        new \Alaress_Probe($currentAttendee, $inputs, $outputs, $newEventCurrentSeq, $message);
     }
 
     /* Getters/Setters
