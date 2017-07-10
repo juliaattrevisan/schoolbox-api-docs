@@ -229,9 +229,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Update units course specification
      *
      * @param Model $folder
+     * @param Model $previous
      * @return bool
      */
-    public function updateCourseSpecification(Model $folder)
+    public function updateCourseSpecification(Model $folder, $previous = null)
     {
         // If the folder is a unit, we need to make sure its course specification is right
 
@@ -541,7 +542,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Postsave callback - saves a homepage config for newly created folders.
+     * Post-save callback - saves a homepage config for newly created folders.
      *
      * @param Model $model
      * @param Model $previous
@@ -558,6 +559,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $homepageConfigMapper->save($model->getHomepage());
             }
         }
+
+        return true;
     }
 
     /**
@@ -1016,7 +1019,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                         ->setParent($this->createModel()->setId('#'));
         }
 
-        return parent::findById($id);
+        /** @var Model $folder */
+        $folder = parent::findById($id);
+
+        return $folder;
     }
 
 
@@ -1454,6 +1460,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Round we go again
 
             $parent = $this->findCheaplyById($folder->getParent()->getId(), ['deleted' => true]);
+
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $result = $this->findNearestNonInheritingAncestralNode($parent, $iteration++);
         }
         else
