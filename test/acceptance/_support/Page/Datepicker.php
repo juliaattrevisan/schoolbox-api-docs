@@ -15,8 +15,14 @@ use Codeception\Exception\TestRuntimeException;
  */
 class Datepicker
 {
-    // include url of current page
-    public static $URL = '';
+    /**
+     * Datepicker page (for testing purposes)
+     *
+     * TODO make this a helper instead of a page object?
+     *
+     * @var string
+     */
+    public static $URL = '/calendar/modify.php';
 
     /**
      * @var AcceptanceTester
