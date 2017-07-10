@@ -18,6 +18,7 @@ use EOTC\Authenticator;
 use EOTC\EventMapper;
 use EOTC\EventMetadataMapper;
 use EOTC\EventStatusMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 
 $page = new SitePage();
@@ -115,8 +116,7 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
      * into External DB by altering its contents after the fact
      */
     if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
-
-        $configLoader = new \Schoolbox\Config\Loader();
+        $configLoader = new ConfigLoader();
 
         /* Spin up a database factory
          */
