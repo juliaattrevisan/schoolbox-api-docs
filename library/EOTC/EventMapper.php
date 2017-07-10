@@ -17,8 +17,6 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
-use Alaress\Database\Factory;
-use \EOTC\Excursion\Connector as ExcursionConnector;
 
 /**
  * Class EventMapper

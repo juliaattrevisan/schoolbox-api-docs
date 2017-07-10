@@ -10,6 +10,9 @@
 
 require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
+use Alaress\Database\Factory;
+use \EOTC\Excursion\Connector as ExcursionConnector;
+
 $page = new SitePage();
 $event = false;
 
@@ -104,31 +107,29 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
      * its previous status was not Approved so we can't spam this event
      * into External DB by altering its contents after the fact
      */
-    new \Alaress_Probe($originalStatus, $status);
-    die();
-//        if ($event->getMetadata()->getStatus()->isApproved() && !$previous->getMetadata()->getStatus()->isApproved()) {
-//
-//        /* Spin up a database factory
-//         */
-//        $factory = new Factory();
-//
-//        /* Spawn the one we want
-//         */
-//        $db = $factory->createMssql();
-//
-//        /* Connect to the place we want
-//         */
-//        $db->connect(
-//            '172.31.15.10',
-//            'Synergetic_AUVIC_ALARESS_PRD',
-//            'sa',
-//            'Synergetic#1'
-//        );
-//
-//        $excursionConnector = new ExcursionConnector($db);
-//        $excursionConnector->sync($event);
-//        }
-//    }
+    if ($status->isApproved() && ($originalStatus != \EOTC\EventStatusMapper::STATUS_APPROVED)) {
+
+        /* Spin up a database factory
+         */
+        $factory = new Factory();
+
+        /* Spawn the one we want
+         */
+        $db = $factory->createMssql();
+
+        /* Connect to the place we want
+         */
+        $db->connect(
+            '172.31.15.10',
+            'Synergetic_AUVIC_ALARESS_PRD',
+            'sa',
+            'Synergetic#1'
+        );
+
+        $excursionConnector = new ExcursionConnector($db);
+        $excursionConnector->sync($event);
+        die();
+    }
 
 	/* Admin redirect back to review screen
 	 */
