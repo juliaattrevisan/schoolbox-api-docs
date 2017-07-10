@@ -12,17 +12,17 @@
  * @method void am($role)
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
- * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = NULL)
+ * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = null)
  *
  * @SuppressWarnings(PHPMD)
-*/
+ */
 class AcceptanceTester extends \Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
 
-   /**
-    * Define custom actions here
-    */
+    /**
+     * Define custom actions here
+     */
 
 
     public static $loginURL = '/login';
@@ -34,11 +34,30 @@ class AcceptanceTester extends \Codeception\Actor
     public static $loginButton = 'input[type=submit]';
 
     /**
+     * Log out of Schoolbox
+     */
+    public function logout()
+    {
+        $i = $this;
+        $i->amOnPage(self::$logoutURL);
+    }
+
+    /**
+     * Login as Alaress
+     */
+    public function loginAsAdmin()
+    {
+        $this->login('alaress', 'alaress');
+    }
+
+    /**
      * Login to Schoolbox
+     *
      * @param $username
      * @param $password
      */
-    public function login($username, $password) {
+    public function login($username, $password)
+    {
 
         $i = $this;
 
@@ -51,7 +70,7 @@ class AcceptanceTester extends \Codeception\Actor
         $i->fillField(self::$usernameField, $username);
         $i->fillField(self::$passwordField, $password);
         //Can't just check a hidden field $i->checkOption('#rememberme'), keeping this as an example:
-        $i->executeJS('$("'.self::$rememberMe.'").val(1);');
+        $i->executeJS('$("' . self::$rememberMe . '").val(1);');
         $i->click(self::$loginButton);
         $i->amOnPage('/');
 
@@ -60,26 +79,10 @@ class AcceptanceTester extends \Codeception\Actor
     }
 
     /**
-     * Log out of Schoolbox
-     */
-    public function logout() {
-        $i = $this;
-        $i->amOnPage(self::$logoutURL);
-    }
-
-
-    /**
-     * Login as Alaress
-     */
-    public function loginAsAdmin() {
-        $this->login('alaress', 'alaress');
-    }
-
-
-    /**
      * Impersonate Coles (sales data)
      */
-    public function impersonateTeacher() {
+    public function impersonateTeacher()
+    {
         $i = $this;
         $i->click('Alaress Admin');
         $i->click('Mr Jack Coles');

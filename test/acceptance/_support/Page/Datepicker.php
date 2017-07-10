@@ -13,7 +13,6 @@ use Codeception\Exception\TestRuntimeException;
  * @package Page
  *
  */
-
 class Datepicker
 {
     // include url of current page
@@ -47,7 +46,7 @@ class Datepicker
      */
     public static function route($param)
     {
-        return static::$URL.$param;
+        return static::$URL . $param;
     }
 
 
@@ -57,11 +56,13 @@ class Datepicker
 
     /**
      * Check if the calendar picker date is the same as the input value
+     *
      * @param $inputField
      * @param $value
      * @throws TestRuntimeException if wait() fails
      */
-    public function checkCalendarDate($inputField, $value) {
+    public function checkCalendarDate($inputField, $value)
+    {
         $i = $this->tester;
         // It would be nice to have Alaress_Date_Format available here to be able to check dates dynamically
         $i->fillField($inputField, $value);
@@ -77,11 +78,13 @@ class Datepicker
 
     /**
      * Check if time is displayed correctly by the calendar picker
+     *
      * @param $inputField
      * @param $value
      * @throws TestRuntimeException if wait() fails
      */
-    public function checkCalendarTime($inputField, $value) {
+    public function checkCalendarTime($inputField, $value)
+    {
         $i = $this->tester;
         $i->fillField($inputField, $value);
         $i->wait(1);
@@ -92,11 +95,13 @@ class Datepicker
 
     /**
      * Check AllDay is ticked for date only input
+     *
      * @param $inputField
      * @param $value
      * @throws TestRuntimeException if wait() fails
      */
-    public function checkCalendarAllDay($inputField, $value) {
+    public function checkCalendarAllDay($inputField, $value)
+    {
         $i = $this->tester;
         $i->fillField($inputField, $value);
         $i->seeCheckboxIsChecked('#hideTime1');
