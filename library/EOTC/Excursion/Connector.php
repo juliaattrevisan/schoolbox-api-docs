@@ -252,6 +252,46 @@ class Connector
         new \Alaress_Probe($currentAttendee, $inputs, $outputs, $newEventCurrentSeq, $message);
     }
 
+    /**
+     * Blow away an Excursion
+     * Use this because the Synweb ui is wrist-slashingly bad
+     *
+     * @param $eventIds
+     */
+    private function purge($eventIds)
+    {
+        new \Alaress_Probe('<h1>Excursion Removal</h1>');
+
+        $message = null;
+
+        foreach ($eventIds as $currentEventId) {
+            $inputs = [
+                'EventCode' => $this->generateIdentifier($currentEventId),
+
+                /* Provides dialog that asks you to confirm uniqueness of attendees
+                 * but changing this option does nothing to the outcome
+                 */
+                'VerifyOnlyFlag' => 0,
+
+                /* One of the options in lu.AttendeeType
+                 */
+                'Type' => self::DEFAULT_EVENT_TYPE_CODE,
+            ];
+
+            $outputs = [
+                'Message' => [
+                    'value' => &$message,
+                    'type' => \PDO::PARAM_STR,
+                    'length' => 200
+                ]
+            ];
+
+            $statement = $this->getDb()->executeStoredProcedure('spdEvents', $inputs, $outputs);
+
+            new \Alaress_Probe($currentEventId, $inputs, $outputs, $message);
+        }
+    }
+
     /* Getters/Setters
      */
 
