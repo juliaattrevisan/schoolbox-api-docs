@@ -17,6 +17,8 @@ use Authenticator;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\MobileApp\ServiceDTO;
+
 
 class Controller extends Base {
 
@@ -122,18 +124,29 @@ class Controller extends Base {
                 $registry->setTouchedAt($now);
 
             } catch (MapperException $e) {
-                /** @var Registry $registry */
-                $registry = $this->registryMapper->createModel();
-                $registry
-                    ->setUser($_SESSION['user'])
-                    ->setToken($data['token'])
-                    ->setProvider($provider)
-                    ->setCreatedAt($now)
-                    ->setTouchedAt($now);
 
-                // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
-                if (isset($data['deviceId'])) {
-                    $registry->setDeviceId($data['deviceId']);
+                try {
+                    /** @var Registry $registry */
+                    $registry = $this->registryMapper->createModel();
+                    $registry
+                        ->setUser($_SESSION['user'])
+                        ->setToken($data['token'])
+                        ->setService(new ServiceDTO($data['app_id'], $provider))
+                        ->setCreatedAt($now)
+                        ->setTouchedAt($now);
+
+                    // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
+                    if (isset($data['deviceId'])) {
+                        $registry->setDeviceId($data['deviceId']);
+                    }
+
+                } catch (MapperException $e) {
+                    $this->getResponse()->status->setCode(400);
+                    $response->set(array(
+                        'format' => 'json',
+                        'data'   => 'Invalid app ID given'
+                    ));
+                    return;
                 }
             }
 
