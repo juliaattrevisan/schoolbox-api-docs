@@ -133,15 +133,15 @@ class Connector
             /* Description: The event's title/name
              * Objective: A seemingly arbitrary string, but I'm going to use it for Event Description
              */
-            'Description' => $event['title'],
-            'Objective' => $event['description'],
+            'Description' => $event->getTitle(),
+            'Objective' => $event->getDetail(),
 
             /* Event dates
              */
-            'EventFrom' => $event['fromDatetime'],
-            'EventTo' => $event['toDatetime'],
-            'InviteDate' => $event['fromDatetime'],
-            'RSVPDueBy' => $event['fromDatetime'],
+            'EventFrom' => $event->getStartDateTime(),
+            'EventTo' => $event->getEndDateTime(),
+            'InviteDate' => $event->getStartDateTime(),
+            'RSVPDueBy' => $event->getStartDateTime(),
 
             /* One of the values in dbo.luAttire
              */
@@ -150,11 +150,11 @@ class Connector
             /* A seemingly arbitrary string, but make it one of the
              * dbo.spsEventTypes options
              */
-            'Type' => $event['eventTypeCode'],
+            'Type' => 'TESTTYPE',
 
             /* One of the values in dbo.luEventStatus
              */
-            'Status' => $event['status'],
+            'Status' => 'PLANNING',
 
             /* Limits
              */
