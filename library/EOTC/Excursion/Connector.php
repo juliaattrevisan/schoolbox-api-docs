@@ -89,8 +89,6 @@ class Connector
      */
     private function insertExcursion(EOTCEvent $event)
     {
-        new \Alaress_Probe('<h1>Excursion Insertion</h1>');
-
         $eventsSeq = null;
         $result = null;
 
@@ -131,8 +129,6 @@ class Connector
             throw new \DomainException('Could not save Excursion: maybe need a unique EventCode identifier?');
         }
 
-        new \Alaress_Probe($inputs, $outputs, $eventsSeq);
-
         return $eventsSeq;
     }
 
@@ -144,8 +140,6 @@ class Connector
      */
     private function updateDetails(EOTCEvent $event, $eventsSeq)
     {
-        new \Alaress_Probe('<h1>Excursion Update</h1>');
-
         $inputs = [
             'EventSeq' => $eventsSeq,
 
@@ -184,10 +178,8 @@ class Connector
              */
             'Comments' => '',
         ];
-        $statement = $this->getDb()->executeStoredProcedure('spuExcursionDetails', $inputs, $outputs);
-        $statement->nextRowset();
 
-        new \Alaress_Probe($inputs, $outputs, $eventsSeq);
+        $statement = $this->getDb()->executeStoredProcedure('spuExcursionDetails', $inputs, $outputs);
     }
 
     /**
@@ -197,8 +189,6 @@ class Connector
      */
     public function insertAttendees(EOTCEvent $event)
     {
-        new \Alaress_Probe('<h1>Attendees</h1>');
-
         foreach ($event->getMetadata()->getStaffAttendees() as $currentAttendee) {
             $this->insertAttendee($event, $currentAttendee, self::ATTENDEE_STAFF);
         }
@@ -248,8 +238,6 @@ class Connector
         ];
 
         $statement = $this->getDb()->executeStoredProcedure('spiCommunityEventsCurrent', $inputs, $outputs);
-
-        new \Alaress_Probe($currentAttendee, $inputs, $outputs, $newEventCurrentSeq, $message);
     }
 
     /**
@@ -260,8 +248,6 @@ class Connector
      */
     private function purge($eventIds)
     {
-        new \Alaress_Probe('<h1>Excursion Removal</h1>');
-
         $message = null;
 
         foreach ($eventIds as $currentEventId) {
@@ -287,8 +273,6 @@ class Connector
             ];
 
             $statement = $this->getDb()->executeStoredProcedure('spdEvents', $inputs, $outputs);
-
-            new \Alaress_Probe($currentEventId, $inputs, $outputs, $message);
         }
     }
 
