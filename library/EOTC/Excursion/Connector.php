@@ -11,6 +11,7 @@
 namespace EOTC\Excursion;
 use Alaress\Database\Connector\IConnector;
 use EOTC\Event as EOTCEvent;
+use Schoolbox\User;
 
 class Connector
 {
@@ -214,7 +215,7 @@ class Connector
      * @param \Schoolbox\User $currentAttendee
      * @param string $attendeeType
      */
-    private function insertAttendee(EOTCEvent $event, \Schoolbox\User $currentAttendee, $attendeeType)
+    private function insertAttendee(EOTCEvent $event, User $currentAttendee, $attendeeType)
     {
         $newEventCurrentSeq = null;
         $message = null;
