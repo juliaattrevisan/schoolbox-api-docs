@@ -14,6 +14,17 @@ use EOTC\Event as EOTCEvent;
 
 class Connector
 {
+    /**
+     * A value that exists in dbo.spsEventTypes
+     * This is the "Type" dropdown in Synweb
+     */
+    const DEFAULT_EVENT_TYPE_CODE = 'TESTTYPE';
+
+    /**
+     * One of the values in dbo.luEventStatus
+     * This is the "Status" dropdown in Synweb
+     */
+    const DEFAULT_STATUS = 'PLANNING';
 
     /**
      * An instance of MSSQL
@@ -91,7 +102,7 @@ class Connector
 
             /* A value that exists in dbo.spsEventTypes
              */
-            'EventTypeCode' => 'TESTTYPE',
+            'EventTypeCode' => self::DEFAULT_EVENT_TYPE_CODE,
 
             /* I guess this is a synergetic id?
              */
@@ -150,11 +161,11 @@ class Connector
             /* A seemingly arbitrary string, but make it one of the
              * dbo.spsEventTypes options
              */
-            'Type' => 'TESTTYPE',
+            'Type' => self::DEFAULT_EVENT_TYPE_CODE,
 
             /* One of the values in dbo.luEventStatus
              */
-            'Status' => 'PLANNING',
+            'Status' => self::DEFAULT_STATUS,
 
             /* Limits
              */
