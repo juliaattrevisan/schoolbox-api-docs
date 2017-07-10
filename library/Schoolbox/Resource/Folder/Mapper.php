@@ -187,7 +187,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCourseSpecification']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateCourseSpecification']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
