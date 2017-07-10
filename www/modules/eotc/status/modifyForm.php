@@ -15,6 +15,7 @@ use EOTC\Excursion\Connector as ExcursionConnector;
 use EOTC\ActivityLog\Registry as ActivityLogRegistry;
 use EOTC\ActivityLog\Factory as ActivityLogFactory;
 use EOTC\Authenticator;
+use EOTC\ConfigMapper;
 use EOTC\EventMapper;
 use EOTC\EventMetadataMapper;
 use EOTC\EventStatusMapper;
@@ -111,32 +112,40 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	 */
 	$registry->notify();
 
-    /* Sync to External DB only when the current status is Approved and
-     * its previous status was not Approved so we can't spam this event
-     * into External DB by altering its contents after the fact
-     */
-    if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
-        $configLoader = new ConfigLoader();
+	/* Optionally sync with external db
+	 */
+    $configMapper = new ConfigMapper();
+    $externalDbSync = $configMapper->findOneByColumn('name', 'external_db_sync');
 
-        /* Spin up a database factory
+    if ($externalDbSync->getValue() == 1) {
+
+        /* Sync to External DB only when the current status is Approved and
+         * its previous status was not Approved so we can't spam this event
+         * into External DB by altering its contents after the fact
          */
-        $factory = new Factory();
+        if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
+            $configLoader = new ConfigLoader();
 
-        /* Spawn the one we want
-         */
-        $db = $factory->createMssql();
+            /* Spin up a database factory
+             */
+            $factory = new Factory();
 
-        /* Connect to the place we want
-         */
-        $db->connect(
-            $configLoader->get('external_db_host'),
-            $configLoader->get('external_db_db'),
-            $configLoader->get('external_db_user'),
-            $configLoader->get('external_db_passwd')
-        );
+            /* Spawn the one we want
+             */
+            $db = $factory->createMssql();
 
-        $excursionConnector = new ExcursionConnector($db);
-        $excursionConnector->sync($event);
+            /* Connect to the place we want
+             */
+            $db->connect(
+                $configLoader->get('external_db_host'),
+                $configLoader->get('external_db_db'),
+                $configLoader->get('external_db_user'),
+                $configLoader->get('external_db_passwd')
+            );
+
+            $excursionConnector = new ExcursionConnector($db);
+            $excursionConnector->sync($event);
+        }
     }
 
 	/* Admin redirect back to review screen
