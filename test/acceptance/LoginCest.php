@@ -1,5 +1,5 @@
 <?php
-class LoginCest 
+class LoginCest
 {
     public function _before(AcceptanceTester $i)
     {
@@ -13,7 +13,7 @@ class LoginCest
         $i->click('Submit');
         $i->see("NEWS HEADLINES");
     }
-    
+
     public function loginWithInvalidPassword(AcceptanceTester $i)
     {
         $i->fillField('username', 'wrong');
