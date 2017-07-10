@@ -135,7 +135,6 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
         $excursionConnector = new ExcursionConnector($db);
         $excursionConnector->sync($event);
-        die();
     }
 
 	/* Admin redirect back to review screen
