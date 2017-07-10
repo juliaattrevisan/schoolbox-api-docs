@@ -68,18 +68,19 @@
             <!-- BEGIN member_email -->
             <div class="component-action">
                 <section>
-                    <form id="email-all"  action="/mail/createMail.php" method="post">
+                    <form id="email-all-members-{COMPONENT_INSTANCE_ID}"  action="/mail/createMail.php" method="post">
                         <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLYTO}&gt;"/>
                         <input type="hidden" name="bcc" value="{EMAILALL}"/>
                     </form>
                     <script>
                         $(function() {
-                            $('[data-email]').click(function() {
-                                $('#email-all').submit();
+                            $('[data-email-members={COMPONENT_INSTANCE_ID}]').click(function(event) {
+                                event.preventDefault();
+                                $('#email-all-members-{COMPONENT_INSTANCE_ID}').submit();
                             });
                         });
                     </script>
-                    <a href="#" data-email class="button">Email All</a>
+                    <a href="#" data-email-members="{COMPONENT_INSTANCE_ID}" class="button">Email All</a>
                 </section>
             </div>
             <!-- END member_email -->
