@@ -225,7 +225,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
                 $parent = $this->findById($parent->getParent()->getId());
 
-                if ($parent->getCourseSpecification() instanceof CourseSpecification) {
+                if ($parent->getCourseSpecification() instanceof CourseSpecification\Model) {
 
                     // Found a course specification, use its course ID and get out of here
 
