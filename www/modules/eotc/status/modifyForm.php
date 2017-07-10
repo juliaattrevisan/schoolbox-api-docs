@@ -11,7 +11,14 @@
 require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 use Alaress\Database\Factory;
-use \EOTC\Excursion\Connector as ExcursionConnector;
+use EOTC\Excursion\Connector as ExcursionConnector;
+use EOTC\ActivityLog\Registry as ActivityLogRegistry;
+use EOTC\ActivityLog\Factory as ActivityLogFactory;
+use EOTC\Authenticator;
+use EOTC\EventMapper;
+use EOTC\EventMetadataMapper;
+use EOTC\EventStatusMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 $page = new SitePage();
 $event = false;
@@ -19,12 +26,12 @@ $event = false;
 /* Spawn an existing event if id provided
  */
 try {
-	$eventMapper = \EOTC\EventMapper::getInstance();
+	$eventMapper = EventMapper::getInstance();
 
 	/** @var \EOTC\Event $event */
 	$event = $eventMapper->findById($_POST['eventId']);
 }
-catch (\Schoolbox\Mapper\Exception $e) {
+catch (MapperException $e) {
 	error(160);
 }
 
@@ -34,7 +41,7 @@ $sessionUser = $_SESSION['user'];
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
  * can view this page
  */
-$authenticator = new \EOTC\Authenticator($page);
+$authenticator = new Authenticator($page);
 
 /* Only EOTC Administrators can view this page and a special case for
  * events where creators can self-promote this status into the next.
@@ -67,7 +74,7 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
 	/* Update with values
 	 */
-	$statusMapper = \EOTC\EventStatusMapper::getInstance();
+	$statusMapper = EventStatusMapper::getInstance();
 
 	/** @var \EOTC\EventStatus $status */
 	$status = $statusMapper->findById($_POST['statusId']);
@@ -79,13 +86,13 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	$event->getMetadata()->setStatus($status);
 	$event->getMetadata()->setComment($_POST['comment']);
 
-	$metadataMapper = \EOTC\EventMetadataMapper::getInstance();
+	$metadataMapper = EventMetadataMapper::getInstance();
 	$metadataMapper->save($event->getMetadata());
 
 	/* Activity Log
 	 */
-	$registry = new \EOTC\ActivityLog\Registry();
-	$factory = new \EOTC\ActivityLog\Factory($event, $sessionUser);
+	$registry = new ActivityLogRegistry();
+	$factory = new ActivityLogFactory($event, $sessionUser);
 
 	/* If a status changed, log it
 	 */
@@ -107,7 +114,7 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
      * its previous status was not Approved so we can't spam this event
      * into External DB by altering its contents after the fact
      */
-    if ($status->isApproved() && ($originalStatus != \EOTC\EventStatusMapper::STATUS_APPROVED)) {
+    if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
 
         /* Spin up a database factory
          */
