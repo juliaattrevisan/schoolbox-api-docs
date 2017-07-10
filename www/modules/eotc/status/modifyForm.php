@@ -116,6 +116,8 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
      */
     if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
 
+        $configLoader = new \Schoolbox\Config\Loader();
+
         /* Spin up a database factory
          */
         $factory = new Factory();
@@ -127,10 +129,10 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
         /* Connect to the place we want
          */
         $db->connect(
-            '172.31.15.10',
-            'Synergetic_AUVIC_ALARESS_PRD',
-            'sa',
-            'Synergetic#1'
+            $configLoader->get('external_db_host'),
+            $configLoader->get('external_db_db'),
+            $configLoader->get('external_db_user'),
+            $configLoader->get('external_db_passwd')
         );
 
         $excursionConnector = new ExcursionConnector($db);
