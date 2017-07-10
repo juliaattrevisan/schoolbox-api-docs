@@ -75,8 +75,11 @@ class Datepicker
         $i->wait(1);
         $i->click('Select Date'); // Replace with a openDatepicker method or something
         $i->wait(5);
-        $i->see('FEBRUARY');
-        $i->see('2017');
+
+        // Check actual datetime
+        $date = \Alaress_Date_Format::newNaturalDate($value);
+        $i->see($date->getUsingFormat('F'));
+        $i->see($date->getYear());
         // Wrong, can't get the element this way
 //      $i->seeElement('span[aria-date="February 1, 2017"]', ['css' => 'selected']);
     }
