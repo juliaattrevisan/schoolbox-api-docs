@@ -17,6 +17,8 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
+use Alaress\Database\Factory;
+use \EOTC\Excursion\Connector as ExcursionConnector;
 
 /**
  * Class EventMapper
@@ -398,8 +400,29 @@ class EventMapper extends Calendar\EventMapper {
      */
     protected function postSave($event)
     {
-        /* Noop
+        new \Alaress_Probe($event);
+
+        /* Spin up a database factory
          */
+        $factory = new Factory();
+
+        /* Spawn the one we want
+         */
+        $db = $factory->createMssql();
+
+        /* Connect to the place we want
+         */
+        $db->connect(
+            '172.31.15.10',
+            'Synergetic_AUVIC_ALARESS_PRD',
+            'sa',
+            'Synergetic#1'
+        );
+
+        $excursionConnector = new ExcursionConnector($db);
+        $excursionConnector->sync($event);
+
+        die();
     }
 
     /**
