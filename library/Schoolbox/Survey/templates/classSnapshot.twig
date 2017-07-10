@@ -1,0 +1,26 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+[ folder.name,                   '/homepage/' ~ folder.id ],
+[ 'Classroom Learning Snapshot', '#' ],
+[ pageTitle ]
+) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Classroom Learning Snapshot</h1>
+        <h2 class="subheader">Select Snapshot To Download</h2>
+        <section>
+            <div class="content">
+                {% for survey in surveys %}
+                    <a href="{{ routeLookup('survey.getClassSnapshot', {surveyId: survey.id}) }}">
+                        {% if survey.assessment_title is not empty %}
+                            {{ survey.assessment_title }} -
+                        {% endif %}
+                        {{ survey.survey_title }}
+                    </a><br>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>

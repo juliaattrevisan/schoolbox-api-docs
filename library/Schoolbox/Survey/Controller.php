@@ -13,6 +13,8 @@ use PHPExcel;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Worksheet;
 use PHPExcel_Writer_Excel2007;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -70,6 +72,68 @@ class Controller extends Base
                 $this->getRequest()->query['query']
             )
         ));
+    }
+
+    /**
+     * Display a list of all surveys the students in the chosen folder have completed and link to the
+     *
+     * @param Folder $folder
+     * @return array|bool
+     */
+    public function getClassSnapshotList($folder)
+    {
+        $externalClass = new \External_Class();
+
+        $students = [];
+        $userIds = [];
+
+        // Get the class codes on the folder we are viewing
+
+        $codes = $folder->getCodes()->getColumnValues('code');
+
+        // Retrieve the students in each of these classes
+
+        foreach ($codes as $code) {
+            $students = array_merge($students, $externalClass->getStudents($code));
+        }
+
+        // If we didn't find any students, no point going on
+
+        if (count($students) == 0) {
+            return false;
+        }
+
+        // Now convert those external user arrays into Schoolbox users
+
+        $users = $this->userMapper->findByColumn(
+            'synergy_id',
+            array_column($students, 'synergy_id')
+        );
+
+        /** @var User $user */
+        foreach ($users as $user) {
+            $userIds[] = $user->getId();
+        }
+
+        // If we didn't find any schoolbox users, no point going on
+
+        if (count($userIds) == 0) {
+            return false;
+        }
+
+        // And work out what surveys they have completed
+
+        $surveys = null;
+
+        $surveys = $this->surveyMapper->getAttemptedSurveysForUsers($userIds);
+
+        $this->getResponse()->content->set([
+            'template' => '@survey/classSnapshot.twig',
+            'data' => [
+                'folder' => $folder,
+                'surveys' => $surveys
+            ]
+        ]);
     }
 
     /**

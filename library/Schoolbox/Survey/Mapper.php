@@ -153,6 +153,52 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Retrieve a list of all surveys attempted by the users specified
+     *
+     * @param array $userIds Array containing Schoolbox user IDs of people that have attempted quizzes
+     * @return array
+     */
+    public function getAttemptedSurveysForUsers($userIds)
+    {
+        $placeholders = "";
+        $bindings = [];
+        $count = 0;
+
+        foreach ($userIds as $userId) {
+            if ($placeholders != '') {
+                $placeholders .= ",";
+            }
+
+            $placeholders .= ":userId{$count}";
+            $bindings[":userId{$count}"] = $userId;
+            $count++;
+        }
+
+
+        $sql = "
+            SELECT DISTINCT assess.assess_id as id,
+                            folder.name as folder_name,
+                            assessment.title as assessment_title,
+                            assess.title survey_title
+            FROM            assess
+            LEFT JOIN       assess_attempt ON assess_attempt.assess_id = assess.assess_id
+            LEFT JOIN       folder ON folder.id = assess.category_id
+            LEFT JOIN       assessment ON assessment.id = assess.assessment_id
+            WHERE           assess_attempt.user_id IN ({$placeholders}) AND
+                            assess.availability = 'survey' AND
+                            assess.deleted_at IS NULL AND
+                            assess_attempt.deleted_at IS NULL AND
+                            folder.deleted_at IS NULL AND
+                            assessment.deleted_at IS NULL
+        ";
+
+        $statement = $this->database->prepare($sql);
+        $statement->execute($bindings);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Retrieve the data required for the ePortfolio matrix component
      *
      * @param int $surveyId
