@@ -35,9 +35,8 @@ class AcceptanceTester extends \Codeception\Actor
 
     /**
      * Login to Schoolbox
-     * @param AcceptanceTester $i
-     * @param                  $username
-     * @param                  $password
+     * @param $username
+     * @param $password
      */
     public function login($username, $password) {
 
@@ -62,7 +61,6 @@ class AcceptanceTester extends \Codeception\Actor
 
     /**
      * Log out of Schoolbox
-     * @param AcceptanceTester $i
      */
     public function logout() {
         $i = $this;
@@ -72,17 +70,14 @@ class AcceptanceTester extends \Codeception\Actor
 
     /**
      * Login as Alaress
-     * @param AcceptanceTester $i
      */
     public function loginAsAdmin() {
-        $i = $this;
         $this->login('alaress', 'alaress');
     }
 
 
     /**
      * Impersonate Coles (sales data)
-     * @param AcceptanceTester $i
      */
     public function impersonateTeacher() {
         $i = $this;
