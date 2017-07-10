@@ -397,12 +397,15 @@ class EventMapper extends Calendar\EventMapper {
      * Override to prevent base postSave from occurring
      *
      * @param \EOTC\Event $event
+     * @param \EOTC\Event $previous
      */
-    protected function postSave($event)
+    protected function postSave($event, $previous)
     {
-        /* Sync to External DB
+        /* Sync to External DB only when the current status is Approved and
+         * its previous status was not Approved so we can't spam this event
+         * into External DB by altering its contents after the fact
          */
-        if ($event->getMetadata()->getStatus()->isApproved()) {
+        if ($event->getMetadata()->getStatus()->isApproved() && !$previous->getMetadata()->getStatus()->isApproved()) {
 
             /* Spin up a database factory
              */
