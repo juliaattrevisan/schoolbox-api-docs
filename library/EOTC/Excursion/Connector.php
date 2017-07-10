@@ -10,6 +10,7 @@
  */
 namespace EOTC\Excursion;
 use Alaress\Database\Connector\IConnector;
+use EOTC\Event as EOTCEvent;
 
 class Connector
 {
@@ -35,9 +36,9 @@ class Connector
      *
      * Ram $event data into synergetic in some way
      *
-     * @param $event
+     * @param EOTCEvent $event
      */
-    public function sync($event)
+    public function sync(EOTCEvent $event)
     {
         /* Set up base excursion details
          */
@@ -63,10 +64,10 @@ class Connector
     /**
      * Insert an event into Synergetic
      *
-     * @param $event
+     * @param EOTCEvent $event
      * @return int
      */
-    private function insertExcursion($event)
+    private function insertExcursion(EOTCEvent $event)
     {
         new \Alaress_Probe('<h1>Excursion Insertion</h1>');
 
@@ -114,11 +115,10 @@ class Connector
     /**
      * Update an excursion with metadata-ish stuff such as description, times, etc.
      *
-     * @param $event
-     * @param $eventsSeq
-     * @return void
+     * @param EOTCEvent $event
+     * @param int $eventsSeq
      */
-    private function updateDetails($event, $eventsSeq)
+    private function updateDetails(EOTCEvent $event, $eventsSeq)
     {
         new \Alaress_Probe('<h1>Excursion Update</h1>');
 
@@ -164,16 +164,14 @@ class Connector
         $statement->nextRowset();
 
         new \Alaress_Probe($inputs, $outputs, $eventsSeq);
-
-        return;
     }
 
     /**
      * Insert attendees
      *
-     * @param $event
+     * @param EOTCEvent $event
      */
-    public function insertAttendees($event)
+    public function insertAttendees(EOTCEvent $event)
     {
         new \Alaress_Probe('<h1>Attendees</h1>');
 
@@ -212,8 +210,6 @@ class Connector
 
             new \Alaress_Probe($currentAttendee, $inputs, $outputs, $newEventCurrentSeq, $message);
         }
-
-        return;
     }
 
     /* Getters/Setters
