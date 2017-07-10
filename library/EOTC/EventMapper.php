@@ -15,7 +15,6 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 /**
