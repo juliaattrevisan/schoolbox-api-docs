@@ -397,36 +397,11 @@ class EventMapper extends Calendar\EventMapper {
      * Override to prevent base postSave from occurring
      *
      * @param \EOTC\Event $event
-     * @param \EOTC\Event $previous
      */
-    protected function postSave($event, $previous)
+    protected function postSave($event)
     {
-        /* Sync to External DB only when the current status is Approved and
-         * its previous status was not Approved so we can't spam this event
-         * into External DB by altering its contents after the fact
+        /* noop
          */
-        if ($event->getMetadata()->getStatus()->isApproved() && !$previous->getMetadata()->getStatus()->isApproved()) {
-
-            /* Spin up a database factory
-             */
-            $factory = new Factory();
-
-            /* Spawn the one we want
-             */
-            $db = $factory->createMssql();
-
-            /* Connect to the place we want
-             */
-            $db->connect(
-                '172.31.15.10',
-                'Synergetic_AUVIC_ALARESS_PRD',
-                'sa',
-                'Synergetic#1'
-            );
-
-            $excursionConnector = new ExcursionConnector($db);
-            $excursionConnector->sync($event);
-        }
     }
 
     /**

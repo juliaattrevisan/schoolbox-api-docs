@@ -100,6 +100,36 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	 */
 	$registry->notify();
 
+    /* Sync to External DB only when the current status is Approved and
+     * its previous status was not Approved so we can't spam this event
+     * into External DB by altering its contents after the fact
+     */
+    new \Alaress_Probe($originalStatus, $status);
+    die();
+//        if ($event->getMetadata()->getStatus()->isApproved() && !$previous->getMetadata()->getStatus()->isApproved()) {
+//
+//        /* Spin up a database factory
+//         */
+//        $factory = new Factory();
+//
+//        /* Spawn the one we want
+//         */
+//        $db = $factory->createMssql();
+//
+//        /* Connect to the place we want
+//         */
+//        $db->connect(
+//            '172.31.15.10',
+//            'Synergetic_AUVIC_ALARESS_PRD',
+//            'sa',
+//            'Synergetic#1'
+//        );
+//
+//        $excursionConnector = new ExcursionConnector($db);
+//        $excursionConnector->sync($event);
+//        }
+//    }
+
 	/* Admin redirect back to review screen
 	 */
 	$page->localRedir('/modules/eotc/review/');
