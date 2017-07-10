@@ -157,10 +157,10 @@ class Connector
 
             /* Event dates
              */
-            'EventFrom' => $event->getStartDateTime(),
-            'EventTo' => $event->getEndDateTime(),
-            'InviteDate' => $event->getStartDateTime(),
-            'RSVPDueBy' => $event->getStartDateTime(),
+            'EventFrom' => $event->getStartDateTime()->getDatabase(),
+            'EventTo' => $event->getEndDateTime()->getDatabase(),
+            'InviteDate' => $event->getStartDateTime()->getDatabase(),
+            'RSVPDueBy' => $event->getStartDateTime()->getDatabase(),
 
             /* One of the values in dbo.luAttire
              */
