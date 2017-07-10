@@ -42,7 +42,8 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Resource\Folder\Code as FolderCode;
+use Schoolbox\Resource\Folder\Code as FolderCode;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 
 /**
  * Class Mapper
