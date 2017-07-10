@@ -10,31 +10,31 @@
  * @version     SVN: $Id$
  */
 
-new \EOTC\Authenticator($this);
+use EOTC\Authenticator;
+use EOTC\ConfigMapper;
+
+new Authenticator($this);
 
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 if ($sessionUser->isSuperuser()) {
-	$configMapper = new \EOTC\ConfigMapper();
+	$configMapper = new ConfigMapper();
 
-	$firstReminder = $configMapper->findByColumn('name', 'first_reminder')->first();
-	$dailyReminder = $configMapper->findByColumn('name', 'daily_reminder')->first();
-	$urgentThreshold = $configMapper->findByColumn('name', 'urgent_threshold')->first();
-	$policy = $configMapper->findByColumn('name', 'policy')->first();
-	$ramsWarning = $configMapper->findByColumn('name', 'rams_warning')->first();
+	$allConfigs = $configMapper->findAll();
 
 	/* Render it out
 	 */
 	$this->setFile(TEMPLATE_content, 'modules/eotc/config/modify.html');
 
-	$this->setVar(array(
-		'CONFIG_FIRST_REMINDER' => $firstReminder->getValue(),
-		'CONFIG_DAILY_REMINDER' => $dailyReminder->getValue(),
-		'CONFIG_URGENT_THRESHOLD' => $urgentThreshold->getValue(),
-		'CONFIG_POLICY' => $policy->getValue(),
-		'CONFIG_RAMS_WARNING' => $ramsWarning->getValue(),
-	));
+	$this->setVar([
+		'CONFIG_FIRST_REMINDER' => $allConfigs->getBy('name', 'first_reminder')->getValue(),
+		'CONFIG_DAILY_REMINDER' => $allConfigs->getBy('name', 'daily_reminder')->getValue(),
+		'CONFIG_URGENT_THRESHOLD' => $allConfigs->getBy('name', 'urgent_threshold')->getValue(),
+		'CONFIG_POLICY' => $allConfigs->getBy('name', 'policy')->getValue(),
+		'CONFIG_RAMS_WARNING' => $allConfigs->getBy('name', 'rams_warning')->getValue(),
+        'CONFIG_EXTERNAL_DB_SYNC' => $allConfigs->getBy('name', 'external_db_sync')->getValue()
+	]);
 }
 else {
 	error(19);
