@@ -149,11 +149,11 @@ class Connector
         $inputs = [
             'EventSeq' => $eventsSeq,
 
-            /* Description: The event's title/name
+            /* Description: The event's title/name (non-html, synweb doesn't support html)
              * Objective: A seemingly arbitrary string, but I'm going to use it for Event Description
              */
             'Description' => $event->getTitle(),
-            'Objective' => $event->getDetail(),
+            'Objective' => html_entity_decode(strip_tags($event->getDetail()), ENT_QUOTES),
 
             /* Event dates
              */
