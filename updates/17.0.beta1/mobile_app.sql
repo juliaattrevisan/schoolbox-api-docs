@@ -7,7 +7,7 @@ CREATE TABLE `mobile_app` (
   `cert_hash` VARCHAR(40) NULL,
   PRIMARY KEY (`app_id`),
   FOREIGN KEY (`cert_hash`) REFERENCES `storage`(`hash`) ON UPDATE NO ACTION ON DELETE NO ACTION
-) CHARSET=ASCII;
+) CHARACTER SET ASCII COLLATE ascii_general_ci;
 
 /*
  * Pull any existing data across from the config table
@@ -38,7 +38,8 @@ SET sql_mode = '';
 
 /* Add the new column */
 ALTER TABLE `mobile_app_registry`
-  ADD COLUMN `app_id` VARCHAR(128) NULL AFTER `provider`;
+  ADD COLUMN `app_id` VARCHAR(128) NOT NULL CHARSET ascii COLLATE ascii_general_ci AFTER `provider`,
+  CHARACTER SET ASCII COLLATE ascii_general_ci;
 
 /* Inject the appropriate app ID data */
 UPDATE `mobile_app_registry` SET app_id = 'apns_default' WHERE provider = 'APNS';
@@ -46,8 +47,7 @@ UPDATE `mobile_app_registry` SET app_id = 'gcm_default'  WHERE provider = 'GCM';
 
 /** Now that the data is in, enforce the foreign key */
 ALTER TABLE `mobile_app_registry`
-  ADD FOREIGN KEY (`app_id`) REFERENCES `mobile_app`(`app_id`) ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CHARSET=ASCII;
+  ADD FOREIGN KEY (`app_id`) REFERENCES `mobile_app`(`app_id`) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 /* hide the old config options (don't delete right away, we might need them) */
 UPDATE `config`
