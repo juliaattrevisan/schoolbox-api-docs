@@ -187,6 +187,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateCourseSpecification']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
@@ -202,6 +203,46 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
 
         $this->ancestry = new Ancestry($this);
+    }
+
+    /**
+     * Update a units course specification
+     *
+     * @param Model $folder
+     * @return bool
+     */
+    public function updateCourseSpecification(Model $folder)
+    {
+        // If the folder is a unit, we need to make sure its course specification is right
+
+        if ($folder->hasUnitSpecification()) {
+
+            // Iterate up through its parents until we find one that has a course specification
+
+            $parent = $this->findById($folder->getParent()->getId());
+
+            do {
+
+                $parent = $this->findById($parent->getParent()->getId());
+
+                if ($parent->getCourseSpecification() instanceof CourseSpecification) {
+
+                    // Found a course specification, use its course ID and get out of here
+
+                    $folder->getUnitSpecification()->setCourse($parent->getCourseSpecification());
+                    return true;
+                }
+
+            } while ($parent->getId() != 0);
+
+            // We didn't find a course specification- this thing isn't where its supposed to be
+
+            return false;
+        }
+
+        // Wasn't a unit being updated, just move on
+
+        return true;
     }
 
     /**
