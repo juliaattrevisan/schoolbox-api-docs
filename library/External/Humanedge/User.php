@@ -489,6 +489,14 @@ class External_Humanedge_User implements External_UserInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function hasIndividualEducationPlan($externalId)
+    {
+        return false;
+    }
+
+    /**
      * @param MSSQL $database
      */
     private function setDatabase($database)

@@ -821,6 +821,14 @@ class External_Tass_User implements External_UserInterface
         return $database->trimAll($database->getAll($query));
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function hasIndividualEducationPlan($externalId)
+    {
+        return false;
+    }
+
     private function setDatabase($database)
     {
         $this->database = $database;

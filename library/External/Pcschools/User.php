@@ -1044,6 +1044,14 @@ class External_Pcschools_User implements External_UserInterface
         return [];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function hasIndividualEducationPlan($externalId)
+    {
+        return false;
+    }
+
     // Local methods
 
     /**

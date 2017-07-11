@@ -1193,6 +1193,14 @@ class External_Doublefirst_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function hasIndividualEducationPlan($externalId)
+    {
+        return false;
+    }
+
     /* Getters/Setters
       */
 

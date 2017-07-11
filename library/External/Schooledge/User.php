@@ -118,4 +118,12 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
         }
         return $this->getDatabase()->getAll($query);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasIndividualEducationPlan($externalId)
+    {
+        return false;
+    }
 }

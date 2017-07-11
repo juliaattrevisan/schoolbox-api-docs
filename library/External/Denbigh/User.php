@@ -524,6 +524,13 @@ class External_Denbigh_User implements External_UserInterface {
         return [];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function hasIndividualEducationPlan($externalId)
+    {
+        return false;
+    }
 
     /* Getters/Setters
       */
