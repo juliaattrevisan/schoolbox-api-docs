@@ -39,15 +39,17 @@ class ExternalEvents extends Base implements IExternalEvents
                     ec.campus_code as location,
                     '' as team
             from    eventcalendar ec
-            where   ec.entry_code = :staffExternalId AND
-                    case 
-                        when ec.start_time is not null then ec.start_date + ec.start_time 
-                        else ec.start_date 
-                    end <= :endTime AND
-                    case 
-                        when ec.end_time is not null then ec.end_date + ec.end_time 
-                        else ec.end_date 
-                    end >= :startTime
+            where   ec.entry_code = :staffExternalId AND NOT
+                    (
+                        CASE 
+                            WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
+                            ELSE ec.end_date 
+                        END < :startTime OR
+                        CASE 
+                            WHEN ec.start_time IS NOT NULL THEN ec.start_date + ec.start_time 
+                            ELSE ec.start_date 
+                        END >= :endTime 
+                    )
                     
         ";
 
