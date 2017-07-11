@@ -28,7 +28,7 @@ engines:
       rulesets: "cleancode,naming"
   scss-lint:
     enabled: true
-  ratings:
-    paths:
-    - "**.php"
-    - "**.scss"
+ratings:
+  paths:
+  - "**.php"
+  - "**.scss"
