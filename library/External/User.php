@@ -211,7 +211,7 @@ class External_User implements External_UserInterface
      */
     public function hasIndividualEducationPlan($externalId)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->hasIndividualEducationPlan($externalId));
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
