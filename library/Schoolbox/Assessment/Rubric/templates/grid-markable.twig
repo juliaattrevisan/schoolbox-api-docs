@@ -1,3 +1,10 @@
+{#
+Renders a markable rubric grid for a specific student.
+
+Usage:
+    rubric    Rubric           A rubric grid with a student's marks overlaid
+    markType  null|MarkType    Optional. What markType should the rubric total be displayed in? Defaults to 'raw'.
+#}
 {% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubric.id %}
 {% set markType = markType ?: { mode: 'raw' } %}

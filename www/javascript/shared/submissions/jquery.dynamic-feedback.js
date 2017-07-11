@@ -71,6 +71,10 @@
                 statusPending: 'pending',
                 statusReviewed: 'reviewed',
 
+                /* The text to display on the publish button
+                 */
+                publishText: 'Publish',
+
                 /* A callback to execute upon successful completion of Publish action
                  */
                 onPublishCallback: function() {}
@@ -96,6 +100,10 @@
             /* Feedback States
              */
             $('[data-combobox]').combobox(config.errors);
+
+            /* Set initial state of the Publish button
+             */
+            $(config.assessmentList).find('[data-draft="publish"]').text(config.publishText);
         }
 
         /**
@@ -119,11 +127,10 @@
                 e.preventDefault();
 
                 var $participant = $(this).closest('[data-participant]'),
-                    $form      = $participant.find('[data-feedback-form]'),
-                    $actionBar = $participant.find('[data-action-bar]');
-
-                var $btnDrafted = $actionBar.find('[data-draft=drafted]'),
-                    $btnPublish = $actionBar.find('[data-draft=publish]');
+                    $form        = $participant.find('[data-feedback-form]'),
+                    $actionBar   = $participant.find('[data-action-bar]'),
+                    $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
+                    $btnPublish  = $actionBar.find('[data-draft=publish]');
 
                 $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
@@ -139,30 +146,28 @@
                     data:  formData,
                     type: 'post'
                 }).done(function () {
-                    // Get handle to participant row
-                    var $li = $form.closest('[data-participant]');
 
-                    var $actionBar = $li.find('[data-action-bar]');
-
-                    if ($actionBar.find('.component-action-info').length) {
-                        $btnPublish.addClass('hide');
+                    // Had we inserted feedback meta message into action bar ?
+                    if ($actionBar.find('[data-feedback-attach-info]').length) {
+                        $btnPublish.text(config.publishText).addClass('hide');
                         $btnDrafted.text('');
                     } else {
                         $actionBar.slideUp(function () {
+                            $btnPublish.text(config.publishText);
                             $btnDrafted.text('');
                         });
                     }
 
                     // Update this participant's status
-                    $li.attr('data-status', config.statusReviewed);
+                    $participant.attr('data-status', config.statusReviewed);
 
                     // Update the icon
-                    $li.find('[data-status]')
+                    $participant.find('[data-status]')
                         .removeClass(config.statusIncomplete + ' ' + config.statusPending)
                         .addClass(config.statusReviewed);
 
                     // Update the text
-                    $li.find('[data-status-label]').html('Reviewed');
+                    $participant.find('[data-status-label]').html('Reviewed');
 
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
@@ -176,7 +181,7 @@
 
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
-                    $btnPublish.removeAttr('disabled');
+                    $btnPublish.removeAttr('disabled').text(config.publishText);
 
                 }).always(function () {
 
@@ -220,7 +225,9 @@
 
             var $participant = $this.closest('[data-participant]'),
                 $form        = $participant.find('[data-feedback-form]'),
-                $actionBar   = $participant.find('[data-action-bar]');
+                $actionBar   = $participant.find('[data-action-bar]'),
+                $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
+                $btnPublish  = $actionBar.find('[data-draft=publish]');
 
             var data = {
                 type: $form.attr('method'),
@@ -229,7 +236,7 @@
             };
 
             $actionBar.find('[data-draft]').attr('disabled', 'disabled');
-            $actionBar.find('[data-draft="drafted"]').text('Saving...');
+            $btnDrafted.text('Saving...');
 
             $(config.formSaveLabel).toastActivate({
                 text: 'Autosaving...'
@@ -238,22 +245,25 @@
             $.ajax($form.attr('action'), data)
                 .done(function () {
                     toast.call($participant, 'Draft saved', true, true);
-                    $actionBar.find('[data-draft="drafted"]').text('Saved as draft');
+                    $btnDrafted.text('Saved as draft');
 
                     // Show the action bar
                     $actionBar.show();
 
-                    // If this was just published and this is the first change afterwards - removing any info about being linked to a response & having attachments
-                    if ($actionBar.find('[data-published="true"]').length) {
+                    $btnPublish.show();
+
+                    // If published feedback already existed, and this is the first change afterwards,
+                    // remove any info about being linked to a response & having attachments
+                    if ($actionBar.is('[data-published]')) {
                         $actionBar.find('[data-feedback-attach-info]').html('');
-                        $actionBar.find('[data-published=true]').removeAttr('data-published');
+                        $actionBar.removeAttr('data-published');
                     }
                 })
                 .fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
                 })
                 .always(function () {
-                    $actionBar.find('[data-draft=publish]').removeAttr("disabled");
+                    $btnPublish.removeAttr("disabled");
                 });
         }
 

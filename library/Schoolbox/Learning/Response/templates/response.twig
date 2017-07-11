@@ -42,6 +42,12 @@ Usage:
         $.fn.dynamicFeedback({
             errors: {{ errors | json_encode | raw }},
 
+            {# Special behaviour of the Publish button on this screen
+             # Publishing on this screen should be synonymous with the
+             # old "Save And Continue" behaviour
+             #}
+            publishText: 'Publish And Continue',
+
             onPublishCallback: function() {
                 {# Go to next available person in the carousel
                  # If there is nobody, just visit Status screen
@@ -309,22 +315,11 @@ Usage:
                         </div>
                     {% endif %}
 
-                    <div class="small-12 column no-pad">
-                        <div class="component-action" data-action-bar="{{ participant.user.id }}" {% if latestFeedback.published %}data-published="true"{% endif %} style="{{ actionStyle }}">
-                            <section>
-                                {% if participant.allFeedbacks | length and not participant.findMostRecentFeedback.published %}
-                                    {% set savedStatusText = 'Saved as Draft' %}
-                                {% endif %}
-
-                                <div>
-                                    {%- spaceless %}
-                                        <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{{ savedStatusText }}</span>
-                                        <a class="button" data-draft="publish">Publish and Continue</a>
-                                    {% endspaceless -%}
-                                </div>
-                            </section>
-                        </div>
-                    </div>
+                    {# Action Bar #}
+                    {% include '@learningAssessment/fragments/dueWork/actionBar.twig' with {
+                        participant:  participant,
+                        publishLabel: 'Publish and Continue'
+                    } only %}
                 </div>
             </form>
         </section>

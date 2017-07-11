@@ -1,0 +1,32 @@
+{#
+  Renders a consistent DueWork action bar. Used on DueWork status page and inline-grader.
+
+  Usage:
+    participant   Participant
+    publishLabel  string        (optional) Publish button label. Defaults to 'Publish'.
+    attachedMsg   string        (optional) Extra meta text to display on action bar
+#}
+
+{% set feedback        = participant.authoritativeFeedback(false) %}
+{% set isDraftFeedback = feedback and not feedback.published %}
+{% set actionStyle     = isDraftFeedback or attachedMsg ? '' : 'display: none;' %}
+{% set publishLabel    = publishLabel ?: 'Publish' %}
+
+
+<div class="small-12 column no-pad">
+    <div class="component-action" data-action-bar {% if feedback.published %}data-published="true"{% endif %} style="{{ actionStyle }}">
+        <section>
+
+            {% if attachedMsg %}
+                <div class="component-action-info" data-feedback-attach-info>{{ attachedMsg|capitalize|raw }}</div>
+            {% endif %}
+
+            <div>
+                {%- spaceless %}
+                    <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{% if isDraftFeedback %}Saved as Draft{% endif %}</span>
+                    <a class="button" data-draft="publish" {% if feedback.published %}style="display:none;"{% endif %}>{{ publishLabel }}</a>
+                {% endspaceless -%}
+            </div>
+        </section>
+    </div>
+</div>
