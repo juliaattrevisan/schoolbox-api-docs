@@ -246,8 +246,8 @@ function renderStudent(
             }
 
             // Only show the parent contacts to the parent themselves, hide divorced parents from each other
-            if($sessionUser->getRole()->isStaff() OR ( $sessionUser->getRole()->isParent() && (
-                    $contact['StudentContactID'] == $sessionUser->getExternalId() OR
+            if($sessionUser->getRole()->isStaff() || ( $sessionUser->getRole()->isParent() && (
+                    $contact['StudentContactID'] == $sessionUser->getExternalId() ||
                     $contact['StudentContactSpouseID'] == $sessionUser->getExternalId())
                 )
             ) {
