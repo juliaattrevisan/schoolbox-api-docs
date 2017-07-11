@@ -51,6 +51,8 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
+				(HOUSECOORDINATOR.FIRST_NAME + ' ' + HOUSECOORDINATOR.SURNAME) AS StudentHouseCoordinator,
+				'' AS HouseCoordID,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
@@ -78,6 +80,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
 			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
 			LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY
+			LEFT JOIN SF HOUSECOORDINATOR ON KGH.SFLINK = HOUSECOORDINATOR.SFKEY
 			WHERE STKEY = '{$synId}'
 		";
 

@@ -224,6 +224,21 @@ function renderStudent(
         }
     }
 
+    // Get house academic care coordinator
+    if ($externalUser['StudentHouseCoordinator']) {
+        if ($externalUser['HouseCoordID']) {
+            try {
+                $houseCoord = $userMapper->findByExternalId($externalUser['HouseCoordID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $houseCoord = new \Schoolbox\User();
+                $houseCoord->setLastname($externalUser['StudentHouseCoordinator']);
+            }
+        } else {
+            $houseCoord = new \Schoolbox\User();
+            $houseCoord->setLastname($externalUser['StudentHouseCoordinator']);
+        }
+    }
+
     // Load contact's user IDs
     $contacts = [];
     $contactList = $synUserHandler->getStudentContactList($user['synergy_id']);
@@ -318,6 +333,7 @@ function renderStudent(
                 'tutorTeacher'       => $tutorTeacher,
                 'hohTeacher'         => $hohTeacher,
                 'coordTeacher'       => $coordTeacher,
+                'houseCoord'         => $houseCoord,
                 'isParentOfStudent'  => $isParentOfStudent,
                 'isRelatedToStudent' => $isRelatedToStudent,
             ]
