@@ -44,17 +44,15 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				KGC.DESCRIPTION AS StudentTutorDescription,
 				'' AS TeacherTutorID,
 				'' AS HeadOfHouseID,
-				'' AS StudentHeadOfHouse,
+				(HEADOFHOUSE.FIRST_NAME + ' ' + HEADOFHOUSE.SURNAME) AS StudentHeadOfHouse,
 				'' AS StudentForm,
 				'' AS StudentFormStaffName,
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
-				(HOUSECOORDINATOR.FIRST_NAME + ' ' + HOUSECOORDINATOR.SURNAME) AS StudentHouseCoordinator,
-				'' AS HouseCoordID,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
-				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentYearLevelCoordinator,
+				 AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
 				'' AS StudentLockerBook,
 				ST.EMERGENCY_ONE_NAME AS StudentEmergencyName,
@@ -82,7 +80,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
 			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
 			LEFT JOIN KCP ON ST.PCG = KCP.KCPKEY
-			LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY
+			LEFT JOIN SF HEADOFHOUSE ON KCY.YEAR_COORD = HEADOFHOUSE.SFKEY
 			LEFT JOIN SF HOUSECOORDINATOR ON KGH.SFLINK = HOUSECOORDINATOR.SFKEY
 			LEFT JOIN SF COACH ON KCP.SFLINK = COACH.SFKEY
 			WHERE STKEY = '{$synId}'

@@ -28,18 +28,18 @@
 {% endif %}
 {% endblock details_coordTeacher %}
 
-{% block details_houseCoord %}
-{% if houseCoord %}
+{% block details_hohTeacher %}
+{% if hohTeacher %}
     <dt class="small-12 medium-3">House Academic Care Coordinator:</dt>
     <dd class="small-12 medium-9">
-        {% if houseCoord.getId() %}
-            <a href="{{ session.mailhandle }}{{ houseCoord.getEmail() }}">{{ houseCoord.formatName() }}</a>
+        {% if hohTeacher.getId() %}
+            <a href="{{ session.mailhandle }}{{ hohTeacher.getEmail() }}">{{ hohTeacher.formatName() }}</a>
         {% else %}
-            {{ houseCoord.formatName() }}
+            {{ hohTeacher.formatName() }}
         {% endif %}
     </dd>
 {% endif %}
-{% endblock details_houseCoord %}
+{% endblock details_hohTeacher %}
 
 {% block details_coach %}
     {% if studentCoach %}

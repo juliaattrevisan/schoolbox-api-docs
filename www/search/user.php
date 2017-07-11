@@ -224,21 +224,6 @@ function renderStudent(
         }
     }
 
-    // Get house academic care coordinator
-    if ($externalUser['StudentHouseCoordinator']) {
-        if ($externalUser['HouseCoordID']) {
-            try {
-                $houseCoord = $userMapper->findByExternalId($externalUser['HouseCoordID']);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $houseCoord = new \Schoolbox\User();
-                $houseCoord->setLastname($externalUser['StudentHouseCoordinator']);
-            }
-        } else {
-            $houseCoord = new \Schoolbox\User();
-            $houseCoord->setLastname($externalUser['StudentHouseCoordinator']);
-        }
-    }
-
     // Get coach
     if ($externalUser['StudentCoach']) {
         if ($externalUser['CoachID']) {
@@ -348,7 +333,6 @@ function renderStudent(
                 'tutorTeacher'       => $tutorTeacher,
                 'hohTeacher'         => $hohTeacher,
                 'coordTeacher'       => $coordTeacher,
-                'houseCoord'         => $houseCoord,
                 'studentCoach'       => $studentCoach,
                 'isParentOfStudent'  => $isParentOfStudent,
                 'isRelatedToStudent' => $isRelatedToStudent,
