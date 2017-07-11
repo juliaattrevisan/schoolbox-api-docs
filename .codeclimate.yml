@@ -20,20 +20,20 @@ engines:
   ratings:
     paths:
     - "**.php"
-  phan:
-    enabled: true
-    config:
-      file_extensions: "php"
-  ratings:
-    paths:
-      - "**.php"
-  phpmd:
-    enabled: false
-    config:
-      file_extensions: "php"
-      rulesets: "cleancode,naming"
-  scss-lint:
-      enabled: true
-  ratings:
-    paths:
-    - "**.scss"
+#  phan:
+#    enabled: true
+#    config:
+#      file_extensions: "php"
+#  ratings:
+#    paths:
+#      - "**.php"
+#  phpmd:
+#    enabled: false
+#    config:
+#      file_extensions: "php"
+#      rulesets: "cleancode,naming"
+#  scss-lint:
+#    enabled: true
+#  ratings:
+#    paths:
+#    - "**.scss"
