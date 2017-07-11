@@ -78,9 +78,9 @@ class Controller extends Base
      * Display a list of all surveys the students in the chosen folder have completed and link to the
      *
      * @param Folder $folder
-     * @return array|bool
+     * @return bool
      */
-    public function getClassSnapshotList($folder)
+    public function getClassSnapshotList(Folder $folder)
     {
         $externalClass = new \External_Class();
 
@@ -134,6 +134,8 @@ class Controller extends Base
                 'surveys' => $surveys
             ]
         ]);
+
+        return true;
     }
 
     /**
