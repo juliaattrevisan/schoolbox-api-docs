@@ -11,6 +11,7 @@
 
 namespace Schoolbox\Survey;
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
@@ -160,20 +161,8 @@ class Mapper extends BaseMapper
      */
     public function getAttemptedSurveysForUsers($userIds)
     {
-        $placeholders = "";
-        $bindings = [];
-        $count = 0;
-
-        foreach ($userIds as $userId) {
-            if ($placeholders != '') {
-                $placeholders .= ",";
-            }
-
-            $placeholders .= ":userId{$count}";
-            $bindings[":userId{$count}"] = $userId;
-            $count++;
-        }
-
+        $placeholders = PredicateBuilder::getArrayPlaceholders($userIds,'userId');
+        $bindings = PredicateBuilder::getArrayBindings($userIds, 'userId');
 
         $sql = "
             SELECT DISTINCT assess.assess_id as id,
