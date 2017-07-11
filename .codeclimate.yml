@@ -27,7 +27,7 @@ engines:
     enabled: true
     config:
       file_extensions: "php"
-      rulesets: "cleancode,naming"
+      rulesets: "unusedcode,naming"
   scss-lint:
     enabled: true
 ratings:
