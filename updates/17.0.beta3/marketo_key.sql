@@ -11,7 +11,7 @@ INSERT INTO config (
   required
 ) VALUES (
   'marketo_client_id',
-  '541-HHE-833',
+  '',
   'Undocumented',
   'Undocumented',
   1,
@@ -35,7 +35,7 @@ INSERT INTO config (
   required
 ) VALUES (
   'marketo_key',
-  'fyV#e9NIhAX3DTPn6qz73DfRmjBbGEixI',
+  '',
   'Undocumented',
   'Undocumented',
   1,
