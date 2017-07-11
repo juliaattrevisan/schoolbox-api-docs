@@ -81,10 +81,12 @@ if ($configMapper->get('site_location') == 'help') {
 
     // Create hash
 
+    $marketoClientId = $configMapper->get('marketo_client_id');
     $marketoHash = sha1($marketoKey . $user->getEmail());
 
     // Pass vars to template
 
+    $this->setVar('marketoClientId', $marketoClientId);
     $this->setVar('marketoHash', $marketoHash);
     $this->setVar('email', $email);
     $this->setVar('firstname', $user->getLastname());
