@@ -24,7 +24,7 @@ engines:
     config:
       file_extensions: "php"
   phpmd:
-    enabled: true
+    enabled: false
     config:
       file_extensions: "php"
       rulesets: "unusedcode,naming"
