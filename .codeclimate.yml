@@ -7,11 +7,33 @@ exclude_paths:
 - "sql/"
 - "updates/"
 - "debian/"
--
 
 engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript:
+      - php:
+  phpcodesniffer:
+    enabled: true
+  ratings:
+    paths:
+    - "**.php"
+  phan:
+    enabled: true
+    config:
+      file_extensions: "php"
+  ratings:
+    paths:
+      - "**.php"
   phpmd:
     enabled: false
     config:
       file_extensions: "php"
       rulesets: "cleancode,naming"
+  scss-lint:
+      enabled: true
+  ratings:
+    paths:
+    - "**.scss"
