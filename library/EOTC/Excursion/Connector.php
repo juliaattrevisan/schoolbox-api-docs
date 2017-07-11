@@ -259,7 +259,7 @@ class Connector
 //     * Preserved for the duration of development in EOTC
 //     * TODO: Remove upon completion
 //     *
-//     * @param $eventIds
+//     * @param array $eventIds an array of eotc_event primary key ints that correspond to stuff in synergetic
 //     */
 //    private function purge($eventIds)
 //    {
