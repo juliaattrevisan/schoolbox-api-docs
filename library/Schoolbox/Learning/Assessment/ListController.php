@@ -27,7 +27,6 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Traversable;
 use UnexpectedValueException;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 
 
 class ListController extends Web\Controller\Base
@@ -329,11 +328,6 @@ class ListController extends Web\Controller\Base
              */
             $assessmentFactory = new Factory($user, $postData);
             $assessment = $assessmentFactory->produce($assessment);
-
-            // Empty attached files if none were posted (only required for due work)
-            if (empty($postData['attachment']) && $assessment instanceof DueWorkModel) {
-                $assessment->setAttachedFiles([]);
-            }
 
             $transactionSummary = $this->getTransactor()->transact($assessment);
         }

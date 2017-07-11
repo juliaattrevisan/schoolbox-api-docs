@@ -98,13 +98,15 @@ class Decorator implements DecoratorInterface
         }
 
         /* If there were attachments, accumulate them
-         * Otherwise go away
+         * Otherwise set attachedFiles to an empty collection
          */
+        $newList = new Collection();
+
         if (count($this->getAttachedFiles())) {
             // Rebuild attached files list
             $factory     = new CollectorFactory();
             $attachments = $factory->build($this->getAttachedFiles())->getAll();
-            $newList     = new Collection();
+
             foreach ($attachments as $file) {
                 $newList->add(
                     (new DueWorkFile())
@@ -112,7 +114,9 @@ class Decorator implements DecoratorInterface
                         ->setFilename($file->getBasename())
                 );
             }
-            $assessment->setAttachedFiles($newList);
         }
+
+        $assessment->setAttachedFiles($newList);
+
     }
 }
