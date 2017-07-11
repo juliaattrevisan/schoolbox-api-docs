@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
+$kernel = require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 use Alaress\Database\Factory;
 use EOTC\Excursion\Connector as ExcursionConnector;
@@ -23,6 +23,8 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 
 $page = new SitePage();
+$page->setDi($kernel->getDependencyInjector());
+
 $event = false;
 
 /* Spawn an existing event if id provided
@@ -137,10 +139,10 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
             /* Connect to the place we want
              */
             $db->connect(
-                $configLoader->get('external_db_host'),
-                $configLoader->get('external_db_db'),
-                $configLoader->get('external_db_user'),
-                $configLoader->get('external_db_passwd')
+                $page->getDi()->get('config')->get('external_db_host'),
+                $page->getDi()->get('config')->get('external_db_db'),
+                $page->getDi()->get('config')->get('external_db_user'),
+                $page->getDi()->get('config')->get('external_db_passwd')
             );
 
             $excursionConnector = new ExcursionConnector($db);
