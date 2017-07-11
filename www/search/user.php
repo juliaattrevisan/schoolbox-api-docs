@@ -163,7 +163,7 @@ function renderStudent(
             try {
                 $group['owner'] = $userMapper->findById($owner['uid']);
             } catch (MapperException $e) {
-                $group['owner'] == $userMapper->getUnknownUser();
+                $group['owner'] = $userMapper->getUnknownUser();
             }
         }
     }
