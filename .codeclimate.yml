@@ -6,10 +6,12 @@ exclude_paths:
 - "node_modules/"
 - "sql/"
 - "updates/"
+- "debian/"
+-
 
 engines:
   phpmd:
-    enabled: true
+    enabled: false
     config:
       file_extensions: "php"
-      rulesets: "cleancode,unusedcode,naming"
+      rulesets: "cleancode,naming"
