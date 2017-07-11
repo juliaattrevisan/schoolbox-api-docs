@@ -126,7 +126,6 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
          * into External DB by altering its contents after the fact
          */
         if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
-            $configLoader = new ConfigLoader();
 
             /* Spin up a database factory
              */
