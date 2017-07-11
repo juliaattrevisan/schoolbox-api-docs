@@ -325,7 +325,6 @@ class External_Humanedge_User implements External_UserInterface
                 COALESCE(
                     CASE WHEN (LEN(t.Email2) > 0) THEN t.Email2 ELSE NULL END,
                     CASE WHEN (LEN(t.Email) > 0) THEN t.Email ELSE NULL END
-                    
                 ) AS StaffOccupEmail,
                 '' AS StaffExtension,
                 c.Name AS StaffCampusDescription,
@@ -340,6 +339,7 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS JobPositionDescriptionAlternate
             FROM Staff t
             LEFT JOIN Campus c ON t.CampusID = c.ID
+            WHERE t.Deceased = 'N'
         ";
 
 //        $queryDebug = "SELECT * FROM PersonPhone";
