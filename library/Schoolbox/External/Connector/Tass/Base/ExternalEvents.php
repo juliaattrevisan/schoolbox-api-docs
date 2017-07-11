@@ -20,8 +20,8 @@ class ExternalEvents extends Base implements IExternalEvents
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
-        $start =    new Alaress_Date_Format($startDate,  Alaress_Date_Format::TIMESTAMP);
-        $end =      new Alaress_Date_Format($endDate,  Alaress_Date_Format::TIMESTAMP);
+        $start = new Alaress_Date_Format($startDate, Alaress_Date_Format::TIMESTAMP);
+        $end = new Alaress_Date_Format($endDate, Alaress_Date_Format::TIMESTAMP);
 
         $query = "
             select  ec.event_id as id,
@@ -50,13 +50,12 @@ class ExternalEvents extends Base implements IExternalEvents
                             ELSE ec.start_date 
                         END >= :endTime 
                     )
-                    
         ";
 
         return $this->databaseExternal->executeQueryIterator($query, [
-            'staffExternalId'   => $user->getExternalId(),
-            'startTime'         => $start->getDatabase(),
-            'endTime'           => $end->getDatabase()
+            'staffExternalId' => $user->getExternalId(),
+            'startTime' => $start->getDatabase(),
+            'endTime' => $end->getDatabase()
         ]);
     }
 }
