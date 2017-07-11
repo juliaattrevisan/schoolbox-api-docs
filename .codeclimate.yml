@@ -2,6 +2,7 @@ exclude_paths:
 - "vendor/"
 - "tests/"
 - "test/"
+- "Test/"
 - "javascript/components/"
 - "node_modules/"
 - "sql/"
