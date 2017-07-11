@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector\Tass\Base;
 
 use Alaress_Date_Format;
+use Schoolbox\User;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 
@@ -18,7 +19,7 @@ class ExternalEvents extends Base implements IExternalEvents
     /**
      * @inheritdoc
      */
-    public function getExternalEvents($user, $startDate, $endDate)
+    public function getExternalEvents(User $user, $startDate, $endDate)
     {
         $start = new Alaress_Date_Format($startDate, Alaress_Date_Format::TIMESTAMP);
         $end = new Alaress_Date_Format($endDate, Alaress_Date_Format::TIMESTAMP);
