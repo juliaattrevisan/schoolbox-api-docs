@@ -116,6 +116,8 @@ function renderStudent(
 
     $student = $userMapper->findById($user['uid']);
 
+    $externalUser['IndividualEducationPlan'] = $synUserHandler->hasIndividualEducationPlan($user['synergy_id']);
+
     // Load the list of subjects, and their teacher.
     // Then group by subject type?
     $subjects      = [];

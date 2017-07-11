@@ -1188,7 +1188,7 @@ class External_Synergetic_User implements External_UserInterface
         $statement = $this->getConnector()->executeQuery($sql, [
             'id' => $externalUserId
         ]);
-        
+
         return $statement->fetchColumn() > 0;
     }
 
