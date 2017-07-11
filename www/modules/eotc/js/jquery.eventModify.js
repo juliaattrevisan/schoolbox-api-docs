@@ -174,7 +174,7 @@
 		/**
 		 * Generate rules for validator
 		 *
-		 * @returns {{campus[]: {required: {depends: validateCampusSelected}, minlength: {param: number, depends: validateCampusSelected}}, ramsFile: {required: {depends: validateRamsFile}, minlength: {param: number}}, teacherInCharge: {required: {depends: validateTeacherInCharge}, minlength: {param: number}}, group[]: {required: {depends: validateGroupSelected}}, startHour: {required: {depends: validateNotAllDaySelected}, 12hour: {depends: validateNotAllDaySelected}}, startMinute: {required: {depends: validateNotAllDaySelected}, minute: {depends: validateNotAllDaySelected}}, endHour: {required: {depends: validateNotAllDaySelected}, 12hour: {depends: validateNotAllDaySelected}}, endMinute: {required: {depends: validateNotAllDaySelected}, minute: {depends: validateNotAllDaySelected}}}}
+		 * @returns {object}
          */
 		function setupEventValidationRules() {
 
@@ -195,25 +195,6 @@
 
 				return (ticValue == '[]' || ticValue == '');
 			};
-
-			/* Ensure start date occurs before end date
-			 */
-			$.validator.addMethod("validateDatetimesCorrect", function(value, element) {
-
-				var allday = $('input[name=allday]').val(),
-					dateFormat = allday > 0 ? dateDisplayFormats.momentJs : dateDisplayFormats.momentJsDatetime,
-					startDatetime = moment($('input[name=startDate]').val(), dateFormat),
-					endDatetime   = moment($('input[name=endDate]').val(), dateFormat);
-
-				/* If both dates are valid and end date occurs before start
-				 */
-				if (startDatetime.isValid() && endDatetime.isValid()) {
-					return endDatetime.valueOf() > startDatetime.valueOf();
-				}
-
-				return false;
-			}, "Start date and time must occur before end date and time");
-
 
 			return {
 				'campus[]': {
@@ -243,13 +224,14 @@
 				},
 				startDate: {
 					required: true,
-					validateDatetimesCorrect: true
+                    datepickerDate: true
 				},
 				endDate: {
 					required: true,
-					validateDatetimesCorrect: true
-				},
-			}
+                    datepickerDate: true,
+                    datepickerDateNotBefore: $('#startDate')
+				}
+			};
 		}
 
 		/**
@@ -260,6 +242,11 @@
 		function setupEventValidation() {
 			$(config.element).alaressValidate({
 				rules: setupEventValidationRules(),
+                messages: {
+                    endDate: {
+                        datepickerDateNotBefore: 'Start date and time must occur before end date and time'
+                    }
+                },
 				submitHandler: function(form) {
 					var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
 					if (multi) {
