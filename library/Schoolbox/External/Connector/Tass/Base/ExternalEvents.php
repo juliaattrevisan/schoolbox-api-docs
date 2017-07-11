@@ -54,7 +54,7 @@ class ExternalEvents extends Base implements IExternalEvents
         ";
 
         return $this->databaseExternal->executeQueryIterator($query, [
-            'staffExternalId'   => $user->getExternalId,
+            'staffExternalId'   => $user->getExternalId(),
             'startTime'         => $start->getDatabase(),
             'endTime'           => $end->getDatabase()
         ]);
