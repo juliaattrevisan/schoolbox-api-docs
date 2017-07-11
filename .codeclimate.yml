@@ -7,6 +7,8 @@ exclude_paths:
 - "sql/"
 - "updates/"
 - "debian/"
+- "www/"
+- "tools/"
 
 engines:
   duplication:
@@ -18,11 +20,11 @@ engines:
   phpcodesniffer:
     enabled: true
   phan:
-    enabled: false
+    enabled: true
     config:
       file_extensions: "php"
   phpmd:
-    enabled: false
+    enabled: true
     config:
       file_extensions: "php"
       rulesets: "cleancode,naming"
