@@ -294,37 +294,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Find course specification of closest parent
-     *
-     * @param Model $folder
-     * @return bool|CourseSpecification\Model
-     */
-    private function findParentCourseSpecification($folder)
-    {
-        // Iterate up through its parents until we find one that has a course specification
-
-        $parent = $this->findById($folder->getParent()->getId());
-
-        do {
-
-            $parent = $this->findById($parent->getParent()->getId());
-
-            if ($parent->getCourseSpecification() instanceof CourseSpecification\Model) {
-
-                // Found a course specification, use its course ID and get out of here
-
-                return $parent->getCourseSpecification();
-            }
-
-        } while ($parent->getId() != 0);
-
-        // If we get here we didn't find anything with a course specification
-
-        return false;
-    }
-
-
-    /**
      * Post soft-delete callback to soft-delete the CourseSpec linked to this Folder if one exists
      *
      * Intentionally no corresponding 'postRestore' callback.
