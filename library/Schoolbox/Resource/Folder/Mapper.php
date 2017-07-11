@@ -187,7 +187,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateCourseSpecification']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateUnit']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
@@ -207,17 +207,17 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Validate a units been dragged into a folder which has a course specification
+     * Validate a unit hasn't been moved into the root folder
      *
      * @param Model $folder
      * @return bool
      */
-    public function validateCourseSpecification(Model $folder)
+    public function validateUnit(Model $folder)
     {
-        // This only applies to units
+        // Units cannot be put in root folder
 
-        if ($folder->hasUnitSpecification()) {
-            return $this->findParentCourseSpecification($folder) instanceof CourseSpecification\Model;
+        if ($folder->hasUnitSpecification() && $folder->getParent()->getId() == 0) {
+            return false;
         }
 
         // Other folders always get a clean bill of health
@@ -226,7 +226,22 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Update units course specification
+     * Update a units course specification. If its parent is not a course this will make it a course
+     *
+     *     ||
+     *     ||
+     *     ||
+     *     ||
+     *     ||
+     *     ||
+     *     ||     ...enjoy cleaning up those resource browser drag & drop course creation messes!
+     *     ||
+     *    /||\
+     *   /||||\
+     *   ======         __|__
+     *   ||||||        / ~@~ \
+     *   ||||||       |-------|
+     *   ||||||       |_______|
      *
      * @param Model $folder
      * @param Model $previous
@@ -238,14 +253,35 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         if ($folder->hasUnitSpecification()) {
 
-            // Iterate up through its parents until we find one that has a course specification
+            // We need to check if parent is a course, but first we need the damn thing hydrated
 
-            $courseSpecification = $this->findParentCourseSpecification($folder);
+            $parent = $this->findById($folder->getParent()->getId());
 
-            if ($courseSpecification instanceof CourseSpecification\Model) {
-                $folder->getUnitSpecification()->setCourse($courseSpecification);
-                UnitSpecification\Mapper::getInstance()->save($folder->getUnitSpecification());
+            if ($parent->hasCourseSpecification()) {
+
+                // It's a course, just use the existing specification
+
+                $courseSpecification = $parent->getCourseSpecification();
+
+            } else {
+
+                // It's not a course, we need to make a new one... yippee!
+
+                /** @var CourseSpecification\Model $courseSpecification */
+                $courseSpecification = CourseSpecification\Mapper::getInstance()->createModel();;
+                $courseSpecification->setFolder($parent);
+                CourseSpecification\Mapper::getInstance()->save($courseSpecification);
+
+                // Now we plonk that new course onto the parent folder
+
+                $parent->setCourseSpecification($courseSpecification);
+                $this->save($parent);
             }
+
+            // And finally update the actual folder we're supposed to be looking at
+
+            $folder->getUnitSpecification()->setCourse($courseSpecification);
+            UnitSpecification\Mapper::getInstance()->save($folder->getUnitSpecification());
 
             // We didn't find a course specification- this unit isn't where its supposed to be
 
