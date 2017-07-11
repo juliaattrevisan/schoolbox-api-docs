@@ -17,23 +17,18 @@ engines:
       - php:
   phpcodesniffer:
     enabled: true
-    ratings:
+  phan:
+    enabled: true
+    config:
+      file_extensions: "php"
+  phpmd:
+    enabled: false
+    config:
+      file_extensions: "php"
+      rulesets: "cleancode,naming"
+  scss-lint:
+    enabled: true
+  ratings:
     paths:
     - "**.php"
-#  phan:
-#    enabled: true
-#    config:
-#      file_extensions: "php"
-#  ratings:
-#    paths:
-#      - "**.php"
-#  phpmd:
-#    enabled: false
-#    config:
-#      file_extensions: "php"
-#      rulesets: "cleancode,naming"
-#  scss-lint:
-#    enabled: true
-#  ratings:
-#    paths:
-#    - "**.scss"
+    - "**.scss"
