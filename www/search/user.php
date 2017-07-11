@@ -114,7 +114,7 @@ function renderStudent(
         PREG_SPLIT_NO_EMPTY
     );
 
-    /** @var Schoolbox\User $user */
+    /** @var Schoolbox\User $sessionUser */
     $sessionUser = $_SESSION["user"];
 
     $student = $userMapper->findById($user['uid']);
