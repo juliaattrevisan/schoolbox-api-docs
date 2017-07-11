@@ -1,11 +1,11 @@
 exclude_paths:
-  "vendor/"
-  "tests/"
-  "test/"
-  "javascript/components/"
-  "node_modules/"
-  "sql/"
-  "updates/"
+- "vendor/"
+- "tests/"
+- "test/"
+- "javascript/components/"
+- "node_modules/"
+- "sql/"
+- "updates/"
 
 engines:
   phpmd:
