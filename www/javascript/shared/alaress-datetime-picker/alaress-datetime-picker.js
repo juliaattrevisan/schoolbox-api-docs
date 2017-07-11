@@ -239,20 +239,22 @@ function massageDateValue(e, staller) {
 
     if ($.trim($(t).val()) != '') {
 
-        $(t).prop('readonly', true);
-        $(t).prop('disabled', true);
-
         // set up params to guide server-side parsing
         var opts = getOptions($(t));
         var params = {
             string: t.value
         };
-
         var xhr = $.get('/ajax/strtotime.php', params);
+        var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
+
+        // Hide any validation error while this is processing
+        $fieldError.hide();
+
+        // Disable the field
+        $(t).prop('readonly', true);
+        $(t).prop('disabled', true);
 
         xhr.done(function (data) {
-
-            var $fieldError = $('#' + $(t).attr('id') + '-error'); // A possible validation error for this field
 
             $(t).prop('disabled', false);
 
@@ -315,9 +317,6 @@ function massageDateValue(e, staller) {
                 $fieldError.hide();
             }
 
-            // Restore JS validation on the field
-            enableValidation($(t));
-
         }).always(function () {
             $(t).prop('readonly', false);
             $(t).prop('disabled', false);
@@ -329,26 +328,6 @@ function massageDateValue(e, staller) {
             staller.stallSubmit(xhr);
         }
     }
-}
-
-
-/**
- * Disables validation on this datepicker.
- *
- * @param element a datepicker
- */
-function disableValidation(element) {
-    element.attr('data-av-ignore', true);
-}
-
-
-/**
- * Enables validation on this datepicker.
- *
- * @param element a datepicker
- */
-function enableValidation(element) {
-    element.removeAttr('data-av-ignore');
 }
 
 
@@ -413,11 +392,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     element
         .on('blur', function (e) {
             massageDateValue(e, options.staller);
-        })
-        .on('focus', function () {
-            // Temporarily disable JS validation on this field so that it doesn't harass the user that
-            // things like 'today' aren't valid dates
-            disableValidation(element);
         })
         .on('keydown', function (e) {
             if (e.keyCode === 13) {
