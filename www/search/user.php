@@ -224,21 +224,6 @@ function renderStudent(
         }
     }
 
-    // Get coach
-    if ($externalUser['StudentCoach']) {
-        if ($externalUser['CoachID']) {
-            try {
-                $studentCoach = $userMapper->findByExternalId($externalUser['CoachID']);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $studentCoach = new \Schoolbox\User();
-                $studentCoach->setLastname($externalUser['StudentCoach']);
-            }
-        } else {
-            $studentCoach = new \Schoolbox\User();
-            $studentCoach->setLastname($externalUser['StudentCoach']);
-        }
-    }
-
     // Load contact's user IDs
     $contacts = [];
     $contactList = $synUserHandler->getStudentContactList($user['synergy_id']);
@@ -333,7 +318,6 @@ function renderStudent(
                 'tutorTeacher'       => $tutorTeacher,
                 'hohTeacher'         => $hohTeacher,
                 'coordTeacher'       => $coordTeacher,
-                'studentCoach'       => $studentCoach,
                 'isParentOfStudent'  => $isParentOfStudent,
                 'isRelatedToStudent' => $isRelatedToStudent,
             ]

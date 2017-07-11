@@ -46,7 +46,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS HeadOfHouseID,
 				(HEADOFHOUSE.FIRST_NAME + ' ' + HEADOFHOUSE.SURNAME) AS StudentHeadOfHouse,
 				'' AS StudentForm,
-				'' AS StudentFormStaffName,
+				(COACH.FIRST_NAME + ' ' + COACH.SURNAME) AS StudentFormStaffName,
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
@@ -70,9 +70,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS AlertMessage,
 				'' AS StudentBoarder,
 				'' AS Comment,
-				ST.ROLL_GROUP,
-				(COACH.FIRST_NAME + ' ' + COACH.SURNAME) AS StudentCoach,
-				'' AS CoachID
+				ST.ROLL_GROUP
 			FROM ST
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
