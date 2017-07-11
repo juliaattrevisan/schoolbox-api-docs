@@ -1173,8 +1173,27 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
-     * This is a helper function to clear the 'Not Selected' placeholder value that
-     * Synergetic loves to add as an option in every lookup table
+     * @inheritdoc
+     */
+    public function hasIndividualEducationPlan($externalUserId)
+    {
+        $sql = "
+            SELECT    COUNT(*) AS countPlans
+            FROM      dbo.IndividualPlans
+            WHERE     ID = :id AND
+                      StartDate <= CURRENT_TIMESTAMP AND
+                      (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
+        ";
+
+        $statement = $this->getConnector()->executeQuery($sql, [
+            'id' => $externalUserId
+        ]);
+
+        return $statement->fetchColumn('countPlans') > 0;
+    }
+
+    /**
+     * This is a helper function to clear the 'Not Selected' placeholder value that Synergetic loves to add as an option in every lookup table
      *
      * @param array $array
      * @param string $placeholder
@@ -1193,18 +1212,14 @@ class External_Synergetic_User implements External_UserInterface
         }, $array);
     }
 
+    // Everything below here is FileYear/FileSemester retrieval shenanigans, this should all disappear and be replaced by proper SQL joins
+
     // TODO: These calls don't seem to be getting cached according to the debug console, so caching them here.
 
-    /**
-     * Cache of users file year/semester
-     * @var array
-     */
+    /** @var array $fileYearSemesterUser Cache of users file year/semester */
     private static $fileYearSemesterUser = [];
 
-    /**
-     * Cache of system file year/semester
-     * @var array
-     */
+    /** @var array $fileYearSemesterDefault Cache of system file year/semester */
     private static $fileYearSemesterDefault;
 
     // TODO: These functions seem to be used prolifically to fill in SQL clauses- in these cases should be using appropriate SQL joins.
