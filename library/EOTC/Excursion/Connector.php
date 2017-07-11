@@ -241,41 +241,48 @@ class Connector
         $statement = $this->getDb()->executeStoredProcedure('spiCommunityEventsCurrent', $inputs, $outputs);
     }
 
-    /**
-     * Blow away an Excursion
-     * Use this because the Synweb ui is wrist-slashingly bad
-     *
-     * @param $eventIds
-     */
-    private function purge($eventIds)
-    {
-        $message = null;
-
-        foreach ($eventIds as $currentEventId) {
-            $inputs = [
-                'EventCode' => $this->generateIdentifier($currentEventId),
-
-                /* Provides dialog that asks you to confirm uniqueness of attendees
-                 * but changing this option does nothing to the outcome
-                 */
-                'VerifyOnlyFlag' => 0,
-
-                /* One of the options in lu.AttendeeType
-                 */
-                'Type' => self::DEFAULT_EVENT_TYPE_CODE,
-            ];
-
-            $outputs = [
-                'Message' => [
-                    'value' => &$message,
-                    'type' => \PDO::PARAM_STR,
-                    'length' => 200
-                ]
-            ];
-
-            $statement = $this->getDb()->executeStoredProcedure('spdEvents', $inputs, $outputs);
-        }
-    }
+//    /**
+//     * Blow away an Excursion
+//     * Use this because the Synweb ui is wrist-slashingly bad
+//     *
+//     * This isn't intended for production, but to lubricate one's journey
+//     * through the horrors of Synweb's excursion deletion process during dev
+//     * It's easier to use this stored proc implementation than the ui.
+//     *
+//     * Preserved for the duration of development in EOTC
+//     * TODO: Remove upon completion
+//     *
+//     * @param $eventIds
+//     */
+//    private function purge($eventIds)
+//    {
+//        $message = null;
+//
+//        foreach ($eventIds as $currentEventId) {
+//            $inputs = [
+//                'EventCode' => $this->generateIdentifier($currentEventId),
+//
+//                /* Provides dialog that asks you to confirm uniqueness of attendees
+//                 * but changing this option does nothing to the outcome
+//                 */
+//                'VerifyOnlyFlag' => 0,
+//
+//                /* One of the options in lu.AttendeeType
+//                 */
+//                'Type' => self::DEFAULT_EVENT_TYPE_CODE,
+//            ];
+//
+//            $outputs = [
+//                'Message' => [
+//                    'value' => &$message,
+//                    'type' => \PDO::PARAM_STR,
+//                    'length' => 200
+//                ]
+//            ];
+//
+//            $statement = $this->getDb()->executeStoredProcedure('spdEvents', $inputs, $outputs);
+//        }
+//    }
 
     /* Getters/Setters
      */
