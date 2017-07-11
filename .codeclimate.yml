@@ -1,0 +1,15 @@
+exclude_paths:
+  "vendor/"
+  "tests/"
+  "test/"
+  "javascript/components/"
+  "node_modules/"
+  "sql/"
+  "updates/"
+
+engines:
+  phpmd:
+    enabled: true
+    config:
+      file_extensions: "php"
+      rulesets: "cleancode,unusedcode,naming"
