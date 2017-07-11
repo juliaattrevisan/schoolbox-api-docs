@@ -312,7 +312,7 @@ class Controller extends Base
                 ]
             ],
             'webdav' => [
-                'title'             => 'WebDav',
+                'title'             => 'Drives',
                 'delete'            => true,
                 'mapper'            => WebDavMapper::class,
                 'fields'            => [
