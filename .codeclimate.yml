@@ -1,0 +1,36 @@
+exclude_paths:
+- "vendor/"
+- "tests/"
+- "test/"
+- "javascript/components/"
+- "node_modules/"
+- "sql/"
+- "updates/"
+- "debian/"
+- "www/"
+- "tools/"
+
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript:
+      - php:
+  phpcodesniffer:
+    enabled: true
+  phan:
+    enabled: true
+    config:
+      file_extensions: "php"
+  phpmd:
+    enabled: false
+    config:
+      file_extensions: "php"
+      rulesets: "unusedcode,naming"
+  scss-lint:
+    enabled: true
+ratings:
+  paths:
+  - "**.php"
+  - "**.scss"
