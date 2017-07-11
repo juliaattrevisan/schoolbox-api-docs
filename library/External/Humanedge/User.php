@@ -322,7 +322,11 @@ class External_Humanedge_User implements External_UserInterface
                     AS StaffPreferredName,
                 t.LastName AS StaffSurname,
                 t.PhoneHome AS StaffOccupPhone,
-                t.Email AS StaffOccupEmail,
+                COALESCE(
+                    CASE WHEN (LEN(t.Email2) > 0) THEN t.Email2 ELSE NULL END,
+                    CASE WHEN (LEN(t.Email) > 0) THEN t.Email ELSE NULL END
+                    
+                ) AS StaffOccupEmail,
                 '' AS StaffExtension,
                 c.Name AS StaffCampusDescription,
                 '' AS StaffCategory,
@@ -336,13 +340,10 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS JobPositionDescriptionAlternate
             FROM Staff t
             LEFT JOIN Campus c ON t.CampusID = c.ID
-            WHERE t.Deceased = 'N'
-            AND t.IsTeachingStaff = 'Y'
         ";
 
 //        $queryDebug = "SELECT * FROM PersonPhone";
 //        $queryDebug = "SELECT Distinct TABLE_NAME FROM information_schema.TABLES";
-//        new \Alaress_Probe($this->getDatabase()->getAll($queryDebug));
 
         return $this->getDatabase()->getAll($query);
     }
