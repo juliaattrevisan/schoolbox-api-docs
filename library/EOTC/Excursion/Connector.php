@@ -43,6 +43,7 @@ class Connector
 
     /**
      * Constructor
+     *
      * @param IConnector $db
      */
     public function __construct(IConnector $db)
@@ -72,7 +73,7 @@ class Connector
     /**
      * Generate an EventCode (a unique guid in synergetic)
      *
-     * @param $eventId
+     * @param int $eventId
      * @return string
      */
     private function generateIdentifier($eventId)
@@ -202,7 +203,7 @@ class Connector
      * Insert an attendee of $event
      *
      * @param EOTCEvent $event
-     * @param \Schoolbox\User $currentAttendee
+     * @param User $currentAttendee
      * @param string $attendeeType
      */
     private function insertAttendee(EOTCEvent $event, User $currentAttendee, $attendeeType)
@@ -291,7 +292,7 @@ class Connector
      * @param IConnector $db
      * @return $this
      */
-    private function setDb($db)
+    private function setDb(IConnector $db)
     {
         $this->db = $db;
         return $this;
