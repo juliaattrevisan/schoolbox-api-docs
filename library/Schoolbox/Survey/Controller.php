@@ -9,6 +9,7 @@ namespace Schoolbox\Survey;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use External_Class;
 use PHPExcel;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Worksheet;
@@ -43,6 +44,9 @@ class Controller extends Base
     /** @var int $currentRow */
     private $currentRow;
 
+    /** @var External_Class $externalClass */
+    private $externalClass;
+
     /**
      * Constructor
      *
@@ -55,6 +59,7 @@ class Controller extends Base
         FolderMapper $folderMapper,
         SurveyMapper $surveyMapper
     ) {
+        $this->externalClass = new External_Class();
         $this->userMapper = $userMapper;
         $this->surveyMapper = $surveyMapper;
         $this->folderMapper = $folderMapper;
@@ -82,8 +87,6 @@ class Controller extends Base
      */
     public function getClassSnapshotList(Folder $folder)
     {
-        $externalClass = new \External_Class();
-
         $students = [];
         $userIds = [];
 
@@ -94,7 +97,7 @@ class Controller extends Base
         // Retrieve the students in each of these classes
 
         foreach ($codes as $code) {
-            $students = array_merge($students, $externalClass->getStudents($code));
+            $students = array_merge($students, $this->externalClass->getStudents($code));
         }
 
         // If we didn't find any students, no point going on
