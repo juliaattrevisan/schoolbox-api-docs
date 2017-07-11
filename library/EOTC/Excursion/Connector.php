@@ -124,6 +124,13 @@ class Connector
             ]
         ];
 
+        /* $statement->errorCode() and $statement->errorInfo() may reveal hints about
+         * why a stored proc might fail. I haven't seen it fail except due to my own
+         * ineptitude during development, though I foresee inspection of these fields
+         * to diagnose various failures that I haven't encountered yet. Therefore
+         * these $statement vars are placeholders for now, while we figure out what
+         * kind of failures may occur
+         */
         $statement = $this->getDb()->executeStoredProcedure('spiExcursions', $inputs, $outputs);
 
         if (!is_numeric($eventsSeq)) {
