@@ -38,6 +38,12 @@ class QuizNotifications extends AbstractNotificationTest
     /** @var Collection|User[] */
     protected $subscribers;
 
+    /** @var int */
+    protected $folderId;
+
+    /** @var int */
+    protected $adminId;
+
     /** @var array */
     protected $markGivenCache;
 
@@ -63,16 +69,33 @@ class QuizNotifications extends AbstractNotificationTest
         $this->clearRedis();
         $this->clearRabbit();
 
-        // Duke of Edinburgh
-        $folderId = 26;
+        // fetch the group with the largest number of subscribers
+        $this->folderId = Database::getInstance()->query('
+            SELECT sid
+            FROM userAccess ua
+            JOIN folder f ON f.id = ua.sid AND ua.service = 1
+            WHERE f.deleted_at IS NULL
+            AND ua.type > 0
+            GROUP BY sid
+            ORDER BY COUNT(sid) DESC
+            LIMIT 1
+        ')->fetchColumn();
 
-        $this->folder = Folder\Mapper::getInstance()->findById($folderId);
+        $this->adminId = Database::getInstance()->query('
+            SELECT uid
+            FROM userAccess
+            WHERE `type` = 3
+            AND service = 1
+            AND sid = ?
+        ', [ $this->folderId ])->fetchColumn();
 
-        $this->subscribers = $this->getSubscribers($folderId);
+        $this->folder = Folder\Mapper::getInstance()->findById($this->folderId);
+
+        $this->subscribers = $this->getSubscribers($this->folderId);
 
         // erase any existing quizzes in the target folder
         Quiz\Mapper::getInstance()->deleteByColumnList([
-            'category_id'  => $folderId,
+            'category_id'  => $this->folderId,
             'availability' => 'assess'
         ]);
 
@@ -99,7 +122,7 @@ class QuizNotifications extends AbstractNotificationTest
         $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, '11 second', '15 second');
 
         foreach ($quizzes as $quiz) {
-            $this->saveQuiz($quiz, $this->getUser(self::ZANE_SMITH));
+            $this->saveQuiz($quiz, $this->getUser($this->adminId));
         }
     }
 
