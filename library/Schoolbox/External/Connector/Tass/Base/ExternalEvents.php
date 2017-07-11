@@ -20,8 +20,8 @@ class ExternalEvents extends Base implements IExternalEvents
      */
     public function getExternalEvents($user, $startDate, $endDate)
     {
-        $start =    new Alaress_Date_Format($startDate, 'U');
-        $end =      new Alaress_Date_Format($endDate, 'U');
+        $start =    new Alaress_Date_Format($startDate,  Alaress_Date_Format::TIMESTAMP);
+        $end =      new Alaress_Date_Format($endDate,  Alaress_Date_Format::TIMESTAMP);
 
         $query = "
             select  ec.event_id as id,
