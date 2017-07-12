@@ -126,25 +126,7 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
          * into External DB by altering its contents after the fact
          */
         if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
-
-            /* Spin up a database factory
-             */
-            $factory = new Factory();
-
-            /* Spawn the one we want
-             */
-            $db = $factory->createMssql();
-
-            /* Connect to the place we want
-             */
-            $db->connect(
-                $page->getDi()->get('config')->get('external_db_host'),
-                $page->getDi()->get('config')->get('external_db_db'),
-                $page->getDi()->get('config')->get('external_db_user'),
-                $page->getDi()->get('config')->get('external_db_passwd')
-            );
-
-            $excursionConnector = new ExcursionConnector($db);
+            $excursionConnector = new ExcursionConnector($kernel->get('databaseExternal'));
             $excursionConnector->sync($event);
         }
     }
