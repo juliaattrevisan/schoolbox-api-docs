@@ -175,7 +175,7 @@ class Controller extends Base
     public function deleteAssessmentFeedback(IFeedback $feedback)
     {
         $code = 204;
-        $data = null;
+        $data = [];
 
         try {
             $this->getFeedbackDataSource()->delete($feedback);
