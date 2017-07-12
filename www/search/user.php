@@ -114,6 +114,9 @@ function renderStudent(
         PREG_SPLIT_NO_EMPTY
     );
 
+    /** @var Schoolbox\User $sessionUser */
+    $sessionUser = $_SESSION["user"];
+
     $student = $userMapper->findById($user['uid']);
 
     // Load the list of subjects, and their teacher.
@@ -160,7 +163,7 @@ function renderStudent(
             try {
                 $group['owner'] = $userMapper->findById($owner['uid']);
             } catch (MapperException $e) {
-                $group['owner'] == $userMapper->getUnknownUser();
+                $group['owner'] = $userMapper->getUnknownUser();
             }
         }
     }
@@ -241,21 +244,29 @@ function renderStudent(
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // noop
             }
-            $contact['main'] = $main;
-            $contact['spouse'] = $spouse;
-            $contacts[] = $contact;
+
+            // Only show the parent contacts to the parent themselves, hide divorced parents from each other
+            if($sessionUser->getRole()->isStaff() || ( $sessionUser->getRole()->isParent() && (
+                    $contact['StudentContactID'] == $sessionUser->getExternalId() ||
+                    $contact['StudentContactSpouseID'] == $sessionUser->getExternalId())
+                )
+            ) {
+                $contact['main'] = $main;
+                $contact['spouse'] = $spouse;
+                $contacts[] = $contact;
+            }
         }
     }
 
     // Determine whether current user is student's parent, and if not if they
     // are related in some other way.
-    /** @var Schoolbox\User $user */
-    $user = $_SESSION["user"];
+
     $student->loadParents();
-    $isParentOfStudent  = $user->isParentOf($student);
+    $isParentOfStudent  = $sessionUser->isParentOf($student);
     $isRelatedToStudent = false;
+    $isPrimaryCarer = false;
     if (!$isParentOfStudent) {
-        $studentList = $synUserHandler->getEnrolledStudents($user->getExternalId());
+        $studentList = $synUserHandler->getEnrolledStudents($sessionUser->getExternalId());
         if(is_array($studentList)) {
             foreach ($studentList as $enrolledStudentId) {
                 if ($enrolledStudentId['RelatedID'] == $student->getExternalId()) {
@@ -266,6 +277,10 @@ function renderStudent(
         }
     } else {
         $isRelatedToStudent = true;
+        // Only the primary parent will see emergency contact information
+        if($contactList[0]['StudentContactID'] == $sessionUser->getExternalId() || $contactList[0]['StudentContactSpouseID'] == $sessionUser->getExternalId()) {
+            $isPrimaryCarer = true;
+        }
     }
 
     // TwigLib
@@ -277,7 +292,7 @@ function renderStudent(
 
     $showPastoral = Config::get('pastoral_enabled');
 
-    if ($user->getRole()->isParent() && !Config::get('pastoral_parent_access'))
+    if ($sessionUser->getRole()->isParent() && !Config::get('pastoral_parent_access'))
         $showPastoral = false;
 
     $protectStudentContacts = \Config::get('protect_student_contacts');
@@ -288,11 +303,11 @@ function renderStudent(
         case Access::VISIBILITY_EVERYONE : // Everyone
             break;
         case Access::VISIBILITY_STAFF: // Staff Only
-            if (!$user->getRole()->isStaff())
+            if (!$sessionUser->getRole()->isStaff())
                 $hideContacts = true;
             break;
         case Access::VISIBILITY_STAFF_PARENT: // Staff & Parents Only
-            if (!$user->getRole()->isStaff() && !$user->getRole()->isParent())
+            if (!$sessionUser->getRole()->isStaff() && !$sessionUser->getRole()->isParent())
                 $hideContacts = true;
             break;
     }
@@ -320,6 +335,7 @@ function renderStudent(
                 'coordTeacher'       => $coordTeacher,
                 'isParentOfStudent'  => $isParentOfStudent,
                 'isRelatedToStudent' => $isRelatedToStudent,
+                'isPrimaryCarer'     => $isPrimaryCarer,
             ]
         )
     );
