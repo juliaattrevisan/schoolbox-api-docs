@@ -134,13 +134,15 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Retrieve all accessible surveys by search keyword
+     * Retrieve all accessible surveys by search keyword returns results in a format suitable for selectize
      *
-     * @param $search
-     * @return mixed
+     * @param string $search
+     * @return array
      */
     public function findByKeyword($search)
     {
+        // Searches cannot be less than three characters
+
         $search = trim($search);
 
         if (strlen($search) < 3) {
@@ -246,8 +248,7 @@ class Mapper extends BaseMapper
      */
     public function getMatrix($surveyId, $userId)
     {
-        $sql =
-            "
+        $sql = "
             SELECT      survey.assess_id AS survey_id,
                         survey.title AS survey_title,
                         section.title AS section_title,
