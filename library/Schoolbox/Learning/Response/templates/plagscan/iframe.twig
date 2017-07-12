@@ -23,19 +23,15 @@
 
 {{ bread.crumbsArray(nodes)}}
 
+{% if interactiveAvailable %}
+    <iframe class="fullscreen scroll-wrapper" src="{{ plagscan.interactiveUrl }}"></iframe>
+{% else %}
+    <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReportContents', {
+        assessmentId: assessment.id,
+        responseId: response.id,
+        participant: participant,
+        contextId: assessment.context.id,
+        plagscanId: plagscan.plagscanId})
+    }}"></iframe>
+{% endif %}
 
-<div class="row">
-    <div class="small-12 columns">
-        {% if interactiveAvailable %}
-            <iframe class="fullscreen scroll-wrapper" src="{{ plagscan.interactiveUrl }}"></iframe>
-        {% else %}
-        <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReportContents', {
-            assessmentId: assessment.id,
-            responseId: response.id,
-            participant: participant,
-            contextId: assessment.context.id,
-            plagscanId: plagscan.plagscanId})
-        }}"></iframe>
-        {% endif %}
-    </div>
-</div>

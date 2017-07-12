@@ -2,6 +2,7 @@
 iframe {
   width: 100%;
   height: rem-calc(($base-font-size) * 25);
+  border: 0;
   &.fullscreen {
     // Increase height of synergetic's iframe (min: 700px)
     min-height: rem-calc(($base-font-size) * 43.75);
