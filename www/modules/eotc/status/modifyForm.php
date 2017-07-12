@@ -133,8 +133,9 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
             catch (\DomainException $e) {
 
                 /* Occurs when trying to create a new EOTC event, but a Synweb id
-                 * already exists for it. This can happen if you mangle the Back
-                 * button in the browser
+                 * already exists for it. This can happen if
+                 *  - you mangle the Back button in the browser
+                 *  - or if superusers change status to non-approved then re-approve
                  */
             }
         }
