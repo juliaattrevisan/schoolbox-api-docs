@@ -103,7 +103,6 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
             $templateHandle,
             '@learning/component/upcomingAssessments.twig',
             [
-                'student'     => $this->getUser(),
                 'assessments' => $this->upcomingAssessments,
                 'limit'       => $this->limit,
             ]
