@@ -482,21 +482,14 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     }
 
     /**
-     * Checks if time is 11:59pm
+     * If the field has a time of 12am or 11:59pm, we consider this to not have time if all day is enabled
+     * Check if a momentjs date object has time by this definition
      *
-     * @param value {object}
+     * @param momentDate {object}
      * @returns {boolean}
      */
-    function hasTime(value) {
-
-        if (pickerOptions.endDay === true && value.hours() == 23 && value.minutes() == 59 && (value.seconds() == 59 || value.second() == 0)) {
-            return false;
-        }
-        if (value.hours() == 0 && value.minutes() == 0 && value.seconds() == 0) {
-            return false;
-        }
-        return true;
-
+    function hasTime(momentDate) {
+        return ((pickerOptions.endDay === false && momentDate.format('HH:mm') !== '00:00') || (pickerOptions.endDay === true && momentDate.format('HH:mm') !== '23:59'));
     }
 
     /**
