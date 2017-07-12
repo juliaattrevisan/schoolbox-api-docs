@@ -88,6 +88,8 @@ function getOptions(element) {
         type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
         endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
         endPeriod: getValue(element, 'data-datepicker-endofperiod'), // It will use end of the period to set time through timetable picker
+        syncStartDate: getValue(element, 'data-datepicker-sync-startdate'),
+        syncEndDate: getValue(element, 'data-datepicker-sync-enddate'),
         staller: null
     };
     return elementOptions;
@@ -310,6 +312,28 @@ function massageDateValue(e, staller) {
                 // this causes a limitation that it is *not possible* to set a field of this nature to midnight
                 setValue($(t), opts, state, true, newDate);
 
+                // Sync dates if applicable
+                if (opts.syncStartDate || opts.syncEndDate) {
+
+                    var dateFormat = fieldHasTime(opts) ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
+
+                    var syncOptions = {
+                        'dateFormat': dateFormat
+                    };
+
+                    if (opts.syncStartDate.length) {
+                        syncOptions.startDate = opts.syncStartDate;
+                    }
+
+                    if (opts.syncEndDate.length) {
+                        syncOptions.endDate = opts.syncEndDate;
+                    }
+
+                    if (syncOptions.startDate || syncOptions.endDate) {
+                        $(t).syncDatesNow(syncOptions);
+                    }
+                }
+
                 // Remove any error class on the field
                 $(t).removeClass('error');
 
@@ -328,6 +352,18 @@ function massageDateValue(e, staller) {
             staller.stallSubmit(xhr);
         }
     }
+}
+
+/**
+ * Check if this field should have time given its options and whether all day is on
+ *
+ * @param {object} options
+ * @returns {boolean}
+ */
+function fieldHasTime(options) {
+    // Only retuning true if time is enabled, just a matter of whether all day is enabled and if so -
+    // is it currently activated?
+    return ((options.enableTime && options.allDayInput === false) || (options.enableTime && $('#' + options.allDayInput).val() == 0));
 }
 
 

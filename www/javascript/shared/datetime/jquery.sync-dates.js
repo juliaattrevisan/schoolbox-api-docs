@@ -86,7 +86,7 @@
         var startDate = moment(settings.startDate.val(), settings.dateFormat, true);
         var endDate   = moment(settings.endDate.val(), settings.dateFormat, true);
 
-        if (startDate.isValid() && endDate.isValid() && endDate.valueOf() < startDate.valueOf()) {
+        if (startDate.isValid() && endDate.isValid() && startDate.isAfter(endDate)) {
             if ($(this).is(settings.startDate)) {
                 settings.endDate.val(settings.startDate.val()).change();
             } else {
@@ -95,5 +95,5 @@
         }
 
     };
-    
+
 })(jQuery);
