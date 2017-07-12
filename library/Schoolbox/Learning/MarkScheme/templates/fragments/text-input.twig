@@ -8,6 +8,7 @@
         limit:        float          JS validation
         maxLength:    int            how big can this input be?
         inputTitle:   string         the tooltip to display on this input
+        errors:       string[]       Admin-configured submission states
     ]
 #}
 
@@ -24,6 +25,12 @@
         data-mark-input
         data-combobox
 />
+
+<script type="text/javascript">
+    $(function() {
+        $('[data-combobox]').combobox({{ errors | json_encode | raw }});
+    });
+</script>
 
 
 

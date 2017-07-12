@@ -5,7 +5,6 @@
  * Usage:
 
  $.fn.dynamicFeedback({
-    errors: {{ errors | json_encode | raw }},
     statusIncomplete: {{ statusIncomplete }},
     statusPending: {{ statusPending }},
     statusReviewed: {{ statusReviewed }}
@@ -61,10 +60,6 @@
                  */
                 filters: $('#filters'),
 
-                /* A list of "Feedback States"
-                 */
-                errors: [],
-
                 /* CSS classes representing incomplete/pending/reviewed states
                  */
                 statusIncomplete: 'incomplete',
@@ -75,9 +70,9 @@
                  */
                 publishText: 'Publish',
 
-                /* A callback to execute upon successful completion of Publish action
-                 */
-                onPublishCallback: function() {}
+                // Callbacks to execute upon successful completion of Draft and Publish actions
+                onDraftCallback: $.noop,
+                onPublishCallback: $.noop
             };
 
             var derived = {
@@ -96,10 +91,6 @@
                 // stash the current state, so we can compare on blur and prevent unnecessary firing
                 $(this).data('preval', $(this).val());
             });
-
-            /* Feedback States
-             */
-            $('[data-combobox]').combobox(config.errors);
 
             /* Set initial state of the Publish button
              */
@@ -147,7 +138,7 @@
                     type: 'post'
                 }).done(function () {
 
-                    // Had we inserted feedback meta message into action bar ?
+                    // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
                         $btnPublish.text(config.publishText).addClass('hide');
                         $btnDrafted.text('');
@@ -172,12 +163,12 @@
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
 
-                    // Store that this has been published in a data var, so that component info can be deleted if needed
-                    // on new feedback creation
-                    $actionBar.attr('data-published', true);
+                    // Store that this has been published in a data var, so that component info msg
+                    // can be deleted if needed on new feedback creation
+                    $actionBar.attr('data-published', '');
 
                     toast.call($participant, 'Feedback published', true, false);
-                    config.onPublishCallback();
+                    config.onPublishCallback($participant.data('participant'));
 
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
@@ -245,11 +236,10 @@
             $.ajax($form.attr('action'), data)
                 .done(function () {
                     toast.call($participant, 'Draft saved', true, true);
-                    $btnDrafted.text('Saved as draft');
 
-                    // Show the action bar
+                    // Show the action bar and buttons
                     $actionBar.show();
-
+                    $btnDrafted.show().text('Saved as Draft');
                     $btnPublish.show();
 
                     // If published feedback already existed, and this is the first change afterwards,
@@ -258,6 +248,8 @@
                         $actionBar.find('[data-feedback-attach-info]').html('');
                         $actionBar.removeAttr('data-published');
                     }
+
+                    config.onDraftCallback($participant.data('participant'));
                 })
                 .fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);

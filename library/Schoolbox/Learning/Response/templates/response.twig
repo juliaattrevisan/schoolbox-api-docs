@@ -291,7 +291,8 @@ Usage:
                                 {% include '@learningMarkScheme/'~markScheme~'.twig' with {
                                     participant: participant,
                                     markScheme:  assessment.markScheme,
-                                    tabIndex:    1
+                                    tabIndex:    1,
+                                    errors:      errors
                                 } only %}
                             </label>
 
@@ -315,10 +316,22 @@ Usage:
                         </div>
                     {% endif %}
 
+
                     {# Action Bar #}
+                    {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
+                    {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
+                    {% set actionStyle         = isDraftFeedback ? '' : 'display: none;' %}
+
+                    {% spaceless %}
+                        {% set buttons %}
+                            <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
+                            <a class="button" data-draft="publish" {% if feedback.published %}style="display:none;"{% endif %}>Publish and Continue</a>
+                        {% endset %}
+                    {% endspaceless %}
+
                     {% include '@learningAssessment/fragments/dueWork/actionBar.twig' with {
-                        participant:  participant,
-                        publishLabel: 'Publish and Continue'
+                        actionStyle:  actionStyle,
+                        buttons:      buttons
                     } only %}
                 </div>
             </form>

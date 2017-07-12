@@ -45,7 +45,7 @@
 
 {% block config %}
 
-    {% set latestAttempt     = participant.authoritativeResponse(false) %}
+    {% set latestAttempt     = participant.findMostRecentResponse %}
     {% set latestReview      = latestAttempt.findMostRecentFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
@@ -89,18 +89,6 @@
     {{ parent() }}
 {% endblock %}
 
-
-{% block extra_nav_items %}
-    {% set attempt = participant.findMostRecentResponse %}
-    {% if attempt and not attempt.submitted %}
-        <form id="form-quiz-submit-{{ attempt.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
-            <input type="hidden" name="attemptId" value="{{ attempt.id }}">
-        </form>
-        <li><a data-quiz-submit="{{ attempt.id }}" class="icon-tick" href="#" title="Mark As Submitted">Mark As Submitted</a></li>
-    {% endif %}
-{% endblock %}
-
-
 {% block meta %}
     {% if participant.allResponses | length %}
         <div class="small-12 large-4 column content">
@@ -134,24 +122,36 @@
 
 
 {% block action_bar %}
-    {% set actionStyle = latestReview.published or not latestAttempt.submitted ? 'display:none;' : '' %}
-    <div class="row">
-        <div class="small-12 column">
-            <div class="component-action">
-                <section>
-                    <div style="{{ actionStyle }}" data-action-bar="{{ participant.user.id }}">
-                        {%- spaceless %}
-                            <a class="button" data-interaction-delete="{{ attempt.id }}" href="#" >Delete Attempt</a>
-                            <a class="button" data-interaction-review="{{ attempt.id }}" href="{{ assessmentResponse.localUrl(attempt) }}">Review Attempt</a>
-                        {% endspaceless -%}
-                    </div>
-                </section>
-            </div>
-        </div>
-    </div>
+
+    {% set latestAttempt     = participant.findMostRecentResponse %}
+    {% set latestReview      = latestAttempt.findMostRecentFeedback %}
+    {% set canFinish         = latestAttempt and not latestAttempt.submitted %}
+    {% set canPublish        = latestAttempt.submitted and (not latestReview or not latestReview.published) %}
+    {% set canDelete         = latestAttempt and (not latestReview or not latestReview.published) %}
+
+    {# Hide if no attempts, or attempt has published review #}
+    {% set actionStyle = not latestAttempt or latestReview.published ? 'display:none;' : '' %}
+
+    {# Mass/Bulk actions #}
+    {% set massActions = '' %}
+    {% if canPublish %}{% set massActions = massActions ~ ' data-mass-review' %}{% endif %}
+    {% if canDelete %}{% set massActions = massActions ~ ' data-mass-delete' %}{% endif %}
+
+    {# Buttons #}
+    {% spaceless %}
+        {% set buttons %}
+            <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestAttempt.id }}" href="/assess/deleteAttempt" >Delete Attempt</a>
+            <a class="button" {% if not canFinish  %}style="display:none;"{% endif %} data-interaction-finish="{{ latestAttempt.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Mark as Submitted</a>
+            <a class="button" {% if not canPublish %}style="display:none;"{% endif %} data-interaction-review="{{ latestAttempt.id }}" href="{{ assessmentResponse.localUrl(latestAttempt) }}">Review Attempt</a>
+        {% endset %}
+    {% endspaceless %}
+
+    {% include '@learningAssessment/fragments/dueWork/actionBar.twig' with {
+        actionStyle:  actionStyle,
+        massActions:  massActions,
+        buttons:      buttons
+    } only %}
 {% endblock %}
-
-
 
 
 {% block scripts %}
@@ -204,20 +204,12 @@
     </div>
 
     <script type="text/javascript">
-        $(function() {
-
-            // Finish incomplete quiz attempt
-            $('[data-quiz-submit]').click(function(e) {
-                e.preventDefault();
-                var attemptId = $('[data-quiz-submit]').attr('data-quiz-submit');
-                $('#form-quiz-submit-' + attemptId).submit();
-            });
-        });
 
         $(function () {
 
             var $participantList  = $('#assessment-status');
 
+            {# Mass review submitted but unreviewed quiz attempts #}
             $('#mass-review').bulky({
                 submitText: function (len, all) {
                     if (!len) {
@@ -229,20 +221,20 @@
                     return 'Mark ' + len + ' Selected as Reviewed';
                 },
                 userList: $participantList,
+                userSelector: '[data-mass-review]',
                 onSubmit: function (toReview) {
-                    var list = toReview.map(function () {
-                        return $(this).find('[data-interaction-review]').data('interactionReview');
-                    }).get();
+                    var list = toReview.map(function () { return $(this).find('[data-interaction-review]').attr('data-interaction-review') }).get();
 
                     $.post(
                         '/assess/reviewAttempt',
                         { selectedIds: list }
-                    ).always(function () {
+                    ).done(function () {
                         location.reload();
                     });
                 }
             });
 
+            {# Mass delete unreviewed quiz attempts #}
             $('#mass-delete').bulky({
                 submitText: function (len, all) {
                     if (!len) {
@@ -254,8 +246,10 @@
                     return 'Delete ' + len + ' Selected';
                 },
                 userList: $participantList,
+                userSelector: '[data-mass-delete]',
                 onSubmit: function (toDelete) {
-                    var userList = toDelete.map(function () { return $(this).data('interactionDraft'); }).get();
+
+                    var userList = toDelete.map(function () { return $(this).closest('[data-participant]').attr('data-participant') }).get();
 
                     $.post(
                         '/assess/deleteAttempt',
@@ -266,6 +260,7 @@
                 }
             });
 
+            {# Delete attempt for single participant #}
             $participantList.on('click', '[data-interaction-delete]', function (e) {
                 e.preventDefault();
 
@@ -277,10 +272,27 @@
                         $.post(
                             '/assess/deleteAttempt',
                             { attemptIds: [ $a.attr('data-interaction-delete') ]}
-                        ).always(function () {
+                        ).done(function () {
+                            // We must reload page to populate the action bar with the previous attempt
                             location.reload();
                         });
                     }
+                });
+            });
+
+            {# Submit/Finish an unfinished/unsubmitted/in-progress quiz attempt #}
+            $participantList.on('click', '[data-interaction-finish]', function (e) {
+                e.preventDefault();
+                var $a = $(this);
+
+                $.post(
+                    $a.attr('href'),
+                    { attemptId: $a.attr('data-interaction-finish')}
+                ).done(function () {
+                    var $actionBar = $a.closest('[data-action-bar]');
+                    $actionBar.attr('data-mass-review', '');
+                    $actionBar.find('[data-interaction-review]').show();
+                    $a.hide();
                 });
             });
         });

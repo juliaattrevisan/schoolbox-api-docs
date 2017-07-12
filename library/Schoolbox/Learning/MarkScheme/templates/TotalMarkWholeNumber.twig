@@ -4,6 +4,7 @@
     Usage: [
         markScheme:  MarkScheme\TotalMarkWholeNumber
         tabIndex:    int
+        errors:      string[]       Admin-configured submission states
     ]
 #}
 
@@ -13,7 +14,8 @@
     placeholder: 'Mark out of ' ~ markScheme.totalMark,
     limit:       markScheme.totalMark,
     maxLength:   16,
-    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark
+    inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark,
+    errors:      errors
 } only %}
 
 

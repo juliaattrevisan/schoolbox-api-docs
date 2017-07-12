@@ -323,6 +323,9 @@ class Controller extends AbstractController
 
     /**
      * Marks an attempt as completed
+     *
+     * @var int    $_POST['attemptId']
+     * @var string $_POST['returnUrl']
      */
     public function postQuizSubmit()
     {
@@ -337,9 +340,11 @@ class Controller extends AbstractController
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
         }
 
-        return $this->getResponse()->redirect->to(
-            Redirect::decode($get['returnUrl'])
-        );
+        if($this->getRequest()->isXhr()) {
+            $this->getResponse()->content->set($this->buildJsonOutput(['status' => 200]));
+        } else {
+            $this->getResponse()->redirect->to(Redirect::decode($get['returnUrl']));
+        }
     }
 
     /**

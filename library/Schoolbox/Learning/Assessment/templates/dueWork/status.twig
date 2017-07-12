@@ -172,10 +172,31 @@
 
     {% endif %}
 
+
     {# Action Bar #}
+    {% set feedback            = participant.findMostRecentFeedback %}
+    {% set isDraftFeedback     = feedback and not feedback.published %}
+    {% set isPublishedFeedback = feedback and feedback.published %}
+    {% set actionStyle         = isDraftFeedback or attachedMsg ? '' : 'display: none;' %}
+
+    {# Action Bar data attrs #}
+    {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
+    {% if isPublishedFeedback %}
+        {% set massActions = massActions ~ ' data-published' %}
+    {% endif %}
+
+    {% spaceless %}
+        {% set buttons %}
+            <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{% if isDraftFeedback %}Saved as Draft{% endif %}</span>
+            <a class="button" data-draft="publish" {% if feedback.published %}style="display:none;"{% endif %}>Publish</a>
+        {% endset %}
+    {% endspaceless %}
+
     {% include '@learningAssessment/fragments/dueWork/actionBar.twig' with {
-        participant:  participant,
-        attachedMsg:  attachedMsg
+        actionStyle:  actionStyle,
+        attachedMsg:  attachedMsg,
+        massActions:  massActions,
+        buttons:      buttons
     } only %}
 
 {% endblock %}
@@ -229,7 +250,13 @@
                 errors: {{ errors | json_encode | raw }},
                 statusIncomplete: '{{ statusIncomplete }}',
                 statusPending: '{{ statusPending }}',
-                statusReviewed: '{{ statusReviewed }}'
+                statusReviewed: '{{ statusReviewed }}',
+                onDraftCallback: function(userId) {
+                    $('[data-participant='+userId+'] [data-action-bar]').attr('data-mass-publish', '');
+                },
+                onPublishCallback: function(userId) {
+                    $('[data-participant='+userId+'] [data-action-bar]').removeAttr('data-mass-publish');
+                }
             });
 
             $('#mass-publish').bulky({
@@ -242,10 +269,12 @@
                     }
                     return 'Publish ' + len + ' Selected';
                 },
+                userSelector: '[data-mass-publish]',
                 userList: $('#assessment-status'),
                 onSubmit: function (toPublish) {
                     toPublish.each(function () {
-                        $(this).find('[data-draft="publish"]').trigger('click');
+                        var $actionBar = $(this);
+                        $actionBar.find('[data-draft="publish"]').trigger('click');
                     });
                 }
             });
