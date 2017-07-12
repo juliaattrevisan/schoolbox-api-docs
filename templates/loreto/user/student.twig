@@ -5,10 +5,10 @@
     {% if tutorTeacher %}
     <dt class="small-12 medium-3">Academic Care Coordinator:</dt>
     <dd class="small-12 medium-9">
-        {% if tutorTeacher.getId() %}
-            <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
+        {% if tutorTeacher.id %}
+            <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
         {% else %}
-            {{ tutorTeacher.formatName() }}
+            {{ tutorTeacher.formatName }}
         {% endif %}
     </dd>
     {% endif %}
@@ -19,14 +19,40 @@
 {% if coordTeacher %}
 <dt class="small-12 medium-3">Year Wellbeing Coordinator:</dt>
 <dd class="small-12 medium-9">
-    {% if coordTeacher.getId() %}
-        <a href="{{ session.mailhandle }}{{ coordTeacher.getEmail() }}">{{ coordTeacher.formatName() }}</a>
+    {% if coordTeacher.id %}
+        <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
     {% else %}
-        {{ coordTeacher.formatName() }}
+        {{ coordTeacher.formatName }}
     {% endif %}
 </dd>
 {% endif %}
 {% endblock details_coordTeacher %}
+
+{% block details_hohTeacher %}
+{% if hohTeacher %}
+    <dt class="small-12 medium-3">House Academic Care Coordinator:</dt>
+    <dd class="small-12 medium-9">
+        {% if hohTeacher.id %}
+            <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
+        {% else %}
+            {{ hohTeacher.formatName }}
+        {% endif %}
+    </dd>
+{% endif %}
+{% endblock details_hohTeacher %}
+
+{% block details_formTeacher %}
+    {% if formTeacher %}
+        <dt class="small-12 medium-3">Coach:</dt>
+        <dd class="small-12 medium-9">
+            {% if formTeacher.id %}
+                <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
+            {% else %}
+                {{ formTeacher.formatName }}
+            {% endif %}
+        </dd>
+    {% endif %}
+{% endblock details_formTeacher %}
 
 {% block details_tutorGroup %}
 {% if showClasses %}

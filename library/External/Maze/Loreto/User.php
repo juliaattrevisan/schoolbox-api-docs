@@ -44,9 +44,9 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				KGC.DESCRIPTION AS StudentTutorDescription,
 				'' AS TeacherTutorID,
 				'' AS HeadOfHouseID,
-				'' AS StudentHeadOfHouse,
+				(HEADOFHOUSE.FIRST_NAME + ' ' + HEADOFHOUSE.SURNAME) AS StudentHeadOfHouse,
 				'' AS StudentForm,
-				'' AS StudentFormStaffName,
+				(COACH.FIRST_NAME + ' ' + COACH.SURNAME) AS StudentFormStaffName,
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
@@ -77,7 +77,10 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			LEFT JOIN KCT ON ST.SCHOOL_YEAR = KCT.KCTKEY
 			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
 			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
+			LEFT JOIN KCP ON ST.PCG = KCP.KCPKEY
 			LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY
+			LEFT JOIN SF HEADOFHOUSE ON KGH.SFLINK = HEADOFHOUSE.SFKEY
+			LEFT JOIN SF COACH ON KCP.SFLINK = COACH.SFKEY
 			WHERE STKEY = '{$synId}'
 		";
 

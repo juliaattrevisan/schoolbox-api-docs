@@ -171,10 +171,15 @@ function renderStudent(
 
     // Load users for form teacher, tutor, etc.
     $formTeacher = null;
-    if ($externalUser['StudentFormStaffName'] && $externalUser['TeacherFormID']) {
-        try {
-            $formTeacher = $userMapper->findByExternalId($externalUser['TeacherFormID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+    if ($externalUser['StudentFormStaffName']) {
+        if ($externalUser['TeacherFormID']) {
+            try {
+                $formTeacher = $userMapper->findByExternalId($externalUser['TeacherFormID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $formTeacher = new \Schoolbox\User();
+                $formTeacher->setLastname($externalUser['StudentFormStaffName']);
+            }
+        } else {
             $formTeacher = new \Schoolbox\User();
             $formTeacher->setLastname($externalUser['StudentFormStaffName']);
         }
@@ -200,12 +205,17 @@ function renderStudent(
     }
 
     $hohTeacher = null;
-    if ($externalUser['StudentHeadOfHouse'] && $externalUser['HeadOfHouseID']) {
-        try {
-            $hohTeacher = $userMapper->findByExternalId($externalUser['HeadOfHouseID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+    if ($externalUser['StudentHeadOfHouse']) {
+        if ($externalUser['HeadOfHouseID']) {
+            try {
+                $hohTeacher = $userMapper->findByExternalId($externalUser['HeadOfHouseID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $hohTeacher = new \Schoolbox\User();
+                $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
+            }
+        } else {
             $hohTeacher = new \Schoolbox\User();
-            $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
+                $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
         }
     }
 
