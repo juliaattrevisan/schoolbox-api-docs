@@ -17,10 +17,10 @@
                 <div class="content">
                     {% for survey in surveys %}
                         <a href="{{ routeLookup('survey.getClassSnapshot', {surveyId: survey.id}) }}">
-                            {% if survey.assessment_title is not empty %}
-                                {{ survey.assessment_title }} -
+                            {% if survey.assessment.title is not empty %}
+                                {{ survey.assessment.title }} -
                             {% endif %}
-                            {{ survey.survey_title }}
+                            {{ survey.title }}
                         </a><br>
                     {% endfor %}
                 </div>

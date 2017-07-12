@@ -15,6 +15,8 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -35,6 +37,7 @@ class Mapper extends BaseMapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('max_attempts', self::TYPE_INTEGER);
         $this->joins('category_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
+        $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessment', 'assessment');
         $this->uses('anonymous_result', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME);
@@ -59,10 +62,12 @@ class Mapper extends BaseMapper
         return "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('folder', 'f')},
+                        {$this->getJoinColumnString('assessment', 'ass')},
                         {$this->getJoinColumnString('assess_attempts', 'aa')}
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('folder', '', 'f')}
             LEFT JOIN   {$this->getJoinSql('assess_attempts', '', 'aa')}
+            LEFT JOIN   {$this->getJoinSql('assessment', '', 'ass')}
         ";
     }
 
@@ -76,6 +81,7 @@ class Mapper extends BaseMapper
         $results = [];
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+
             if ($row['availability'] == 'survey') {
                 $results[] = $row;
 
@@ -85,6 +91,10 @@ class Mapper extends BaseMapper
                 /** @var Folder $folder */
                 $folder = $this->hydrateJoin($row, 'folder', 'f');
                 $model->setFolder($folder);
+
+                /** @var Assessment $assessment */
+                $assessment = $this->hydrateJoin($row, 'assessment', 'ass');
+                $model->setAssessment($assessment);
 
                 /** @var Collection $attempts */
                 $attempts = $this->getJoinMapper('assess_attempts')->findByColumn('assess_id', $model->getId());
@@ -157,34 +167,27 @@ class Mapper extends BaseMapper
      * Retrieve a list of all surveys attempted by the users specified
      *
      * @param array $userIds Array containing Schoolbox user IDs of people that have attempted quizzes
-     * @return array
+     * @return Collection
      */
     public function getAttemptedSurveysForUsers($userIds)
     {
-        $placeholders = PredicateBuilder::getArrayPlaceholders($userIds,'userId');
-        $bindings = PredicateBuilder::getArrayBindings($userIds, 'userId');
+        $data = PredicateBuilder::getArrayBindings($userIds, 'userId');
 
-        $sql = "
-            SELECT DISTINCT assess.assess_id as id,
-                            folder.name as folder_name,
-                            assessment.title as assessment_title,
-                            assess.title survey_title
-            FROM            assess
-            LEFT JOIN       assess_attempt ON assess_attempt.assess_id = assess.assess_id
-            LEFT JOIN       folder ON folder.id = assess.category_id
-            LEFT JOIN       assessment ON assessment.id = assess.assessment_id
-            WHERE           assess_attempt.user_id IN ({$placeholders}) AND
-                            assess.availability = 'survey' AND
-                            assess.deleted_at IS NULL AND
-                            assess_attempt.deleted_at IS NULL AND
-                            folder.deleted_at IS NULL AND
-                            assessment.deleted_at IS NULL
+        $sql = $this->getSelectString() . " 
+                
+            WHERE           `aa`.user_id IN ({$data['placeholders']}) AND
+                            `{$this->getTable()}`.deleted_at IS NULL AND
+                            `aa`.deleted_at IS NULL AND
+                            `f`.deleted_at IS NULL AND
+                            `ass`.deleted_at IS NULL
         ";
 
-        $statement = $this->database->prepare($sql);
-        $statement->execute($bindings);
+        $statement = $this->getDatabase()->prepare($sql);
+        $statement->execute($data['bindings']);
 
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        // Hydrate records for return
+
+        return $this->hydrateSelect($statement);
     }
 
     /**

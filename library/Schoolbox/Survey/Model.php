@@ -12,6 +12,7 @@
 namespace Schoolbox\Survey;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -31,6 +32,9 @@ class Model
 
     /** @var Folder $folder */
     protected $folder;
+
+    /** @var Assessment $assessment */
+    protected $assessment;
 
     /** @var Collection $sections */
     protected $sections;
@@ -96,7 +100,7 @@ class Model
     public function getMaxAttempts()
     {
         return $this->maxAttempts;
-    }    
+    }
 
     /**
      * @param Folder $folder
@@ -115,6 +119,24 @@ class Model
     {
         return $this->folder;
     }
+
+    /**
+     * @param Assessment $assessment
+     * @return self
+     */
+    public function setAssessment($assessment)
+    {
+        $this->assessment = $assessment;
+        return $this;
+    }
+
+    /**
+     * @return Assessment
+     */
+    public function getAssessment()
+    {
+        return $this->assessment;
+    }    
 
     /**
      * @param Collection $sections
