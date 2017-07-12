@@ -126,8 +126,17 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
          * into External DB by altering its contents after the fact
          */
         if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
-            $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
-            $excursionConnector->sync($event);
+            try {
+                $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
+                $excursionConnector->sync($event);
+            }
+            catch (\DomainException $e) {
+
+                /* Occurs when trying to create a new EOTC event, but a Synweb id
+                 * already exists for it. This can happen if you mangle the Back
+                 * button in the browser
+                 */
+            }
         }
     }
 
