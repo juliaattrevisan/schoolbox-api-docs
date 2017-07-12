@@ -128,6 +128,9 @@ module.exports = function(grunt) {
                     // Course selector
                     'www/javascript/shared/course/jquery.course-selector.js',
 
+                    // Date syncing
+                    'www/javascript/shared/datetime/jquery.sync-dates.js',
+
                     // Flatpickr date selector
                     'www/javascript/components/flatpickr/dist/flatpickr.js',
 
