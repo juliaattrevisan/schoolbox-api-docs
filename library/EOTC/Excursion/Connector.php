@@ -35,6 +35,13 @@ class Connector
     const ATTENDEE_STUDENT = 'ATTENDEE';
 
     /**
+     * Connectors which can synchronise EOTC events to external db
+     *
+     * @var array
+     */
+    private $availableConnectors = ['synergetic'];
+
+    /**
      * An instance of MSSQL
      *
      * @var IConnector
@@ -44,11 +51,16 @@ class Connector
     /**
      * Constructor
      *
+     * @param $databaseType
      * @param IConnector $db
      */
-    public function __construct(IConnector $db)
+    public function __construct($databaseType, IConnector $db)
     {
-        $this->setDb($db);
+        /* Only set $db when external db supports what we're doing
+         */
+        if (in_array($databaseType, $this->getAvailableConnectors())) {
+            $this->setDb($db);
+        }
     }
 
     /**
@@ -60,14 +72,19 @@ class Connector
      */
     public function sync(EOTCEvent $event)
     {
-        /* Set up base excursion details
+        /* If the external db isn't supported, do nothing
          */
-        $eventsSeq = $this->insertExcursion($event);
-        $this->updateDetails($event, $eventsSeq);
+        if ($this->getDb()) {
 
-        /* Attendees
-         */
-        $this->insertAttendees($event);
+            /* Set up base excursion details
+             */
+            $eventsSeq = $this->insertExcursion($event);
+            $this->updateDetails($event, $eventsSeq);
+
+            /* Attendees
+             */
+            $this->insertAttendees($event);
+        }
     }
 
     /**
@@ -310,5 +327,13 @@ class Connector
     {
         $this->db = $db;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    private function getAvailableConnectors()
+    {
+        return $this->availableConnectors;
     }
 }

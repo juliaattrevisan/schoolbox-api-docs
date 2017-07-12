@@ -126,7 +126,7 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
          * into External DB by altering its contents after the fact
          */
         if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
-            $excursionConnector = new ExcursionConnector($kernel->get('databaseExternal'));
+            $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
             $excursionConnector->sync($event);
         }
     }
