@@ -45,14 +45,14 @@
 
 {% block config %}
 
-    {% set latestAttempt     = participant.findMostRecentResponse %}
-    {% set latestReview      = latestAttempt.findMostRecentFeedback %}
+    {% set latestResponse    = participant.findMostRecentResponse %}
+    {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
-    {% set isPublished       = latestReview.published %}
-    {% set canPublish        = latestReview and not isPublished %}
+    {% set isPublished       = latestFeedback.published %}
+    {% set canPublish        = latestFeedback and not isPublished %}
 
-    {% if not latestAttempt %}
+    {% if not latestResponse %}
         {% set pActionSummary    = '' %}
     {% endif %}
 
@@ -61,14 +61,14 @@
 
     {# Progress icon tool tip #}
     {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.reviewRequired ? labelPending  : labelReviewed)  %}
-    {% set pTooltip     = latestAttempt and not latestAttempt.isSubmitted ? 'Review will be required when this attempt is finished' : pTooltip %}
+    {% set pTooltip     = latestResponse and not latestResponse.isSubmitted ? 'Review will be required when this attempt is finished' : pTooltip %}
 
     {% set pStatusText %}
         {%- spaceless %}
-            {% if not latestAttempt %}
+            {% if not latestResponse %}
                 Not attempted
             {% else %}
-                {% if latestAttempt.submittedAt.isNull %}
+                {% if latestResponse.submittedAt.isNull %}
                     Attempt in progress
                 {% else %}
                     {% if multipleResponses %}
@@ -76,7 +76,7 @@
                     {% else %}
                         Attempted
                     {% endif %}
-                    {% if latestAttempt.submittedOnTime %}
+                    {% if latestResponse.submittedOnTime %}
                         on time
                     {% else %}
                         late
@@ -92,13 +92,13 @@
 {% block meta %}
     {% if participant.allResponses | length %}
         <div class="small-12 large-4 column content">
-            {% set urgencyClass = latestReview ? urgency.marks(latestReview.normalisedMark) : '' %}
+            {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
 
-            {% if latestAttempt %}
-                {% if latestAttempt.submitted %}
-                    {% if latestReview %}
+            {% if latestResponse %}
+                {% if latestResponse.submitted %}
+                    {% if latestFeedback %}
                         <span class="grade {{ urgencyClass }}">
-                            <span>{{ latestReview.humanReadableMark }}</span>
+                            <span>{{ latestFeedback.humanReadableMark }}</span>
                          </span>
                     {% else %}
                         {#<a href="#" class="button expand">Review</a>#}
@@ -112,8 +112,8 @@
             {% endif %}
         </div>
         <div class="small-12 large-8 column content">
-            {% if latestAttempt.submitted %}
-                Finished <time title="{{ latestAttempt.submittedAt.local }}"><strong>{{ latestAttempt.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestAttempt.duration.hms }}</strong>
+            {% if latestResponse.submitted %}
+                Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong>
                 {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
             {% endif %}
         </div>
@@ -123,14 +123,14 @@
 
 {% block action_bar %}
 
-    {% set latestAttempt     = participant.findMostRecentResponse %}
-    {% set latestReview      = latestAttempt.findMostRecentFeedback %}
-    {% set canFinish         = latestAttempt and not latestAttempt.submitted %}
-    {% set canPublish        = latestAttempt.submitted and (not latestReview or not latestReview.published) %}
-    {% set canDelete         = latestAttempt and (not latestReview or not latestReview.published) %}
+    {% set latestResponse    = participant.findMostRecentResponse %}
+    {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
+    {% set canFinish         = latestResponse and not latestResponse.submitted %}
+    {% set canPublish        = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
+    {% set canDelete         = latestResponse and (not latestFeedback or not latestFeedback.published) %}
 
     {# Hide if no attempts, or attempt has published review #}
-    {% set actionStyle = not latestAttempt or latestReview.published ? 'display:none;' : '' %}
+    {% set actionStyle = not latestResponse or latestFeedback.published ? 'display:none;' : '' %}
 
     {# Mass/Bulk actions #}
     {% set massActions = '' %}
@@ -140,9 +140,9 @@
     {# Buttons #}
     {% spaceless %}
         {% set buttons %}
-            <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestAttempt.id }}" href="/assess/deleteAttempt" >Delete Attempt</a>
-            <a class="button" {% if not canFinish  %}style="display:none;"{% endif %} data-interaction-finish="{{ latestAttempt.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Mark as Submitted</a>
-            <a class="button" {% if not canPublish %}style="display:none;"{% endif %} data-interaction-review="{{ latestAttempt.id }}" href="{{ assessmentResponse.localUrl(latestAttempt) }}">Review Attempt</a>
+            <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt" >Delete Attempt</a>
+            <a class="button" {% if not canFinish  %}style="display:none;"{% endif %} data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Mark as Submitted</a>
+            <a class="button" {% if not canPublish %}style="display:none;"{% endif %} data-interaction-review="{{ latestResponse.id }}" href="{{ assessmentResponse.localUrl(latestResponse) }}">Review Attempt</a>
         {% endset %}
     {% endspaceless %}
 

@@ -273,8 +273,7 @@
                 userList: $('#assessment-status'),
                 onSubmit: function (toPublish) {
                     toPublish.each(function () {
-                        var $actionBar = $(this);
-                        $actionBar.find('[data-draft="publish"]').trigger('click');
+                        $(this).find('[data-draft="publish"]').trigger('click');
                     });
                 }
             });
