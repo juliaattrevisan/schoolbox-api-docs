@@ -53,9 +53,9 @@ interface IBuilder
     public function isFalse($columnName);
 
     /**
-     * @param string     $columnName
-     * @param string|int $columnValue
-     * @return IBuilder
+     * @param string $columnName
+     * @param string|int|string[]|int[] $columnValue
+     * @return Builder
      */
     public function equals($columnName, $columnValue);
 

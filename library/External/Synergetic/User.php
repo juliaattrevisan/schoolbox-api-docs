@@ -6,6 +6,7 @@
  */
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
@@ -1172,51 +1173,37 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getHousemasterEmails($externalUserIds)
     {
-        // Make sure an array of user ID's was passed
+        // Make sure an array of valid external ID's was passed
 
-        if (!is_array($externalUserIds) || count($externalUserIds) == 0) {
+        $ids = array_filter($externalUserIds, function ($externalUserId) {
+            return self::isExternalIdValid($externalUserId);
+        });
+
+        if (count($ids) == 0) {
             return [];
         }
 
         $fileYearSemester = $this->findFileYearAndSemester();
 
-        $bindings = [
-            'FileYear' => $fileYearSemester['year']
-        ];
+        $predicateBuilder = $this->getConnector()
+            ->buildPredicateBuilder('StudentYears')
+            ->equals('StudentYears.FileYear', $fileYearSemester['year'])
+            ->equals('StudentYears.ID', $ids);
 
-        // Create SQL parameter bindings for external ID's
-
-        $count = 0;
-        $placeholders = "";
-
-        /** @var int $externalUserId */
-        foreach ($externalUserIds as $externalUserId) {
-
-            // Make sure the external user ID is valid so we don't blow up the query string
-
-            if (self::isExternalIdValid($externalUserId)) {
-                if (!empty($placeholders)) {
-                    $placeholders .= ",";
-                }
-
-                $placeholders .= ":id{$count}";
-                $bindings[":id{$count}"] = $externalUserId;
-                $count++;
-            }
-        }
-
-        if ($count == 0) {
-            return [];
-        }
+        $where = implode(' AND ', $predicateBuilder->getWhere());
 
         $sql = "
             SELECT DISTINCT OccupEmail FROM Community 
             JOIN luHouse ON HeadOfHouseID = Community.ID
             JOIN StudentYears ON StudentYears.House = luHouse.Code
-            WHERE StudentYears.ID IN ({$placeholders}) AND FileYear = :FileYear
+            WHERE {$where}
         ";
 
-        return $this->getConnector()->executeQuery($sql, $bindings)->fetchColumnArray('OccupEmail');
+        $bindings = $predicateBuilder->getParams();
+
+        return $this->getConnector()
+            ->executeQuery($sql, $bindings)
+            ->fetchColumnArray('OccupEmail');
     }
 
     /**
