@@ -11,7 +11,7 @@ Usage:
     latestFeedback    null|DueWork\Feedback
     attachzone        array
     selectedFileHash  string
-    markScheme        string
+    markSchemeName    string
     carousel          StudentCarousel
     submissionStates  Collection|DueWork_Error[]
     responseList      Collection|DueWork\Submission
@@ -40,8 +40,6 @@ Usage:
         var nextUrl = findNext(tgt);
 
         $.fn.dynamicFeedback({
-            errors: {{ errors | json_encode | raw }},
-
             {# Special behaviour of the Publish button on this screen
              # Publishing on this screen should be synonymous with the
              # old "Save And Continue" behaviour
@@ -285,10 +283,10 @@ Usage:
                         </script>
                     {% endif %}
 
-                    {% if 'none' != assessment.markType.slug %}
+                    {% if 'none' != markSchemeName | lower %}
                         <div class="small-12 medium-3 column">
                             <label>{{ locale.grades.proper }}
-                                {% include '@learningMarkScheme/'~markScheme~'.twig' with {
+                                {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                                     participant: participant,
                                     markScheme:  assessment.markScheme,
                                     tabIndex:    1,
@@ -302,8 +300,8 @@ Usage:
                         </div>
                     {% endif %}
 
-                    <div class="small-12{% if 'none' != assessment.markType.slug %} medium-9{% endif %} column">
-                        {% include '@learningMarkScheme/fragments/comment.twig' with {
+                    <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
+                        {% include '@learningAssessment/fragments/dueWork/comment.twig' with {
                             participant: participant,
                             tabIndex:    2
                         } only %}
@@ -325,11 +323,11 @@ Usage:
                     {% spaceless %}
                         {% set buttons %}
                             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
-                            <a class="button" data-draft="publish" {% if feedback.published %}style="display:none;"{% endif %}>Publish and Continue</a>
+                            <a class="button" data-draft="publish" {% if isPublishedFeedback %}style="display:none;"{% endif %}>Publish and Continue</a>
                         {% endset %}
                     {% endspaceless %}
 
-                    {% include '@learningAssessment/fragments/dueWork/actionBar.twig' with {
+                    {% include '@learningAssessment/fragments/actionBar.twig' with {
                         actionStyle:  actionStyle,
                         buttons:      buttons
                     } only %}

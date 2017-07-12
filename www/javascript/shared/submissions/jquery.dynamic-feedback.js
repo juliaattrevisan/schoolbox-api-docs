@@ -173,9 +173,6 @@
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
                     $btnPublish.removeAttr('disabled').text(config.publishText);
-
-                }).always(function () {
-
                 });
             });
         }

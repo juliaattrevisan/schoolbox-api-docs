@@ -6,11 +6,12 @@
     buttons       string        The buttons that should appear in the action bar
     attachedMsg   string        (optional) Extra meta text to display on action bar
     massActions   string        (optional) Any mass action data attributes to add to this action bar
+    dataAttrs     string        (optional) Any other data attributes to add to action bar
 #}
 
 
 <div class="small-12 column no-pad">
-    <div class="component-action" data-action-bar {{ massActions }} style="{{ actionStyle }}">
+    <div class="component-action" data-action-bar {{ massActions }} {{ dataAttrs }} style="{{ actionStyle }}">
         <section>
 
             {% if attachedMsg %}

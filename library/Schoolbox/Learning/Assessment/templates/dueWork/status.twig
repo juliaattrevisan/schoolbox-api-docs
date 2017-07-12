@@ -102,7 +102,7 @@
                 {% endif %}
 
                 <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
-                    {% include '@learningMarkScheme/fragments/comment.twig' with {
+                    {% include '@learningAssessment/fragments/dueWork/comment.twig' with {
                         participant: participant,
                         tabIndex:   (loop.index0 * 2) + 2
                     } only %}
@@ -181,9 +181,8 @@
 
     {# Action Bar data attrs #}
     {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
-    {% if isPublishedFeedback %}
-        {% set massActions = massActions ~ ' data-published' %}
-    {% endif %}
+    {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
+
 
     {% spaceless %}
         {% set buttons %}
@@ -192,10 +191,11 @@
         {% endset %}
     {% endspaceless %}
 
-    {% include '@learningAssessment/fragments/dueWork/actionBar.twig' with {
+    {% include '@learningAssessment/fragments/actionBar.twig' with {
         actionStyle:  actionStyle,
         attachedMsg:  attachedMsg,
         massActions:  massActions,
+        dataAttrs:    dataAttrs,
         buttons:      buttons
     } only %}
 
@@ -241,13 +241,11 @@
          - statusIncomplete: a string representing the 'incomplete' state
          - statusPending: a string representing the 'pending' state
          - statusReviewed: a string representing the 'reviewed' state
-         - errors: An array of "Submission States" such as absent, et al.
      #}
     <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
     <script type="text/javascript">
         $(function() {
             $.fn.dynamicFeedback({
-                errors: {{ errors | json_encode | raw }},
                 statusIncomplete: '{{ statusIncomplete }}',
                 statusPending: '{{ statusPending }}',
                 statusReviewed: '{{ statusReviewed }}',

@@ -145,7 +145,7 @@ class Controller extends Base
                 'latestFeedback' => $latestFeedback,
                 'attachzone' => $attachZone->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
-                'markScheme' => $this->deriveSchemeName($assessment->getMarkScheme()),
+                'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
                 'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
 

@@ -49,8 +49,8 @@
     {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
     {% set multipleResponses = participant.allResponses | length > 1 %}
 
-    {% set isPublished       = latestFeedback.published %}
-    {% set canPublish        = latestFeedback and not isPublished %}
+    {% set isPublished  = latestFeedback.published %}
+    {% set canPublish   = latestFeedback and not isPublished %}
 
     {% if not latestResponse %}
         {% set pActionSummary    = '' %}
@@ -146,7 +146,7 @@
         {% endset %}
     {% endspaceless %}
 
-    {% include '@learningAssessment/fragments/dueWork/actionBar.twig' with {
+    {% include '@learningAssessment/fragments/actionBar.twig' with {
         actionStyle:  actionStyle,
         massActions:  massActions,
         buttons:      buttons
