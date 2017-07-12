@@ -607,6 +607,36 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Returns a new collection containing unique items only
+     *
+     * @param string $column The column on which to test uniqueness
+     * @return Collection
+     */
+    public function getUnique($column)
+    {
+        $found = [];
+        $results = new Collection();
+
+        $getterMethod = $this->getGetMethodName($column);
+
+        foreach ($this as $item) {
+
+            $value = $item->$getterMethod();
+
+            if (is_object($value)) {
+                throw new \UnexpectedValueException('Cannot compare objects');
+            }
+
+            if (!in_array($value, $found)) {
+                $results->add($item);
+                $found[$value] = true;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * Put an object in a particular place in the stack
      *
      * @param $index

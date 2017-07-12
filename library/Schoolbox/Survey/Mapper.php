@@ -185,9 +185,9 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute($data['bindings']);
 
-        // Hydrate records for return
+        // Hydrate results and return unique surveys
 
-        return $this->hydrateSelect($statement);
+        return $this->hydrateSelect($statement)->getUnique('id');
     }
 
     /**
