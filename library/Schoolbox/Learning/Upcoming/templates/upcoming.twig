@@ -243,7 +243,7 @@
 
 {% if subjects|length %}
 <div class="row">
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 medium-6 columns island">
         <h2 class="subheader">Upcoming {{ locale.dueWork.proper }}</h2>
         <section>
             {% if upcomingWork|length %}
@@ -270,10 +270,6 @@
                 </li>
                 {% endfor %}
             </ul>
-            <div class="row">
-                <div class="small-12 island">
-                </div>
-            </div>
             {% else %}
                 <div class="empty-state">
                     <i class="icon-due-work"></i>
