@@ -21,7 +21,6 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
-use Schoolbox\Survey\Mapper as SurveyMapper;
 
 class Mapper extends BaseMapper
 {
@@ -83,6 +82,7 @@ class Mapper extends BaseMapper
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             if ($row['availability'] == 'survey') {
+
                 $results[] = $row;
 
                 /** @var Model $model */
@@ -104,63 +104,6 @@ class Mapper extends BaseMapper
 
         /** @noinspection PhpDeprecationInspection */
         return $this->hydrateList($results);
-    }
-
-    /**
-     * Retrieve the data required for the ePortfolio matrix component
-     *
-     * @param int $surveyId
-     * @return array
-     */
-    public function getClassSnapshot($surveyId)
-    {
-        $sql = "
-            SELECT
-              attempt.user_id,
-              survey.assess_id  AS survey_id,
-              survey.title      AS survey_title,
-              section.title     AS section_title,
-              question.question AS question,
-              answer.answer     AS answers,
-              response.response AS selectedAnswers
-            FROM assess survey
-              JOIN assess_section section ON
-                                            section.deleted_at IS NULL AND
-                                            section.assess_id = survey.assess_id
-              JOIN assess_question question ON
-                                              question.deleted_at IS NULL AND
-                                              question.section_id = section.section_id
-              JOIN assess_attempt attempt ON
-                                            attempt.deleted_at IS NULL AND
-                                            attempt.assess_id = survey.assess_id AND
-                                            attempt.finish IS NOT NULL AND
-                                            attempt.attempt_id = (
-                                              SELECT attempt_id
-                                              FROM assess_attempt last_attempt
-                                              WHERE last_attempt.assess_id = survey.assess_id AND
-                                                last_attempt.user_id = attempt.user_id
-            
-                                              ORDER BY last_attempt.attempt_id DESC
-                                              LIMIT 1
-                                            )
-              JOIN assess_response response ON
-                                              response.deleted_at IS NULL AND
-                                              response.attempt_id = attempt.attempt_id AND
-                                              response.section_id = section.section_id AND
-                                              response.question_id = question.question_id
-              JOIN assess_answer answer ON answer.question_id = question.question_id
-            WHERE survey.deleted_at IS NULL AND
-                  survey.assess_id = :survey_id AND
-                  survey.availability = 'survey'
-            ORDER BY attempt.user_id,
-              section.sequence,
-              question.sequence            
-        ";
-
-        $statement = $this->database->prepare($sql);
-        $statement->execute(['survey_id' => $surveyId]);
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -191,65 +134,6 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Retrieve the data required for the ePortfolio matrix component
-     *
-     * @param int $surveyId
-     * @param int $userId
-     * @return array
-     */
-    public function getMatrix($surveyId, $userId)
-    {
-        $sql =
-            "
-            SELECT      survey.assess_id AS survey_id,
-                        survey.title AS survey_title,
-                        section.title AS section_title,
-                        question.question AS question,
-                        answer.answer AS answers,
-                        response.response AS selectedAnswers
-            FROM        assess survey
-            JOIN        assess_section section ON 
-                            section.deleted_at IS NULL AND 
-                            section.assess_id = survey.assess_id
-            JOIN        assess_question question ON
-                            question.deleted_at IS NULL AND
-                            question.section_id = section.section_id
-            JOIN        assess_attempt attempt ON
-                            attempt.deleted_at IS NULL AND
-                            attempt.assess_id = survey.assess_id AND
-                            attempt.user_id = :user_id AND
-                            attempt.finish IS NOT NULL AND
-                            attempt.attempt_id = (
-                                SELECT    attempt_id
-                                FROM      assess_attempt last_attempt
-                                WHERE     last_attempt.assess_id = survey.assess_id
-                                ORDER BY  last_attempt.attempt_id DESC
-                                LIMIT 1
-                            )
-            JOIN        assess_response response ON
-                            response.deleted_at IS NULL AND
-                            response.attempt_id = attempt.attempt_id AND
-                            response.section_id = section.section_id AND
-                            response.question_id = question.question_id 
-            JOIN        assess_answer answer ON answer.question_id = question.question_id                            
-            WHERE       survey.deleted_at IS NULL AND
-                        survey.assess_id = :survey_id AND
-                        survey.availability = 'survey'
-            ORDER BY    section.sequence, 
-                        question.sequence
-        ";
-
-        $statement = $this->database->prepare($sql);
-
-        $statement->execute([
-            'survey_id' => $surveyId,
-            'user_id' => $userId
-        ]);
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
      * Retrieve all accessible surveys by search keyword
      *
      * @param $search
@@ -264,10 +148,7 @@ class Mapper extends BaseMapper
         }
 
         $results = [];
-
         $folderMapper = FolderMapper::getInstance();
-        $surveyMapper = SurveyMapper::getInstance();
-
         $predicateBuilder = $this->getPredicateBuilder();
 
         // If the logged in user isn't a superuser, restrict search to folders they have access to
@@ -297,7 +178,7 @@ class Mapper extends BaseMapper
 
         $predicateBuilder->like('title', "%{$search}%");
 
-        $surveys = $surveyMapper->findByPredicates($predicateBuilder);
+        $surveys = $this->findByPredicates($predicateBuilder);
 
         /** @var Model $survey */
         foreach ($surveys as $survey) {
@@ -308,5 +189,101 @@ class Mapper extends BaseMapper
         }
 
         return $results;
+    }
+
+    /**
+     * Retrieve the data required for the ePortfolio matrix component
+     *
+     * @param int $surveyId
+     * @return array
+     */
+    public function getClassSnapshot($surveyId)
+    {
+        $sql = "
+            SELECT      attempt.user_id,
+                        survey.assess_id  AS survey_id,
+                        survey.title      AS survey_title,
+                        section.title     AS section_title,
+                        question.question AS question,
+                        answer.answer     AS answers,
+                        response.response AS selectedAnswers
+            FROM        assess survey
+            JOIN        assess_section section ON section.deleted_at IS NULL AND section.assess_id = survey.assess_id
+            JOIN        assess_question question ON question.deleted_at IS NULL AND question.section_id = section.section_id
+            JOIN        assess_attempt attempt ON attempt.deleted_at IS NULL AND attempt.assess_id = survey.assess_id AND attempt.finish IS NOT NULL AND 
+                        attempt.attempt_id = (
+                            SELECT    attempt_id
+                            FROM      assess_attempt last_attempt
+                            WHERE     last_attempt.assess_id = survey.assess_id AND last_attempt.user_id = attempt.user_id
+                            ORDER BY  last_attempt.attempt_id DESC
+                            LIMIT 1
+                        )
+            JOIN        assess_response response ON response.deleted_at IS NULL AND
+                        response.attempt_id = attempt.attempt_id AND
+                        response.section_id = section.section_id AND
+                        response.question_id = question.question_id
+            JOIN        assess_answer answer ON answer.question_id = question.question_id
+            WHERE       survey.deleted_at IS NULL AND
+                        survey.assess_id = :survey_id AND
+                        survey.availability = 'survey'
+            ORDER BY    attempt.user_id,
+                        section.sequence,
+                        question.sequence            
+        ";
+
+        $statement = $this->database->prepare($sql);
+        $statement->execute(['survey_id' => $surveyId]);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retrieve the data required for the ePortfolio matrix component
+     *
+     * @param int $surveyId
+     * @param int $userId
+     * @return array
+     */
+    public function getMatrix($surveyId, $userId)
+    {
+        $sql =
+            "
+            SELECT      survey.assess_id AS survey_id,
+                        survey.title AS survey_title,
+                        section.title AS section_title,
+                        question.question AS question,
+                        answer.answer AS answers,
+                        response.response AS selectedAnswers
+            FROM        assess survey
+            JOIN        assess_section section ON section.deleted_at IS NULL AND section.assess_id = survey.assess_id
+            JOIN        assess_question question ON question.deleted_at IS NULL AND question.section_id = section.section_id
+            JOIN        assess_attempt attempt ON attempt.deleted_at IS NULL AND attempt.assess_id = survey.assess_id AND attempt.user_id = :user_id AND
+                        attempt.finish IS NOT NULL AND attempt.attempt_id = (
+                            SELECT    attempt_id
+                            FROM      assess_attempt last_attempt
+                            WHERE     last_attempt.assess_id = survey.assess_id
+                            ORDER BY  last_attempt.attempt_id DESC
+                            LIMIT 1
+                        )
+            JOIN        assess_response response ON response.deleted_at IS NULL AND 
+                        response.attempt_id = attempt.attempt_id AND
+                        response.section_id = section.section_id AND
+                        response.question_id = question.question_id 
+            JOIN        assess_answer answer ON answer.question_id = question.question_id                            
+            WHERE       survey.deleted_at IS NULL AND
+                        survey.assess_id = :survey_id AND
+                        survey.availability = 'survey'
+            ORDER BY    section.sequence, 
+                        question.sequence
+        ";
+
+        $statement = $this->database->prepare($sql);
+
+        $statement->execute([
+            'survey_id' => $surveyId,
+            'user_id' => $userId
+        ]);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }
