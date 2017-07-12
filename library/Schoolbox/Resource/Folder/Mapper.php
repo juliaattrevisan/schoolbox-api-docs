@@ -42,7 +42,7 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Resource\Folder\Code as FolderCode;
+use Schoolbox\Resource\Folder\Code as FolderCode;
 
 /**
  * Class Mapper
@@ -187,11 +187,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateUnit']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'unMuteClassNotifications']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCourseSpecification']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'hardDeleteCategoryCodes']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCategoryCodes']);
@@ -202,6 +204,93 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
 
         $this->ancestry = new Ancestry($this);
+    }
+
+    /**
+     * Validate a unit hasn't been moved into the root folder
+     *
+     * @param Model $folder
+     * @return bool
+     */
+    public function validateUnit(Model $folder)
+    {
+        // Units cannot be put in root folder
+
+        if ($folder->hasUnitSpecification() && $folder->getParent()->getId() == 0) {
+            return false;
+        }
+
+        // Other folders always get a clean bill of health
+
+        return true;
+    }
+
+    /**
+     * Update a units course specification. If its parent is not a course this will make it a course
+     *
+     *     ||
+     *     ||
+     *     ||
+     *     ||
+     *     ||
+     *     ||
+     *     ||     ...enjoy cleaning up those resource browser drag & drop course creation messes!
+     *     ||
+     *    /||\
+     *   /||||\
+     *   ======         __|__
+     *   ||||||        / ~@~ \
+     *   ||||||       |-------|
+     *   ||||||       |_______|
+     *
+     * @param Model $folder
+     * @param Model $previous
+     * @return bool
+     */
+    public function updateCourseSpecification(Model $folder, $previous = null)
+    {
+        // If the folder is a unit, we need to make sure its course specification is right
+
+        if ($folder->hasUnitSpecification()) {
+
+            // We need to check if parent is a course, but first we need the damn thing hydrated
+
+            $parent = $this->findById($folder->getParent()->getId());
+
+            if ($parent->hasCourseSpecification()) {
+
+                // It's a course, just use the existing specification
+
+                $courseSpecification = $parent->getCourseSpecification();
+
+            } else {
+
+                // It's not a course, we need to make a new one... yippee!
+
+                /** @var CourseSpecification\Model $courseSpecification */
+                $courseSpecification = CourseSpecification\Mapper::getInstance()->createModel();;
+                $courseSpecification->setFolder($parent);
+                CourseSpecification\Mapper::getInstance()->save($courseSpecification);
+
+                // Now we plonk that new course onto the parent folder
+
+                $parent->setCourseSpecification($courseSpecification);
+                $this->save($parent);
+            }
+
+            // And finally update the actual folder we're supposed to be looking at
+
+            $folder->getUnitSpecification()->setCourse($courseSpecification);
+            UnitSpecification\Mapper::getInstance()->save($folder->getUnitSpecification());
+
+            // We didn't find a course specification- this unit isn't where its supposed to be
+
+            return false;
+        }
+
+        // Wasn't a unit being updated, just move on
+
+        return true;
     }
 
     /**
@@ -458,7 +547,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Postsave callback - saves a homepage config for newly created folders.
+     * Post-save callback - saves a homepage config for newly created folders.
      *
      * @param Model $model
      * @param Model $previous
@@ -475,6 +564,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $homepageConfigMapper->save($model->getHomepage());
             }
         }
+
+        return true;
     }
 
     /**
@@ -933,7 +1024,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                         ->setParent($this->createModel()->setId('#'));
         }
 
-        return parent::findById($id);
+        /** @var Model $folder */
+        $folder = parent::findById($id);
+
+        return $folder;
     }
 
 
@@ -1371,6 +1465,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Round we go again
 
             $parent = $this->findCheaplyById($folder->getParent()->getId(), ['deleted' => true]);
+
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $result = $this->findNearestNonInheritingAncestralNode($parent, $iteration++);
         }
         else
