@@ -17,7 +17,7 @@
 {% set id = inputPrefix | replace({'][': '-'}) | replace({'[': '-', ']': ''}) %}
 {% if assessmentDate.valid and not assessmentDate.isNull %}{% set date = endOfDay ? assessmentDate.endOfDay.local : assessmentDate.local %}{% else %}{% set date = unitDate.local %}{% endif %}
 {% set class = date != unitDate.local ? '' : 'hide' %}
-<div class="small-12 medium-3 columns">
+<div class="small-12 medium-6 large-3 columns">
     <label for="{{ inputPrefix }}_{{ dateProperty }}_date">{{ dateLabel }} Date</label>
     <input id="{{ id }}_{{ dateProperty }}_date"
            name="{{ inputPrefix }}[dates][{{ dateProperty }}]"
