@@ -12,7 +12,6 @@
 <!-- BEGIN custom_head -->
 
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 
 <script>
@@ -86,7 +85,6 @@
                                    data-role="open_date"
                                    data-index="{{ loop.index }}"
                                    data-datepicker
-                                   data-datepicker-sync
                                    data-datepicker-sync-enddate="#due_date-{{ loop.index }}"
                                    data-datepicker-buttontext="" />
                         </div>
@@ -102,7 +100,8 @@
                                    data-role="due_date"
                                    data-index="{{ loop.index }}"
                                    data-datepicker
-                                   data-datepicker-buttontext="" />
+                                   data-datepicker-sync-startdate="#open_date-{{ loop.index }}"
+                                   data-datepicker-buttontext=""/>
                         </div>
                     </div>
                 </li>
