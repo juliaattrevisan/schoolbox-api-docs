@@ -18,19 +18,19 @@
                     <a href="{{ url }}" title="{{ tooltip }}">
                     {% endif %}
                         <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}">
-                        <h3>
+                        <p>
                             {% if currentInteraction.isSubmitted %}
                                 Submission
                             {% else %}
                                 Draft Submission
                             {% endif %}
-                        </h3>
-
+                            by {{ participant.user.fullname }}
                         {% if currentInteraction.isSubmitted %}
-                            <p class="meta">{{ participant.user.fullname }} on {{ currentInteraction.submittedAt.short }}</p>
+                            | <span class="meta">{{ currentInteraction.submittedAt.short }}</span>
                         {% else %}
-                            <p class="meta">Draft last updated {{ currentInteraction.updatedAt.short }}</p>
+                            | <span class="meta">{{ currentInteraction.updatedAt.short }}</span>
                         {% endif %}
+                        </p>
 
                     {% if url %}
                     </a>
@@ -47,20 +47,15 @@
             {% endif %}
         </li>
     </ul>
-
     {% if currentInteraction.allFiles %}
-    <ul class="information-list">
-        {% for currentFile in currentInteraction.allFiles %}
-        <li>
+    {% for currentFile in currentInteraction.allFiles %}
             {% include '@learning/dueWork/interaction/response/files.twig' with {
                 assessment: currentInteraction.assessable,
                 assessmentId: currentInteraction.assessable.id,
                 response: currentInteraction,
                 plagscanId: currentFile.plagscan.plagscanId
             } %}
-        </li>
         {% endfor %}
-    </ul>
     {% endif %}
 
     {% if currentInteraction.allFeedback|length %}

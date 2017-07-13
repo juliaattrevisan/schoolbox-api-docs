@@ -77,13 +77,11 @@
     {% endif %}
 
     {% if currentFeedback.allFiles | length %}
-        <ul class="information-list">
             {% for currentFile in currentFeedback.allFiles %}
-
             {# Only show published feedback and therefore also
              # only list files that are involved with a Published Feedback
              #}
-            <li class="actions-small-1">
+            <div class="actions-small-1">
                 <div class="list-item">
                     <div class="card attachment small-12">
                         {# Crocodoc annotations have their own special url.
@@ -94,25 +92,26 @@
 
                             {% if crocodocRoute %}
                                 <a href="{{ crocodocRoute }}">
-                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
-                                    <p>{{ currentFile.filename }} | <span class="meta">Download</span></p>
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
+                                    <p>{{ currentFile.filename }}</p>
                                 </a>
                             {% endif %}
                         {% else %}
-                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" title="{{ currentFile.filename }}">
+                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
-                                <p>{{ currentFile.filename }} | <span class="meta">Download</span></p>
+                                <p>{{ currentFile.filename }} </p>
                             </a>
                         {% endif %}
                     </div>
                 </div>
-                {% if currentFile.crocodocId|length %}
                 <nav>
-                    {% include '@learningResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
+                    {% if currentFile.crocodocId|length %}
+                        {% include '@learningResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
+                    {% else %}
+                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download no-text"></a>
+                    {% endif %}
                 </nav>
-                {% endif %}
-            </li>
+            </div>
             {% endfor %}
-        </ul>
     {% endif %}
 </li>
