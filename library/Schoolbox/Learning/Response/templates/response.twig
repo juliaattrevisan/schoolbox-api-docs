@@ -21,6 +21,7 @@ Usage:
     participant       Participant
     plagscanEnabled   bool
     rubricContext     null|array
+    interactionLocked bool                             Is the assessment due in an archived term?
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
@@ -33,6 +34,7 @@ Usage:
 } only %}
 
 {% set deleteRoute = routeLookupIfAuthorized('learningResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
+{% set readonly    = interactionLocked and not USER.superUser %}
 
 <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
 <script type="text/javascript">
@@ -223,16 +225,21 @@ Usage:
     <div class="small-12 island">
         <section class="content">
 
-            <form method="post" data-feedback-form action="{{ routeLookup('learningFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
+            <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
                 <input type="hidden" name="responseId" value="{{ response.id }}" />
 
                 <div class="row">
 
                     {% if assessment.useRubric and rubricContext %}
                         <div class="small-12 island">
-                            {% include '@rubric/grid-markable.twig' with {
-                                rubric:   rubricContext.rubric,
-                                markType: rubricContext.markType
+                            {% set rubricTemplate = readonly
+                                ? 'grid.twig'
+                                : 'grid-markable.twig'
+                            %}
+                            {% include '@rubric/' ~ rubricTemplate with {
+                                rubric:         rubricContext.rubric,
+                                markType:       rubricContext.markType,
+                                markVisibility: participant.assessable.isFeedbackVisibleToUser(USER)
                             } only %}
                         </div>
 
@@ -294,7 +301,7 @@ Usage:
                                 } only %}
                             </label>
 
-                            {% if assessment.useRubric and rubricContext %}
+                            {% if assessment.useRubric and rubricContext and not readonly %}
                                 <p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
                             {% endif %}
                         </div>
@@ -303,12 +310,13 @@ Usage:
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                         {% include '@learningAssessment/fragments/dueWork/comment.twig' with {
                             participant: participant,
-                            tabIndex:    2
+                            tabIndex:    2,
+                            readonly:    readonly
                         } only %}
                     </div>
 
                     {# Maybe files may be uploaded here? #}
-                    {% if attachzone %}
+                    {% if attachzone and not readonly %}
                         <div class="small-12 columns">
                             {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
                         </div>
@@ -323,7 +331,7 @@ Usage:
                     {% spaceless %}
                         {% set buttons %}
                             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
-                            <a class="button" data-draft="publish" {% if isPublishedFeedback %}style="display:none;"{% endif %}>Publish and Continue</a>
+                            {% if not readonly %}<a class="button" data-draft="publish" {% if isPublishedFeedback %}style="display:none;"{% endif %}>Publish and Continue</a>{% endif %}
                         {% endset %}
                     {% endspaceless %}
 

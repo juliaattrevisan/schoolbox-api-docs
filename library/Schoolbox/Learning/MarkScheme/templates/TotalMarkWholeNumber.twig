@@ -5,6 +5,7 @@
         markScheme:  MarkScheme\TotalMarkWholeNumber
         tabIndex:    int
         errors:      string[]       Admin-configured submission states
+        readonly:    bool           Should this form input be rendered as readonly?
     ]
 #}
 
@@ -15,7 +16,8 @@
     limit:       markScheme.totalMark,
     maxLength:   16,
     inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark,
-    errors:      errors
+    errors:      errors,
+    readonly:    readonly
 } only %}
 
 

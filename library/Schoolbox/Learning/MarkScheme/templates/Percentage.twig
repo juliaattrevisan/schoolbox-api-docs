@@ -5,6 +5,7 @@
         markScheme:  MarkScheme\Percentage
         tabIndex:    int
         errors:      string[]       Admin-configured submission states
+        readonly:     bool          Should this form input be rendered as readonly?
     ]
 #}
 
@@ -16,5 +17,6 @@
     limit:       100,
     maxLength:   16,
     inputTitle:  'Percentage',
-    errors:      errors
+    errors:      errors,
+    readonly:    readonly
 } only %}

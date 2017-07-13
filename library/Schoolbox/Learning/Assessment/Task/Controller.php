@@ -25,6 +25,7 @@ use Schoolbox\UserMapper;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Assessment\Term;
 
 
 class Controller extends Assessment\Controller
@@ -45,6 +46,7 @@ class Controller extends Assessment\Controller
      * @param Transactor                    $transactor
      * @param Assessment\Breadcrumb\Factory $bakery
      * @param TaskResponseDataSource        $taskResponseDataSource
+     * @param Term\Mapper                   $termMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -54,9 +56,10 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
-        TaskResponseDataSource $taskResponseDataSource
+        TaskResponseDataSource $taskResponseDataSource,
+        Term\Mapper $termMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper);
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
 

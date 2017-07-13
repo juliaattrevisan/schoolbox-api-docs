@@ -22,6 +22,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Term;
 
 abstract class Controller extends ListController implements IAssessmentController
 {
@@ -31,6 +32,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     /** @var WorkTypeMapper */
     private $workTypeMapper;
+
+    /** @var Term\Mapper */
+    private $termMapper;
 
     /**
      * Controller constructor.
@@ -42,6 +46,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Access                $access
      * @param Transactor            $transactor
      * @param BreadcrumbFactory     $bakery
+     * @param Term\Mapper           $termMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -50,11 +55,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
         WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
-        BreadcrumbFactory $bakery
+        BreadcrumbFactory $bakery,
+        Term\Mapper $termMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor);
         $this->bakery          = $bakery;
         $this->workTypeMapper  = $workTypeMapper;
+        $this->termMapper      = $termMapper;
     }
 
     /**
@@ -485,5 +492,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function patchUpdateAssessment(IAssessable $assessment)
     {
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+    /**
+     * @return Term\Mapper
+     */
+    protected function getTermMapper()
+    {
+        return $this->termMapper;
     }
 }

@@ -33,6 +33,7 @@ use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Assessment\Term;
 
 class Module extends BaseModule
 {
@@ -357,6 +358,7 @@ class Module extends BaseModule
                 'bakery' => $injector->lazyNew(BreadcrumbFactory::class, [
                     'router' => $injector->lazyGet('router')
                 ]),
+                'termMapper' => $this->getMapperFactory()->getLazy(Term\Mapper::class),
             ])
         );
     }

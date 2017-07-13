@@ -78,15 +78,15 @@ class RubricContext
      * @param User $student
      * @param User $currentUser
      * @param Access $access
+     * @param bool $publishedOnly
      * @return array
      */
-    public function generate(DueWork $dueWork, User $student, User $currentUser, Access $access)
+    public function generate(DueWork $dueWork, User $student, User $currentUser, Access $access, $publishedOnly = true)
     {
         if(!$dueWork->getUseRubric()){
             return ['rubric' => null];
         }
 
-        $publishedOnly = true;
         $this->rubricMapper->applyStudentMark($dueWork->getRubric(), $student, $publishedOnly);
 
         $context = [

@@ -13,11 +13,13 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Authorizer\Rule\IsNotInteractionLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use \Twig_Loader_Chain;
+use Schoolbox\Assessment\Term;
 
 class Module extends BaseModule
 {
@@ -31,16 +33,24 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws Forbidden If user authenticated but lacks perms for request
+     * @throws \InvalidArgumentException If assessment's due date is null
      */
     protected function registerRoutes()
     {
         // rules
-        $canGiveFeedbackFromParticipant = new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
-            if ($params['participant'] instanceof Participant) {
-                return $params['participant']->getAssessable()->getContext()->getFolder()->getId();
-            }
-            throw new Forbidden();
-        }, Access::getInstance());
+        $canGiveFeedbackFromParticipant = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\All(
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+                    if ($params['participant'] instanceof Participant) {
+                        return $params['participant']->getAssessable()->getContext()->getFolder()->getId();
+                    }
+                    throw new Forbidden('User does not have homepage access');
+                }, Access::getInstance()),
+                new IsNotInteractionLocked(new Assessment\LockedChecker($this->getTermMapper()))
+            )
+        );
 
         $canDeleteFeedback = new Rule\IsSuperuser();
 
@@ -174,6 +184,15 @@ class Module extends BaseModule
     public function getUserDataSource()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return Mapper|Term\Mapper
+     * @throws \InvalidArgumentException If unable to find mapper class
+     */
+    private function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(Term\Mapper::class);
     }
 
     /**

@@ -9,6 +9,7 @@
         maxLength:    int            how big can this input be?
         inputTitle:   string         the tooltip to display on this input
         errors:       string[]       Admin-configured submission states
+        readonly:     bool           Should this form input be rendered as readonly?
     ]
 #}
 
@@ -24,6 +25,7 @@
         title="{{ inputTitle }}"
         data-mark-input
         data-combobox
+        {% if readonly %}readonly{% endif %}
 />
 
 <script type="text/javascript">

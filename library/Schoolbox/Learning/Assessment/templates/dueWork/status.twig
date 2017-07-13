@@ -13,6 +13,7 @@
      - statusReviewed:   a string representing the 'reviewed'   state
      - errors:           string[]  Admin-configured submission states, eg 'Absent', 'Pending', 'Not Submitted' etc
      - markSchemeName:   string    filename of markScheme template fragment
+     - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
 
 #}
 {% extends '@learningAssessment/status.twig' %}
@@ -20,6 +21,8 @@
 {% set labelIncomplete = 'Submission required' %}
 {% set labelPending    = 'Marking required' %}
 {% set labelReviewed   = 'Reviewed' %}
+
+{% set readonly = interactionLocked and not USER.superUser %}
 
 {% block headerOptions %}
     {% if download %}
@@ -32,10 +35,12 @@
         <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}" class="icon-progress">Rubric Report</a>
     </li>
     {% endif %}
+    {% if not readonly %}
     <li class="separator">Bulk Actions</li>
     <li>
         <a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish drafts&hellip;</a>
     </li>
+    {% endif %}
 {% endblock %}
 
 
@@ -49,6 +54,7 @@
     {% set canPublish   = latestFeedback and not isPublished %}
 
     {% set pActionResponses  = routeLookupIfAuthorized('learningResponse.getParticularResponse', routeArgs) %}
+    {% set fbUrl             = routeLookupIfAuthorized('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant }) %}
 
     {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}
     {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
@@ -83,7 +89,10 @@
 
 {% block grading %}
     <div class="small-12 column">
-        <form data-feedback-form method="post" action="{{ routeLookup('learningFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant }) }}">
+
+        {% if fbUrl %}
+        <form data-feedback-form method="post" action="{{ fbUrl }}">
+        {% endif %}
 
             <input type="hidden" name="responseId" value="{{ response.id }}" />
 
@@ -95,7 +104,8 @@
                         participant: participant,
                         markScheme:  assessment.markScheme,
                         tabIndex:    (loop.index0 * 2) + 1,
-                        errors:      errors
+                        errors:      errors,
+                        readonly:    readonly
                     } only %}
                     </label>
                 </div>
@@ -104,11 +114,14 @@
                 <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                     {% include '@learningAssessment/fragments/dueWork/comment.twig' with {
                         participant: participant,
-                        tabIndex:   (loop.index0 * 2) + 2
+                        tabIndex:   (loop.index0 * 2) + 2,
+                        readonly:    readonly
                     } only %}
                 </div>
             </div>
+        {% if fbUrl %}
         </form>
+        {% endif %}
     </div>
 {% endblock %}
 
@@ -187,7 +200,7 @@
     {% spaceless %}
         {% set buttons %}
             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{% if isDraftFeedback %}Saved as Draft{% endif %}</span>
-            <a class="button" data-draft="publish" {% if feedback.published %}style="display:none;"{% endif %}>Publish</a>
+            {% if not readonly %}<a class="button" data-draft="publish" {% if feedback.published %}style="display:none;"{% endif %}>Publish</a>{% endif %}
         {% endset %}
     {% endspaceless %}
 
@@ -202,7 +215,7 @@
 {% endblock %}
 
 {% block scripts %}
-
+{% if not readonly %}
 <script type="application/javascript" src="/javascript/shared/submissions/jquery.bulky.js"></script>
 <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true" role="dialog">
     <h2>Publish Drafts</h2>
@@ -277,4 +290,5 @@
             });
         });
     </script>
+{% endif %}
 {% endblock %}

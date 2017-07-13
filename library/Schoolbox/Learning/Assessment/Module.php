@@ -16,6 +16,7 @@ use OutOfBoundsException;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
+use Schoolbox\Learning\Authorizer\Rule\IsNotInteractionLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -45,6 +46,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use UnexpectedValueException;
+use Schoolbox\Assessment\Term;
 
 class Module extends BaseModule
 {
@@ -129,10 +131,18 @@ class Module extends BaseModule
             })
         );
 
+        /* SU can always submit, teachers/students cannot if due in archived term
+         * (intentionally ignores student and submitting past close date)
+         */
         $canSubmit = new Rule\Any(
             new Rule\IsSuperuser(),
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsUser('studentId')
+            new Rule\All(
+                new Rule\Any(
+                    new Rule\IsUser('studentId'),
+                    new Rule\HasRole(Role::STAFF)
+                ),
+                new IsNotInteractionLocked(new LockedChecker($this->getTermMapper()))
+            )
         );
 
         // Prevent navigation to non-project assessment spec status pages
@@ -349,7 +359,8 @@ class Module extends BaseModule
         $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
             'router' => $injector->lazyGet('router')
         ]);
-        $ac['workTypeMapper']           = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
+        $ac['workTypeMapper'] = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
+        $ac['termMapper']     = $this->getMapperFactory()->getLazy(Term\Mapper::class);
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
@@ -413,6 +424,17 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
+
+
+    /**
+     * @return Mapper|Term\Mapper
+     * @throws \InvalidArgumentException If unable to find mapper class
+     */
+    private function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(Term\Mapper::class);
+    }
+
 
     /**
      * @return Mapper|ErrorMapper

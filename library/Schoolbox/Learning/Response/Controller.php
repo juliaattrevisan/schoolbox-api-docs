@@ -17,6 +17,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
@@ -25,6 +26,7 @@ use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Attachzone;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
@@ -37,6 +39,7 @@ use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use DueWork_ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Application\Exception as ApplicationException;
 
 class Controller extends Base
@@ -53,6 +56,9 @@ class Controller extends Base
     /** @var BreadcrumbFactory */
     protected $bakery;
 
+    /** @var Term\Mapper */
+    private $termMapper;
+
 
     /**
      * Controller constructor.
@@ -61,11 +67,12 @@ class Controller extends Base
      * @param DataSource  $responseDataSource
      * @param BreadcrumbFactory $bakery
      */
-    public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource, BreadcrumbFactory $bakery)
+    public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource, BreadcrumbFactory $bakery, Term\Mapper $termMapper)
     {
         $this->setErrorMapper($errorMapper);
         $this->responseDataSource = $responseDataSource;
         $this->bakery = $bakery;
+        $this->termMapper = $termMapper;
 
     }
 
@@ -83,6 +90,7 @@ class Controller extends Base
      * @param Submission $response
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
+     * @throws \InvalidArgumentException If assessment due date is null.
      */
     public function getParticularResponse(IAssessable $assessment, Participant $participant, Submission $response = null)
     {
@@ -131,6 +139,9 @@ class Controller extends Base
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
 
+        // Is the page being displayed in readonly mode?
+        $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
+
         /* ResponseFile Factory might throw exceptions if you're viewing
          * crocodocable files that somehow die
          */
@@ -166,6 +177,7 @@ class Controller extends Base
                 /* Plagscan status
                  */
                 'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+                'interactionLocked' => $isInteractionLocked,
             ];
 
             if($assessment instanceof DueWork){
@@ -175,7 +187,12 @@ class Controller extends Base
                 if($assessment->getUseRubric()){
                     $assessment->setRubric($rubricMapper->findByDueWork($assessment));
                 }
-                $data['rubricContext'] = (new RubricContext($rubricMapper))->generateMarkable($assessment, $participant->getUser());
+                $rubricContext = new RubricContext($rubricMapper);
+
+                // Should rubric be readonly or markable?
+                $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
+                    ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
+                    : $rubricContext->generateMarkable($assessment, $participant->getUser());
             }
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));

@@ -6,12 +6,13 @@
         tabIndex:     int
         markScheme:   LetterGrade
         errors:       string[]       Admin-configured submission states
+        readonly:     bool           Should this form input be rendered as readonly?
     ]
 #}
 
 {% set humanReadableMark = participant.humanReadableMark(false) %}
 
-<select data-mark-input name="mark" tabindex="{{ tabIndex }}">
+<select data-mark-input name="mark" tabindex="{{ tabIndex }}" {% if readonly %}disabled{% endif %}>
 
     {# Empty state #}
     {% set found = (humanReadableMark is null) %}

@@ -112,12 +112,12 @@
                             <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                                 {%- spaceless %}
                                     {% if pActionResponses %}
-                                        <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View and {{ locale.grades }} submission</a></li>
+                                        <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
                                     {% endif %}
                                     {% if pActionSummary %}
                                         <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ locale.submissionHistory.proper }}</a></li>
                                     {% endif %}
-                                    {% if pSobo %}
+                                    {% if pSobo and pActionSobo %}
                                     <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
                                     {% endif %}
                                     {{ block('extra_nav_items') }}

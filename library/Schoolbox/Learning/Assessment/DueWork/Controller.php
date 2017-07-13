@@ -40,6 +40,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
+use Schoolbox\Assessment\Term;
 
 class Controller extends Assessment\Controller
 {
@@ -67,6 +68,7 @@ class Controller extends Assessment\Controller
      * @param Rubric\ResultMapper           $resultSetMapper
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
      * @param ParticipantMapper             $participantMapper
+     * @param Term\Mapper                   $termMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -79,9 +81,10 @@ class Controller extends Assessment\Controller
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
-        ParticipantMapper $participantMapper
+        ParticipantMapper $participantMapper,
+        Term\Mapper $termMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
@@ -124,6 +127,7 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
+     * @throws \InvalidArgumentException If assessment due date is null.
      */
     public function getStatus(IAssessable $assessment)
     {
@@ -137,6 +141,7 @@ class Controller extends Assessment\Controller
             'assessment'     => $assessment,
             'download'       => $this->hasDownloadableSubmissionFiles($assessment),
             'rubricMarks'    => Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
         ];
 
         $this->getResponse()->content->set(

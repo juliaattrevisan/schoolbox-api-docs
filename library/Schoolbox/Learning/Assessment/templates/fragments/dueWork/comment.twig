@@ -4,6 +4,7 @@
     Usage: [
         participant:  Participant
         tabindex:     int
+        readonly:     bool           Should textarea be rendered as readonly?
     ]
 #}
 {% set latestFeedback = participant.findMostRecentFeedback %}
@@ -14,5 +15,6 @@
             name="comment"
             placeholder="Feedback for {{ participant.user.firstName }}"
             rows="3"
+            {% if readonly %}readonly{% endif %}
     >{{ latestFeedback.comment }}</textarea>
 </label>
