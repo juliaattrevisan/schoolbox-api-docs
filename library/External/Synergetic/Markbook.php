@@ -20,6 +20,7 @@ use Schoolbox\UserMapper;
 
 class External_Synergetic_Markbook implements External_MarkbookInterface
 {
+    use External_FileYearSemesterTrait;
     use External_MssqlConnector;
     use External_Synergetic_ValidateExternalIdTrait;
 
@@ -632,18 +633,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     }
 
     /**
-     * @param External_User $externalUser
-     */
-    public function setExternalUser($externalUser)
-    {
-        $this->externalUser = $externalUser;
-    }
-
-    /**
      * @return External_User
      */
     public function getExternalUser()
     {
         return $this->externalUser;
+    }
+
+    /**
+     * @param External_User $externalUser
+     * @return $this
+     */
+    public function setExternalUser($externalUser)
+    {
+        $this->externalUser = $externalUser;
+        return $this;
     }
 }
