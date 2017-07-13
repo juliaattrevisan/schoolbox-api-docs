@@ -60,7 +60,7 @@ abstract class Evaluation_Response extends DeprecatedModel
                   LEFT JOIN assess_answer ON assess_answer.question_id = assess_question.question_id
                   WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND automated_marking = 'true'
-                  AND automarked_already = 'false'";
+                  AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
         return $this->db->getAll($query);
     }
