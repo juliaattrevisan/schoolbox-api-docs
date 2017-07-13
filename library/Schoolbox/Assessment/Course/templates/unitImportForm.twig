@@ -64,7 +64,7 @@
 
                         {# Checkbox & Unit Name #}
 
-                        <div class="card small-12">
+                        <div class="card small-12 large-4">
                             <input id="import-{{ loop.index }}"
                                    name="unit[{{ loop.index }}][import]"
                                    {% if unitImpl.id %}checked="checked" data-warn-removal {% endif %}
@@ -78,7 +78,7 @@
 
                         {# Open Date #}
 
-                        <div class="small-12 medium-6 columns" data-hide-watch="#import-{{ loop.index }}">
+                        <div class="small-12 medium-6 large-4 columns" data-hide-watch="#import-{{ loop.index }}">
                             <label for="open_date-{{ loop.index }}">Open</label>
                             <input id="open_date-{{ loop.index }}"
                                    name="unit[{{ loop.index }}][open_date]"
@@ -88,12 +88,13 @@
                                    data-index="{{ loop.index }}"
                                    data-datepicker
                                    data-datepicker-sync
-                                   data-datepicker-sync-enddate="#due_date-{{ loop.index }}" />
+                                   data-datepicker-sync-enddate="#due_date-{{ loop.index }}"
+                                   data-datepicker-buttontext="" />
                         </div>
 
                         {# Close Date #}
 
-                        <div class="small-12 medium-6 columns" data-hide-watch="#import-{{ loop.index }}">
+                        <div class="small-12 medium-6 large-4 columns" data-hide-watch="#import-{{ loop.index }}">
                             <label for="due_date-{{ loop.index }}">Close</label>
                             <input id="due_date-{{ loop.index }}"
                                    name="unit[{{ loop.index }}][close_date]"
@@ -101,7 +102,8 @@
                                    value="{{ unitImpl.dueDate.localShort }}"
                                    data-role="due_date"
                                    data-index="{{ loop.index }}"
-                                   data-datepicker />
+                                   data-datepicker
+                                   data-datepicker-buttontext="" />
                         </div>
                     </div>
                 </li>
