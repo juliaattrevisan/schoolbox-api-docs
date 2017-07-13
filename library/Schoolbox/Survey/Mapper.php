@@ -112,7 +112,7 @@ class Mapper extends BaseMapper
      * @param array $userIds Array containing Schoolbox user IDs of people that have attempted quizzes
      * @return Collection
      */
-    public function getAttemptedSurveysForUsers($userIds)
+    public function findAttemptedSurveysForUsers($userIds)
     {
         $data = PredicateBuilder::getArrayBindings($userIds, 'userId');
 

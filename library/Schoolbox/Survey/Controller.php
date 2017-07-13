@@ -128,7 +128,7 @@ class Controller extends Base
 
         $surveys = null;
 
-        $surveys = $this->surveyMapper->getAttemptedSurveysForUsers($userIds);
+        $surveys = $this->surveyMapper->findAttemptedSurveysForUsers($userIds);
 
         $this->getResponse()->content->set([
             'template' => '@survey/classSnapshot.twig',
