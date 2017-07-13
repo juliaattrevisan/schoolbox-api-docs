@@ -524,6 +524,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         });
                     }
 
+                    // Sync dates if applicable
+                    syncDatesOnElement(element, options, '');
+
                     // Close modal
                     $modal.foundation('reveal', 'close');
 
@@ -567,6 +570,11 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                             setCalendarAllDay(timetableAllDay, getOptions(item).id);
                         });
                     }
+
+                    // Sync dates if applicable
+                    syncDatesOnElement(element, options, '');
+
+                    // Close the modal
                     $modal.foundation('reveal', 'close');
                 });
 
