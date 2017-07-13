@@ -69,7 +69,7 @@
             <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][spec_id]" value="{{ assessmentSpec.id }}" />
             <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][impl_id]" value="{{ assessmentImpl.id }}" />
 
-            <div class="compact card small-12 large-4">
+            <div class="compact card small-12">
                 <input type="checkbox"
                        id="a_import-{{ assessment.id}}"
                        {% if isChecked %} checked="checked"{% endif %}
@@ -113,7 +113,7 @@
                     assessmentId: assessmentSpec.id
                     } only %}
                 {% else %}
-                    <div class="small-12 medium-3 large-2 columns"><p>&nbsp;</p></div>
+                    <div class="small-12 medium-3 columns"><p>&nbsp;</p></div>
                 {% endif %}
 
                 {#due date is always relevant#}
@@ -139,7 +139,7 @@
                         assessmentId: assessmentSpec.id
                     } only %}
                 {% else %}
-                    <div class="small-12 medium-3 large-2 columns"><p>&nbsp;</p></div>
+                    <div class="small-12 medium-3 columns"><p>&nbsp;</p></div>
                 {% endif %}
             </div>
 
