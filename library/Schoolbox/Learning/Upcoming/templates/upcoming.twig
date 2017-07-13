@@ -245,8 +245,8 @@
 <div class="row">
     <div class="small-12 medium-6 columns island">
         <h2 class="subheader">Upcoming {{ locale.dueWork.proper }}</h2>
+        {% if upcomingWork|length %}
         <section>
-            {% if upcomingWork|length %}
             <ul class="action-list">
                 {% for upcoming in upcomingWork %}
                 <li>
@@ -270,13 +270,13 @@
                 </li>
                 {% endfor %}
             </ul>
-            {% else %}
-                <div class="empty-state">
-                    <i class="icon-due-work"></i>
-                    <p>Currently no work has been set, nice one.</p>
-                </div>
-            {% endif %}
         </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>Currently no work has been set, nice one.</p>
+            </div>
+        {% endif %}
     </div>
 
     <div class="small-12 medium-6 columns">
