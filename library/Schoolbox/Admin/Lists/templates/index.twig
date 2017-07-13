@@ -302,9 +302,12 @@
                         </li>
                     {% endfor %}
                 </ul>
-
+            <div class="component-action">
+                <section>
+                    <a href="#" data-button="add-row" class="button">Add New Row</a>
+                </section>
+            </div>
             </section>
-            <a href="#" data-button="add-row" class="button expand icon-add">New Row</a>
             <input type="submit" value="Save"/>
         </form>
     </div>
@@ -314,7 +317,7 @@
 {# #ID# is used as a placeholder for an ID that is preg_replaced in JS when rows are inserted. #}
 
 <div data-clone class="hide">
-    <li class="row {% if tables[table].delete %}actions-small-1{% endif %}">
+    <li class="{% if tables[table].delete %}actions-small-1{% endif %}">
         <input type="hidden" name="id[]" value="#ID#">
 
         {# The first non-hidden input field needs to have the data-focus attribute set, this variable keeps track of that #}
