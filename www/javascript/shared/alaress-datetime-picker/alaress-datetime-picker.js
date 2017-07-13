@@ -88,8 +88,6 @@ function getOptions(element) {
         type: getValue(element, 'data-datepicker-call'), //Ajax call type: events, duework or nothing
         endDay: getValue(element, 'data-datepicker-endofday'), // Should allday change time to 23:59:59
         endPeriod: getValue(element, 'data-datepicker-endofperiod'), // It will use end of the period to set time through timetable picker
-        syncStartDate: getValue(element, 'data-datepicker-sync-startdate'),
-        syncEndDate: getValue(element, 'data-datepicker-sync-enddate'),
         staller: null
     };
     return elementOptions;
@@ -313,26 +311,7 @@ function massageDateValue(e, staller) {
                 setValue($(t), opts, state, true, newDate);
 
                 // Sync dates if applicable
-                if (opts.syncStartDate || opts.syncEndDate) {
-
-                    var dateFormat = fieldHasTime(opts) ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
-
-                    var syncOptions = {
-                        'dateFormat': dateFormat
-                    };
-
-                    if (opts.syncStartDate.length) {
-                        syncOptions.startDate = opts.syncStartDate;
-                    }
-
-                    if (opts.syncEndDate.length) {
-                        syncOptions.endDate = opts.syncEndDate;
-                    }
-
-                    if (syncOptions.startDate || syncOptions.endDate) {
-                        $(t).syncDatesNow(syncOptions);
-                    }
-                }
+                syncDatesOnElement($(t), opts, '');
 
                 // Remove any error class on the field
                 $(t).removeClass('error');
@@ -353,6 +332,48 @@ function massageDateValue(e, staller) {
         }
     }
 }
+
+
+/**
+ * Takes an element and syncs it with it's start and end date as per its data attribs
+ * Will run itself in one direction until it stops finding a start or end date set
+ *
+ * @param {jQuery} $element
+ * @param {object} options
+ * @param {string} from - used to set a direction this will go in, start or end
+ */
+function syncDatesOnElement($element, options, from) {
+
+    var dateFormat = fieldHasTime(options) ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
+
+    var syncOptions = {
+        dateFormat: dateFormat
+    };
+
+    if ($element.attr('data-datepicker-sync-startdate') !== undefined && from !== 'end') {
+
+        syncOptions.startDate = $element.attr('data-datepicker-sync-startdate');
+        syncOptions.endDate = $element;
+
+        $element.syncDatesNow(syncOptions);
+
+        // Run this again for the start element
+        syncDatesOnElement($($element.attr('data-datepicker-sync-startdate')), options, 'start');
+    }
+
+    if ($element.attr('data-datepicker-sync-endDate') !== undefined && from !== 'start') {
+
+        syncOptions.startDate = $element;
+        syncOptions.endDate = $element.attr('data-datepicker-sync-endDate');
+
+        $element.syncDatesNow(syncOptions);
+
+        // Run this again for the end element
+        syncDatesOnElement($($element.attr('data-datepicker-sync-endDate')), options, 'end');
+    }
+
+}
+
 
 /**
  * Check if this field should have time given its options and whether all day is on

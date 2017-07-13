@@ -53,7 +53,7 @@
 
 
     /**
-     * Syncs dates with each other on function call
+     * Syncs dates on function call
      *
      * Options:
      * * startDate, endDate: selectors for the start and end date input. If either
@@ -70,27 +70,25 @@
 
         var settings = $.extend({}, defaults, options);
 
-        // Set up startDate and endDate
         if (settings.startDate) {
             settings.startDate = $(settings.startDate);
-        } else {
-            settings.startDate = this;
+
+            var startDate = moment(settings.startDate.val(), settings.dateFormat, true);
+            var endDate = moment($(this).val(), settings.dateFormat, true);
+
+            if (startDate.isValid() && endDate.isValid() && startDate.isAfter(endDate)) {
+                settings.startDate.val($(this).val()).change();
+            }
         }
 
         if (settings.endDate) {
             settings.endDate = $(settings.endDate);
-        } else {
-            settings.endDate = this;
-        }
 
-        var startDate = moment(settings.startDate.val(), settings.dateFormat, true);
-        var endDate   = moment(settings.endDate.val(), settings.dateFormat, true);
+            startDate = moment($(this).val(), settings.dateFormat, true);
+            endDate = moment(settings.endDate.val(), settings.dateFormat, true);
 
-        if (startDate.isValid() && endDate.isValid() && startDate.isAfter(endDate)) {
-            if ($(this).is(settings.startDate)) {
-                settings.endDate.val(settings.startDate.val()).change();
-            } else {
-                settings.startDate.val(settings.endDate.val()).change();
+            if (startDate.isValid() && endDate.isValid() && startDate.isAfter(endDate)) {
+                settings.endDate.val($(this).val()).change();
             }
         }
 
