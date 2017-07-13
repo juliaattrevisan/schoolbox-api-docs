@@ -2,7 +2,7 @@
 
 {% block buttons %}
     {{ parent() }}
-    {% if (session.user.getRole().isParent()) %}
+    {% if isParentOfStudent %}
         <li><a class="icon-staff" href="/synergetic/pti?id=$student.synergeticId">Parent Teacher</a></li>
     {% endif %}
 {% endblock buttons %}
