@@ -146,7 +146,7 @@ class Controller extends Base
      *
      * @param Model $survey
      */
-    public function getClassSnapshot($survey)
+    public function findClassSnapshot($survey)
     {
         $this->excel = new PHPExcel();
 

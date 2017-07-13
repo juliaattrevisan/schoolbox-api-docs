@@ -199,7 +199,7 @@ class Mapper extends BaseMapper
      * @param int $surveyId
      * @return array
      */
-    public function getClassSnapshot($surveyId)
+    public function findClassSnapshot($surveyId)
     {
         $sql = "
             SELECT      attempt.user_id,
