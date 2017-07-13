@@ -998,10 +998,10 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * The concise, typesafe version of hasMap()
      *
-     * @param string $column
-     * @param string|IColumnType $type
-     * @param int    $options
-     * @param string $property
+     * @param string          $column
+     * @param int|IColumnType $type
+     * @param int             $options
+     * @param string          $property
      * @return bool
      */
     protected function uses($column, $type, $options = null, $property = null)
@@ -1806,9 +1806,9 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Returns a collection with models filtered by column/property
      *
-     * @param String       $columnName
-     * @param String|array $columnValue
-     * @param array        $options @see findByColumnList() $options param
+     * @param string $columnName
+     * @param mixed  $columnValue
+     * @param array  $options @see findByColumnList() $options param
      * @param  array $options
      *
      * @return GenericCollection

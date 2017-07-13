@@ -120,7 +120,7 @@ class ServiceMapper extends Mapper
                     throw new Mapper\Exception('No PEM certificate given for APNS service.');
                 }
 
-                return new Cloud\Apple\APNS($rm, $appId,Apns\Client\Message::PRODUCTION_URI, $this->getPemPath($storageObj), $key);
+                return new Cloud\Apple\APNS($rm, $appId, Apns\Client\Message::PRODUCTION_URI, $this->getPemPath($storageObj), $key);
 
             case Registry::PROVIDER_GOOGLE:
                 return new Cloud\Google\GCM($rm, $appId, $key);
@@ -135,7 +135,7 @@ class ServiceMapper extends Mapper
      *
      * @param int $idValue
      * @throws Mapper\Exception
-     * @return object
+     * @return object|null
      */
     public function createModel($idValue = null)
     {

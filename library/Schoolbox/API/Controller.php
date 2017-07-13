@@ -19,7 +19,6 @@ use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\ServiceDTO;
 
-
 class Controller extends Base {
 
     /** @var Authenticator */
@@ -124,7 +123,6 @@ class Controller extends Base {
                 $registry->setTouchedAt($now);
 
             } catch (MapperException $e) {
-
                 try {
                     /** @var Registry $registry */
                     $registry = $this->registryMapper->createModel();
