@@ -350,26 +350,26 @@ function syncDatesOnElement($element, options, from) {
         dateFormat: dateFormat
     };
 
-    if ($element.attr('data-datepicker-sync-startdate') !== undefined && from !== 'end') {
+    if ($element.attr('data-datesync-startdate') !== undefined && from !== 'end') {
 
-        syncOptions.startDate = $element.attr('data-datepicker-sync-startdate');
+        syncOptions.startDate = $element.attr('data-datesync-startdate');
         syncOptions.endDate = $element;
 
         $element.syncDatesNow(syncOptions);
 
         // Run this again for the start element
-        syncDatesOnElement($($element.attr('data-datepicker-sync-startdate')), options, 'start');
+        syncDatesOnElement($($element.attr('data-datesync-startdate')), options, 'start');
     }
 
-    if ($element.attr('data-datepicker-sync-endDate') !== undefined && from !== 'start') {
+    if ($element.attr('data-datesync-endDate') !== undefined && from !== 'start') {
 
         syncOptions.startDate = $element;
-        syncOptions.endDate = $element.attr('data-datepicker-sync-endDate');
+        syncOptions.endDate = $element.attr('data-datesync-endDate');
 
         $element.syncDatesNow(syncOptions);
 
         // Run this again for the end element
-        syncDatesOnElement($($element.attr('data-datepicker-sync-endDate')), options, 'end');
+        syncDatesOnElement($($element.attr('data-datesync-endDate')), options, 'end');
     }
 
 }

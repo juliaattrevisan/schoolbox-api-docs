@@ -85,8 +85,8 @@
                                    data-role="open_date"
                                    data-index="{{ loop.index }}"
                                    data-datepicker
-                                   data-datepicker-sync-enddate="#due_date-{{ loop.index }}"
-                                   data-datepicker-buttontext="" />
+                                   data-datepicker-buttontext=""
+                                   data-datesync-enddate="#due_date-{{ loop.index }}" />
                         </div>
 
                         {# Close Date #}
@@ -100,8 +100,8 @@
                                    data-role="due_date"
                                    data-index="{{ loop.index }}"
                                    data-datepicker
-                                   data-datepicker-sync-startdate="#open_date-{{ loop.index }}"
-                                   data-datepicker-buttontext=""/>
+                                   data-datesync-startdate="#open_date-{{ loop.index }}"
+                                   data-datepicker-buttontext="" />
                         </div>
                     </div>
                 </li>
