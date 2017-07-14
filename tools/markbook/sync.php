@@ -102,7 +102,7 @@ Usage:         php sync.php -p=[folderID] [--year=yyyy] [--semester=s] [--start=
     --end=yyyy-mm-dd     Only sync work due before this date, format --end=2016-08-15, default to current semester
     --dry-run:           if set, does not actually update anything, but shows what would be updated
     --update-only:       if set, will not create any new items in the remote system, only updates existing markbooks
-    {$additionalParameters}                         
+{$additionalParameters}                         
 
 HELP;
 
