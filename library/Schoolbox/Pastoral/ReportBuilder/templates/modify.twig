@@ -121,62 +121,29 @@
 
         {# Generate the report after a little sanity checking#}
 
-        $('[data-report]').click(function (event) {
-
-            event.preventDefault();
-
-            var error = false;
-
-            // Title is required
-
-            $('#name_error').hide();
-
-            if ($('#name').val().trim().length == 0) {
-                $('#name_error').show();
-                $('#name').focus();
-                error = true;
-            }
-
-            // At least one record type has to be selected
-
-            $('#type_error').hide();
-
-            if ($('[data-check-type]:checked').length == 0) {
-                $('#type_error').show();
-                if (!error) {
-                    $('[data-check-type]').focus();
+        $('#formReport').alaressValidate({
+            rules: {
+                'name': {
+                    required: true
+                },
+                'types[]': {
+                    required: true,
+                    minLength: 1
+                },
+                'years[]': {
+                    required: true,
+                    minLength: 1
                 }
-                error = true;
-            }
-
-            {# At least one year has to be selected #}
-
-            $('#year_error').hide();
-
-            if ($('[data-check-year]:checked').length == 0) {
-                $('#year_error').show();
-                if (!error) {
-                    $('[data-check-year]').focus();
+            },
+            messages: {
+                'types[]': {
+                    required: 'You must select at least one record type to show in the report'
+                },
+                'years[]': {
+                    required: 'You must select at least one year level to show in the report'
                 }
-                error = true;
             }
-
-            if (!error)
-            {
-                var order = '';
-
-                $('#sort-order').children('li').each(function (d) {
-                    if (order != '') {
-                        order += ',';
-                    }
-                    order = order + $(this).data('order');
-                });
-
-                $('#order').val(order);
-
-                $('#formReport').submit();
-            }
-        });
+        })
     });
 
 </script>
@@ -201,9 +168,6 @@
                         <label for="name">
                             Report Name
                             <input id="name" type="text" class="required" name="name" value="{{ report.name }}"/>
-                        </label>
-                        <label id="name_error" for="name" class="error" style="display:none;">
-                            This field is required.
                         </label>
                         <div class="checklist">
                             <input id="dashboard" name="dashboard" value="1" type="checkbox" {% if report.dashboard %}checked{% endif %}>
@@ -267,7 +231,7 @@
             <section>
                 <div class="small-12 columns content">
                     <div class="checklist">
-                        <input id="type-all" data-check-all-type type="checkbox">
+                        <input id="type-all" type="checkbox" data-check-all-type>
                         <label for="type-all">Select All</label>
                         {% for type in types %}
                             <input data-check-type id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
@@ -279,9 +243,6 @@
                                 {{ type.name }}
                             </label>
                         {% endfor %}
-                        <label id="type_error" class="error" style="display:none;">
-                            You must select at least one record type to show in the report
-                        </label>
                     </div>
                 </div>
             </section>
@@ -294,7 +255,7 @@
             {% if moderator %}
                 <section>
                     <div class="small-12 columns content">
-                        <div class="checklist">
+                        <fieldset class="checklist">
                             <label>
                                 {{ locale.pastoral.proper }} Moderator Filter
                             </label>
@@ -307,18 +268,17 @@
                             <label for="involved">
                                 Only show records in which you are the author or an audience member
                             </label>
-                        </div>
+                        </fieldset>
                     </div>
                 </section>
             {% else %}
                 <input type="hidden" id="involved-checkbox" value="1">
             {% endif %}
 
-
             <section>
                 <div class="small-12 columns content">
                     <div class="checklist">
-                        <input id="year-all" data-check-all-year type="checkbox">
+                        <input id="year-all" type="checkbox" data-check-all-year>
                         <label for="year-all">Select All</label>
                         {% for year in years %}
                             <input data-check-year id="year-{{ year }}" name="years[]" value="{{ year }}" type="checkbox"
@@ -330,9 +290,6 @@
                             >
                             <label for="year-{{ year }}">{{ year }}</label>
                         {% endfor %}
-                        <label id="year_error" class="error" style="display:none;">
-                            You must select at least one year level to show in the report
-                        </label>
                     </div>
                 </div>
             </section>
@@ -449,7 +406,7 @@
                 </section>
             {% endif %}
 
-            <a href="#" data-report class="submit expand">Save Report</a>
+            <input type="submit" value="Save Report" />
         </form>
     </div>
 </div>
