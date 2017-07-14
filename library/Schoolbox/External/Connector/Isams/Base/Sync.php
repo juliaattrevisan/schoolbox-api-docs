@@ -37,7 +37,7 @@ class Sync extends Base implements ISync
             SELECT
                 StudentID                AS student_id,
                 Username                 AS network_login,
-                ''                       AS student_title,
+                Title                    AS student_title,
                 StudentFirstname         AS student_given_name,
                 StudentFirstname         AS student_preferred,
                 StudentSurname           AS student_surname,
@@ -68,7 +68,7 @@ class Sync extends Base implements ISync
             SELECT DISTINCT 
                         Username                        AS student_contact_network_login,
                         ParentID                        AS student_contact_id,
-                        ''                              AS student_contact_title,
+                        Title                           AS student_contact_title,
                         ParentFirstname                 AS student_contact_preferred,
                         ParentFirstname                 AS student_contact_given_name,
                         ParentSurname                   AS student_contact_surname,
