@@ -18,8 +18,8 @@ $page = new SitePage();
 $externalClass = new External_Class();
 $externalHandler = new External_User();
 
-$ids = array();
-$emailString = array();
+$ids = [];
+$emailString = [];
 
 // Find all the students whose housemasters we'll need to contact...
 
