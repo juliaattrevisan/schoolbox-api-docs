@@ -10,7 +10,6 @@
 namespace Schoolbox\MobileApp;
 
 
-use Alaress\Async\Notification\Cloud\ServiceInterface;
 use Alaress_Date_Format;
 use Schoolbox\User;
 
@@ -29,7 +28,7 @@ class Registry {
     /** @var string */
     protected $deviceId;
 
-    /** @var ServiceInterface */
+    /** @var Service */
     protected $service;
 
     /** @var Alaress_Date_Format */
@@ -120,7 +119,7 @@ class Registry {
 
 
     /**
-     * @return ServiceInterface
+     * @return Service
      */
     public function getService()
     {
@@ -129,7 +128,7 @@ class Registry {
 
 
     /**
-     * @param ServiceInterface $service
+     * @param Service $service
      * @return $this
      */
     public function setService($service)

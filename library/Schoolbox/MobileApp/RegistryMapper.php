@@ -10,10 +10,10 @@
 namespace Schoolbox\MobileApp;
 
 
-use Alaress\Async\Notification\Cloud\ServiceInterface;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -44,7 +44,7 @@ class RegistryMapper extends Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('touched_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
 
-        $this->joins('app_id', ServiceMapper::class, 'app_id', null, null, 'service', 'service');
+        $this->joins('app_id', ServiceMapper::class, 'id', null, null, 'service', 'service');
     }
 
 
@@ -109,8 +109,13 @@ class RegistryMapper extends Mapper
         $c = new Collection();
 
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            /** @var ServiceInterface $service */
+            /** @var Service $service */
             $service = $this->hydrateJoin($r, 'service', 's');
+
+            /** @var IStorage $cert */
+            $cert = $this->getJoinMapper('service')->hydrateJoin($r, 'cert', 'cert');
+
+            $service->setCertificate($cert);
 
             /** @var User $user */
             $user = $this->hydrateJoin($r, 'user_id', 'u');
