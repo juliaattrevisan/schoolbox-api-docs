@@ -52,7 +52,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <dl class="sub-nav">
+        <dl class="tabs">
             <dd class="active"><a href="/adminv2/photos">User Photos</a></dd>
             <dd><a href="/adminv2/photos/upload">Upload</a></dd>
         </dl>
@@ -61,8 +61,8 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Filter By Surname</h2>
         <section class="content">
+            <h3>Filter By Surname</h3>
             <dl class="sub-nav no-margin">
                 <dd {% if surname == 'a' %}class="active"{% endif %}><a href="?surname=a">A</a></dd>
                 <dd {% if surname == 'b' %}class="active"{% endif %}><a href="?surname=b">B</a></dd>

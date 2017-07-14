@@ -37,19 +37,20 @@
 
         <section class="content">
             <p>If a user has deleted a file or link this will clean up the soft deleted remnants. This should be completed yearly to keep disk usage down.</p>
-
-	    <!-- <a href="/adminv2/cleanup/file" class="button icon-delete" data-cleanup="file">Remove Files</a> -->
-	    <p>This function has been removed temporarily.</p>
+	        <!-- <a href="/adminv2/cleanup/file" class="button icon-delete" data-cleanup="file">Remove Files</a> -->
+	        <p>This function has been removed temporarily.</p>
         </section>
     </div>
     <div class="small-12 large-6 island">
         <h2 class="subheader">Clean Stream Cache</h2>
-
         <section>
             <div class="content">
-                <p>The stream cache is used to store items downloaded from remote systems and zip archives to be downloaded.  This can be safely deleted yearly or more frequently as all data is replaceable.  This will increase page load times while the cache items are refetched.</p>
-
-                <a href="/adminv2/cleanup/zip/stream" class="button icon-delete" data-cleanup="stream">Clean Data Cache</a>
+                <p>The stream cache is used to store items downloaded from remote systems and zip archives to be downloaded. This can be safely deleted yearly or more frequently as all data is replaceable. This will increase page load times while the cache items are refetched.</p>
+            </div>
+            <div class="component-action">
+                <section>
+                    <a href="/adminv2/cleanup/zip/stream" class="button" data-cleanup="stream">Clean Data Cache</a>
+                </section>
             </div>
         </section>
     </div>
