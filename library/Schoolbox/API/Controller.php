@@ -17,7 +17,7 @@ use Authenticator;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\MobileApp\Service;
+use Schoolbox\MobileApp\ServiceMapper;
 
 class Controller extends Base {
 
@@ -129,7 +129,7 @@ class Controller extends Base {
                     $registry
                         ->setUser($_SESSION['user'])
                         ->setToken($data['token'])
-                        ->setService(new Service(null, $data['app_id'], $provider))
+                        ->setService(ServiceMapper::getInstance()->findOneByColumnList([ 'app_identifier' => $data['app_id'], 'provider' => $provider ]))
                         ->setCreatedAt($now)
                         ->setTouchedAt($now);
 
