@@ -178,7 +178,6 @@ else {
 		'ASSESS_FINISH' => $dueDate->getShort(),
 		'SECTION_TITLE' => Scrub::text($section['title']),
 		'QUESTION_TITLE' => Scrub::text($question['title']),
-		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
 		'ASSESS_CATEGORY_ID' => $category->getId(),
 		'ASSESS_CATEGORY_NAME' => Scrub::text($category->getName()),
 		'visible_staff_block'                  => '',
