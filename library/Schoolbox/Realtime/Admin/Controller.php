@@ -11,6 +11,8 @@ namespace Schoolbox\Realtime\Admin;
 
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Collection;
+use Schoolbox\MobileApp\Service;
 use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -172,8 +174,11 @@ class Controller extends BaseController
 
         $zones = [];
 
-        foreach ($apps->filterBy('providerName', MobileApp\Registry::PROVIDER_APPLE) as $app) {
-            $appId = $app->getAppIdentifier();
+        /** @var Collection|Service[] $apples */
+        $apples = $apps->filterBy('providerName', MobileApp\Registry::PROVIDER_APPLE);
+
+        foreach ($apples as $app) {
+            $appId = $app->getId();
             $zones[$appId] = (new Zone($appId))->getTwigContext();
         }
 
@@ -252,9 +257,16 @@ class Controller extends BaseController
             return;
         }
 
-        MobileApp\ServiceMapper::getInstance()->save(new MobileApp\ServiceDTO(
-            $appId, $provider, $key, $certificate
-        ));
+        $serviceMapper = MobileApp\ServiceMapper::getInstance();
+
+        $serviceMapper->save(
+            $serviceMapper
+                ->createModel()
+                ->setAppIdentifier($appId)
+                ->setProviderName($provider)
+                ->setKey($key)
+                ->setCertificate($certificate)
+        );
 
         if ($this->getRequest()->isXhr()) {
             // respond with an empty 200 OK
