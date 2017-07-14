@@ -514,10 +514,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $quizName = $quiz->getTitle();
 
-        // don't provide a link for parents to click on if it's just going to give the a 403
-        $quizParam = $this->conf->get('restrict_student_submissions')
-            ? new Param($quizName)
-            : new Param($quizName, "/submission/submissionHistory/$quizId");
 
         $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
         $href = "/assess/intro/$quizId";
@@ -529,13 +525,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->setTitle(":child has not yet attempted :quizname in :catname")
             ->setHref($href)
             ->setIcon($icon)
-            ->setParam('quizname', $quizParam)
             ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
         $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
         foreach ($unattemptedStudents as $student) {
-            $bob->setParam('child', new ChildParam($student));
+            // don't provide a link for parents to click on if it's just going to give the a 403
+            $quizParam = $this->conf->get('restrict_student_submissions')
+                ? new Param($quizName)
+                : new Param($quizName, $this->buildParticipantRoute($quiz, $student));
+
+            $bob
+                ->setParam('child', new ChildParam($student))
+                ->setParam('quizname', $quizParam);
             $envelope->targetToParent($student->getId(), $bob->build());
         }
 
@@ -787,5 +789,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         return $envelope;
     }
 
+
+    /**
+     * Convenience helper to build a route to the Participant Summary page
+     *
+     * @param Model $quiz
+     * @param User  $student
+     * @return string
+     */
+    private function buildParticipantRoute(Model $quiz, User $student)
+    {
+        return sprintf('/learning/assessments/%s/%s', $quiz->getAssessmentModel()->getId(), $student->getId());
+    }
 
 }
