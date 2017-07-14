@@ -29,9 +29,6 @@
         var dataCheckYear = $('[data-check-year]');
         var dataCheckAllYear = $('[data-check-all-year]');
 
-        var datetimeAfter = $('#datetime_after');
-        var datetimeBefore = $('#datetime_before');
-
         $('#sort-order').sortable({handle: '.grip', axis: 'y'});
 
         {# Toggle all checkboxes when the 'Select All' box is changed #}
@@ -124,11 +121,6 @@
             ]
         });
 
-        {# Setup datepicker#}
-
-        datetimeBefore.datepicker();
-        datetimeAfter.datepicker();
-
         {# Generate the report after a little sanity checking#}
 
         $('[data-report]').click(function (event) {
@@ -136,21 +128,6 @@
             event.preventDefault();
 
             var error = false;
-
-            // Dates can't be backwards
-
-            $('#datetime_after_error').hide();
-
-            if (datetimeAfter.val() != '' && datetimeBefore.val() != '') {
-
-                var datetime_after = $.datepicker.parseDate('dd/mm/yy', datetimeAfter.val());
-                var datetime_before = $.datepicker.parseDate('dd/mm/yy', datetimeBefore.val());
-
-                if (datetime_before < datetime_after) {
-                    $('#datetime_after_error').show();
-                    error = true;
-                }
-            }
 
             // Title is required
 
@@ -265,11 +242,6 @@
                                 </select>
                             </label>
                         {% endif %}
-                    </div>
-                    <div class="small-12 columns">
-                        <label id="datetime_after_error" for="datetime_after" class="error" style="display:none;">
-                            Invalid date range specified
-                        </label>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="datetime_after">
