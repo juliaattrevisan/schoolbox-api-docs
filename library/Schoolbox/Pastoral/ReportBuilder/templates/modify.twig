@@ -16,6 +16,8 @@
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 
 <script type="text/javascript">
 
@@ -272,13 +274,13 @@
                     <div class="small-12 large-6 columns">
                         <label for="datetime_after">
                             Published On Or After
-                            <input type="text" class="required" name="after" id="datetime_after" maxlength="50" value="{{ report.afterDate.usingFormat('d/m/Y') }}"/>
+                            <input type="text" class="required" name="after" id="datetime_after" maxlength="50" value="{{ report.afterDate.usingFormat('d/m/Y') }}" data-datepicker data-datepicker-sync data-datepicker-sync-enddate="#datetime_before"/>
                         </label>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="item_datetime_published">
                             Published On Or Before
-                            <input type="text" class="required" name="before" id="datetime_before" maxlength="50" value="{{ report.beforeDate.usingFormat('d/m/Y') }}"/>
+                            <input type="text" class="required" name="before" id="datetime_before" maxlength="50" value="{{ report.beforeDate.usingFormat('d/m/Y') }}" data-datepicker />
                         </label>
                     </div>
                     <div class="small-12 columns">
