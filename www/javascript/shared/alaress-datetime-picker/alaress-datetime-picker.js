@@ -310,6 +310,9 @@ function massageDateValue(e, staller) {
                 // this causes a limitation that it is *not possible* to set a field of this nature to midnight
                 setValue($(t), opts, state, true, newDate);
 
+                // Sync dates if applicable
+                syncDatesOnElement($(t), opts, '');
+
                 // Remove any error class on the field
                 $(t).removeClass('error');
 
@@ -328,6 +331,60 @@ function massageDateValue(e, staller) {
             staller.stallSubmit(xhr);
         }
     }
+}
+
+
+/**
+ * Takes an element and syncs it with it's start and end date as per its data attribs
+ * Will run itself in one direction until it stops finding a start or end date set
+ *
+ * @param {jQuery} $element
+ * @param {object} options
+ * @param {string} from - used to set a direction this will go in, start or end
+ */
+function syncDatesOnElement($element, options, from) {
+
+    var dateFormat = fieldHasTime(options) ? dateDisplayFormats.momentJsDatetime : dateDisplayFormats.momentJs;
+
+    var syncOptions = {
+        dateFormat: dateFormat
+    };
+
+    if ($element.attr('data-datesync-startdate') !== undefined && from !== 'end') {
+
+        syncOptions.startDate = $element.attr('data-datesync-startdate');
+        syncOptions.endDate = $element;
+
+        $element.syncDatesNow(syncOptions);
+
+        // Run this again for the start element
+        syncDatesOnElement($($element.attr('data-datesync-startdate')), options, 'start');
+    }
+
+    if ($element.attr('data-datesync-endDate') !== undefined && from !== 'start') {
+
+        syncOptions.startDate = $element;
+        syncOptions.endDate = $element.attr('data-datesync-endDate');
+
+        $element.syncDatesNow(syncOptions);
+
+        // Run this again for the end element
+        syncDatesOnElement($($element.attr('data-datesync-endDate')), options, 'end');
+    }
+
+}
+
+
+/**
+ * Check if this field should have time given its options and whether all day is on
+ *
+ * @param {object} options
+ * @returns {boolean}
+ */
+function fieldHasTime(options) {
+    // Only retuning true if time is enabled, just a matter of whether all day is enabled and if so -
+    // is it currently activated?
+    return ((options.enableTime && options.allDayInput === false) || (options.enableTime && $('#' + options.allDayInput).val() == 0));
 }
 
 
@@ -467,6 +524,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         });
                     }
 
+                    // Sync dates if applicable
+                    syncDatesOnElement(element, options, '');
+
                     // Close modal
                     $modal.foundation('reveal', 'close');
 
@@ -510,6 +570,11 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                             setCalendarAllDay(timetableAllDay, getOptions(item).id);
                         });
                     }
+
+                    // Sync dates if applicable
+                    syncDatesOnElement(element, options, '');
+
+                    // Close the modal
                     $modal.foundation('reveal', 'close');
                 });
 

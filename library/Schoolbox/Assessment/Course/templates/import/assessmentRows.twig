@@ -98,7 +98,7 @@
                     unitDate: unitImpl.openDate,
                     inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                     dateProperty: 'publish',
-                    dateSyncProperty: publishDateSync,
+                    dateSyncEnd: publishDateSync,
                     assessmentId: assessmentSpec.id
                 } only %}
 
@@ -109,7 +109,8 @@
                     unitDate: unitImpl.openDate,
                     inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                     dateProperty: 'open',
-                    dateSyncProperty: 'due',
+                    dateSyncStart: 'publish',
+                    dateSyncEnd: 'due',
                     assessmentId: assessmentSpec.id
                     } only %}
                 {% else %}
@@ -123,7 +124,8 @@
                     endOfDay: true,
                     inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                     dateProperty: 'due',
-                    dateSyncProperty: 'close',
+                    dateSyncStart: 'open',
+                    dateSyncEnd: 'close',
                     assessmentId: assessmentSpec.id
                 } only %}
 
@@ -135,6 +137,7 @@
                         endOfDay: true,
                         inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                         dateProperty: 'close',
+                        dateSyncStart: 'due',
                         dateLabel: 'Late',
                         assessmentId: assessmentSpec.id
                     } only %}

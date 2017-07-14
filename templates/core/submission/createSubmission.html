@@ -1,6 +1,5 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.timetable-day-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
@@ -12,7 +11,6 @@
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.form-validate.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.timetablepicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 
 <script type="text/javascript">
@@ -278,8 +276,7 @@
                                            type="text"
                                            value="{PUBLISH_DATE}"
                                            data-datepicker
-                                           data-datepicker-sync
-                                           data-datepicker-sync-enddate="#open_date"
+                                           data-datesync-enddate="#open_date"
                                            data-default_time="00:00"
                                     />
                                 </label>
@@ -343,8 +340,7 @@
                                            type="text"
                                            value="{OPEN_DATE}"
                                            data-datepicker
-                                           data-datepicker-sync
-                                           data-datepicker-sync-enddate="#due_date"
+                                           data-datesync-enddate="#due_date"
                                            data-default_time="00:00"
                                     />
                                 </label>
@@ -409,8 +405,7 @@
                                            type="text"
                                            value="{DUE_DATE}"
                                            data-datepicker
-                                           data-datepicker-sync
-                                           data-datepicker-sync-enddate="#late_date"
+                                           data-datesync-enddate="#late_date"
                                            data-default_time="23:59"
                                     />
                                 </label>

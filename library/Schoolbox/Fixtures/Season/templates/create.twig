@@ -1,5 +1,3 @@
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript">
     $(function() {
         $('#seasonForm').alaressValidate({
@@ -64,7 +62,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Start Date
-                            <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker data-datepicker-sync data-datepicker-sync-enddate="#end" value="{{ season.start.getLocalShort }}">
+                            <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker data-datesync-enddate="#end" value="{{ season.start.getLocalShort }}">
                         </label>
                     </div>
 
@@ -72,7 +70,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             End Date
-                            <input type="text" id="end" name="end" placeholder="End Date" data-datepicker value="{{ season.end.getLocalShort }}">
+                            <input type="text" id="end" name="end" placeholder="End Date" data-datepicker data-datesync-startdate="#start" value="{{ season.end.getLocalShort }}">
                         </label>
                     </div>
 
