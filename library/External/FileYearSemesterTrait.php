@@ -21,7 +21,8 @@ trait External_FileYearSemesterTrait
     /**
      * @return int
      */
-    public function getFileYear() {
+    public function getFileYear()
+    {
         return $this->fileYear;
     }
 
@@ -29,7 +30,8 @@ trait External_FileYearSemesterTrait
      * @param $fileYear
      * @return $this
      */
-    public function setFileYear($fileYear) {
+    public function setFileYear($fileYear)
+    {
         $this->fileYear = $fileYear;
         return $this;
     }
@@ -37,7 +39,8 @@ trait External_FileYearSemesterTrait
     /**
      * @return int
      */
-    public function getFileSemester() {
+    public function getFileSemester()
+    {
         return $this->fileSemester;
     }
 
@@ -45,7 +48,8 @@ trait External_FileYearSemesterTrait
      * @param $fileSemester
      * @return $this
      */
-    public function setFileSemester($fileSemester) {
+    public function setFileSemester($fileSemester)
+    {
         $this->fileSemester = $fileSemester;
         return $this;
     }
