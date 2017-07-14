@@ -49,8 +49,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * Returns the assessment information if found in remote system
      *
      * @param Activity $assessment
-     * @param int|null $year
-     * @param int|null $semester
      * @return array
      */
     public function getAssessment(Activity $assessment)
