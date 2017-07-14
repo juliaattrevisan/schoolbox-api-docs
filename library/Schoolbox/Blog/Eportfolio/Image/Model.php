@@ -116,7 +116,7 @@ class Model {
 	 * @param \Alaress_Date_Format $deletedAt
 	 * @return self
 	 */
-	public function setDeleted($deletedAt) {
+	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
 		return $this;
 	}
