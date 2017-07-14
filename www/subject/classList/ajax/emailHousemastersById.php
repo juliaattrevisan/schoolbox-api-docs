@@ -47,4 +47,5 @@ if ($allStudents && count($allHousemasters)) {
 
 $emailString = array_values(array_filter(array_unique($emailString)));
 
+header('Content-Type: application/json');
 echo json_encode($emailString);
