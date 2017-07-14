@@ -589,7 +589,9 @@ class Controller extends Base\Base
             foreach ($courseSpec->getUnits() as $unitSpec) {
                 $unitName = $post['unit'][$unitSpec->getId()]['name'];
                 if (isset($unitName)) {
-                    $this->getFolderMapper()->save($unitSpec->getFolder()->setName($unitName));
+                    // Re-hydrate unit folder to ensure curriculum codes etc are hydrated.
+                    $unitFolder = $this->folderMapper->findById($unitSpec->getFolder()->getId());
+                    $this->folderMapper->save($unitFolder->setName($unitName));
                 }
             }
         } else {
