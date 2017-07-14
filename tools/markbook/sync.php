@@ -6,8 +6,9 @@
  * This has been designed so it can be run multiple times, if the corresponding assessment already exists it will be
  * updated.
  *
- * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @stolenfrom  James Leckie <jleckie@alaress.com.au>
+ * @author      Damian Sloane <dsloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
@@ -34,8 +35,8 @@ $options = getopt('p::h::help', array('start::', 'end::', 'year::', 'semester::'
 
 // Setup kernel
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Markbook Syncrhonisation Tool', [
-    'verbose'  => [true, true, true, true],
+$kernel = new Schoolbox\Application\Daemon\Kernel('Schoolbox Markbook Sync Script', [
+    'verbose' => [true, true, true, true],
     'help' => isset($options['h']) || isset($options['help']) ? true : false,
     'parentId' => isset($options['p']) ? $options['p'] : 0,
     'year' => isset($options['year']) ? $options['year'] : false,
@@ -44,7 +45,6 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Markbook Syncrhonisation Tool
     'end' => isset($options['end']) ? $options['end'] : false,
     'updateOnly' => isset($options['update-only']),
     'dryRun' => isset($options['dry-run'])
-
 ]);
 
 /**
@@ -70,6 +70,44 @@ function traverse($folderId, $folderMapper, $catsWithCodes = array())
     return $catsWithCodes;
 }
 
+/**
+ * Display help text
+ *
+ * @param ConfigMapper $configMapper
+ */
+function help($configMapper)
+{
+    $additionalParameters = "";
+
+    // Synergetic receives some additional options around FileYear/FileSemester
+
+    if ($configMapper->get('external_type') == 'synergetic') {
+        $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook, format --year=2016 (must be used with semester parameter)\n";
+        $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook, --semester=1 (must be used with year parameter)\n";
+    }
+
+    // Get pretty uppercased SIS name
+
+    $remoteSystemName = ucwords($configMapper->get('external_type'));
+
+    echo <<<HELP
+    
+Schoolbox Markbook Sync Script    
+    
+Description:   Syncs existing markbook data from Schoolbox into {$remoteSystemName}
+Usage:         php sync.php -p=[folderID] [--year=yyyy] [--semester=s] [--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
+
+    -p=xxx               the Schoolbox ID of parent folder to start the traversal, defaults to 0, format --p=237 
+    --start=yyyy-mm-dd   Only sync work due after this date, format --start=2016-04-20, defaults to current semester
+    --end=yyyy-mm-dd     Only sync work due before this date, format --end=2016-08-15, default to current semester
+    --dry-run:           if set, does not actually update anything, but shows what would be updated
+    --update-only:       if set, will not create any new items in the remote system, only updates existing markbooks
+    {$additionalParameters}                         
+
+HELP;
+
+}
+
 // Get this kernel started
 
 $kernel->run(function ($di, $loop, $log, $opts) {
@@ -86,28 +124,12 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $configMapper = ConfigMapper::getInstance();
 
     if ($configMapper->get('external_markbook') == 0) {
-        $log->error("ERROR: External markbook synchronisation is not enabled");
+        $log->error("ERROR: External markbook synchronisation is not enabled in Schoolbox. Please enable in your Schoolbox administrator settings and try again.");
         exit(0);
     }
 
-// Display help if requested
-
     if ($opts['help']) {
-        echo <<<HELP
-    
-Syncs existing markbook data from Schoolbox into remote system
-
-Usage: sync.php -p=[folderID] [--year=yyyy] [--semester=s] [--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
-    -p=xxx               the ID of parent folder to start the traversal, defaults to 0, format --p=237 
-    --year=yyyy          Synergetic FileYear into which to export the markbook, format --year=2016 (must be used with semester parameter)
-    --semester=s         Synergetic FileSemester into which to export the markbook, --semester=1 (must be used with year parameter)
-    --start=yyyy-mm-dd   work due after this date, format --start=2016-04-20, defaults to current semester
-    --end=yyyy-mm-dd     work due before this date, format --end=2016-08-15, defualts to current semester
-    --dry-run:           if set, don't actually update anything, but show what would be updated.
-    --update-only:       if set, will not create any new items in the remote system, only updates existing settings
-                         
-
-HELP;
+        help($configMapper);
         exit(1);
     }
 
@@ -120,34 +142,42 @@ HELP;
 
     /** @noinspection PhpDeprecationInspection */
     $markbookHandler = new SubmissionReturn();
-    $markbookExternal = new External_Markbook();
+
+    // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
+
+    if ($configMapper->get('external_type') == 'synergetic') {
+
+        /** @var External_Synergetic_Markbook $markbookExternal */
+        $markbookExternal = new External_Synergetic_Markbook();
+
+        // Check if we've got a year and semester override set. Both must be set for this to be used.
+
+        if ($opts['year'] && $opts['semester']) {
+
+            // User override year/semester for export
+
+            $markbookExternal->setFileYear($opts['year']);
+            $markbookExternal->setFileSemester($opts['semester']);
+
+        } elseif ($opts['year'] || $opts['semester']) {
+
+            // Both year/semester were not supplied- need to kick them back to command prompt.
+
+            $log->error("ERROR: You must specify both a year and semester to user this option.");
+            help($configMapper);
+            exit(0);
+        }
+
+    } else {
+
+        /** @var External_Markbook $markbookExternal */
+        $markbookExternal = new External_Markbook();
+    }
 
     // Determine the time period we want to sync
 
     $startTime = new Alaress_Date_Format;
     $endTime = new Alaress_Date_Format;
-
-    // Check if we've got a year and semester override set
-
-    if ($opts['year'] && $opts['semester']) {
-
-        // User override year/semester for export
-
-        $year = $opts['year'];
-        $semester = $opts['semester'];
-
-    } else if ($opts['year'] || $opts['semester']) {
-
-        $log->error("ERROR: You must specify both a year and semester");
-        exit(0);
-
-    } else {
-
-        // Will be overridden with default from Synergetic
-
-        $year = null;
-        $semester = null;
-    }
 
     if ($opts['start'] && $opts['end']) {
 
@@ -164,14 +194,14 @@ HELP;
             $endTime->setTime(23, 59, 59);
 
             if ($startTime->gt($endTime)) {
-                $log->error("ERROR: Invalid date range supplied, end date must be later than the start date");
+                $log->error("ERROR: Invalid date range supplied, end date must be later than the start date.");
             }
 
         } catch (InvalidArgumentException $e) {
 
             // Creation of date/time objects failed, format must be wrong
 
-            $log->error("ERROR: Invalid date supplied, please check date format matches (" . Alaress_Date_Format::DATABASE_DATE_FORMAT . ")");
+            $log->error("ERROR: Invalid date supplied, please check date format matches (" . Alaress_Date_Format::DATABASE_DATE_FORMAT . ").");
             exit(0);
         }
 
@@ -205,15 +235,16 @@ HELP;
     // Make sure we got a result
 
     if (count($folderList) == 0) {
-        $log->error('ERROR: No matching folders were found');
+        $log->info('No matching folders were found, nothing to sync.');
         exit(0);
     }
 
     // Iterate all assessments in these folders
 
-    $log->info('Markbook synchronisation starting');
-    $log->info("Syncing work between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}");
+    $log->info('Markbook synchronisation starting...');
+    $log->info("Syncing work between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}...");
 
+    /** @var Folder $folder */
     foreach ($folderList as $folder) {
 
         $action = str_pad("Processing folder: ", 34, " ");
@@ -262,7 +293,7 @@ HELP;
                     $log->info("    {$action}Create/Update");
 
                     if (!$opts['dryRun']) {
-                        $markbookExternal->createOrUpdateAssessment($submissionBox, $year, $semester);
+                        $markbookExternal->createOrUpdateAssessment($submissionBox);
                     }
 
                 } else {
@@ -273,7 +304,7 @@ HELP;
                     $log->info("    {$action}Update Only");
 
                     if (!$opts['dryRun']) {
-                        $markbookExternal->updateAssessment($submissionBox, $year, $semester);
+                        $markbookExternal->updateAssessment($submissionBox);
                     }
                 }
 
@@ -322,7 +353,7 @@ HELP;
                     $log->info("        {$name}{$mark}");
 
                     if (!$opts['dryRun']) {
-                        $markbookExternal->setMark($return, $year, $semester);
+                        $markbookExternal->setMark($return);
                     }
                 }
             }
@@ -351,7 +382,7 @@ HELP;
 
                 $log->info("    {$action}{$quiz->getTitle()} ({$quiz->getId()})");
 
-                $markbook = $markbookExternal->getAssessment($activity, $year, $semester);
+                $markbook = $markbookExternal->getAssessment($activity);
 
                 if (is_array($markbook) && count($markbook) >= 1) {
 
@@ -360,7 +391,7 @@ HELP;
                     $log->info("    {$action}{$activity->getName()}");
 
                     if (!$opts['dryRun']) {
-                        $markbookExternal->updateAssessment($activity, $year, $semester);
+                        $markbookExternal->updateAssessment($activity);
                     }
 
                 } elseif (!$opts['updateOnly']) {
@@ -370,7 +401,7 @@ HELP;
                     $log->info("    {$action}{$activity->getName()}");
 
                     if (!$opts['dryRun']) {
-                        $markbookExternal->createAssessment($activity, $year, $semester);
+                        $markbookExternal->createAssessment($activity);
                     }
 
                 } else {
@@ -398,7 +429,7 @@ HELP;
                     $return->getUser()->setId($studentID);
 
                     if (!$opts['dryRun']) {
-                        $markbookExternal->setMark($return, $year, $semester);
+                        $markbookExternal->setMark($return);
                     }
                 }
             }
