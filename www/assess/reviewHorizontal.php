@@ -61,7 +61,7 @@ catch (\Exception $e) {
     error(117);
 }
 
-$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
 
 /* Index of questions
