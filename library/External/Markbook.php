@@ -20,7 +20,8 @@ class External_Markbook implements External_MarkbookInterface
      *
      * @param String $databaseName
      */
-    public function __construct($databaseName = '') {
+    public function __construct($databaseName = '')
+    {
         $factory = new External_DatabaseFactory();
         $this->setDatabase($factory->buildMarkbookConnector($databaseName));
         $this->setOffline(new External_Offline_Markbook());
