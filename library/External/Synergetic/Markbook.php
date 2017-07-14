@@ -53,7 +53,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param int|null $semester
      * @return array
      */
-    public function getAssessment(Activity $assessment, $year = null, $semester = null)
+    public function getAssessment(Activity $assessment)
     {
         $bindings = [
             'markbookIdentifier' => $this->getMarkbookIdentifier($assessment)
@@ -109,7 +109,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createOrUpdateAssessment(Activity $assessment, $year = null, $semester = null)
+    public function createOrUpdateAssessment(Activity $assessment)
     {
         $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
 
@@ -149,7 +149,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createAssessment(Activity $assessment, $year = null, $semester = null)
+    public function createAssessment(Activity $assessment)
     {
         /** @var bool $result */
         $result = false;
@@ -262,7 +262,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function updateAssessment(Activity $assessment, $year = null, $semester = null)
+    public function updateAssessment(Activity $assessment)
     {
         $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
 
@@ -299,7 +299,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function deleteAssessment(Activity $assessment, $year = null, $semester = null)
+    public function deleteAssessment(Activity $assessment)
     {
         $bindings = [
             'headingAbbreviation2' => $this->getMarkbookIdentifier($assessment),
@@ -374,7 +374,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function setMark($result, $year = null, $semester = null)
+    public function setMark($result)
     {
         $activity = new Activity;
 
@@ -431,12 +431,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $assessmentRemoteList = $this->getAssessment($activity, $year, $semester);
+        $assessmentRemoteList = $this->getAssessment($activity);
 
         // If assessment box does not exist, create it first
 
         if (!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1) {
-            $this->createAssessment($activity, $year, $semester);
+            $this->createAssessment($activity);
             $assessmentRemoteList = $this->getAssessment($activity);
         }
 

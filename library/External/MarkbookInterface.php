@@ -22,7 +22,7 @@ interface External_MarkbookInterface
      * @param int|null $semester
      * @return array
      */
-    public function getAssessment(Activity $assessment, $year = null, $semester = null);
+    public function getAssessment(Activity $assessment);
 
     /**
      * Creates or update an assessment item in the markbook
@@ -32,7 +32,7 @@ interface External_MarkbookInterface
      * @param int|null $semester
      * @return bool
      */
-    public function createOrUpdateAssessment(Activity $assessment, $year = null, $semester = null);
+    public function createOrUpdateAssessment(Activity $assessment);
 
     /**
      * Creates a new assessment item in the markbook
@@ -42,7 +42,7 @@ interface External_MarkbookInterface
      * @param int|null $semester
      * @return bool
      */
-    public function createAssessment(Activity $assessment, $year = null, $semester = null);
+    public function createAssessment(Activity $assessment);
 
     /**
      * Updates an existing markbook assessment
@@ -52,7 +52,7 @@ interface External_MarkbookInterface
      * @param int|null $semester
      * @return bool
      */
-    public function updateAssessment(Activity $assessment, $year = null, $semester = null);
+    public function updateAssessment(Activity $assessment);
 
     /**
      * Deletes an existing markbook assessment
@@ -62,7 +62,7 @@ interface External_MarkbookInterface
      * @param int|null $semester
      * @return bool
      */
-    public function deleteAssessment(Activity $assessment, $year = null, $semester = null);
+    public function deleteAssessment(Activity $assessment);
 
     /**
      * Creates or updates the mark for a student in the remote markbook
@@ -72,7 +72,7 @@ interface External_MarkbookInterface
      * @param int|null $semester
      * @return bool
      */
-    public function setMark($returnedWork, $year = null, $semester = null);
+    public function setMark($returnedWork);
 
 }
 

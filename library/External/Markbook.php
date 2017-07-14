@@ -29,49 +29,49 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function getAssessment(Activity $assessment, $year = null, $semester = null)
+    public function getAssessment(Activity $assessment)
     {
-        return $this->getDatabase()->getAssessment($assessment, $year, $semester);
+        return $this->getDatabase()->getAssessment($assessment);
     }
 
     /**
      * @inheritdoc
      */
-    public function createOrUpdateAssessment(Activity $assessment, $year = null, $semester = null)
+    public function createOrUpdateAssessment(Activity $assessment)
     {
-        return $this->getDatabase()->createOrUpdateAssessment($assessment, $year, $semester);
+        return $this->getDatabase()->createOrUpdateAssessment($assessment);
     }
 
     /**
      * @inheritdoc
      */
-    public function createAssessment(Activity $assessment, $year = null, $semester = null)
+    public function createAssessment(Activity $assessment)
     {
-        return $this->getDatabase()->createAssessment($assessment, $year, $semester);
+        return $this->getDatabase()->createAssessment($assessment);
     }
 
     /**
      * @inheritdoc
      */
-    public function updateAssessment(Activity $assessment, $year = null, $semester = null)
+    public function updateAssessment(Activity $assessment)
     {
-        return $this->getDatabase()->updateAssessment($assessment, $year, $semester);
+        return $this->getDatabase()->updateAssessment($assessment);
     }
 
     /**
      * @inheritDoc
      */
-    public function deleteAssessment(Activity $assessment, $year = null, $semester = null)
+    public function deleteAssessment(Activity $assessment)
     {
-        return $this->getDatabase()->deleteAssessment($assessment, $year, $semester);
+        return $this->getDatabase()->deleteAssessment($assessment);
     }
 
     /**
      * @inheritdoc
      */
-    public function setMark($returnedWork, $year = null, $semester = null)
+    public function setMark($returnedWork)
     {
-        return $this->getDatabase()->setMark($returnedWork, $year, $semester);
+        return $this->getDatabase()->setMark($returnedWork);
     }
 
     /**

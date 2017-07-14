@@ -18,7 +18,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function getAssessment(Activity $assessment, $year = null, $semester = null)
+    public function getAssessment(Activity $assessment)
     {
         return [];
     }
@@ -26,7 +26,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createOrUpdateAssessment(Activity $assessment, $year = null, $semester = null)
+    public function createOrUpdateAssessment(Activity $assessment)
     {
         return [];
     }
@@ -34,7 +34,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createAssessment(Activity $assessment, $year = null, $semester = null)
+    public function createAssessment(Activity $assessment)
     {
         return [];
     }
@@ -42,7 +42,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function updateAssessment(Activity $assessment, $year = null, $semester = null)
+    public function updateAssessment(Activity $assessment)
     {
         return [];
     }
@@ -50,7 +50,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritDoc
      */
-    public function deleteAssessment(Activity $assessment, $year = null, $semester = null)
+    public function deleteAssessment(Activity $assessment)
     {
         return [];
     }
@@ -58,7 +58,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function setMark($returnedWork, $year = null, $semester = null)
+    public function setMark($returnedWork)
     {
     }
 }
