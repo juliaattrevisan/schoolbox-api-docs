@@ -138,12 +138,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // If the markbook already exists, do an update
 
         if ($statement->fetch()) {
-            return $this->updateAssessment($assessment, $year, $semester);
+            return $this->updateAssessment($assessment);
         }
 
         // Otherwise create only
 
-        return $this->createAssessment($assessment, $year, $semester);
+        return $this->createAssessment($assessment);
     }
 
     /**
