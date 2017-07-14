@@ -1,7 +1,13 @@
 <?php
 /**
- * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   Copyright 2015, Alaress Pty Ltd
+ * Synergetic Markbook Connector
+ *
+ * TODO: Using HdgAbbrev2 is stupid- this can be modified by users in Synergetic.
+ * TODO: This should be modified to use MarkBookSeq/StaffAssessmentMarkbookSeq/StudentAssessmentMarkbookSeq which is immutable.
+ *
+ * @stolenfrom  James Leckie <jleckie@alaress.com.au>
+ * @author      Damian Sloane <dsloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
@@ -29,8 +35,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
     // These prefixes are prefixed on the "markbook abbeviated heading 2" to signify which table the ID which follows it relate to
 
-    // TODO: These sort of shenanigans will screw us- we should stop being lazy and track these links back to the immutable MarkbookSeq internally in Schoolbox
-
     const ASSESSMENT_PREFIX = 'Q-';
     const SUBMISSION_PREFIX = 'W-';
 
@@ -57,12 +61,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function getAssessment(Activity $assessment)
     {
-        $bindings = [
-            'markbookIdentifier' => $this->getMarkbookIdentifier($assessment)
-        ];
-
-        // TODO: Using HdgAbbrev2 is stupid- this can be modified by users in Synergetic. This should be modified to use MarkBookSeq which is immutable.
-
         $sql = "
             SELECT    FileType,
                       FileYear,
@@ -84,6 +82,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ";
 
         return $this->getConnector()->executeQuery($sql, [
+            'markbookIdentifier' => $this->getMarkbookIdentifier($assessment),
             'fileYear' => $this->fileYear,
             'fileSemester' => $this->fileSemester
         ])->fetchAll();
@@ -97,8 +96,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function getMarkbookIdentifier(Activity $assessment)
     {
-        // TODO: These sort of shenanigans can screw us- we should stop being lazy and track these links back to the immutable MarkbookSeq internally in Schoolbox
-
         return ($assessment->isAssessment() ? self::ASSESSMENT_PREFIX : self::SUBMISSION_PREFIX) . $assessment->getId();
     }
 
@@ -410,12 +407,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $mark = round($mark);
             }
 
-            if ($this->doesMarkExist($assessmentRemote['FileType'],
-                    $assessmentRemote['ClassCampus'],
-                    $assessmentRemote['ClassCode'],
-                    $assessmentRemote['MarkBookSeq'],
-                    $student->getExternalId())
-            ) {
+            if ($this->doesMarkExist(
+                $assessmentRemote['FileType'],
+                $assessmentRemote['ClassCampus'],
+                $assessmentRemote['ClassCode'],
+                $assessmentRemote['MarkBookSeq'],
+                $student->getExternalId()
+            )) {
 
                 if (isset($mark) || !empty($comment)) {
 
