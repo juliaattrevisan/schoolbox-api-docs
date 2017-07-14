@@ -153,10 +153,16 @@ $(function() {
         <div class="content">
             <script type="text/javascript">
                 $(function() {
+                    function resetValidation(form) {
+                        form.data('noStudentEmails', false)
+                            .data('noParentEmails', false)
+                            .data('noHousemasterEmails', false);
+                    }
+
                     $('#email-selected-students').click(function(event) {
                         event.preventDefault();
                         var form = $('#contact-table-form');
-                        form.data('noStudentEmails', false).data('noParentEmails', false)
+                        resetValidation(form);
                         if (form.valid()) {
                             $('#email-selected-students')
                                     .emailSelected({
@@ -175,7 +181,7 @@ $(function() {
                     $('#email-selected-parents').click(function(event) {
                         event.preventDefault();
                         var form = $('#contact-table-form');
-                        form.data('noStudentEmails', false).data('noParentEmails', false)
+                        resetValidation(form);
                         if (form.valid()) {
                             $('#email-selected-parents')
                                 .emailSelected({
@@ -194,7 +200,7 @@ $(function() {
                     $('#email-selected-housemasters').click(function(event) {
                         event.preventDefault();
                         var form = $('#contact-table-form');
-                        form.data('noStudentEmails', false).data('noHousemasterEmails', false)
+                        resetValidation(form);
                         if (form.valid()) {
                             $('#email-selected-housemasters')
                                 .emailSelected({
