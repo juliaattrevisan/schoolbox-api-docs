@@ -17,9 +17,12 @@ use Schoolbox\User;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
+use Schoolbox\Import\ImportNavigation;
 
 class Controller extends Base
 {
+    use ImportNavigation;
+
     /**
      * @var StorageMapper $storageMapper
      */
@@ -158,11 +161,13 @@ class Controller extends Base
                 'template' => '@adminPhotos/index.twig',
                 'data'     => array(
                     'pageCurrent' => 'import',
+                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                     'attachzone' => $this->getAttachZone(),
                 ),
             )
         );
     }
+
 
     /**
      * Render the view page
@@ -204,6 +209,7 @@ class Controller extends Base
             array(
                 'template' => '@adminPhotos/view.twig',
                 'data'     => array(
+                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                     'pageCurrent' => 'import',
                     'users' => $users,
                     'surname' => $surname

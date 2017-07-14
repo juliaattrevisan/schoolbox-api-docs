@@ -45,14 +45,17 @@
 
 {# Shared navigation menu #}
 
-{{ renderAdminNavigation(pageCurrent) }}
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 
 <div class="row">
-    <div class="small-12 island collapse">
+    <div class="small-12 island">
         <h1>Pastoral Care Records</h1>
-        <dl class="sub-nav">
+        <dl class="tabs">
             <dd>
                 <a href="/adminv2/import/user">User</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/photos/upload">User Photos</a>
             </dd>
             <dd>
                 <a href="/adminv2/import/timetable-structure">Timetable Structure</a>
@@ -63,18 +66,13 @@
             <dd>
                 <a href="/adminv2/import/enrolment">Enrolment</a>
             </dd>
-            <dd>
-                <a href="/adminv2/photos/upload">User Photos</a>
-            </dd>
+
             <dd class="active">
                 <a href="/adminv2/import-pastoral">Pastoral Care Records</a>
             </dd>
         </dl>
     </div>
-</div>
-
 {% if externalEnabled == '1' %}
-
     <div class="small-12 island">
         <h2 class="subheader">Import Pastoral Care Records From SIS</h2>
         <form data-form-import method="post" action="/adminv2/import-pastoral/process">
@@ -116,20 +114,17 @@
                 <label id="defaultOwnerError" for="defaultOwner" class="error hide">You must select a fallback record owner before you can proceed.</label>
             </section>
         </form>
-
     </div>
-
 {% else %}
-
     <div class="small-12 island">
-            <div class="empty-state">
-                <i class="icon-pastoral"></i>
-                <p>
-                    Sorry, importing of pastoral care records is only possible if
-                    <a href='/adminv2/setting/Pastoral+Care#external_pastoral'>External Pastoral Synchronisation</a> is enabled on the
-                    Pastoral Care configuration screen.
-                </p>
-            </div>
+        <div class="empty-state">
+            <i class="icon-pastoral"></i>
+            <p>
+                Sorry, importing of pastoral care records is only possible if
+                <a href='/adminv2/setting/Pastoral+Care#external_pastoral'>External Pastoral Synchronisation</a> is enabled on the
+                Pastoral Care configuration screen.
+            </p>
+        </div>
     </div>
-
 {% endif %}
+</div>

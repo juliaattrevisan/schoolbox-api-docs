@@ -9,7 +9,7 @@
 
 {# Shared navigation menu #}
 
-{{ renderAdminNavigation(pageCurrent) }}
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 
 <div class="row">
     <div class="small-12 island collapse">

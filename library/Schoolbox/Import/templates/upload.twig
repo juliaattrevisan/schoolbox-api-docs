@@ -1,7 +1,5 @@
 {# Shared navigation menu #}
 
-{{ renderAdminNavigation(pageCurrent) }}
-
 {% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 
 <div class="row">
@@ -20,20 +18,14 @@
 
         {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
     </div>
-
     <div class="small-12 island">
-        <section class="content">
-            {% block helpText %}
-            {% endblock helpText %}
+        <form action="{{ routeLookup(basename ~ '.preview') }}" method="post">
+                {% block helpText %}
+                {% endblock helpText %}
 
-            {% block form %}
-            <form action="{{ routeLookup(basename ~ '.preview') }}" method="post">
-
-                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-
-                <input type="submit" value="Preview Import" />
-            </form>
-            {% endblock form %}
-        </section>
+                {% block form %}
+                    <input type="submit" value="Preview Import" />
+                {% endblock form %}
+        </form>
     </div>
 </div>

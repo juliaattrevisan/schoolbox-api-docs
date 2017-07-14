@@ -27,7 +27,7 @@ trait ImportNavigation
     protected function buildBreadcrumbs(Router $router)
     {
         return new Navigator(
-            new Node('Home', '/adminv2/home', false),
+            new Node('Administration', '/adminv2/home', false),
             new Node('Importer', $router->generate('adminImport.intro'), true)
         );
     }
@@ -49,6 +49,11 @@ trait ImportNavigation
                 ($currentPage == 'adminImportUser')
             ),
             new Node(
+                'User Photos',
+                $router->generate('adminPhotos.getIndex'),
+                ($currentPage == 'adminUserPhotos')
+            ),
+            new Node(
                 'Timetable Structure',
                 $router->generate('adminImportStructure.upload'),
                 ($currentPage == 'adminImportStructure')
@@ -63,11 +68,7 @@ trait ImportNavigation
                 $router->generate('adminImportEnrolment.upload'),
                 ($currentPage == 'adminImportEnrolment')
             ),
-            new Node(
-                'User Photos',
-                $router->generate('adminPhotos.getIndex'),
-                ($currentPage == 'adminUserPhotos')
-            ),
+
         ];
         if ($this->getConfigLoader()->get('pastoral_enabled')) {
             $args[] = new Node(
