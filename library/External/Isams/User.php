@@ -58,7 +58,7 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT      V_Parent.ParentID             AS ID,
-                        ''                            AS Title,
+                        V_Parent.Title                AS Title,
                         V_Parent.ParentFirstname      AS Preferred,
                         V_Parent.ParentSurname        AS Surname,
                         V_Parent.CISEmail             AS Email,
@@ -217,7 +217,7 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentBoarder,
                         ''                            AS StudentForm,
                         V_Parent.ParentID             AS StudentContactID,
-                        ''                            AS StudentContactTitle,
+                        V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
                         V_Parent.ParentFirstname      AS StudentContactLegalFullName,
                         V_Parent.ParentSurname        AS StudentContactSurname,
@@ -281,7 +281,7 @@ class External_Isams_User implements External_UserInterface
         $query = "
             SELECT      
                         V_Parent.ParentID             AS StudentContactID,
-                        ''                            AS StudentContactTitle,
+                        V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
                         V_Parent.ParentSurname        AS StudentContactSurname,
                         V_Parent.CISEmail             AS StudentContactDefaultEmail,
@@ -410,7 +410,7 @@ class External_Isams_User implements External_UserInterface
         $query = "
             SELECT      StudentID               AS StudentID,
                         Username                AS NetworkLogin,
-                        ''                      AS StudentTitle,
+                        Title                   AS StudentTitle,
                         StudentFirstname        AS StudentPreferred,
                         StudentSurname          AS StudentSurname,
                         Gender                  AS StudentGender,
@@ -438,7 +438,7 @@ class External_Isams_User implements External_UserInterface
             SELECT      
                         Username                      AS StudentContactNetworkLogin,
                         V_Parent.ParentID             AS StudentContactID,
-                        ''                            AS StudentContactTitle,
+                        V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
                         V_Parent.ParentSurname        AS StudentContactSurname,
                         V_Parent.CISEmail             AS StudentContactDefaultEmail,
