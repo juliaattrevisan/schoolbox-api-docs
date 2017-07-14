@@ -315,7 +315,7 @@ else {
 
     /* Render out breadcrumbs
      */
-    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
     $term    = TermMapper::getInstance()->findForDate($dueDate);
     $trail   = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
