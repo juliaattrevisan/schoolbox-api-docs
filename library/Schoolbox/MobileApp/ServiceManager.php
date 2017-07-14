@@ -9,12 +9,17 @@
 
 namespace Schoolbox\MobileApp;
 
+use Alaress\Async\Notification\Cloud;
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use RangeException;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Storage;
+use ZendService\Apple\Apns;
 
 /**
  * Class ServiceManager
@@ -25,6 +30,9 @@ class ServiceManager implements IServiceManager
 
     /** @var RegistryMapper */
     protected $registryMapper;
+
+    /** @var ServiceInterface[][] */
+    protected $serviceCache = [];
 
     /** @var LoggerInterface */
     protected $log;
@@ -57,20 +65,26 @@ class ServiceManager implements IServiceManager
         // TODO retrieve the list of unread messages for this user - until SA-359 is complete, this is not possible...
         $unreadCount = 1;
 
-        foreach ($this->findRegistrationsByUser($userId) as $appId => $appRegistrations) {
-            // TODO verify that this doesn't repeat work in CLI context
-            $service = ServiceMapper::getInstance()->findById($appId);
-            $tokens  = $appRegistrations->getColumnValues('token');
+        foreach ($this->findRegistrationsByUser($userId) as $provider => $appRegistrations) {
 
-            // ensure the log is set
-            $service->setLog($this->log);
+            foreach ($appRegistrations as $appIdentifier => $reg) {
+                $service = $this->getService($reg['service']);
 
-            try {
-                $this->pushToService($service, $tokens, $data, $unreadCount);
+                /** @var Collection $apps */
+                $apps = $reg['registrations'];
 
-            } catch (InvalidArgumentException $e) {
-                // service not available
-                $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ $e ]);
+                $tokens = $apps->getColumnValues('token');
+
+                // ensure the log is set
+                $service->setLog($this->log);
+
+                try {
+                    $this->pushToService($service, $tokens, $data, $unreadCount);
+
+                } catch (InvalidArgumentException $e) {
+                    // service not available
+                    $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ $e ]);
+                }
             }
         }
     }
@@ -104,16 +118,122 @@ class ServiceManager implements IServiceManager
 
 
     /**
+     * Returns the list of app registrations for the given user, indexed by provider and then app identifier
+     *
      * @param int $userId
-     * @return Collection|Collection[]|Registry[][]
+     * @return Registry[][]
      */
     private function findRegistrationsByUser($userId)
     {
-        $registrations = RegistryMapper::getInstance()->findByColumn('user_id', 6);
+        $registrations = [];
 
-        return $registrations->groupByCallback(function (Registry $registration) {
-            return $registration->getService()->getAppIdentifier();
-        });
+        foreach (RegistryMapper::getInstance()->findByColumn('user_id', $userId) as $registration) {
+            $srv = $registration->getService();
+
+            // by-reference for convenience
+            $p =& $registrations[$srv->getProviderName()][$srv->getAppIdentifier()];
+
+            if (empty($p)) {
+                $p['service'] = $srv;
+                $p['registrations'] = new GenericCollection(Registry::class);
+            }
+
+            $p['registrations']->add($registration);
+        }
+
+        return $registrations;
+    }
+
+
+    /**
+     * @param Service $service
+     * @return ServiceInterface
+     * @throws Mapper\Exception
+     */
+    public function getService(Service $service)
+    {
+        $provider   = $service->getProviderName();
+        $identifier = $service->getAppIdentifier();
+
+        if (empty($this->serviceCache[$provider][$identifier])) {
+            $key = $service->getKey();
+
+            switch ($provider) {
+                case Registry::PROVIDER_APPLE:
+
+                    /** @var Storage\Model $storageObj */
+                    $storageObj = $service->getCertificate();
+
+                    if (!$storageObj) {
+                        // invalid PEM reference
+                        throw new Mapper\Exception('No PEM certificate given for APNS service.');
+                    }
+
+                    return new Cloud\Apple\APNS($this->registryMapper, $identifier, Apns\Client\Message::PRODUCTION_URI, $this->getPemPath($storageObj), $key);
+
+                case Registry::PROVIDER_GOOGLE:
+                    return new Cloud\Google\GCM($this->registryMapper, $identifier, $key);
+            }
+
+            throw new Mapper\Exception("Invalid provider: must be one of APNS or GCM, '$provider' given.");
+        }
+
+        return $this->serviceCache[$provider][$identifier];
+    }
+
+
+    /**
+     * Return the path APNS should use for the PEM file held by the given storage object
+     *
+     * @param Storage\Model $storage
+     */
+    private function getPemPath(Storage\Model $storage)
+    {
+        $hash = $storage->getHash();
+
+        // since this is on-construction, check the file in play and see if it needs updating
+        if ($this->apnsCertRequiresUpdate($hash)) {
+            // copy the cert from storage
+            $fp = fopen($this->getTempCertFilename($hash), 'wb');
+            $storage->pipe($fp);
+            fclose($fp);
+        }
+    }
+
+
+    /**
+     * Verify whether or not the given PEM hash requires update on-disk
+     *
+     * @param string $fileHash
+     * @return bool
+     */
+    private function apnsCertRequiresUpdate($fileHash)
+    {
+        $tempCert = $this->getTempCertFilename($fileHash);
+
+        if (!is_readable($tempCert)) {
+            return true;
+        }
+        if (!filesize($tempCert)) {
+            return true;
+        }
+        if (sha1_file($tempCert) !== $fileHash) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Return a consistent temp-file path for the given hash
+     *
+     * @param string $fileHash
+     * @return string
+     */
+    private function getTempCertFilename($fileHash)
+    {
+        return sys_get_temp_dir() . "/{$fileHash}.pem";
     }
 
 }
