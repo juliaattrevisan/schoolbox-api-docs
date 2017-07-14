@@ -36,7 +36,7 @@ class Sync extends Base implements ISync
         "
             SELECT
                 StudentID                AS student_id,
-                ''                       AS network_login,
+                Username                 AS network_login,
                 ''                       AS student_title,
                 StudentFirstname         AS student_given_name,
                 StudentFirstname         AS student_preferred,
@@ -66,7 +66,7 @@ class Sync extends Base implements ISync
         $query =
         "
             SELECT DISTINCT 
-                        ParentCode                      AS student_contact_network_login,
+                        Username                        AS student_contact_network_login,
                         ParentID                        AS student_contact_id,
                         ''                              AS student_contact_title,
                         ParentFirstname                 AS student_contact_preferred,
@@ -100,7 +100,7 @@ class Sync extends Base implements ISync
         $query =
         "
             SELECT      V_Staff.StaffID                     AS staff_id,
-                        ''                                  AS network_login,
+                        Username                            AS network_login,
                         1                                   AS active_flag,
                         V_Staff.title                       AS staff_title,
                         teacherfirstname                    AS staff_given_name,

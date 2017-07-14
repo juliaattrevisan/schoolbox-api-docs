@@ -409,7 +409,7 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT      StudentID               AS StudentID,
-                        ''                      AS NetworkLogin,
+                        Username                AS NetworkLogin,
                         ''                      AS StudentTitle,
                         StudentFirstname        AS StudentPreferred,
                         StudentSurname          AS StudentSurname,
@@ -436,7 +436,7 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT      
-                        ''                            AS StudentContactNetworkLogin,
+                        Username                      AS StudentContactNetworkLogin,
                         V_Parent.ParentID             AS StudentContactID,
                         ''                            AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
@@ -468,7 +468,7 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT      StaffID           AS StaffID,
-                        teacherusercode   AS NetworkLogin,
+                        Username          AS NetworkLogin,
                         1                 AS ActiveFlag,
                         title             AS StaffTitle,
                         PreferredName     AS StaffPreferredName,
@@ -516,7 +516,7 @@ class External_Isams_User implements External_UserInterface
                         ''                AS JobPositionDescription,
                         EnrolmentDate     AS StaffJobPositionStartDate,
                         ''                AS StaffJobPositionEndDate,
-                        teacherusercode   AS NetworkLogin,
+                        Username          AS NetworkLogin,
                         1                 AS ActiveFlag,
                         'o'               AS DefaultEmailCode,
                         Email             AS OccupEmail,
