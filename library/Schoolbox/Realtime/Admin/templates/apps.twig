@@ -54,7 +54,7 @@
             <ul class="information-list" id="app-list">
                 {% for app in apps %}
                     <li>
-                        {% include '@adminMessages/providers/' ~ app.providerName ~ '/entity.twig' with { app: app, attachzone: attachzones[app.appIdentifier] } only %}
+                        {% include '@adminMessages/providers/' ~ app.providerName ~ '/entity.twig' with { app: app, attachzone: attachzones[app.id] } only %}
                     </li>
                 {% endfor %}
             </ul>
