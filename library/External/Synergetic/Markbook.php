@@ -77,14 +77,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             WHERE     HdgAbbrev2 = :markbookIdentifier
         ";
 
-        if (!empty($year)) {
+        if (!empty($this->fileYear)) {
             $sql .= " AND FileYear = :fileYear";
-            $bindings['fileYear'] = $year;
+            $bindings['fileYear'] = $this->fileYear;
         }
 
-        if (!empty($semester)) {
+        if (!empty($this->fileSemester)) {
             $sql .= " AND FileSemester = :fileSemester";
-            $bindings['fileSemester'] = $semester;
+            $bindings['fileSemester'] = $this->fileSemester;
         }
 
         $statement = $this->getConnector()->executeQuery($sql, $bindings);
@@ -121,14 +121,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             WHERE     HdgAbbrev2 = :markbookIdentifier
         ";
 
-        if (!empty($year)) {
+        if (!empty($this->fileYear)) {
             $sql .= " AND FileYear = :fileYear";
-            $bindings['fileYear'] = $year;
+            $bindings['fileYear'] = $this->fileYear;
         }
 
-        if (!empty($semester)) {
+        if (!empty($this->fileSemester)) {
             $sql .= " AND FileSemester = :fileSemester";
-            $bindings['fileSemester'] = $semester;
+            $bindings['fileSemester'] = $this->fileSemester;
         }
 
         $statement = $this->getConnector()->executeQuery($sql, $bindings);
@@ -173,14 +173,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         // If file year/semester were supplied, used them- otherwise go for the defaults
 
-        if (!empty($year)) {
-            $fileYear = $year;
+        if (!empty($this->fileYear)) {
+            $fileYear = $this->fileYear;
         } else {
             $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
         }
 
-        if (!empty($semester)) {
-            $fileSemester = $semester;
+        if (!empty($this->fileSemester)) {
+            $fileSemester = $this->fileSemester;
         } else {
             $fileSemester = $this->getExternalUser()->getCurrentSemester($owner->getExternalId());
         }
@@ -279,14 +279,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             WHERE   HdgAbbrev2 = :headingAbbreviation2
         ";
 
-        if (!empty($year)) {
+        if (!empty($this->fileYear)) {
             $sql .= " AND FileYear = :fileYear";
-            $bindings['fileYear'] = $year;
+            $bindings['fileYear'] = $this->fileYear;
         }
 
-        if (!empty($semester)) {
+        if (!empty($this->fileSemester)) {
             $sql .= " AND FileSemester = :fileSemester";
-            $bindings['fileSemester'] = $semester;
+            $bindings['fileSemester'] = $this->fileSemester;
         }
 
         $statement = $this->getConnector()->prepareQuery($sql, $bindings);
@@ -316,14 +316,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             WHERE staffBook.HdgAbbrev2 = :headingAbbreviation2
         ";
 
-        if (!empty($year)) {
+        if (!empty($this->fileYear)) {
             $sql .= " AND FileYear = :fileYear";
-            $bindings['fileYear'] = $year;
+            $bindings['fileYear'] = $this->fileYear;
         }
 
-        if (!empty($semester)) {
+        if (!empty($this->fileSemester)) {
             $sql .= " AND FileSemester = :fileSemester";
-            $bindings['fileSemester'] = $semester;
+            $bindings['fileSemester'] = $this->fileSemester;
         }
 
         $this->getConnector()->executeQuery($sql, $bindings);
@@ -442,14 +442,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         foreach ($assessmentRemoteList as $assessmentRemote) {
 
-            if (!empty($year)) {
-                $fileYear = $year;
+            if (!empty($this->fileYear)) {
+                $fileYear = $this->fileYear;
             } else {
                 $fileYear = $assessmentRemote['FileYear'];
             }
 
-            if (!empty($semester)) {
-                $fileSemester = $semester;
+            if (!empty($this->fileSemester)) {
+                $fileSemester = $this->fileSemester;
             } else {
                 $fileSemester = $assessmentRemote['FileSemester'];
             }
@@ -517,14 +517,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                                     MarkBookSeq = :markbookSeq
                     ";
 
-                    if (!empty($year)) {
+                    if (!empty($this->fileYear)) {
                         $sql .= " AND FileYear = :fileYear";
-                        $bindings['fileYear'] = $year;
+                        $bindings['fileYear'] = $this->fileYear;
                     }
 
-                    if (!empty($semester)) {
+                    if (!empty($this->fileSemester)) {
                         $sql .= " AND FileSemester = :fileSemester";
-                        $bindings['fileSemester'] = $semester;
+                        $bindings['fileSemester'] = $this->fileSemester;
                     }
                 }
 
