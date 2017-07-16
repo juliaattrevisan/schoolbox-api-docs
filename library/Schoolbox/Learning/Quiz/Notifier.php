@@ -332,7 +332,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $quizName = $quiz->getTitle();
 
         $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
-        $href = "/assess/results/$quizId";
+        $href = sprintf('/learning/assessments/%s/status', $quiz->getAssessmentModel()->getId());
 
         $bob = new Builder();
         $bob->addTopic("assess.$quizId.closed")
@@ -432,22 +432,21 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $quizName = $quiz->getTitle();
 
         $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
-        $href = "/assess/intro/$quizId";
 
         $bob = new Builder();
         $bob->addTopic("assess.$quizId.overdue")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
             ->setTitle(":child did not attempt :quizname in :catname")
-            ->setHref($href)
             ->setIcon($icon)
-            ->setParam('quizname', new Param($quizName, $href))
+            ->setParam('quizname', new Param($quizName))
             ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
         $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
         foreach ($unattemptedStudents as $student) {
             $bob->setParam('child', new ChildParam($student));
+            $bob->setHref('/search/user/'.$student->getId());
             $envelope->targetToParent($student->getId(), $bob->build());
         }
 
@@ -514,28 +513,26 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $quizName = $quiz->getTitle();
 
-        // don't provide a link for parents to click on if it's just going to give the a 403
-        $quizParam = $this->conf->get('restrict_student_submissions')
-            ? new Param($quizName)
-            : new Param($quizName, "/submission/submissionHistory/$quizId");
-
         $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
-        $href = "/assess/intro/$quizId";
+
+        // don't provide a link for parents to click on if it's just going to give the a 403
+        $quizParam = new Param($quizName);
 
         $bob = new Builder();
         $bob->addTopic("assess.$quizId.upcoming")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::WARNING)
             ->setTitle(":child has not yet attempted :quizname in :catname")
-            ->setHref($href)
-            ->setIcon($icon)
             ->setParam('quizname', $quizParam)
+            ->setIcon($icon)
             ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
         $unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
         foreach ($unattemptedStudents as $student) {
-            $bob->setParam('child', new ChildParam($student));
+            $bob
+                ->setHref('/search/user/'.$student->getId())
+                ->setParam('child', new ChildParam($student));
             $envelope->targetToParent($student->getId(), $bob->build());
         }
 
@@ -702,7 +699,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $quizType = $quiz->getWorkType()->getName();
 
         $icon = "/images/icon.php?size={$this->iconSize}&icon=work";
-        $href = "/assess/intro/$quizId";
 
         // notify all student's parents
         $students = $this->userAccessMapper->findStudentsInCategory($quiz->getCategory());
@@ -715,14 +711,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
                 ->setTitle(":child's $quizType was renamed from :oldname to :newname in :catname")
-                ->setHref($href)
                 ->setIcon($icon)
                 ->setParam('oldname', new Param($diff['title'][1]))
-                ->setParam('newname', new Param($diff['title'][0], "/assess/intro/$quizId"))
+                ->setParam('newname', new Param($diff['title'][0]))
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
             foreach ($students as $student) {
                 $bob->setParam('child', new ChildParam($student));
+                $bob->setHref('/search/user/'.$student->getId());
+
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
             unset($diff['title']);
@@ -749,14 +746,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
                 ->setTitle(":child's $quizType :quizname closing date was $verb to :date in :catname")
-                ->setHref($href)
                 ->setIcon($icon)
-                ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
+                ->setParam('quizname', new Param($quizName))
                 ->setParam('date', new Param($date))
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
             foreach ($students as $student) {
                 $bob->setParam('child', new ChildParam($student));
+                $bob->setHref('/search/user/'.$student->getId());
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
             unset($diff['finish']);
@@ -773,19 +770,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
                 ->setTitle(":child's $quizType :quizname was updated in :catname")
-                ->setHref($href)
                 ->setIcon($icon)
-                ->setParam('quizname', new Param($quizName, "/assess/intro/$quizId"))
+                ->setParam('quizname', new Param($quizName))
                 ->setParam('catname', new CategoryParam($quiz->getCategory()));
 
             foreach ($students as $student) {
                 $bob->setParam('child', new ChildParam($student));
+                $bob->setHref('/search/user/'.$student->getId());
                 $envelope->targetToParent($student->getId(), $bob->build());
             }
         }
 
         return $envelope;
     }
-
-
 }
