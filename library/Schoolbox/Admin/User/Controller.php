@@ -173,7 +173,7 @@ class Controller extends Base
                 'titles' => $this->userTitleMapper->findAll(),
                 'fileYear' => $fileYear,
                 'fileSemester' => $fileSemester,
-                'allGroups' => $this->folderMapper->searchByName('',true)->sortBy('name', 'asc'),
+                'allGroups' => $this->folderMapper->searchByName('', true)->sortBy('name', 'asc'),
                 'user' => $user,
                 'userGroups' => $this->folderMapper->findForUser($user, false, UserAccess::ACCESS_READ),
                 'userGroupPermissions' => $groupPermissions,
