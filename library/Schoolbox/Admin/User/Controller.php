@@ -172,9 +172,9 @@ class Controller extends Base
                 'titles' => $this->userTitleMapper->findAll(),
                 'fileYear' => $fileYear,
                 'fileSemester' => $fileSemester,
-                'folders' => $this->folderMapper->searchByName('',true)->sortBy('name', 'asc'),
+                'allGroups' => $this->folderMapper->searchByName('',true)->sortBy('name', 'asc'),
                 'user' => $user,
-                'userAccess' => $this->folderMapper->findForUser($user, false, UserAccess::ACCESS_READ),
+                'userGroups' => $this->folderMapper->findForUser($user, false, UserAccess::ACCESS_READ),
                 'userPermissions' => $this->userAccessMapper->findAllForUser($user),
                 'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), ['limit' => 10])->sortBy('date', 'desc'),
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [

@@ -215,7 +215,7 @@
                     </li>
 
                     {# Show all groups the user is a member of #}
-                    {% for folder in userAccess %}
+                    {% for folder in userGroups %}
 
                         <li class="actions-small-1" data-group>
                             <div class="list-item">
@@ -252,7 +252,7 @@
                             <div class="card small-7">
                                 <select required name="sid" id="groupSelect" form="groupAdd" class="required">
                                     <option value="">Select a Group</option>
-                                    {% for folder in folders %}
+                                    {% for folder in allGroups %}
                                         <option value="{{ folder.id }}">{{ folder.name }}</option>
                                     {% endfor %}
                                 </select>
