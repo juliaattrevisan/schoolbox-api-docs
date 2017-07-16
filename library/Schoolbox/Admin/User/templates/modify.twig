@@ -215,52 +215,44 @@
                     </li>
 
                     {# Show all groups the user is a member of #}
+                    {% for folder in userAccess %}
 
-                    {% for folder in folders if folder.isGroup %}
-
-                        {% set readSelected = '' %}
-                        {% set writeSelected = '' %}
-                        {% set adminSelected = '' %}
-
-                        {% for access in userAccess if access.serviceIdentifier == folder.id %}
-
-                            <li class="actions-small-1" data-group>
-                                <div class="list-item">
-                                    <div class="card small-7">
-                                        <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
-                                    </div>
-                                    <div class="card small-5">
-                                        <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, service: 'service', sid: 'sid'}) }}" method="post">
-                                            {% if access.accessLevel == 1 %}
-                                                {% set readSelected = 'selected' %}
-                                            {% endif %}
-                                            {% if access.accessLevel == 2 %}
-                                                {% set writeSelected = 'selected' %}
-                                            {% endif %}
-                                            {% if access.accessLevel == 3 %}
-                                                {% set adminSelected = 'selected' %}
-                                            {% endif %}
-
-                                            <select name="type" data-autosubmit-group data-folder="{{ folder.id }}">
-                                                <option value="1" {{ readSelected }}>Read</option>
-                                                <option value="2" {{ writeSelected }}>Write</option>
-                                                <option value="3" {{ adminSelected }}>Group Admin</option>
-                                            </select>
-                                        </form>
-                                    </div>
+                        <li class="actions-small-1" data-group>
+                            <div class="list-item">
+                                <div class="card small-7">
+                                    <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
                                 </div>
-                                <nav>
-                                    <a href="#" data-delete-group="{{ folder.id }}" class="icon-delete" title="Remove"></a>
-                                </nav>
-                            </li>
-                        {% endfor %}
+                                <div class="card small-5">
+                                    <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, service: 'service', sid: 'sid'}) }}" method="post">
+                                        {% if access.accessLevel == 1 %}
+                                            {% set readSelected = 'selected' %}
+                                        {% endif %}
+                                        {% if access.accessLevel == 2 %}
+                                            {% set writeSelected = 'selected' %}
+                                        {% endif %}
+                                        {% if access.accessLevel == 3 %}
+                                            {% set adminSelected = 'selected' %}
+                                        {% endif %}
+
+                                        <select name="type" data-autosubmit-group data-folder="{{ folder.id }}">
+                                            <option value="1" {{ readSelected }}>Read</option>
+                                            <option value="2" {{ writeSelected }}>Write</option>
+                                            <option value="3" {{ adminSelected }}>Group Admin</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="#" data-delete-group="{{ folder.id }}" class="icon-delete" title="Remove"></a>
+                            </nav>
+                        </li>
                     {% endfor %}
 
                     <li class="actions-small-1">
                             <div class="card small-7">
                                 <select required name="sid" id="groupSelect" form="groupAdd" class="required">
                                     <option value="">Select a Group</option>
-                                    {% for folder in folders if folder.isGroup %}
+                                    {% for folder in folders %}
                                         <option value="{{ folder.id }}">{{ folder.name }}</option>
                                     {% endfor %}
                                 </select>
@@ -541,7 +533,7 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
-                                Message from {{ currentUser.fullName }}
+                                Message from {{ USER.fullName }}
                                 <input type="text" value="" name="body"/>
                             </label>
                         </div>

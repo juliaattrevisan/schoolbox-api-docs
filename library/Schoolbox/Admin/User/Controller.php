@@ -158,6 +158,8 @@ class Controller extends Base
             $fileYear = '';
         }
 
+        $userGroups =
+
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
@@ -170,10 +172,9 @@ class Controller extends Base
                 'titles' => $this->userTitleMapper->findAll(),
                 'fileYear' => $fileYear,
                 'fileSemester' => $fileSemester,
-                'folders' => $this->folderMapper->findAll()->sortBy('name', 'asc'),
+                'folders' => $this->folderMapper->searchByName('',true)->sortBy('name', 'asc'),
                 'user' => $user,
-                'currentUser' => $this->getUser(),
-                'userAccess' => $this->userAccessMapper->findAllGroupsForUser($user),
+                'userAccess' => $this->folderMapper->findForUser($user, false, UserAccess::ACCESS_READ),
                 'userPermissions' => $this->userAccessMapper->findAllForUser($user),
                 'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), ['limit' => 10])->sortBy('date', 'desc'),
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
