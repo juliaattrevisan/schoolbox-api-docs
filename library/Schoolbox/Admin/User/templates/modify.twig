@@ -223,20 +223,10 @@
                                 <div class="card small-5">
                                     <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: folder.id}) }}" method="post">
                                         {% set perm = userGroupPermissions.getBy('serviceIdentifier',folder.id).accessLevel %}
-                                        {% if perm == 1 %}
-                                            {% set readSelected = 'selected' %}
-                                        {% endif %}
-                                        {% if perm == 2 %}
-                                            {% set writeSelected = 'selected' %}
-                                        {% endif %}
-                                        {% if perm == 3 %}
-                                            {% set adminSelected = 'selected' %}
-                                        {% endif %}
-
                                         <select name="type" data-autosubmit-group data-folder="{{ folder.id }}" title="Access">
-                                            <option value="1" {{ readSelected }}>Read</option>
-                                            <option value="2" {{ writeSelected }}>Write</option>
-                                            <option value="3" {{ adminSelected }}>Group Admin</option>
+                                            <option value="1" {% if perm == 1 %}selected{% endif %}>Read</option>
+                                            <option value="2" {% if perm == 2 %}selected{% endif %}>Write</option>
+                                            <option value="3" {% if perm == 3 %}selected{% endif %}>Group Admin</option>
                                         </select>
                                     </form>
                                 </div>
