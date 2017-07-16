@@ -158,7 +158,8 @@ class Controller extends Base
             $fileYear = '';
         }
 
-        $userGroups =
+        $userPermissions = $this->userAccessMapper->findAllForUser($user);
+        $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE);
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
@@ -175,7 +176,8 @@ class Controller extends Base
                 'allGroups' => $this->folderMapper->searchByName('',true)->sortBy('name', 'asc'),
                 'user' => $user,
                 'userGroups' => $this->folderMapper->findForUser($user, false, UserAccess::ACCESS_READ),
-                'userPermissions' => $this->userAccessMapper->findAllForUser($user),
+                'userGroupPermissions' => $groupPermissions,
+                'userPermissions' => $userPermissions,
                 'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), ['limit' => 10])->sortBy('date', 'desc'),
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
                     'order' => ['time' => 'desc'],
