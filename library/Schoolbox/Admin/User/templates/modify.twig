@@ -222,7 +222,7 @@
                                 </div>
                                 <div class="card small-5">
                                     <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: folder.id}) }}" method="post">
-                                        {% set perm = userGroupPermissions.filterBy('serviceIdentifier',folder.id).first.accessLevel %}
+                                        {% set perm = userGroupPermissions.getBy('serviceIdentifier',folder.id).accessLevel %}
                                         {% if perm == 1 %}
                                             {% set readSelected = 'selected' %}
                                         {% endif %}
