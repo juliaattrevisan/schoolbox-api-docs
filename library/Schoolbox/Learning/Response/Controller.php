@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Response;
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -36,6 +37,7 @@ use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use DueWork_ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Application\Exception as ApplicationException;
 
 class Controller extends Base
 {
@@ -227,20 +229,14 @@ class Controller extends Base
     /**
      * Download a particular annotated crocodoc as a pdf
      *
-     * @param Submission $response
+     * @param Submission     $response
      * @param SubmissionFile $file
-     * @param Feedback $feedback
+     * @throws ApplicationException\Exception
      */
-    public function getCrocodocDownload(Submission $response, Feedback $feedback, SubmissionFile $file)
+    public function getCrocodocDownload(Submission $response, SubmissionFile $file)
     {
-        /* If you are a student and the feedback is published
-         * and the requested file has a crocodocked url,
-         * attempt to download it
-         *
-         * Otherwise 404
-         */
         try {
-            $location = $this->determineCrocodocUrl($response, $feedback, $file, true);
+            $download = $this->getInlineGraderFacade($response, $file)->getDownloadUrl();
         }
         catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
@@ -252,8 +248,7 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
 
-        $this->getResponse()->redirect->to($location);
-        return;
+        $this->getResponse()->redirect->to($download);
     }
 
     /**
@@ -262,18 +257,13 @@ class Controller extends Base
      * @param Submission $response
      * @param Feedback $feedback
      * @param SubmissionFile $file
+     * @throws ServiceNotFound If unable to locate Web Renderer in DI
+     * @throws ApplicationException\Exception
      */
     public function getCrocodocView(Submission $response, Feedback $feedback, SubmissionFile $file)
     {
-        /* If you are a student and the feedback is published
-         * and the requested file has a crocodocked url,
-         * attempt to view it
-         *
-         * Otherwise 404
-         */
         try {
-            $viewUrl = $this->determineCrocodocUrl($response, $feedback, $file);
-            $downloadUrl = $this->determineCrocodocUrl($response, $feedback, $file, false);
+            $facade = $this->getInlineGraderFacade($response, $file);
         }
         catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
@@ -286,11 +276,11 @@ class Controller extends Base
         }
 
         $data = [
-            'viewUrl' => $viewUrl,
-            'downloadUrl' => $downloadUrl,
-            'response' => $response,
-            'feedback' => $feedback,
-            'file' => $file
+            'viewUrl'     => $facade->getViewUrl(),
+            'downloadUrl' => $facade->getDownloadUrl(),
+            'response'    => $response,
+            'feedback'    => $feedback,
+            'file'        => $file,
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/crocodocView.twig', $data));
@@ -300,39 +290,20 @@ class Controller extends Base
      * Figure out a Response File's crocodoc url
      * This is a link to the third-party Crocodoc system
      *
-     * @param Submission $response
-     * @param Feedback $feedback
+     * @param Submission     $response
      * @param SubmissionFile $file
-     * @param bool $download
-     * @return string
+     * @return InlineGraderFacade
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
+     * @throws \InvalidArgumentException If no crocodoc ID
      */
-    private function determineCrocodocUrl(Submission $response, Feedback $feedback, SubmissionFile $file, $download = false)
+    private function getInlineGraderFacade(Submission $response, SubmissionFile $file)
     {
-        /* Staff can view their own annotations
-         * Students can view published feedback associated with their response
-         */
-        $isStaff = $this->getUser()->getRole()->isStaff();
-        $studentCanView = $this->getUser()->getRole()->isStudent() && $feedback->isPublished() && $feedback->getReviewee()->getId() == $this->getUser()->getId();
-
-        if ($isStaff || $studentCanView) {
-            if (strlen($file->getCrocodocId())) {
-
-                /** @var InlineGraderFacade $location */
-                $location = (new InlineGraderFacade(new InlineGraderAuthenticator(), $response, $file, $this->getUser()));
-
-                if ($download) {
-                    return $location->getDownloadUrl();
-                }
-
-                return $location->getViewUrl();
-            }
-
+        if (!$file->getCrocodocId()) {
             throw new \InvalidArgumentException('There is no Inline Grader annotated version of this document.');
         }
 
-        throw new \DomainException('You do not have permission to view this document.');
+        return new InlineGraderFacade(new InlineGraderAuthenticator(), $response, $file, $this->getUser());
     }
 
     /**

@@ -30,12 +30,16 @@ class ParentCanViewFeedback extends AbstractCanViewFeedback
 
         $assessment = $this->findAssessment($params);
         $student    = $this->findStudent($params)->loadParents();
+        $feedback   = $this->findFeedback($params);
 
         if (!$user->isParentOf($student)) {
             throw new Unauthorized('Current user is not a parent of the specified student');
         }
         if (!$assessment->isFeedbackVisibleToUser($user)) {
             throw new Unauthorized('The assessment is configured to not permit parents to see feedback');
+        }
+        if(!$feedback->isPublished()){
+            throw new Unauthorized('Feedback is not published. Parents cannot view draft feedback');
         }
     }
 }

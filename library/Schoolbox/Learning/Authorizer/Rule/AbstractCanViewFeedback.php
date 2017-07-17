@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DueWork\Submission;
@@ -59,5 +60,19 @@ abstract class AbstractCanViewFeedback implements IAuthorizationRule
             return $response->getSubmittedBy();
         }
         throw new \InvalidArgumentException('Unable to locate a student in supplied params');
+    }
+
+
+    /**
+     * @param array $params
+     * @return IFeedback
+     * @throws \InvalidArgumentException If unable to find any feedback instance in params
+     */
+    protected function findFeedback(array $params)
+    {
+        if (isset($params['feedback']) && $params['feedback'] instanceof IFeedback) {
+            return $params['feedback'];
+        }
+        throw new \InvalidArgumentException('Unable to locate feedback in supplied params');
     }
 }
