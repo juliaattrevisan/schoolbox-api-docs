@@ -35,7 +35,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     /** @var ClientInterface $redis */
     $redis = $di->get('redis');
 
-    $payloadKeys = $redis->keys('msg:*:m:*');
+    $instanceId  = INSTANCE_ID;
+    $payloadKeys = $redis->keys("msg:$instanceId:m:*");
 
     $log->info(sprintf('Found %d payload%s to reserialize', count($payloadKeys), count($payloadKeys) === 1 ? '' : 's'));
 
