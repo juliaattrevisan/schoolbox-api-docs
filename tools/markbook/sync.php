@@ -353,7 +353,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                         $mark = round($mark);
                     }
 
-                    $name = str_pad("{$student['firstname']} {$student['lastname']}:", 26, " ");
+                    $name = str_pad("{$student['firstname']} {$student['lastname']} ({$student['synergy_id']}:", 26, " ");
                     $log->info("        {$name}{$mark}");
 
                     if (!$opts['dryRun']) {
