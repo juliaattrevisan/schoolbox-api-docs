@@ -95,7 +95,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             FROM {$table}
             LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
             LEFT JOIN {$this->getJoinSql('hash.allowedFileExtension', 'h', 'm', true)}
-            LEFT JOIN {$this->getJoinSql('owner', $table, 'u')}
+            LEFT JOIN {$this->getJoinSql('owner', $table, 'u', true)}
             LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), $table, 'c')}
         ";
 
