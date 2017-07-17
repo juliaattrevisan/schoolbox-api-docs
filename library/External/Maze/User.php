@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 use Schoolbox\User;
@@ -15,21 +14,21 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * An instance of MSSQL
 	 *
-	 * @var null
+	 * @var MSSQL $db
 	 */
 	protected $db = null;
 
 	/**
 	 * A Handler of Groups
 	 *
-	 * @var
+	 * @var Group $groupHandler
 	 */
 	protected $groupHandler;
 
 	/**
 	 * Helper
 	 *
-	 * @var External_Maze_Helper
+	 * @var External_Maze_Helper $helper
 	 */
 	protected $helper = null;
 
