@@ -18,7 +18,6 @@ $this->setBlock(TEMPLATE_content, 'search_eportfolio', 'search_eportfolio_block'
 $this->setBlock(TEMPLATE_content, 'has_results', 'has_results_block');
 $this->setBlock('has_results', 'user', 'user_block');
 $this->setBlock('has_results', 'apply_campus', 'apply_campus_block');
-$this->setBlock('has_results', 'apply_defaultcampus', 'apply_defaultcampus_block');
 $this->setBlock('has_results', 'apply_role', 'apply_role_block');
 $this->setBlock('has_results', 'apply_eportfolio', 'apply_eportfolio_block');
 $this->setBlock('has_results', 'apply_webmail', 'apply_webmail_block');
@@ -43,17 +42,6 @@ foreach ($allCampuses as $currentCampus) {
     );
 
     $this->parse('search_campus_block', 'search_campus', true);
-
-    /* New Default Campus setting
-     */
-    $this->setVar(
-        array(
-            'APPLY_DEFAULTCAMPUS_ID' => $currentCampus->getId(),
-            'APPLY_DEFAULTCAMPUS_NAME' => $currentCampus->getName()
-        )
-    );
-
-    $this->parse('apply_defaultcampus_block', 'apply_defaultcampus', true);
 
     /* New Campus setting
      */

@@ -30,7 +30,6 @@ if (isset($_POST['updateUsers'])) {
 
             $userMapper->bulkModifyUpdate(
                 $user,
-                $_POST['apply_defaultcampus'],
                 $_POST['apply_campus'],
                 $_POST['apply_role'],
                 $_POST['apply_year'],
