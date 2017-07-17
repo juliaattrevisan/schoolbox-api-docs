@@ -227,6 +227,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         } catch (ClientHttpException $e) {
             switch ($e->getResponse()->getStatus()) {
                 case 401:
+                    // TODO this should raise a redirect message, not just rudely redirect
                     SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
                     break;
 
