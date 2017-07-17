@@ -8,8 +8,11 @@
  */
 
 use Alaress\File\Remote\FetcherInterface;
+use Sabre\HTTP\ClientHttpException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
@@ -47,6 +50,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     protected $mimeMapper;
 
     /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
      * @param DAV_ExtendedClient $client
      * @param array $paths List of paths from the baseUri to access
      * @param bool $lite
@@ -59,6 +67,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $this->folderMapper = FolderMapper::getInstance();
         $this->fileMapper = FileMapper::getInstance();
         $this->mimeMapper = MimetypeMapper::getInstance();
+        $this->errorMapper = ErrorMapper::getInstance();
 
         $this->buildTree();
     }
@@ -193,6 +202,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      * @param string $path
      * @param string $filter
      * @return mixed
+     * @throws SchoolboxException if the WebDAV client threw an exception other than 400, 401 or 404
      */
     public function getList($path = '', $filter = 'dir')
     {
@@ -214,23 +224,26 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     '{DAV:}creationdate',
                 ], 1
             );
-        } /* Handle Sabre_DAV_Exception specifically
-         */
-        catch (Sabre\DAV\Exception\NotAuthenticated $e) {
-            SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
-        } catch (Sabre\DAV\Exception\NotFound $e) {
-            /* In some cases we are told that something exists, only to be thrown a 404 error
-                Instead of reacting badly just return false and get on with life */
-            return false;
-        } catch (Sabre\DAV\Exception $e) {
-            if ($e->getMessage() == "HTTP error: 401") {
-                SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
-            } else {
-                if ($e->getMessage() == "HTTP error: 404" OR $e->getMessage() == "HTTP error: 400") {
+        } catch (ClientHttpException $e) {
+            switch ($e->getResponse()->getStatus()) {
+                case 401:
+                    SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
+                    break;
+
+                case 400:
+                case 404:
+                    // In some cases we are told that something exists, only to be thrown a 404 error
+                    // Instead of reacting badly just return false and get on with life
                     return false;
-                } else {
-                    error(141, $e->getMessage() . " at: " . $path);
-                }
+
+                default:
+                    // error out I guess
+                    // This gets caught elsewhere but that isn't my problem
+                    throw $this->errorMapper->generateException(
+                        ErrorMapper::ERROR_WEBDAV,
+                        $e,
+                        $e->getMessage() . " at: " . $path
+                    );
             }
         }
 
