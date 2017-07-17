@@ -109,13 +109,6 @@ class User implements JsonSerializable, ISoftDeletable
      */
     private $campusCollection;
 
-    /**
-     * The user's default campus
-     *
-     * @var Campus
-     */
-    private $defaultCampus;
-
     /** @var bool */
     private $superuser;
 
@@ -228,16 +221,6 @@ class User implements JsonSerializable, ISoftDeletable
     public function isInCampus(Campus $campus)
     {
         return $this->getCampusCollection()->getBy('id', $campus->getId()) instanceof Campus;
-    }
-
-    /**
-     * Returns the users default campus
-     *
-     * @return Campus
-     */
-    public function getDefaultCampus()
-    {
-        return $this->defaultCampus;
     }
 
     /**
@@ -822,6 +805,7 @@ class User implements JsonSerializable, ISoftDeletable
     }
 
     /**
+     * @param bool $hideContacts
      * @return self
      */
     public function setHideContacts($hideContacts)
@@ -832,6 +816,7 @@ class User implements JsonSerializable, ISoftDeletable
     }
 
     /**
+     * @param bool $hideTimetable
      * @return self
      */
     public function setHideTimetable($hideTimetable)
@@ -878,16 +863,6 @@ class User implements JsonSerializable, ISoftDeletable
         return $this;
     }
 
-
-    /**
-     * @param Campus $defaultCampus
-     * @return self
-     */
-    public function setDefaultCampus($defaultCampus)
-    {
-        $this->defaultCampus = $defaultCampus;
-        return $this;
-    }
 
     /**
      * Set boarding status (only if boarder leave is enabled)
@@ -1144,7 +1119,7 @@ class User implements JsonSerializable, ISoftDeletable
      */
     private function findEmailRecipients($user)
     {
-        $parentRoles = \Schoolbox\RoleMapper::getInstance()->findByColumn(
+        $parentRoles = RoleMapper::getInstance()->findByColumn(
             'group_type',
             Role::PARENT
         )->getColumnValues('id');
@@ -1156,7 +1131,7 @@ class User implements JsonSerializable, ISoftDeletable
                 $thisRecipient = new Collection();
                 // if a synergy ID is available, and a valid user can be obtained from it, use that
                 if ($synergyId) {
-                    $thisRecipient = \Schoolbox\UserMapper::getInstance()->findByColumnList(
+                    $thisRecipient = UserMapper::getInstance()->findByColumnList(
                         array(
                             'synergy_id' => $synergyId,
                             'group_id'   => $parentRoles
