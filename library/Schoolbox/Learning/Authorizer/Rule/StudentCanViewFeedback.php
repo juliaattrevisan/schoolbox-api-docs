@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
 /**
@@ -35,7 +34,7 @@ class StudentCanViewFeedback extends AbstractCanViewFeedback
         if ($user->getId() !== $student->getId()) {
             throw new Unauthorized('Current user is not participation student');
         }
-        if (IAssessable::MARK_VISIBILITY_PRIVATE === $assessment->getMarkVisibility()) {
+        if (!$assessment->isFeedbackVisibleToUser($user)) {
             throw new Unauthorized('This assessment is configured to not permit students to see feedback');
         }
     }
