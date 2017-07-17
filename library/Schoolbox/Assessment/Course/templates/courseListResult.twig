@@ -79,25 +79,25 @@ Usage:
             {% endif %}
     </nav>
 
-        {% if hasTot %}
+    {% if hasTot %}
     <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
         <li>
             <a href="{{ importUrl }}" class="icon-download">Import into classes</a>
         </li>
         <li>
-            {% if courseSpec.folder.hasHomepage %}
-                <a href="/homepage/{{ courseSpec.folder.id }}/" class="icon-home">Course Homepage</a>
-            {% else %}
-                <a href="/resources/{{ courseSpec.folder.id }}/" class="icon-folder">Course Resources</a>
-            {% endif %}
+        {% if courseSpec.folder.hasHomepage %}
+            <a href="/homepage/{{ courseSpec.folder.id }}/" class="icon-home">Course Homepage</a>
+        {% else %}
+            <a href="/resources/{{ courseSpec.folder.id }}/" class="icon-folder">Course Resources</a>
+        {% endif %}
         </li>
+        <li><a href="{{ routeLookup('learningAnalytics.course', {courseSpecId: courseSpec.id}) }}" class="icon-poll">Learning Analytics</a></li>
         <li><a href="{{ routeLookup('course.modifyCourse', {id: courseSpec.id}) }}" class="icon-modify">Modify</a></li>
-
             {# Course delete: standard folder delete -#}
         {% if USER.isSuperuser() %}
         <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: courseSpec.id}) }}" class="icon-delete" data-course-delete-id="{{ courseSpec.id }}" data-action="course-delete">Delete</a></li>
         {% endif %}
 
     </ul>
-        {% endif %}
+    {% endif %}
 </li>
