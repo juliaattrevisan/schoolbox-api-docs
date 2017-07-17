@@ -1469,6 +1469,17 @@ class Adapter  implements \External_UserInterface {
     {
         return $this->handler;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param string $externalId
+     * @return bool
+     */
+    public function hasIndividualEducationPlan($externalId)
+    {
+        return $this->getHandler()->hasIndividualEducationPlan();
+    }
 }
 
 
