@@ -123,7 +123,8 @@ class External_Pcschools_User implements External_UserInterface
                 S.ALERT AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
                 '' AS StudentStudiesCode,
-                S.ALERT AS AlertMessage
+                S.ALERT AS AlertMessage,
+                0 AS countIndividualEducationPlans
             FROM STUDENT S
             LEFT JOIN CODEMAST AS S_HOUSE ON S.HOUSE = S_HOUSE.CODE AND S_HOUSE.TYPE = 'HOUSE'
             LEFT JOIN CODEMAST AS S_CLASS ON S.HOME_CLASS = S_CLASS.CODE AND S_CLASS.TYPE = 'CLASS'
@@ -1042,14 +1043,6 @@ class External_Pcschools_User implements External_UserInterface
     {
         // Non-core promise
         return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasIndividualEducationPlan($externalId)
-    {
-        return false;
     }
 
     // Local methods

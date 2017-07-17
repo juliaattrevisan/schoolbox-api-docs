@@ -176,12 +176,4 @@ class External_Offline_User implements External_UserInterface
     {
         return array();
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasIndividualEducationPlan($externalId)
-    {
-        return false;
-    }
 }

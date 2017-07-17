@@ -60,7 +60,14 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                     vStudents.StudentsComment as Comment,
                     uStudentProgressiveAbsenceCount.AbsenceFullDaysForYear,
                     uStudentProgressiveAbsenceCount.LateStartDaysForYear,
-                    uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear
+                    uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear,                        
+                        (
+                            SELECT    COUNT(*) 
+                            FROM      dbo.IndividualPlans IEP
+                            WHERE     IEP.ID = vStudents.ID AND
+                            StartDate <= CURRENT_TIMESTAMP AND
+                            (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
+                        ) AS countIndividualEducationPlans  
                 FROM dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts
                         ON CommunityAlerts.ID = StudentID

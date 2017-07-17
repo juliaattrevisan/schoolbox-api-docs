@@ -207,14 +207,6 @@ class External_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
-     */
-    public function hasIndividualEducationPlan($externalId)
-    {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-    }
-
-    /**
      * @param $methodName
      * @param $argumentList
      * @return mixed

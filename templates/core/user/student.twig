@@ -62,7 +62,7 @@
                         {% endblock medicalAlert %}
 
                         {% block individualEducationPlan %}
-                            {% if isStaff and externalUser.IndividualEducationPlan %}
+                            {% if isStaff and externalUser.countIndividualEducationPlans > 0 %}
                                 <div class="alert-box warning icon-bell">
                                     Individual Education Plan
                                 </div>

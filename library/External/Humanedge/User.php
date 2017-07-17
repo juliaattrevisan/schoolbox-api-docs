@@ -92,7 +92,8 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS StudentMedicalAlert,
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
                 '' AS StudentStudiesCode,
-                '' AS AlertMessage
+                '' AS AlertMessage,
+                0 AS countIndividualEducationPlans
             FROM Student s
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID AND sc.EmergencyContact = 'Y'
             LEFT JOIN Contact c ON sc.ContactID = c.ID
@@ -486,14 +487,6 @@ class External_Humanedge_User implements External_UserInterface
     public function getStudentForms()
     {
         return '';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasIndividualEducationPlan($externalId)
-    {
-        return false;
     }
 
     /**

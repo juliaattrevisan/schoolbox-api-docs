@@ -164,7 +164,8 @@ class External_Isams_User implements External_UserInterface
                         txtadditionalHealth     AS StudentMedicalAlert,
                         ''                      AS StudentSpecialNeedsFlag,
                         ''                      AS StudentStudiesCode,
-                        ''                      AS StudentBoarder
+                        ''                      AS StudentBoarder,
+                        0 AS countIndividualEducationPlans
             FROM        V_Student
             WHERE       StudentID = '{$this->database->quote($externalUserId)}'
         ";
@@ -571,14 +572,6 @@ class External_Isams_User implements External_UserInterface
     public function getStudentForms()
     {
         return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasIndividualEducationPlan($externalId)
-    {
-        return false;
     }
 
     /* Getters/Setters

@@ -351,7 +351,14 @@ class External_Synergetic_User implements External_UserInterface
                         vStudents.StudentStudiesCode,
                         AlertMessage,
                         vStudents.StudentBoarder,
-                        vStudents.StudentsComment as Comment
+                        vStudents.StudentsComment as Comment,                        
+                        (
+                            SELECT    COUNT(*) 
+                            FROM      dbo.IndividualPlans IEP
+                            WHERE     IEP.ID = vStudents.ID AND
+                            StartDate <= CURRENT_TIMESTAMP AND
+                            (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
+                        ) AS countIndividualEducationPlans                      
             FROM        dbo.vStudents vStudents
             LEFT JOIN   CommunityAlerts ON 
                             CommunityAlerts.ID = StudentID AND 
@@ -1170,26 +1177,6 @@ class External_Synergetic_User implements External_UserInterface
         }
 
         return $forms;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasIndividualEducationPlan($externalUserId)
-    {
-        $sql = "
-            SELECT    COUNT(*) AS countPlans
-            FROM      dbo.IndividualPlans
-            WHERE     ID = :id AND
-                      StartDate <= CURRENT_TIMESTAMP AND
-                      (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
-        ";
-
-        $statement = $this->getConnector()->executeQuery($sql, [
-            'id' => $externalUserId
-        ]);
-
-        return $statement->fetchColumn() > 0;
     }
 
     /**

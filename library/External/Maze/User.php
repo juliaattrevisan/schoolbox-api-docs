@@ -340,7 +340,8 @@ class External_Maze_User implements External_UserInterface {
 				'' AS AlertMessage,
 				'' AS StudentBoarder,
 				'' AS Comment,
-				ST.ROLL_GROUP
+				ST.ROLL_GROUP,
+				0 AS countIndividualEducationPlans
 			FROM ST
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
@@ -1069,14 +1070,6 @@ class External_Maze_User implements External_UserInterface {
     public function getStudentForms()
     {
         return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasIndividualEducationPlan($externalId)
-    {
-        return false;
     }
 
 	/* Getters/Setters

@@ -497,12 +497,4 @@ interface External_UserInterface {
      * @return array [['Code' => string, 'Description' => string], ...]
      */
     public function getStudentForms();
-
-    /**
-     * Returns flag indicating if the student has an individual education plan
-     *
-     * @param string $externalId
-     * @return bool
-     */
-    public function hasIndividualEducationPlan($externalId);
 }

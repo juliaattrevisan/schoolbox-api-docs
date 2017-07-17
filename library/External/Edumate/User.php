@@ -123,7 +123,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               s.form_staff_name AS StudentTutor, p.full_name AS StudentEmergencyName,
               p.mobile AS StudentEmergencyPhone,
               '' AS Comment,
-              '' AS StudentStudiesCode
+              '' AS StudentStudiesCode,
+              0 AS countIndividualEducationPlans
             FROM db2inst1.schoolbox_students s
             LEFT JOIN db2inst1.schoolbox_parent_student ps ON s.student_number = ps.student_number
             LEFT JOIN db2inst1.schoolbox_parents p ON ps.carer_number = p.carer_number
@@ -529,13 +530,5 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getEmail($externalUserId)
     {
         return '';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasIndividualEducationPlan($externalId)
-    {
-        return false;
     }
 }
