@@ -160,9 +160,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         // Hydrate result type
 
-        $workType   = WorkTypeMapper::getInstance()->findById($assessment->getType());
-        $resultType = $workType->getExternalResultType();
-
+        if (!empty($assessment->getType())) {
+            $workType = WorkTypeMapper::getInstance()->findById($assessment->getType());
+            $resultType = $workType->getExternalResultType();
+        }
+        
         if (empty($resultType)) {
             $resultType = 'OGRaw';
         }
