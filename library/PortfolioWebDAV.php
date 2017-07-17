@@ -82,15 +82,16 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         //    <id> => '<path>'
         // )
 
-        $i = 0;
         $rootPath = md5('');
         $_SESSION['portfolioIdPathMap'][0] = '';
 
+        $i = 0;
         foreach ($this->rootPaths as $path) {
+            $i++;
             $_SESSION['portfolioIdPathMap'][$i] = $path;
             $basename = $path == '/' ? '/' : rawurldecode(basename($path));
             $cache = array(
-                'id' => ++$i,
+                'id' => $i,
                 'parent' => 0,
                 'path' => $path,
                 'name' => $basename,
