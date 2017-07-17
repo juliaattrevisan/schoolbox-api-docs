@@ -13,7 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Authorizer\Rule\IsNotInteractionLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -48,7 +48,7 @@ class Module extends BaseModule
                     }
                     throw new Forbidden('User does not have homepage access');
                 }, Access::getInstance()),
-                new IsNotInteractionLocked(new Assessment\LockedChecker($this->getTermMapper()))
+                new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
             )
         );
 

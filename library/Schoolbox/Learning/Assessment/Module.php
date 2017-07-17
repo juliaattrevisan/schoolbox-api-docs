@@ -16,7 +16,7 @@ use OutOfBoundsException;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
-use Schoolbox\Learning\Authorizer\Rule\IsNotInteractionLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -141,7 +141,7 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new Rule\HasRole(Role::STAFF)
                 ),
-                new IsNotInteractionLocked(new LockedChecker($this->getTermMapper()))
+                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
             )
         );
 

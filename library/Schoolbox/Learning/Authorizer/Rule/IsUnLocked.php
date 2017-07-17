@@ -19,7 +19,7 @@ use Schoolbox\User;
  *
  * Does NOT short-circuit for SuperUsers - the module should combine Rules to achieve that effect if desired.
  */
-abstract class IsNotLocked implements IAuthorizationRule
+abstract class IsUnLocked implements IAuthorizationRule
 {
 
     /**
