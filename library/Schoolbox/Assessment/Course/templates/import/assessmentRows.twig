@@ -37,6 +37,9 @@
             var date = $(this).attr('data-course-unit-date');
             var $input = $(this).prev('.input-group').find('input');
             $input.val(date).trigger('change');
+
+            // Sync dates as required
+            syncDatesOnElement($input, getOptions($input), '');
         });
 
     });
