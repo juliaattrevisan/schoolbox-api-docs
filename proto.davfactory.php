@@ -57,7 +57,7 @@ class DavFactory {
         // increasing order of precedence
         $tests = array(
             self::CONDITION_ROLE   => $user->getRole()->getType(),
-            self::CONDITION_CAMPUS => $user->getDefaultCampus()->getId(),
+            self::CONDITION_CAMPUS => $user->getCampusCollection()->first()->getId(),
             self::CONDITION_YEAR   => $user->getYear()
         );
 

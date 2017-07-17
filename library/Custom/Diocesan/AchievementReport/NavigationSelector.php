@@ -92,24 +92,22 @@ class NavigationSelector {
 
     /**
      * Determine default report
-     *
-     * @return string
-     */
+     **/
     public function determineDefaultReport() {
         $this->setDefaultReport(array('error' => 'Unknown default report.'));
 
-        if ($this->getUser()->getDefaultCampus() instanceof Campus) {
-            if (in_array($this->getUser()->getDefaultCampus()->getExtTimetableCode(), array('JNR', 'JS'))) {
+        if ($this->getUser()->getCampusCollection()->first() instanceof Campus) {
+            if (in_array($this->getUser()->getCampusCollection()->first()->getExtTimetableCode(), array('JNR', 'JS'))) {
                 if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
                     $this->setDefaultReport('comingSoon');
                 }
             }
-            elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'JH') {
+            elseif ($this->getUser()->getCampusCollection()->first()->getExtTimetableCode() == 'JH') {
                 if (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
                     $this->setDefaultReport('schoolGrades');
                 }
             }
-            elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'SNR') {
+            elseif ($this->getUser()->getCampusCollection()->first()->getExtTimetableCode() == 'SNR') {
 
                 /* NCEA for year 11 specifically
                  */

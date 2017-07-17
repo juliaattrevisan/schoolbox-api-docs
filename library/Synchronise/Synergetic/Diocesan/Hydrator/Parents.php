@@ -91,24 +91,14 @@ class Parents implements Synchronise_Base_IHydrator
             return $newUser;
         }
 
-        /** @var User $eldest */
-        $eldest = $children->first();
+        $childCampus = array();
 
-        if (!$eldest->getDefaultCampus() instanceof Campus) {
-            // *sigh*
-            if ($eldest->getCampusCollection()->count()) {
-                $eldest->setDefaultCampus($eldest->getCampusCollection()->first());
-            } else {
-                return $newUser;
-            }
+        foreach($children as $child) {
+            /** @var User $child */
+            $childCampus = array_merge($childCampus, $child->getCampusCollection()->getColumnValues('id'));
         }
 
-        $newUser['defaultCampus'] = $eldest->getDefaultCampus()->getId();
-
-        $newUser['campus'] = array_unique($children->map(function ($user) {
-            /** @var User $user */
-            return $user->getDefaultCampus()->getId();
-        })->getAll());
+        $newUser['campus'] = array_unique($childCampus);
 
         return $newUser;
     }

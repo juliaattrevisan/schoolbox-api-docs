@@ -123,10 +123,6 @@ class UserBulkMapper extends UserMapper
              */
             if ($campus->getId()) {
                 $userOffset->getCampusCollection()->add($campus);
-
-                if ($row['uc.defaultCampus'] == 1) {
-                    $user->setDefaultCampus($campus);
-                }
             }
         }
 

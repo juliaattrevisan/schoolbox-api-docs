@@ -62,11 +62,6 @@ class Campus implements HydratorInterface
             }
             if (!empty($campusList)) {
                 $user->setCampusCollection($campusList);
-                // set default campus to first in list
-                foreach ($campusList as $campus) {
-                    $user->setDefaultCampus($campus);
-                    break;
-                }
             }
         }
         return $user;
