@@ -10,41 +10,24 @@
 
 namespace Schoolbox\Blog\Eportfolio\Image;
 
-class Model {
+use \Schoolbox\ISoftDeletable;
+use \Schoolbox\Mapper\Traits\Model\Id;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
-	/** @var int */
-	protected $id;
+class Model implements ISoftDeletable {
+
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
 	/** @var int */
 	protected $blogId;
 
 	/** @var string */
 	protected $hash;
-
-	/** @var \Alaress_Date_Format */
-	protected $createdAt;
-
-	/** @var \Alaress_Date_Format */
-	protected $updatedAt;
-
-	/** @var \Alaress_Date_Format */
-	protected $deletedAt;
-
-	/**
-	 * @param int $id
-	 * @return self
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
 
 	/**
 	 * @param int $blogId
@@ -76,56 +59,5 @@ class Model {
 	 */
 	public function getHash() {
 		return $this->hash;
-	}
-
-	/**
-	 * @param \Alaress_Date_Format $createdAt
-	 * @return self
-	 */
-	public function setCreatedAt($createdAt) {
-		$this->createdAt = $createdAt;
-		return $this;
-	}
-
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getCreatedAt() {
-		return $this->createdAt;
-	}
-
-	/**
-	 * @param \Alaress_Date_Format $updatedAt
-	 * @return self
-	 */
-	public function setUpdatedAt($updatedAt) {
-		$this->updatedAt = $updatedAt;
-		return $this;
-	}
-
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getUpdatedAt() {
-		return $this->updatedAt;
-	}
-
-	/**
-	 * @param \Alaress_Date_Format $deletedAt
-	 * @return self
-	 */
-	public function setDeleted($deletedAt) {
-		$this->deletedAt = $deletedAt;
-		return $this;
-	}
-
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getDeletedAt() {
-		return $this->deletedAt;
 	}
 } 
