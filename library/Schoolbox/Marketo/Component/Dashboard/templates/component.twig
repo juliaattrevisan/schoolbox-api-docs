@@ -1,0 +1,53 @@
+<script>
+
+    $(function () {
+
+        {# Mutex flag to account for both callbacks #}
+
+        var isMunchkinInit = false;
+
+        function initMunchkin() {
+
+            {# Only action the callback once #}
+
+            if (isMunchkinInit === false) {
+                isMunchkinInit = true;
+
+                {# Setup munchkin #}
+
+                Munchkin.init('{{ marketoClientId }}');
+
+                {# Associate user details with lead #}
+
+                Munchkin.munchkinFunction('associateLead', {
+                        'Email': '{{ email }}',
+                        'FirstName': '{{ user.firstname }}',
+                        'LastName': '{{ user.lastname }}'
+                    },
+                    '{{ marketoHash }}'
+                );
+            }
+        }
+
+        {# Create a script element to load Munchkin #}
+
+        var scriptMunchkin = document.createElement('script');
+        scriptMunchkin.type = 'text/javascript';
+        scriptMunchkin.async = true;
+        scriptMunchkin.src = '//munchkin.marketo.net/munchkin.js';
+
+        {# Wire up callbacks to execute when script has loaded. Assuming the two methods are some cross-browser shenanigans... #}
+
+        scriptMunchkin.onload = initMunchkin;
+        scriptMunchkin.onreadystatechange = function () {
+            if (this.readyState == 'complete' || this.readyState == 'loaded') {
+                initMunchkin();
+            }
+        };
+
+        {# Add script to markup #}
+
+        document.getElementsByTagName('head')[0].appendChild(scriptMunchkin);
+    });
+
+</script>
