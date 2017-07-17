@@ -287,7 +287,6 @@ class UserBulkMapper extends UserMapper
         $this->save($user);
 
         /* Override the joined model persist, in $this->save()
-         * There isn't a convenient way to set the defaultCampus value
          * using the mappers in their current form
          */
 
