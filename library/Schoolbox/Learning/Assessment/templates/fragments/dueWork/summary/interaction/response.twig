@@ -48,6 +48,7 @@
         </li>
     </ul>
     {% if currentInteraction.allFiles %}
+    <ul class="information-list">
     {% for currentFile in currentInteraction.allFiles %}
             {% include '@learning/dueWork/interaction/response/files.twig' with {
                 assessment: currentInteraction.assessable,
@@ -56,6 +57,7 @@
                 plagscanId: currentFile.plagscan.plagscanId
             } %}
         {% endfor %}
+    </ul>
     {% endif %}
 
     {% if currentInteraction.allFeedback|length %}

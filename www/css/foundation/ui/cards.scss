@@ -231,9 +231,6 @@
 	* Has a strange width because .information-list li has negative margins
 	*/
 	&.attachment{
-		background-color: rgba(0,0,0,0.02);
-		border: 1px solid $body-bg;
-		margin: 0.5rem;
 		padding: 0.5rem;
 		width: calc(100% - 1rem);
 		a{
