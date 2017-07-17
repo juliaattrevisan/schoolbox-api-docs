@@ -78,10 +78,6 @@
             window.location.href = url;
         });
 
-		$('#start_date').syncDates({
-			endDate: $('#finish_date')
-		});
-
 		//
 		// Form listener for exporter - brings up a dialog box that offers a URL
 		// to click.
@@ -256,10 +252,10 @@
                     <div class="small-12 large-6 column">
                         <div class="row">
                             <div class="small-4 columns">
-                                <input id="start_date" name='start_date' value="{SELECTED_START}" data-datepicker data-datepicker-buttontext />
+                                <input id="start_date" name='start_date' value="{SELECTED_START}" data-datepicker data-datepicker-buttontext data-datesync-enddate="#finish_date" />
                             </div>
                             <div class="small-4 columns">
-                                <input id="finish_date" name='finish_date' value="{SELECTED_FINISH}" data-datepicker data-datepicker-buttontext />
+                                <input id="finish_date" name='finish_date' value="{SELECTED_FINISH}" data-datepicker data-datepicker-buttontext data-datesync-startdate="#start_date" />
                             </div>
                             <div class="small-4 columns">
                                 <input type="submit" value="Update" />

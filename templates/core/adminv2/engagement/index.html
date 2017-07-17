@@ -13,10 +13,6 @@
             var url = '/adminv2/engagement/index/{CURRENT_PAGE}/' + start_date + '/' + finish_date;
             window.location.href = url;
         });
-
-        $('#start_date').syncDates({
-            endDate: $('#finish_date')
-        });
     });
 </script>
 <!-- END custom_head -->
@@ -52,10 +48,10 @@
                 <fieldset>
                     <legend>Report Range</legend>
                     <div class="column small-12 medium-6">
-                        <input id="start_date" data-datepicker placeholder="Start Date" name='start_date' value="{SELECTED_START}" />
+                        <input id="start_date" placeholder="Start Date" name='start_date' value="{SELECTED_START}" data-datepicker data-datesync-enddate="#finish_date" />
                     </div>
                     <div class="column small-12 medium-6">
-                        <input id="finish_date" data-datepicker placeholder="End Date" name='finish_date'  value="{SELECTED_FINISH}" />
+                        <input id="finish_date" placeholder="End Date" name='finish_date'  value="{SELECTED_FINISH}" data-datepicker data-datesync-startdate="#start_date" />
                     </div>
                 </fieldset>
             </section>
