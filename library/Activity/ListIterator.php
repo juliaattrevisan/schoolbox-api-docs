@@ -21,7 +21,7 @@ class Activity_ListIterator extends Activity_ListAbstract {
      * @return string
      */
     public function current() {
-        return $this->renderItem($this->datasource->current());
+        return $this->datasource->current();
     }
 
     /**
@@ -35,14 +35,14 @@ class Activity_ListIterator extends Activity_ListAbstract {
      * @return mixed scalar on success, or null on failure.
      */
     public function key() {
-        $this->datasource->key();
+        return $this->datasource->key();
     }
 
     /**
      * @return boolean The return value will be casted to boolean and then evaluated.
      */
     public function valid() {
-        $this->datasource->valid();
+        return $this->datasource->valid();
     }
 
     /**

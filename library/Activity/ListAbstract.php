@@ -78,7 +78,7 @@ abstract class Activity_ListAbstract implements Iterator {
      * @param $data
      * @return SitePage
      */
-    protected function renderItem($data) {
+    public function renderItem($data) {
         // instantiate a new sitepage if the monolith wasn't provided
         if(!$this->sitepage) {
             $this->noInstance = true;

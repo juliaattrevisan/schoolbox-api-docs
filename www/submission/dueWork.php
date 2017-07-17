@@ -643,6 +643,7 @@ if (empty($feedItems)) {
     $activityList->setTarget($this, 'ACTIVITY_LIST');
     foreach ($activityList as $a) {
         // iterates across and pumps out the list
+        $activityList->renderItem($a);
     }
 }
 
