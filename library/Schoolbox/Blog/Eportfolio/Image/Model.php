@@ -10,12 +10,13 @@
 
 namespace Schoolbox\Blog\Eportfolio\Image;
 
+use \Schoolbox\ISoftDeletable;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
-class Model {
+class Model implements ISoftDeletable {
 
     use Id;
     use CreatedAtDate;
