@@ -293,7 +293,11 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                     $log->info("    {$action}Create/Update");
 
                     if (!$opts['dryRun']) {
-                        $markbookExternal->createOrUpdateAssessment($submissionBox);
+                        if ($markbookExternal->hasAssessment($submissionBox)) {
+                            $markbookExternal->createAssessment($submissionBox);
+                        } else {
+                            $markbookExternal->updateAssessment($submissionBox);
+                        }
                     }
 
                 } else {

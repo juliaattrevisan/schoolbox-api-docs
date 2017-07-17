@@ -38,9 +38,9 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createOrUpdateAssessment(Activity $assessment)
+    public function hasAssessment(Activity $assessment)
     {
-        return $this->getDatabase()->createOrUpdateAssessment($assessment);
+        return $this->getDatabase()->hasAssessment($assessment);
     }
 
     /**

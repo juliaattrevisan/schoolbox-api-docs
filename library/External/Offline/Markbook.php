@@ -26,9 +26,9 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createOrUpdateAssessment(Activity $assessment)
+    public function hasAssessment(Activity $assessment)
     {
-        return [];
+        return false;
     }
 
     /**

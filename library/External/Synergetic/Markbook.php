@@ -102,7 +102,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createOrUpdateAssessment(Activity $assessment)
+    public function hasAssessment(Activity $assessment)
     {
         $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
 
@@ -120,15 +120,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'fileSemester' => $this->fileSemester
         ]);
 
-        // If the markbook already exists, do an update
-
-        if ($statement->fetch()) {
-            return $this->updateAssessment($assessment);
-        }
-
-        // Otherwise create only
-
-        return $this->createAssessment($assessment);
+        return $statement->fetchColumn() > 0;
     }
 
     /**
@@ -164,7 +156,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $workType = WorkTypeMapper::getInstance()->findById($assessment->getType());
             $resultType = $workType->getExternalResultType();
         }
-        
+
         if (empty($resultType)) {
             $resultType = 'OGRaw';
         }

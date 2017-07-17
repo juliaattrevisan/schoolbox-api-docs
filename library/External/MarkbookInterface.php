@@ -23,12 +23,12 @@ interface External_MarkbookInterface
     public function getAssessment(Activity $assessment);
 
     /**
-     * Creates or update an assessment item in the markbook
+     * Indicates if assessment exists
      *
      * @param Activity $assessment
      * @return bool
      */
-    public function createOrUpdateAssessment(Activity $assessment);
+    public function hasAssessment(Activity $assessment);
 
     /**
      * Creates a new assessment item in the markbook
