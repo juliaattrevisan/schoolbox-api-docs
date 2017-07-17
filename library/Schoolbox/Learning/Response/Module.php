@@ -15,6 +15,8 @@ use OutOfBoundsException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
+use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -128,84 +130,13 @@ class Module extends BaseModule
      */
     private function buildRuleCanAccessCrocodoc()
     {
-        $studentCanAccess = new Rule\Callback(function (array $params, User $user) {
-            $assessment = $this->findAssessment($params);
-            $student    = $this->findStudent($params);
-
-            if ($user->getId() !== $student->getId()) {
-                throw new Unauthorized('Current user is not student concerned');
-            }
-            if (IAssessable::MARK_VISIBILITY_PRIVATE === $assessment->getMarkVisibility()) {
-                throw new Unauthorized('This assessment is configured to not permit students to see feedback');
-            }
-        });
-
-        $parentCanAccess = new Rule\Callback(function (array $params, User $user) {
-            $assessment = $this->findAssessment($params);
-            $student    = $this->findStudent($params)->loadParents();
-
-            if (!$user->isParentOf($student)) {
-                throw new Unauthorized('Current user is not parent of student concerned');
-            }
-            if (IAssessable::MARK_VISIBILITY_PARENT_STUDENT !== $assessment->getMarkVisibility()) {
-                throw new Unauthorized('This assessment is configured to not permit parents to see feedback');
-            }
-        });
-
         // And combine - ensuring parent check is last
         return new Rule\Any(
             new Rule\IsSuperuser(),
             $this->buildRuleHasWriteAccess(),
-            $studentCanAccess,
-            $parentCanAccess
+            new ParentCanViewFeedback(),
+            new StudentCanViewFeedback()
         );
-    }
-
-
-    /**
-     * Locate an IAssessable instance in supplied params
-     *
-     * @param array $params
-     * @return IAssessable
-     * @throws \InvalidArgumentException If unable to locate an IAssessable instance
-     */
-    private function findAssessment(array $params)
-    {
-        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
-            return $params['assessment'];
-        }
-        if (isset($params['participant']) && $params['participant'] instanceof Participant) {
-            /** @var Participant $participant */
-            $participant = $params['participant'];
-            return $participant->getAssessable();
-        }
-        throw new \InvalidArgumentException('Unable to locate an assessment in supplied params');
-    }
-
-
-    /**
-     * Locate a student User instance in supplied params
-     *
-     * @param array $params
-     * @return User
-     * @throws \InvalidArgumentException If unable to locate a student User instance
-     */
-    private function findStudent(array $params)
-    {
-        if (isset($params['student']) && $params['student'] instanceof User) {
-            return $params['student'];
-        }
-        if (isset($params['participant']) && $params['participant'] instanceof Participant) {
-            /** @var Participant $participant */
-            $participant = $params['participant'];
-            return $participant->getUser();
-        }
-        if (isset($params['response']) && $params['response'] instanceof Submission\Model) {
-            /** @var Submission\Model $response */
-            $response = $params['response'];
-            return $response->getSubmittedBy();
-        }
-        throw new \InvalidArgumentException('Unable to locate a student in supplied params');
     }
 
 
