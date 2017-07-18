@@ -143,9 +143,8 @@
 
         <div id="listEmptyState" class="empty-state {{ emptyStateClass }}">
             <i class="icon-list"></i>
-            <p>The {{ tables[table].title }} list is currently empty.</p>
+            <p>The {{ tables[table].title }} list is currently empty, but you may <a href="#" data-button="add-row">add a new row</a>.</p>
         </div>
-
 
         <form method="post" action="/adminv2/lists/save">
             <input name="table" type="hidden" value="{{ table }}" />
