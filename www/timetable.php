@@ -115,6 +115,9 @@ foreach ($userList as $user) {
                                 if (isset($currentClass['description']) && strlen($currentClass['description'])) {
                                     $classCount++;
                                 }
+                                else if (isset($currentClass['code']) && strlen($currentClass['code'])) {
+                                    $classCount++;
+                                }
                             }
                         }
                     }
@@ -227,14 +230,6 @@ foreach ($userList as $user) {
                                         }
                                     } // staff, or external_db is disabled
 
-                                    $this->setVar([
-                                        'PERIOD_DESC'   => Scrub::Text($class['description']),
-                                        'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
-                                        'PERIOD_ROOM'   => Scrub::Text($class['room']),
-                                        'PERIOD_STAFF'  => Scrub::Text($period_staff),
-                                        'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
-                                    ]);
-
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */
                                     if (!isset($catCache[$class['code']])) {
                                         try {
@@ -245,6 +240,18 @@ foreach ($userList as $user) {
                                             //Subject not found
                                         }
                                     }
+
+                                    $description = $class['description'] ? $class['description'] : $cat->getName();
+
+                                    $this->setVar([
+                                        'PERIOD_DESC'   => Scrub::Text($description),
+                                        'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
+                                        'PERIOD_ROOM'   => Scrub::Text($class['room']),
+                                        'PERIOD_STAFF'  => Scrub::Text($period_staff),
+                                        'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
+                                    ]);
+
+
 
 
                                     if ($catCache[$class['code']] && $groupHandler->getPermission($catCache[$class['code']]) >= READ_ACCESS) {
