@@ -41,7 +41,6 @@ class Mapper extends BaseMapper
      */
     public function findTabsForUser($user)
     {
-        //var_dump($user);
         $campusList = array();
         foreach ($user->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
