@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -36,8 +36,8 @@ class Parents implements Synchronise_Base_IHydrator
 
     /**
      * @param Synchronise_Base_IHydrator $base
-     * @param External_UserInterface     $eu
-     * @param Mapper                     $userMapper
+     * @param External_UserInterface $eu
+     * @param Mapper $userMapper
      */
     function __construct(Synchronise_Base_IHydrator $base, External_UserInterface $eu, UserMapper $userMapper)
     {
@@ -59,7 +59,7 @@ class Parents implements Synchronise_Base_IHydrator
         $newUser['defaultCampus'] = self::DEFAULT_PARENT_CAMPUS;
         $newUser['group_id'] = self::ROLE_PARENT;
 
-        $lookup   = $this->base instanceof Synchronise_Base_Hydrator_Spouse ? 'StudentContactSpouseID' : 'StudentContactID';
+        $lookup = $this->base instanceof Synchronise_Base_Hydrator_Spouse ? 'StudentContactSpouseID' : 'StudentContactID';
         $lookupId = $externalUser[$lookup];
 
         // BECAUSE THERE MIGHT NOT BE DATA! WHY WOULD THERE NOT BE DATA!?!?!
@@ -79,7 +79,7 @@ class Parents implements Synchronise_Base_IHydrator
         // extract the values from array, because every element is an array with ONE IRRELEVANTLY-NAMED ELEMENT in it...
         $children = new Collection();
 
-        foreach($enrolments as $child) {
+        foreach ($enrolments as $child) {
             try {
                 $children->add($this->userMapper->findByExternalId($child['RelatedID']));
             } catch (Exception $e) {
@@ -93,7 +93,7 @@ class Parents implements Synchronise_Base_IHydrator
 
         $childCampus = array();
 
-        foreach($children as $child) {
+        foreach ($children as $child) {
             /** @var User $child */
             $childCampus = array_merge($childCampus, $child->getCampusCollection()->getColumnValues('id'));
         }
