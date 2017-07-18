@@ -364,6 +364,12 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
+        /* User must supply name, types and years
+         */
+        if (!strlen(trim($post['name'])) || !count($post['types']) || !count($post['years'])) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
         /** @var PastoralReport $pastoralReport */
 
         if (empty($post['id'])) {
