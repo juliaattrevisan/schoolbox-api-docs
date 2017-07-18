@@ -41,6 +41,7 @@ class Mapper extends BaseMapper
      */
     public function findTabsForUser($user)
     {
+        //var_dump($user);
         $campusList = array();
         foreach ($user->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
@@ -56,6 +57,15 @@ class Mapper extends BaseMapper
             $webmail = "AND menu_top.webmail = 0";
         }
 
+        $eportfolio = "";
+
+        var_dump($user->getEportfolioEnable());
+
+        if(!$user->getEportfolioEnable())
+        {
+            $eportfolio = "AND menu_top.text NOT like 'ePortfolio'";
+        }
+
         $query = "
                 SELECT DISTINCT {$this->getColumnString()}
                 FROM menu_top
@@ -65,6 +75,7 @@ class Mapper extends BaseMapper
                 AND menu_top_role.role_id = :roleId    
                 AND menu_top.deleted_at IS NULL
                 {$webmail}
+                {$eportfolio}
                 ORDER BY sort_order ASC
         ";
 
