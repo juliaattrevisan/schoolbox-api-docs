@@ -107,8 +107,9 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
             $status = $object->getStatus();
 
-            // if in a final state, don't add extra reminders
+            // if in a final state, rescind upcoming reminders
             if ($status->isApproved() || $status->isRejected()) {
+                $bundle->detach(self::TRIGGER_UPCOMING);
                 return;
             }
         }
