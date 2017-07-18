@@ -33,7 +33,7 @@ if ($sessionUser->isSuperuser()) {
 		'CONFIG_URGENT_THRESHOLD' => $allConfigs->getBy('name', 'urgent_threshold')->getValue(),
 		'CONFIG_POLICY' => $allConfigs->getBy('name', 'policy')->getValue(),
 		'CONFIG_RAMS_WARNING' => $allConfigs->getBy('name', 'rams_warning')->getValue(),
-        'CONFIG_EXTERNAL_DB_SYNC' => $allConfigs->getBy('name', 'external_db_sync')->getValue()
+        'CONFIG_EXTERNAL_DB_SYNC_CHECKED' => $allConfigs->getBy('name', 'external_db_sync')->getValue() == 1 ? 'checked' : ''
 	]);
 }
 else {
