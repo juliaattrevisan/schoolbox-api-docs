@@ -148,7 +148,7 @@ class Controller extends Base
         if ($user->getId() == NULL) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
-        
+
         if ($this->getConfigLoader()->get('external_enable') && $this->getConfigLoader()->get('external_type') == 'synergetic' && $user->getExternalId() > 0) {
             $externalUser = $this->di->get('externalUser');
             $fileSemester = $externalUser->getCurrentSemester($user->getExternalId());
@@ -159,7 +159,8 @@ class Controller extends Base
         }
 
         $userPermissions = $this->userAccessMapper->findAllForUser($user);
-        $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)->indexBy('serviceIdentifier');
+        $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+                                            ->indexBy('serviceIdentifier');
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
@@ -436,7 +437,7 @@ class Controller extends Base
         if (is_array($post['campus'])) {
 
             $user->setCampusCollection(new GenericCollection(Campus::class));
-            
+
             foreach ($post['campus'] as $campusId) {
                 $campus = new Campus();
                 $campus->setId($campusId);
