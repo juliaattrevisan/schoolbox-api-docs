@@ -42,7 +42,8 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setModified(Alaress_Date_Format::now());
 
         // If the owner has been deleted - set new owner to the editor
-        if ($link->getOwner()->getId() === null) {
+        $owner = $link->getOwner();
+        if (!$owner || null === $owner->getId() || $owner->isDeleted()) {
             $link->setOwner($sessionUser->getId());
         }
 

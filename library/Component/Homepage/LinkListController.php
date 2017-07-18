@@ -14,7 +14,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      *
      * @var Schoolbox\Resource\LinkMapper
      */
-    private $linkMapper = null;
+    private $linkMapper;
 
     /**
      * Available sort fields for this component.
@@ -30,7 +30,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      */
     public function execute()
     {
-        $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
+        $this->linkMapper = \Schoolbox\Resource\LinkMapper::getInstance();
 
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
@@ -67,7 +67,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         ]);
 
         /** @var Schoolbox\Resource\Link[] $allLinks */
-        $allLinks = $this->getLinkMapper()->findAllInCategory(
+        $allLinks = $this->linkMapper->findAllInCategory(
             $this->getSource(),
             array(
                 'size' => $this->getConfig('size'),
@@ -114,6 +114,8 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->setBlock('source_folder_exists', 'link', 'link_block');
             $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
             $this->setBlock('link', 'modify_link', 'modify_link_block');
+            $this->setBlock('link', 'owner_exists', 'owner_exists_block');
+            $this->setBlock('link', 'owner_deleted', 'owner_deleted_block');
 
             $this->setVar('empty_state_block', '');
 
@@ -123,7 +125,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
                 $this->setVar([
                     'source_folder_deleted_block' => '',
-                    'link_block' => '',
+                    'link_block'                  => '',
                 ]);
 
                 foreach ($allLinks as $currentLink) {
@@ -142,6 +144,15 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                         'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
                         'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
                     ]);
+
+                    // Owner name and optional link
+                    if ($currentLink->getOwner()->isDeleted()) {
+                        $this->setVar('owner_exists_block', '');
+                        $this->parse('owner_deleted_block', 'owner_deleted');
+                    } else {
+                        $this->parse('owner_exists_block', 'owner_exists');
+                        $this->setVar('owner_deleted_block', '');
+                    }
 
                     // Controls
                     if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -165,28 +176,5 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         }
 
         return true;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set link mapper
-     *
-     * @param \Schoolbox\Resource\LinkMapper $linkMapper
-     */
-    private function setLinkMapper($linkMapper)
-    {
-        $this->linkMapper = $linkMapper;
-    }
-
-    /**
-     * Get link mapper
-     *
-     * @return \Schoolbox\Resource\LinkMapper
-     */
-    private function getLinkMapper()
-    {
-        return $this->linkMapper;
     }
 }
