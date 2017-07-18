@@ -126,7 +126,21 @@
             rules: {
                 'name': 'required',
                 'types[]': 'required',
-                'years[]': 'required'
+                'years[]': 'required',
+                'after': {
+                    datepickerDate: {
+                        depends: function (element) {
+                            return $(element).val().length > 0;
+                        }
+                    }
+                },
+                'before': {
+                    datepickerDate: {
+                        depends: function (element) {
+                            return $(element).val().length > 0;
+                        }
+                    }
+                }
             },
             messages: {
                 'types[]': 'You must select at least one record type to show in the report',
