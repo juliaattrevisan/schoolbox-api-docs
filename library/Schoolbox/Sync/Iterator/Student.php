@@ -44,11 +44,21 @@ class Student extends IteratorIterator
 
 
     /**
-     * @return void
+     * @inheritdoc
      */
     public function next()
     {
         $this->getInnerIterator()->next();
+        $this->loadCurrent();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function rewind()
+    {
+        parent::rewind();
         $this->loadCurrent();
     }
 
