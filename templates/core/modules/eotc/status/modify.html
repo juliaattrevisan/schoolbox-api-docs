@@ -1,3 +1,41 @@
+<script type="text/javascript">
+    $(function() {
+        var approvedStatusId = 5;
+
+        var seriesData = {
+            num: '{SERIES_EVENTS_NUM}',
+            description: '{SERIES_EVENTS_DESCRIPTION}, beginning {EVENT_REC_START} and ending {EVENT_REC_END}'
+        };
+
+        $('#submitChangeStatus').on('click', function(event) {
+            event.preventDefault();
+
+            var form = $('#changeStatusForm');
+
+            /* Confirm all recurring events when status changes to Approved
+             * and when Sync is enabled
+             */
+            var isApproved = form.find('select[name=statusId]').val() == approvedStatusId;
+            var isSyncEnabled = {SYNC_ENABLED};
+
+            /* Warn that you're about to mass-synchronise only if external db sync is on
+             * and that you have events in a series otherwise don't worry
+             */
+            if (isSyncEnabled && isApproved) {
+                $(this).confirmDialog({
+                    text: 'There are '  + seriesData.num + ' events in a recurring series which repeats ' + seriesData.description + '. Are you sure you want to synchronise these events into your SIS?',
+                    confirmEvent: function() {
+                        form.submit();
+                    }
+                });
+            }
+            else {
+                form.submit();
+            }
+        });
+    });
+</script>
+
 <ul class="breadcrumb">
     <li><a href="/modules/eotc/review" title="{TPL_LOCAL_EOTC_PLURAL_PC}">{TPL_LOCAL_EOTC_PLURAL_PC}</a></li>
     <li class="active"><a href="#">{EVENT_TITLE}</a></li>
@@ -183,7 +221,7 @@
     <div class="small-12 island">
         <h2 class="subheader">Change Event Status</h2>
 
-        <form action="/modules/eotc/status/modifyForm.php" method="post">
+        <form action="/modules/eotc/status/modifyForm.php" method="post" id="changeStatusForm">
             <input name='eventId' type="hidden" value="{EVENT_ID}">
 
             <section>
@@ -203,7 +241,7 @@
                 </fieldset>
             </section>
 
-            <input type="submit" value="Update" />
+            <input id='submitChangeStatus' type="submit" value="Update" />
         </form>
     </div>
 </div>

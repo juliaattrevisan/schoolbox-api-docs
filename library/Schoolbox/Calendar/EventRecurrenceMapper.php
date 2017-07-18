@@ -104,6 +104,7 @@ class EventRecurrenceMapper
 
         if (isset($recurMap[$diff])) {
             return array(
+                'num'   => count($series),
                 'freq'  => $recurMap[$diff],
                 'start' => $dateFirst,
                 'end'   => $dateLast
@@ -111,6 +112,7 @@ class EventRecurrenceMapper
         }
 
         return array(
+            'num'   => count($series),
             'freq'  => 'periodically',
             'start' => $dateFirst,
             'end'   => $dateLast
