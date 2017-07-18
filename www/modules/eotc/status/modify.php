@@ -111,6 +111,11 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     } else {
         $this->setVar(
             array(
+                'SERIES_EVENTS_NUM' => 0,
+                'SERIES_EVENTS_DESCRIPTION' => '',
+                'EVENT_REC_FREQ'  => '',
+                'EVENT_REC_START' => '',
+                'EVENT_REC_END'   => '',
                 'recurring_reminder_block' => ''
             )
         );

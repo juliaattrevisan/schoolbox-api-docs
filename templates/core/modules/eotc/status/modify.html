@@ -3,7 +3,7 @@
         var approvedStatusId = 5;
 
         var seriesData = {
-            num: '{SERIES_EVENTS_NUM}',
+            num: {SERIES_EVENTS_NUM},
             description: '{SERIES_EVENTS_DESCRIPTION}, beginning {EVENT_REC_START} and ending {EVENT_REC_END}'
         };
 
@@ -21,7 +21,7 @@
             /* Warn that you're about to mass-synchronise only if external db sync is on
              * and that you have events in a series otherwise don't worry
              */
-            if (isSyncEnabled && isApproved) {
+            if (isSyncEnabled && isApproved && seriesData.num) {
                 $(this).confirmDialog({
                     text: 'There are '  + seriesData.num + ' events in a recurring series which repeats ' + seriesData.description + '. Are you sure you want to synchronise these events into your SIS?',
                     confirmEvent: function() {
