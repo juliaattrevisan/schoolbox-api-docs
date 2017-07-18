@@ -16,9 +16,12 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
+use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
+use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -43,6 +46,8 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws \InvalidArgumentException if any sub-rule is not a IAuthorizationRule
+     * @throws Unauthorized If auth rule fails
      */
     protected function registerRoutes()
     {
@@ -50,35 +55,9 @@ class Module extends BaseModule
         $preloadResponse        = function (array $params) { return $this->preloadResponseWithFeedback($params); };
         $preloadPlagscanWithAss = function (array $params) { return $this->preloadPlagscanWithAssessment($params); };
 
-        /**
-         * @param $params['response'] IResponse
-         * @param $params['assessment'] IAssessable
-         */
-        $hasWriteAccess = new Rule\HasHomepageAccess(
-            UserAccess::ACCESS_WRITE,
-            function ($params) {
-                if ($params['response'] instanceof IResponse) {
-                    return $params['response']->getAssessable()->getContext()->getFolder()->getId();
-                } elseif ($params['assessment'] instanceof IAssessable) {
-                    return $params['assessment']->getContext()->getFolder()->getId();
-                } elseif ($params['contextId']) {
-                    return $params['contextId'];
-                } else {
-                    throw new Unauthorized();
-                }
-            },
-            Access::getInstance()
-        );
+        $hasWriteAccess = $this->buildRuleHasWriteAccess();
 
-        /**
-         * @param $params['response'] IResponse
-         * @param $params['assessment'] IAssessable
-         * @param $params['participant'] Participant
-         */
-        $hasWriteOrIsParticipant = new Rule\Any(
-            $hasWriteAccess,
-            new IsParticipant()
-        );
+        $canAccessCrocodoc = $this->buildRuleCanAccessCrocodoc();
 
         $hasPlagscanAccess = new Rule\Any(
             $hasWriteAccess,
@@ -99,11 +78,64 @@ class Module extends BaseModule
 
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
 
-        $this->register('GET', $crocodocPattern . '/download',  'getCrocodocDownload', $hasWriteOrIsParticipant, $preloadResponse); // a || r
-        $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $hasWriteOrIsParticipant, $preloadResponse); // a || r
+        $this->register('GET', $crocodocPattern . '/download',  'getCrocodocDownload', $canAccessCrocodoc, $preloadResponse); // a || r
+        $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $canAccessCrocodoc, $preloadResponse); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/{contextId:\d+}/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
+    }
+
+
+    /**
+     * Builds an auth rule determining if current user has WRITE+ perm to assessment's folder
+     *
+     * @return Rule\HasHomepageAccess
+     * @throws Unauthorized If current user lacks write access to assessment folder
+     */
+    private function buildRuleHasWriteAccess()
+    {
+        return new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
+            function ($params) {
+                if ($params['response'] instanceof IResponse) {
+                    return $params['response']->getAssessable()->getContext()->getFolder()->getId();
+                }
+                if ($params['assessment'] instanceof IAssessable) {
+                    return $params['assessment']->getContext()->getFolder()->getId();
+                }
+                if ($params['contextId']) {
+                    return $params['contextId'];
+                }
+                throw new Unauthorized();
+            },
+            Access::getInstance()
+        );
+    }
+
+
+    /**
+     * Returns an auth rule determining if current user can view/download an
+     * annotated student submission file (aka 'crocodoc').
+     *
+     * Permitted if user is either of:
+     * * SuperUser,
+     * * Have WRITE+ perm to assessment's folder
+     * * Student who submitted the file and students can view feedback
+     * * Parent of student who submitted file, and parents can view feedback
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws \InvalidArgumentException if any sub-rule is not a IAuthorizationRule
+     * @throws Unauthorized If current user not permitted to access the crocodoc
+     */
+    private function buildRuleCanAccessCrocodoc()
+    {
+        // And combine - ensuring parent check is last
+        return new Rule\Any(
+            new Rule\IsSuperuser(),
+            $this->buildRuleHasWriteAccess(),
+            new ParentCanViewFeedback(),
+            new StudentCanViewFeedback()
+        );
     }
 
 

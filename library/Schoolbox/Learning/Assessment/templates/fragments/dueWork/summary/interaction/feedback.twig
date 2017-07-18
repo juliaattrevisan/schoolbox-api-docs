@@ -95,7 +95,15 @@
                          # responseId comes from the twig that includes this fragment
                          #}
                         {% if currentFile.crocodocId|length %}
-                            {% set crocodocRoute = routeLookupIfAuthorized('learningResponse.getCrocodocView', {assessmentId: currentFeedback.assessable.id, assessment: assessment, responseId: responseId, feedbackId: currentFeedback.id, crocodocId: currentFile.crocodocId, participant: participant}) %}
+                            {% set crocodocRoute = routeLookupIfAuthorized('learningResponse.getCrocodocView', {
+                                assessmentId: currentFeedback.assessable.id,
+                                assessment:   assessment,
+                                responseId:   responseId,
+                                feedbackId:   currentFeedback.id,
+                                feedback:     currentFeedback,
+                                crocodocId:   currentFile.crocodocId,
+                                participant:  participant
+                            }) %}
 
                             {% if crocodocRoute %}
                                 <a href="{{ crocodocRoute }}">

@@ -49,11 +49,13 @@
     <nav>
         <a href="{{ routeLookup('learningResponse.getCrocodocDownload', {
             assessmentId: response.assessable.id,
-            response: response,
-            responseId: response.id,
-            feedbackId: feedback.id,
-            crocodocId: file.crocodocId}
-        ) }}" class="icon-download" title="Download"></a>
+            assessment:   response.assessable,
+            response:     response,
+            responseId:   response.id,
+            feedbackId:   feedback.id,
+            feedback:     feedback,
+            crocodocId:   file.crocodocId
+        }) }}" class="icon-download" title="Download"></a>
     </nav>
 </div>
 
