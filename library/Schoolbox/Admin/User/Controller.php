@@ -159,7 +159,7 @@ class Controller extends Base
         }
 
         $userPermissions = $this->userAccessMapper->findAllForUser($user);
-        $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE);
+        $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)->indexBy('serviceIdentifier');
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
