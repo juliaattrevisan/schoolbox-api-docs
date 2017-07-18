@@ -43,7 +43,7 @@ class Result extends Base
                 `{$mapper->getTable()}` `f`
                 LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
                 LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
-                LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
+                LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o', true)}
                 INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
             WHERE
                 f.deleted_at IS NULL

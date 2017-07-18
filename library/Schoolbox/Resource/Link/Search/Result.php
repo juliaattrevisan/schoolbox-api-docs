@@ -39,7 +39,7 @@ class Result extends Base
                 MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
             FROM
                 `{$mapper->getTable()}` `l`
-                LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
+                LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u', true)}
                 INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
             WHERE
                 l.deleted_at IS NULL
