@@ -124,23 +124,13 @@
 
         $('#formReport').alaressValidate({
             rules: {
-                'name': {
-                    required: true
-                },
-                'types[]': {
-                    required: true
-                },
-                'years[]': {
-                    required: true
-                }
+                'name': 'required',
+                'types[]': 'required',
+                'years[]': 'required'
             },
             messages: {
-                'types[]': {
-                    required: 'You must select at least one record type to show in the report'
-                },
-                'years[]': {
-                    required: 'You must select at least one year level to show in the report'
-                }
+                'types[]': 'You must select at least one record type to show in the report',
+                'years[]': 'You must select at least one year level to show in the report'
             },
             errorPlacement: function(error, element) {
                 if ((element.attr('name') == 'types[]') || (element.attr('name') == 'years[]')) {
