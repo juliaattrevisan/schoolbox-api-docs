@@ -32,7 +32,7 @@
             error.insertBefore(element.closest(parentSearch).find('input[type=checkbox]:first-of-type, input[type=radio]:first-of-type'));
 
         } else if (element.closest('.input-group').length) {
-            error.insertAfter(element.closest('.input-group'))
+            error.insertAfter(element.closest('.input-group'));
         } else {
             error.insertAfter(element);
         }
@@ -52,5 +52,5 @@
         };
         var config = $.extend({}, defaults, options || {});
         return this.validate(config);
-    }
+    };
 })(jQuery);
