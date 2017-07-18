@@ -57,9 +57,7 @@ class Mapper extends BaseMapper
         }
 
         $eportfolio = "";
-
-        var_dump($user->getEportfolioEnable());
-
+        
         if(!$user->getEportfolioEnable())
         {
             $eportfolio = "AND menu_top.text NOT like 'ePortfolio'";
