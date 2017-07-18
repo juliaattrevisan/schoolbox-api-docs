@@ -26,13 +26,13 @@ if ($sessionUser->isSuperuser()) {
     $allConfigs = $configMapper->findAll();
 
 	$firstReminder = $allConfigs->getBy('name', 'first_reminder');
-    $firstReminder->setValue($_POST['firstReminder']);
+    $firstReminder->setValue((int)$_POST['firstReminder']);
 
 	$dailyReminder = $allConfigs->getBy('name', 'daily_reminder');
-    $dailyReminder->setValue($_POST['dailyReminder']);
+    $dailyReminder->setValue((int)$_POST['dailyReminder']);
 
 	$urgentThreshold = $allConfigs->getBy('name', 'urgent_threshold');
-    $urgentThreshold->setValue($_POST['urgentThreshold']);
+    $urgentThreshold->setValue((int)$_POST['urgentThreshold']);
 
 	$policy = $allConfigs->getBy('name', 'policy');
     $policy->setValue($_POST['policy']);
@@ -41,7 +41,7 @@ if ($sessionUser->isSuperuser()) {
     $ramsWarning->setValue($_POST['ramsWarning']);
 
     $externalDbSync = $allConfigs->getBy('name', 'external_db_sync');
-    $externalDbSync->setValue($_POST['externalDbSync']);
+    $externalDbSync->setValue((int)$_POST['externalDbSync']);
 
 	$configMapper->save($firstReminder);
 	$configMapper->save($dailyReminder);
