@@ -233,7 +233,7 @@ if (isset($_GET["returnUrl"])) {
         $folderUrl = "/homepage/{$folder->getId()}";
     }
 } else {
-    $folderUrl = sprintf('/learning/grades/%d/%s/%d', $_SESSION['id'], $term->getCode(), $folder->getId());
+    $folderUrl = "/homepage/{$folder->getId()}";
 }
 
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
