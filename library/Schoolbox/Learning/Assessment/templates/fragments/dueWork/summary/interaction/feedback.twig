@@ -27,37 +27,32 @@
 {% endif %}
 
 <li {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row class="actions-small-1">
-    <div class="list-item">
-        <div class="card small-12 medium-8">
+    <div class="list-item flex-grade">
+        <div class="card small-12">
             {% if url %}
             <a href="{{ url }}" title="{{ tooltip }}">
             {% endif %}
-                <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="" class="hide-for-small-only">
-                <h3>
+                <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
+                <p>
                     {% if currentFeedback.published %}
-                        Feedback
+                        Feedback by {{ currentFeedback.reviewer.fullname }} |
                     {% else %}
-                        Draft Feedback
+                        Draft Feedback by {{ currentFeedback.reviewer.fullname }} |
                     {% endif %}
-                </h3>
-
-                <p class="meta">
-                    {{ currentFeedback.reviewer.fullname }}
-
-                    {% if currentFeedback.published %}
-                        on {{ currentFeedback.publishedAt.short }}
-                    {% else %}
-                        on {{ currentFeedback.updatedAt.short }}
-                    {% endif %}
+                    <span class="meta">
+                        {% if currentFeedback.published %}
+                            {{ currentFeedback.publishedAt.short }}
+                        {% else %}
+                            {{ currentFeedback.updatedAt.short }}
+                        {% endif %}
+                    </span>
                 </p>
             {% if url %}
             </a>
             {% endif %}
         </div>
-        <div class="small-12 medium-4 columns text-right">
-            <div class="grade content">
-                <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
-            </div>
+        <div class="grade">
+            <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
         </div>
     </div>
     {% set deleteRoute = routeLookupIfAuthorized(
@@ -84,13 +79,12 @@
     {% if currentFeedback.allFiles | length %}
         <ul class="information-list">
             {% for currentFile in currentFeedback.allFiles %}
-
             {# Only show published feedback and therefore also
              # only list files that are involved with a Published Feedback
              #}
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="small-12 card compact">
+                    <div class="card attachment small-12">
                         {# Crocodoc annotations have their own special url.
                          # responseId comes from the twig that includes this fragment
                          #}
@@ -107,25 +101,26 @@
 
                             {% if crocodocRoute %}
                                 <a href="{{ crocodocRoute }}">
-                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                                     <p>{{ currentFile.filename }}</p>
                                 </a>
                             {% endif %}
                         {% else %}
-                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" rel="external" data-plugin="preview">
-                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
-                                <p>{{ currentFile.filename }}</p>
+                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
+                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
+                                <p>{{ currentFile.filename }} </p>
                             </a>
                         {% endif %}
                     </div>
                 </div>
-                {% if currentFile.crocodocId|length %}
                 <nav>
-                    {% include '@learningResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
+                    {% if currentFile.crocodocId|length %}
+                        {% include '@learningResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
+                    {% else %}
+                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
+                    {% endif %}
                 </nav>
-                {% endif %}
             </li>
             {% endfor %}
-        </ul>
     {% endif %}
 </li>

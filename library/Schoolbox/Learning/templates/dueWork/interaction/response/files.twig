@@ -1,21 +1,24 @@
-<div class="list-item">
-    <div class="card small-12 compact">
-        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" rel="external" data-plugin="preview">
-            <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" class="mime" />
-            <p>{{ currentFile.filename }}</p>
+<li class="actions-small-1">
+    <div class="list-item">
+        <div class="card attachment small-12">
+            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
+                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
+                <p>{{ currentFile.filename }}</p>
 
-            {% include '@learning/dueWork/plagscan/status.twig' with {
-                currentFile: currentFile,
-                plagscanEnabled: plagscanEnabled,
-                assessment: assessment,
-                assessmentId: assessmentId,
-                participant: participant,
-                response: response,
-                plagscanId: plagscanId
-            } only %}
-        </a>
+                {% include '@learning/dueWork/plagscan/status.twig' with {
+                    currentFile: currentFile,
+                    plagscanEnabled: plagscanEnabled,
+                    assessment: assessment,
+                    assessmentId: assessmentId,
+                    participant: participant,
+                    response: response,
+                    plagscanId: plagscanId
+                } only %}
+            </a>
+        </div>
     </div>
-</div>
-<nav>
-    <a href="/storage/fetch.php?hash={{ currentFile.hash }}" class='icon-download' title="Download original"></a>
-</nav>
+    <nav>
+        <a href="/storage/fetch.php?hash={{ currentFile.hash }}" class='icon-download' title="Download"></a>
+    </nav>
+</li>
+

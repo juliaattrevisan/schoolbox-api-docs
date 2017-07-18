@@ -226,6 +226,24 @@
 			@include contrast-bg();
 		}
 	}
+	/*
+	* Currently, this needs to sit inside an .information-list li
+	* Has a strange width because .information-list li has negative margins
+	*/
+	&.attachment{
+		padding: 0.5rem;
+		width: calc(100% - 1rem);
+		a{
+			display: flex;
+			align-items: center;
+		}
+		img{
+			margin: 0rem 0.5rem 0 -0.25rem;
+			width: 3rem;
+			padding-right: 0.5rem;
+			border-right: 1px solid $gainsboro;
+		}
+	}
 
 	/* Marksheet Input Card
      * This displays the Mark and Comment that someone received
@@ -274,7 +292,6 @@
 	/* Force same font size, regardless of hierarchy
 	 * On extra-large viewports, restore native typography sizes
 	 */
-
 	h1,h2,h3,h4,h5,h6 {
 		margin-top: 0;
 		margin-bottom: 0;
@@ -330,5 +347,18 @@
 	width: 100%;
 	&:hover{
 		background-color: $content-ui-hover;
+	}
+}
+
+// Grades that sit along side of cards
+.flex-grade{
+	display: flex;
+	align-items: center;
+	.grade{
+		flex: 1 0 auto;
+		padding: 0 1rem;
+	}
+	@media #{$small-only} {
+		flex-wrap: wrap;
 	}
 }

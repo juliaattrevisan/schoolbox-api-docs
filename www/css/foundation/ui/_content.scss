@@ -1075,7 +1075,6 @@ $selector-width: 2.25rem;
 }
 
 .grade{
-    //min-height: 3rem;
     font-size: rem-calc(($base-font-size - 4));
     span {
         display: block;
@@ -1173,42 +1172,10 @@ $selector-width: 2.25rem;
 }
 
 // Threaded / Social Stream
-.threaded {
-    @include information-list;
-    .body{
-        margin: rem-calc(($base-font-size - 8)) 0 rem-calc(($base-font-size - 8)) 74px;
-        p{
-            margin: $paragraph-margin-bottom 0;
-        }
-    }
+.social-stream, .threaded {
 
-    .reply{
+    .reply  {
         background-color: $snow;
-        border-top: 1px solid $body-bg;
-        padding-left: 2rem;
-
-        @media #{$small-only} {
-            padding-left: 2.5rem;
-        }
-
-        .reply{
-            background-color: transparent;
-            padding-left: 1rem;
-            margin-left: 1rem;
-        }
-    }
-
-    @media #{$small-only} {
-        .body{
-            margin: rem-calc(($base-font-size - 8)) 0;
-        }
-    }
-}
-
-.social-stream {
-    @extend .threaded;
-
-    .reply {
         border-top: 0;
         border-left: 6px solid $base;
         padding-left: 1rem;
@@ -1225,6 +1192,7 @@ $selector-width: 2.25rem;
         }
 
         .reply {
+            background-color: transparent;
             margin-left: 1rem;
 
             li:first-child{
