@@ -123,29 +123,31 @@
 
                 </fieldset>
                 <fieldset class="content">
-                    <div class="small-12 medium-6 columns">
+                    <div class="small-12 medium-6 columns checklist">
                         <legend>
                             Roles
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This news item will only be visible to the roles you select">?</span>
                         </legend>
+                        <input type="checkbox" id="roleAll" value="{GROUP_ID}" name="" data-select-all data-select-all-for-group="role"  />
+                        <label for="roleAll" class="checkbox-label">Select all</label>
+
                         <!-- BEGIN group_selection -->
                         <input type="checkbox" id="role{GROUP_ID}" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED} data-select-all-group="role" />
                         <label for="role{GROUP_ID}" class="checkbox-label">{GROUP_NAME}</label>
                         <!-- END group_selection -->
-                        <input type="checkbox" id="roleAll" value="{GROUP_ID}" name="" data-select-all data-select-all-for-group="role"  />
-                        <label for="roleAll" class="checkbox-label">Select all</label>
                     </div>
                     <!-- BEGIN campus_row -->
-                    <div class="small-12 medium-6 columns">
+                    <div class="small-12 medium-6 columns checklist">
                         <legend>Campus
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This news item will only be visible to users that are within this campus">?</span>
                         </legend>
+                        <input type="checkbox" id="campusAll" value="{GROUP_ID}" name="" data-select-all data-select-all-for-group="campus" />
+                        <label for="campusAll" class="checkbox-label">Select all</label>
+
                         <!-- BEGIN campus_selection -->
                         <input type="checkbox" id="campus{CAMPUS_ID}" value="{CAMPUS_ID}" name="campus[]" {CAMPUS_ID_SELECTED} data-select-all-group="campus" />
                         <label for="campus{CAMPUS_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
                         <!-- END campus_selection -->
-                        <input type="checkbox" id="campusAll" value="{GROUP_ID}" name="" data-select-all data-select-all-for-group="campus" />
-                        <label for="campusAll" class="checkbox-label">Select all</label>
                     </div>
                     <!-- END campus_row -->
                     <div class="small-12 columns">

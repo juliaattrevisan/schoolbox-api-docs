@@ -18,7 +18,7 @@
         if (element.is('[data-radio-block]')) {
             element.parents('fieldset').find('div.error-placeholder').html(error);
         } else if (element.is('[type="checkbox"], [type="radio"]')) {
-            error.insertBefore(element);
+            error.insertBefore(element.closest('.checklist, .radiolist').find('input[type=checkbox]:first-of-type, input[type=radio]:first-of-type'));
         } else if (element.closest('.input-group').length) {
             error.insertAfter(element.closest('.input-group'))
         } else {
