@@ -107,8 +107,9 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
             $status = $object->getStatus();
 
-            // if in a final state, don't add extra reminders
+            // if in a final state, rescind upcoming reminders
             if ($status->isApproved() || $status->isRejected()) {
+                $bundle->detach(self::TRIGGER_UPCOMING);
                 return;
             }
         }
@@ -214,6 +215,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $relEventId    = $relEvent->getId();
         $relEventStart = $relEvent->getStartDateTime();
         $currentStatus = $eventMetadata->getStatus();
+
+        // Don't notify if event is in a final state.
+        // (Required because some notifs may be awaiting, and not rescinded)
+        // TODO is this able to be an int?
+        if ($currentStatus->isApproved() || $currentStatus->isRejected()) {
+            $this->log->notice("Event is in final state - no upcoming notification will be sent");
+            return $envelope;
+        }
 
         $userIds = $this->getInterestedUsers($relEvent, $currentStatus);
 
