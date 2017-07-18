@@ -148,7 +148,7 @@ class Controller extends Base
         if ($user->getId() == NULL) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
-        
+
         if ($this->getConfigLoader()->get('external_enable') && $this->getConfigLoader()->get('external_type') == 'synergetic' && $user->getExternalId() > 0) {
             $externalUser = $this->di->get('externalUser');
             $fileSemester = $externalUser->getCurrentSemester($user->getExternalId());
@@ -157,6 +157,10 @@ class Controller extends Base
             $fileSemester = '';
             $fileYear = '';
         }
+
+        $userPermissions = $this->userAccessMapper->findAllForUser($user);
+        $groupPermissions = $userPermissions->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+                                            ->indexBy('serviceIdentifier');
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
@@ -170,11 +174,11 @@ class Controller extends Base
                 'titles' => $this->userTitleMapper->findAll(),
                 'fileYear' => $fileYear,
                 'fileSemester' => $fileSemester,
-                'folders' => $this->folderMapper->findAll()->sortBy('name', 'asc'),
+                'allGroups' => $this->folderMapper->searchByName('', true)->sortBy('name', 'asc'),
                 'user' => $user,
-                'currentUser' => $this->getUser(),
-                'userAccess' => $this->userAccessMapper->findAllGroupsForUser($user),
-                'userPermissions' => $this->userAccessMapper->findAllForUser($user),
+                'userGroups' => $this->folderMapper->findForUser($user, false, UserAccess::ACCESS_READ),
+                'userGroupPermissions' => $groupPermissions,
+                'userPermissions' => $userPermissions,
                 'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), ['limit' => 10])->sortBy('date', 'desc'),
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
                     'order' => ['time' => 'desc'],
@@ -433,7 +437,7 @@ class Controller extends Base
         if (is_array($post['campus'])) {
 
             $user->setCampusCollection(new GenericCollection(Campus::class));
-            
+
             foreach ($post['campus'] as $campusId) {
                 $campus = new Campus();
                 $campus->setId($campusId);

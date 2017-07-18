@@ -202,7 +202,6 @@
     {# Group Access #}
 
     <div class="row">
-        <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
         <div class="small-12 island">
             <h3 class="subheader" id="groups">Groups</h3>
             <section>
@@ -215,58 +214,41 @@
                     </li>
 
                     {# Show all groups the user is a member of #}
-
-                    {% for folder in folders if folder.isGroup %}
-
-                        {% set readSelected = '' %}
-                        {% set writeSelected = '' %}
-                        {% set adminSelected = '' %}
-
-                        {% for access in userAccess if access.serviceIdentifier == folder.id %}
-
-                            <li class="actions-small-1" data-group>
-                                <div class="list-item">
-                                    <div class="card small-7">
-                                        <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
-                                    </div>
-                                    <div class="card small-5">
-                                        <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, service: 'service', sid: 'sid'}) }}" method="post">
-                                            {% if access.accessLevel == 1 %}
-                                                {% set readSelected = 'selected' %}
-                                            {% endif %}
-                                            {% if access.accessLevel == 2 %}
-                                                {% set writeSelected = 'selected' %}
-                                            {% endif %}
-                                            {% if access.accessLevel == 3 %}
-                                                {% set adminSelected = 'selected' %}
-                                            {% endif %}
-
-                                            <select name="type" data-autosubmit-group data-folder="{{ folder.id }}">
-                                                <option value="1" {{ readSelected }}>Read</option>
-                                                <option value="2" {{ writeSelected }}>Write</option>
-                                                <option value="3" {{ adminSelected }}>Group Admin</option>
-                                            </select>
-                                        </form>
-                                    </div>
+                    {% for folder in userGroups %}
+                        <li class="actions-small-1" data-group>
+                            <div class="list-item">
+                                <div class="card small-7">
+                                    <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
                                 </div>
-                                <nav>
-                                    <a href="#" data-delete-group="{{ folder.id }}" class="icon-delete" title="Remove"></a>
-                                </nav>
-                            </li>
-                        {% endfor %}
+                                <div class="card small-5">
+                                    <form action="{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: folder.id}) }}" method="post">
+                                        {% set perm = userGroupPermissions[folder.id].accessLevel %}
+                                        <select name="type" data-autosubmit-group data-folder="{{ folder.id }}" title="Access">
+                                            <option value="1" {% if perm == 1 %}selected{% endif %}>Read</option>
+                                            <option value="2" {% if perm == 2 %}selected{% endif %}>Write</option>
+                                            <option value="3" {% if perm == 3 %}selected{% endif %}>Group Admin</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="#" data-delete-group="{{ folder.id }}" class="icon-delete" title="Remove"></a>
+                            </nav>
+                        </li>
                     {% endfor %}
 
                     <li class="actions-small-1">
+                        <form action="{{ routeLookup('adminUser.postInsertGroup', {userId: user.id }) }}" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
                             <div class="card small-7">
-                                <select required name="sid" id="groupSelect" form="groupAdd" class="required">
+                                <select required name="sid" id="groupSelect" form="groupAdd" class="required" title="Group">
                                     <option value="">Select a Group</option>
-                                    {% for folder in folders if folder.isGroup %}
+                                    {% for folder in allGroups %}
                                         <option value="{{ folder.id }}">{{ folder.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="card small-5 end">
-                                <select required name="type" form="groupAdd">
+                                <select required name="type" form="groupAdd" title="Access">
                                     <option value="1">Read</option>
                                     <option value="2">Write</option>
                                     <option value="3">Group Admin</option>
@@ -324,8 +306,7 @@
                                     {% endif %}
                                 </div>
                                 <div class="small-4 card">
-                                    <form action="{{ routeLookup('adminUser.postUpdateService') }}" method="post" class="updateServicesForm">
-                                        <input type="hidden" name="uid" value="{{ user.id }}"/>
+                                    <form action="{{ routeLookup('adminUser.postUpdateService', {userId: user.id, service: permission.service, sid: permission.serviceIdentifier}) }}" method="post" class="updateServicesForm">
                                         <input type="hidden" name="sid" value="{{ permission.serviceIdentifier }}"/>
                                         <input type="hidden" name="service" value="{{ permission.service }}"/>
                                         <input type="hidden" name="updateServices" value="1"/>
@@ -541,7 +522,7 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
-                                Message from {{ currentUser.fullName }}
+                                Message from {{ USER.fullName }}
                                 <input type="text" value="" name="body"/>
                             </label>
                         </div>
@@ -728,24 +709,15 @@
             {# AJAX submission of groups #}
 
             $(':input[data-autosubmit-group]').change(function () {
-                var form = $(this.form);
-                var folderId = $(this).data('folder');
-
-                $.post('{{ routeLookup('adminUser.postUpdateGroup', {userId: user.id, folderId: 'folderId'}) }}'.replace(/folderId/g, folderId), form.serializeArray());
+                var form = $(this).parents('form:first');
+                $.post(form.attr('action'), form.serializeArray());
             });
 
             {# AJAX submission of services #}
 
             $(':input[data-autosubmit-service]').change(function () {
-                var form = $(this.form);
-                var service = $(this).data('service');
-                var sid = $(this).data('sid');
-
-                $.post('{{ routeLookup('adminUser.postUpdateService', {userId: user.id, service: 'service', sid: 'sid'}) }}'
-                        .replace(/service/g, service)
-                        .replace(/sid/g, sid),
-                    form.serializeArray()
-                );
+                var form = $(this).parents('form:first');
+                $.post(form.attr('action'), form.serializeArray());
             });
 
             {# Hide campus selector if user selected a service that doesn't use them #}
