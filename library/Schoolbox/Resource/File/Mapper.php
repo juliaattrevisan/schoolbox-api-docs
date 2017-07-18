@@ -72,7 +72,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      *
      * @return Collection|Model[]
      */
-    public function findForFolders($folderIds, $options = array())
+    public function findForFolders($folderIds, array $options = [])
     {
         $name          = isset($options['name']) ? $options['name'] : '';
         $limit         = !empty($options['size']) ? intval($options['size']) : 0;

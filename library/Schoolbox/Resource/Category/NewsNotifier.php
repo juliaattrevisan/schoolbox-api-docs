@@ -170,7 +170,9 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 			->setByline("$shortDate by $authorName in $catName")
 			->setBody($news->getBody())
 			->setParams([
-				'user' => new UserParam($user),
+				'user' => $user->isDeleted()
+                    ? new Param($user->formatName())
+                    : new UserParam($user),
 				'title' => new Param($heading, $href),
 				'catname' => new CategoryParam($cat)
 			]);

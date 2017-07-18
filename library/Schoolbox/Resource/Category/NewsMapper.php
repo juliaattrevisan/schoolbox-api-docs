@@ -9,112 +9,127 @@
 
 namespace Schoolbox\Resource\Category;
 
-
+use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Searchable;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
+/**
+ * @method News hydrate(array $row, $alias = '', $callback = null)
+ */
 class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 
-	/**
-	 * @return void
-	 */
-	protected function mapping() {
-		$this->hasTable('subject_news');
-		$this->hasModel(News::class);
+    /**
+     * @return void
+     * @throws Mapper\DefinitionException If an invalid join name is specified
+     */
+    protected function mapping()
+    {
+        $this->hasTable('subject_news');
+        $this->hasModel(News::class);
 
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('heading', self::TYPE_STRING);
+        $this->uses('datetime_posted', self::TYPE_DATETIME, null, 'postDate');
+        $this->uses('datetime_published', self::TYPE_DATE, null, 'publishDate');
+        $this->uses('datetime_expires', self::TYPE_DATE, null, 'expiryDate');
+        $this->uses('body', self::TYPE_STRING);
+        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
 
-		$this->hasMap(array(
-			'column'     => 'heading',
-			'property'   => 'heading',
-			'type'       => self::TYPE_STRING
-		));
-
-		$this->hasMap(array(
-			'column'     => 'datetime_posted',
-			'property'   => 'postDate',
-			'type'       => self::TYPE_DATETIME
-		));
-
-		$this->hasMap(array(
-			'column'     => 'datetime_published',
-			'property'   => 'publishDate',
-			'type'       => self::TYPE_DATETIME
-		));
-
-		$this->hasMap(array(
-			'column'     => 'datetime_expires',
-			'property'   => 'expiryDate',
-			'type'       => self::TYPE_DATETIME
-		));
-
-		$this->hasMap(array(
-			'column'     => 'body',
-			'property'   => 'body',
-			'type'       => self::TYPE_STRING
-		));
-
-		$this->hasMap(array(
-			'column'     => 'deleted',
-			'property'   => 'deleted',
-			'type'       => self::TYPE_BOOLEAN
-		));
-
-		$this->hasMap(array(
-			'column'     => 'code',
-			'property'   => 'category',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'folder'
-		));
-
-		$this->hasMap(array(
-			'column'     => 'owner',
-			'property'   => 'owner',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'owner'
-		));
-
-		$this->hasJoin('owner', array(
-			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'owner',
-			'other_key' => 'id'
-		));
-
-		$this->hasJoin('folder', array(
-			'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-			'this_key'  => 'code',
-			'other_key' => 'id'
-		));
-
-		$this->hasJoin('perms', array(
-			'mapper'    => '\Schoolbox\Permission\Access\RoleAccessMapper',
-			'this_key'  => 'code',
-			'other_key' => 'cid'
-		));
-
-		$this->hasJoin('userAccess', array(
-			'mapper'    => '\Schoolbox\Permission\Access\UserAccessMapper',
-			'this_key'  => 'code',
-			'other_key' => 'sid'
-		));
-
-		$this->hasSoftDeleteBooleanField('deleted');
-
-	}
+        $this->joins('code', Folder\Mapper::class, 'id', null, null, 'category', 'folder');
+        $this->joins('owner', UserMapper::class, 'id', null, null, 'owner', 'owner');
 
 
-	/**
-	 * Performs a search with the given parameters, and returns a Collection of the resultant set.
+        $this->hasJoin('perms', [
+            'mapper'    => RoleAccessMapper::class,
+            'this_key'  => 'code',
+            'other_key' => 'cid',
+        ]);
+
+        $this->hasJoin('userAccess', [
+            'mapper'    => UserAccessMapper::class,
+            'this_key'  => 'code',
+            'other_key' => 'sid',
+        ]);
+    }
+
+
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('folder', 'f')},
+                {$this->getJoinColumnString('owner', 'o')}
+            FROM {$this->database->quoteIdentifier($this->table)}
+            LEFT JOIN {$this->getJoinSql('owner', '', 'o', true)}
+            INNER JOIN {$this->getJoinSql('folder', '', 'f')}
+        ";
+    }
+
+
+    /**
+     * @param \PDOStatement $statement
+     * @return GenericCollection|News[]
+     */
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while($row = $statement->fetch(PDO::FETCH_ASSOC)){
+            $news = $this->hydrate($row);
+
+            /** @var Folder\Model $folder */
+            $folder = $this->hydrateJoin($row, 'folder', 'f');
+            $news->setCategory($folder);
+
+            /** @var User $user */
+            $user = $this->hydrateJoin($row, 'owner', 'o');
+            $news->setOwner($user);
+            $collection[$news->getId()] = $news;
+        }
+
+        return $collection;
+    }
+
+
+    /**
+     * Finds all non-archived news items in specified folder
+     *
+     * @param int      $folderId
+     * @param null|int $limit
+     * @return GenericCollection|News[]
+     */
+    public function findForFolder($folderId, $limit = null)
+    {
+        if (0 === $limit) {
+            return $this->createCollection();
+        }
+
+        $pb = $this->getPredicateBuilder();
+        $pb->equals('code', $folderId);
+        $pb->greaterThanOrEqualTo('datetime_expires', \Alaress_Date_Format::now());
+
+        $options = [];
+        if (null !== $limit) {
+            $options['limit'] = $limit;
+        }
+
+        return $this->findByPredicates($pb, $options);
+    }
+
+    /**
+     * Performs a search with the given parameters, and returns a Collection of the resultant set.
 	 *
 	 * @param User $user
 	 * @param string $keyword
@@ -204,7 +219,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 			FROM
 				`{$this->getTable()}` `n`
 				INNER JOIN {$this->getJoinSql('folder', 'n', 'c')}
-				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u')}
+				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u', true)}
 			WHERE
 				`n`.`deleted` = FALSE
 				AND `n`.`datetime_published` < :time

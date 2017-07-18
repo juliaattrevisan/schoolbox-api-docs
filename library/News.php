@@ -228,7 +228,7 @@ class News extends DeprecatedModel
             UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, item_image,
             news_items.item_datetime_posted, news_items.item_datetime_modified, news_items.item_datetime_published,
             UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
-            user.lastname, user.title, user.id as uid, user.firstname, user.synergy_id synid, newsTopic.name topicName, newsTopicID, sequence
+            user.lastname, user.title, user.id as uid, user.firstname, user.synergy_id synid, user.deleted_at AS 'u.deleted_at', newsTopic.name topicName, newsTopicID, sequence
          FROM `" . $this->_table . "`
          LEFT JOIN user ON news_items.item_owner = user.id
          JOIN newsCampus ON newsCampus.id = news_items.item_id
@@ -254,7 +254,7 @@ class News extends DeprecatedModel
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_blurb, news_items.item_body, item_image,
 			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime, news_items.item_datetime_published,
-			user.lastname, user.title, user.firstname, user.id as uid, user.synergy_id synid, newsTopic.name topicName, newsTopicID, sequence
+			user.lastname, user.title, user.firstname, user.id as uid, user.synergy_id synid, user.deleted_at AS 'u.deleted_at', newsTopic.name topicName, newsTopicID, sequence
 		FROM `" . $this->_table . "`
 		LEFT JOIN user ON news_items.item_owner = user.id
         LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id

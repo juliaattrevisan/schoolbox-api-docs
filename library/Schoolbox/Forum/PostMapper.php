@@ -152,7 +152,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
                 {$this->getJoinColumnString('owner', 'o')},
                 {$this->getJoinColumnString('thread', 't')}
             FROM `{$this->getTable()}` p
-              LEFT JOIN {$this->getJoinSql('owner', 'p', 'o')}
+              LEFT JOIN {$this->getJoinSql('owner', 'p', 'o', true)}
               LEFT JOIN {$this->getJoinSql('thread', 'p', 't')}
             WHERE p.deleted = 'false'
             AND t.categoryID = :cat

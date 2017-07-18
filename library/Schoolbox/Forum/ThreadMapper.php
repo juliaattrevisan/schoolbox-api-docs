@@ -205,7 +205,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
                 {$this->getColumnString('t')},
                 {$this->getJoinColumnString('owner', 'o')}
             FROM `{$this->getTable()}` t
-              LEFT JOIN {$this->getJoinSql('owner', 't', 'o')}
+            LEFT JOIN {$this->getJoinSql('owner', 't', 'o', true)}
             WHERE t.deleted = 'false'
             AND t.categoryID = :cat
             AND t.date < :time

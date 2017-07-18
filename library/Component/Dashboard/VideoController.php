@@ -4,13 +4,15 @@
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+use Schoolbox\Collection;
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Video\ResourceVideo;
 
 class Component_Dashboard_VideoController extends Component_Dashboard_ControllerAbstract
 {
 
     /**
-     * @var \Schoolbox\Collection
+     * @var Collection|ResourceVideo[]
      */
     protected $outputList;
 
@@ -100,6 +102,8 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
         $this->setBlock($templateHandle, 'video_list', 'video_list_block');
         $this->setBlock($templateHandle, 'video_pending_list', 'video_pending_list_block');
         $this->setBlock('video_list', 'video_list_comment', 'video_list_comment_block');
+        $this->setBlock('video_list', 'owner_exists', 'owner_exists_block');
+        $this->setBlock('video_list', 'owner_deleted', 'owner_deleted_block');
         $this->setBlock('video_pending_list', 'video_pending_comment', 'video_pending_comment_block');
 
         $this->setVar('video_list_block', '');
@@ -128,7 +132,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
                 $comment = Scrub::text($video->getFile()->getDescription());
 
-                if ($video->getStatus() == "completed") {
+                if ($video->getStatus() === "completed") {
                     if (strlen($comment)) {
                         $this->setVar(array(
                             'VIDEO_LIST_COMMENT' => $comment
@@ -169,6 +173,15 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                     }
                 }
 
+                // Owner name and optional link
+                if($video->getFile()->getOwner()->isDeleted()){
+                    $this->setVar('owner_exists_block', '');
+                    $this->parse('owner_deleted_block', 'owner_deleted');
+                } else {
+                    $this->parse('owner_exists_block', 'owner_exists');
+                    $this->setVar('owner_deleted_block', '');
+                }
+
                 /* Clear children after parsing out the parent
                  */
                 $this->setVar(array(
@@ -178,7 +191,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
             }
         }
 
-        if (is_object($this->defaultVideo) && $this->defaultVideo->getStatus() == 'completed') {
+        if (is_object($this->defaultVideo) && $this->defaultVideo->getStatus() === 'completed') {
             $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
             $this->parse('default_video_block', 'default_video');
         } else {

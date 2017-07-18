@@ -30,7 +30,17 @@
                                     <img src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
                                     <p>{VIDEO_LIST_TITLE}</p>
                                 </a>
-                                <p class="meta">{VIDEO_LIST_DURATION} | Posted by <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></p>
+                                <p class="meta">{VIDEO_LIST_DURATION} | Posted by
+
+                                    <!-- BEGIN owner_exists -->
+                                    <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
+                                    <!-- END owner_exists -->
+
+                                    <!-- BEGIN owner_deleted -->
+                                    {VIDEO_LIST_POSTER}
+                                    <!-- END owner_deleted -->
+
+                                </p>
                             </div>
                         </div>
                         <!-- BEGIN video_list_comment -->

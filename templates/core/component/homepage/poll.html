@@ -51,7 +51,15 @@
                                     <img src="{POLL_AUTHOR_THUMB}" alt="View Profile" />
                                     <h3>{POLL_QUESTION}</h3>
                                 </a>
-                                <p class="meta">Posted by <a href="/search/user/{POLL_AUTHOR_ID}">{POLL_AUTHOR_NAME}</a> {POLL_CREATED}</p>
+                                <p class="meta">Posted by
+                                    <!-- BEGIN owner_exists -->
+                                    <a href="/search/user/{POLL_AUTHOR_ID}">{POLL_AUTHOR_NAME}</a>
+                                    <!-- END owner_exists -->
+                                    <!-- BEGIN owner_deleted -->
+                                    {POLL_AUTHOR_NAME}
+                                    <!-- END owner_deleted -->
+                                    {POLL_CREATED}
+                                </p>
                             </div>
                         </div>
                         <!-- BEGIN poll_vote -->

@@ -125,7 +125,13 @@
                                         <h3>{AUDIO_LIST_TITLE}</h3>
                                     </a>
                                     <p class="meta">
-                                        ({AUDIO_LIST_DURATION}) Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a>
+                                        ({AUDIO_LIST_DURATION}) Posted by
+                                        <!-- BEGIN owner_exists -->
+                                        <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a>
+                                        <!-- END owner_exists -->
+                                        <!-- BEGIN owner_deleted -->
+                                        {AUDIO_LIST_POSTER}
+                                        <!-- END owner_deleted -->
                                     </p>
                                 </div>
                             </div>

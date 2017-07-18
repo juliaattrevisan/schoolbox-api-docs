@@ -2,11 +2,20 @@
 <li class="actions-small-2" data-socialstream-row xmlns="http://www.w3.org/1999/html">
     <div class="list-item">
         <div class="card small-12">
+
+            <!-- BEGIN owner_exists -->
             <a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" title="View Profile">
                 <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
                 <p>{SOCIALSTREAM_POST_USER_FULLNAME}</p>
                 <p class="meta">Posted {SOCIALSTREAM_POST_CREATED_AT}</p>
             </a>
+            <!-- END owner_exists -->
+            <!-- BEGIN owner_deleted -->
+                <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
+                <p>{SOCIALSTREAM_POST_USER_FULLNAME}</p>
+                <p class="meta">Posted {SOCIALSTREAM_POST_CREATED_AT}</p>
+            <!-- END owner_deleted -->
+
         </div>
     </div>
     <nav>
@@ -93,10 +102,18 @@
         <li class="actions-small-2" data-socialstream-row>
             <div class="list-item">
                 <div class="card small-12">
+
+                    <!-- BEGIN commenter_exists -->
                     <a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" title="View Profile">
                         <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">
                         <p>{SOCIALSTREAM_COMMENT_USER_FULLNAME} | <span class="meta">Replied {SOCIALSTREAM_COMMENT_CREATED_AT}</span></p>
                     </a>
+                    <!-- END commenter_exists -->
+                    <!-- BEGIN commenter_deleted -->
+                    <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">
+                    <p>{SOCIALSTREAM_COMMENT_USER_FULLNAME} | <span class="meta">Replied {SOCIALSTREAM_COMMENT_CREATED_AT}</span></p>
+                    <!-- END commenter_deleted -->
+
                 </div>
             </div>
             <nav>
@@ -182,10 +199,18 @@
                 <li class="actions-small-1" data-socialstream-row>
                     <div class="list-item">
                         <div class="card small-12">
+
+                            <!-- BEGIN replier_exists -->
                             <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">
                                 <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
                                 <p>{SOCIALSTREAM_REPLY_USER_FULLNAME} | <span class="meta">Replied {SOCIALSTREAM_REPLY_CREATED_AT}</span></p>
                             </a>
+                            <!-- END replier_exists -->
+                            <!-- BEGIN replier_deleted -->
+                            <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
+                            <p>{SOCIALSTREAM_REPLY_USER_FULLNAME} | <span class="meta">Replied {SOCIALSTREAM_REPLY_CREATED_AT}</span></p>
+                            <!-- END replier_deleted -->
+
                         </div>
                     </div>
                     <nav>

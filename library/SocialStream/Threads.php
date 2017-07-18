@@ -225,6 +225,8 @@ class Threads
         $page->setFile('socialstream_thread', '/component/homepage/socialstream/thread.html');
         $page->setBlock('socialstream_thread', 'socialstream_post', 'socialstream_post_block');
         $page->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
+        $page->setBlock('socialstream_post', 'owner_exists', 'owner_exists_block');
+        $page->setBlock('socialstream_post', 'owner_deleted', 'owner_deleted_block');
         $page->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
 
         /* Thumbnail stuff
@@ -250,6 +252,8 @@ class Threads
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video_pending', 'socialstream_comment_has_video_pending_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_metadata', 'socialstream_comment_has_metadata_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_image', 'socialstream_comment_has_image_block');
+        $page->setBlock('socialstream_comment', 'commenter_exists', 'commenter_exists_block');
+        $page->setBlock('socialstream_comment', 'commenter_deleted', 'commenter_deleted_block');
         $page->setBlock('socialstream_comment', 'socialstream_comment_has_add', 'socialstream_comment_has_add_block');
         $page->setBlock('socialstream_comment', 'socialstream_comment_has_delete', 'socialstream_comment_has_delete_block');
 
@@ -263,6 +267,9 @@ class Threads
         $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_metadata', 'socialstream_reply_has_metadata_block');
         $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_image', 'socialstream_reply_has_image_block');
         $page->setBlock('socialstream_reply', 'socialstream_reply_has_delete', 'socialstream_reply_has_delete_block');
+        $page->setBlock('socialstream_reply', 'replier_exists', 'replier_exists_block');
+        $page->setBlock('socialstream_reply', 'replier_deleted', 'replier_deleted_block');
+
 
         $page->setVar(
             array(
@@ -319,6 +326,15 @@ class Threads
                     'SOCIALSTREAM_POST_TIMESTAMP'        => Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
                 )
             );
+
+            // Owner name and optional link
+            if($currentPost->getOwner()->isDeleted()){
+                $page->setVar('owner_exists_block', '');
+                $page->parse('owner_deleted_block', 'owner_deleted');
+            } else {
+                $page->parse('owner_exists_block', 'owner_exists');
+                $page->setVar('owner_deleted_block', '');
+            }
 
             /* Ability to add posts
              */
@@ -382,6 +398,15 @@ class Threads
                         'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => Scrub::text($currentComment->getOwner()->getFullname()),
                     )
                 );
+
+                // Commenter name and optional link
+                if($currentComment->getOwner()->isDeleted()){
+                    $page->setVar('commenter_exists_block', '');
+                    $page->parse('commenter_deleted_block', 'commenter_deleted');
+                } else {
+                    $page->parse('commenter_exists_block', 'commenter_exists');
+                    $page->setVar('commenter_deleted_block', '');
+                }
 
                 /* Ability to add posts
                  */
@@ -475,6 +500,15 @@ class Threads
                             'socialstream_reply_has_metadata_block'      => '',
                         )
                     );
+
+                    // Replier name and optional link
+                    if($currentReply->getOwner()->isDeleted()){
+                        $page->setVar('replier_exists_block', '');
+                        $page->parse('replier_deleted_block', 'replier_deleted');
+                    } else {
+                        $page->parse('replier_exists_block', 'replier_exists');
+                        $page->setVar('replier_deleted_block', '');
+                    }
 
                     $hasAttachment = $currentReply->renderThumbnail('reply', $page);
 

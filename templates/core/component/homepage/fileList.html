@@ -131,7 +131,12 @@
 
                                     <p class="meta {COMPONENT_COMPACTMODE_HIDE}">
                                         Posted by
+                                        <!-- BEGIN owner_exists -->
                                         <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a>
+                                        <!-- END owner_exists -->
+                                        <!-- BEGIN owner_deleted -->
+                                        {FILE_POSTED_BY}
+                                        <!-- END owner_deleted -->
                                         {FILE_POSTED_RELATIVE}
                                     </p>
                                     <p class="{COMPONENT_COMPACTMODE_HIDE}">{FILE_COMMENT}</p>

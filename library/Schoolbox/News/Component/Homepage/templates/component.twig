@@ -1,4 +1,13 @@
-{% if news is empty %}
+{#
+ Usage:
+    news:         Collection|News[]
+    modify:       bool
+    moderate:     bool
+    code:         int
+    compact:      bool
+    showArchive:  bool
+#}
+{% if 0 == (news | length) %}
 
     <div class="empty-state">
         <i class="icon-news"></i>
@@ -29,11 +38,19 @@
 
                 {# Compact view #}
                 {% for item in news %}
+                    {% set owner = item.owner  %}
                     <li {% if ( moderate or ( modify and config.news_edit_other ) ) %}class="actions-small-1"{% endif %}>
                         <div class="list-item">
                             <div class="card small-12">
-                                <h3><a href="/homepage/news/{{ item.code }}/{{ item.id }}">{{ item.heading }}</a></h3>
-                                <p class="meta">Posted by <a href="/search/user/{{ item.owner }}">{{ item.firstname }} {{ item.lastname }}</a> <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.posted.getRelativeTime }}</span></p>
+                                <h3><a href="/homepage/news/{{ item.category.id }}/{{ item.id }}">{{ item.heading }}</a></h3>
+                                <p class="meta">Posted by
+                                    {% if owner.deleted %}
+                                        {{ owner.fullName }}
+                                    {% else %}
+                                        <a href="/search/user/{{ owner.id }}">{{ owner.fullName }}</a>
+                                    {% endif %}
+                                    <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.postDate.getRelativeTime }}</span>
+                                </p>
                             </div>
                         </div>
                         {% if ( moderate or ( modify and config.news_edit_other ) ) %}
@@ -48,14 +65,21 @@
 
                 {# Non compact view #}
                 {% for item in news %}
+                    {% set owner = item.owner  %}
                     <li {% if modify %}class="actions-small-1"{% endif %}>
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="/search/user/{{ item.owner }}">
-                                    <img src="/portrait.php?userId={{ item.synid }}&size=square64" alt="View Profile" />
+                                <a href="/search/user/{{ item.owner.id }}">
+                                    <img src="/portrait.php?userId={{ owner.externalId }}&size=square64" alt="View Profile" />
                                 </a>
                                 <h3>{{ item.heading }}</h3>
-                                <p class="meta">Posted by <a href="/search/user/{{ item.owner }}">{{ item.firstname }} {{ item.lastname }}</a> <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.posted.getRelativeTime }}</span></p>
+                                <p class="meta">Posted by
+                                    {% if owner.deleted %}
+                                        {{ owner.firstname }} {{ owner.lastname }}
+                                    {% else %}
+                                        <a href="/search/user/{{ owner.id }}">{{ owner.firstname }} {{ owner.lastname }}</a>
+                                    {% endif %}
+                                    <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.postDate.getRelativeTime }}</span></p>
                             </div>
                         </div>
                         {% if modify %}
