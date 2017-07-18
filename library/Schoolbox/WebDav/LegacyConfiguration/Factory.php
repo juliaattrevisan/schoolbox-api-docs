@@ -586,9 +586,9 @@ class Factory
             }
         } elseif (in_array($siteLocation, array('core', 'demo'))) {
             $settings = array(
-                'baseUri' => 'http://webdave.alaress-dev.com.au/',
-                'userName' => 'webdave',
-                'password' => 'e3IRS043UdNis',
+                'baseUri'  => 'http://127.0.0.1:8000/',
+                'userName' => $session['username'],
+                'password' => $session['password'],
             );
 
             $paths = ['/'];
