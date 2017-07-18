@@ -99,13 +99,13 @@ trait StackableTrait
     }
 
     /**
-     * Checks if the iterator is valid
+     * Checks if the iterator's current position is valid
      *
      * @return bool
      */
     public function valid()
     {
-        return null !== $this->consolidatedItem;
+        return $this->consolidatedItem instanceof User\Base;
     }
 
     /**
