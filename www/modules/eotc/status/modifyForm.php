@@ -25,12 +25,13 @@ use Schoolbox\Mapper\Exception as MapperException;
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());
 
+$eventMapper = EventMapper::getInstance();
+
 $event = false;
 
 /* Spawn an existing event if id provided
  */
 try {
-	$eventMapper = EventMapper::getInstance();
 
 	/** @var \EOTC\Event $event */
 	$event = $eventMapper->findById($_POST['eventId']);
@@ -126,17 +127,31 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
          * into External DB by altering its contents after the fact
          */
         if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
-            try {
-                $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
-                $excursionConnector->sync($event);
-            }
-            catch (\DomainException $e) {
+            $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
 
-                /* Occurs when trying to create a new EOTC event, but a Synweb id
-                 * already exists for it. This can happen if
-                 *  - you mangle the Back button in the browser
-                 *  - or if superusers change status to non-approved then re-approve
-                 */
+            /* Synchronise all events in a series if appropriate
+             * Otherwise just sync one event
+             */
+            if ($event->getSeriesId()) {
+                $allEvents = $eventMapper->getAllInSeries($event);
+            }
+            else {
+                $allEvents = new \Schoolbox\Collection();
+                $allEvents->add($event);
+            }
+
+            foreach ($allEvents as $currentEvent) {
+                try {
+                    $excursionConnector->sync($currentEvent);
+                }
+                catch (\DomainException $e) {
+
+                    /* Occurs when trying to create a new EOTC event, but a Synweb id
+                     * already exists for it. This can happen if
+                     *  - you mangle the Back button in the browser
+                     *  - or if superusers change status to non-approved then re-approve
+                     */
+                }
             }
         }
     }
