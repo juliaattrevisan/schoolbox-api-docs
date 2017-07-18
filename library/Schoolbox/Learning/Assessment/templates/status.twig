@@ -49,6 +49,9 @@
             {% if not assessment.dueAt.isNull %}
             <li class="icon-calendar">{{ dueDate.dueDate(assessment, USER) }}</li>
             {% endif %}
+            {% if readonly %}
+                <li class="icon-archive">Term has been archived</li>
+            {% endif %}
         </ul>
     </div>
     <div class="small-12 large-8 columns text-right">

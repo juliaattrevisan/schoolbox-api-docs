@@ -138,6 +138,9 @@ Usage:
                 {% if responseList|length == 1 %}
                 <li class="icon-calendar">Submitted {{ response.submittedAt.short }}</li>
                 {% endif %}
+                {% if readonly %}
+                    <li class="icon-archive">Term has been archived</li>
+                {% endif %}
             </ul>
         </div>
     </div>
