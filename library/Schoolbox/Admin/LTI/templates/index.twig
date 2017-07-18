@@ -9,14 +9,21 @@
 </div>
 <div class="row">
     <div class="small-12 island">
+        {% for provider in providers %}
         <section>
             <ul class="action-list">
-                {% for provider in providers %}
-                    {% include '@adminLti/listItem.twig' with {provider: provider} %}
-                {% endfor %}
+                {% include '@adminLti/listItem.twig' with {provider: provider} %}
             </ul>
         </section>
-        <a href="#" class="button submit" data-reveal-id="addProviderModal">Add Provider</a>
+        <a href="#" class="button submit" data-reveal-id="addProviderModal">Add New Provider</a>
+        {% endfor %}
+
+        {% if providers is empty %}
+            <div class="empty-state">
+                <i class="icon-lti"></i>
+                <p>There arent any providers. Start by <a href="#" data-reveal-id="addProviderModal">adding your first provider</a>.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 

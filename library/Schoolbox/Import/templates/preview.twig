@@ -12,22 +12,20 @@
     </div>
 
     <div class="small-12 island">
-        <section class="content no-pad no-margin">
+        <section class="no-margin">
             <ul class="information-list ups" data-log>
                 {% include '@upsRuleset/log/lines.twig' %}
             </ul>
         </section>
 
-        <section class="content">
-            {% block form %}
-            <form action="{{ routeLookup(basename ~ '.import') }}" method="post">
-
+        {% block form %}
+        <form action="{{ routeLookup(basename ~ '.import') }}" method="post">
+            <section class="content">
                 {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-
-                <input type="submit" value="Run Import" />
-            </form>
-            {% endblock form %}
-        </section>
+            </section>
+            <input type="submit" value="Run Import" />
+        </form>
+        {% endblock form %}
     </div>
 </div>
 <script type="text/javascript">

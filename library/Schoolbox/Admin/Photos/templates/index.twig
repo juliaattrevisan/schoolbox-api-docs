@@ -53,15 +53,9 @@
                     <b>All photos uploaded must be named using the ID of the individual (e.g. 10255.jpg)</b>
                 </p>
             </section>
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <section class="no-margin">
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                        </section>
-                    </div>
-                </fieldset>
-            </section>
+
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
             <input type="submit" class="button" value="Upload Photos">
         </form>
     </div>
