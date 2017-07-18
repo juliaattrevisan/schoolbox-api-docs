@@ -29,7 +29,7 @@ class StudentCanViewFeedback extends AbstractCanViewFeedback
         }
 
         $assessment = $this->findAssessment($params);
-        $student    = $this->findStudent($params)->loadParents();
+        $student    = $this->findStudent($params);
         $feedback   = $this->findFeedback($params);
 
         if ($user->getId() !== $student->getId()) {
