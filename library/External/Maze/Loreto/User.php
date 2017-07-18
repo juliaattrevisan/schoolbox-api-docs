@@ -70,7 +70,8 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS AlertMessage,
 				'' AS StudentBoarder,
 				'' AS Comment,
-				ST.ROLL_GROUP
+				ST.ROLL_GROUP,
+				0 AS countIndividualEducationPlans
 			FROM ST
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP

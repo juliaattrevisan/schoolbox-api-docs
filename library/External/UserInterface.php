@@ -1,10 +1,8 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: aetworowsky
- * Date: 20/10/11
- * Time: 4:45 PM
- * To change this template use File | Settings | File Templates.
+ * @author    The Whole Company <support@alaress.com.au>
+ * @copyright Copyright 2011-2017 (Hopefully RIP after that), Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 use Schoolbox\User;

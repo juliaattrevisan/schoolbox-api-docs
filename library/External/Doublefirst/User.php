@@ -392,7 +392,8 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS Comment,
                 pca.CustodyAlert                                    AS CustodyAlert,
                 pca.CustodyNotes                                    AS CustodyNotes,
-                pcad.Description                                    AS CustodyResponsiblePerson
+                pcad.Description                                    AS CustodyResponsiblePerson,
+                0 AS countIndividualEducationPlans
             FROM V_PupilBasicInformation                            p
             LEFT JOIN PupilCareAuthority pca                        ON pca.PupilID = p.PupilID
             LEFT JOIN LookupDetails pcad                            ON pcad.LookupID = 3025 AND LookupDetailsID = pca.ResponsibleForCustody

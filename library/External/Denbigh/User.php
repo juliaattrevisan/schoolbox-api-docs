@@ -169,7 +169,7 @@ class External_Denbigh_User implements External_UserInterface {
 				pe_sta.denbighID AS tutor_denbighID, pe_sta.surname AS tutor_surname, pe_sta.preferred_name AS tutor_preferred_name, pe_sta.title AS tutor_title,
 				pe_pa.denbighID AS parent_denbighID, pe_pa.surname AS parent_surname, pe_pa.preferred_name AS parent_preferred_name, pe_pa.title AS parent_title,
 				fa.EmergencyContact1, fa.EmergencyRelationship1, fa.EmergencyPhone1, fa.EmergencyEmail1,
-				stu.boardingStatus
+				stu.boardingStatus, 0 AS countIndividualEducationPlans
 			FROM People pe
 			LEFT JOIN Students stu ON stu.peopleDenbighID = pe.denbighID
 			/* Student's tutor */
@@ -523,7 +523,6 @@ class External_Denbigh_User implements External_UserInterface {
     {
         return [];
     }
-
 
     /* Getters/Setters
       */

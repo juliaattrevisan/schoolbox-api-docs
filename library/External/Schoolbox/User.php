@@ -108,7 +108,8 @@ class External_Schoolbox_User implements External_UserInterface
                             '' AS StudentStudiesCode,
                             '' AS AlertMessage,
                             '' AS StudentBoarder,
-                            '' AS Comment
+                            '' AS Comment,
+                            0 AS countIndividualEducationPlans
                         FROM `user`
                         LEFT JOIN user_profile ON user.id = user_profile.user_id
                         WHERE user.synergy_id = :externalUserId

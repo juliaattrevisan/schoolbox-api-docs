@@ -351,7 +351,14 @@ class External_Synergetic_User implements External_UserInterface
                         vStudents.StudentStudiesCode,
                         AlertMessage,
                         vStudents.StudentBoarder,
-                        vStudents.StudentsComment as Comment
+                        vStudents.StudentsComment as Comment,                        
+                        (
+                            SELECT    COUNT(*) 
+                            FROM      dbo.IndividualPlans IEP
+                            WHERE     IEP.ID = vStudents.ID AND
+                            StartDate <= CURRENT_TIMESTAMP AND
+                            (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
+                        ) AS countIndividualEducationPlans                      
             FROM        dbo.vStudents vStudents
             LEFT JOIN   CommunityAlerts ON 
                             CommunityAlerts.ID = StudentID AND 
@@ -1173,8 +1180,7 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
-     * This is a helper function to clear the 'Not Selected' placeholder value that
-     * Synergetic loves to add as an option in every lookup table
+     * This is a helper function to clear the 'Not Selected' placeholder value that Synergetic loves to add as an option in every lookup table
      *
      * @param array $array
      * @param string $placeholder
@@ -1193,18 +1199,14 @@ class External_Synergetic_User implements External_UserInterface
         }, $array);
     }
 
+    // Everything below here is FileYear/FileSemester retrieval shenanigans, this should all disappear and be replaced by proper SQL joins
+
     // TODO: These calls don't seem to be getting cached according to the debug console, so caching them here.
 
-    /**
-     * Cache of users file year/semester
-     * @var array
-     */
+    /** @var array $fileYearSemesterUser Cache of users file year/semester */
     private static $fileYearSemesterUser = [];
 
-    /**
-     * Cache of system file year/semester
-     * @var array
-     */
+    /** @var array $fileYearSemesterDefault Cache of system file year/semester */
     private static $fileYearSemesterDefault;
 
     // TODO: These functions seem to be used prolifically to fill in SQL clauses- in these cases should be using appropriate SQL joins.

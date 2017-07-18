@@ -1,134 +1,114 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: aetworowsky
- * Date: 20/10/11
- * Time: 4:40 PM
- * To change this template use File | Settings | File Templates.
+ * @author    The Whole Company <support@alaress.com.au>
+ * @copyright Copyright 2011-2017 (Hopefully RIP after that), Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 use Alaress\Redis;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 
-class External_User implements External_UserInterface {
-
+class External_User implements External_UserInterface
+{
     use External_CacheTrait;
 
-	private $database;
+    /** @var External_UserInterface $database */
+    private $database;
 
-	/**
-	 * @var External_Offline_User
-	 */
-	private $offline;
+    /** @var External_Offline_User $offline */
+    private $offline;
 
-	/**
-	 * Constructor
-	 *
-	 * @throws Exception
-	 * @param String $databaseName
-	 */
-	public function __construct($databaseName = '') {
-		$factory = new External_DatabaseFactory();
-		$this->setDatabase($factory->buildUserConnector($databaseName));
+    /** @var ConfigMapper $configMapper */
+    private $configMapper;
+
+    /**
+     * Constructor
+     *
+     * @param string $databaseName
+     * @throws Exception
+     */
+    public function __construct($databaseName = '')
+    {
+        $factory = new External_DatabaseFactory();
+        $this->setConfigMapper(ConfigMapper::getInstance());
+        $this->setDatabase($factory->buildUserConnector($databaseName));
         $this->setOffline(new External_Offline_User());
         $this->setCache(Redis::getInstance());
-        $this->setTimeout(Config::get('external_cache_timeout'));
-	}
+        $this->setTimeout($this->configMapper->get('external_cache_timeout'));
+    }
 
     /**
-     * Returns a valid readable path to the user's portrait
-     *
-     * @param Integer $externalUserId
-     * @return String
+     * @inheritdoc
      */
-    public function getPortrait ($externalUserId) {
+    public function getPortrait($externalUserId)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
-	/**
-	 * Used in search
-	 *
-	 * @param Integer $externalUserId
-	 * @return array
-	 */
-	public function getParent ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
-
-	/**
-	 * No usages found
-	 *
-	 * @param Integer $externalUserId
-	 * @return array
-	 */
-	public function getParentSync ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
-
     /**
-     * Returns a list of emails for parents of the listed students
-     *
-     * @param array $synergyIds
-     * @return array
+     * @inheritdoc
      */
-    public function getParentEmails($synergyIds) {
+    public function getParent($externalUserId)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
-
-	/**
-	 * Used in search
-	 *
-	 * @param Integer $externalUserId
-	 * @return array
-	 */
-	public function getStudent ($externalUserId) {
+    /**
+     * @inheritdoc
+     */
+    public function getParentSync($externalUserId)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
-
-	/**
-	 * Used in search
-	 *
-	 * @param Integer $externalUserId
-	 * @return array
-	 */
-	function getStaff ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
+    }
 
     /**
-	 * Used in report module
-	 *
-	 * @param $yearlevel
-	 * @param $name
-	 * @param $boardingStatus
-	 * @param $form
-	 *
-	 * @internal param int $yearLevel
-	 * @return array
-	 */
-	public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
+     * @inheritdoc
+     */
+    public function getParentEmails($synergyIds)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
+    }
 
-	/**
-	 * Compiles a list of contacts relevant to a student
-	 *
-	 * @param string $externalUserId
-	 * @return array
-	 */
-	function getStudentContactList ($externalUserId) {
+    /**
+     * @inheritdoc
+     */
+    public function getStudent($externalUserId)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
+    }
 
-	/**
-	 * Used in report module, determines the current semester
-	 *
-	 * @return Integer
-	 */
-	function getCurrentSemester ($externalUserId = null) {
+    /**
+     * @inheritdoc
+     */
+    function getStaff($externalUserId)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getStudentContactList($externalUserId)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    function getCurrentSemester($externalUserId = null)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
 
     /**
      * {@inheritdoc}
@@ -138,100 +118,80 @@ class External_User implements External_UserInterface {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
-	/**
-	 * Retrieves a teacher or student's subject list
-	 *
-	 * @param User $user
-	 * @return array
-	 */
-	function getSubjectList (User $user) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
-
-	/**
-	 * Retrieves a parent's enrolled students
-	 *
-	 * @param Integer $externalUserId
-	 * @return array
-	 */
-	function getEnrolledStudents ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
-
-	/**
-	 * Return a user's email
-	 *
-	 * @param Integer $externalUserId
-	 * @return String
-	 */
-	function getEmail ($externalUserId) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
-
-	/**
-	 * No usages found
-	 *
-	 * @todo Review usage of method
-	 * @return array
-	 */
-	public function getStudentUserAccountInfo () {
-		return $this->getDatabase()->getStudentUserAccountInfo();
-	}
-
-	/**
-	 * No usages found
-	 *
-	 * @todo Review usage of method
-	 * @return array
-	 */
-	public function getParentUserAccountInfo () {
-		return $this->getDatabase()->getParentUserAccountInfo();
-	}
-
-	/**
-	 * No usages found
-	 *
-	 * @todo Review usage of method
-	 * @return array
-	 */
-	public function getStaffUserAccountInfo () {
-		return $this->getDatabase()->getStaffUserAccountInfo();
-	}
-
     /**
-     * Determine the boarder type of a student
-     *
-     * @param $boarderValue
-     * @return mixed
+     * @inheritdoc
      */
-    public function determineBoarderType ($boarderValue) {
+    function getSubjectList(User $user)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
-     * Return the housemaster of the specified house
-     *
-     * @param $houseID
-     * @return mixed
+     * @inheritdoc
      */
-    public function getHousemasterByHouseId ($houseID) {
+    function getEnrolledStudents($externalUserId)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
-     * Get contact list for staff directory
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function getStaffContactListExtended() {
+    function getEmail($externalUserId)
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @param int $staffID
-     * @return array|bool
+     * @inheritdoc
+     */
+    public function getStudentUserAccountInfo()
+    {
+        return $this->getDatabase()->getStudentUserAccountInfo();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getParentUserAccountInfo()
+    {
+        return $this->getDatabase()->getParentUserAccountInfo();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStaffUserAccountInfo()
+    {
+        return $this->getDatabase()->getStaffUserAccountInfo();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function determineBoarderType($boarderValue)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterByHouseId($houseID)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStaffContactListExtended()
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getCampusFromTimetable($staffID)
     {
@@ -239,35 +199,43 @@ class External_User implements External_UserInterface {
     }
 
     /**
-     * Retrieves a list of forms that a student may be in.
-     *
-     * @return array [['Code' => string, 'Description' => string], ...]
+     * @inheritdoc
      */
     public function getStudentForms()
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
+    /**
+     * @param $methodName
+     * @param $argumentList
+     * @return mixed
+     */
+    public function __call($methodName, $argumentList)
+    {
+        $database = $this->getDatabase();
 
-    public function __call ($methodName, $argumentList) {
-		$database = $this->getDatabase();
+        $methodReflection = new ReflectionMethod($database, $methodName);
 
-		$methodReflection = new ReflectionMethod($database, $methodName);
+        return $methodReflection->invokeArgs($database, $argumentList);
+    }
 
-		return $methodReflection->invokeArgs($database, $argumentList);
-	}
-
-	private function setDatabase ($database) {
-		$this->database = $database;
-	}
+    /**
+     * @param $database
+     */
+    private function setDatabase($database)
+    {
+        $this->database = $database;
+    }
 
     /**
      * @return External_UserInterface
      */
-    private function getDatabase () {
+    private function getDatabase()
+    {
         return $this->database;
     }
-    
+
     /**
      * @return External_Offline_User
      */
@@ -275,7 +243,7 @@ class External_User implements External_UserInterface {
     {
         return $this->offline;
     }
-    
+
     /**
      * @param External_Offline_User $offline
      */
@@ -284,5 +252,19 @@ class External_User implements External_UserInterface {
         $this->offline = $offline;
     }
 
+    /**
+     * @return ConfigMapper
+     */
+    public function getConfigMapper()
+    {
+        return $this->configMapper;
+    }
 
+    /**
+     * @param ConfigMapper $configMapper
+     */
+    public function setConfigMapper($configMapper)
+    {
+        $this->configMapper = $configMapper;
+    }
 }
