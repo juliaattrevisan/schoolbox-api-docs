@@ -12,20 +12,14 @@ use Schoolbox\User;
 
 class External_Schoolpro_User implements External_UserInterface
 {
-
-    /**
-     * An instance of MSSQL
-     *
-     * @var null
-     */
-    private $db = null;
+    use External_MssqlConnector;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->setDb(MSSQL::getInstance());
+        $this->setupDatabase();
     }
 
     /**
@@ -46,7 +40,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         if ($result['success'] && count($result['result'])) {
             $currentParent = $result['result'][0];
@@ -92,7 +86,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         new \Alaress_Probe($result);
 
@@ -134,7 +128,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         if ($result['success'] && count($result['result'])) {
             $currentStudent = $result['result'][0];
@@ -150,7 +144,7 @@ class External_Schoolpro_User implements External_UserInterface
                 )
             );
 
-            $medicalResult = $this->getDb()->executeProcedure($medicalVars[0], $medicalVars[1]);
+            $medicalResult = $this->getConnector()->executeStoredProcedure($medicalVars[0], $medicalVars[1])->fetchAll();
 
             /* These arrive in a variety of formats
              */
@@ -222,7 +216,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         if ($result['success'] && count($result['result'])) {
             $currentStudentContact = $result['result'][0];
@@ -302,7 +296,6 @@ class External_Schoolpro_User implements External_UserInterface
     public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
-        $groupHandler = new Group();
 
         if (empty($externalId)) {
             return [];
@@ -318,7 +311,7 @@ class External_Schoolpro_User implements External_UserInterface
                 )
             );
 
-            $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+            $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
             if ($result['success'] && count($result['result'])) {
                 $subjectList = array();
@@ -344,7 +337,7 @@ class External_Schoolpro_User implements External_UserInterface
                 )
             );
 
-            $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+            $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
             if ($result['success'] && count($result['result'])) {
                 $subjectList = array();
@@ -387,7 +380,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         if ($result['success'] && count($result['result'])) {
             $allStudents = array();
@@ -478,7 +471,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         /* Find the last updated datetime
          */
@@ -506,7 +499,7 @@ class External_Schoolpro_User implements External_UserInterface
                     )
                 );
 
-                $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+                $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
                 /* Get the binary data and dump it into a file
                  */
@@ -522,7 +515,7 @@ class External_Schoolpro_User implements External_UserInterface
 
                     /* Save the image
                      */
-                    $photoHandle = fopen($photoPath, "w");
+                    $photoHandle = fopen($photoPath, "wb");
                     fwrite($photoHandle, $result['result'][0]['RawData']);
                     fclose($photoHandle);
                 }
@@ -547,7 +540,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         new \Alaress_Probe($result);
     }
@@ -565,7 +558,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         new \Alaress_Probe($result);
     }
@@ -583,7 +576,7 @@ class External_Schoolpro_User implements External_UserInterface
             )
         );
 
-        $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
         new \Alaress_Probe($result);
     }
@@ -636,24 +629,4 @@ class External_Schoolpro_User implements External_UserInterface
 
     /* Getters/Setters
      */
-
-    /**
-     * Set db
-     *
-     * @param null $db
-     */
-    private function setDb($db)
-    {
-        $this->db = $db;
-    }
-
-    /**
-     * Get db
-     *
-     * @return null
-     */
-    private function getDb()
-    {
-        return $this->db;
-    }
 }
