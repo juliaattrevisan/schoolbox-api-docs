@@ -216,6 +216,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $relEventStart = $relEvent->getStartDateTime();
         $currentStatus = $eventMetadata->getStatus();
 
+        // Don't notify if event is in a final state.
+        // (Required because some notifs may be awaiting, and not rescinded)
+        // TODO is this able to be an int?
+        if ($currentStatus->isApproved() || $currentStatus->isRejected()) {
+            $this->log->notice("Event is in final state - no upcoming notification will be sent");
+            return $envelope;
+        }
+
         $userIds = $this->getInterestedUsers($relEvent, $currentStatus);
 
         if (count($userIds) == 0) {
