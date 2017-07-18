@@ -1,7 +1,5 @@
 <?php
 /**
- * Class description here
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -12,21 +10,30 @@ namespace Schoolbox\Sync\Iterator;
 use Schoolbox\External\Normalise\User;
 
 /**
- * Class StackableTrait
+ * Re-usable logic for an IteratorIterator where the outer iterator needs to return
+ * items that may be composed of 1 or more contiguous items from the inner iterator.
  *
- * @package Schoolbox\Sync\Iterator
+ * Eg,
+ * From inner iterator:
+ * * Item #1: id=1, email='me@example.com'
+ * * Item #2: id=1, email='other@example.com'
+ *
+ * From outer iterator:
+ * * Item #1: id=1, email='me@example.com; other@example.com'
  */
 trait StackableTrait
 {
     /**
      * @var int
      */
-    protected $rowNum = 0;
+    protected $rowNum;
 
     /**
-     * @var array|User\Base[]
+     * Composed from one or more contiguous items from the inner iterator
+     *
+     * @var User\Base|null
      */
-    protected $stack = [];
+    protected $consolidatedItem;
 
     /**
      * All classes which use this trait need to support this method
@@ -37,30 +44,40 @@ trait StackableTrait
     abstract public function getInnerIterator();
 
     /**
-     * Creates a single record out of the stack.
+     * Creates a single record out of 1 or more rows of data
      *
      * @param  array $preStack
      * @return User\Base
      */
-    abstract protected function buildFromStack($preStack);
+    abstract protected function buildFromStack(array $preStack);
 
     /**
      * Gets the ID field out of this result set.
+     *
+     * This is the field which determines which contiguous items from the inner iterator
+     * are considered as belonging to the one logical entity.
      *
      * @return string
      */
     abstract protected function getIdField();
 
     /**
-     * Loads separate records from the iterator, and loads them into
-     * the stack for this item.
+     * Retrieves 1 or more distinct records from the inner iterator,
+     * and consolidates them into a single item.
+     *
+     * After this method returns, the inner iterator will already be pointing at next item.
+     * We need to inspect the next item after the current item so we can determine we have
+     * finished consolidating sub-items from the inner iterator.
      */
     protected function buildStack()
     {
-        $id       = null;
-        $preStack = [];
+        $id               = null;
+        $discreteSubItems = [];
+
         while ($this->getInnerIterator()->valid() && $row = $this->getInnerIterator()->current()) {
             $thisId = $row[$this->getIdField()];
+
+            // First sub-item for logical entity ?
             if (!isset($id)) {
                 $id = $thisId;
             }
@@ -70,15 +87,15 @@ trait StackableTrait
             if ($thisId != $id) {
                 break;
             }
-            $preStack[] = $row;
+            $discreteSubItems[] = $row;
             $this->getInnerIterator()->next();
         }
-        if (empty($preStack)) {
+        if (empty($discreteSubItems)) {
             // At the end of the result set
-            $this->stack = [];
+            $this->consolidatedItem = null;
             return;
         }
-        $this->stack[] = $this->buildFromStack($preStack);
+        $this->consolidatedItem = $this->buildFromStack($discreteSubItems);
     }
 
     /**
@@ -88,22 +105,17 @@ trait StackableTrait
      */
     public function valid()
     {
-        if (!empty($this->stack)) {
-            return true;
-        }
-        $this->buildStack();
-        return !empty($this->stack);
+        return null !== $this->consolidatedItem;
     }
 
     /**
      * Return the current element
      *
-     * @return User\Base
+     * @return User\Base|null
      */
     public function current()
     {
-        // Stack is managed by valid()
-        return $this->stack[0];
+        return $this->consolidatedItem;
     }
 
     /**
@@ -111,17 +123,30 @@ trait StackableTrait
      */
     public function next()
     {
-        array_shift($this->stack);
+        // Intentionally does not directly call $innerIterator->next() as each execution
+        // of buildStack() indirectly generates 1 or more calls to $innerIterator->next()
         $this->rowNum++;
+        $this->buildStack();
     }
 
     /**
      * Get the key of the current element
      *
-     * @return int
+     * @return int|null
      */
     public function key()
     {
         return $this->rowNum;
+    }
+
+    /**
+     * Resets the pointer to 0 and loads first item ready for retrieval.
+     */
+    public function rewind()
+    {
+        $this->getInnerIterator()->rewind();
+
+        $this->rowNum = 0;
+        $this->buildStack();
     }
 }

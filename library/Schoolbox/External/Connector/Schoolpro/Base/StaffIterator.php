@@ -16,15 +16,33 @@ use Schoolbox\Sync\Iterator\Staff;
 
 class StaffIterator extends Staff
 {
+
     /**
-     * Return the current element
-     *
+     * @return string
+     */
+    protected function getIdField()
+    {
+        return 'ID';
+    }
+
+
+    /**
+     * @param  array[] $preStack
+     * @var    int     $preStack[]['ID']            eg 123
+     * @var    string  $preStack[]['UserName']      eg "moxman"
+     * @var    string  $preStack[]['Title']         eg "Mrs"
+     * @var    string  $preStack[]['FirstName']     eg "Melanie"
+     * @var    string  $preStack[]['Surname']       eg "Oxman"
+     * @var    string  $preStack[]['StaffCategory'] eg "Teacher"
+     * @var    string  $preStack[]['email']         eg "moxman@cedars.nsw.edu.au"
+     * @var    int     $preStack[]['CampusID']      eg 1
      * @return Normalise\User\Staff
      */
-    public function current()
+    public function buildFromStack(array $preStack)
     {
-        $currentResult = $this->getInnerIterator()->current();
-        $staff         = new Normalise\User\Staff();
+        // Build a single object out of 1 or more rows.
+        $currentResult = current($preStack);
+        $staff = new Normalise\User\Staff();
         $staff
             ->setId($currentResult['ID'])
             ->setTitle($currentResult['Title'])
@@ -46,15 +64,8 @@ class StaffIterator extends Staff
             ->setActive(1)
         ;
 
-        /* Assign emails
-         */
-        if (strlen($currentResult['email'])) {
-            $email = new Normalise\User\Common\Email();
-            $email
-                ->setAddress($currentResult['email']);
-
-            $staff->addEmail($email);
-        }
+        // Email - one for every item in stack
+        array_map([$staff, 'addEmail'], $this->columnValuesAsEmail($preStack, 'email'));
 
         /* Campus
          */

@@ -41,7 +41,7 @@ class Staff extends IteratorIterator
      * @param  array $preStack
      * @return User\Staff
      */
-    public function buildFromStack($preStack)
+    public function buildFromStack(array $preStack)
     {
         // Build a normalized object out of the current item
         // (copypasted from Adapter->getStaffUserAccountInfo)

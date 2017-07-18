@@ -18,17 +18,73 @@ class Student extends IteratorIterator
     use StackableHelper;
 
     /**
+     * @var User\Student|null
+     */
+    private $currentItem;
+
+
+    /**
+     * @return bool
+     */
+    public function valid()
+    {
+        return $this->currentItem instanceof User\Student;
+    }
+
+
+    /**
      * Return the current element
      *
-     * @return User\Student
+     * @return User\Student|null
      */
     public function current()
     {
-        // Build a normalized object out of the current item
-        // (copypasted from Adapter->getStudentUserAccountInfo)
-        $currentResult = parent::current();
-        $student       = new User\Student();
-        $student
+        return $this->currentItem;
+    }
+
+
+    /**
+     * @return void
+     */
+    public function next()
+    {
+        $this->getInnerIterator()->next();
+        $this->loadCurrent();
+    }
+
+
+    /**
+     * Performs the transformation of database row to Student object
+     *
+     * @return void
+     */
+    protected function loadCurrent()
+    {
+        /**
+         * @var array  $currentResult
+         * @var int    $currentResult['student_id']
+         * @var string $currentResult['network_login']
+         * @var string $currentResult['student_title']
+         * @var string $currentResult['student_given_name']
+         * @var string $currentResult['student_preferred']
+         * @var string $currentResult['student_surname']
+         * @var string $currentResult['student_gender']
+         * @var string $currentResult['student_email']
+         * @var string $currentResult['student_work_email']
+         * @var string $currentResult['student_year_level']
+         * @var string $currentResult['student_house']
+         * @var string $currentResult['student_boarder']
+         * @var string $currentResult['student_boarding_house']
+         * @var string $currentResult['student_campus']
+         */
+        $currentResult = $this->getInnerIterator()->current();
+
+        if(!is_array($currentResult)){
+            $this->currentItem = null;
+            return;
+        }
+
+        $student = (new User\Student())
             ->setId($currentResult['student_id'])
             ->setTitle($currentResult['student_title'])
             ->setGivenName($currentResult['student_given_name'])
@@ -87,6 +143,15 @@ class Student extends IteratorIterator
             ->add($campus)
         ;
 
-        return $student;
+        $this->currentItem = $student;
+    }
+
+
+    /**
+     * @param User\Student|null $currentItem
+     */
+    protected function setCurrentItem(User\Student $currentItem = null)
+    {
+        $this->currentItem = $currentItem;
     }
 }

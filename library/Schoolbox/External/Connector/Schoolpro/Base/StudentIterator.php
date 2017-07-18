@@ -17,13 +17,31 @@ use Schoolbox\Sync\Iterator\Student;
 class StudentIterator extends Student
 {
     /**
-     * Return the current element
-     *
-     * @return Normalise\User\Student
+     * Performs the transformation of database row to Student object
+     * @return void
      */
-    public function current()
+    public function loadCurrent()
     {
+        /**
+         * @var    array   $currentResult
+         * @var    int     $currentResult['ID']        eg 1234
+         * @var    string  $currentResult['UserName']  eg "16sdryburgh"
+         * @var    string  $currentResult['Title']     eg NULL
+         * @var    string  $currentResult['FirstName'] eg "Shania"
+         * @var    string  $currentResult['Surname']   eg "Dryburgh"
+         * @var    string  $currentResult['email']     eg "16sdryburgh@cedars.nsw.edu.au"
+         * @var    int     $currentResult['LevelID']   eg 112
+         * @var    int     $currentResult['CampusID']  eg 1
+         * @var    int     $currentResult['HouseID']   eg 2
+         */
         $currentResult = $this->getInnerIterator()->current();
+
+        if(!is_array($currentResult)){
+            $this->setCurrentItem(null);
+            return;
+        }
+
+
         $student       = new Normalise\User\Student();
         $student
             ->setId($currentResult['ID'])
@@ -85,6 +103,6 @@ class StudentIterator extends Student
             ->add($campus)
         ;
 
-        return $student;
+        $this->setCurrentItem($student);
     }
 }
