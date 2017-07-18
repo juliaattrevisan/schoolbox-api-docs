@@ -16,7 +16,8 @@
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
@@ -43,8 +44,8 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 }
 
 try {
-	$category = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
-} catch (\Schoolbox\Mapper\Exception $e) {
+	$category = FolderMapper::getInstance()->findById($assess['category_id']);
+} catch (MapperException $e) {
 	error(112);
 	exit;
 }
@@ -57,12 +58,12 @@ try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($assess['category_id']);
 }
-catch (\Exception $e) {
+catch (MapperException $e) {
     error(117);
 }
 
-$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-$term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
+$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$term    = TermMapper::getInstance()->findForDate($dueDate);
 
 /* Index of questions
  */
@@ -177,7 +178,6 @@ else {
 		'ASSESS_FINISH' => $dueDate->getShort(),
 		'SECTION_TITLE' => Scrub::text($section['title']),
 		'QUESTION_TITLE' => Scrub::text($question['title']),
-		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
 		'ASSESS_CATEGORY_ID' => $category->getId(),
 		'ASSESS_CATEGORY_NAME' => Scrub::text($category->getName()),
 		'visible_staff_block'                  => '',
@@ -229,7 +229,6 @@ else {
 			$this->setVar('readonly_mark_block', '');
 
 			$this->setVar(array(
-				'ON_OFF'			=> ++$j % 2 ? '' : 'dark',
 				'QUESTION_QUESTION_ID' => $currentAttempt['question_id'],
 				'QUESTION_SEQUENCE' => $currentAttempt['sequence'],
 				'QUESTION_QUESTION' => Scrub::html($currentAttempt['question']),
@@ -315,8 +314,8 @@ else {
 
     /* Render out breadcrumbs
      */
-    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-    $term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
+    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+    $term    = TermMapper::getInstance()->findForDate($dueDate);
     $trail   = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
