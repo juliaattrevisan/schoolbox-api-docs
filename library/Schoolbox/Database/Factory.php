@@ -99,6 +99,7 @@ class Factory
             case 'isams':
             case 'doublefirst':
             case 'humanedge':
+            case 'schooledge':
 
                 $connectorExternal = $this->factory->createMssql();
                 break;
