@@ -63,6 +63,13 @@ abstract class AbstractNotificationTest extends AbstractTest
     private $listFactory;
 
     /**
+     * Some tests have multiple stages; what is the current stage?
+     *
+     * @var int
+     */
+    private $currentStage = 1;
+
+    /**
      * How many tests have failed?
      *
      * @var int
@@ -82,6 +89,24 @@ abstract class AbstractNotificationTest extends AbstractTest
         $this->listFactory = new ListFactory(INSTANCE_ID, $this->redis);
     }
 
+    /**
+     * Is this test complete?
+     *
+     * @return bool
+     */
+    protected function isTestComplete()
+    {
+        return false;
+    }
+
+    /**
+     * Goes to a stage of the test.
+     *
+     * @var int $stage
+     */
+    protected function goToStage($stage)
+    {
+    }
 
     /**
      * @param int $userId

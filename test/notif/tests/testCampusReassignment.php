@@ -100,6 +100,38 @@ class CampusReassignment extends AbstractNotificationTest
         ++$this->activeWorkers;
     }
 
+    /**
+     * @return bool
+     */
+    protected function isTestComplete()
+    {
+        return $this->currentCampus == self::CAMPUS_TWO;
+    }
+
+    /**
+     * @param int $stage
+     */
+    protected function goToStage($stage)
+    {
+        switch ($stage) {
+            case 2:
+                // go to stage 2 (campus 2)
+                $this->log->warning("All roles processed; moving to new campus");
+                $this->moveCampus(self::CAMPUS_TWO);
+
+                // perform a recache
+                $this->cacheSubscriptions();
+
+                // signal routed to drop the cache and reload
+                $this->sendSignal('routed', 'reload');
+                break;
+
+            default:
+                // I shouldn't get to this stage
+                $this->log->warning("Invalid stage: $stage");
+                break;
+        }
+    }
 
     /**
      * @routed Task Complete
