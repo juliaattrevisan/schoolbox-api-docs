@@ -9,22 +9,23 @@
 
 namespace Schoolbox;
 
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
-class RoleMapper extends Mapper {
+class RoleMapper extends Mapper
+{
 
     /* Enum in groups table
      */
-    const ROLE_STAFF   = 'staff';
-    const ROLE_PARENT  = 'parent';
+    const ROLE_STAFF = 'staff';
+    const ROLE_PARENT = 'parent';
     const ROLE_STUDENT = 'student';
-    const ROLE_GUEST   = 'guest';
+    const ROLE_GUEST = 'guest';
+
 
     /**
      * Setup mapper
      */
-    protected function mapping() {
-
+    protected function mapping()
+    {
         $this->hasTable('groups');
         $this->hasModel(Role::class);
 
@@ -35,11 +36,17 @@ class RoleMapper extends Mapper {
         $this->uses('digest_schedule', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(
-            self::CALLBACK_POSTSOFTDELETE,
-            function (Role $role) {
-                Pastoral\Access\Mapper::getInstance()->deleteByColumn('role_id', $role->getId());
-            }
-        );
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeletePastoralAccess']);
+    }
+
+
+    /**
+     * @param Role $role
+     * @return bool
+     */
+    public function softDeletePastoralAccess(Role $role)
+    {
+        Pastoral\Access\Mapper::getInstance()->deleteByColumn('role_id', $role->getId());
+        return true;
     }
 }
