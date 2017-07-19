@@ -321,7 +321,7 @@ class External_Humanedge_User implements External_UserInterface
                     ELSE t.FirstName END 
                     AS StaffPreferredName,
                 t.LastName AS StaffSurname,
-                t.PhoneHome AS StaffOccupPhone,
+                '' AS StaffOccupPhone,
                 COALESCE(
                     CASE WHEN (LEN(t.Email2) > 0) THEN t.Email2 ELSE NULL END,
                     CASE WHEN (LEN(t.Email) > 0) THEN t.Email ELSE NULL END
@@ -338,14 +338,42 @@ class External_Humanedge_User implements External_UserInterface
                 t.Position AS JobPositionDescription,
                 '' AS JobPositionDescriptionAlternate
             FROM Staff t
+            LEFT JOIN Person.PersonPhone ON Person.PersonPhone.PersonID = t.PersonID
             LEFT JOIN Campus c ON t.CampusID = c.ID
             WHERE t.Deceased = 'N'
         ";
 
-//        $queryDebug = "SELECT * FROM PersonPhone";
-//        $queryDebug = "SELECT Distinct TABLE_NAME FROM information_schema.TABLES";
+        /* Get everyone
+         */
+        $allStaff = $this->getDatabase()->getAll($query);
 
-        return $this->getDatabase()->getAll($query);
+        /* Each person can have 0..N "phone" fields. This is really a mechanism of contact
+         * and includes home/family/business/email/mobile/other records for some reason so
+         * we need to filter out and select the data we want
+         */
+        $processed = [];
+
+        foreach ($allStaff as $currentStaff) {
+            if (!isset($processed[$currentStaff['SchoolStaffCode']])) {
+                $processed[$currentStaff['SchoolStaffCode']] = $currentStaff;
+            }
+
+            /* Assign Business Phone
+             */
+            if ($currentStaff['PhoneType'] == 'Business') {
+                $processed[$currentStaff['SchoolStaffCode']]['StaffOccupPhone'] = $currentStaff['Number'];
+            }
+
+            /* Assign Extension
+             */
+            if ($currentStaff['PhoneType'] == 'Other') {
+                $processed[$currentStaff['SchoolStaffCode']]['StaffExtension'] = $currentStaff['Number'];
+            }
+        }
+
+        return array_values($processed);
+
+//        $queryDebug = "SELECT Distinct TABLE_NAME FROM information_schema.TABLES";
     }
 
     /**
