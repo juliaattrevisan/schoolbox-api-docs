@@ -48,6 +48,16 @@ class QuizNotifications extends AbstractNotificationTest
     protected $markGivenCache;
 
     /**
+     * How many mark notifs have been sent to students?
+     *
+     * Terminate the test when all students have been notified about all quizzes they should be.
+     * @see $this->onWorkerComplete
+     *
+     * @var int
+     */
+    protected $sentMarkNotifs = 0;
+
+    /**
      * Provide the list of daemons that need to be attached for this test
      *
      * @return array
@@ -220,7 +230,7 @@ class QuizNotifications extends AbstractNotificationTest
                 // student has received mark notification: verify that should have happened
                 $this->assertTrue(Quiz\Mapper::getInstance()->findById($quizId)->isMarkShownToStudents());
                 $this->log->notice("Student {$recipient->formatName()} has correctly received mark notification");
-
+                $this->sentMarkNotifs++;
                 return;
 
             case ":child's Quiz :quizname was updated in :catname":
@@ -285,6 +295,18 @@ class QuizNotifications extends AbstractNotificationTest
 
     }
 
+    /**
+     * @routed Task Complete
+     */
+    public function onWorkerComplete()
+    {
+        $maxNotifsSendable = count($this->subscribers) * 2;
+        $this->log->debug(sprintf("%d/%d students notified about marks", $this->sentMarkNotifs, $maxNotifsSendable));
+        if ($this->sentMarkNotifs >= $maxNotifsSendable) {
+            $this->log->warning("Test ended, no failures recorded; manual check for success required");
+            $this->terminateDaemons();
+        }
+    }
 
     /**
      * @param int  $folderId
