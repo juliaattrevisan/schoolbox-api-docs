@@ -345,7 +345,8 @@
                                 <div class="content no-pad">
                                     <ul class="information-list">
                                         {% for contact in contacts %}
-                                            <li class="actions-small-1">
+                                        {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
+                                        <li class="actions-small-1">
                                                 <div class="list-item">
                                                     <div class="card small-12">
                                                         {% if contact.main %}
@@ -375,7 +376,7 @@
                                                     {% endif %}
                                                 </ul>
                                             </li>
-
+                                            {% endif %}
                                             {# is there a spouse? #}
                                             {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
                                                 <li class="actions-small-1">
