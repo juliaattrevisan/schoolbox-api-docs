@@ -62,6 +62,12 @@ abstract class AbstractNotificationTest extends AbstractTest
     /** @var ListFactory */
     private $listFactory;
 
+    /**
+     * How many tests have failed?
+     *
+     * @var int
+     */
+    private $failureCount = 0;
 
     /**
      * @param string $name
@@ -184,5 +190,23 @@ abstract class AbstractNotificationTest extends AbstractTest
 
         $cache = new WriteCache($this->redis, $this->log, $loaderFactory);
         $cache->cacheAllUsers(INSTANCE_ID);
+    }
+
+    /**
+     * Adds a failure.
+     */
+    protected function incrementFailureCount()
+    {
+        $this->failureCount++;
+    }
+
+    /**
+     * Have any failures been recorded?
+     *
+     * @return bool
+     */
+    protected function isTestFailed()
+    {
+        return $this->failureCount > 0;
     }
 }

@@ -37,10 +37,6 @@ class CampusReassignment extends AbstractNotificationTest
     /** @var int */
     private $currentCampus;
 
-    /** @var int */
-    private $failureCount = 0;
-
-
     /**
      * Provide the list of daemons that need to be attached for this test
      *
@@ -123,7 +119,7 @@ class CampusReassignment extends AbstractNotificationTest
         } elseif ($this->currentCampus == self::CAMPUS_TWO) {
             // this is the end of the test
 
-            if ($this->failureCount > 0) {
+            if ($this->isTestFailed()) {
                 $this->log->alert("Test ended with failures");
             } else {
                 $this->log->warning("Test ended, no failures recorded; manual check for success required");
@@ -174,7 +170,7 @@ class CampusReassignment extends AbstractNotificationTest
 
         if (!$this->verifyCampusMembership($message, $recipientId)) {
             $this->log->error("User $recipientId should NOT have received message $messageId");
-            ++$this->failureCount;
+            $this->incrementFailureCount();
         }
     }
 
