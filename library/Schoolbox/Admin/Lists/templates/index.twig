@@ -89,15 +89,21 @@
             $(this).confirmDialog({
                 text: '{{ tables[table].deleteWarning }}',
                 confirmEvent: function () {
+
+                    var $toast = $('#toast');
+                    $toast.toastActivate({text: 'Deleting item...'});
+
                     $.post('{{ routeLookup('adminLists.postDelete') }}', {
                         table: '{{ table }}',
                         id: deleteId
                     })
-                            .done(function (response) {
-                                if (response.result !== false) {
-                                    listItem.remove();
-                                }
-                            });
+                    .done(function (response) {
+                        if (response.result !== false) {
+                            listItem.remove();
+                        $toast.toastTimeout({text: 'Item deleted', css: 'success'});
+                        } else {
+                            $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});}
+                    });
                 }
             });
         });
@@ -412,3 +418,5 @@
         {% endif %}
     </li>
 </div>
+
+<div id="toast" class="toast" data-alert></div>
