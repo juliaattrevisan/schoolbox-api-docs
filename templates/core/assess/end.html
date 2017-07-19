@@ -17,12 +17,14 @@
         <div class="alert-box success">Quiz Completed</div>
         <section class="content">
             <!-- BEGIN has_marks -->
-            <p class="grade">
-                <span>{ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)</span>
-            </p>
-
             <p>
                 <em>This mark is unconfirmed and may change following teacher review.</em>
+            </p>
+            <p class="grade">
+                <span>{ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)</span>
+                <!-- BEGIN view_attempt -->
+                <a href="/assess/studentReview/{ASSESS_ID}/{SECTION_ID}/{ATTEMPT_ID}{RETURN_URL_SUFFIX}">View results</a>
+                <!-- END view_attempt -->
             </p>
             <!-- END has_marks -->
 
@@ -41,8 +43,6 @@
 </div>
 <div class="row">
     <div class="small-12 column">
-        <!-- BEGIN view_attempt -->
-        <a class="button expand submit" href="/assess/studentReview/{ASSESS_ID}/{SECTION_ID}/{ATTEMPT_ID}{RETURN_URL_SUFFIX}">View Results</a>
-        <!-- END view_attempt -->
+        <a class="submit button expand" href="">Return home</a>
     </div>
 </div>

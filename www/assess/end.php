@@ -88,7 +88,7 @@ $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setBlock(TEMPLATE_content, 'unmarkedRemaining', 'unmarkedRemaining_block');
 $this->setBlock(TEMPLATE_content, 'has_marks', 'has_marks_block');
-$this->setBlock(TEMPLATE_content, 'view_attempt', 'view_attempt_block');
+$this->setBlock('has_marks', 'view_attempt', 'view_attempt_block');
 
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
 
