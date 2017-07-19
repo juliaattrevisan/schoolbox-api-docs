@@ -36,9 +36,28 @@ class RoleMapper extends Mapper
         $this->uses('digest_schedule', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteUsersExists']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeletePastoralAccess']);
     }
 
+
+    /**
+     * Soft deleted callback to ensure the role does not have any extant users
+     *
+     * (FKs will take care of the hard-delete scenario)
+     *
+     * @param Role $role
+     * @return bool
+     */
+    public function softDeleteUsersExists(Role $role)
+    {
+        $userMapper = UserMapper::getInstance();
+        $pb         = $userMapper->getPredicateBuilder();
+        $pb->isNull('deleted_at');
+        $pb->equals('group_id', $role->getId());
+
+        return !$userMapper->countByPredicates($pb);
+    }
 
     /**
      * @param Role $role
