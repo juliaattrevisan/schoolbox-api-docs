@@ -3,7 +3,7 @@
 {% block details_tutorTeacher %}
 {% if showClasses %}
     {% if tutorTeacher %}
-    <dt class="small-12 medium-3">Academic Care Coordinator:</dt>
+    <dt class="small-12 medium-3">Academic Care Coordinator</dt>
     <dd class="small-12 medium-9">
         {% if tutorTeacher.id %}
             <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
@@ -17,7 +17,7 @@
 
 {% block details_coordTeacher %}
 {% if coordTeacher %}
-<dt class="small-12 medium-3">Year Wellbeing Coordinator:</dt>
+<dt class="small-12 medium-3">Year Wellbeing Coordinator</dt>
 <dd class="small-12 medium-9">
     {% if coordTeacher.id %}
         <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
@@ -30,7 +30,7 @@
 
 {% block details_hohTeacher %}
 {% if hohTeacher %}
-    <dt class="small-12 medium-3">House Academic Care Coordinator:</dt>
+    <dt class="small-12 medium-3">House Academic Care Coordinator</dt>
     <dd class="small-12 medium-9">
         {% if hohTeacher.id %}
             <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
@@ -43,7 +43,7 @@
 
 {% block details_formTeacher %}
     {% if formTeacher %}
-        <dt class="small-12 medium-3">Coach:</dt>
+        <dt class="small-12 medium-3">Coach</dt>
         <dd class="small-12 medium-9">
             {% if formTeacher.id %}
                 <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
@@ -57,13 +57,17 @@
 {% block details_tutorGroup %}
 {% if showClasses %}
     {% if externalUser.StudentTutorDescription %}
-    <dt class="small-12 medium-3">Circle Class:</dt>
+    <dt class="small-12 medium-3">Circle Class</dt>
     <dd class="small-12 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
     {% endif %}
 
     {% if externalUser.StudentFormStaffName %}
-    <dt class="small-12 medium-3">Circle Teacher:</dt>
+    <dt class="small-12 medium-3">Circle Teacher</dt>
     <dd class="small-12 medium-9">{{ externalUser.StudentFormStaffName }}</dd>
     {% endif %}
 {% endif %}
 {% endblock details_tutorGroup %}
+
+{% block details_studentType %}
+    {# Intentionally empty #}
+{% endblock details_studentType %}
