@@ -434,7 +434,7 @@ class External_Maze_User implements External_UserInterface {
 				ADDRESS01 AS StudentContactAddress1,
 				ADDRESS02 AS StudentContactAddress2,
 				ADDRESS03 AS StudentContactAddress3,
-				'' AS StudentContactSuburb,
+				UM.SUBURB AS StudentContactSuburb,
 				POSTCODE AS StudentContactPostCode,
 				STATE AS StudentContactState,
 				TELEPHONE AS StudentContactPhoneActual,
@@ -449,11 +449,13 @@ class External_Maze_User implements External_UserInterface {
 				TELEPHONE AS StudentContactSpousePhoneActual,
 				FMOBILE AS StudentContactSpouseMobilePhone,
 				FBUS_PHONE AS StudentContactSpouseOccupPhone,
-				'' AS StudentContactSpouseRelation
+				'' AS StudentContactSpouseRelation,
+				CASE WHEN DF.DFKEY = ST.FAMILY THEN 1 ELSE 0 END as primaryFamily
 			FROM DF
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
 			LEFT JOIN ST ON (DF.DFKEY = ST.FAMILY OR (ST.FAMB = DF.DFKEY AND ST.LIVING_B != 'N'))
 			WHERE ST.STKEY = '{$externalUserId}'
+			ORDER BY primaryFamily DESC
 		";
 
 	        return $this->getDb()->getAll($query);
