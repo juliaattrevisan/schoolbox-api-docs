@@ -98,7 +98,7 @@ class Module extends BaseModule
         $this->register('GET', '/{userId:\d+}/{termCode}/{subjectId:\d+}',         'getGradesForSubject', $permissions, $loadVieweeTermFolder);
 
         // Filtered routes (todo merge GET + POST and distinguish via sync vs. ajax)
-        $this->register('POST', '/report/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport',          $permissions, $loadVieweeTermFolder);
+        $this->register('POST', '/{userId:\d+}/{termCode}/{subjectId:\d+}', 'postReport',          $permissions, $loadVieweeTermFolder);
     }
 
 
