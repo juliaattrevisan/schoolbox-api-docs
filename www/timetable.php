@@ -234,13 +234,19 @@ foreach ($userList as $user) {
                                     if (!isset($catCache[$class['code']])) {
                                         try {
                                             $cat = $categoryMapper->findByCode($class['code']);
-                                            $catCache[$class['code']] = $cat->getId();
-                                            $description = $class['description'] ? $class['description'] : $cat->getName();
-
+                                            /** @var Schoolbox\Resource\Folder\Model[] $catCache */
+                                            $catCache[$class['code']] = $cat;
                                         } catch (\Schoolbox\Mapper\Exception $e) {
                                             //Subject not found
-                                            $description = $class['description'] ? $class['description'] : $class['code'];
                                         }
+                                    }
+
+                                    if ($class['description']) {
+                                        $description = $class['description'];
+                                    } elseif (isset($catCache[$class['code']])) {
+                                        $description = $catCache[$class['code']]->getName();
+                                    } else {
+                                        $description = $class['code'];
                                     }
 
                                     $this->setVar([
@@ -251,7 +257,7 @@ foreach ($userList as $user) {
                                         'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
                                     ]);
 
-                                    if ($catCache[$class['code']] && $groupHandler->getPermission($catCache[$class['code']]) >= READ_ACCESS) {
+                                    if (isset($catCache[$class['code']]) && $groupHandler->getPermission($catCache[$class['code']]->getId()) >= READ_ACCESS) {
                                         // Yes you really do need to double url-encode this
                                         $this->setVar(
                                             'PERIOD_URL',
