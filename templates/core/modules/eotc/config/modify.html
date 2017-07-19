@@ -55,6 +55,22 @@
 						<textarea name="ramsWarning" class="fullwidth">{CONFIG_RAMS_WARNING}</textarea>
 					</div>
 				</fieldset>
+
+
+				<fieldset class="content">
+					<legend>
+						External DB Sync <span class='hint has-tip tip-top' title="Approved Events are uploaded into the external database" data-tooltip="">?</span>
+					</legend>
+					<div class="small-12 columns">
+						<div class="switch">
+							<input id="externalDbSync" name="externalDbSync" type="checkbox" value="1" {CONFIG_EXTERNAL_DB_SYNC_CHECKED} />
+							<label for="externalDbSync">
+								<span>On</span>
+								<span>Off</span>
+							</label>
+						</div>
+					</div>
+				</fieldset>
 			</section>
 
 			<input type="submit" value="Submit" />

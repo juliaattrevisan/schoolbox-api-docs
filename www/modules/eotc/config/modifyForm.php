@@ -12,6 +12,8 @@
 
 require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
+use EOTC\ConfigMapper;
+
 $page = new SitePage();
 
 new \EOTC\Authenticator($page);
@@ -20,25 +22,33 @@ new \EOTC\Authenticator($page);
 $sessionUser = $_SESSION['user'];
 
 if ($sessionUser->isSuperuser()) {
-	$configMapper = new \EOTC\ConfigMapper();
+	$configMapper = new ConfigMapper();
+    $allConfigs = $configMapper->findAll();
 
-	$firstReminder = $configMapper->findByColumn('name', 'first_reminder')->first();
-	$dailyReminder = $configMapper->findByColumn('name', 'daily_reminder')->first();
-	$urgentThreshold = $configMapper->findByColumn('name', 'urgent_threshold')->first();
-	$policy = $configMapper->findByColumn('name', 'policy')->first();
-	$ramsWarning = $configMapper->findByColumn('name', 'rams_warning')->first();
+	$firstReminder = $allConfigs->getBy('name', 'first_reminder');
+    $firstReminder->setValue((int)$_POST['firstReminder']);
 
-	$firstReminder->setValue($_POST['firstReminder']);
-	$dailyReminder->setValue($_POST['dailyReminder']);
-	$urgentThreshold->setValue($_POST['urgentThreshold']);
-	$policy->setValue($_POST['policy']);
-	$ramsWarning->setValue($_POST['ramsWarning']);
+	$dailyReminder = $allConfigs->getBy('name', 'daily_reminder');
+    $dailyReminder->setValue((int)$_POST['dailyReminder']);
+
+	$urgentThreshold = $allConfigs->getBy('name', 'urgent_threshold');
+    $urgentThreshold->setValue((int)$_POST['urgentThreshold']);
+
+	$policy = $allConfigs->getBy('name', 'policy');
+    $policy->setValue($_POST['policy']);
+
+	$ramsWarning = $allConfigs->getBy('name', 'rams_warning');
+    $ramsWarning->setValue($_POST['ramsWarning']);
+
+    $externalDbSync = $allConfigs->getBy('name', 'external_db_sync');
+    $externalDbSync->setValue((int)$_POST['externalDbSync']);
 
 	$configMapper->save($firstReminder);
 	$configMapper->save($dailyReminder);
 	$configMapper->save($urgentThreshold);
 	$configMapper->save($policy);
 	$configMapper->save($ramsWarning);
+    $configMapper->save($externalDbSync);
 
 	$page->localRedir('/modules/eotc/config/modify');
 }

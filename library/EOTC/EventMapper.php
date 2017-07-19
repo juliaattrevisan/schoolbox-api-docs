@@ -15,7 +15,6 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 /**
@@ -394,11 +393,11 @@ class EventMapper extends Calendar\EventMapper {
      *
      * Override to prevent base postSave from occurring
      *
-     * @param Calendar\Event $event
+     * @param \EOTC\Event $event
      */
     protected function postSave($event)
     {
-        /* Noop
+        /* noop
          */
     }
 

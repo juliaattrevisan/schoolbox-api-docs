@@ -56,7 +56,16 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $this->setBlock(TEMPLATE_content, 'event_resourcebooking', 'event_resourcebooking_block');
     $this->setBlock(TEMPLATE_content, 'has_modify_event', 'has_modify_event_block');
 
+    /* Find out if the external sync config is enabled
+     */
+    $configMapper = new \EOTC\ConfigMapper();
 
+    $this->setVar([
+        'SYNC_ENABLED' => $configMapper->findOneByColumn('name', 'external_db_sync')->getValue() == 1 ? 'true' : 'false'
+    ]);
+
+    /* Event details
+     */
     $this->setVar(
         array(
             'EVENT_ID'           => $event->getId(),
@@ -91,6 +100,8 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
 
         $this->setVar(
             array(
+                'SERIES_EVENTS_NUM' => $recurrence['num'],
+                'SERIES_EVENTS_DESCRIPTION' => $recurrence['freq'],
                 'EVENT_REC_FREQ'  => ucfirst($recurrence['freq']),
                 'EVENT_REC_START' => $recurrenceStart->getLongDateOnly(),
                 'EVENT_REC_END'   => $recurrenceEnd->getLongDateOnly(),
@@ -100,6 +111,11 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     } else {
         $this->setVar(
             array(
+                'SERIES_EVENTS_NUM' => 0,
+                'SERIES_EVENTS_DESCRIPTION' => '',
+                'EVENT_REC_FREQ'  => '',
+                'EVENT_REC_START' => '',
+                'EVENT_REC_END'   => '',
                 'recurring_reminder_block' => ''
             )
         );

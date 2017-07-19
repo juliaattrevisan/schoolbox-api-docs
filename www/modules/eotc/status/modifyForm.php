@@ -8,20 +8,35 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
+$kernel = require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
+
+use Alaress\Database\Factory;
+use EOTC\Excursion\Connector as ExcursionConnector;
+use EOTC\ActivityLog\Registry as ActivityLogRegistry;
+use EOTC\ActivityLog\Factory as ActivityLogFactory;
+use EOTC\Authenticator;
+use EOTC\ConfigMapper;
+use EOTC\EventMapper;
+use EOTC\EventMetadataMapper;
+use EOTC\EventStatusMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Mapper\Exception as MapperException;
 
 $page = new SitePage();
+$page->setDi($kernel->getDependencyInjector());
+
+$eventMapper = EventMapper::getInstance();
+
 $event = false;
 
 /* Spawn an existing event if id provided
  */
 try {
-	$eventMapper = \EOTC\EventMapper::getInstance();
 
 	/** @var \EOTC\Event $event */
 	$event = $eventMapper->findById($_POST['eventId']);
 }
-catch (\Schoolbox\Mapper\Exception $e) {
+catch (MapperException $e) {
 	error(160);
 }
 
@@ -31,7 +46,7 @@ $sessionUser = $_SESSION['user'];
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
  * can view this page
  */
-$authenticator = new \EOTC\Authenticator($page);
+$authenticator = new Authenticator($page);
 
 /* Only EOTC Administrators can view this page and a special case for
  * events where creators can self-promote this status into the next.
@@ -64,7 +79,7 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
 	/* Update with values
 	 */
-	$statusMapper = \EOTC\EventStatusMapper::getInstance();
+	$statusMapper = EventStatusMapper::getInstance();
 
 	/** @var \EOTC\EventStatus $status */
 	$status = $statusMapper->findById($_POST['statusId']);
@@ -76,13 +91,13 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	$event->getMetadata()->setStatus($status);
 	$event->getMetadata()->setComment($_POST['comment']);
 
-	$metadataMapper = \EOTC\EventMetadataMapper::getInstance();
+	$metadataMapper = EventMetadataMapper::getInstance();
 	$metadataMapper->save($event->getMetadata());
 
 	/* Activity Log
 	 */
-	$registry = new \EOTC\ActivityLog\Registry();
-	$factory = new \EOTC\ActivityLog\Factory($event, $sessionUser);
+	$registry = new ActivityLogRegistry();
+	$factory = new ActivityLogFactory($event, $sessionUser);
 
 	/* If a status changed, log it
 	 */
@@ -99,6 +114,47 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	/* Notify everyone
 	 */
 	$registry->notify();
+
+	/* Optionally sync with external db
+	 */
+    $configMapper = new ConfigMapper();
+    $externalDbSync = $configMapper->findOneByColumn('name', 'external_db_sync');
+
+    if ($externalDbSync->getValue() == 1) {
+
+        /* Sync to External DB only when the current status is Approved and
+         * its previous status was not Approved so we can't spam this event
+         * into External DB by altering its contents after the fact
+         */
+        if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
+            $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
+
+            /* Synchronise all events in a series if appropriate
+             * Otherwise just sync one event
+             */
+            if ($event->getSeriesId()) {
+                $allEvents = $eventMapper->getAllInSeries($event);
+            }
+            else {
+                $allEvents = new \Schoolbox\Collection();
+                $allEvents->add($event);
+            }
+
+            foreach ($allEvents as $currentEvent) {
+                try {
+                    $excursionConnector->sync($currentEvent);
+                }
+                catch (\DomainException $e) {
+
+                    /* Occurs when trying to create a new EOTC event, but a Synweb id
+                     * already exists for it. This can happen if
+                     *  - you mangle the Back button in the browser
+                     *  - or if superusers change status to non-approved then re-approve
+                     */
+                }
+            }
+        }
+    }
 
 	/* Admin redirect back to review screen
 	 */
