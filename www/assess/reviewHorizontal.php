@@ -177,7 +177,7 @@ else {
 		'ASSESS_START' => $openDate->getShort(),
 		'ASSESS_FINISH' => $dueDate->getShort(),
 		'SECTION_TITLE' => Scrub::text($section['title']),
-		'QUESTION_TITLE' => Scrub::text($question['title']),
+		'QUESTION_TITLE' => Scrub::html($question['question']),
 		'ASSESS_CATEGORY_ID' => $category->getId(),
 		'ASSESS_CATEGORY_NAME' => Scrub::text($category->getName()),
 		'visible_staff_block'                  => '',
