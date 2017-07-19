@@ -62,15 +62,15 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         $tableData = $this->getTableData();
-        $mapper_name = $tableData[$post['table']]['mapper'];
+        $mapperName = $tableData[$post['table']]['mapper'];
 
-        if (class_exists($mapper_name)) {
+        /** @var Mapper $mapperName */
+        if (class_exists($mapperName)) {
             /** @var Mapper $mapper */
-            $mapper = new $mapper_name;
+            $mapper = $mapperName::getInstance();
             try {
                 $record = $mapper->findById($post['id']);
-                $mapper->delete($record);
-                $result = true;
+                $result = $mapper->delete($record);
             } catch (MapperException $e) {
             }
         }
