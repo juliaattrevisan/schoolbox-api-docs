@@ -50,10 +50,16 @@ class Mapper extends BaseMapper
             throw new MapperException('User has no campus, and therefore has no menu');
         }
 
-        $webmail = "";
+        $webmail = '';
 
         if (!$user->getWebmail()) {
             $webmail = "AND menu_top.webmail = 0";
+        }
+
+        $eportfolio = '';
+
+        if (!$user->getEportfolioEnable()) {
+            $eportfolio = "AND menu_top.text NOT like 'ePortfolio'";
         }
 
         $query = "
@@ -65,6 +71,7 @@ class Mapper extends BaseMapper
                 AND menu_top_role.role_id = :roleId    
                 AND menu_top.deleted_at IS NULL
                 {$webmail}
+                {$eportfolio}
                 ORDER BY sort_order ASC
         ";
 
@@ -74,5 +81,5 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateList($statement);
-    }    
+    }
 }
