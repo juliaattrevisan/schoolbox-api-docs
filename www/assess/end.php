@@ -86,8 +86,10 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
 $this->setFile(TEMPLATE_content, 'assess/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
-$this->setBlock(TEMPLATE_content, 'unmarkedRemaining', 'unmarkedRemaining_block');
 $this->setBlock(TEMPLATE_content, 'has_marks', 'has_marks_block');
+$this->setBlock(TEMPLATE_content, 'has_complete', 'has_complete_block');
+
+$this->setBlock('has_marks', 'unmarkedRemaining', 'unmarkedRemaining_block');
 $this->setBlock('has_marks', 'view_attempt', 'view_attempt_block');
 
 $this->setTitle('Assessment: ' . Scrub::text($assess['title']));
@@ -183,6 +185,13 @@ if ($numUnmarkedQuestions) {
     $this->parse('unmarkedRemaining_block', 'unmarkedRemaining');
 } else {
     $this->setVar('unmarkedRemaining_block', '');
+}
+
+if($assess['completion_message']) {
+    $this->parse('has_complete_block', 'has_complete');
+}
+else {
+    $this->setVar('has_complete_block','');
 }
 
 /* View Attempt link
