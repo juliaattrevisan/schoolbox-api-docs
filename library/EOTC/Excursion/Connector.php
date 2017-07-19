@@ -95,7 +95,7 @@ class Connector
      */
     private function generateIdentifier($eventId)
     {
-        return "EOTC_SYNC_{$eventId}";
+        return "EOTC_{$eventId}";
     }
 
     /**
