@@ -153,7 +153,9 @@ abstract class AbstractNotificationTest extends AbstractTest
      */
     protected function clearRedis()
     {
-        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
+        $this->log->notice(
+            trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared'
+        );
     }
 
 
@@ -183,5 +185,4 @@ abstract class AbstractNotificationTest extends AbstractTest
         $cache = new WriteCache($this->redis, $this->log, $loaderFactory);
         $cache->cacheAllUsers(INSTANCE_ID);
     }
-
 }

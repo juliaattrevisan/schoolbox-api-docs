@@ -16,7 +16,6 @@ use Schoolbox\Learning\Quiz\Section\Question\QuestionType\Mapper as QuizQuestion
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 
-
 /**
  * Class Mapper
  * @package Schoolbox\Learning\Quiz\Section\Question
