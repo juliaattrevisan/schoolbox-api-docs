@@ -138,12 +138,25 @@ class QuizNotifications extends AbstractNotificationTest
         $message   = $this->fetchMessageInstance($messageId)->jsonSerialize();
         $recipient = $this->getUser($recipientId);
 
-        if (!preg_match('`/assess/[A-Za-z]+/(\d+)`', $message['href'], $matches)) {
-            $this->log->notice("For some reason, href '{$message['href']}' doesn't match expectation");
-            return;
-        }
+        if (preg_match('`/assess/[A-Za-z]+/(\d+)`', $message['href'], $matches)) {
+            list (, $quizId) = $matches;
 
-        list (, $quizId) = $matches;
+        } else {
+            // This message is targeted to the parent, and therefore doesn't reference the quiz.
+            // Extract quiz ID out of topics
+            foreach ($message['topics'] as $topic) {
+                if (preg_match('`INFO\\.notify\\.parent\\.\\d+\\.assess\\.(\\d+).updated`', $topic, $matches)) {
+                    list (, $quizId) = $matches;
+                    break;
+                }
+            }
+
+            if (empty($quizId)) {
+                $this->log->notice("For some reason, href '{$message['href']}' doesn't match expectation");
+                return;
+            }
+
+        }
 
         switch ($message['title']['text']) {
             // new quiz
