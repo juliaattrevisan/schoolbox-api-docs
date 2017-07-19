@@ -252,3 +252,4 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
 ]);
 
+$this->setVar('RETURN_URL', $folderUrl);
