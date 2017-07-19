@@ -235,13 +235,13 @@ foreach ($userList as $user) {
                                         try {
                                             $cat = $categoryMapper->findByCode($class['code']);
                                             $catCache[$class['code']] = $cat->getId();
+                                            $description = $class['description'] ? $class['description'] : $cat->getName();
 
                                         } catch (\Schoolbox\Mapper\Exception $e) {
                                             //Subject not found
+                                            $description = $class['description'] ? $class['description'] : $class['code'];
                                         }
                                     }
-
-                                    $description = $class['description'] ? $class['description'] : $cat->getName();
 
                                     $this->setVar([
                                         'PERIOD_DESC'   => Scrub::Text($description),
@@ -250,9 +250,6 @@ foreach ($userList as $user) {
                                         'PERIOD_STAFF'  => Scrub::Text($period_staff),
                                         'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
                                     ]);
-
-
-
 
                                     if ($catCache[$class['code']] && $groupHandler->getPermission($catCache[$class['code']]) >= READ_ACCESS) {
                                         // Yes you really do need to double url-encode this
