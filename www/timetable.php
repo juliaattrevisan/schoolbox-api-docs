@@ -115,6 +115,9 @@ foreach ($userList as $user) {
                                 if (isset($currentClass['description']) && strlen($currentClass['description'])) {
                                     $classCount++;
                                 }
+                                else if (isset($currentClass['code']) && strlen($currentClass['code'])) {
+                                    $classCount++;
+                                }
                             }
                         }
                     }
@@ -227,27 +230,34 @@ foreach ($userList as $user) {
                                         }
                                     } // staff, or external_db is disabled
 
+                                    /* Lookup subject code and check permissions, if read access provide a link to the user */
+                                    if (!isset($catCache[$class['code']])) {
+                                        try {
+                                            $cat = $categoryMapper->findByCode($class['code']);
+                                            /** @var Schoolbox\Resource\Folder\Model[] $catCache */
+                                            $catCache[$class['code']] = $cat;
+                                        } catch (\Schoolbox\Mapper\Exception $e) {
+                                            //Subject not found
+                                        }
+                                    }
+
+                                    if ($class['description']) {
+                                        $description = $class['description'];
+                                    } elseif (isset($catCache[$class['code']])) {
+                                        $description = $catCache[$class['code']]->getName();
+                                    } else {
+                                        $description = $class['code'];
+                                    }
+
                                     $this->setVar([
-                                        'PERIOD_DESC'   => Scrub::Text($class['description']),
+                                        'PERIOD_DESC'   => Scrub::Text($description),
                                         'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
                                         'PERIOD_STAFF'  => Scrub::Text($period_staff),
                                         'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
                                     ]);
 
-                                    /* Lookup subject code and check permissions, if read access provide a link to the user */
-                                    if (!isset($catCache[$class['code']])) {
-                                        try {
-                                            $cat = $categoryMapper->findByCode($class['code']);
-                                            $catCache[$class['code']] = $cat->getId();
-
-                                        } catch (\Schoolbox\Mapper\Exception $e) {
-                                            //Subject not found
-                                        }
-                                    }
-
-
-                                    if ($catCache[$class['code']] && $groupHandler->getPermission($catCache[$class['code']]) >= READ_ACCESS) {
+                                    if (isset($catCache[$class['code']]) && $groupHandler->getPermission($catCache[$class['code']]->getId()) >= READ_ACCESS) {
                                         // Yes you really do need to double url-encode this
                                         $this->setVar(
                                             'PERIOD_URL',
