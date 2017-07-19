@@ -1,5 +1,20 @@
 {% extends '@core/user/student.twig' %}
 
+{% block details_hohTeacher %}
+    {% if showClasses %}
+        {% if hohTeacher %}
+            <dt class="small-12 medium-3">Staff House Leader:</dt>
+            <dd class="small-12 medium-9">
+                {% if hohTeacher.getId() %}
+                    <a href="{{ session.mailhandle }}{{ hohTeacher.getEmail() }}">{{ hohTeacher.formatName() }}</a>
+                {% else %}
+                    {{ hohTeacher.formatName() }}
+                {% endif %}
+            </dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_hohTeacher %}
+
 {% if showButtons %}
     {% block details_studiesCode %}
         {% if externalUser.StudentStudiesCode %}
