@@ -177,17 +177,22 @@ class Markbook
      */
     protected function collateStatistics()
     {
-        // Collate assessments and weight
-        foreach ($this->getTopLevelAssessments() as $assessment) {
+        // Collate all assessment statistics
+        foreach ($this->assessments as $assessment) {
             $this->collateAssessmentStatistics($assessment);
+        }
+
+        // But only top-level assessments contribute to markbook total weight
+        foreach ($this->getTopLevelAssessments() as $assessment) {
             $this->totalWeight += $assessment->getWeight();
         }
 
-        // Collate weight percent for each assessment
+        // Collate weight percent for each top-level assessment
         if ($this->totalWeight > 0) {
             foreach ($this->getTopLevelAssessments() as $assessment) {
-                $this->assessmentStatistics[$assessment->getId()]['weightPercent'] =
-                    $this->assessmentStatistics[$assessment->getId()]['weight'] / $this->totalWeight * 100;
+                $assessmentId = $assessment->getId();
+                $this->assessmentStatistics[$assessmentId]['weightPercent'] =
+                    $this->assessmentStatistics[$assessmentId]['weight'] / $this->totalWeight * 100;
             }
         }
 
@@ -197,7 +202,7 @@ class Markbook
         $weightedSummator  = new WeightedAverage();
 
         // Not all assessables are used in stats:
-        // only ones for which feedback is visible are usable.
+        // only ones for which feedback is visible, and are not project sub-assessments, are usable.
         $visibleAssessments = $this->topLevelAssessments->filter(function(IAssessable $assessable) {
             return $assessable->isFeedbackVisibleToUser($this->viewingUser);
         });
@@ -304,8 +309,9 @@ class Markbook
             // Pass 2: weight percent
             if ($statistics['projectTotalWeight'] > 0) {
                 foreach ($assessment->getAssessables() as $projectAssessment) {
-                    $this->assessmentStatistics[$projectAssessment->getId()]['projectWeightPercent']
-                        = $this->assessmentStatistics[$projectAssessment->getId()]['weightInProject'] / $statistics['projectTotalWeight'] * 100;
+                    $projectAssessmentId = $projectAssessment->getId();
+                    $this->assessmentStatistics[$projectAssessmentId]['projectWeightPercent']
+                        = $this->assessmentStatistics[$projectAssessmentId]['weightInProject'] / $statistics['projectTotalWeight'] * 100;
                 }
             }
         }

@@ -59,7 +59,7 @@
                             <span>Student Average</span>
                         </div>
                     </th>
-                    {% for assessment in markbook.assessmentsWithProjectContents  %}
+                    {% for assessment in markbook.assessments %}
                     <th data-assessment="{{ assessment.id }}">
                         <div>
                                 <span>
@@ -81,7 +81,7 @@
                     <th class="{{ urgency.marks(markbook.normalisedMean) }}-bg">
                             {{ weightedMean | default('–') }}
                     </th>
-                    {% for assessment in markbook.assessmentsWithProjectContents %}
+                    {% for assessment in markbook.assessments %}
                         {% set assessmentMean = markbook.assessmentStatistics[assessment.id].mean %}
                         <th class="{{ urgency.marks(assessmentMean) }}-bg" data-assessment="{{ assessment.id }}">
                                 {{ assessmentMean | default('–') }}
@@ -124,14 +124,14 @@
                     {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
                     {% set meanNormalised = markbook.studentStatistics[student.id].meanNormalised %}
                     <th class="{{ urgency.marks(meanNormalised) }}-bg">
-                        {# TODO use actual selected term code #}
+                        {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
                         <a class="{{ urgency.marks(meanNormalised) }}-bg"
                            href="{{ routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students {{ locale.grades.plural }}">
                             {{ studentMean | default('–') }}
                         </a>
                     </th>
 
-                    {% for assessment in markbook.assessmentsWithProjectContents  %}
+                    {% for assessment in markbook.assessments %}
                         <td class="column-{{ assessment.id }}" data-assessment="{{ assessment.id }}">
                             {% if assessment.isParticipant(student) %}
                                 {% set participant = assessment.getParticipant(student) %}
