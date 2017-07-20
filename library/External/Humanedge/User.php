@@ -311,7 +311,69 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        return [];
+        $query = "
+            SELECT      
+                t.PersonID AS StaffID,
+                t.Code AS SchoolStaffCode,
+                t.Title AS StaffTitle,
+                    CASE WHEN (LEN(t.PreferredName)>0) 
+                    THEN t.PreferredName 
+                    ELSE t.FirstName END 
+                    AS StaffPreferredName,
+                t.LastName AS StaffSurname,
+                '' AS StaffOccupPhone,
+                COALESCE(
+                    CASE WHEN (LEN(t.Email2) > 0) THEN t.Email2 ELSE NULL END,
+                    CASE WHEN (LEN(t.Email) > 0) THEN t.Email ELSE NULL END
+                ) AS StaffOccupEmail,
+                '' AS StaffExtension,
+                c.Name AS StaffCampusDescription,
+                '' AS StaffCategory,
+                '' AS StaffCategoryType,
+                t.Mobile AS StaffDefaultMobilePhone,
+                '' AS StaffVoiceMail,
+                t.TeachingDepartment AS StaffDepartmentDescription,
+                '' AS StaffJobPositionStartDate,
+                '' AS StaffJobPositionEndDate,
+                t.Position AS JobPositionDescription,
+                '' AS JobPositionDescriptionAlternate
+            FROM Staff t
+            LEFT JOIN Person.PersonPhone ON Person.PersonPhone.PersonID = t.PersonID
+            LEFT JOIN Campus c ON t.CampusID = c.ID
+            WHERE t.Deceased = 'N'
+        ";
+
+        /* Get everyone
+         */
+        $allStaff = $this->getDatabase()->getAll($query);
+
+        /* Each person can have 0..N "phone" fields. This is really a mechanism of contact
+         * and includes home/family/business/email/mobile/other records for some reason so
+         * we need to filter out and select the data we want
+         */
+        $processed = [];
+
+        foreach ($allStaff as $currentStaff) {
+            if (!isset($processed[$currentStaff['SchoolStaffCode']])) {
+                $processed[$currentStaff['SchoolStaffCode']] = $currentStaff;
+            }
+
+            /* Assign Business Phone
+             */
+            if ($currentStaff['PhoneType'] == 'Business') {
+                $processed[$currentStaff['SchoolStaffCode']]['StaffOccupPhone'] = $currentStaff['Number'];
+            }
+
+            /* Assign Extension
+             */
+            if ($currentStaff['PhoneType'] == 'Other') {
+                $processed[$currentStaff['SchoolStaffCode']]['StaffExtension'] = $currentStaff['Number'];
+            }
+        }
+
+        return array_values($processed);
+
+//        $queryDebug = "SELECT Distinct TABLE_NAME FROM information_schema.TABLES";
     }
 
     /**
