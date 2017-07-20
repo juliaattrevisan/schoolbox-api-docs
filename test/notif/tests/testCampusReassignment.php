@@ -15,7 +15,7 @@ use Schoolbox\RoleMapper;
 
 
 /**
- * This class tests whether the rerouter respects users moving from one campus to another.
+ * This class tests whether routed respects users moving from one campus to another.
  */
 class CampusReassignment extends AbstractNotificationTest
 {
@@ -37,10 +37,6 @@ class CampusReassignment extends AbstractNotificationTest
     /** @var int */
     private $currentCampus;
 
-    /** @var int */
-    private $failureCount = 0;
-
-
     /**
      * Provide the list of daemons that need to be attached for this test
      *
@@ -59,12 +55,9 @@ class CampusReassignment extends AbstractNotificationTest
      */
     public function prepare()
     {
-        // fear not - you are sudo
-        `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
-        $this->log->notice('Weapons to maximum');
-        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
-        `rabbitmqadmin get queue=vagrantx.sb.sched count=10000 requeue=false`;
-        $this->log->notice("Rabbit schedule queue cleared");
+        $this->weaponsToMaximum();
+        $this->clearRedis();
+        $this->clearRabbit();
 
         // fix email addresses
         Database::getInstance()->query("UPDATE `user` SET alt_email = CONCAT(LOWER(firstname), '.', LOWER(lastname), '@school.box')");
@@ -78,12 +71,14 @@ class CampusReassignment extends AbstractNotificationTest
 
         // put everyone in senior campus
         $this->moveCampus(self::CAMPUS_ONE);
+
+        $this->cacheSubscriptions();
     }
 
 
     /**
-     * @rerouted  Added \d+ subscriptions
-     * @scheduled Connected to STOMP
+     * @routed    Listening on redis://routed.\w+.*
+     * @scheduled Listening on redis://scheduled.\w+.*
      */
     public function onReady()
     {
@@ -96,55 +91,48 @@ class CampusReassignment extends AbstractNotificationTest
         $this->log->info("Published an article");
     }
 
-
     /**
-     * @rerouted Tasking \d+ with reroute
+     * Test is finished after the test for campus 2 has been run.
+     *
+     * @return bool
      */
-    public function onWorkerTasked()
+    protected function isTestComplete()
     {
-        ++$this->activeWorkers;
+        return $this->currentCampus == self::CAMPUS_TWO;
     }
 
-
     /**
-     * @rerouted Task Complete
+     * Stage 2: campus 2
+     * All other stages are invalid (it starts on stage 1)
+     *
+     * @param int $stage
      */
-    public function onWorkerComplete()
+    protected function goToStage($stage)
     {
-        --$this->activeWorkers;
+        switch ($stage) {
+            case 2:
+                // go to stage 2 (campus 2)
+                $this->log->warning("All roles processed; moving to new campus");
+                $this->moveCampus(self::CAMPUS_TWO);
 
-        if ($this->activeWorkers > 0) {
-            $this->log->info("Waiting for $this->activeWorkers more workers to finish");
-            return;
+                // perform a recache
+                $this->cacheSubscriptions();
 
-        } elseif ($this->activeWorkers < 0) {
-            $this->log->error("WTF?!");
-            return;
+                // signal routed to drop the cache and reload
+                $this->sendSignal('routed', 'reload');
+                break;
 
-        } elseif ($this->currentCampus == self::CAMPUS_TWO) {
-            // this is the end of the test
-
-            if ($this->failureCount > 0) {
-                $this->log->alert("Test ended with failures");
-            } else {
-                $this->log->warning("Test ended, no failures recorded; manual check for success required");
-            }
-
-            $this->terminateDaemons();
-            return;
+            default:
+                // I shouldn't get to this stage
+                $this->log->warning("Invalid stage: $stage");
+                break;
         }
-
-        $this->log->warning("All roles processed; moving to new campus");
-        $this->moveCampus(self::CAMPUS_TWO);
-
-        // signal rerouted to drop the cache and
-        // TODO implement REDIS publish
     }
 
-
     /**
-     * @rerouted Dropped \d+ subscriptions
-     * @rerouted Reload complete
+     * @routed Received signal to reload
+     * @routed \d+ routes installed from cache
+     * @routed \d+ routes installed from cache
      */
     public function onReloadComplete()
     {
@@ -154,7 +142,7 @@ class CampusReassignment extends AbstractNotificationTest
 
 
     /**
-     * @rerouted SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<recipientId>\d+)
+     * @routed SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<recipientId>\d+)
      *
      * @param string $messageId
      * @param string $recipientId
@@ -171,19 +159,20 @@ class CampusReassignment extends AbstractNotificationTest
 
         if (!$this->verifyCampusMembership($message, $recipientId)) {
             $this->log->error("User $recipientId should NOT have received message $messageId");
-            ++$this->failureCount;
+            $this->incrementFailureCount();
         }
     }
 
 
     /**
-     * @rerouted DROP (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40})
+     * @routed User not a member of any given campus; expected  one of \[(?P<expected>\d+)\], got \[(?P<actual>\d+)\]
      *
-     * @param string $messageId
+     * @param int $expected
+     * @param int $actual
      */
-    public function onDrop($messageId)
+    public function onDrop($expected, $actual)
     {
-
+        $this->assertEquals(self::CAMPUS_ONE, $expected);
     }
 
 

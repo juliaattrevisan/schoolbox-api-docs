@@ -62,6 +62,24 @@ class EotcReminders extends AbstractNotificationTest
         return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
     }
 
+    /**
+     * Test completion isn't handled yet.
+     *
+     * @return false
+     */
+    protected function isTestComplete()
+    {
+        return false;
+    }
+
+    /**
+     * Does nothing yet.
+     *
+     * @param int $stage
+     */
+    protected function goToStage($stage)
+    {
+    }
 
     /**
      * @param int $id
@@ -185,7 +203,7 @@ class EotcReminders extends AbstractNotificationTest
     /**
      * When both daemons are ready to go, 
      *
-     * @rerouted  Added (?P<count>\d+) subscriptions
+     * @routed    Added (?P<count>\d+) subscriptions
      * @scheduled Connected to STOMP
      */
     public function onReady()
@@ -389,7 +407,7 @@ class EotcReminders extends AbstractNotificationTest
 
     /**
      *
-     * @rerouted ^SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<userId>\d+)
+     * @routed ^SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<userId>\d+)
      *
      * @param string $messageId
      * @param int    $userId

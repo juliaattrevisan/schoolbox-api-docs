@@ -16,6 +16,11 @@ use Schoolbox\Learning\Quiz\Section\Question\QuestionType\Mapper as QuizQuestion
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 
+/**
+ * Class Mapper
+ * @package Schoolbox\Learning\Quiz\Section\Question
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     protected function mapping()
@@ -69,18 +74,21 @@ class Mapper extends BaseMapper
         /** @var Model[]|GenericCollection $questions */
         $questions = $this->createCollection();
 
-        while($row = $statement->fetch(\PDO::FETCH_ASSOC))
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC))
         {
-            /** @var Model $question */
-            $question = $this->hydrate($row)
-                ->setSolution($this->hydrateJoin($row, 'solution', 's'));
+            $question = $this->hydrate($row);
 
-            // Does this Question have a Solution?
-            if(!$question->getSolution()->getId()){
-                $question->setSolution(null);
+            /** @var QuizSolution $solution */
+            $solution = $this->hydrateJoin($row, 'solution', 's');
+
+            if ($solution) {
+                // solution is for some reason optional, so only set it if it actually came through
+                $question->setSolution($solution);
             }
+
             $questions->add($question);
         }
+
         return $questions;
     }
 

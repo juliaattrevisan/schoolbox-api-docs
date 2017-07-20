@@ -7,12 +7,15 @@
  */
 
 use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Routing\Dictionary\SubscriptionDictionary;
+use Alaress\Routing\Router;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
@@ -35,8 +38,24 @@ class QuizNotifications extends AbstractNotificationTest
     /** @var Collection|User[] */
     protected $subscribers;
 
+    /** @var int */
+    protected $folderId;
+
+    /** @var int */
+    protected $adminId;
+
     /** @var array */
     protected $markGivenCache;
+
+    /**
+     * How many mark notifs have been sent to students?
+     *
+     * Terminate the test when all students have been notified about all quizzes they should be.
+     * @see $this->onWorkerComplete
+     *
+     * @var int
+     */
+    protected $sentMarkNotifs = 0;
 
     /**
      * Provide the list of daemons that need to be attached for this test
@@ -48,6 +67,26 @@ class QuizNotifications extends AbstractNotificationTest
         return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
     }
 
+    /**
+     * The test is complete when all students have received notifications for
+     * all quizzes that they should receive notifications for.
+     *
+     * @return bool
+     */
+    protected function isTestComplete()
+    {
+        $maxNotifsSendable = count($this->subscribers) * 2;
+        return $this->sentMarkNotifs >= $maxNotifsSendable;
+    }
+
+    /**
+     * This test has no stages.
+     *
+     * @param int $stage
+     */
+    protected function goToStage($stage)
+    {
+    }
 
     /**
      * Perform any setup required
@@ -56,39 +95,37 @@ class QuizNotifications extends AbstractNotificationTest
      */
     public function prepare()
     {
-        // fear not - you are sudo
-        `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
-        $this->log->notice('Weapons to maximum');
-        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
-        `rabbitmqadmin get queue=vagrantx.sb.sched count=10000 requeue=false`;
-        $this->log->notice("Rabbit schedule queue cleared");
+        $this->weaponsToMaximum();
+        $this->clearRedis();
+        $this->clearRabbit();
 
-        // Duke of Edinburgh
-        $folderId = 26;
+        // fetch the group with the largest number of subscribers
+        $this->folderId = Database::getInstance()->query('
+            SELECT sid
+            FROM userAccess ua
+            JOIN folder f ON f.id = ua.sid AND ua.service = 1
+            WHERE f.deleted_at IS NULL
+            AND ua.type > 0
+            GROUP BY sid
+            ORDER BY COUNT(sid) DESC
+            LIMIT 1
+        ')->fetchColumn();
 
-        $this->folder = Folder\Mapper::getInstance()->findById($folderId);
+        $this->adminId = Database::getInstance()->query('
+            SELECT uid
+            FROM userAccess
+            WHERE `type` = 3
+            AND service = 1
+            AND sid = ?
+        ', [ $this->folderId ])->fetchColumn();
 
-        // ask rabbit who has bindings for this
-        $subscribers = explode("\n", trim(`rabbitmqctl list_bindings | grep "service\.1\.$folderId\.1" | egrep -o "ux.[0-9]*" | cut -f2 -d.`));
+        $this->folder = Folder\Mapper::getInstance()->findById($this->folderId);
 
-        $users = [];
-
-        // get references to all these people
-        foreach ($subscribers as $userId) {
-            $users[$userId] = $this->getUser($userId);
-        }
-
-        $this->subscribers = (new Collection($users))->filter(
-            function ($user)
-            {
-                /** @var User $user */
-                return $user->getRole()->isStudent();
-            }
-        );
+        $this->subscribers = $this->getSubscribers($this->folderId);
 
         // erase any existing quizzes in the target folder
         Quiz\Mapper::getInstance()->deleteByColumnList([
-            'category_id'  => $this->folder->getId(),
+            'category_id'  => $this->folderId,
             'availability' => 'assess'
         ]);
 
@@ -98,14 +135,13 @@ class QuizNotifications extends AbstractNotificationTest
 
 
     /**
-     * @rerouted  Added \d+ subscriptions
-     * @scheduled Connected to STOMP
+     * @routed    Listening on redis://routed
+     * @scheduled Listening on redis://scheduled
      */
     public function onReady()
     {
         // start generating quizzes
-        $this->log->notice("Gettin yo quiz on", [ 'char' => '>' ]);
-
+        $this->log->notice('Gettin yo quiz on', [ 'char' => '>' ]);
 
         // load up the quiz instances
         $quizzes = [];
@@ -116,13 +152,13 @@ class QuizNotifications extends AbstractNotificationTest
         $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, '11 second', '15 second');
 
         foreach ($quizzes as $quiz) {
-            $this->saveQuiz($quiz, $this->getUser(self::ZANE_SMITH));
+            $this->saveQuiz($quiz, $this->getUser($this->adminId));
         }
     }
 
 
     /**
-     * @rerouted SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<recipientId>\d+)
+     * @routed SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> user (?P<recipientId>\d+)
      *
      * @param string $messageId
      * @param int    $recipientId
@@ -132,20 +168,33 @@ class QuizNotifications extends AbstractNotificationTest
         $message   = $this->fetchMessageInstance($messageId)->jsonSerialize();
         $recipient = $this->getUser($recipientId);
 
-        if (!preg_match('`/assess/[A-Za-z]+/(\d+)`', $message['href'], $matches)) {
-            $this->log->notice("For some reason, href '{$message['href']}' doesn't match expectation");
-            return;
-        }
+        if (preg_match('`/assess/[A-Za-z]+/(\d+)`', $message['href'], $matches)) {
+            list (, $quizId) = $matches;
 
-        list (, $quizId) = $matches;
+        } else {
+            // This message is targeted to the parent, and therefore doesn't reference the quiz.
+            // Extract quiz ID out of topics
+            foreach ($message['topics'] as $topic) {
+                if (preg_match('`INFO\\.notify\\.parent\\.\\d+\\.assess\\.(\\d+).updated`', $topic, $matches)) {
+                    list (, $quizId) = $matches;
+                    break;
+                }
+            }
+
+            if (empty($quizId)) {
+                $this->log->notice("For some reason, href '{$message['href']}' doesn't match expectation");
+                return;
+            }
+
+        }
 
         switch ($message['title']['text']) {
             // new quiz
-            case ":username opened a Quiz, :quizname, in :catname":
+            case ':username opened a Quiz, :quizname, in :catname':
 
                 // if the recipient is a student, attempt the quiz, otherwise ignore
                 if (!$recipient->getRole()->isStudent()) {
-                    $this->log->info("Not student; ignoring");
+                    $this->log->info('Not student; ignoring');
                     return;
                 }
 
@@ -153,11 +202,11 @@ class QuizNotifications extends AbstractNotificationTest
                 return;
 
             // new attempt
-            case ":student attempted :quiz in :category":
+            case ':student attempted :quiz in :category':
 
                 // if you staff, you handle this
                 if (!$recipient->getRole()->isStaff()) {
-                    $this->log->info("Not staff; ignoring");
+                    $this->log->info('Not staff; ignoring');
                     return;
                 }
 
@@ -175,7 +224,7 @@ class QuizNotifications extends AbstractNotificationTest
                 }
 
                 if (!preg_match('`^/search/user/(\d+)$`', $param->getHref(), $matches)) {
-                    $this->log->warning("Something went wrong extracting the student from the parameter");
+                    $this->log->warning('Something went wrong extracting the student from the parameter');
                     return;
                 }
 
@@ -197,15 +246,20 @@ class QuizNotifications extends AbstractNotificationTest
 
                 return;
 
-            case ":staff has marked your attempt of :quiz in :cat":
+            case ':staff has marked your attempt of :quiz in :cat':
                 // student has received mark notification: verify that should have happened
                 $this->assertTrue(Quiz\Mapper::getInstance()->findById($quizId)->isMarkShownToStudents());
                 $this->log->notice("Student {$recipient->formatName()} has correctly received mark notification");
+                $this->sentMarkNotifs++;
+                return;
 
+            case ":child's Quiz :quizname was updated in :catname":
+            case ':author updated :quizname in :catname':
+                // as part of this test setting up the description gets altered, so these are expected and ignorable
                 return;
 
             default:
-                $this->log->notice("Don't know how to handle: '{$message['title']['text']}'", [ 'char' => '?' ]);
+                $this->log->error("Don't know how to handle: '{$message['title']['text']}'", [ 'char' => '?' ]);
                 return;
         }
 
@@ -258,7 +312,40 @@ class QuizNotifications extends AbstractNotificationTest
                 $qm->save($quiz);
             }
         }
+    }
 
+    /**
+     * @param int  $folderId
+     * @param bool $recurseOnFail
+     * @throws InvalidArgumentException
+     * @throws UnderflowException
+     * @return Collection
+     */
+    private function getSubscribers($folderId, $recurseOnFail = true)
+    {
+        $router = new Router(new SubscriptionDictionary('.'));
+
+        (new ReadCache($this->redis, $this->log))->readIntoRouter(INSTANCE_ID, $router);
+
+        $subscribers = array_keys($router->get("*.notify.service.1.$folderId.1.*"));
+
+        if (empty($subscribers) && $recurseOnFail) {
+            $this->cacheSubscriptions();
+            return $this->getSubscribers($folderId, false);
+        }
+
+        $users = [];
+
+        // get references to all these people
+        foreach ($subscribers as $userId) {
+            $users[$userId] = $this->getUser($userId);
+        }
+
+        return (new Collection($users))->filter(
+            function (User $user) {
+                return $user->getRole()->isStudent();
+            }
+        );
     }
 
 
@@ -416,7 +503,7 @@ class QuizNotifications extends AbstractNotificationTest
 
         // keep tabs on this question ID so I can get it easily later
         $quiz->setDescription(json_encode($meta));
-        Quiz\Mapper::getInstance()->save($quiz);
+        $oam->save($quiz);
     }
 
 

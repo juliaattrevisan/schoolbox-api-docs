@@ -51,7 +51,8 @@ abstract class AbstractTest extends PHPUnit_Framework_TestCase implements TestCa
      */
     protected function markTestComplete()
     {
-        $this->log->notice("Test complete");
+        $this->log->notice('Test complete');
+        $this->terminateDaemons();
     }
 
 

@@ -58,7 +58,14 @@ class Collector extends DataCollector implements Renderable, AssetProvider
 
         foreach ($backtrace as $trace) {
             if (substr($trace['class'], 0, strlen($prefix)) != $prefix) {
-                $sql .= "Statment Class: " . get_class($statement) . "\nLine {$trace['line']}: {$trace['file']}::{$trace['function']}()\n\n";
+                $sql .= sprintf(
+                    "Statement Class: %s\nLine %d: %s::%s()\n\n",
+                    get_class($statement),
+                    isset($trace['line']) ? $trace['line'] : '<unknown>',
+                    isset($trace['file']) ? $trace['file'] : '<unknown>',
+                    isset($trace['function']) ? $trace['function'] : '<unknown>'
+                );
+
                 break;
             }
         }
