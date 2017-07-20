@@ -82,7 +82,6 @@ class Mapper extends BaseMapper
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             if ($row['availability'] == 'survey') {
-
                 $results[] = $row;
 
                 /** @var Model $model */
@@ -210,9 +209,13 @@ class Mapper extends BaseMapper
                         answer.answer     AS answers,
                         response.response AS selectedAnswers
             FROM        assess survey
-            JOIN        assess_section section ON section.deleted_at IS NULL AND section.assess_id = survey.assess_id
-            JOIN        assess_question question ON question.deleted_at IS NULL AND question.section_id = section.section_id
-            JOIN        assess_attempt attempt ON attempt.deleted_at IS NULL AND attempt.assess_id = survey.assess_id AND attempt.finish IS NOT NULL AND 
+            JOIN        assess_section section ON section.deleted_at IS NULL AND 
+                        section.assess_id = survey.assess_id
+            JOIN        assess_question question ON question.deleted_at IS NULL AND 
+                        question.section_id = section.section_id
+            JOIN        assess_attempt attempt ON attempt.deleted_at IS NULL AND 
+                        attempt.assess_id = survey.assess_id AND 
+                        attempt.finish IS NOT NULL AND 
                         attempt.attempt_id = (
                             SELECT    attempt_id
                             FROM      assess_attempt last_attempt

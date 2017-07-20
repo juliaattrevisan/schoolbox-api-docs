@@ -593,7 +593,6 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             }
         } else {
             foreach ($other as $item) {
-
                 if(is_object($item) ){
                     throw new \UnexpectedValueException('Cannot compare objects');
                 }
@@ -620,7 +619,6 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         $getterMethod = $this->getGetMethodName($column);
 
         foreach ($this as $item) {
-
             $value = $item->$getterMethod();
 
             if (is_object($value)) {
