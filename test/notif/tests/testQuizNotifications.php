@@ -67,6 +67,26 @@ class QuizNotifications extends AbstractNotificationTest
         return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
     }
 
+    /**
+     * The test is complete when all students have received notifications for
+     * all quizzes that they should receive notifications for.
+     *
+     * @return bool
+     */
+    protected function isTestComplete()
+    {
+        $maxNotifsSendable = count($this->subscribers) * 2;
+        return $this->sentMarkNotifs >= $maxNotifsSendable;
+    }
+
+    /**
+     * This test has no stages.
+     *
+     * @param int $stage
+     */
+    protected function goToStage($stage)
+    {
+    }
 
     /**
      * Perform any setup required
@@ -292,18 +312,6 @@ class QuizNotifications extends AbstractNotificationTest
                 $qm->save($quiz);
             }
         }
-    }
-
-    /**
-     * The test is complete when all students have received notifications for
-     * all quizzes that they should receive notifications for.
-     *
-     * @return bool
-     */
-    protected function isTestComplete()
-    {
-        $maxNotifsSendable = count($this->subscribers) * 2;
-        return $this->sentMarkNotifs >= $maxNotifsSendable;
     }
 
     /**

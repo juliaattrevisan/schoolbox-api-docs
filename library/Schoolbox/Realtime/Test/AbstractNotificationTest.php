@@ -102,26 +102,16 @@ abstract class AbstractNotificationTest extends AbstractTest
     /**
      * Is this test complete?
      *
-     * By default it is always false; this means that tests will have to mark
-     * themselves complete manually.
-     *
      * @return bool
      */
-    protected function isTestComplete()
-    {
-        return false;
-    }
+    abstract protected function isTestComplete();
 
     /**
      * Goes to a stage of the test.
      *
-     * By default tests have no stages; stage transitions are managed here.
-     *
      * @var int $stage
      */
-    protected function goToStage($stage)
-    {
-    }
+    abstract protected function goToStage($stage);
 
     /**
      * Ends the test.

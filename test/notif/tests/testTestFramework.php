@@ -15,6 +15,25 @@ use Schoolbox\Realtime\Test\AbstractNotificationTest;
 class TestFramework extends AbstractNotificationTest
 {
     /**
+     * The test's completion is not handled by a task daemon expiring.
+     *
+     * @return false
+     */
+    protected function isTestComplete()
+    {
+        return false;
+    }
+
+    /**
+     * This test has no stages.
+     *
+     * @param int $stage
+     */
+    protected function goToStage($stage)
+    {
+    }
+
+    /**
      * Set up the test case.
      */
     public function prepare()

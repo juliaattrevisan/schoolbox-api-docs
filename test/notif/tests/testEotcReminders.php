@@ -62,6 +62,24 @@ class EotcReminders extends AbstractNotificationTest
         return [ self::DAEMON_SCHEDULE, self::DAEMON_ROUTE ];
     }
 
+    /**
+     * Test completion isn't handled yet.
+     *
+     * @return false
+     */
+    protected function isTestComplete()
+    {
+        return false;
+    }
+
+    /**
+     * Does nothing yet.
+     *
+     * @param int $stage
+     */
+    protected function goToStage($stage)
+    {
+    }
 
     /**
      * @param int $id
