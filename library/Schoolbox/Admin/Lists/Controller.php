@@ -62,21 +62,28 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         $tableData = $this->getTableData();
-        $mapper_name = $tableData[$post['table']]['mapper'];
+        $mapperName = $tableData[$post['table']]['mapper'];
 
-        if (class_exists($mapper_name)) {
+        /** @var Mapper $mapperName */
+        if (class_exists($mapperName)) {
             /** @var Mapper $mapper */
-            $mapper = new $mapper_name;
+            $mapper = $mapperName::getInstance();
             try {
                 $record = $mapper->findById($post['id']);
-                $mapper->delete($record);
-                $result = true;
+                $result = $mapper->delete($record);
             } catch (MapperException $e) {
             }
         }
 
+        $responseData = ['result' => $result];
+
+        // Did deletion fail, and a message is defined to display on failure?
+        if(!$result && isset($tableData[$post['table']]['deleteFailMsg'])){
+            $responseData['message'] = $tableData[$post['table']]['deleteFailMsg'];
+        }
+
         $this->getResponse()->content->set([
-            'data'   => ['result' => $result],
+            'data'   => $responseData,
             'format' => 'json'
         ]);
     }
@@ -262,6 +269,7 @@ class Controller extends Base
                 'title'             => 'Roles',                                 // Title of the tab
                 'delete'            => true,
                 'deleteWarning'     => 'WARNING! Deleting users roles can have a serious impact on your system and may prevent access to various users/records throughout the system- please consult Schoolbox helpdesk if you require more information. Are you sure you want to delete this role?',
+                'deleteFailMsg'     => 'You cannot delete a role that still has non-deleted users with that role',
                 'mapper'            => RoleMapper::class,                       // Mapper for the list item
                 //'findAllMethod'     => 'findAllIncludeHidden',                // By default it uses the findAll() method of the mapper- however you can override this. Necessary for 'components' page where findAll is overridden to not return items with 'visible = false'
                 'fixed'             => [                                        // This is a list of fixed values added to new items, useful if there are hidden items that need default values
