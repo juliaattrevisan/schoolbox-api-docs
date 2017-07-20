@@ -85,11 +85,7 @@
                 classCode: config.classCode
             };
 
-            $j.post(config.url, payload, function (responseText) {
-
-                // Parse the result into an object
-
-                var allEmails = JSON.parse(responseText);
+            $j.post(config.url, payload, function (allEmails) {
 
                 // Inject and redirect only if emails were found
 
@@ -100,7 +96,7 @@
                 else {
                     config.element.trigger('emailSelected.noEmail');
                 }
-            });
+            }, 'json');
         }
 
         /**
