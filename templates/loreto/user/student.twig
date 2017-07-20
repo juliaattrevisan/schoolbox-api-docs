@@ -41,18 +41,18 @@
 {% endif %}
 {% endblock details_hohTeacher %}
 
-{% block details_formTeacher %}
-    {% if formTeacher %}
+{% block details_coach %}
+    {% if studentCoach %}
         <dt class="small-12 medium-3">Coach</dt>
         <dd class="small-12 medium-9">
-            {% if formTeacher.id %}
-                <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
+            {% if studentCoach.id %}
+                <a href="{{ session.mailhandle }}{{ studentCoach.email }}">{{ studentCoach.formatName }}</a>
             {% else %}
-                {{ formTeacher.formatName }}
+                {{ studentCoach.formatName }}
             {% endif %}
         </dd>
     {% endif %}
-{% endblock details_formTeacher %}
+{% endblock details_coach %}
 
 {% block details_tutorGroup %}
 {% if showClasses %}
