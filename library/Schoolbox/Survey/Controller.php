@@ -81,6 +81,7 @@ class Controller extends Base
 
     /**
      * Display a list of all surveys the students in the chosen folder have completed and link to the
+     * classroom learning snapshot
      *
      * @param Folder $folder
      * @return bool
