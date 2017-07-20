@@ -81,7 +81,7 @@ class Factory extends NullableContext\Factory
         User $viewee = null
     ) {
         return [
-            'projects' => $this->getProjects($pageFilter, $viewee),
+            'projects' => $this->getProjects($pageFilter, $viewee, $overrides),
         ];
     }
 
@@ -89,11 +89,12 @@ class Factory extends NullableContext\Factory
     /**
      * @param Filter\Page\Model $pageFilter
      * @param User              $viewee
+     * @param Collection        $overrides Indexed by filter.id, selection.key
      * @return Collection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      */
-    private function getProjects(Filter\Page\Model $pageFilter, User $viewee)
+    private function getProjects(Filter\Page\Model $pageFilter, User $viewee, Collection $overrides)
     {
         // Determine which folders we are ultimately interested in getting projects from:
         $options             = $pageFilter->getOptions();
@@ -139,6 +140,15 @@ class Factory extends NullableContext\Factory
         $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : -1;
 
         $involvedFolders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, true);
+
+        /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
+         * otherwise any assessments inside projects in the extra folder will never be visible.
+         */
+        $extraFolderIds = $this->parseFolderIds($overrides);
+        if (count($extraFolderIds)) {
+            $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
+            $involvedFolders      = $involvedFolders->mergeUnique($extraFolders, 'id');
+        }
 
         // Divide folders into immediate contexts, and indirect contexts via a unit-impl
         /** @var GenericCollection $directFolders */

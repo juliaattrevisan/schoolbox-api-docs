@@ -21,7 +21,7 @@ abstract class Factory extends Filter\AbstractFactory
      * into the nullable context filters so that assessments in those nullable contexts on the inserted
      * folder can be matched by the nullable context filters.
      *
-     * @param Collection|GenericCollection[]|Filter\Selection\Model[][] $overrides
+     * @param Collection|GenericCollection[]|Filter\Selection\Model[][] $overrides Indexed by filter.id, selection.key
      * @return int[]
      */
     protected function parseFolderIds(Collection $overrides)
