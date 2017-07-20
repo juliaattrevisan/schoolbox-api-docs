@@ -20,7 +20,6 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
-
 /**
  * A factory for building 'Project' filter objects
  */

@@ -213,14 +213,14 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param GenericCollection|Selection\Model[][] $overrideSelections Indexed by filter.id, then selection.key
+     * @param Collection|GenericCollection[]|Selection\Model[][] $overrideSelections Indexed by filter.id, then selection.key
      * @param GenericCollection|Page\Model[]        $visiblePageFilters
      * @param User                                  $user
      * @param string                                $page
      * @return Collection|GenericCollection[]|Selection\Model[][] Indexed by filter.id, then selection.key
      * @throws \InvalidArgumentException If selection mapper class not found
      */
-    private function findUserSelections(GenericCollection $overrideSelections, GenericCollection $visiblePageFilters, User $user, $page)
+    private function findUserSelections(Collection $overrideSelections, GenericCollection $visiblePageFilters, User $user, $page)
     {
         /** @var int[] $visibleFilterIds */
         $visibleFilterIds = $visiblePageFilters->map(function (Page\Model $pageFilter) {

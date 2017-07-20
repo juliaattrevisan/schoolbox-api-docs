@@ -13,7 +13,6 @@ use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
-
 /**
  * A factory for building 'UnitImpl' filter objects
  */

@@ -33,12 +33,12 @@ abstract class Factory extends Filter\AbstractFactory
 
         $folderIds = [];
 
-        foreach ($folderFilters as $folderFilter){
+        foreach ($folderFilters as $folderFilter) {
             $folderOverrides = $overrides[$folderFilter->getId()];
-            if($folderOverrides){
+            if ($folderOverrides) {
                 /** @var Filter\Selection\Model $folderOverride */
-                foreach($folderOverrides as $folderOverride){
-                    if($folderOverride->getSelected()){
+                foreach ($folderOverrides as $folderOverride) {
+                    if ($folderOverride->getSelected()) {
                         $folderIds[$folderOverride->getKey()] = $folderOverride->getKey();
                     }
                 }
