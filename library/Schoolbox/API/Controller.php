@@ -129,7 +129,7 @@ class Controller extends Base {
                     $registry
                         ->setUser($_SESSION['user'])
                         ->setToken($data['token'])
-                        ->setService(ServiceMapper::getInstance()->findOneByColumnList([ 'app_identifier' => $data['app_id'], 'provider' => $provider ]))
+                        ->setService(ServiceMapper::getInstance()->findOneByColumnList([ 'app_identifier' => $data['appId'], 'provider' => $provider ]))
                         ->setCreatedAt($now)
                         ->setTouchedAt($now);
 
