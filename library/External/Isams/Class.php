@@ -47,6 +47,10 @@ class External_Isams_Class implements External_ClassInterface
      */
     public function getStudents($subCode)
     {
+        if (empty($subCode)) {
+            return [];
+        }
+
         $classQuery = $this->getClassCodeQuery($subCode);
 
         $query = "
@@ -97,6 +101,10 @@ class External_Isams_Class implements External_ClassInterface
      */
     public function getTeacherName($subCode, $user = null)
     {
+        if (empty($subCode)) {
+            return [];
+        }
+
         $classQuery = $this->getClassCodeQuery($subCode);
 
         $query =
