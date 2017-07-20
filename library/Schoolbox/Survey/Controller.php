@@ -146,7 +146,7 @@ class Controller extends Base
      *
      * @param Model $survey
      */
-    public function findClassSnapshot($survey)
+    public function getClassSnapshot($survey)
     {
         $this->excel = new PHPExcel();
 
@@ -154,7 +154,7 @@ class Controller extends Base
 
             $answersRenderArray = [];
 
-            $responses = Mapper::getInstance()->getClassSnapshot($survey->getId());
+            $responses = Mapper::getInstance()->findClassSnapshot($survey->getId());
 
             foreach ($responses as $response) {
 
