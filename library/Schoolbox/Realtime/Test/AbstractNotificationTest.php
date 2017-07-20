@@ -63,6 +63,16 @@ abstract class AbstractNotificationTest extends AbstractTest
     private $listFactory;
 
     /**
+     * How many currently active workers are there?
+     *
+     * When this counts down to zero, the test's finish state is checked.
+     * (Each test should define its own finish state.)
+     *
+     * @var int
+     */
+    private $activeWorkers = 0;
+
+    /**
      * Some tests have multiple stages; what is the current stage?
      *
      * @var int
@@ -92,6 +102,9 @@ abstract class AbstractNotificationTest extends AbstractTest
     /**
      * Is this test complete?
      *
+     * By default it is always false; this means that tests will have to mark
+     * themselves complete manually.
+     *
      * @return bool
      */
     protected function isTestComplete()
@@ -102,10 +115,57 @@ abstract class AbstractNotificationTest extends AbstractTest
     /**
      * Goes to a stage of the test.
      *
+     * By default tests have no stages; stage transitions are managed here.
+     *
      * @var int $stage
      */
     protected function goToStage($stage)
     {
+    }
+
+    /**
+     * Increment the number of workers when one is tasked.
+     *
+     * @routed Tasking \d+ with route
+     */
+    public function onWorkerTasked()
+    {
+        ++$this->activeWorkers;
+    }
+
+    /**
+     * Decrement the number of workers when one finishes.
+     *
+     * Also triggers stage transition, and test completion if it's complete.
+     *
+     * @routed Task Complete
+     */
+    public function onWorkerComplete()
+    {
+        --$this->activeWorkers;
+
+        if ($this->activeWorkers > 0) {
+            $this->log->info("Waiting for $this->activeWorkers more workers to finish");
+            return;
+        }
+
+        if ($this->activeWorkers < 0) {
+            $this->log->error("WTF?!");
+            return;
+        }
+
+        if ($this->isTestComplete()) {
+            if ($this->failureCount > 0) {
+                $this->log->alert("Test ended with failures");
+            } else {
+                $this->log->warning("Test ended, no failures recorded; manual check for success required");
+            }
+            $this->terminateDaemons();
+            return;
+        }
+
+        // go to the next stage
+        $this->goToStage(++$this->currentStage);
     }
 
     /**

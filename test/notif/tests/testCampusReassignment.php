@@ -91,16 +91,9 @@ class CampusReassignment extends AbstractNotificationTest
         $this->log->info("Published an article");
     }
 
-
     /**
-     * @routed Tasking \d+ with route
-     */
-    public function onWorkerTasked()
-    {
-        ++$this->activeWorkers;
-    }
-
-    /**
+     * Test is finished after the test for campus 2 has been run.
+     *
      * @return bool
      */
     protected function isTestComplete()
@@ -109,6 +102,9 @@ class CampusReassignment extends AbstractNotificationTest
     }
 
     /**
+     * Stage 2: campus 2
+     * All other stages are invalid (it starts on stage 1)
+     *
      * @param int $stage
      */
     protected function goToStage($stage)
@@ -132,45 +128,6 @@ class CampusReassignment extends AbstractNotificationTest
                 break;
         }
     }
-
-    /**
-     * @routed Task Complete
-     */
-    public function onWorkerComplete()
-    {
-        --$this->activeWorkers;
-
-        if ($this->activeWorkers > 0) {
-            $this->log->info("Waiting for $this->activeWorkers more workers to finish");
-            return;
-
-        } elseif ($this->activeWorkers < 0) {
-            $this->log->error("WTF?!");
-            return;
-
-        } elseif ($this->currentCampus == self::CAMPUS_TWO) {
-            // this is the end of the test
-
-            if ($this->isTestFailed()) {
-                $this->log->alert("Test ended with failures");
-            } else {
-                $this->log->warning("Test ended, no failures recorded; manual check for success required");
-            }
-
-            $this->terminateDaemons();
-            return;
-        }
-
-        $this->log->warning("All roles processed; moving to new campus");
-        $this->moveCampus(self::CAMPUS_TWO);
-
-        // perform a recache
-        $this->cacheSubscriptions();
-
-        // signal routed to drop the cache and reload
-        $this->sendSignal('routed', 'reload');
-    }
-
 
     /**
      * @routed Received signal to reload
