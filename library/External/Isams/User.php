@@ -32,7 +32,7 @@ class External_Isams_User implements External_UserInterface
 
     /** @var ConfigMapper $configMapper */
     private $configMapper;
-    
+
     /** Constructor */
     public function __construct()
     {
@@ -387,7 +387,7 @@ class External_Isams_User implements External_UserInterface
     public function getEnrolledStudents($externalUserId)
     {
         $query = "
-            SELECT    StudentID  
+            SELECT    StudentID AS RelatedID
             FROM      V_Parent   
             WHERE     V_Parent.ParentID = '{$this->database->quote($externalUserId)}'
         ";
@@ -623,7 +623,7 @@ class External_Isams_User implements External_UserInterface
     {
         return $this->groupHandler;
     }
-    
+
     /**
      * @param ConfigMapper $configMapper
      * @return $this

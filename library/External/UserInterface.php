@@ -434,7 +434,8 @@ interface External_UserInterface {
      * @importance high - used to determine a parent's children, and related permissions.
      *
      * @param $externalUserId
-     * @return array
+     * @return string[][]
+     * @var string|int $return[idx]['RelatedID']
      */
     public function getEnrolledStudents($externalUserId);
 

@@ -820,7 +820,7 @@ class External_Maze_User implements External_UserInterface {
 	/**
 	 * Returns a local path to the user's portrait
 	 *
-	 * @param Integer $externalUserId
+	 * @param string $externalUserId
 	 * @return Bool|String
 	 */
 	public function getPortrait($externalUserId)

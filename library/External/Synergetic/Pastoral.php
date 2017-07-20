@@ -924,7 +924,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Finds a schoolbox user by their external ID, returning null if not found
      *
-     * @param int $externalId Synergetic ID of person we want to find in Schoolbox
+     * @param string $externalId Synergetic ID of person we want to find in Schoolbox
      * @return null|User
      */
     private function getSchoolboxUser($externalId)

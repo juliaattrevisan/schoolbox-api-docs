@@ -330,7 +330,7 @@ class UserMapper extends Mapper
     /**
      * Find a user by their external id and come with roles, campus, etc
      *
-     * @param int    $id
+     * @param string    $id
      * @param string $roleType If provided, restrict to this role type.
      *                         One of `Role::STAFF`, `Role::STUDENT`, `Role::PARENT`, `Role::GUEST`
      * @return User
