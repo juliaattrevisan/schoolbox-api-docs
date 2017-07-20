@@ -9,7 +9,6 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType;
 
@@ -61,7 +60,7 @@ class Factory extends Filter\AbstractFactory
         User $user,
         Filter\Page\Model $pageFilter,
         Filter\IDefinition $definition,
-        GenericCollection $overrides = null,
+        Collection $overrides,
         User $viewee = null
     ) {
         return [];

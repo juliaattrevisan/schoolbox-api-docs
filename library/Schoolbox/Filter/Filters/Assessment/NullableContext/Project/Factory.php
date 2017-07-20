@@ -76,7 +76,7 @@ class Factory extends Filter\AbstractFactory
         User $user,
         Filter\Page\Model $pageFilter,
         Filter\IDefinition $definition,
-        GenericCollection $overrides = null,
+        Collection $overrides,
         User $viewee = null
     ) {
         return [
@@ -210,6 +210,7 @@ class Factory extends Filter\AbstractFactory
             $statement = $this->projectMapper->getDatabase()->prepare($query);
             $statement->execute($builder->getParams());
 
+            /** @noinspection PhpAssignmentInConditionInspection */
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $projectId      = $row['p.id'];
                 $folderId       = $row['f.id'];
@@ -261,6 +262,7 @@ class Factory extends Filter\AbstractFactory
             $statement = $this->projectMapper->getDatabase()->prepare($query);
             $statement->execute($builder->getParams());
 
+            /** @noinspection PhpAssignmentInConditionInspection */
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $projectId      = $row['p.id'];
                 $unitImplId     = $row['ui.id'];

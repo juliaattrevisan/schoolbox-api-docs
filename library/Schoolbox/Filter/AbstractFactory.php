@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -61,15 +62,21 @@ abstract class AbstractFactory implements IFactory
         User $user,
         Page\Model $pageFilter,
         User $viewee = null,
-        GenericCollection $selections,
-        GenericCollection $overrides = null
+        Collection $selections,
+        Collection $overrides
     ) {
+        $filterId = $definition->getFilter()->getId();
+        $filterSelections = $selections[$filterId] ?: $this->filterSelectionMapper->createCollection();
+
+        // Did controller or URL request to override saved user-selections ?
+        $filterOverrides = $overrides[$filterId] ?: null;
+
         // If overrides are present, ignore the user's saved selections.
         $baseArgs = [
             'definition'            => $definition,
             'user'                  => $user,
             'pageFilter'            => $pageFilter,
-            'selections'            => $overrides ?: $selections,
+            'selections'            => $filterOverrides ?: $filterSelections,
             'filterSelectionMapper' => $this->filterSelectionMapper,
         ];
 
@@ -108,18 +115,18 @@ abstract class AbstractFactory implements IFactory
 
 
     /**
-     * @param User                                     $user
-     * @param Page\Model                               $pageFilter
-     * @param IDefinition                              $definition
-     * @param null|GenericCollection|Selection\Model[] $overrides
-     * @param null|User                                $viewee
+     * @param User                                             $user
+     * @param Page\Model                                       $pageFilter
+     * @param IDefinition                                      $definition
+     * @param Collection|GenericCollection|Selection\Model[][] $overrides  Indexed by filter.id, selection.key
+     * @param null|User                                        $viewee
      * @return mixed[]
      */
     protected abstract function buildExtraComponentArgs(
         User $user,
         Page\Model $pageFilter,
         IDefinition $definition,
-        GenericCollection $overrides = null,
+        Collection $overrides,
         User $viewee = null
     );
 

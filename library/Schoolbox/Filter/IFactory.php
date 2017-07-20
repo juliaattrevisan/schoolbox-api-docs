@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
@@ -34,20 +35,20 @@ interface IFactory
     /**
      * Build a filter component, ready to inject into a filter panel
      *
-     * $selections:
+     * $selections[filterId]:
      * * cannot insert items
      * * ignored if $overrides are present, or if $pageFilter is not user-configurable
      *
-     * $overrides:
+     * $overrides[filterId]:
      * * can insert items
      * * if non-null, ignore $selections
      *
-     * @param IDefinition                              $definition They type of filter we are building
-     * @param User                                     $user
-     * @param Page\Model                               $pageFilter
-     * @param null|User                                $viewee
-     * @param GenericCollection|Selection\Model[]      $selections Indexed by selection.key
-     * @param null|GenericCollection|Selection\Model[] $overrides  Indexed by selection.key
+     * @param IDefinition                                      $definition They type of filter we are building
+     * @param User                                             $user
+     * @param Page\Model                                       $pageFilter
+     * @param null|User                                        $viewee
+     * @param Collection|GenericCollection|Selection\Model[][] $selections Indexed by filter.id, selection.key
+     * @param Collection|GenericCollection|Selection\Model[][] $overrides  Indexed by filter.id, selection.key
      * @return IComponent|null
      */
     public function buildComponent(
@@ -55,8 +56,8 @@ interface IFactory
         User $user,
         Page\Model $pageFilter,
         User $viewee = null,
-        GenericCollection $selections,
-        GenericCollection $overrides = null
+        Collection $selections,
+        Collection $overrides
     );
 
 

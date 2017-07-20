@@ -7,8 +7,8 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
@@ -29,7 +29,7 @@ class Factory extends FolderFilter\Factory
         User $user,
         Filter\Page\Model $pageFilter,
         Filter\IDefinition $definition,
-        GenericCollection $overrides = null,
+        Collection $overrides,
         User $viewee = null
     ) {
         $folders = $this->getFolderMapper()->createCollection()
