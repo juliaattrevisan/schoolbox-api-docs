@@ -236,6 +236,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `wikiRevision`
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
+                        JOIN `folder` ON `folder`.id = `wiki`.categoryID AND `folder`.deleted_at IS NULL
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
                         LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
                             AND `perms`.gid = '{$roleId}'
@@ -253,6 +254,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 		$count_query = "SELECT COUNT(*)
                         FROM `wikiRevision`
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
+                        JOIN `folder` ON `folder`.id = `wiki`.categoryID AND `folder`.deleted_at IS NULL
                         LEFT JOIN `user` ON `wikiRevision`.userID = `user`.id
                         LEFT JOIN `perms` ON `wiki`.categoryID = `perms`.cid
                             AND `perms`.gid = '{$roleId}'
