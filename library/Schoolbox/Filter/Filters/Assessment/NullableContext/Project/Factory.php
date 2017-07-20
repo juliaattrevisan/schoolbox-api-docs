@@ -18,12 +18,13 @@ use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Mapper;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 
 /**
  * A factory for building 'Project' filter objects
  */
-class Factory extends Filter\AbstractFactory
+class Factory extends NullableContext\Factory
 {
 
     /**

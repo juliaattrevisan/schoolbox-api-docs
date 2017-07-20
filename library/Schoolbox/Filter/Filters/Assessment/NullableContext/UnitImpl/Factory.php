@@ -11,12 +11,13 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 
 /**
  * A factory for building 'UnitImpl' filter objects
  */
-class Factory extends Filter\AbstractFactory
+class Factory extends NullableContext\Factory
 {
 
     /** @var UnitImpl\Mapper */

@@ -14,12 +14,13 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 
 /**
  * A factory for building 'UnitSpec' filter objects
  */
-class Factory extends Filter\AbstractFactory
+class Factory extends NullableContext\Factory
 {
 
     /** @var Folder\Mapper */
@@ -97,6 +98,14 @@ class Factory extends Filter\AbstractFactory
 
         $folders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, true);
 
+        /* If we inserted an extra folder/s, we need to also insert any units imported to that folder,
+         * otherwise any assessments inside units imported to the extra folder will never be visible.
+         */
+        $extraFolderIds = $this->parseFolderIds($overrides);
+        if (count($extraFolderIds)) {
+            $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
+            $folders      = $folders->mergeUnique($extraFolders, 'id');
+        }
 
         // Get all courses imported to these folders
         $courseImpls = $this->courseImplMapper->findByFolderId($folders->getColumnValues('id'));
