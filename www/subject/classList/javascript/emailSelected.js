@@ -87,13 +87,9 @@
 
             $j.post(config.url, payload, function (responseText) {
 
-                // Stringify the result so that it parses correctly
-
-                var json = JSON.stringify(responseText);
-
                 // Parse the result into an object
 
-                var allEmails = JSON.parse(json);
+                var allEmails = JSON.parse(responseText);
 
                 // Inject and redirect only if emails were found
 
