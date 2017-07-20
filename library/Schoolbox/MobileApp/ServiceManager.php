@@ -55,9 +55,9 @@ class ServiceManager implements IServiceManager
      */
     public function push($userId, $data)
     {
-        $registrations = $this->registryMapper->findByColumn('user_id', $userId);
+        $registrations = $this->registryMapper->countByColumn('user_id', $userId);
 
-        if (count($registrations) === 0) {
+        if ($registrations === 0) {
             $this->log->notice("Received push for user $userId, but they have no devices registered");
             return;
         }
