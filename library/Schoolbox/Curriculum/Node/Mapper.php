@@ -121,10 +121,10 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             $statement->bindValue($param, $value);
         }
         if ($limit) {
-            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+            $statement->bindValue('limit', (int) $limit, \PDO::PARAM_INT);
         }
         if ($offset) {
-            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+            $statement->bindValue('offset', (int) $offset, \PDO::PARAM_INT);
         }
 
         $statement->execute();
@@ -158,18 +158,17 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         /** @var Model $curriculumNode */
         $curriculumNode = $this->hydrate($row, $alias);
         if ($curriculumNode) {
-            $curriculumNode->setLearningArea(
-                $this->getJoinMapper('area')->hydrate($row, $areaAlias)
-                    ->setSource(
-                        $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias)
-                    )
-            );
-            $curriculumNode->setLearningLevel(
-                $this->getJoinMapper('level')->hydrate($row, $levelAlias)
-                    ->setSource(
-                        $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias)
-                    )
-            );
+            $curriculumNode->setLearningArea($this->getJoinMapper('area')->hydrate($row, $areaAlias));
+            if($curriculumNode->getLearningArea() instanceof LearningArea\Model) {
+                $curriculumNode->getLearningArea()->setSource(
+                    $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias));
+            }
+
+            $curriculumNode->setLearningLevel($this->getJoinMapper('level')->hydrate($row, $levelAlias));
+            if($curriculumNode->getLearningLevel() instanceof LearningLevel\Model) {
+                $curriculumNode->getLearningLevel()->setSource(
+                    $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias));
+            }
         }
         return $curriculumNode;
     }
