@@ -9,15 +9,14 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
-
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 /**
  * A factory for building 'UnitSpec' filter objects
  */
-class Factory extends Filter\AbstractFactory
+class Factory extends NullableContext\Factory
 {
 
     /** @var UnitSpec\Mapper */
@@ -48,7 +47,7 @@ class Factory extends Filter\AbstractFactory
         User $user,
         Filter\Page\Model $pageFilter,
         Filter\IDefinition $definition,
-        GenericCollection $overrides = null,
+        Collection $overrides,
         User $viewee = null
     ) {
         return [];

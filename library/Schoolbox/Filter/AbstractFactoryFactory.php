@@ -194,23 +194,17 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         // We cannot merely replace userSelections here. That must happen later.
         // This is because overrideSelections can insert options, but userSelections cannot
-        $codec              = $this->buildCodec();
-        $overrideSelections = $codec->convertRequestToSelections($user, $page, $request);
-        $userSelections     = $this->findUserSelections($overrideSelections, $userConfigurablePageFilters, $user, $page);
+        $codec      = $this->buildCodec();
+        $overrides  = $codec->convertRequestToSelections($user, $page, $request);
+        $selections = $this->findUserSelections($overrides, $userConfigurablePageFilters, $user, $page);
 
         // Build Panel Components
         foreach ($enabledPageFilters as $pageFilter) {
             $filter     = $pageFilter->getFilter();
-            $filterId   = $filter->getId();
             $class      = $filter->getClass();
             $factory    = $this->buildFilterFactoryForFilter($class);
             $definition = $factory->buildDefinition($filter);
             $definition->normalisePageOptions($pageFilter, $user->getRole()->getType());
-
-            $selections = $userSelections[$filterId] ?: $this->getSelectionMapper()->createCollection();
-
-            // Did controller or URL request to override saved user-selections ?
-            $overrides = $overrideSelections[$filterId] ?: null;
 
             $filterComponents[$class] = $factory->buildComponent($definition, $user, $pageFilter, $viewee, $selections, $overrides);
         }
@@ -219,14 +213,14 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param GenericCollection|Selection\Model[][] $overrideSelections Indexed by filter.id, then selection.key
+     * @param Collection|GenericCollection[]|Selection\Model[][] $overrideSelections Indexed by filter.id, then selection.key
      * @param GenericCollection|Page\Model[]        $visiblePageFilters
      * @param User                                  $user
      * @param string                                $page
      * @return Collection|GenericCollection[]|Selection\Model[][] Indexed by filter.id, then selection.key
      * @throws \InvalidArgumentException If selection mapper class not found
      */
-    private function findUserSelections(GenericCollection $overrideSelections, GenericCollection $visiblePageFilters, User $user, $page)
+    private function findUserSelections(Collection $overrideSelections, GenericCollection $visiblePageFilters, User $user, $page)
     {
         /** @var int[] $visibleFilterIds */
         $visibleFilterIds = $visiblePageFilters->map(function (Page\Model $pageFilter) {

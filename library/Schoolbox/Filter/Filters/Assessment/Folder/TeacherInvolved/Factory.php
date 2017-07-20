@@ -7,8 +7,8 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
@@ -29,7 +29,7 @@ class Factory extends FolderFilter\Factory
         User $user,
         Filter\Page\Model $pageFilter,
         Filter\IDefinition $definition,
-        GenericCollection $overrides = null,
+        Collection $overrides,
         User $viewee = null
     ) {
 
@@ -62,8 +62,9 @@ class Factory extends FolderFilter\Factory
 
         // Did caller specify they wish to insert some custom folders in the list?
         // (Note that perm check was already performed by key-converter)
-        if ($overrides && $overrides->count()) {
-            $folderIds    = $overrides->getColumnValues('key');
+        $filterOverrides = $overrides[$definition->getFilter()->getId()];
+        if ($filterOverrides && $filterOverrides->count()) {
+            $folderIds    = $filterOverrides->getColumnValues('key');
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
             foreach ($extraFolders as $extraFolder) {

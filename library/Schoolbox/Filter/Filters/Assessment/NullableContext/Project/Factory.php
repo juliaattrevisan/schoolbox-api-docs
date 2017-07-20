@@ -18,12 +18,12 @@ use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Mapper;
-
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 /**
  * A factory for building 'Project' filter objects
  */
-class Factory extends Filter\AbstractFactory
+class Factory extends NullableContext\Factory
 {
 
     /**
@@ -76,11 +76,11 @@ class Factory extends Filter\AbstractFactory
         User $user,
         Filter\Page\Model $pageFilter,
         Filter\IDefinition $definition,
-        GenericCollection $overrides = null,
+        Collection $overrides,
         User $viewee = null
     ) {
         return [
-            'projects' => $this->getProjects($pageFilter, $viewee),
+            'projects' => $this->getProjects($pageFilter, $viewee, $overrides),
         ];
     }
 
@@ -88,11 +88,12 @@ class Factory extends Filter\AbstractFactory
     /**
      * @param Filter\Page\Model $pageFilter
      * @param User              $viewee
+     * @param Collection        $overrides Indexed by filter.id, selection.key
      * @return Collection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      */
-    private function getProjects(Filter\Page\Model $pageFilter, User $viewee)
+    private function getProjects(Filter\Page\Model $pageFilter, User $viewee, Collection $overrides)
     {
         // Determine which folders we are ultimately interested in getting projects from:
         $options             = $pageFilter->getOptions();
@@ -138,6 +139,15 @@ class Factory extends Filter\AbstractFactory
         $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : -1;
 
         $involvedFolders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, true);
+
+        /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
+         * otherwise any assessments inside projects in the extra folder will never be visible.
+         */
+        $extraFolderIds = $this->parseFolderIds($overrides);
+        if (count($extraFolderIds)) {
+            $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
+            $involvedFolders      = $involvedFolders->mergeUnique($extraFolders, 'id');
+        }
 
         // Divide folders into immediate contexts, and indirect contexts via a unit-impl
         /** @var GenericCollection $directFolders */
@@ -210,6 +220,7 @@ class Factory extends Filter\AbstractFactory
             $statement = $this->projectMapper->getDatabase()->prepare($query);
             $statement->execute($builder->getParams());
 
+            /** @noinspection PhpAssignmentInConditionInspection */
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $projectId      = $row['p.id'];
                 $folderId       = $row['f.id'];
@@ -261,6 +272,7 @@ class Factory extends Filter\AbstractFactory
             $statement = $this->projectMapper->getDatabase()->prepare($query);
             $statement->execute($builder->getParams());
 
+            /** @noinspection PhpAssignmentInConditionInspection */
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $projectId      = $row['p.id'];
                 $unitImplId     = $row['ui.id'];
