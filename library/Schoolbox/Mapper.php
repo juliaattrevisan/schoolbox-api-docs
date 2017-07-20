@@ -2208,7 +2208,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         try {
             $stmt = $this->selectScalarByColumnList('COUNT(*)', $columnList, $options);
-            return intval($stmt->fetchColumn());
+            return (int)$stmt->fetchColumn();
         } catch (UnderflowException $e) {
             return 0;
         }
