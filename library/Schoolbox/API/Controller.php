@@ -55,6 +55,10 @@ class Controller extends Base {
      */
     public function register($provider)
     {
+        $sessionUser     = $this->getUser();
+        $sessionUserId   = $sessionUser->getId();
+        $sessionUserKey  = $sessionUser->getKey();
+
         $data      = (array)$this->getRequest()->post;
         $response  = $this->getResponse()->content;
         $providers = array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE);
@@ -119,7 +123,7 @@ class Controller extends Base {
             $now = \Alaress_Date_Format::now();
 
             try {
-                $registry = $this->registryMapper->findById($_SESSION['id'], $data['token'], $provider);
+                $registry = $this->registryMapper->findById($sessionUserId, $data['token'], $provider);
                 $registry->setTouchedAt($now);
 
             } catch (MapperException $e) {
@@ -127,7 +131,7 @@ class Controller extends Base {
                     /** @var Registry $registry */
                     $registry = $this->registryMapper->createModel();
                     $registry
-                        ->setUser($_SESSION['user'])
+                        ->setUser($sessionUser)
                         ->setToken($data['token'])
                         ->setService(ServiceMapper::getInstance()->findOneByColumnList([ 'app_identifier' => $data['appId'], 'provider' => $provider ]))
                         ->setCreatedAt($now)
@@ -154,8 +158,8 @@ class Controller extends Base {
         $response->set(array(
             'format' => 'json',
             'data'   => array(
-                'id'  => $_SESSION['id'],
-                'key' => $_SESSION['key'],
+                'id'  => $sessionUserId,
+                'key' => $sessionUserKey,
             )
         ));
     }
