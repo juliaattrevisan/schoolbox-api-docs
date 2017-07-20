@@ -19,21 +19,24 @@
  *    '{_}`
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 
 class External_Isams_User implements External_UserInterface
 {
-    /**
-     * @var MSSQL
-     */
+    /** @var MSSQL */
     private $database;
 
-    /** @var Group */
+    /** @var Group $groupHandler */
     private $groupHandler;
 
+    /** @var ConfigMapper $configMapper */
+    private $configMapper;
+    
     /** Constructor */
     public function __construct()
     {
+        $this->setConfigMapper(ConfigMapper::getInstance());
         $this->setDatabase(MSSQL::getInstance());
         $this->setGroup(new Group());
     }
@@ -46,6 +49,13 @@ class External_Isams_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
+        $photoPath = realpath($this->getConfigMapper()->get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+
+        if ($this->getConfigMapper()->get('photo_sis_import') == 0) {
+            if (file_exists($photoPath))
+                return $photoPath;
+        }
+
         return false;
     }
 
@@ -611,5 +621,23 @@ class External_Isams_User implements External_UserInterface
     public function getGroup()
     {
         return $this->groupHandler;
+    }
+    
+    /**
+     * @param ConfigMapper $configMapper
+     * @return $this
+     */
+    public function setConfigMapper($configMapper)
+    {
+        $this->configMapper = $configMapper;
+        return $this;
+    }
+
+    /**
+     * @return ConfigMapper
+     */
+    public function getConfigMapper()
+    {
+        return $this->configMapper;
     }
 }
