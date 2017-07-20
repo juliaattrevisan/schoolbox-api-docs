@@ -28,7 +28,7 @@
             </ul>
         </section>
         {% endif %}
-        {% if registry %}
+        {% if registry | length %}
             <h2 class="subheader">Applications Registered</h2>
             <table>
                 <thead>
@@ -54,6 +54,11 @@
                 {% endfor %}
                 </tbody>
             </table>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-mobile"></i>
+                <p>No users currently have any apps registered.</p>
+            </div>
         {% endif %}
     </div>
 </div>
