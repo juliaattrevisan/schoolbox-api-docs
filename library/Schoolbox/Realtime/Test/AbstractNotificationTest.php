@@ -124,6 +124,19 @@ abstract class AbstractNotificationTest extends AbstractTest
     }
 
     /**
+     * Ends the test.
+     */
+    protected function markTestComplete()
+    {
+        if ($this->failureCount > 0) {
+            $this->log->alert("Test ended with failures");
+        } else {
+            $this->log->warning("Test ended, no failures recorded; manual check for success required");
+        }
+        parent::markTestComplete();
+    }
+
+    /**
      * Increment the number of workers when one is tasked.
      *
      * @routed Tasking \d+ with route
@@ -155,12 +168,7 @@ abstract class AbstractNotificationTest extends AbstractTest
         }
 
         if ($this->isTestComplete()) {
-            if ($this->failureCount > 0) {
-                $this->log->alert("Test ended with failures");
-            } else {
-                $this->log->warning("Test ended, no failures recorded; manual check for success required");
-            }
-            $this->terminateDaemons();
+            $this->markTestComplete();
             return;
         }
 
