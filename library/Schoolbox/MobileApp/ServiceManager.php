@@ -186,6 +186,7 @@ class ServiceManager implements IServiceManager
      * Return the path APNS should use for the PEM file held by the given storage object
      *
      * @param Storage\Model $storage
+     * @return string
      */
     private function getPemPath(Storage\Model $storage)
     {
@@ -198,6 +199,8 @@ class ServiceManager implements IServiceManager
             $storage->pipe($fp);
             fclose($fp);
         }
+
+        return $this->getTempCertFilename($hash);
     }
 
 
