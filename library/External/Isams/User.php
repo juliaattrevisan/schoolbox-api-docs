@@ -52,8 +52,9 @@ class External_Isams_User implements External_UserInterface
         $photoPath = realpath($this->getConfigMapper()->get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
         if ($this->getConfigMapper()->get('photo_sis_import') == 0) {
-            if (file_exists($photoPath))
+            if (file_exists($photoPath)) {
                 return $photoPath;
+            }
         }
 
         return false;
