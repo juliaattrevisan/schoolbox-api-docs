@@ -292,20 +292,18 @@ class QuizNotifications extends AbstractNotificationTest
                 $qm->save($quiz);
             }
         }
-
     }
 
     /**
-     * @routed Task Complete
+     * The test is complete when all students have received notifications for
+     * all quizzes that they should receive notifications for.
+     *
+     * @return bool
      */
-    public function onWorkerComplete()
+    protected function isTestComplete()
     {
         $maxNotifsSendable = count($this->subscribers) * 2;
-        $this->log->debug(sprintf("%d/%d students notified about marks", $this->sentMarkNotifs, $maxNotifsSendable));
-        if ($this->sentMarkNotifs >= $maxNotifsSendable) {
-            $this->log->warning("Test ended, no failures recorded; manual check for success required");
-            $this->terminateDaemons();
-        }
+        return $this->sentMarkNotifs >= $maxNotifsSendable;
     }
 
     /**
