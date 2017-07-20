@@ -15,34 +15,43 @@
 <div class="row">
     <div class="small-12 island">
         <div class="alert-box success">Quiz Completed</div>
+        <!-- BEGIN has_marks -->
+        <section>
+            <div class="content">
+                <article>
+                    <p>
+                        <em>This mark is unconfirmed and may change following teacher review.</em>
+                    </p>
+                    <p class="grade">
+                        <span>{ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)</span>
+                    </p>
+                    <!-- BEGIN unmarkedRemaining -->
+                    <p>
+                        {ATTEMPT_NUM_MARKED_QUESTIONS} out of {ATTEMPT_NUM_QUESTIONS} questions of your quiz have been marked.
+                        <strong>There are {ATTEMPT_NUM_UNMARKED_QUESTIONS} questions remaining to be marked by your teacher, worth
+                            {ATTEMPT_VALUE_UNMARKED_QUESTIONS} marks.</strong>
+                    </p>
+                    <!-- END unmarkedRemaining -->
+                </article>
+            </div>
+            <!-- BEGIN view_attempt -->
+        <div class="component-action">
+            <section>
+                <a class="button" href="/assess/studentReview/{ASSESS_ID}/{SECTION_ID}/{ATTEMPT_ID}{RETURN_URL_SUFFIX}">View results</a>
+            </section>
+        </div>
+        </section>
+        <!-- END view_attempt -->
+        <!-- END has_marks -->
+        <!-- BEGIN has_complete -->
         <section class="content">
-            <!-- BEGIN has_marks -->
-            <p class="grade">
-                <span>{ATTEMPT_MARKS}/{ATTEMPT_TOTAL} ({ATTEMPT_PERCENTAGE}%)</span>
-            </p>
-
-            <p>
-                <em>This mark is unconfirmed and may change following teacher review.</em>
-            </p>
-            <!-- END has_marks -->
-
-
-            <!-- BEGIN unmarkedRemaining -->
-            <p>
-                {ATTEMPT_NUM_MARKED_QUESTIONS} out of {ATTEMPT_NUM_QUESTIONS} questions of your quiz have been marked.
-                <strong>There are {ATTEMPT_NUM_UNMARKED_QUESTIONS} questions remaining to be marked, worth
-                {ATTEMPT_VALUE_UNMARKED_QUESTIONS} marks.</strong>
-            </p>
-            <!-- END unmarkedRemaining -->
-
             <article>{ASSESS_COMPLETION_MESSAGE}</article>
         </section>
+        <!-- END has_complete -->
     </div>
 </div>
 <div class="row">
     <div class="small-12 column">
-        <!-- BEGIN view_attempt -->
-        <a class="button expand submit" href="/assess/studentReview/{ASSESS_ID}/{SECTION_ID}/{ATTEMPT_ID}{RETURN_URL_SUFFIX}">View Results</a>
-        <!-- END view_attempt -->
+        <a class="submit button expand" href="{RETURN_URL}">Return</a>
     </div>
 </div>

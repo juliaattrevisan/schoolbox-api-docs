@@ -204,7 +204,7 @@ abstract class Evaluation_Response extends DeprecatedModel
                   WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND assess_attempt.reviewed_at IS NULL
                   AND assess_question.deleted_at IS NULL
-                  AND automarked_already = 'false'";
+                  AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
         return $this->db->getOne($query);
     }
@@ -224,7 +224,7 @@ abstract class Evaluation_Response extends DeprecatedModel
 				  WHERE {$this->_table}.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND assess_attempt.reviewed_at IS NULL
                   AND assess_question.deleted_at IS NULL
-                  AND automarked_already = 'false'";
+                  AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
         $value = $this->db->getOne($query);
 
