@@ -7,7 +7,7 @@
 
 {% if assessmentType == 'dueWork' %}
     {% set teacherMessage = 'to assess your students' %}
-    {% set studentMessage = 'There is no {{ locale.dueWork }} to complete at this time.' %}
+    {% set studentMessage = 'There is no ' ~ locale.dueWork ~ ' to complete at this time.' %}
 {% elseif assessmentType == 'quiz'  %}
     {% set teacherMessage = 'to test your students' %}
     {% set studentMessage = 'There are no quizzes to complete at this time.' %}
