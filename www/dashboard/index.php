@@ -5,9 +5,6 @@
  * @link        http://www.alaress.com.au
  */
 
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\User;
-
 /** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'dashboard/index.html');
 $this->setTab('main');
