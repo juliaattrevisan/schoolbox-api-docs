@@ -615,7 +615,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     public function getUnique($column)
     {
         $found = [];
-        $results = new Collection();
+        $results = $this->emptyClone();
 
         $getterMethod = $this->getGetMethodName($column);
 
