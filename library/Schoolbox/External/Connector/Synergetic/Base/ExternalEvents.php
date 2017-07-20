@@ -12,13 +12,14 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 use Alaress_Date_Format;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
+use Schoolbox\User;
 
 class ExternalEvents extends Base implements IExternalEvents
 {
     /**
      * @inheritdoc
      */
-    public function getExternalEvents($user, $startDate, $endDate)
+    public function getExternalEvents(User $user, $startDate, $endDate)
     {
         $start = new Alaress_Date_Format($startDate, 'U');
         $finish = new Alaress_Date_Format($endDate, 'U');
