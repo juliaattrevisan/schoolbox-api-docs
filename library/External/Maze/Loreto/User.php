@@ -46,7 +46,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				HEADOFHOUSE.SFKEY AS HeadOfHouseID,
 				(HEADOFHOUSE.FIRST_NAME + ' ' + HEADOFHOUSE.SURNAME) AS StudentHeadOfHouse,
 				'' AS StudentForm,
-				(COACH.FIRST_NAME + ' ' + COACH.SURNAME) AS StudentFormStaffName,
+				'' AS StudentFormStaffName, -- This field is hydrated below
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
@@ -54,6 +54,8 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
 				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentYearLevelCoordinator,
 				COORDINATOR.SFKEY AS YearLevelCoordID,
+				(COACH.FIRST_NAME + ' ' + COACH.SURNAME) AS StudentCoach,
+				COACH.SFKEY AS CoachID,
 				'' AS StudentLockerBook,
 				ST.EMERGENCY_ONE_NAME AS StudentEmergencyName,
 				ST.EMERGENCY_ONE_PHONE AS StudentEmergencyPhone,
