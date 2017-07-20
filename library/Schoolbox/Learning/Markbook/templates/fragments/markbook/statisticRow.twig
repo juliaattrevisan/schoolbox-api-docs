@@ -1,7 +1,7 @@
 <tr class="sub-row" data-sub-table-row data-hidable-columns>
     <th>{{ label }}</th>
     <th>&nbsp;</th>
-    {% for assessment in markbook.assessmentsWithProjectContents  %}
+    {% for assessment in markbook.assessments  %}
     <th data-assessment="{{ assessment.id }}">
         {% if markbook.assessmentStatistics[assessment.id][key] %}
             {% if round %}
