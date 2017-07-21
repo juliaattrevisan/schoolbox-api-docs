@@ -225,6 +225,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         }
 
         $userIds = $this->getInterestedUsers($relEvent, $currentStatus);
+        array_push($userIds, $relEvent->getAuthor()->getId());
 
         if (count($userIds) == 0) {
             // no audience? no messages
@@ -250,7 +251,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.".self::TRIGGER_UPCOMING)
-            ->setIcon("/images/icon.php?icon=alert&size=32");
+            ->setIcon("/images/icon.php?icon=alert&size=32")
+            ->setAllowSelfSend(true);
 
         $msg = $bob->build();
 

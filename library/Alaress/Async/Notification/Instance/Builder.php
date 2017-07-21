@@ -269,6 +269,19 @@ class Builder implements BuilderInterface
 		return $this;
 	}
 
+    /**
+     * This allows the message to bypass the filter that prevents messages being delivered to the user themselves.
+     * This should be used only when a message is being delivered some time after the action occurred.  Like reminders.
+     *
+     * Set to TRUE if you wish to deliver a message to the effector.
+     *
+     * @param bool $allowSelfSend
+     * @return self
+     */
+    public function setAllowSelfSend($allowSelfSend) {
+        $this->context['allowSelfSend'] = $allowSelfSend;
+        return $this;
+    }
 
 	/**
 	 * Builds an instance from the construction given
