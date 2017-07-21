@@ -1658,17 +1658,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               FROM `assessment` AS `a`
               LEFT JOIN `assessment_folder`                     AS `af`   ON `a`.`id`        = `af`.`assessment_id`
               LEFT JOIN `assessment_course_unit_implementation` AS `acui` ON `a`.`id`        = `acui`.`assessment_id`
-              LEFT JOIN `course_unit_implementation`            AS `cui`  ON `cui`.`id`      = `acui`.`course_unit_implementation_id`
-              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id`       = `cui`.`course_implementation_id`
-              LEFT JOIN `task`                                  AS `t`    ON `a`.`id`        = `t`.`assessment_id`
-              LEFT JOIN `assess`                                AS `q`    ON `a`.`id`        = `q`.`assessment_id`
-              LEFT JOIN `submission_box`                        AS `d`    ON `a`.`id`        = `d`.`assessment_id`
-              LEFT JOIN `task_completion`                       AS `tc`   ON `t`.`id`        = `tc`.`task_id`
-              LEFT JOIN `assess_attempt`                        AS `qa`   ON `q`.`assess_id` = `qa`.`assess_id`
-              LEFT JOIN `student_submission`                    AS `ss`   ON `ss`.`box_id`   = `d`.id
+              LEFT JOIN `course_unit_implementation`            AS `cui`  ON `cui`.`id`      = `acui`.`course_unit_implementation_id`  AND `cui`.deleted_at IS NULL 
+              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id`       = `cui`.`course_implementation_id` AND `ci`.deleted_at IS NULL 
+              LEFT JOIN `task`                                  AS `t`    ON `a`.`id`        = `t`.`assessment_id` AND `t`.deleted_at IS NULL 
+              LEFT JOIN `assess`                                AS `q`    ON `a`.`id`        = `q`.`assessment_id` AND `q`.deleted_at IS NULL 
+              LEFT JOIN `submission_box`                        AS `d`    ON `a`.`id`        = `d`.`assessment_id` AND `d`.deleted = 0 
+              LEFT JOIN `task_completion`                       AS `tc`   ON `t`.`id`        = `tc`.`task_id` AND `tc`.deleted_at IS NULL 
+              LEFT JOIN `assess_attempt`                        AS `qa`   ON `q`.`assess_id` = `qa`.`assess_id` AND `qa`.deleted_at IS NULL 
+              LEFT JOIN `student_submission`                    AS `ss`   ON `ss`.`box_id`   = `d`.id AND `ss`.deleted_at IS NULL 
               WHERE 
                 (`tc`.`student_id` = :studentId OR `ss`.`owner` = :studentId OR `qa`.`user_id` = :studentId)
                 {$termWhere}
+                AND `a`.deleted_at IS NULL
             )
             ORDER BY f.name
         ";
@@ -1788,29 +1789,29 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
               LEFT JOIN `assessment_folder`                     AS `af`   ON `af`.`assessment_id` = `a`.`id`
 
               LEFT JOIN `assessment_course_unit_implementation` AS `aui`  ON `a`.`id` = `aui`.`assessment_id`
-              LEFT JOIN `course_unit_implementation`            AS `ui`   ON `ui`.`id` = `aui`.`course_unit_implementation_id`
-              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id` = `ui`.`course_implementation_id`
+              LEFT JOIN `course_unit_implementation`            AS `ui`   ON `ui`.`id` = `aui`.`course_unit_implementation_id` AND `ui`.deleted_at IS NULL 
+              LEFT JOIN `course_implementation`                 AS `ci`   ON `ci`.`id` = `ui`.`course_implementation_id` AND `ci`.deleted_at IS NULL 
 
               LEFT JOIN `project_assessment`                    AS `pa`   ON `pa`.`assessment_id` = `a`.`id`
-              LEFT JOIN `project`                               AS `p`    ON `p`.`id` = `pa`.`project_id`
-              LEFT JOIN `assessment`                            AS `ap`   ON `ap`.`id` = `p`.`assessment_id`
+              LEFT JOIN `project`                               AS `p`    ON `p`.`id` = `pa`.`project_id` AND `p`.deleted_at IS NULL 
+              LEFT JOIN `assessment`                            AS `ap`   ON `ap`.`id` = `p`.`assessment_id` AND `ap`.deleted_at IS NULL 
               LEFT JOIN `assessment_folder`                     AS `apf`  ON `apf`.`assessment_id` = `ap`.`id`
 
               LEFT JOIN `project_assessment`                    AS `uipa` ON `uipa`.`assessment_id` = `a`.`id`
-              LEFT JOIN `project`                               AS `uip`  ON `uip`.`id` = `uipa`.`project_id`
-              LEFT JOIN `assessment`                            AS `uiap` ON `uiap`.`id` = `uip`.`assessment_id`
+              LEFT JOIN `project`                               AS `uip`  ON `uip`.`id` = `uipa`.`project_id` AND `uip`.deleted_at IS NULL 
+              LEFT JOIN `assessment`                            AS `uiap` ON `uiap`.`id` = `uip`.`assessment_id` AND `uiap`.deleted_at IS NULL 
               LEFT JOIN `assessment_course_unit_implementation` AS `paui` ON `paui`.`assessment_id` = `uiap`.`id`
-              LEFT JOIN `course_unit_implementation`            AS `pui`  ON `pui`.`id` = `paui`.`course_unit_implementation_id`
-              LEFT JOIN `course_implementation`                 AS `pci`  ON `pci`.`id` = `pui`.`course_implementation_id`
+              LEFT JOIN `course_unit_implementation`            AS `pui`  ON `pui`.`id` = `paui`.`course_unit_implementation_id` AND `pui`.deleted_at IS NULL 
+              LEFT JOIN `course_implementation`                 AS `pci`  ON `pci`.`id` = `pui`.`course_implementation_id` AND `pci`.deleted_at IS NULL 
 
-              LEFT JOIN `task`                                  AS `tk`   ON `tk`.`assessment_id` = `a`.`id`
-              LEFT JOIN `assess`                                AS `qz`   ON `qz`.`assessment_id` = `a`.`id`
-              LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id`
+              LEFT JOIN `task`                                  AS `tk`   ON `tk`.`assessment_id` = `a`.`id` AND `tk`.deleted_at IS NULL 
+              LEFT JOIN `assess`                                AS `qz`   ON `qz`.`assessment_id` = `a`.`id` AND `qz`.deleted_at IS NULL 
+              LEFT JOIN `submission_box`                        AS `dw`   ON `dw`.`assessment_id` = `a`.`id` AND `dw`.deleted = 0 
 
-              LEFT JOIN `task_completion`                       AS `tkc`  ON `tkc`.`task_id` = `tk`.`id`
-              LEFT JOIN `assess_attempt`                        AS `qza`  ON `qza`.`assess_id` = `qz`.`assess_id`
-              LEFT JOIN `submission_return`                     AS `dwr`  ON `dwr`.`box_id` = `dw`.id
-              WHERE $whereClause
+              LEFT JOIN `task_completion`                       AS `tkc`  ON `tkc`.`task_id` = `tk`.`id` AND `tkc`.deleted_at IS NULL 
+              LEFT JOIN `assess_attempt`                        AS `qza`  ON `qza`.`assess_id` = `qz`.`assess_id` AND `qza`.deleted_at IS NULL 
+              LEFT JOIN `submission_return`                     AS `dwr`  ON `dwr`.`box_id` = `dw`.id AND `dwr`.deleted_at IS NULL 
+              WHERE $whereClause AND `a`.deleted_At IS NULL
             )
             ORDER BY f.name
         ";
