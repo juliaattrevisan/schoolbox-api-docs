@@ -80,9 +80,21 @@ class EventMetadataNotifier extends AbstractModuleNotifier
      */
     public function bundleTriggers($bundle)
     {
+        $detachUpcoming = false;
         if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
             $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
+
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
+
+            /** @var EventMetadata $object */
+            $object = $bundle->getEvent()->getObject();
+            $status = $object->getStatus();
+
+            // if in a final state, rescind upcoming reminders
+            if ($status->isApproved() || $status->isRejected()) {
+                $detachUpcoming = true;
+                $bundle->detach(self::TRIGGER_UPCOMING);
+            }
 
             // what KIND of update has occurred?
             $diff = $bundle->getEvent()->getDiff();
@@ -100,21 +112,11 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
             // process the other kinds of updates
             $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
-
-
-            /** @var EventMetadata $object */
-            $object = $bundle->getEvent()->getObject();
-
-            $status = $object->getStatus();
-
-            // if in a final state, rescind upcoming reminders
-            if ($status->isApproved() || $status->isRejected()) {
-                $bundle->detach(self::TRIGGER_UPCOMING);
-                return;
-            }
         }
 
-        $bundle->attach(self::TRIGGER_UPCOMING, array($this, 'getNextReminderTime'));
+        if (!$detachUpcoming) {
+            $bundle->attach(self::TRIGGER_UPCOMING, array($this, 'getNextReminderTime'));
+        }
     }
 
 
