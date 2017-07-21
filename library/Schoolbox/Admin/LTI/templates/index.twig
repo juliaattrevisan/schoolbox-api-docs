@@ -11,11 +11,15 @@
     <div class="small-12 island">
         {% for provider in providers %}
         <section>
-            <ul class="action-list">
+            <ul class="information-list">
                 {% include '@adminLti/listItem.twig' with {provider: provider} %}
             </ul>
+            <div class="component-action">
+                <section>
+                    <a href="#" class="button" data-reveal-id="addProviderModal">Add New Provider</a>
+                </section>
+            </div>
         </section>
-        <a href="#" class="button submit" data-reveal-id="addProviderModal">Add New Provider</a>
         {% endfor %}
 
         {% if providers is empty %}

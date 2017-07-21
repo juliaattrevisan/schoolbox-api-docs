@@ -11,8 +11,8 @@
             <p>Your enrolment data is stored in your external database - you do not need to upload it here.</p>
         </div>
     {% else %}
-    <section class="content">
-        <fieldset>
+    <section>
+        <div class="content">
             <p>
                 Provide a file containing your class enrolments in the CSV format in the template below.
             </p>
@@ -24,14 +24,14 @@
                     The student or staff member will be associated with this new class, but it will not be on the timetable.
                 </li>
             </ul>
-            <a href="/adminv2/import/enrolmentTemplate.csv" class="button icon-download">Download Template</a>
-        </fieldset>
+        </div>
+        <div class="component-action">
+            <section>
+                <a href="/adminv2/import/enrolmentTemplate.csv" class="button">Download Template</a>
+            </section>
+        </div>
     </section>
-    <section class="content">
-        <fieldset>
-            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-        </fieldset>
-    </section>
+        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
     {% endif %}
 {% endblock helpText %}
 

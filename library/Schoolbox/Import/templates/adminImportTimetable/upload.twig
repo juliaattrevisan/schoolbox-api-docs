@@ -11,8 +11,8 @@
             <p>Your timetable data is stored in your external database - you do not need to upload it here.</p>
         </div>
     {% else %}
-    <section class="content">
-        <fieldset>
+    <section>
+        <div class="content">
             <p>
                 Provide a file containing your timetable in the CSV format in the template below.
             </p>
@@ -26,14 +26,14 @@
                 </li>
                 <li>Any empty fields will be filled with the previous non-empty value in that column.</li>
             </ul>
-            <a href="/adminv2/import/timetableTemplate.csv" class="button icon-download">Download Template</a>
-        </fieldset>
+        </div>
+        <div class="component-action">
+            <section>
+                <a href="/adminv2/import/timetableTemplate.csv" class="button">Download Template</a>
+            </section>
+        </div>
     </section>
-        <section class="content">
-            <fieldset>
-                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-        </fieldset>
-    </section>
+        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
     {% endif %}
 {% endblock helpText %}
 
