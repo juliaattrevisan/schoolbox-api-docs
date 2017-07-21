@@ -111,6 +111,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      * @param bool $lite
      * @return PortfolioWebDAV
      * @throws DomainException if no legacy config exists
+     * @throws UnexpectedValueException if no user is logged in
      */
     public static function factory($lite = false)
     {
@@ -121,6 +122,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         }
 
         $paths = [];
+        $settings = null;
 
         $siteLocation = Cfg::get('site_location');
         $fallbackEnabled = Cfg::get('webdav_fallback_enabled');
@@ -128,8 +130,12 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         /** @var Collection $davs */
         $davs = WebDavMapper::getInstance()->findByColumn('enabled', 1);
 
-        /** @var User $user */
+        // TODO inject user and password as parameter
         $user = $_SESSION["user"];
+        if (!$user instanceof User) {
+            // no user; abort
+            throw new UnexpectedValueException("Anonymous users may not access drives");
+        }
 
         /** @var WebDav $dav */
         foreach ($davs as $dav) {
