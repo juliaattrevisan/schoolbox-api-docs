@@ -31,6 +31,7 @@ class Blog extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
             $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `blog`
+                        JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
                         LEFT JOIN `user` ON `blog`.owner_id = `user`.id
                         LEFT JOIN `perms` ON `blog`.folder_id = `perms`.cid
                             AND `perms`.gid = {$_SESSION['gid']}
@@ -47,6 +48,7 @@ class Blog extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
             $count_query = "SELECT COUNT(*)
                             FROM `blog`
+                            JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL
                             LEFT JOIN `user` ON `blog`.owner_id = `user`.id
                             LEFT JOIN `perms` ON `blog`.folder_id = `perms`.cid
                                 AND `perms`.gid = {$_SESSION['gid']}
