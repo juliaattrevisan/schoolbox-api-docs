@@ -194,7 +194,7 @@ class Controller extends Base
                         $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = [];
                     }
 
-                    $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])][$response['user_id']]= $answers;
+                    $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])][$response['user_id']] = $answers;
                 }
             }
 
@@ -204,7 +204,11 @@ class Controller extends Base
 
                 // Create a tab for each section
 
-                $this->spreadsheetTabSetup($tabText, $survey->getFolder()->getNameWithCodes() . " - " . $survey->getTitle());
+                $this->spreadsheetTabSetup(
+                    $this->replaceInvalidCharacters($tabText),
+                    $this->replaceInvalidCharacters($survey->getFolder()->getNameWithCodes() . " - " . $survey->getTitle())
+                );
+
                 $this->activeSheet->getDefaultRowDimension()->setRowHeight(-1);
 
                 // Start from the left
@@ -362,5 +366,30 @@ class Controller extends Base
         readfile($tempFilename);
 
         unlink($tempFilename);
+    }
+
+    /**
+     * Replaces disallowed characters from tab names/titles with semi-similar ones that are allowed
+     *
+     * @param string $string
+     * @return string
+     */
+    private function replaceInvalidCharacters($string)
+    {
+        $replacements = [
+            '\\' => '|',
+            '/' => '|',
+            '*' => '-',
+            '[' => '(',
+            ']' => ')',
+            ':' => '-',
+            '?' => ''
+        ];
+
+        return str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $string
+        );
     }
 }
