@@ -10,6 +10,7 @@
 namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Log\Mapper as LogMapper;
 use Schoolbox\User;
@@ -19,6 +20,8 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+    use ImportNavigation;
+
     /**
      * @var ConfigMapper
      */
@@ -123,6 +126,7 @@ class Controller extends Base
             'template' => '@adminImportPastoral/log.twig',
             'data'     => array(
                 'pageCurrent' => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'logs' => $this->getLogMapper()->findImportIds()
             )
         ]);
@@ -139,6 +143,7 @@ class Controller extends Base
             'template' => '@adminImportPastoral/logDetail.twig',
             'data'     => array(
                 'pageCurrent' => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'log' => $log
             )
         ]);
@@ -164,6 +169,7 @@ class Controller extends Base
             'template' => '@adminImportPastoral/log.twig',
             'data'     => array(
                 'pageCurrent'   => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'logs'          => $this->getLogMapper()->findImportIds(),
                 'message'       => true
             ),
@@ -214,6 +220,7 @@ class Controller extends Base
                 'template' => '@adminImportPastoral/index.twig',
                 'data'     => array(
                     'pageCurrent' => 'import',
+                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                     'externalEnabled' => $this->getConfigMapper()->get("external_pastoral")
                 ),
             )

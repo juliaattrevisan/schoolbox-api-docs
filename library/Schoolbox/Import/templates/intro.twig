@@ -2,18 +2,16 @@
 
 {{ renderAdminNavigation(pageCurrent) }}
 
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
-
 <div class="row">
     <div class="small-12 columns">
-        <h1>Import</h1>
+        <h2 class="subheader">Import</h2>
 
         {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
     </div>
 
     <div class="small-12 island">
         <section class="content">
-            <p>Select a role type or feature to import from your school information system.</p>
+            <p>From this page you can import different data into Schoolbox via CSV import files.  Please note if you are using a live connection you may only load users, all other data will be loaded automatically via your SIS connector.</p>
         </section>
     </div>
 </div>

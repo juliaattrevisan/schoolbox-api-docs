@@ -23,11 +23,15 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <p>Download the template first, enter your required class pages or folders and upload below.</p>
-                        <a href="/adminv2/csv/folderBulkAdd.csv" class="button icon-download">Download Template</a>
+                        <p>First, download the template from the link below, then enter your required class pages or folders and upload your CSV.</p>
                         {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
                     </div>
                 </fieldset>
+                <div class="component-action">
+                    <section>
+                        <a href="/adminv2/csv/folderBulkAdd.csv" class="button" title="Download template">Download Template</a>
+                    </section>
+                </div>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Default Access Permissions</label>

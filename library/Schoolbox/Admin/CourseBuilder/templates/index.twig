@@ -28,133 +28,136 @@
 </script>
 
 {# Config page contents #}
-
-<div class="small-12 island">
-    <dl class="tabs" data-tab="">
-        <dd class="{% if tab == 'course' %}active{% endif %}"><a data-tab id="course" href="#panel-course">Course Page</a></dd>
-        <dd class="{% if tab == 'unit' %}active{% endif %}"><a data-tab id="unit" href="#panel-unit">{{ locale.unit.proper }} Page</a></dd>
-    </dl>
+<div class="row">
+    <div class="small-12 island">
+        <dl class="tabs" data-tab="">
+            <dd class="{% if tab == 'course' %}active{% endif %}"><a data-tab id="course" href="#panel-course">Course Page</a></dd>
+            <dd class="{% if tab == 'unit' %}active{% endif %}"><a data-tab id="unit" href="#panel-unit">{{ locale.unit.proper }} Page</a></dd>
+        </dl>
+    </div>
 </div>
 
-<form action="/adminv2/course-builder/save" method="post">
-    <input type="hidden" id="tab" name="tab" value="{{ tab }}">
-    <div class="tabs-content">
-        <div class="content {% if tab == 'course' %}active{% endif %}" id="panel-course">
-            <div class="list-item small-12 island">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                Homepage Template
-                                <select name="courseTemplate">
-                                    <option {% if courseTemplate == -1 %}selected{% endif %} value="-1">No Homepage</option>
-                                    {% for template in templates %}
-                                        <option {% if courseTemplate == template.getId %}selected{% endif %} value="{{ template.getId }}">{{ template.getName }}</option>
-                                    {% endfor %}
-                                </select>
-                            </label>
+<div class="row">
+    <div class="small-12 columns">
+        <form action="/adminv2/course-builder/save" method="post">
+            <input type="hidden" id="tab" name="tab" value="{{ tab }}">
+            <div class="tabs-content">
+                <div class="content {% if tab == 'course' %}active{% endif %}" id="panel-course">
+                    <div class="row">
+                        <div class="small-12 island">
+                            <section>
+                                <fieldset class="content">
+                                    <div class="small-12 columns">
+                                        <label>
+                                            Homepage Template
+                                            <select name="courseTemplate">
+                                                <option {% if courseTemplate == -1 %}selected{% endif %} value="-1">No Homepage</option>
+                                                {% for template in templates %}
+                                                    <option {% if courseTemplate == template.getId %}selected{% endif %} value="{{ template.getId }}">{{ template.getName }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </label>
+                                    </div>
+                                    <div class="small-12 columns">
+                                        <label>Default Access Permissions</label>
+                                    </div>
+                                    <div class="small-12 columns">
+                                        <input data-checkbox-course-inherit type="checkbox" id="courseInherit" name="courseInherit" value="1" {% if courseInherit == 1 %}checked{% endif %} />
+                                        <label for="courseInherit" class="checkbox-label">Inherit permissions from the course's parent folder</label>
+                                    </div>
+                                </fieldset>
+                                <table id="course-permissions" {% if courseInherit == 1 %}class="hide"{% endif %}>
+                                    <thead>
+                                        <tr>
+                                            <th>Role</th>
+                                            <th>None</th>
+                                            <th>Read</th>
+                                            <th>Write</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for role in roles %}
+                                            <tr>
+                                                <td>{{ role.getName }}</td>
+                                                <td>
+                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupNone{{ role.getId }}" value="0" {{ permissions['course'][role.getId][0] }}>
+                                                    <label class="radio-label" for="courseGroupNone{{ role.getId }}"></label>
+                                                </td>
+                                                <td>
+                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupRead{{ role.getId }}" value="1" {{ permissions['course'][role.getId][1] }}>
+                                                    <label class="radio-label" for="courseGroupRead{{ role.getId }}"></label>
+                                                </td>
+                                                <td>
+                                                    <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupWrite{{ role.getId }}" value="2" {{ permissions['course'][role.getId][2] }}>
+                                                    <label class="radio-label" for="courseGroupWrite{{ role.getId }}"></label>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </section>
                         </div>
-                    </fieldset>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>Default Access Permissions</label>
+                    </div>
+                </div>
+                <div class="content {% if tab == 'unit' %}active{% endif %}" id="panel-unit">
+                    <div class="row">
+                        <div class="small-12 island">
+                            <section>
+                                <fieldset class="content">
+                                    <div class="small-12 columns">
+                                        <label>
+                                            Homepage Template
+                                            <select name="unitTemplate">
+                                                <option {% if unitTemplate == -1 %}selected{% endif %} value="-1">No Homepage</option>
+                                                {% for template in templates %}
+                                                    <option {% if unitTemplate == template.getId %}selected{% endif %} value="{{ template.getId }}">{{ template.getName }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </label>
+                                    </div>
+                                    <div class="small-12 columns">
+                                        <label>Default Access Permissions</label>
+                                    </div>
+                                    <div class="small-12 columns">
+                                        <input data-checkbox-unit-inherit type="checkbox" id="unitInherit" name="unitInherit" value="1" {% if unitInherit == 1 %}checked{% endif %} />
+                                        <label for="unitInherit" class="checkbox-label">Inherit permissions from the course's parent folder</label>
+                                    </div>
+                                </fieldset>
+                                <table id="unit-permissions" {% if unitInherit == 1 %}class="hide"{% endif %}>
+                                    <thead>
+                                        <tr>
+                                            <th>Role</th>
+                                            <th>None</th>
+                                            <th>Read</th>
+                                            <th>Write</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for role in roles %}
+                                            <tr>
+                                                <td>{{ role.getName }}</td>
+                                                <td>
+                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupNone{{ role.getId }}" value="0" {{ permissions['unit'][role.getId][0] }}>
+                                                    <label class="radio-label" for="unitGroupNone{{ role.getId }}"></label>
+                                                </td>
+                                                <td>
+                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupRead{{ role.getId }}" value="1" {{ permissions['unit'][role.getId][1] }}>
+                                                    <label class="radio-label" for="unitGroupRead{{ role.getId }}"></label>
+                                                </td>
+                                                <td>
+                                                    <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupWrite{{ role.getId }}" value="2" {{ permissions['unit'][role.getId][2] }}>
+                                                    <label class="radio-label" for="unitGroupWrite{{ role.getId }}"></label>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </section>
                         </div>
-                        <div class="small-12 columns">
-                            <input data-checkbox-course-inherit type="checkbox" id="courseInherit" name="courseInherit" value="1" {% if courseInherit == 1 %}checked{% endif %} />
-                            <label for="courseInherit" class="checkbox-label">Inherit permissions from the course's parent folder</label>
-                        </div>
-                    </fieldset>
-                    <table id="course-permissions" {% if courseInherit == 1 %}class="hide"{% endif %}>
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>None</th>
-                                <th>Read</th>
-                                <th>Write</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for role in roles %}
-                                <tr>
-                                    <td>{{ role.getName }}</td>
-                                    <td>
-                                        <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupNone{{ role.getId }}" value="0" {{ permissions['course'][role.getId][0] }}>
-                                        <label class="radio-label" for="courseGroupNone{{ role.getId }}"></label>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupRead{{ role.getId }}" value="1" {{ permissions['course'][role.getId][1] }}>
-                                        <label class="radio-label" for="courseGroupRead{{ role.getId }}"></label>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="course_group[{{ role.getId }}]" id="courseGroupWrite{{ role.getId }}" value="2" {{ permissions['course'][role.getId][2] }}>
-                                        <label class="radio-label" for="courseGroupWrite{{ role.getId }}"></label>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </section>
+                    </div>
+                </div>
+                <button class="submit expand" type="submit">Save Changes</button>
             </div>
-        </div>
-        <div class="content {% if tab == 'unit' %}active{% endif %}" id="panel-unit">
-            <div class="list-item small-12 island">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                Homepage Template
-                                <select name="unitTemplate">
-                                    <option {% if unitTemplate == -1 %}selected{% endif %} value="-1">No Homepage</option>
-                                    {% for template in templates %}
-                                        <option {% if unitTemplate == template.getId %}selected{% endif %} value="{{ template.getId }}">{{ template.getName }}</option>
-                                    {% endfor %}
-                                </select>
-                            </label>
-                        </div>
-                    </fieldset>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>Default Access Permissions</label>
-                        </div>
-                        <div class="small-12 columns">
-                            <input data-checkbox-unit-inherit type="checkbox" id="unitInherit" name="unitInherit" value="1" {% if unitInherit == 1 %}checked{% endif %} />
-                            <label for="unitInherit" class="checkbox-label">Inherit permissions from the course's parent folder</label>
-                        </div>
-                    </fieldset>
-                    <table id="unit-permissions" {% if unitInherit == 1 %}class="hide"{% endif %}>
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>None</th>
-                                <th>Read</th>
-                                <th>Write</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for role in roles %}
-                                <tr>
-                                    <td>{{ role.getName }}</td>
-                                    <td>
-                                        <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupNone{{ role.getId }}" value="0" {{ permissions['unit'][role.getId][0] }}>
-                                        <label class="radio-label" for="unitGroupNone{{ role.getId }}"></label>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupRead{{ role.getId }}" value="1" {{ permissions['unit'][role.getId][1] }}>
-                                        <label class="radio-label" for="unitGroupRead{{ role.getId }}"></label>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="unit_group[{{ role.getId }}]" id="unitGroupWrite{{ role.getId }}" value="2" {{ permissions['unit'][role.getId][2] }}>
-                                        <label class="radio-label" for="unitGroupWrite{{ role.getId }}"></label>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </section>
-            </div>
-        </div>
-        <div class="small-12 island">
-            <button class="expand" type="submit">Save Changes</button>
-        </div>
+        </form>
     </div>
-</form>
+</div>

@@ -1,8 +1,7 @@
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
 {# Shared navigation menu #}
-
-{{ renderAdminNavigation(pageCurrent) }}
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 
 <div class="row">
     <div class="small-12 island collapse">
@@ -10,6 +9,9 @@
         <dl class="sub-nav">
             <dd>
                 <a href="/adminv2/import/user">User</a>
+            </dd>
+            <dd class="active">
+                <a href="/adminv2/photos/upload">User Photos</a>
             </dd>
             <dd>
                 <a href="/adminv2/import/timetable-structure">Timetable Structure</a>
@@ -20,9 +22,7 @@
             <dd>
                 <a href="/adminv2/import/enrolment">Enrolment</a>
             </dd>
-            <dd class="active">
-                <a href="/adminv2/photos/upload">User Photos</a>
-            </dd>
+
             <dd>
                 <a href="/adminv2/import-pastoral">{{ locale.pastoralCare.proper }} Records</a>
             </dd>
@@ -32,7 +32,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <dl class="sub-nav">
+        <dl class="tabs">
             <dd><a href="/adminv2/photos">User Photos</a></dd>
             <dd class="active"><a href="/adminv2/photos/upload">Upload</a></dd>
         </dl>
@@ -53,15 +53,9 @@
                     <b>All photos uploaded must be named using the ID of the individual (e.g. 10255.jpg)</b>
                 </p>
             </section>
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <section class="no-margin">
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                        </section>
-                    </div>
-                </fieldset>
-            </section>
+
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
             <input type="submit" class="button" value="Upload Photos">
         </form>
     </div>

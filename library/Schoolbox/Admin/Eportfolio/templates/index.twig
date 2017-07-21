@@ -115,123 +115,112 @@
 {# Shared navigation menu #}
 
 {{ renderAdminNavigation(pageCurrent) }}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">ePortfolio Deployment</h2>
+        <form id="form" action="{{ routeLookup('adminEportfolio.postDeploy') }}" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Source User
+                            <span class="hint has-tip tip-top" data-tooltip title="Enter the name of the user whose ePortfolio pages you want to copy">?</span>
+                        </label>
+                        <input type="text" required id="sourceUserId" name="sourceUserId" placeholder="Copy ePortfolios From User">
+                    </div>
 
-<div class="small-12 island">
-    <h1>ePortfolio Deployment</h1>
-    <form id="form" action="{{ routeLookup('adminEportfolio.postDeploy') }}" method="post">
-        <section>
-            <fieldset class="content">
-                <div class="row">
-                    <div class="small-12">
-                        <div class="small-12 columns">
-                            <label>
-                                Source User
-                                <span class="hint has-tip tip-top" data-tooltip title="Enter the name of the user whose ePortfolio pages you want to copy">?</span>
-                            </label>
-                            <input type="text" required id="sourceUserId" name="sourceUserId" placeholder="Copy ePortfolios From User">
-                        </div>
+                    <div class="small-12 columns">
+                        <label>Select Page(s) To Copy</label>
+                        <span id="errorPage"></span>
+                        <fieldset class="checklist" data-pages style="display: none;"></fieldset>
 
-                        <div class="small-12 columns">
-                            <label>Select Page(s) To Copy</label>
-                            <span id="errorPage"></span>
-                            <fieldset class="checklist" data-pages style="display: none;"></fieldset>
+                        <p id="source-empty">The selected source user does not have any ePortfolio pages to copy.</p>
 
-                            <p id="source-empty">The selected source user does not have any ePortfolio pages to copy.</p>
-
-                            <div class="hide">
-                                <div data-clone-page>
-                                    <input data-checkbox-page id="checkbox-pageId" type="checkbox" value="pageId" name="page[]" checked>
-                                    <label for="checkbox-pageId">pageTitle</label>
-                                </div>
+                        <div class="hide">
+                            <div data-clone-page>
+                                <input data-checkbox-page id="checkbox-pageId" type="checkbox" value="pageId" name="page[]" checked>
+                                <label for="checkbox-pageId">pageTitle</label>
                             </div>
                         </div>
                     </div>
-                </div>
-            </fieldset>
-            <fieldset class="content">
-                <div class="row">
-                    <div class="small-12">
-                        <div class="small-12 columns">
-                            <label>
-                                Target User(s)
-                                <span class="hint has-tip tip-top" data-tooltip title="Enter the names of users you want to copy the selected ePortfolio pages to">?</span>
-                            </label>
-                            <input type="text" id="destinationUserId" name="destinationUserId" placeholder="Copy ePortfolios To These Users">
-                        </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Target User(s)
+                            <span class="hint has-tip tip-top" data-tooltip title="Enter the names of users you want to copy the selected ePortfolio pages to">?</span>
+                        </label>
+                        <input type="text" id="destinationUserId" name="destinationUserId" placeholder="Copy ePortfolios To These Users">
+                    </div>
 
-                        <div class="small-12 medium-6 columns">
-                            <label>
-                                Target Role(s)
-                                <span class="hint has-tip tip-top" data-tooltip title="Select the roles you want to copy the selected ePortfolio pages to. All users in the selected roles will receive a copy of the ePortfolio pages selected.">?</span>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Target Role(s)
+                            <span class="hint has-tip tip-top" data-tooltip title="Select the roles you want to copy the selected ePortfolio pages to. All users in the selected roles will receive a copy of the ePortfolio pages selected.">?</span>
+                        </label>
+                        <fieldset class="checklist">
+                            {% for role in roles %}
+                                <input data-role id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
+                                <label for="checkbox-role-{{ role.id }}">{{ role.name }}</label>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Target Campus(es)
+                            <span class="hint has-tip tip-top" data-tooltip title="Select the campuses you want to copy the selected ePortfolio pages to. All users in the selected campuses will receive a copy of the ePortfolio pages selected.">?</span>
+                        </label>
+                        <fieldset class="checklist">
+                            {% for campus in campuses %}
+                                <input data-campus id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
+                                <label for="checkbox-campus-{{ campus.id }}">{{ campus.name }}</label>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Skip Duplicates
+                            <span class="hint has-tip tip-top" data-tooltip title="If enabled pages will not be copied to users if they already have a page with the same name.">?</span>
+                        </label>
+                        <div class="switch round">
+                            <input id="skipDuplicates" type="checkbox" name="skipDuplicates" value="1" checked>
+                            <label for="skipDuplicates">
+                                <span>Yes</span>
+                                <span>No</span>
                             </label>
-                            <fieldset class="checklist">
-                                {% for role in roles %}
-                                    <input data-role id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
-                                    <label for="checkbox-role-{{ role.id }}">{{ role.name }}</label>
-                                {% endfor %}
-                            </fieldset>
-                        </div>
-                        <div class="small-12 medium-6 columns">
-                            <label>
-                                Target Campus(es)
-                                <span class="hint has-tip tip-top" data-tooltip title="Select the campuses you want to copy the selected ePortfolio pages to. All users in the selected campuses will receive a copy of the ePortfolio pages selected.">?</span>
-                            </label>
-                            <fieldset class="checklist">
-                                {% for campus in campuses %}
-                                    <input data-campus id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
-                                    <label for="checkbox-campus-{{ campus.id }}">{{ campus.name }}</label>
-                                {% endfor %}
-                            </fieldset>
                         </div>
                     </div>
-                </div>
-            </fieldset>
-            <fieldset class="content">
-                <div class="row">
-                    <div class="small-12">
-                        <div class="small-12 columns">
-                            <label>
-                                Skip Duplicates
-                                <span class="hint has-tip tip-top" data-tooltip title="If enabled pages will not be copied to users if they already have a page with the same name.">?</span>
+                    <div class="small-12 columns">
+                        <label>
+                            Enable ePortfolios
+                            <span class="hint has-tip tip-top" data-tooltip title="If enabled users who do not have ePortfolios enabled will have the setting automatically enabled.">?</span>
+                        </label>
+                        <div class="switch round">
+                            <input id="enableEportfolios" type="checkbox" name="enableEportfolios" value="1" checked>
+                            <label for="enableEportfolios">
+                                <span>Yes</span>
+                                <span>No</span>
                             </label>
-                            <div class="switch round">
-                                <input id="skipDuplicates" type="checkbox" name="skipDuplicates" value="1" checked>
-                                <label for="skipDuplicates">
-                                    <span>Yes</span>
-                                    <span>No</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>
-                                Enable ePortfolios
-                                <span class="hint has-tip tip-top" data-tooltip title="If enabled users who do not have ePortfolios enabled will have the setting automatically enabled.">?</span>
-                            </label>
-                            <div class="switch round">
-                                <input id="enableEportfolios" type="checkbox" name="enableEportfolios" value="1" checked>
-                                <label for="enableEportfolios">
-                                    <span>Yes</span>
-                                    <span>No</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="small-12 columns">
-                            <label>
-                                Perform Dry Run
-                                <span class="hint has-tip tip-top" data-tooltip title="If enabled no changes will be made to the database.">?</span>
-                            </label>
-                            <div class="switch round">
-                                <input id="dryRun" type="checkbox" name="dryRun" value="1" checked>
-                                <label for="dryRun">
-                                    <span>Yes</span>
-                                    <span>No</span>
-                                </label>
-                            </div>
                         </div>
                     </div>
-                </div>
-            </fieldset>
-        </section>
-        <input type="submit" class="expand" value="Deploy Selected Pages">
-    </form>
+                    <div class="small-12 columns">
+                        <label>
+                            Perform Dry Run
+                            <span class="hint has-tip tip-top" data-tooltip title="If enabled no changes will be made to the database.">?</span>
+                        </label>
+                        <div class="switch round">
+                            <input id="dryRun" type="checkbox" name="dryRun" value="1" checked>
+                            <label for="dryRun">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" class="expand" value="Deploy Selected Pages">
+        </form>
+    </div>
 </div>

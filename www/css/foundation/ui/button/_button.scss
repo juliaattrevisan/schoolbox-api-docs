@@ -138,7 +138,8 @@ input[type="submit"]{
 
 /* Fake submit button
  */
-a.submit {
+a.submit,
+button.submit{
 	@extend input[type="submit"];
 	.splash {
 		background-color: $submit-button-color;
