@@ -40,7 +40,7 @@ abstract class AbstractTreeBuilder
      * @param string $namespace
      * @param string $rootNodeLabel
      */
-    public function __construct(Folder\ILocator $locator, $namespace, $rootNodeLabel = 'Top Level')
+    public function __construct(Folder\ILocator $locator = null, $namespace = null, $rootNodeLabel = 'Top Level')
     {
         $this->folderLocator = $locator;
         $this->rootNodeLabel = $rootNodeLabel;
