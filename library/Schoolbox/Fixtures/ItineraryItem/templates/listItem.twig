@@ -4,7 +4,10 @@
     <div class="column small-12 large-6 xlarge-4">
         <label>
             Date
-            <input type="text" name="itinerary[date][]" id="itineraryDate-{{ itineraryItem.id }}" placeholder="Date" data-datepicker data-datepicker-time value="{{ itineraryItem.startAt.local }}">
+            {# If this input has data - it can use the datepicker attacher,
+               otherwise it needs to use a custom one which is attached on MightyList create (in listContent.twig)
+             #}
+            <input type="text" name="itinerary[date][]" id="itineraryDate-{{ itineraryItem.id }}" placeholder="Date" {{ (itineraryItem.startAt.localShort) ? 'data-datepicker' : 'data-itinerary-date' }} data-datepicker-time value="{{ itineraryItem.startAt.local }}">
         </label>
     </div>
     <div class="small-12 large-6 xlarge-8 columns">
