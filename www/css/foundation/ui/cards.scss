@@ -88,11 +88,6 @@
 		width: 3rem;
 	}
 
-	.pipe{
-		@include contrast-bg();
-		margin: 0 0.35rem;
-	}
-
 	/* .card .label is used in viewSubmission.html and
 	 * navigation-option.html for displaying a status under a
 	 * user's name

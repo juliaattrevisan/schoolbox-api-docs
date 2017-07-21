@@ -35,11 +35,12 @@
                 <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
                 <p>
                     {% if currentFeedback.published %}
-                        Feedback by {{ currentFeedback.reviewer.fullname }}<span class="pipe">|</span>
+                        Feedback
                     {% else %}
-                        Draft Feedback by {{ currentFeedback.reviewer.fullname }}<span class="pipe">|</span>
+                        Draft Feedback
                     {% endif %}
-                    <span class="meta">
+                        by {{ currentFeedback.reviewer.fullname }}
+                    <span class="pipe meta">
                         {% if currentFeedback.published %}
                             {{ currentFeedback.publishedAt.short }}
                         {% else %}
