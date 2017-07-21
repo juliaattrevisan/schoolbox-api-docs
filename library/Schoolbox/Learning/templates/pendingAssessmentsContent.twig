@@ -158,7 +158,11 @@
                                 {% if participant.responseRequired %}
                                     {% set studentEmails = studentEmails|merge([participant.user.getEmail()]) %}
                                     <li>
-                                        <a class="link-row" href="/search/user/{{ participant.user.id }}">
+                                        {% set href = (assessment is dueWork)
+                                            ? routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id})
+                                            : '/search/user/' ~ participant.user.id
+                                        %}
+                                        <a class="link-row" href="{{ href }}">
                                             <div class="compact card small-6">
                                                 <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
                                                 <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
