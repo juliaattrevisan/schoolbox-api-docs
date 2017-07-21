@@ -239,7 +239,8 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
                             MATCH(`body`) AGAINST ('$keyword') AS `score`,
                             MATCH(`forumThread`.`title`) AGAINST ('$keyword') AS `score_title`
                         FROM `forumPost`
-                        LEFT JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
+                        JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
+                        JOIN `folder` ON `folder`.id = `forumThread`.categoryID AND `folder`.deleted_At IS NULL
                         LEFT JOIN `user` ON `forumPost`.userID = `user`.id
                         LEFT JOIN `perms` ON `forumThread`.categoryID = `perms`.cid
                             AND `perms`.gid = {$_SESSION['gid']}
@@ -260,7 +261,8 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
         $count_query = "SELECT COUNT(*)
                         FROM `forumPost`
-                        LEFT JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
+                        JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
+                        JOIN `folder` ON `folder`.id = `forumThread`.categoryID AND `folder`.deleted_At IS NULL
                         LEFT JOIN `user` ON `forumPost`.userID = `user`.id
                         LEFT JOIN `perms` ON `forumThread`.categoryID = `perms`.cid
                             AND `perms`.gid = {$_SESSION['gid']}

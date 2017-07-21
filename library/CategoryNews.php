@@ -82,6 +82,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
         $query = "SELECT `subject_news`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                         MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                     FROM `subject_news`
+                    JOIN `folder` ON `folder`.id = `subject_news`.code AND `folder`.deleted_At IS NULL
                     LEFT JOIN `user` ON `subject_news`.owner = `user`.id
                     LEFT JOIN `perms` ON `subject_news`.code = `perms`.cid
                         AND `perms`.gid = {$_SESSION['gid']}
@@ -99,6 +100,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
 
         $count_query = "SELECT COUNT(*)
                         FROM `subject_news`
+                        JOIN `folder` ON `folder`.id = `subject_news`.code AND `folder`.deleted_At IS NULL
                         LEFT JOIN `user` ON `subject_news`.owner = `user`.id
                         LEFT JOIN `perms` ON `subject_news`.code = `perms`.cid
                             AND `perms`.gid = {$_SESSION['gid']}
