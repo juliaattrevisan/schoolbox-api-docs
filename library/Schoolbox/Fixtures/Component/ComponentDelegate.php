@@ -125,7 +125,11 @@ class ComponentDelegate
 
         // Filter matches, and link teams which now contain relevant players
         foreach ($all_matches as $match) {
-            if ($includeHistorical || $match->getStartAt()->isFuture()) {
+            
+            $matchDay = clone $match->getStartAt();
+            $matchDay->endOfDay();
+
+            if ($includeHistorical || $matchDay->isFuture()) {
                 $matches[$match->getId()] = $match;
             } else {
                 continue;
