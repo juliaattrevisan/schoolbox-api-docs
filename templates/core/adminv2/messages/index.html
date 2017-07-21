@@ -24,39 +24,33 @@
     <div class="small-12 medium-4 columns">
         <div class="row">
             <div class="small-12 island">
-                <h2 class="subheader">Status</h2>
-                <section class="content">
-                    <div class="row">
+                <h2 class="subheader">Notification System</h2>
+                <section>
+                    <div class="row content">
                         <div class="small-12 columns">
                             <div class="alert-box">
                                 Notification System is
                                 <strong>{MSG_SYS_ENABLED}</strong>
                             </div>
-
+                            <!-- BEGIN global_offline -->
+                            <p><em>Enable messaging to set the global notification settings.</em></p>
+                            <!-- END global_offline -->
                             <p>
                                 You can {MSG_SYS_TOGGLE} it
                                 <a href="/adminv2/setting/Policy">via the policy settings page</a>.
                             </p>
                         </div>
                     </div>
-                </section>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">Global Settings</h2>
-                <section class="content">
                     <!-- BEGIN global_online -->
-                    <p><a href="/adminv2/messages/configure" class="expand button icon-settings">Configure Notification Settings</a></p>
+                    <div class="component-action">
+                        <section>
+                            <a href="/adminv2/messages/configure" class="button">Configure Settings</a>
+                        </section>
+                    </div>
                     <!-- END global_online -->
-                    <!-- BEGIN global_offline -->
-                    <p><em>Enable messaging to set the global notification settings.</em></p>
-                    <!-- END global_offline -->
                 </section>
             </div>
         </div>
-
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Email Previews</h2>
