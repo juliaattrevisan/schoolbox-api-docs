@@ -2,10 +2,15 @@
 {{ renderAdminNavigation(pageCurrent) }}
 
 {# show each provider #}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">LTI Providers</h2>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h2 class="subheader">Menu Items</h2>
+        </div>
     </div>
+    <nav>
+        <a href="#" data-reveal-id="addProviderModal" class="icon-add" title="Add LTI Provider"></a>
+    </nav>
 </div>
 <div class="row">
     <div class="small-12 island">
@@ -14,18 +19,13 @@
             <ul class="information-list">
                 {% include '@adminLti/listItem.twig' with {provider: provider} %}
             </ul>
-            <div class="component-action">
-                <section>
-                    <a href="#" class="button" data-reveal-id="addProviderModal">Add New Provider</a>
-                </section>
-            </div>
         </section>
         {% endfor %}
 
         {% if providers is empty %}
             <div class="empty-state">
                 <i class="icon-lti"></i>
-                <p>There arent any providers. Start by <a href="#" data-reveal-id="addProviderModal">adding your first provider</a>.</p>
+                <p>You have no LTI providers currently installed. Start by <a href="#" data-reveal-id="addProviderModal">adding your first provider</a>.</p>
             </div>
         {% endif %}
     </div>
