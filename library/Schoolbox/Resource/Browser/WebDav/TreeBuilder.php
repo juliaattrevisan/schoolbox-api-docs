@@ -20,11 +20,12 @@ use Schoolbox\Resource\Folder\IFolder;
 class TreeBuilder extends AbstractTreeBuilder
 {
     /**
+     * Constructor
+     *
+     * @param PortfolioWebDAV $dav
      */
-    public function __construct()
+    public function __construct(PortfolioWebDAV $dav = null)
     {
-        $dav = PortfolioWebDAV::factory();
-
         parent::__construct($dav, 'webdavfile', 'Drives');
 
         $this->fileLocator = $dav;

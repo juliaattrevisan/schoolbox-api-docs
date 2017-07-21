@@ -11,7 +11,6 @@ namespace Schoolbox\Resource\Browser\WebDav;
 
 
 use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use PortfolioWebDAV;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\Resource\Browser\FullAccessController;
@@ -31,11 +30,15 @@ class Module extends AbstractModule
             // open session first, because webdav factory needs session to
             // determine user's permissions
             $ci->get('session')->start();
-            return PortfolioWebDAV::factory();
+            try {
+                return PortfolioWebDAV::factory();
+            } catch (\UnexpectedValueException $e) {
+                return null;
+            }
         });
 
         return array_merge(parent::getSetterList($ci), [
-            'setTreeBuilder'  => $ci->lazyNew(TreeBuilder::class),
+            'setTreeBuilder'  => $ci->lazyNew(TreeBuilder::class, ['dav' => $lazyDav,]),
             'setNodeType'     => NodeFactory::WEBDAV,
             'setFolderMapper' => $lazyDav,
             'setFileMapper'   => $lazyDav,
