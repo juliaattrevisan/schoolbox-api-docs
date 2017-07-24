@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Marketo\Component\Dashboard;
+namespace Custom\Help\Marketo\Component\Dashboard;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;

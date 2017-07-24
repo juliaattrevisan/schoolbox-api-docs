@@ -9,7 +9,7 @@ namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
-use Schoolbox\Marketo\Component\Dashboard\Module as MarketoModule;
+use Custom\Help\Marketo\Component\Dashboard\Module as MarketoModule;
 
 
 class Marketo extends ModuleLoader implements ModuleConfigInterface
