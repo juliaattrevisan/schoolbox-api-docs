@@ -10,13 +10,28 @@
         </div>
     </div>
     <nav>
-        {# New item: only if I have the permission to do this #}
-        {% if isRouteAuthorized('resourceItem.add') %}
-            <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource"></a>
-        {% endif %}
-        <a class="icon-search" data-reveal-id="search-modal" title="Search Resources"></a>
-        <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Report"></a>
+        <a href="#" class="icon-overflow" data-dropdown="options" aria-expanded="false" title="Actions"></a>
     </nav>
+    <ul class="f-dropdown" data-dropdown-content id="options">
+        <li>
+            <a class="icon-search" data-reveal-id="search-modal" title="Search Resources">Search Resources</a>
+        </li>
+        <li>
+            <a class="icon-report" href="{{  routeLookup('resourceBookingReport.index', {id: categoryId}) }}" title="Booking Report">Booking Report</a>
+        </li>
+        <li>
+            <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Calendar">Availability Calendar</a>
+        </li>
+        {% if isRouteAuthorized('resourceItem.add') %}
+            <li class="separator">Admin Actions</li>
+            <li>
+                <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource">Add Resource</a>
+            </li>
+            <li>
+                <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceCategory.add') }}" title="Add Category">Add Category</a>
+            </li>
+        {% endif %}
+    </ul>
 </div>
 
 <div id="search-modal" class="reveal-modal" data-reveal>
