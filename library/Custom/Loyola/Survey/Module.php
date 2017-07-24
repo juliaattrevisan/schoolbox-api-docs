@@ -64,7 +64,7 @@ class Module extends BaseModule
             $preloads = [];
 
             if (isset($params['surveyId'])) {
-                $preloads['survey'] = $this->getMapperFactory()->get(Mapper::class)->findById($params['surveyId']);
+                $preloads['survey'] = $this->getMapperFactory()->get(SurveyMapper::class)->findById($params['surveyId']);
             }
 
             if (isset($params['folderId'])) {

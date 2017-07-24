@@ -17,6 +17,7 @@ use PHPExcel_Writer_Excel2007;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Survey\Model as Survey;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Scrub;
@@ -145,17 +146,17 @@ class Controller extends Base
     /**
      * Retrieve spreadsheet containing aggregated survey results
      *
-     * @param Model $survey
+     * @param Survey $survey
      */
     public function getClassSnapshot($survey)
     {
         $this->excel = new PHPExcel();
 
-        if ($survey instanceof Model) {
+        if ($survey instanceof Survey) {
 
             $answersRenderArray = [];
 
-            $responses = Mapper::getInstance()->findClassSnapshot($survey->getId());
+            $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId());
 
             foreach ($responses as $response) {
 
