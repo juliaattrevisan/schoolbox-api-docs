@@ -16,7 +16,7 @@
             },
             onCreate: function (element) {
                 // Add datepicker
-                element.find('[data-datepicker]')
+                element.find('[data-itinerary-date]')
                     .attr('id', 'itineraryDate-new-' + String(Date.now()))
                     .alaressDateTimePicker();
             }
