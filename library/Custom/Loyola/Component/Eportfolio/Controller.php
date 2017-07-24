@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Survey\Component\Eportfolio;
+namespace Custom\Loyola\Survey\Component\Eportfolio;
 
 use Component_Eportfolio_ControllerAbstract;
 use Schoolbox\Mapper\Exception as MapperException;
