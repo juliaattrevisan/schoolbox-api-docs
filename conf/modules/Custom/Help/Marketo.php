@@ -5,10 +5,11 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Config\Modules;
+namespace Config\Modules\Custom\Help;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
+use Config\Modules\ModuleConfigInterface;
 use Custom\Help\Marketo\Component\Dashboard\Module as MarketoModule;
 
 
