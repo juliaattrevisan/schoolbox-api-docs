@@ -48,6 +48,9 @@ class Model
     /** @var bool */
     protected $anonymousResult;
 
+    /** @var \Alaress_Date_Format */
+    protected $finish;
+
     /**
      * @param string $availability
      * @return self
@@ -189,6 +192,24 @@ class Model
     public function setAnonymousResult($anonymousResult)
     {
         $this->anonymousResult = $anonymousResult;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getFinish()
+    {
+        return $this->finish;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $finish
+     * @return $this
+     */
+    public function setFinish($finish)
+    {
+        $this->finish = $finish;
         return $this;
     }
 }
