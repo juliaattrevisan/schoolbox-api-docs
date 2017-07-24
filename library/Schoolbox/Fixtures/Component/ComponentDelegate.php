@@ -125,19 +125,22 @@ class ComponentDelegate
 
         // Filter matches, and link teams which now contain relevant players
         foreach ($all_matches as $match) {
-            if ($includeHistorical || $match->getStartAt()->isFuture()) {
+            $matchDay = clone $match->getStartAt();
+            $matchDay->endOfDay();
+
+            if ($includeHistorical || $matchDay->isFuture()) {
                 $matches[$match->getId()] = $match;
             } else {
                 continue;
             }
 
             // Can we link a home team ?
-            if ($teams[$match->getHomeTeam()->getId()]) {
+            if ($match->getHomeTeam() && $teams[$match->getHomeTeam()->getId()]) {
                 $match->setHomeTeam($teams[$match->getHomeTeam()->getId()]);
             }
 
             // Can we link an away team ?
-            if ($teams[$match->getAwayTeam()->getId()]) {
+            if ($match->getAwayTeam() && $teams[$match->getAwayTeam()->getId()]) {
                 $match->setAwayTeam($teams[$match->getAwayTeam()->getId()]);
             }
         }
@@ -169,11 +172,15 @@ class ComponentDelegate
             $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
             $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
 
+            /** @var Collection|Match[] $all_matches */
             $all_matches = $home_matches->mergeUnique($away_matches, 'id');
 
             // Filter matches
             foreach ($all_matches as $match) {
-                if ($includeHistorical || $match->getStartAt()->isFuture()) {
+                $matchDay = clone $match->getStartAt();
+                $matchDay->endOfDay();
+
+                if ($includeHistorical || $matchDay->isFuture()) {
                     $matches[$match->getId()] = $match;
                 }
             }
