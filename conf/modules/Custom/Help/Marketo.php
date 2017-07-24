@@ -24,6 +24,6 @@ class Marketo extends ModuleLoader implements ModuleConfigInterface
     {
         $namespace = 'marketo';
 
-        $this->loadModule($kernel, MarketoModule::class, "/{$namespace}");
+        $this->loadModule($kernel, MarketoModule::class, "/modules/custom/help/{$namespace}");
     }
 }
