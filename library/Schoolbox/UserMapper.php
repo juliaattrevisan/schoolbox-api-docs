@@ -249,7 +249,7 @@ class UserMapper extends Mapper
         return "
             SELECT {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                     {$this->getJoinColumnString('role', 'g')},
-                    {$this->getJoinColumnString('userCampus', 'c')}, v_c.defaultCampus as `uc.defaultCampus`,
+                    {$this->getJoinColumnString('userCampus', 'c')},
                     {$this->getColumnString('lu')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
