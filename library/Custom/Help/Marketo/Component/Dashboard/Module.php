@@ -9,7 +9,6 @@ namespace Custom\Help\Marketo\Component\Dashboard;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Mapper\Exception as MapperException;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule
