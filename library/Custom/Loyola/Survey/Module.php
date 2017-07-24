@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Survey;
+namespace Custom\Loyola\Survey;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
@@ -15,13 +15,14 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
     /**
      * @var string $basename Module basename
      */
-    protected $basename = 'Module';
+    protected $basename = 'survey';
 
     /**
      * {@inheritdoc}
@@ -31,6 +32,7 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 '/ajax' => 'getSelectize',
+                '/class/{folderId}' => 'getClassSnapshotList',
                 '/class/snapshot/{surveyId}' => 'getClassSnapshot',
             ],
             'POST' => [
@@ -62,7 +64,11 @@ class Module extends BaseModule
             $preloads = [];
 
             if (isset($params['surveyId'])) {
-                $preloads['survey'] = $this->getMapperFactory()->get(Mapper::class)->findById($params['surveyId']);
+                $preloads['survey'] = $this->getMapperFactory()->get(SurveyMapper::class)->findById($params['surveyId']);
+            }
+
+            if (isset($params['folderId'])) {
+                $preloads['folder'] = $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']);
             }
 
             return $preloads;
@@ -81,5 +87,13 @@ class Module extends BaseModule
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }

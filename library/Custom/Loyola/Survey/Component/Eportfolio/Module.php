@@ -5,11 +5,10 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Survey\Component\Eportfolio;
+namespace Custom\Loyola\Survey\Component\Eportfolio;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Mapper\Exception as MapperException;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule

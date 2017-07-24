@@ -5,12 +5,13 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Config\Modules;
+namespace Config\Modules\Custom\Loyola;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
-use Schoolbox\Survey\Module as SurveyModule;
-use Schoolbox\Survey\Component\Eportfolio\Module as EportfolioModule;
+use Custom\Loyola\Survey\Module as SurveyModule;
+use Custom\Loyola\Survey\Component\Eportfolio\Module as EportfolioModule;
+use Config\Modules\ModuleConfigInterface;
 
 class Survey extends ModuleLoader implements ModuleConfigInterface
 {
@@ -24,7 +25,10 @@ class Survey extends ModuleLoader implements ModuleConfigInterface
     {
         $namespace = 'survey';
 
-        $this->loadModule($kernel, SurveyModule::class, "/{$namespace}");
-        $this->loadModule($kernel, EportfolioModule::class, "/{$namespace}");
+        $di = $kernel->getDependencyInjector();
+        if ($di->get('config')->get('site_location') == 'loyola') {
+            $this->loadModule($kernel, SurveyModule::class, "/{$namespace}");
+            $this->loadModule($kernel, EportfolioModule::class, "/{$namespace}");
+        }
     }
 }

@@ -7,7 +7,8 @@ INSERT INTO component_definition
   component_category,
   visible,
   multiple
-) VALUES (
+)
+SELECT
   'Survey Summary',
   'Schoolbox\\Survey\\Component\\Eportfolio\\Controller',
   'Provides a summary of latest survey results for a student on their ePortfolio page',
@@ -15,7 +16,8 @@ INSERT INTO component_definition
   1,
   'true',
   'true'
-);
+FROM `config`
+WHERE `name` = 'site_location' and `value` = 'loyola';
 
 INSERT INTO component_config_definition
 (
@@ -24,13 +26,15 @@ INSERT INTO component_config_definition
   default_value,
   label,
   description
-) VALUES (
+)
+SELECT
   (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
   'collapse',
   '1',
   'Display Component Heading On Student View',
   null
-);
+FROM `config`
+WHERE `name` = 'site_location' and `value` = 'loyola';
 
 INSERT INTO component_config_definition
 (
@@ -39,13 +43,15 @@ INSERT INTO component_config_definition
   default_value,
   label,
   description
-) VALUES (
+) 
+SELECT
   (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
   'componentname',
   'Survey',
   'Heading',
   null
-);
+FROM `config`
+WHERE `name` = 'site_location' and `value` = 'loyola';
 
 INSERT INTO component_config_definition
 (
@@ -54,13 +60,15 @@ INSERT INTO component_config_definition
   default_value,
   label,
   description
-) VALUES (
+)
+SELECT
   (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
   'survey',
   '',
   'Select Survey',
   null
-);
+FROM `config`
+WHERE `name` = 'site_location' and `value` = 'loyola';
 
 INSERT INTO component_config_definition
 (
@@ -69,10 +77,13 @@ INSERT INTO component_config_definition
   default_value,
   label,
   description
-) VALUES (
+) 
+    
+SELECT 
   (SELECT `id` FROM `component_definition` WHERE class = 'Schoolbox\\Survey\\Component\\Eportfolio\\Controller'),
   'size',
   '4',
   'Number Of Questions To Display',
   null
-);
+FROM `config`
+WHERE `name` = 'site_location' and `value` = 'loyola';

@@ -12,6 +12,7 @@
 namespace Schoolbox\Survey;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -32,6 +33,9 @@ class Model
     /** @var Folder $folder */
     protected $folder;
 
+    /** @var Assessment $assessment */
+    protected $assessment;
+
     /** @var Collection $sections */
     protected $sections;
 
@@ -43,6 +47,9 @@ class Model
 
     /** @var bool */
     protected $anonymousResult;
+
+    /** @var \Alaress_Date_Format */
+    protected $finish;
 
     /**
      * @param string $availability
@@ -96,7 +103,7 @@ class Model
     public function getMaxAttempts()
     {
         return $this->maxAttempts;
-    }    
+    }
 
     /**
      * @param Folder $folder
@@ -115,6 +122,24 @@ class Model
     {
         return $this->folder;
     }
+
+    /**
+     * @param Assessment $assessment
+     * @return self
+     */
+    public function setAssessment($assessment)
+    {
+        $this->assessment = $assessment;
+        return $this;
+    }
+
+    /**
+     * @return Assessment
+     */
+    public function getAssessment()
+    {
+        return $this->assessment;
+    }    
 
     /**
      * @param Collection $sections
@@ -167,6 +192,24 @@ class Model
     public function setAnonymousResult($anonymousResult)
     {
         $this->anonymousResult = $anonymousResult;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getFinish()
+    {
+        return $this->finish;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $finish
+     * @return $this
+     */
+    public function setFinish($finish)
+    {
+        $this->finish = $finish;
         return $this;
     }
 }

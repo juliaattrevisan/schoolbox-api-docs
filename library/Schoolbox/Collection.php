@@ -593,7 +593,6 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             }
         } else {
             foreach ($other as $item) {
-
                 if(is_object($item) ){
                     throw new \UnexpectedValueException('Cannot compare objects');
                 }
@@ -604,6 +603,35 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             }
         }
         return $merged;
+    }
+
+    /**
+     * Returns a new collection containing unique items only
+     *
+     * @param string $column The column on which to test uniqueness
+     * @return Collection
+     */
+    public function getUnique($column)
+    {
+        $found = [];
+        $results = $this->emptyClone();
+
+        $getterMethod = $this->getGetMethodName($column);
+
+        foreach ($this as $item) {
+            $value = $item->$getterMethod();
+
+            if (is_object($value)) {
+                throw new \UnexpectedValueException('Cannot compare objects');
+            }
+
+            if (!in_array($value, $found)) {
+                $results->add($item);
+                $found[] = $value;
+            }
+        }
+
+        return $results;
     }
 
     /**

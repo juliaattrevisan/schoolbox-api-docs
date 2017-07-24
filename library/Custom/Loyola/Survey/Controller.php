@@ -5,15 +5,19 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Survey;
+namespace Custom\Loyola\Survey;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use External_Class;
 use PHPExcel;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Worksheet;
 use PHPExcel_Writer_Excel2007;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Survey\Model as Survey;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Scrub;
@@ -41,6 +45,9 @@ class Controller extends Base
     /** @var int $currentRow */
     private $currentRow;
 
+    /** @var External_Class $externalClass */
+    private $externalClass;
+
     /**
      * Constructor
      *
@@ -53,6 +60,7 @@ class Controller extends Base
         FolderMapper $folderMapper,
         SurveyMapper $surveyMapper
     ) {
+        $this->externalClass = new External_Class();
         $this->userMapper = $userMapper;
         $this->surveyMapper = $surveyMapper;
         $this->folderMapper = $folderMapper;
@@ -73,39 +81,98 @@ class Controller extends Base
     }
 
     /**
+     * Display a list of all surveys the students in the chosen folder have completed and link to the
+     * classroom learning snapshot
+     *
+     * @param Folder $folder
+     * @return bool
+     */
+    public function getClassSnapshotList(Folder $folder)
+    {
+        $students = [];
+        $userIds = [];
+
+        // Get the class codes on the folder we are viewing
+
+        $codes = $folder->getCodes()->getColumnValues('code');
+
+        // Retrieve the students in each of these classes
+
+        foreach ($codes as $code) {
+            $students = array_merge($students, $this->externalClass->getStudents($code));
+        }
+
+        // If we didn't find any students, no point going on
+
+        if (count($students) == 0) {
+            return false;
+        }
+
+        // Now convert those external user arrays into Schoolbox users
+
+        $users = $this->userMapper->findByColumn(
+            'synergy_id',
+            array_column($students, 'synergy_id')
+        );
+
+        /** @var User $user */
+        foreach ($users as $user) {
+            $userIds[] = $user->getId();
+        }
+
+        // If we didn't find any schoolbox users, no point going on
+
+        if (count($userIds) == 0) {
+            return false;
+        }
+
+        // And work out what surveys they have completed
+
+        $surveys = null;
+
+        $surveys = $this->surveyMapper->findAttemptedSurveysForUsers($userIds);
+
+        $this->getResponse()->content->set([
+            'template' => '@survey/classSnapshot.twig',
+            'data' => [
+                'folder' => $folder,
+                'surveys' => $surveys
+            ]
+        ]);
+
+        return true;
+    }
+
+    /**
      * Retrieve spreadsheet containing aggregated survey results
      *
-     * @param Model $survey
+     * @param Survey $survey
      */
     public function getClassSnapshot($survey)
     {
         $this->excel = new PHPExcel();
 
-        if ($survey instanceof Model) {
-
+        if ($survey instanceof Survey) {
             $answersRenderArray = [];
 
-            $responses = Mapper::getInstance()->getClassSnapshot($survey->getId());
+            $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId());
 
             foreach ($responses as $response) {
-
                 // Strip the section title of tags and create an array entry for it if none already exists
-
                 $sectionTitle = Scrub::html2text($response['section_title']);
 
                 if (!isset($answersRenderArray[$sectionTitle])) {
                     $answersRenderArray[$sectionTitle] = [];
                 }
 
-                // Unserialize the available answers (into an array of objects) and then mash into an indexed array so we can easily lookup
-                // the persons selected answer
+                // Unserialize the available answers (into an array of objects) and then mash into an indexed array so
+                // we can easily lookup the persons selected answer
 
                 $answers = unserialize($response['answers']);
 
                 $answersArray = [];
 
                 if (is_array($answers)) {
-
                     foreach ($answers as $answer) {
                         $answersArray[$answer->value] = $answer->description;
                     }
@@ -124,17 +191,19 @@ class Controller extends Base
                         $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = [];
                     }
 
-                    $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])][$response['user_id']]= $answers;
+                    $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])][$response['user_id']] = $answers;
                 }
             }
 
             // Throw this data into the spreadsheet
 
             foreach ($answersRenderArray as $tabText => $question) {
-
                 // Create a tab for each section
+                $this->spreadsheetTabSetup(
+                    $this->replaceInvalidCharacters($tabText),
+                    $this->replaceInvalidCharacters($survey->getFolder()->getNameWithCodes() . " - " . $survey->getTitle())
+                );
 
-                $this->spreadsheetTabSetup($tabText, $survey->getFolder()->getNameWithCodes() . " - " . $survey->getTitle());
                 $this->activeSheet->getDefaultRowDimension()->setRowHeight(-1);
 
                 // Start from the left
@@ -146,9 +215,7 @@ class Controller extends Base
                 // Iterate each question
 
                 foreach ($question as $questionText => $users) {
-
                     // Move back to the start row
-
                     $this->currentRow = $startRow;
 
                     $this->activeSheet->getColumnDimensionByColumn($currentQuestionColumn)->setAutoSize(true);
@@ -163,9 +230,7 @@ class Controller extends Base
                     $this->currentRow++;
 
                     foreach ($users as $userId => $answers) {
-
                         // Draw in the respondents names
-
                         $user = $this->userMapper->findByIdWithFallback($userId);
 
                         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getFont()->setBold(true);
@@ -271,7 +336,6 @@ class Controller extends Base
         $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, "Date/Time: " . Alaress_Date_Format::now()->getShort());
         $this->activeSheet->getRowDimension($this->currentRow)->setRowHeight(20);
         $this->currentRow += 2;
-
     }
 
     /**
@@ -292,5 +356,30 @@ class Controller extends Base
         readfile($tempFilename);
 
         unlink($tempFilename);
+    }
+
+    /**
+     * Replaces disallowed characters from tab names/titles with semi-similar ones that are allowed
+     *
+     * @param string $string
+     * @return string
+     */
+    private function replaceInvalidCharacters($string)
+    {
+        $replacements = [
+            '\\' => '|',
+            '/' => '|',
+            '*' => '-',
+            '[' => '(',
+            ']' => ')',
+            ':' => '-',
+            '?' => ''
+        ];
+
+        return str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $string
+        );
     }
 }
