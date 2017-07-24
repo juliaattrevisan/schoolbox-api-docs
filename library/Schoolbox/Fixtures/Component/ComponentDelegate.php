@@ -177,7 +177,10 @@ class ComponentDelegate
 
             // Filter matches
             foreach ($all_matches as $match) {
-                if ($includeHistorical || $match->getStartAt()->isFuture()) {
+                $matchDay = clone $match->getStartAt();
+                $matchDay->endOfDay();
+
+                if ($includeHistorical || $matchDay->isFuture()) {
                     $matches[$match->getId()] = $match;
                 }
             }
