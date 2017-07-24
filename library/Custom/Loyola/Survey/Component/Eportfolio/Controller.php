@@ -42,11 +42,8 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
         try {
             $this->survey = $this->surveyMapper->findById($this->config['survey']);
-
         } catch (MapperException $e) {
-
             // The survey was not found, only show the component if the user is a staff member so they can configure it
-
             if ($this->currentUser->getRole()->isStaff || $this->currentUser->isSuperuser()) {
                 return true;
             } else {
@@ -75,31 +72,27 @@ class Controller extends Component_Eportfolio_ControllerAbstract
         $showAllQuestions           = $maximumQuestionsPerSection === 0;
 
         if ($this->survey instanceof Survey) {
-
             $responses = $this->surveyMapper->getMatrix(
                 $this->survey->getId(),
                 $this->getContext()->getUserId()
             );
 
             foreach ($responses as $response) {
-
                 // Strip the section title of tags and create an array entry for it if none already exists
-
                 $sectionTitle = Scrub::html2text($response['section_title']);
 
                 if (!isset($answersRenderArray[$sectionTitle])) {
                     $answersRenderArray[$sectionTitle] = [];
                 }
 
-                // Unserialize the available answers (into an array of objects) and then mash into an indexed array so we can easily lookup
-                // the persons selected answer
+                // Unserialize the available answers (into an array of objects) and then mash into an indexed array so
+                // we can easily lookup the persons selected answer
 
                 $answers = unserialize($response['answers']);
 
                 $answersArray = [];
 
                 if (is_array($answers)) {
-
                     foreach ($answers as $answer) {
                         $answersArray[$answer->value] = $answer->description;
                     }
@@ -109,9 +102,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
                     // The number of questions is restricted by the components configuration
 
                     if ($showAllQuestions || count($answersRenderArray[$sectionTitle]) < $maximumQuestionsPerSection) {
-
                         // Unserialize the persons selected answer(s) and store them with the question for rendering
-
                         $selectedAnswers = unserialize($response['selectedAnswers']);
 
                         $answers = [];

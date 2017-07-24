@@ -153,30 +153,26 @@ class Controller extends Base
         $this->excel = new PHPExcel();
 
         if ($survey instanceof Survey) {
-
             $answersRenderArray = [];
 
             $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId());
 
             foreach ($responses as $response) {
-
                 // Strip the section title of tags and create an array entry for it if none already exists
-
                 $sectionTitle = Scrub::html2text($response['section_title']);
 
                 if (!isset($answersRenderArray[$sectionTitle])) {
                     $answersRenderArray[$sectionTitle] = [];
                 }
 
-                // Unserialize the available answers (into an array of objects) and then mash into an indexed array so we can easily lookup
-                // the persons selected answer
+                // Unserialize the available answers (into an array of objects) and then mash into an indexed array so
+                // we can easily lookup the persons selected answer
 
                 $answers = unserialize($response['answers']);
 
                 $answersArray = [];
 
                 if (is_array($answers)) {
-
                     foreach ($answers as $answer) {
                         $answersArray[$answer->value] = $answer->description;
                     }
@@ -202,9 +198,7 @@ class Controller extends Base
             // Throw this data into the spreadsheet
 
             foreach ($answersRenderArray as $tabText => $question) {
-
                 // Create a tab for each section
-
                 $this->spreadsheetTabSetup(
                     $this->replaceInvalidCharacters($tabText),
                     $this->replaceInvalidCharacters($survey->getFolder()->getNameWithCodes() . " - " . $survey->getTitle())
@@ -221,9 +215,7 @@ class Controller extends Base
                 // Iterate each question
 
                 foreach ($question as $questionText => $users) {
-
                     // Move back to the start row
-
                     $this->currentRow = $startRow;
 
                     $this->activeSheet->getColumnDimensionByColumn($currentQuestionColumn)->setAutoSize(true);
@@ -238,9 +230,7 @@ class Controller extends Base
                     $this->currentRow++;
 
                     foreach ($users as $userId => $answers) {
-
                         // Draw in the respondents names
-
                         $user = $this->userMapper->findByIdWithFallback($userId);
 
                         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getFont()->setBold(true);
@@ -346,7 +336,6 @@ class Controller extends Base
         $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, "Date/Time: " . Alaress_Date_Format::now()->getShort());
         $this->activeSheet->getRowDimension($this->currentRow)->setRowHeight(20);
         $this->currentRow += 2;
-
     }
 
     /**

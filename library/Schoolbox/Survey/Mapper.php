@@ -81,7 +81,6 @@ class Mapper extends BaseMapper
         $results = [];
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             if ($row['availability'] == 'survey') {
                 $results[] = $row;
 
