@@ -9,6 +9,7 @@ SET sql_mode = 'STRICT_ALL_TABLES';
 
 INSERT INTO mobile_app
     SELECT
+        NULL,
         'gcm_default',
         'GCM',
         MAX(CASE WHEN `name` = 'push_gcm_api_key' THEN NULLIF(`value`, '') ELSE NULL END),

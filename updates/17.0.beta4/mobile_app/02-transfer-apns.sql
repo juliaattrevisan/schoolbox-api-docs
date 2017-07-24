@@ -9,6 +9,7 @@ SET sql_mode = 'STRICT_ALL_TABLES';
 
 INSERT INTO mobile_app
     SELECT
+        NULL,
         'apns_default',
         'APNS',
         MAX(CASE WHEN `name` = 'push_apns_cert_key' THEN `value` ELSE '' END),
