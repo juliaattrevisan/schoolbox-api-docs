@@ -40,7 +40,12 @@
 
                                 <p class="meta {COMPONENT_COMPACTMODE_HIDE}" >
                                     Posted by
+                                    <!-- BEGIN owner_exists -->
                                     <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a>
+                                    <!-- END owner_exists -->
+                                    <!-- BEGIN owner_deleted -->
+                                    {LINK_POSTED_BY}
+                                    <!-- END owner_deleted -->
                                     on {LINK_POSTED_DATE}
                                 </p>
                                 <p class="{COMPONENT_COMPACTMODE_HIDE}">{LINK_COMMENT}</p>

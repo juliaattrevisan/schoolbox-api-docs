@@ -215,7 +215,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
             	{$userMapper->getColumnString('o')}
             FROM `{$this->table}` l
             LEFT JOIN {$this->getJoinSql('folder', 'l', 'c')}
-            LEFT JOIN {$this->getJoinSql('user', 'l', 'o')}
+            LEFT JOIN {$this->getJoinSql('user', 'l', 'o', true)}
             WHERE l.category = :categoryId
             AND l.deleted_at IS NULL
             ORDER BY l.{$sort} {$sortDir}
