@@ -18,13 +18,16 @@
                     {% for survey in surveys %}
                     <li>
                         <div class="card small-12">
-                            <a href="{{ routeLookup('survey.getClassSnapshot', {surveyId: survey.id}) }}">
-                                {% if survey.assessment.title is not empty %}
-                                    {{ survey.assessment.title }} -
-                                {% endif %}
-                                {{ survey.title }}
-                            </a>
+                            <h3>
+                                <a href="{{ routeLookup('survey.getClassSnapshot', {surveyId: survey.id}) }}">
+                                    {% if survey.assessment.title is not empty %}
+                                        {{ survey.assessment.title }} -
+                                    {% endif %}
+                                    {{ survey.title }}
+                                </a>
+                            </h3>
                             <p class="meta">
+                                <a href="/homepage/{{ survey.folder.id }}" title="{{ survey.folder.title }}">{{ survey.folder.title }}</a><br />
                                 Due <time datetime="{{ survey.finish }}">{{ survey.finish.short|replace({'11:59pm': ''}) }}</time>
                             </p>
                         </div>
