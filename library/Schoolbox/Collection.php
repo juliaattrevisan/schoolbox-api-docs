@@ -627,7 +627,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
             if (!in_array($value, $found)) {
                 $results->add($item);
-                $found[$value] = true;
+                $found[] = $value;
             }
         }
 
