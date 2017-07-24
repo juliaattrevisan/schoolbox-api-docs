@@ -22,6 +22,12 @@ interface ServiceInterface
 
 
     /**
+     * @return string
+     */
+    public function getAppIdentifier();
+
+
+    /**
      * @param array $tokens
      * @param array $data
      * @param int   $unreadCount

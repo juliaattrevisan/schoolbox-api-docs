@@ -830,6 +830,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         return $copy;
     }
 
+
+    /**
+     * @param string $field
+     * @param mixed $value
+     * @return static
+     */
     public function filterBy($field, $value)
     {
         $getField = $this->getGetMethodName($field);

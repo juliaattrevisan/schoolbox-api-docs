@@ -46,13 +46,14 @@ class APNS extends AbstractService
 
     /**
      * @param RegistryMapper $registryMapper
-     * @param int    $environment
-     * @param string $certificatePath
-     * @param string $passPhrase
+     * @param string         $appIdentifier
+     * @param int            $environment
+     * @param string         $certificatePath
+     * @param string         $passPhrase
      */
-    public function __construct(RegistryMapper $registryMapper, $environment, $certificatePath, $passPhrase = null)
+    public function __construct(RegistryMapper $registryMapper, $appIdentifier, $environment, $certificatePath, $passPhrase = null)
     {
-        parent::__construct($registryMapper);
+        parent::__construct($registryMapper, $appIdentifier);
         $this->client      = new Client();
         $this->environment = $environment;
         $this->certPath    = $certificatePath;

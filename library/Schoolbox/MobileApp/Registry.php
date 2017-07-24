@@ -28,8 +28,8 @@ class Registry {
     /** @var string */
     protected $deviceId;
 
-    /** @var string */
-    protected $provider;
+    /** @var Service */
+    protected $service;
 
     /** @var Alaress_Date_Format */
     protected $createdAt;
@@ -49,7 +49,7 @@ class Registry {
 
     /**
      * @param User $user
-     * @return self
+     * @return $this
      */
     public function setUser($user)
     {
@@ -69,7 +69,7 @@ class Registry {
 
     /**
      * @param string $token
-     * @return self
+     * @return $this
      */
     public function setToken($token)
     {
@@ -89,7 +89,7 @@ class Registry {
 
     /**
      * @param string $deviceId
-     * @return self
+     * @return $this
      */
     public function setDeviceId($deviceId)
     {
@@ -109,7 +109,7 @@ class Registry {
 
     /**
      * @param Alaress_Date_Format $touchedAt
-     * @return self
+     * @return $this
      */
     public function setTouchedAt($touchedAt)
     {
@@ -119,21 +119,21 @@ class Registry {
 
 
     /**
-     * @return string
+     * @return Service
      */
-    public function getProvider()
+    public function getService()
     {
-        return $this->provider;
+        return $this->service;
     }
 
 
     /**
-     * @param string $provider
-     * @return self
+     * @param Service $service
+     * @return $this
      */
-    public function setProvider($provider)
+    public function setService($service)
     {
-        $this->provider = $provider;
+        $this->service = $service;
         return $this;
     }
 
@@ -149,7 +149,7 @@ class Registry {
 
     /**
      * @param Alaress_Date_Format $createdAt
-     * @return self
+     * @return $this
      */
     public function setCreatedAt($createdAt)
     {

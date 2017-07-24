@@ -1,0 +1,105 @@
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script>
+    $(function () {
+
+        $('#app-list').on('click', '[data-open]', function (e) {
+            e.preventDefault();
+
+            var o = $(this).data('open');
+
+            $('#' + o).slideToggle();
+        });
+
+        $('input[name=provider]').click(function() {
+            $('[data-mage-next="part-2"]').trigger('click');
+        });
+
+        // init defaults
+        $('input[data-mage-next]').mage();
+
+        // inject html
+        $('input[data-mage-next="part-2"]').mage({
+            onXhrDone: function (data) {
+                $('[data-provider-details]').html(data);
+            }
+        });
+
+        // on success, reload the page
+        $('input[data-mage-next="part-3"]').mage({
+            onXhrDone: function () {
+                window.location.reload();
+            }
+        })
+    });
+</script>
+
+{# TODO insert messaging-specific breadcrumbs #}
+{% import 'sub/breadcrumbs.twig' as bread  %}
+{{ bread.crumbs(
+    [ 'Admin', '/adminv2/home' ],
+    [ 'Messages', '/adminv2/messages' ],
+    [ 'Push Providers', '/adminv2/messages/apps']
+) }}
+
+<div class="row">
+    <div class="small-12 column">
+        <h1>Push Providers</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Registered Apps</h2>
+        {% if apps | length %}
+        <section>
+            <ul class="information-list" id="app-list">
+                {% for app in apps %}
+                    <li>
+                        {% include '@adminMessages/providers/' ~ app.providerName ~ '/entity.twig' with { app: app, attachzone: attachzones[app.id] } only %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-mobile"></i>
+            <p>No mobile apps are currently registered.</p>
+        </div>
+        {% endif %}
+
+        <h2 class="subheader">Register New App</h2>
+        <form id="new-app" method="post" action="{{ routeLookup('adminMessages.postModifyApp') }}">
+            <section>
+                <fieldset class="content" data-mage="part-1">
+                    <legend>Provider</legend>
+                    <div class="small-12 column">
+                        {#<label>Select the provider of your new application to register:</label>#}
+                    </div>
+                    {% for provider, description in providers %}
+                        <div class="column small-12 medium-6{%  if loop.last %} end{% endif %}">
+                            <input type="radio" name="provider" value="{{ provider }}" id="provider-{{ provider }}" data-radio-block />
+                            <label for="provider-{{ provider }}" class="block">
+                                <i class="icon-mobile"></i> {{ description }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                    <input type="hidden" name="part-1" data-mage-next="part-2" formmethod="GET" formaction="{{ routeLookup('adminMessages.getCreateAppForm') }}">
+                    <div class="column small-12 medium-12 error-placeholder"></div>
+                </fieldset>
+                <fieldset class="content" data-mage="part-2" disabled>
+                    <legend>App Details</legend>
+                    <div class="small-12 columns" style="display:none;" data-mage-collapsed>
+                        <div data-provider-details>{# will be populated by ajax #}</div>
+                        <div class="row" data-mage-submitrow>
+                            <div class="small-12 medium-8 column">
+                                <p class="alert alert-box icon-alert" data-mage-error></p>
+                            </div>
+                            <div class="small-12 medium-4 column">
+                                <input type="submit" name="part-2" value="Register" data-mage-next="part-3" data-mage-working="Registering app..." />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>

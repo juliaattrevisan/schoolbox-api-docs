@@ -11,7 +11,8 @@ namespace Schoolbox\Realtime\Admin;
 
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\IConfigLoader;
+use Schoolbox\Collection;
+use Schoolbox\MobileApp\Service;
 use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -19,13 +20,13 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Resource;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\RoleMapper;
-use Alaress\Async\Notification\Cloud;
 use Alaress\Redis;
 use Schoolbox\MobileApp;
-use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
-use ZendService\Apple\Apns;
 use Schoolbox\Config\ConfigMapper;
 
 class Controller extends BaseController
@@ -161,6 +162,119 @@ class Controller extends BaseController
         }
 
         return $this->config;
+    }
+
+
+    /**
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getApps()
+    {
+        $apps = MobileApp\ServiceMapper::getInstance()->findAll();
+
+        $zones = [];
+
+        /** @var Collection|Service[] $apples */
+        $apples = $apps->filterBy('providerName', MobileApp\Registry::PROVIDER_APPLE);
+
+        foreach ($apples as $app) {
+            $appId = $app->getId();
+            $zones[$appId] = (new Zone($appId))->getTwigContext();
+        }
+
+        $data = [
+            'pageCurrent' => 'messages',
+            'apps'        => $apps,
+            'attachzones' => $zones,
+            'providers'   => [
+                'apns' => 'Apple Push Notification Service',
+                'gcm'  => 'Google Cloud Messaging'
+            ],
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminMessages/apps.twig', $data, 'Admin > Messages > Apps'));
+    }
+
+
+    /**
+     */
+    public function getCreateAppForm()
+    {
+        $provider = strtoupper($this->getRequest()->query->get('provider'));
+
+        $data = [];
+
+        if ($provider === 'APNS') {
+            $data['attachzone'] = (new Zone('apns'))->getTwigContext();
+        }
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@adminMessages/providers/{$provider}/create.twig", $data));
+    }
+
+
+    /**
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postModifyApp()
+    {
+        $resolutions = [];
+
+        $rq   = $this->getRequest();
+        $post = $rq->post;
+
+        $provider    = strtoupper($post->get('provider'));
+        $appId       = trim($post->get('app'));
+        $key         = trim($post->get('key'));
+        $certificate = null;
+
+        if ($provider === MobileApp\Registry::PROVIDER_GOOGLE) {
+            // require key for GCM
+            if (empty($key)) {
+                $resolutions[] = "specify the {$provider} API key";
+            }
+        } elseif ($provider === MobileApp\Registry::PROVIDER_APPLE) {
+            // require a certificate for APNS
+            try {
+                $certificate = (new CollectorFactory())->build($post->get('attachment', []))->getFirst();
+
+                if (empty($certificate)) {
+                    // yes this looks contrived but it saves on duplicating the error message
+                    throw new Resource\Exception();
+                }
+
+            } catch (Resource\Exception $e) {
+                // no file supplied
+                $resolutions[] = "provide the {$provider} certificate";
+            }
+        }
+
+        if (empty($appId)) {
+            $resolutions[] = "specify the {$provider} app identifier";
+        }
+
+        if (count($resolutions)) {
+            $this->sendError('Could not register app', $resolutions);
+            return;
+        }
+
+        $serviceMapper = MobileApp\ServiceMapper::getInstance();
+
+        $serviceMapper->save(
+            $serviceMapper
+                ->createModel()
+                ->setAppIdentifier($appId)
+                ->setProviderName($provider)
+                ->setKey($key)
+                ->setCertificate($certificate)
+        );
+
+        if ($this->getRequest()->isXhr()) {
+            // respond with an empty 200 OK
+            $this->getResponse()->content->set($this->buildJsonOutput(null));
+            return;
+        }
+
+        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('adminMessages.getApps'));
     }
 
 
@@ -336,16 +450,13 @@ class Controller extends BaseController
      */
     public function testPush($userId = null)
     {
-        /** @var IConfigLoader $conf */
-        $conf = $this->getDi()->get('config');
-
-        $write = fopen('php://memory', 'r+');
+        $write = fopen('php://memory', 'rb+');
 
         $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);
 
-        $factory = new MobileApp\ServiceManagerFactory($conf, $log, MobileApp\RegistryMapper::getInstance());
-        $cloudManager = $factory->build([ MobileApp\Registry::PROVIDER_APPLE, MobileApp\Registry::PROVIDER_GOOGLE ]);
+        $cloudManager = new MobileApp\ServiceManager($log, MobileApp\RegistryMapper::getInstance());
 
+        // just grab... anything
         $redis = Redis::getClientInstance();
         $keys  = $redis->keys('msg*:m:*');
         $data  = $redis->get($keys[1]);
@@ -365,49 +476,18 @@ class Controller extends BaseController
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ $e ]);
             }
+
+            $log->warning('-- END --');
+
         } else {
             $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll([ 'order' => [ 'user_id' => 'asc' ] ]);
         }
 
-        $log->warning("-- END --");
         rewind($write);
 
-        $content['data']['logs'] = explode("\n", trim(stream_get_contents($write)));
+        $content['data']['logs'] = array_filter(explode("\n", trim(stream_get_contents($write))));
 
         $this->getResponse()->content->set($content);
     }
-
-
-    /**
-     * @param string $hashInStorage
-     * @return bool
-     */
-    function _apnsCertRequiresUpdate($hashInStorage)
-    {
-        $tempCert = $this->_getTempCertFilename();
-
-        if (!is_readable($tempCert)) {
-            return true;
-        }
-        if (!filesize($tempCert)) {
-            return true;
-        }
-        if (sha1_file($tempCert) != $hashInStorage) {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * @return string
-     */
-    function _getTempCertFilename()
-    {
-        return sys_get_temp_dir() . '/sbapns.pem';
-    }
-
-
 
 }

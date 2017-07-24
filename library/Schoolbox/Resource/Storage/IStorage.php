@@ -116,4 +116,5 @@ interface IStorage
      * @return resource file stream
      */
     public function readStream();
-} 
+
+}

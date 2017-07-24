@@ -39,14 +39,22 @@ class GCM extends AbstractService
 
     /**
      * @param RegistryMapper $registryMapper
-     * @param string $apiKey
+     * @param string         $appIdentifier
+     * @param string         $apiKey
      */
-    public function __construct(RegistryMapper $registryMapper, $apiKey)
+    public function __construct(RegistryMapper $registryMapper, $appIdentifier, $apiKey)
     {
-        parent::__construct($registryMapper);
+        parent::__construct($registryMapper, $appIdentifier);
         $this->apiKey = $apiKey;
     }
 
+    /**
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->apiKey;
+    }
 
     /**
      * @return string

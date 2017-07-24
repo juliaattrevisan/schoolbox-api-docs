@@ -9,76 +9,43 @@
 
 namespace Schoolbox\MobileApp;
 
+use Alaress\Async\Notification\Cloud;
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 use InvalidArgumentException;
 use OutOfBoundsException;
-use OverflowException;
 use Psr\Log\LoggerInterface;
 use RangeException;
+use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Storage;
+use ZendService\Apple\Apns;
 
-class ServiceManager
+/**
+ * Class ServiceManager
+ * @package Schoolbox\MobileApp
+ */
+class ServiceManager implements IServiceManager
 {
-
-    /** @var ServiceInterface[] */
-    protected $services = array();
 
     /** @var RegistryMapper */
     protected $registryMapper;
+
+    /** @var ServiceInterface[][] */
+    protected $serviceCache = [];
 
     /** @var LoggerInterface */
     protected $log;
 
 
     /**
-     * @param ServiceInterface[] $services
      * @param RegistryMapper     $registryMapper
      * @param LoggerInterface    $log
      */
-    public function __construct(array $services, LoggerInterface $log, RegistryMapper $registryMapper = null)
+    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper)
     {
-        $this->registryMapper = $registryMapper ?: RegistryMapper::getInstance();
+        $this->registryMapper = $registryMapper;
         $this->log = $log;
-
-        foreach ($services as $service) {
-            // ensure typesafety
-            $this->addService($service);
-        }
-    }
-
-
-    /**
-     * @param ServiceInterface $service
-     * @return self
-     */
-    public function addService(ServiceInterface $service)
-    {
-        $provider = $service->getProviderName();
-
-        // can't set it more than once
-        if (array_key_exists($provider, $this->services)) {
-            throw new OverflowException("Cannot redeclare service '$provider'.");
-        }
-
-        // apply our logger to this server
-        $service->setLog($this->log);
-
-        // index by provider name
-        $this->services[$provider] = $service;
-        $this->log->debug("Added cloud notification provider '$provider'");
-        return $this;
-    }
-
-
-    /**
-     * You should only do this if a service cannot be used, eg. the API key in config is invalid.
-     *
-     * @param string $provider
-     */
-    protected function dropService($provider) {
-        if (array_key_exists($provider, $this->services)) {
-            $this->services[$provider] = null;
-            $this->log->debug("Dropped cloud notification provider '$provider'");
-        }
     }
 
 
@@ -88,13 +55,9 @@ class ServiceManager
      */
     public function push($userId, $data)
     {
-        if (count($this->services) == 0) {
-            return;
-        }
+        $registrations = $this->registryMapper->countByColumn('user_id', $userId);
 
-        $registered = $this->registryMapper->findByColumn('user_id', $userId)->groupBy('provider');
-
-        if (count($registered) == 0) {
+        if ($registrations === 0) {
             $this->log->notice("Received push for user $userId, but they have no devices registered");
             return;
         }
@@ -102,15 +65,26 @@ class ServiceManager
         // TODO retrieve the list of unread messages for this user - until SA-359 is complete, this is not possible...
         $unreadCount = 1;
 
-        foreach ($registered as $provider => $registries) {
-            try {
-                $service = $this->getService($provider);
-                $tokens  = $registries->getColumnValues('token');
-                $this->pushToService($service, $tokens, $data, $unreadCount);
+        foreach ($this->findRegistrationsByUser($userId) as $provider => $appRegistrations) {
 
-            } catch (InvalidArgumentException $e) {
-                // service not available
-                $this->log->notice("Failed push to '$provider': {$e->getMessage()}", [ $e ]);
+            foreach ($appRegistrations as $appIdentifier => $reg) {
+                $service = $this->getService($reg['service']);
+
+                /** @var Collection $apps */
+                $apps = $reg['registrations'];
+
+                $tokens = $apps->getColumnValues('token');
+
+                // ensure the log is set
+                $service->setLog($this->log);
+
+                try {
+                    $this->pushToService($service, $tokens, $data, $unreadCount);
+
+                } catch (InvalidArgumentException $e) {
+                    // service not available
+                    $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ $e ]);
+                }
             }
         }
     }
@@ -125,15 +99,15 @@ class ServiceManager
     protected function pushToService(ServiceInterface $service, $tokens, $data, $unreadCount = 0)
     {
         $provider = $service->getProviderName();
+        $appId    = $service->getAppIdentifier();
 
         try {
-            $this->log->info("Sending data to " . count($tokens) . " $provider devices");
+            $this->log->info(sprintf('Sending data to %d device%s on "%s" (%s)', count($tokens), count($tokens) === 1 ? '' : 's', $appId, $provider));
             $service->send($tokens, $data, $unreadCount);
 
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use
-            $this->dropService($provider);
-            $this->log->warning("Dropping unusable service '$provider': {$e->getMessage()}", [ $e ]);
+            $this->log->warning("Service '{$service->getProviderName()}' unusable: {$e->getMessage()}", [ $e ]);
 
         } catch (RangeException $e) {
             // TODO implement backoff-and-retry.
@@ -144,17 +118,125 @@ class ServiceManager
 
 
     /**
-     * @param string $providerName
-     * @throws InvalidArgumentException
-     * @return ServiceInterface
+     * Returns the list of app registrations for the given user, indexed by provider and then app identifier
+     *
+     * @param int $userId
+     * @return Registry[][]
      */
-    protected function getService($providerName)
+    private function findRegistrationsByUser($userId)
     {
-        if (isset($this->services[$providerName])) {
-            return $this->services[$providerName];
+        $registrations = [];
+
+        foreach (RegistryMapper::getInstance()->findByColumn('user_id', $userId) as $registration) {
+            $srv = $registration->getService();
+
+            // by-reference for convenience
+            $p =& $registrations[$srv->getProviderName()][$srv->getAppIdentifier()];
+
+            if (empty($p)) {
+                $p['service'] = $srv;
+                $p['registrations'] = new GenericCollection(Registry::class);
+            }
+
+            $p['registrations']->add($registration);
         }
 
-        throw new InvalidArgumentException("Provider '$providerName' not available.");
+        return $registrations;
+    }
+
+
+    /**
+     * @param Service $service
+     * @return ServiceInterface
+     * @throws Mapper\Exception
+     */
+    public function getService(Service $service)
+    {
+        $provider   = $service->getProviderName();
+        $identifier = $service->getAppIdentifier();
+
+        if (empty($this->serviceCache[$provider][$identifier])) {
+            $key = $service->getKey();
+
+            switch ($provider) {
+                case Registry::PROVIDER_APPLE:
+
+                    /** @var Storage\Model $storageObj */
+                    $storageObj = $service->getCertificate();
+
+                    if (!$storageObj) {
+                        // invalid PEM reference
+                        throw new Mapper\Exception('No PEM certificate given for APNS service.');
+                    }
+
+                    return new Cloud\Apple\APNS($this->registryMapper, $identifier, Apns\Client\Message::PRODUCTION_URI, $this->getPemPath($storageObj), $key);
+
+                case Registry::PROVIDER_GOOGLE:
+                    return new Cloud\Google\GCM($this->registryMapper, $identifier, $key);
+            }
+
+            throw new Mapper\Exception("Invalid provider: must be one of APNS or GCM, '$provider' given.");
+        }
+
+        return $this->serviceCache[$provider][$identifier];
+    }
+
+
+    /**
+     * Return the path APNS should use for the PEM file held by the given storage object
+     *
+     * @param Storage\Model $storage
+     * @return string
+     */
+    private function getPemPath(Storage\Model $storage)
+    {
+        $hash = $storage->getHash();
+
+        // since this is on-construction, check the file in play and see if it needs updating
+        if ($this->apnsCertRequiresUpdate($hash)) {
+            // copy the cert from storage
+            $fp = fopen($this->getTempCertFilename($hash), 'wb');
+            $storage->pipe($fp);
+            fclose($fp);
+        }
+
+        return $this->getTempCertFilename($hash);
+    }
+
+
+    /**
+     * Verify whether or not the given PEM hash requires update on-disk
+     *
+     * @param string $fileHash
+     * @return bool
+     */
+    private function apnsCertRequiresUpdate($fileHash)
+    {
+        $tempCert = $this->getTempCertFilename($fileHash);
+
+        if (!is_readable($tempCert)) {
+            return true;
+        }
+        if (!filesize($tempCert)) {
+            return true;
+        }
+        if (sha1_file($tempCert) !== $fileHash) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Return a consistent temp-file path for the given hash
+     *
+     * @param string $fileHash
+     * @return string
+     */
+    private function getTempCertFilename($fileHash)
+    {
+        return sys_get_temp_dir() . "/{$fileHash}.pem";
     }
 
 }

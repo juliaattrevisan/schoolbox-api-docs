@@ -17,6 +17,7 @@ use Authenticator;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\MobileApp\ServiceMapper;
 
 class Controller extends Base {
 
@@ -54,6 +55,10 @@ class Controller extends Base {
      */
     public function register($provider)
     {
+        $sessionUser     = $this->getUser();
+        $sessionUserId   = $sessionUser->getId();
+        $sessionUserKey  = $sessionUser->getKey();
+
         $data      = (array)$this->getRequest()->post;
         $response  = $this->getResponse()->content;
         $providers = array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE);
@@ -118,22 +123,32 @@ class Controller extends Base {
             $now = \Alaress_Date_Format::now();
 
             try {
-                $registry = $this->registryMapper->findById($_SESSION['id'], $data['token'], $provider);
+                $registry = $this->registryMapper->findById($sessionUserId, $data['token'], $provider);
                 $registry->setTouchedAt($now);
 
             } catch (MapperException $e) {
-                /** @var Registry $registry */
-                $registry = $this->registryMapper->createModel();
-                $registry
-                    ->setUser($_SESSION['user'])
-                    ->setToken($data['token'])
-                    ->setProvider($provider)
-                    ->setCreatedAt($now)
-                    ->setTouchedAt($now);
+                try {
+                    /** @var Registry $registry */
+                    $registry = $this->registryMapper->createModel();
+                    $registry
+                        ->setUser($sessionUser)
+                        ->setToken($data['token'])
+                        ->setService(ServiceMapper::getInstance()->findOneByColumnList([ 'app_identifier' => $data['appId'], 'provider' => $provider ]))
+                        ->setCreatedAt($now)
+                        ->setTouchedAt($now);
 
-                // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
-                if (isset($data['deviceId'])) {
-                    $registry->setDeviceId($data['deviceId']);
+                    // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
+                    if (isset($data['deviceId'])) {
+                        $registry->setDeviceId($data['deviceId']);
+                    }
+
+                } catch (MapperException $e) {
+                    $this->getResponse()->status->setCode(400);
+                    $response->set(array(
+                        'format' => 'json',
+                        'data'   => 'Invalid app ID given'
+                    ));
+                    return;
                 }
             }
 
@@ -143,8 +158,8 @@ class Controller extends Base {
         $response->set(array(
             'format' => 'json',
             'data'   => array(
-                'id'  => $_SESSION['id'],
-                'key' => $_SESSION['key'],
+                'id'  => $sessionUserId,
+                'key' => $sessionUserKey,
             )
         ));
     }
