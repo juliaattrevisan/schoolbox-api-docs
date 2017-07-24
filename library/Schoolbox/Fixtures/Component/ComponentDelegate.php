@@ -172,6 +172,7 @@ class ComponentDelegate
             $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
             $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
 
+            /** @var Collection|Match[] $all_matches */
             $all_matches = $home_matches->mergeUnique($away_matches, 'id');
 
             // Filter matches
