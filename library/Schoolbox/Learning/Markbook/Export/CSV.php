@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Markbook\Export;
 
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -99,7 +100,7 @@ class CSV implements IExporter
     private function getSortedAssessments(Markbook $markbook)
     {
         $sortedAssessments = new GenericCollection(IAssessable::class);
-        foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
+        foreach ($markbook->getAssessments() as $assessment) {
             $sortedAssessments[$assessment->getId()] = $assessment;
         }
         return $sortedAssessments;
@@ -241,7 +242,9 @@ class CSV implements IExporter
      */
     private function addParticipant(array $row, GenericCollection $participants, IAssessable $assessment, $userId)
     {
-        if ($participants[$assessment->getId()]->keyExists($userId)) {
+        if ($participants[$assessment->getId()] instanceof Collection
+            && $participants[$assessment->getId()][$userId] instanceof Participant
+        ) {
             $participant = $participants[$assessment->getId()][$userId];
 
             $humanReadableMark = $participant->getHumanReadableMark(true);
