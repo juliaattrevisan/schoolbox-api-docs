@@ -10,16 +10,17 @@
 
 $kernel = require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
-use Alaress\Database\Factory;
 use EOTC\Excursion\Connector as ExcursionConnector;
 use EOTC\ActivityLog\Registry as ActivityLogRegistry;
 use EOTC\ActivityLog\Factory as ActivityLogFactory;
 use EOTC\Authenticator;
 use EOTC\ConfigMapper;
+use EOTC\Event;
 use EOTC\EventMapper;
 use EOTC\EventMetadataMapper;
+use EOTC\EventStatus;
 use EOTC\EventStatusMapper;
-use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
 $page = new SitePage();
@@ -32,15 +33,14 @@ $event = false;
 /* Spawn an existing event if id provided
  */
 try {
-
-	/** @var \EOTC\Event $event */
+	/** @var Event $event */
 	$event = $eventMapper->findById($_POST['eventId']);
 }
 catch (MapperException $e) {
 	error(160);
 }
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
@@ -70,7 +70,7 @@ if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->is
 }
 /* EOTC Administrators and event authors can edit this event
  */
-else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
+elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
 	/* Remember original states so we know which obs to spawn
 	 */
@@ -81,7 +81,7 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	 */
 	$statusMapper = EventStatusMapper::getInstance();
 
-	/** @var \EOTC\EventStatus $status */
+	/** @var EventStatus $status */
 	$status = $statusMapper->findById($_POST['statusId']);
 
 	if (!$authenticator->isStatusChangeAllowed($event, $status))  {
@@ -140,6 +140,7 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
                 $allEvents->add($event);
             }
 
+            /** @var Event $currentEvent */
             foreach ($allEvents as $currentEvent) {
                 try {
                     $excursionConnector->sync($currentEvent);
