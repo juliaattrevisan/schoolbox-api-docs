@@ -47,6 +47,7 @@ $page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
 $page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block');
 $page->setBlock('can_add_resources', 'resource', 'resource_block');
 $page->setBlock(TEMPLATE_content, 'can_promote_in_principle', 'can_promote_in_principle_block');
+$page->setBlock(TEMPLATE_content, 'can_permission_slip_required', 'can_permission_slip_required_block');
 
 $authenticator = new Authenticator($this);
 
@@ -282,6 +283,30 @@ if (is_numeric($_GET['eventID'])) {
             }
         }
 
+        /* Permission Slip Required
+         */
+        try {
+            $externalDbSync = ConfigMapper::getInstance()->findOneByColumn('name', 'external_db_sync');
+
+            if ($externalDbSync->getValue()) {
+                $this->setVar([
+                    'EVENT_PERMISSION_SLIP_SELECTED' => $event->getMetadata()->getPermissionSlipRequired() ? 'checked="checked"' : ''
+                ]);
+
+                $this->parse('can_permission_slip_required_block', 'can_permission_slip_required');
+            }
+            else {
+                $this->setVar([
+                    'can_permission_slip_required_block' => ''
+                ]);
+            }
+        }
+        catch (MapperException $e) {
+            $this->setVar([
+                'can_permission_slip_required_block' => ''
+            ]);
+        }
+
         /* SB-3911
 		 */
         if ($i) {
@@ -402,6 +427,30 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
         'has_activity_log_block' => '',
         'activity_log_block' => ''
     ));
+
+    /* Permission Slip Required
+     */
+    try {
+        $externalDbSync = ConfigMapper::getInstance()->findOneByColumn('name', 'external_db_sync');
+
+        if ($externalDbSync->getValue()) {
+            $this->setVar([
+                'EVENT_PERMISSION_SLIP_SELECTED' => $event->getMetadata()->getPermissionSlipRequired() ? 'checked="checked"' : ''
+            ]);
+
+            $this->parse('can_permission_slip_required_block', 'can_permission_slip_required');
+        }
+        else {
+            $this->setVar([
+                'can_permission_slip_required_block' => ''
+            ]);
+        }
+    }
+    catch (MapperException $e) {
+        $this->setVar([
+            'can_permission_slip_required_block' => ''
+        ]);
+    }
 
     /* Cannot add students until an event is created
 	 */

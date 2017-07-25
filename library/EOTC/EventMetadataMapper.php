@@ -52,6 +52,11 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			'property' => 'comment',
 			'type' => self::TYPE_STRING,
 		));
+        $this->hasMap(array(
+            'column' => 'permission_slip',
+            'property' => 'permissionSlipRequired',
+            'type' => self::TYPE_INTEGER,
+        ));
 		$this->hasMap(array(
 			'column'   => 'created_at',
 			'property' => 'createdAt',

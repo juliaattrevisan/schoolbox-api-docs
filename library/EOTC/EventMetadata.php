@@ -86,6 +86,13 @@ class EventMetadata {
 	 */
 	protected $resourceBookings = null;
 
+    /**
+     * Permission slip required
+     *
+     * @var int
+     */
+	protected $permissionSlipRequired = 0;
+
 	/**
 	 * Created at
 	 *
@@ -356,4 +363,22 @@ class EventMetadata {
 	public function getResourceBookings() {
 		return $this->resourceBookings;
 	}
+
+    /**
+     * @return int
+     */
+    public function getPermissionSlipRequired()
+    {
+        return $this->permissionSlipRequired;
+    }
+
+    /**
+     * @param int $permissionSlipRequired
+     * @return self $this
+     */
+    public function setPermissionSlipRequired($permissionSlipRequired)
+    {
+        $this->permissionSlipRequired = $permissionSlipRequired;
+        return $this;
+    }
 }
