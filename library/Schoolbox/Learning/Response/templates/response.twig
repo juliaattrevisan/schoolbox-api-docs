@@ -228,7 +228,7 @@ Usage:
     <div class="small-12 island">
         <section class="content">
 
-            <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
+            <form method="post" data-feedback-form action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {assessmentId: assessment.id, studentId: participant.user.id, responseId: response.id, participant: participant}) }}">
                 <input type="hidden" name="responseId" value="{{ response.id }}" />
 
                 <div class="row">

@@ -4,7 +4,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-namespace Schoolbox\Learning\Feedback;
+namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
@@ -26,7 +26,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'learningFeedback';
+    protected $basename = 'learningDueWorkFeedback';
 
 
     /**

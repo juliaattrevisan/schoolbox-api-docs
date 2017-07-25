@@ -13,7 +13,7 @@ use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
-use Schoolbox\Learning\Feedback\Module as FeedbackModule;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Response\Module as ResponseModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
@@ -36,7 +36,7 @@ class Learning extends ModuleLoader
 
         $this->loadModule($kernel, Grades\Module::class,            "/{$namespace}/grades");
         $this->loadModule($kernel, AssessmentModule::class,         "/{$namespace}");
-        $this->loadModule($kernel, FeedbackModule::class,           "/{$namespace}");
+        $this->loadModule($kernel, DueWork\Feedback\Module::class,  "/{$namespace}");
         $this->loadModule($kernel, ResponseModule::class,           "/{$namespace}");
         $this->loadModule($kernel, QuizModule::class,               "/{$namespace}");
         $this->loadModule($kernel, MarkbookModule::class,           "/{$namespace}/markbook");
