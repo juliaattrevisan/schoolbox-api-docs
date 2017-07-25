@@ -13,9 +13,9 @@ namespace EOTC;
 
 use Schoolbox\Collection;
 use Schoolbox\Resource\Storage;
-use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class EventMetadataMapper extends \Schoolbox\Mapper {
 
@@ -115,7 +115,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			return $metadata;
 		}
 
-		throw new \Exception('No metadata for this event exists.');
+		throw new MapperException('No metadata for this event exists.');
 	}
 
 	/**
