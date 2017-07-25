@@ -5,14 +5,14 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Config\Modules;
+namespace Config\Modules\Custom\Help;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
-use Schoolbox\Marketo\Component\Dashboard\Module as MarketoModule;
+use Custom\Help\Marketo\Component\Dashboard\Module as MarketoModule;
 
 
-class Marketo extends ModuleLoader implements ModuleConfigInterface
+class Marketo extends ModuleLoader
 {
     /**
      * Run configuration for the given module
@@ -24,6 +24,6 @@ class Marketo extends ModuleLoader implements ModuleConfigInterface
     {
         $namespace = 'marketo';
 
-        $this->loadModule($kernel, MarketoModule::class, "/{$namespace}");
+        $this->loadModule($kernel, MarketoModule::class, "/modules/custom/help/{$namespace}");
     }
 }

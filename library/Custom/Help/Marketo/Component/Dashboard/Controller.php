@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Marketo\Component\Dashboard;
+namespace Custom\Help\Marketo\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 
@@ -18,7 +18,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
-        return $this->getConfigMapper()->get('site_location') == 'help';
+        return $this->getConfigMapper()->get('site_location') === 'help';
     }
 
     /**
