@@ -87,7 +87,6 @@ class Bulk_User extends Bulk_Abstract
                         'synergy_id'         => $user[4],
                         'group_id'           => $user[5],
                         'campus'             => $userCampus,
-                        'defaultCampus'      => $userCampus[0],
                         'year'               => $user[10],
                         'password'           => $user[11],
                         'local_email'        => $user[12],

@@ -123,7 +123,6 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
@@ -250,7 +249,7 @@ class UserMapper extends Mapper
         return "
             SELECT {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                     {$this->getJoinColumnString('role', 'g')},
-                    {$this->getJoinColumnString('userCampus', 'c')}, v_c.defaultCampus as `uc.defaultCampus`,
+                    {$this->getJoinColumnString('userCampus', 'c')},
                     {$this->getColumnString('lu')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
@@ -293,10 +292,6 @@ class UserMapper extends Mapper
             if ($campus) {
                 // Don't double add
                 $users[$userId]->getCampusCollection()->setOffset($campus->getId(), $campus);
-
-                if ($row['uc.defaultCampus'] == 1) {
-                    $users[$userId]->setDefaultCampus($campus);
-                }
             }
 
             $linkedUser = $this->hydrate($row, 'lu');
@@ -843,34 +838,6 @@ class UserMapper extends Mapper
         }
 
         return $years;
-    }
-
-    /**
-     * Post-save callback for updating a user's default campus.
-     *
-     * @param User $user
-     */
-    public function updateDefaultCampus(User $user)
-    {
-        $defaultCampus = $user->getDefaultCampus();
-        if ($defaultCampus instanceof Campus) {
-            $defaultCampusId = $defaultCampus->getId();
-            if ($defaultCampusId) {
-                $statement = $this->getDatabase()->prepare("
-                    UPDATE userCampus
-                    SET    defaultCampus = :isDefault
-                    WHERE  uid    = :userId
-                    AND    campus = :campusId
-                ");
-                foreach ($user->getCampusCollection() as $campus) {
-                    $statement->execute([
-                        'userId'    => $user->getId(),
-                        'campusId'  => $campus->getId(),
-                        'isDefault' => ($defaultCampusId == $campus->getId() ? 1 : 0),
-                    ]);
-                }
-            }
-        }
     }
 
     /**

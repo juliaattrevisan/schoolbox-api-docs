@@ -15,7 +15,8 @@ use Schoolbox\User;
 use Schoolbox\Campus;
 use MSSQL;
 
-class NavigationSelector {
+class NavigationSelector
+{
 
     /**
      * MSSQL db handler
@@ -80,7 +81,8 @@ class NavigationSelector {
      * @param User $user
      * @param $externalUser
      */
-    public function __construct($db, User $user, $externalUser) {
+    public function __construct($db, User $user, $externalUser)
+    {
         $this->setExternalUser($externalUser);
         $this->setDb($db);
         $this->setUser($user);
@@ -92,51 +94,42 @@ class NavigationSelector {
 
     /**
      * Determine default report
-     *
-     * @return string
-     */
-    public function determineDefaultReport() {
+     **/
+    public function determineDefaultReport()
+    {
         $this->setDefaultReport(array('error' => 'Unknown default report.'));
 
-        if ($this->getUser()->getDefaultCampus() instanceof Campus) {
-            if (in_array($this->getUser()->getDefaultCampus()->getExtTimetableCode(), array('JNR', 'JS'))) {
+        if ($this->getUser()->getCampusCollection()->first() instanceof Campus) {
+            if (in_array($this->getUser()->getCampusCollection()->first()->getExtTimetableCode(), array('JNR', 'JS'))) {
                 if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
                     $this->setDefaultReport('comingSoon');
                 }
-            }
-            elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'JH') {
+            } elseif ($this->getUser()->getCampusCollection()->first()->getExtTimetableCode() == 'JH') {
                 if (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
                     $this->setDefaultReport('schoolGrades');
                 }
-            }
-            elseif ($this->getUser()->getDefaultCampus()->getExtTimetableCode() == 'SNR') {
-
+            } elseif ($this->getUser()->getCampusCollection()->first()->getExtTimetableCode() == 'SNR') {
                 /* NCEA for year 11 specifically
                  */
                 if ($this->getUser()->getYear() == 11) {
                     if ($this->getHasNcea()) {
                         $this->setDefaultReport('ncea');
-                    }
-                    else {
+                    } else {
                         $this->setDefaultReport(array('error' => 'Year 11 student not in NCEA.'));
                     }
-                }
-                /* Need to decide whether this is an IB or an NCEA student
+                } /* Need to decide whether this is an IB or an NCEA student
                  */
                 elseif (($this->getUser()->getYear() >= 12) && ($this->getUser()->getYear() <= 13)) {
                     if ($this->getHasIb()) {
                         $this->setDefaultReport('ib');
-                    }
-                    elseif ($this->getHasNcea()) {
+                    } elseif ($this->getHasNcea()) {
                         $this->setDefaultReport('ncea');
-                    }
-                    else {
+                    } else {
                         $this->setDefaultReport(array('error' => 'Year 12/13 student not in NCEA or IB.'));
                     }
                 }
             }
-        }
-        else {
+        } else {
             $this->setDefaultReport(array('error' => "Unknown default campus for {$this->getUser()->getFullname()}."));
         }
     }
@@ -149,7 +142,8 @@ class NavigationSelector {
      *
      * Facade method
      */
-    private function navigationData() {
+    private function navigationData()
+    {
         $availableNavigation = array();
 
         /* Conditionally add NCEA option
@@ -179,7 +173,8 @@ class NavigationSelector {
     /**
      * Find out if they are in the NCEA table
      */
-    private function hasSchoolGrades() {
+    private function hasSchoolGrades()
+    {
         $externalUser = $this->getExternalUser();
         $externalUserId = $externalUser['StudentID'];
 
@@ -200,7 +195,8 @@ class NavigationSelector {
     /**
      * Find out if they are in the NCEA table
      */
-    private function hasNcea() {
+    private function hasNcea()
+    {
         $externalUser = $this->getExternalUser();
         $externalUserId = $externalUser['StudentID'];
 
@@ -221,7 +217,8 @@ class NavigationSelector {
     /**
      * Find out if they are in the IB table
      */
-    private function hasIb() {
+    private function hasIb()
+    {
         $externalUser = $this->getExternalUser();
         $externalUserId = $externalUser['StudentID'];
 

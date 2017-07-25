@@ -148,7 +148,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         // bypass handlers because I need access to the mysql pointer resource
         $query = "
             SELECT `u`.*,
-            GROUP_CONCAT(DISTINCT `c`.`name` ORDER BY `uc`.`defaultCampus` DESC, `c`.`name` ASC SEPARATOR ', ') AS `campus`,
+            GROUP_CONCAT(DISTINCT `c`.`name` ORDER BY `c`.`name` ASC SEPARATOR ', ') AS `campus`,
             `r`.`name` AS `role`,
             `h`.`house` AS `house`,
             `rh`.`name` AS `res_house`,
