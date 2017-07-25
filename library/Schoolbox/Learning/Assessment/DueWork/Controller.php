@@ -650,7 +650,7 @@ class Controller extends Assessment\Controller
     /**
      * Save a Response, on behalf of a User, for a particular Assessment
      *
-     * @api POST /learning/assessments/:assessmentId/:participantId/submit
+     * @api POST /learning/assessments/:assessmentId/:studentId/submit
      * @param Participant $participant
      * @return void
      */
