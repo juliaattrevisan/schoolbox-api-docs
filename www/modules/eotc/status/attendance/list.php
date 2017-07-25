@@ -36,7 +36,9 @@ $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
 if ($isEOTCAdministrator || $isSubscribedUser) {
 	$this->setFile(TEMPLATE_content, 'modules/eotc/status/attendance.html');
-	$this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
+    $this->setBlock(TEMPLATE_content, 'has_student_attendees', 'has_student_attendees_block');
+	$this->setBlock('has_student_attendees', 'student_attendee', 'student_attendee_block');
+    $this->setBlock(TEMPLATE_content, 'no_student_attendees', 'no_student_attendees_block');
 
 	$this->setVar(array(
 		'EVENT_ID' => $event->getId(),
@@ -45,6 +47,8 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 
     $roleMapper = RoleMapper::getInstance();
 
+    /* If there are students, list them, otherwise show empty state
+     */
     if ($event->getMetadata()->getStudentAttendees()->count()) {
 		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
 			$role = $roleMapper->findById($currentStudent->getRole()->getId());
@@ -59,11 +63,20 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 
 			$this->parse('student_attendee_block', 'student_attendee', true);
 		}
+
+		$this->setVar([
+		    'no_student_attendees_block' => ''
+        ]);
+
+		$this->parse('has_student_attendees_block', 'has_student_attendees');
 	}
 	else {
 		$this->setVar([
+            'has_student_attendees_block' => '',
 			'student_attendee_block' => ''
 		]);
+
+		$this->parse('no_student_attendees_block', 'no_student_attendees');
 	}
 }
 else {
