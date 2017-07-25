@@ -33,8 +33,8 @@ if ($sessionUser->isSuperuser()) {
         'CONFIG_URGENT_THRESHOLD'                    => $allConfigs->getBy('name', 'urgent_threshold')->getValue(),
         'CONFIG_POLICY'                              => $allConfigs->getBy('name', 'policy')->getValue(),
         'CONFIG_RAMS_WARNING'                        => $allConfigs->getBy('name', 'rams_warning')->getValue(),
-        'CONFIG_EXTERNAL_DB_SYNC_CHECKED'            => $allConfigs->getBy('name', 'external_db_sync')->getValue() == 1 ? 'checked' : '',
-        'CONFIG_STUDENTS_ATTENDEES_REQUIRED_CHECKED' => $allConfigs->getBy('name', 'student_attendees_required')->getValue() == 1 ? 'checked' : ''
+        'CONFIG_EXTERNAL_DB_SYNC_CHECKED'            => (int)$allConfigs->getBy('name', 'external_db_sync')->getValue() == 1 ? 'checked' : '',
+        'CONFIG_STUDENTS_ATTENDEES_REQUIRED_CHECKED' => (int)$allConfigs->getBy('name', 'student_attendees_required')->getValue() == 1 ? 'checked' : ''
 	]);
 }
 else {
