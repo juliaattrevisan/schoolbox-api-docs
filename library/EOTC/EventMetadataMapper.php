@@ -53,7 +53,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			'type' => self::TYPE_STRING,
 		));
         $this->hasMap(array(
-            'column' => 'permission_slip',
+            'column' => 'permission_slip_required',
             'property' => 'permissionSlipRequired',
             'type' => self::TYPE_INTEGER,
         ));
