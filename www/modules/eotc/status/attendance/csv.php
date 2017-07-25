@@ -9,23 +9,28 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use EOTC\Authenticator;
+use EOTC\EventMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\RoleMapper;
+use Schoolbox\User;
 
 $event = false;
 
 try {
-	$eventMapper = \EOTC\EventMapper::getInstance();
+	$eventMapper = EventMapper::getInstance();
 	$event = $eventMapper->findById($this->arg[0]);
 }
-catch (\Schoolbox\Mapper\Exception $e) {
+catch (MapperException $e) {
 	error(160);
 }
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 /* Only EOTC Administrators and Subscribed Users can view this page
  */
-$authenticator = new \EOTC\Authenticator($this);
+$authenticator = new Authenticator($this);
 
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
@@ -33,34 +38,34 @@ $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 if ($isEOTCAdministrator || $isSubscribedUser) {
 	$csv = '';
 
-	$this->setVar(array(
+	$this->setVar([
 		'EVENT_ID' => $event->getId(),
 		'EVENT_NAME' => $event->getTitle(),
-	));
+	]);
 
 	/* If there are attendees, pop it out
      */
 	if ($event->getMetadata()->getStudentAttendees()->count()) {
-		$roleMapper = \Schoolbox\RoleMapper::getInstance();
+		$roleMapper = RoleMapper::getInstance();
 
-		$row = array(
-			'Synergy ID',
+		$row = [
+			'External ID',
 			'Firstname',
 			'Surname',
 			'Group'
-		);
+		];
 
 		$csv .= TextFormatter::outputCSV($row) . "\n";
 
 		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
 			$role = $roleMapper->findById($currentStudent->getRole()->getId());
 
-			$row = array(
+			$row = [
 				$currentStudent->getExternalId(),
 				$currentStudent->getFirstname(),
 				$currentStudent->getLastname(),
 				$role->getName(),
-			);
+			];
 
 			$csv .= TextFormatter::outputCSV($row) . "\n";
 		}
