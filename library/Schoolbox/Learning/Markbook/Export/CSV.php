@@ -243,7 +243,7 @@ class CSV implements IExporter
     private function addParticipant(array $row, GenericCollection $participants, IAssessable $assessment, $userId)
     {
         if ($participants[$assessment->getId()] instanceof Collection
-            && $participants[$assessment->getId()]->keyExists($userId)
+            && $participants[$assessment->getId()][$userId] instanceof Participant
         ) {
             $participant = $participants[$assessment->getId()][$userId];
 
