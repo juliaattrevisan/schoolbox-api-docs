@@ -43,12 +43,16 @@ if ($sessionUser->isSuperuser()) {
     $externalDbSync = $allConfigs->getBy('name', 'external_db_sync');
     $externalDbSync->setValue((int)$_POST['externalDbSync']);
 
-	$configMapper->save($firstReminder);
+    $mandatoryStudents = $allConfigs->getBy('name', 'student_attendees_required');
+    $mandatoryStudents->setValue((int)$_POST['studentAttendeesRequired']);
+
+    $configMapper->save($firstReminder);
 	$configMapper->save($dailyReminder);
 	$configMapper->save($urgentThreshold);
 	$configMapper->save($policy);
 	$configMapper->save($ramsWarning);
     $configMapper->save($externalDbSync);
+    $configMapper->save($mandatoryStudents);
 
 	$page->localRedir('/modules/eotc/config/modify');
 }
