@@ -25,10 +25,14 @@
 			color: inherit;
 		}
 
-		h2,h3,h4,h5,h6, p, .meta {
+		h2,h3,h4,h5,h6,.meta {
 			text-overflow: ellipsis;
 			overflow: hidden;
 			white-space: nowrap;
+		}
+
+		p{
+			word-wrap: break-word;
 		}
 
 		a {
@@ -299,10 +303,14 @@
 		color: inherit;
 	}
 
-	h2,h3,h4,h5,h6, p, .meta {
+	h2,h3,h4,h5,h6,.meta {
 		text-overflow: ellipsis;
 		overflow: hidden;
 		white-space: nowrap;
+	}
+
+	p{
+		word-wrap: break-word;
 	}
 
 	a {
