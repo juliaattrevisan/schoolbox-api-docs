@@ -49,7 +49,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$event = new \EOTC\Event();
 			}
 
-
 			/* Spawn and assign metadata record to event
 			 */
 			try {
@@ -139,6 +138,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 */
 			$metadata->setEventType($_POST['type']);
 			$metadata->setRamsRequired($_POST['ramsRequired']);
+            $metadata->setPermissionSlipRequired($_POST['permissionSlipRequired'] ? $_POST['permissionSlipRequired'] : 0);
 
 			/* Only assign createdAt for new metadata records
 			 */
