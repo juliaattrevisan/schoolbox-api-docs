@@ -1,21 +1,11 @@
 {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
 
 {% if acceptingResponses %}
-    {% set publishEndSelector = 'input[name="openDate"]' %}
-    {% set dueEndSelector = 'input[name="closeDate"]' %}
+    {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
+    {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
+    {{ dateForm.dateField('Due',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
+    {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
 {% else %}
-    {% set publishEndSelector = 'input[name="dueDate"]' %}
-    {% set dueEndSelector = '' %}
-{% endif %}
-
-{{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '', publishEndSelector) }}
-
-{% if acceptingResponses %}
-{{ dateForm.dateField('Open', 'open', assessment.openAt, '#publishDate', '#dueDate') }}
-{% endif %}
-
-{{ dateForm.dateField('Due', 'due', assessment.dueAt, publishEndSelector, dueEndSelector) }}
-
-{% if acceptingResponses %}
-{{ dateForm.dateField('Late', 'close', assessment.closeAt, '#dueDate') }}
+    {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#dueDate') }}
+    {{ dateForm.dateField('Due',     'due',     assessment.dueAt,     '#publishDate', '') }}
 {% endif %}
