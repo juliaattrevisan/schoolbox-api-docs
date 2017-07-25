@@ -1,93 +1,95 @@
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$.fn.alaressEditor();
-	});
+    $(function () {
+        $.fn.alaressEditor();
+    });
 </script>
 
 <div class="row">
     <div class="small-12 columns">
-		<h1>{TPL_LOCAL_EOTC_PC} Configuration Settings</h1>
+        <h1>{TPL_LOCAL_EOTC_PC} Configuration Settings</h1>
     </div>
 </div>
 
 <div class="row">
-	<div class="small-12 island">
-		<form action="/modules/eotc/config/modifyForm.php" method="post">
-			<section>
-				<fieldset class="content">
-					<legend>First Reminder <span class='hint has-tip tip-top' title="Email reminder sent this amount of days before event if it has not been finalised. Email reminder will go to all people capable of approving event." data-tooltip>?</span></legend>
-					<div class="small-12 columns">
-						<input type="text" name="firstReminder" value="{CONFIG_FIRST_REMINDER}" />
-					</div>
-				</fieldset>
+    <div class="small-12 island">
+        <form action="/modules/eotc/config/modifyForm.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <legend>First Reminder <span class='hint has-tip tip-top'
+                                                 title="Email reminder sent this amount of days before event if it has not been finalised. Email reminder will go to all people capable of approving event."
+                                                 data-tooltip="">?</span></legend>
+                    <div class="small-12 columns">
+                        <input type="text" name="firstReminder" value="{CONFIG_FIRST_REMINDER}"/>
+                    </div>
+                </fieldset>
 
-				<fieldset class="content">
-					<legend>Daily Reminder <span class='hint has-tip tip-top' title="Email reminder will be sent each day from this many days before the event to remind all those who can approve they must approve this event." data-tooltip>?</span></legend>
-					<div class="small-12 columns">
-						<input type="text" name="dailyReminder" value="{CONFIG_DAILY_REMINDER}" />
-					</div>
-				</fieldset>
+                <fieldset class="content">
+                    <legend>Daily Reminder <span class='hint has-tip tip-top'
+                                                 title="Email reminder will be sent each day from this many days before the event to remind all those who can approve they must approve this event."
+                                                 data-tooltip="">?</span></legend>
+                    <div class="small-12 columns">
+                        <input type="text" name="dailyReminder" value="{CONFIG_DAILY_REMINDER}"/>
+                    </div>
+                </fieldset>
 
-				<fieldset class="content">
-					<legend>Urgent Threshold <span class='hint has-tip tip-top' title="Events that are not fully approved will be shown as urgent this many days out form their due date." data-tooltip>?</span></legend>
-					<div class="small-12 columns">
-						<input type="text" name="urgentThreshold" value="{CONFIG_URGENT_THRESHOLD}" />
-					</div>
-				</fieldset>
+                <fieldset class="content">
+                    <legend>Urgent Threshold <span class='hint has-tip tip-top'
+                                                   title="Events that are not fully approved will be shown as urgent this many days out form their due date."
+                                                   data-tooltip="">?</span></legend>
+                    <div class="small-12 columns">
+                        <input type="text" name="urgentThreshold" value="{CONFIG_URGENT_THRESHOLD}"/>
+                    </div>
+                </fieldset>
 
-				<fieldset class="content">
-					<legend>Policy <span class='hint has-tip tip-top' title="{TPL_LOCAL_EOTC_PC} Policy." data-tooltip>?</span></legend>
-					<div class="small-12 columns">
-						<textarea name="policy" class="fullwidth">{CONFIG_POLICY}</textarea>
-					</div>
-				</fieldset>
+                <fieldset class="content">
+                    <legend>Policy <span class='hint has-tip tip-top' title="{TPL_LOCAL_EOTC_PC} Policy." data-tooltip="">?</span></legend>
+                    <div class="small-12 columns">
+                        <textarea name="policy" class="fullwidth">{CONFIG_POLICY}</textarea>
+                    </div>
+                </fieldset>
 
-				<fieldset class="content">
-					<legend>
-						{TPL_LOCAL_EOTCRAMSABBREVIATION_PC} Warning Message
-						<span class='hint has-tip tip-top'
-							  title="A message which displays when a user attempts to create {TPL_LOCAL_EOTC_INDEF} {TPL_LOCAL_EOTC} without {TPL_LOCAL_EOTCRAMSABBREVIATION_INDEF} {TPL_LOCAL_EOTCRAMSABBREVIATION}."
-							  data-tooltip>?</span>
-					</legend>
-					<div class="small-12 columns">
-						<textarea name="ramsWarning" class="fullwidth">{CONFIG_RAMS_WARNING}</textarea>
-					</div>
-				</fieldset>
+                <fieldset class="content">
+                    <legend>
+                        {TPL_LOCAL_EOTCRAMSABBREVIATION_PC} Warning Message
+                        <span class='hint has-tip tip-top'
+                              title="A message which displays when a user attempts to create {TPL_LOCAL_EOTC_INDEF} {TPL_LOCAL_EOTC} without {TPL_LOCAL_EOTCRAMSABBREVIATION_INDEF} {TPL_LOCAL_EOTCRAMSABBREVIATION}."
+                              data-tooltip="">?</span>
+                    </legend>
+                    <div class="small-12 columns">
+                        <textarea name="ramsWarning" class="fullwidth">{CONFIG_RAMS_WARNING}</textarea>
+                    </div>
+                </fieldset>
 
-				<fieldset class="content">
-					<legend>
-						External DB Sync <span class='hint has-tip tip-top' title="Approved Events are uploaded into the external database" data-tooltip>?</span>
-					</legend>
-					<div class="small-12 columns">
-						<div class="switch">
-							<input id="externalDbSync" name="externalDbSync" type="checkbox" value="1" {CONFIG_EXTERNAL_DB_SYNC_CHECKED} />
-							<label for="externalDbSync">
-								<span>On</span>
-								<span>Off</span>
-							</label>
-						</div>
-					</div>
-				</fieldset>
 
-				<fieldset class="content">
-					<legend>
-						Mandatory Student Attendees <span class='hint has-tip tip-top' title="When on, events must have student attendees before approval" data-tooltip>?</span>
-					</legend>
-					<div class="small-12 columns">
-						<div class="switch">
-							<input id="studentAttendeesRequired" name="studentAttendeesRequired" type="checkbox" value="1" {CONFIG_STUDENTS_ATTENDEES_REQUIRED_CHECKED} />
-							<label for="studentAttendeesRequired">
-								<span>On</span>
-								<span>Off</span>
-							</label>
-						</div>
-					</div>
-				</fieldset>
-			</section>
+                <fieldset class="content">
+                    <legend>
+                        External DB Sync <span class='hint has-tip tip-top' title="Approved Events are uploaded into the external database"
+                                               data-tooltip="">?</span>
+                    </legend>
+                    <div class="small-12 columns">
+                        <div class="switch">
+                            <input id="externalDbSync" name="externalDbSync" type="checkbox" value="1" {CONFIG_EXTERNAL_DB_SYNC_CHECKED}/>
+                            <label for="externalDbSync">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
 
-			<input type="submit" value="Submit" />
-		</form>
-	</div>
+                <fieldset class="content">
+                    <legend>External File Type Blacklist<span class='hint has-tip tip-top'
+                                                              title="Comma delimited list of Synergetic File Types that should be excluded"
+                                                              data-tooltip="">?</span></legend>
+                    <div class="small-12 columns">
+                        <input type="text" name="externalFiletypeBlacklist" value="{CONFIG_EXTERNAL_FILETYPE_BLACKLIST}"/>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit"/>
+        </form>
+    </div>
 </div>
