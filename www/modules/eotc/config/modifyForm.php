@@ -66,6 +66,10 @@ if ($sessionUser->isSuperuser()) {
         }
     }
 
+    // Sort it alphabetically
+
+    asort($validFileTypes);
+
     $externalFiletypeBlacklist = $allConfigs->getBy('name', 'external_filetype_blacklist');
     $externalFiletypeBlacklist->setValue(implode(",", $validFileTypes));
 
