@@ -46,6 +46,7 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $this->setBlock(TEMPLATE_content, 'event_campus', 'event_campus_block');
     $this->setBlock(TEMPLATE_content, 'has_rams', 'has_rams_block');
     $this->setBlock('has_rams', 'rams_list', 'rams_list_block');
+    $this->setBlock(TEMPLATE_content, 'no_rams', 'no_rams_block');
     $this->setBlock(TEMPLATE_content, 'has_event_activity_log', 'has_event_activity_log_block');
     $this->setBlock('has_event_activity_log', 'event_activity_log', 'event_activity_log_block');
     $this->setBlock(TEMPLATE_content, 'has_change_event_status', 'has_change_event_status_block');
@@ -148,7 +149,19 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
 
             $this->parse('rams_list_block', 'rams_list', true);
         }
+
         $this->parse('has_rams_block', 'has_rams');
+
+        $this->setVar([
+            'no_rams_block' => '',
+        ]);
+    }
+    else {
+        $this->setVar([
+            'has_rams_block' => '',
+        ]);
+
+        $this->parse('no_rams_block', 'no_rams');
     }
 
     /* Teacher In Charge
