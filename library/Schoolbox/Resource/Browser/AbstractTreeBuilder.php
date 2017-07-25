@@ -94,7 +94,8 @@ abstract class AbstractTreeBuilder
                     $this->buildChildNodes($parentCategoryId, $parentList)
                 );
             }
-        } else {
+        }
+        else {
 
             $found = false;
             foreach ($parentList as $parentCategoryId) {
@@ -318,7 +319,7 @@ abstract class AbstractTreeBuilder
         /* Folders in the root node of My Files have no Parent folder hydrated
          * generateNodeArray() can deal with this, but need to check here first
          */
-        if ($file->getFolder() instanceof Folder\Model) {
+        if ($file->getFolder() instanceof IFolder) {
             $folderId = $file->getFolder()->getId();
         }
         else {
