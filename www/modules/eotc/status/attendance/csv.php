@@ -36,6 +36,7 @@ $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event)
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
 if ($isEOTCAdministrator || $isSubscribedUser) {
+    $roleMapper = RoleMapper::getInstance();
 	$csv = '';
 
 	$this->setVar([
@@ -43,20 +44,35 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 		'EVENT_NAME' => $event->getTitle(),
 	]);
 
-	/* If there are attendees, pop it out
+    $row = [
+        'External ID',
+        'Firstname',
+        'Surname',
+        'Group'
+    ];
+
+    $csv .= TextFormatter::outputCSV($row) . "\n";
+
+	/* A list of staff attendees
+     */
+    if ($event->getMetadata()->getStaffAttendees()->count()) {
+        foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
+            $role = $roleMapper->findById($currentStaff->getRole()->getId());
+
+            $row = [
+                $currentStaff->getExternalId(),
+                $currentStaff->getFirstname(),
+                $currentStaff->getLastname(),
+                $role->getName(),
+            ];
+
+            $csv .= TextFormatter::outputCSV($row) . "\n";
+        }
+    }
+
+    /* A list of student attendees
      */
 	if ($event->getMetadata()->getStudentAttendees()->count()) {
-		$roleMapper = RoleMapper::getInstance();
-
-		$row = [
-			'External ID',
-			'Firstname',
-			'Surname',
-			'Group'
-		];
-
-		$csv .= TextFormatter::outputCSV($row) . "\n";
-
 		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
 			$role = $roleMapper->findById($currentStudent->getRole()->getId());
 
