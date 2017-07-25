@@ -11,6 +11,7 @@
  */
 use EOTC\Authenticator;
 use EOTC\EventMapper;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -53,39 +54,27 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 
     $csv .= TextFormatter::outputCSV($row) . "\n";
 
-	/* A list of staff attendees
+    /* A list of everyone
      */
-    if ($event->getMetadata()->getStaffAttendees()->count()) {
-        foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
-            $role = $roleMapper->findById($currentStaff->getRole()->getId());
+    /** @var Collection $everyone */
+    $everyone = new Collection();
+    $everyone = $everyone->merge($event->getMetadata()->getStaffAttendees());
+    $everyone = $everyone->merge($event->getMetadata()->getStudentAttendees());
+
+    if ($everyone->count()) {
+        foreach ($everyone as $current) {
+            $role = $roleMapper->findById($current->getRole()->getId());
 
             $row = [
-                $currentStaff->getExternalId(),
-                $currentStaff->getFirstname(),
-                $currentStaff->getLastname(),
+                $current->getExternalId(),
+                $current->getFirstname(),
+                $current->getLastname(),
                 $role->getName(),
             ];
 
             $csv .= TextFormatter::outputCSV($row) . "\n";
         }
     }
-
-    /* A list of student attendees
-     */
-	if ($event->getMetadata()->getStudentAttendees()->count()) {
-		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
-			$role = $roleMapper->findById($currentStudent->getRole()->getId());
-
-			$row = [
-				$currentStudent->getExternalId(),
-				$currentStudent->getFirstname(),
-				$currentStudent->getLastname(),
-				$role->getName(),
-			];
-
-			$csv .= TextFormatter::outputCSV($row) . "\n";
-		}
-	}
 
 	/* Thump out a csv
      */
