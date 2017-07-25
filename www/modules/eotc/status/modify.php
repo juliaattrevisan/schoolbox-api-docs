@@ -44,8 +44,6 @@ $isCanFinalise = $authenticator->canFinalise($sessionUser, $event);
 if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFinalise) {
     $this->setFile(TEMPLATE_content, 'modules/eotc/status/modify.html');
     $this->setBlock(TEMPLATE_content, 'event_campus', 'event_campus_block');
-    $this->setBlock(TEMPLATE_content, 'event_staff', 'event_staff_block');
-    $this->setBlock(TEMPLATE_content, 'event_student', 'event_student_block');
     $this->setBlock(TEMPLATE_content, 'has_rams', 'has_rams_block');
     $this->setBlock('has_rams', 'rams_list', 'rams_list_block');
     $this->setBlock(TEMPLATE_content, 'has_event_activity_log', 'has_event_activity_log_block');
@@ -181,18 +179,6 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
         )
     );
 
-    foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
-        $this->setVar(
-            array(
-                'EVENT_STAFF_ID'          => $currentStaff->getId(),
-                'EVENT_STAFF_EXTERNAL_ID' => $currentStaff->getExternalId(),
-                'EVENT_STAFF_NAME'        => $currentStaff->getFullname(),
-            )
-        );
-
-        $this->parse('event_staff_block', 'event_staff', true);
-    }
-
     /* Student Attendees
      */
     $this->setVar(
@@ -201,18 +187,6 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
             'EVENT_STUDENT_COUNT' => $event->getMetadata()->getStudentAttendees()->count()
         )
     );
-
-    foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
-        $this->setVar(
-            array(
-                'EVENT_STUDENT_ID'          => $currentStudent->getId(),
-                'EVENT_STUDENT_EXTERNAL_ID' => $currentStudent->getExternalId(),
-                'EVENT_STUDENT_NAME'        => $currentStudent->getFullname(),
-            )
-        );
-
-        $this->parse('event_student_block', 'event_student', true);
-    }
 
     /* Related campuses
      */
