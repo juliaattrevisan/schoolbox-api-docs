@@ -10,6 +10,7 @@
 
 namespace EOTC;
 
+use EOTC\ConfigMapper as EOTCConfigMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -275,7 +276,7 @@ class Authenticator {
 		 */
 		if (($oldStatusId != $newStatusId) && ($newStatusId == EventStatusMapper::STATUS_APPROVED)) {
             try {
-                $studentsMandatory = (int)ConfigMapper::getInstance()->findOneByColumn('name', 'student_attendees_required')->getValue() === 1;
+                $studentsMandatory = (int)EOTCConfigMapper::getInstance()->findOneByColumn('name', 'student_attendees_required')->getValue() === 1;
                 $noStudents = count($event->getMetadata()->getStudentAttendees()) === 0;
 
                 /* If students are mandatory but there are none assigned to the event,
