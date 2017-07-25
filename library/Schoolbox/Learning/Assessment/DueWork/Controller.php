@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use DueWork_ErrorMapper;
 use Schoolbox\Application\Exception\NotFound;
@@ -41,6 +42,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Application\Exception as ApplicationException;
 
 class Controller extends Assessment\Controller
 {
@@ -653,6 +655,11 @@ class Controller extends Assessment\Controller
      * @api POST /learning/assessments/:assessmentId/:studentId/submit
      * @param Participant $participant
      * @return void
+     * @throws RouteNotFound If unable to generate a specified Route
+     * @throws \PDOException If unable to save the Response
+     * @throws ApplicationException\Exception If not accepting submissions
+     * @throws MapperException\Deleted If specified Response is deleted
+     * @throws MapperException If unable to create new Response object
      */
     public function postCreateResponse(Participant $participant)
     {
