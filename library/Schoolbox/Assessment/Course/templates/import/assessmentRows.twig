@@ -37,6 +37,9 @@
             var date = $(this).attr('data-course-unit-date');
             var $input = $(this).prev('.input-group').find('input');
             $input.val(date).trigger('change');
+
+            // Sync dates as required
+            syncDatesOnElement($input, getOptions($input), '');
         });
 
     });
@@ -57,6 +60,8 @@
         {% set assessment           = assessmentImpl ?: assessmentSpec %}
         {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) %}
         {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
+        {% set dueSyncStart         = (acceptingResponses) ? 'open' : 'publish' %}
+        {% set dueSyncEnd           = (acceptingResponses) ? 'close' : '' %}
 
         {# Check the checkbox if any of following is true:
          # * Assessment already imported
@@ -124,8 +129,8 @@
                     endOfDay: true,
                     inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                     dateProperty: 'due',
-                    dateSyncStart: 'open',
-                    dateSyncEnd: 'close',
+                    dateSyncStart: dueSyncStart,
+                    dateSyncEnd: dueSyncEnd,
                     assessmentId: assessmentSpec.id
                 } only %}
 
