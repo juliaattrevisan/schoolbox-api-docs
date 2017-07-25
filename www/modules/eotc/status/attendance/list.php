@@ -36,17 +36,52 @@ $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
 if ($isEOTCAdministrator || $isSubscribedUser) {
 	$this->setFile(TEMPLATE_content, 'modules/eotc/status/attendance.html');
+    $this->setBlock(TEMPLATE_content, 'has_staff_attendees', 'has_staff_attendees_block');
+    $this->setBlock('has_staff_attendees', 'staff_attendee', 'staff_attendee_block');
+    $this->setBlock(TEMPLATE_content, 'no_staff_attendees', 'no_staff_attendees_block');
     $this->setBlock(TEMPLATE_content, 'has_student_attendees', 'has_student_attendees_block');
 	$this->setBlock('has_student_attendees', 'student_attendee', 'student_attendee_block');
     $this->setBlock(TEMPLATE_content, 'no_student_attendees', 'no_student_attendees_block');
 
-	$this->setVar(array(
+    $this->setVar(array(
 		'EVENT_ID' => $event->getId(),
 		'EVENT_NAME' => $event->getTitle(),
 	));
 
     $roleMapper = RoleMapper::getInstance();
 
+    /* If there are staff, list them, otherwise show empty state
+     */
+    if ($event->getMetadata()->getStaffAttendees()->count()) {
+        foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
+            $role = $roleMapper->findById($currentStaff->getRole()->getId());
+
+            $this->setVar([
+                'STAFF_ATTENDEE_EXTERNAL_ID' => $currentStaff->getExternalId(),
+                'STAFF_ATTENDEE_ID' => $currentStaff->getId(),
+                'STAFF_ATTENDEE_FIRSTNAME' => $currentStaff->getFirstname(),
+                'STAFF_ATTENDEE_LASTNAME' => $currentStaff->getLastname(),
+                'STAFF_ATTENDEE_ROLE_NAME' => $role->getName(),
+            ]);
+
+            $this->parse('staff_attendee_block', 'staff_attendee', true);
+        }
+
+        $this->setVar([
+            'no_staff_attendees_block' => ''
+        ]);
+
+        $this->parse('has_staff_attendees_block', 'has_staff_attendees');
+    }
+    else {
+        $this->setVar([
+            'has_staff_attendees_block' => '',
+            'staff_attendee_block' => ''
+        ]);
+
+        $this->parse('no_staff_attendees_block', 'no_staff_attendees');
+    }
+    
     /* If there are students, list them, otherwise show empty state
      */
     if ($event->getMetadata()->getStudentAttendees()->count()) {
