@@ -9,13 +9,18 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use EOTC\Authenticator;
+use EOTC\EventMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\RoleMapper;
+
 $event = false;
 
 try {
-	$eventMapper = \EOTC\EventMapper::getInstance();
+	$eventMapper = EventMapper::getInstance();
 	$event = $eventMapper->findById($this->arg[0]);
 }
-catch (\Schoolbox\Mapper\Exception $e) {
+catch (MapperException $e) {
 	error(160);
 }
 
@@ -24,7 +29,7 @@ $sessionUser = $_SESSION['user'];
 
 /* Only EOTC Administrators and Subscribed Users can view this page
  */
-$authenticator = new \EOTC\Authenticator($this);
+$authenticator = new Authenticator($this);
 
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
@@ -38,27 +43,27 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 		'EVENT_NAME' => $event->getTitle(),
 	));
 
-	if ($event->getMetadata()->getStudentAttendees()->count()) {
-		$roleMapper = \Schoolbox\RoleMapper::getInstance();
+    $roleMapper = RoleMapper::getInstance();
 
+    if ($event->getMetadata()->getStudentAttendees()->count()) {
 		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
 			$role = $roleMapper->findById($currentStudent->getRole()->getId());
 
-			$this->setVar(array(
+			$this->setVar([
 				'STUDENT_ATTENDEE_EXTERNAL_ID' => $currentStudent->getExternalId(),
 				'STUDENT_ATTENDEE_ID' => $currentStudent->getId(),
 				'STUDENT_ATTENDEE_FIRSTNAME' => $currentStudent->getFirstname(),
 				'STUDENT_ATTENDEE_LASTNAME' => $currentStudent->getLastname(),
 				'STUDENT_ATTENDEE_ROLE_NAME' => $role->getName(),
-			));
+			]);
 
 			$this->parse('student_attendee_block', 'student_attendee', true);
 		}
 	}
 	else {
-		$this->setVar(array(
+		$this->setVar([
 			'student_attendee_block' => ''
-		));
+		]);
 	}
 }
 else {
