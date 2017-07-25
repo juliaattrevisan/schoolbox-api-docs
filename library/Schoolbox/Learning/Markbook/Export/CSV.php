@@ -99,7 +99,7 @@ class CSV implements IExporter
     private function getSortedAssessments(Markbook $markbook)
     {
         $sortedAssessments = new GenericCollection(IAssessable::class);
-        foreach ($markbook->getAssessmentsWithProjectContents() as $assessment) {
+        foreach ($markbook->getAssessments() as $assessment) {
             $sortedAssessments[$assessment->getId()] = $assessment;
         }
         return $sortedAssessments;
