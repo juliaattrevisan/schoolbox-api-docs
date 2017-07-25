@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
+use Schoolbox\Learning\MarkScheme;
 
 class Learning extends ModuleLoader
 {
@@ -41,5 +42,6 @@ class Learning extends ModuleLoader
         $this->loadModule($kernel, MarkbookModule::class,           "/{$namespace}/markbook");
         $this->loadModule($kernel, UpcomingModule::class,           "/{$namespace}/due");
         $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
+        $this->loadModule($kernel, MarkScheme\Module::class,        "/{$namespace}/markscheme");
     }
 }
