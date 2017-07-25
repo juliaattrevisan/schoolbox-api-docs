@@ -52,7 +52,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
      */
     public function deleteAssessment(Activity $assessment)
     {
-        return [];
+        return false;
     }
 
     /**
@@ -60,5 +60,6 @@ class External_Offline_Markbook implements External_MarkbookInterface
      */
     public function setMark($returnedWork)
     {
+        return false;
     }
 }

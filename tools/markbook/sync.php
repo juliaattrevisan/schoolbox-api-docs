@@ -36,7 +36,7 @@ $options = getopt('p::h::help', array('start::', 'end::', 'year::', 'semester::'
 // Setup kernel
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Schoolbox Markbook Sync Script', [
-    'verbose' => [true, true, true, true],
+    'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'help' => isset($options['h']) || isset($options['help']) ? true : false,
     'parentId' => isset($options['p']) ? $options['p'] : 0,
     'year' => isset($options['year']) ? $options['year'] : false,
@@ -84,6 +84,7 @@ function help($configMapper)
     if ($configMapper->get('external_type') == 'synergetic') {
         $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook, format --year=2016 (must be used with semester parameter)\n";
         $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook, --semester=1 (must be used with year parameter)\n";
+        $addParamsShort = "[--year=yyyy] [--semester=s] ";
     }
 
     // Get pretty uppercased SIS name
@@ -95,7 +96,7 @@ function help($configMapper)
 Schoolbox Markbook Sync Script    
     
 Description:   Syncs existing markbook data from Schoolbox into {$remoteSystemName}
-Usage:         php sync.php -p=[folderID] [--year=yyyy] [--semester=s] [--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
+Usage:         php sync.php -p=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
 
     -p=xxx               the Schoolbox ID of parent folder to start the traversal, defaults to 0, format --p=237 
     --start=yyyy-mm-dd   Only sync work due after this date, format --start=2016-04-20, defaults to current semester
@@ -125,12 +126,12 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
     if ($configMapper->get('external_markbook') == 0) {
         $log->error("ERROR: External markbook synchronisation is not enabled in Schoolbox. Please enable in your Schoolbox administrator settings and try again.");
-        exit(0);
+        exit(1);
     }
 
     if ($opts['help']) {
         help($configMapper);
-        exit(1);
+        exit(0);
     }
 
     // Get instance of mappers
@@ -165,7 +166,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
             $log->error("ERROR: You must specify both a year and semester to user this option.");
             help($configMapper);
-            exit(0);
+            exit(1);
         }
 
     } else {
@@ -202,7 +203,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
             // Creation of date/time objects failed, format must be wrong
 
             $log->error("ERROR: Invalid date supplied, please check date format matches (" . Alaress_Date_Format::DATABASE_DATE_FORMAT . ").");
-            exit(0);
+            exit(1);
         }
 
     } elseif (date('n') > 6) {
