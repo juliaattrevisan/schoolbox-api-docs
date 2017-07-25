@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Response;
+namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
@@ -40,7 +40,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'learningResponse';
+    protected $basename = 'learningDueWorkResponse';
 
 
     /**
@@ -342,7 +342,7 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-        $this->addTemplatePath($templateLoader, __DIR__ . '/../MarkScheme/templates', 'learningMarkScheme');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/../../../MarkScheme/templates', 'learningMarkScheme');
     }
 
     /**

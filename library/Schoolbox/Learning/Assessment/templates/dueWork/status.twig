@@ -53,7 +53,7 @@
     {% set isPublished  = latestFeedback.published %}
     {% set canPublish   = latestFeedback and not isPublished %}
 
-    {% set pActionResponses  = routeLookupIfAuthorized('learningResponse.getParticularResponse', routeArgs) %}
+    {% set pActionResponses  = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
     {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant }) %}
 
     {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}

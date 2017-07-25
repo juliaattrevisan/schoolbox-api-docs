@@ -8,7 +8,7 @@
  #}
 {% if currentFeedback.response.id %}
     {% if not currentFeedback.isPublished %}
-        {% set url = routeLookupIfAuthorized('learningResponse.getParticularResponse', {
+        {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
             assessmentId: currentFeedback.assessable.id,
             studentId: currentFeedback.response.submittedOnBehalfOf.id,
             responseId: responseId,
@@ -89,7 +89,7 @@
                          # responseId comes from the twig that includes this fragment
                          #}
                         {% if currentFile.crocodocId|length %}
-                            {% set crocodocRoute = routeLookupIfAuthorized('learningResponse.getCrocodocView', {
+                            {% set crocodocRoute = routeLookupIfAuthorized('learningDueWorkResponse.getCrocodocView', {
                                 assessmentId: currentFeedback.assessable.id,
                                 assessment:   assessment,
                                 responseId:   responseId,
@@ -115,7 +115,7 @@
                 </div>
                 <nav>
                     {% if currentFile.crocodocId|length %}
-                        {% include '@learningResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
+                        {% include '@learningDueWorkResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
                     {% else %}
                         <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
                     {% endif %}

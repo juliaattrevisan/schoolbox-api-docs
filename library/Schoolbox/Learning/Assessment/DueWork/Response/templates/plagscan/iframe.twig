@@ -8,7 +8,7 @@
     [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbookForClass', {folderId: assessment.context.folder.id}) ],
     [assessment.context.title, routeLookup('learningAssessment.getSummary', {assessmentId: assessment.context.id, studentId: response.submittedOnBehalfOf.id}) ],
     [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-    ['Inline Grader', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
+    ['Inline Grader', routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
     ['Plagscan Report', null]
     ] %}
 {% else %}
@@ -16,7 +16,7 @@
     ['Learning', routeLookup('learning.getClasses')],
     [assessment.context.folder.name, routeLookup('learningMarkbook.getMarkbookForClass', {folderId: assessment.context.folder.id})],
     [assessment.title, routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id})],
-    ['Inline Grader', routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
+    ['Inline Grader', routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
     ['Plagscan Report', null]
     ] %}
 {% endif %}
@@ -26,7 +26,7 @@
 {% if interactiveAvailable %}
     <iframe class="fullscreen scroll-wrapper" src="{{ plagscan.interactiveUrl }}"></iframe>
 {% else %}
-    <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningResponse.getPlagscanReportContents', {
+    <iframe class="fullscreen scroll-wrapper" src="{{ routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReportContents', {
         assessmentId: assessment.id,
         responseId: response.id,
         participant: participant,

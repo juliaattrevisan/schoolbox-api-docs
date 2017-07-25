@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Response;
+namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\Client;
@@ -195,7 +195,7 @@ class Controller extends Base
                     : $rubricContext->generateMarkable($assessment, $participant->getUser());
             }
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/response.twig', $data));
         }
         catch (\RangeException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
@@ -295,7 +295,7 @@ class Controller extends Base
             'file'        => $file,
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/crocodocView.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/crocodocView.twig', $data));
     }
 
     /**
@@ -364,7 +364,7 @@ class Controller extends Base
             'interactiveAvailable' => $interactiveAvailable
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/plagscan/iframe.twig', $data));
     }
 
     /**
@@ -380,7 +380,7 @@ class Controller extends Base
             'html' => $plagscan->getHtml(),
         ];
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningResponse/plagscan/contents.twig', $data));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
     }
 
     /* Getters/Setters

@@ -174,7 +174,7 @@
                                             </div>
                                         {% else %}
                                             {% set href = assessment is dueWork
-                                                ? routeLookup('learningResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id})
+                                                ? routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id})
                                                 : '/search/user/' ~ participant.user.id
                                             %}
                                             <a class="link-row" href="{{ href }}">
