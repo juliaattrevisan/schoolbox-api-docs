@@ -20,6 +20,7 @@ use EOTC\EventMapper;
 use EOTC\EventMetadataMapper;
 use EOTC\EventStatus;
 use EOTC\EventStatusMapper;
+use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -122,11 +123,15 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
     if ($externalDbSync->getValue() == 1) {
 
-        /* Sync to External DB only when the current status is Approved and
-         * its previous status was not Approved so we can't spam this event
-         * into External DB by altering its contents after the fact
+        /* Sync to External DB only when:
+         * - the current status is Approved and
+         * - its previous status was not Approved
+         * - Permission Slip is required
+         *
+         * We need to check the previous status so we don't spam this event
+         * into External DB by altering its contents after it was already approved
          */
-        if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
+        if ($status->isApproved() && $event->getMetadata()->getPermissionSlipRequired() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
             $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
 
             /* Synchronise all events in a series if appropriate
@@ -136,7 +141,7 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
                 $allEvents = $eventMapper->getAllInSeries($event);
             }
             else {
-                $allEvents = new \Schoolbox\Collection();
+                $allEvents = new Collection();
                 $allEvents->add($event);
             }
 
