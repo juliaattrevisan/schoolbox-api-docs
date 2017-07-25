@@ -9,8 +9,10 @@
  */
 
 namespace EOTC;
-use \Schoolbox\User;
+
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 class Authenticator {
 
@@ -267,13 +269,29 @@ class Authenticator {
 	{
 		$oldStatusId = $event->getMetadata()->getStatus()->getId();
 		$newStatusId = $newStatus->getId();
-		if ($oldStatusId != $newStatusId) {
-			if ($newStatusId == EventStatusMapper::STATUS_APPROVED) {
-				if (count($event->getMetadata()->getStudentAttendees()) === 0) {
-					return false;
-				}
-			}
+
+		/* If the status changed and it's currently being approved,
+		 * check for student attendances
+		 */
+		if (($oldStatusId != $newStatusId) && ($newStatusId == EventStatusMapper::STATUS_APPROVED)) {
+            try {
+                $studentsMandatory = (int)ConfigMapper::getInstance()->findOneByColumn('name', 'student_attendees_required')->getValue() === 1;
+                $noStudents = count($event->getMetadata()->getStudentAttendees()) === 0;
+
+                /* If students are mandatory but there are none assigned to the event,
+                 * the status cannot be changed to Approved
+                 */
+                if ($studentsMandatory && $noStudents) {
+                    return false;
+                }
+            }
+            catch (MapperException $e) {
+
+                /* noop
+                 */
+            }
 		}
+
 		return true;
 	}
 
