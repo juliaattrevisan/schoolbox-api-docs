@@ -221,12 +221,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 					$event->getMetadata()->setRamsFiles(new Collection($files));
 				}
-				else {
-					$event->getMetadata()->setRamsFiles(new Collection());
-				}
-			}
-			else {
-				$event->getMetadata()->setRamsFiles(new Collection());
 			}
 
 			/* If promoting an event, set to the next status
