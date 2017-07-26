@@ -134,7 +134,6 @@ class Statistics
      * Includes teacher Submitting-On-Behalf-Of
      *
      * @return int
-     * @throws \DomainException
      */
     public function getCountHasSubmittedResponse()
     {
@@ -154,7 +153,6 @@ class Statistics
      * Return the number of participants which have published feedback for this assessment
      *
      * @return int
-     * @throws \DomainException
      */
     public function getCountHasPublishedFeedback()
     {
