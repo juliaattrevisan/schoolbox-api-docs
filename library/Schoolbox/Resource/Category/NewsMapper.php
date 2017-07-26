@@ -49,13 +49,13 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		$this->hasMap(array(
 			'column'     => 'datetime_published',
 			'property'   => 'publishDate',
-			'type'       => self::TYPE_DATE
+			'type'       => self::TYPE_DATETIME
 		));
 
 		$this->hasMap(array(
 			'column'     => 'datetime_expires',
 			'property'   => 'expiryDate',
-			'type'       => self::TYPE_DATE
+			'type'       => self::TYPE_DATETIME
 		));
 
 		$this->hasMap(array(

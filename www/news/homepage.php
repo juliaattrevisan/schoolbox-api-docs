@@ -87,8 +87,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 						'CATEGORY_ID'			=> $this->arg[1],
 						'CATEGORY_NAME'			=> scrub::Text($folder->getName()),
 						'delete_button_block'	=> '',
-		                'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
-		                'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
+		                'DATETIME_PUBLISHED' => $publishedDate->startOfDay()->getLocal(),
+		                'DATETIME_EXPIRES' => $expiryDate->endOfDay()->getLocal(),
 					);
 						
 	$this->setVar($output);
