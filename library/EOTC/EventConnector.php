@@ -393,8 +393,7 @@ class EventConnector extends EventMapper
                 $event->setType($eventItem->getType()->getId());
 
                 /* Augment title with student counts
-                 *
-                 * TODO: Probably will include students + staff + 1 TIC
+                 * students + staff + 1 TIC
                  */
                 $event->setTitle("{$eventItem->getTitle()} ({$row['numStudents']},{$row['numStaff']})");
 
