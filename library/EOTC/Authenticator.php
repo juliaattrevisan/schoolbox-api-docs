@@ -5,9 +5,7 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace EOTC;
 
 use EOTC\ConfigMapper as EOTCConfigMapper;
@@ -23,6 +21,11 @@ class Authenticator {
 	 * @var EventPermissionMapper
 	 */
 	private $permissionMapper = null;
+
+    /**
+     * @var EOTCConfigMapper
+     */
+	private $configMapper;
 
 	/**
 	 * Cache obtained permissions in associative array
@@ -41,13 +44,13 @@ class Authenticator {
      */
 	public function __construct(\SitePage $page) {
 
-        //Return 404 if EOTC is not enabled
-        $configMapper = ConfigMapper::getInstance();
-        if(0 == $configMapper->get('eotc_enabled')){
+        // Return 404 if EOTC is not enabled
+        if (0 == ConfigMapper::getInstance()->get('eotc_enabled')) {
             $page->pageNotFound();
         }
 
         $this->setPermissionMapper(new EventPermissionMapper());
+        $this->setConfigMapper(EOTCConfigMapper::getInstance());
 
 		$this->setup();
 	}
@@ -276,7 +279,7 @@ class Authenticator {
 		 */
 		if (($oldStatusId != $newStatusId) && ($newStatusId == EventStatusMapper::STATUS_APPROVED)) {
             try {
-                $studentsMandatory = (int)EOTCConfigMapper::getInstance()->findOneByColumn('name', 'student_attendees_required')->getValue() === 1;
+                $studentsMandatory = (int)$this->getConfigMapper()->findOneByColumn('name', 'student_attendees_required')->getValue() === 1;
                 $noStudents = count($event->getMetadata()->getStudentAttendees()) === 0;
 
                 /* If students are mandatory but there are none assigned to the event,
@@ -326,4 +329,22 @@ class Authenticator {
 	{
 		return $this->allPermissions;
 	}
+
+    /**
+     * @return EOTCConfigMapper
+     */
+    private function getConfigMapper()
+    {
+        return $this->configMapper;
+    }
+
+    /**
+     * @param EOTCConfigMapper $configMapper
+     * @return self $this
+     */
+    private function setConfigMapper($configMapper)
+    {
+        $this->configMapper = $configMapper;
+        return $this;
+    }
 }
