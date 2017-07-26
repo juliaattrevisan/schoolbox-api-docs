@@ -10,7 +10,7 @@
 
 namespace EOTC;
 
-
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Storage;
 
@@ -19,20 +19,16 @@ class EventMetadata {
 	/**
 	 * Primary key
 	 * 
-	 * @var null
+	 * @var int
 	 */
 	private $id = null;
 
 	/**
-	 * An instance of Calendar\EventType
-	 *
-	 * @var \Schoolbox\Calendar\EventType
+	 * @var EventType
 	 */
 	private $eventType = null;
 
 	/**
-	 * An instance of EventStatus
-	 *
 	 * @var EventStatus
 	 */
 	private $status = null;
@@ -75,7 +71,7 @@ class EventMetadata {
 	/**
 	 * A collection of brownhole files
 	 *
-	 * @var null
+	 * @var Collection
 	 */
 	protected $ramsFiles = null;
 
@@ -94,22 +90,16 @@ class EventMetadata {
 	protected $permissionSlipRequired = 0;
 
 	/**
-	 * Created at
-	 *
 	 * @var \Alaress_Date_Format
 	 */
 	private $createdAt = null;
 
 	/**
-	 * Updated at
-	 *
-	 * @var \Alaress_Date_Format
+     * @var \Alaress_Date_Format
 	 */
 	private $updatedAt = null;
 
 	/**
-	 * Deleted at
-	 *
 	 * @var \Alaress_Date_Format
 	 */
 	private $deletedAt = null;
@@ -122,10 +112,6 @@ class EventMetadata {
 		$this->setStudentAttendees(new Collection());
 		$this->setRamsFiles(new Collection());
 		$this->setResourceBookings(new Collection());
-
-//		/** @var \EOTC\EventStatus $eventStatus */
-//		$eventStatus = EventStatusMapper::getInstance()->findById(1);
-//		$this->setStatus($eventStatus);
 	}
 
 	/* Getters/Setters
@@ -135,9 +121,11 @@ class EventMetadata {
 	 * Set created at
 	 *
 	 * @param \Alaress_Date_Format $createdAt
+     * @return self $this
 	 */
 	public function setCreatedAt($createdAt) {
 		$this->createdAt = $createdAt;
+		return $this;
 	}
 
 	/**
@@ -153,9 +141,11 @@ class EventMetadata {
 	 * Set deleted at
 	 *
 	 * @param \Alaress_Date_Format $deletedAt
+     * @return self $this
 	 */
 	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
+		return $this;
 	}
 
 	/**
@@ -171,15 +161,17 @@ class EventMetadata {
 	 * Set event type
 	 *
 	 * @param int $eventType
+     * @return self $this
 	 */
 	public function setEventType($eventType) {
 		$this->eventType = $eventType;
+        return $this;
 	}
 
 	/**
 	 * Get event type
 	 *
-	 * @return int
+	 * @return EventTYpe $eventType
 	 */
 	public function getEventType() {
 		return $this->eventType;
@@ -189,9 +181,11 @@ class EventMetadata {
 	 * Set id
 	 *
 	 * @param int $id
+     * @return self $this
 	 */
 	public function setId($id) {
 		$this->id = $id;
+		return $this;
 	}
 
 	/**
@@ -206,16 +200,18 @@ class EventMetadata {
 	/**
 	 * Set rams required
 	 *
-	 * @param boolean $ramsRequired
+	 * @param bool $ramsRequired
+     * @return self $this
 	 */
 	public function setRamsRequired($ramsRequired) {
 		$this->ramsRequired = $ramsRequired;
+		return $this;
 	}
 
 	/**
 	 * Get rams required
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function getRamsRequired() {
 		return $this->ramsRequired;
@@ -225,9 +221,11 @@ class EventMetadata {
 	 * Set status
 	 *
 	 * @param EventStatus $status
+     * @return self $this
 	 */
 	public function setStatus($status) {
 		$this->status = $status;
+		return $this;
 	}
 
 	/**
@@ -243,9 +241,11 @@ class EventMetadata {
 	 * Set updated at
 	 *
 	 * @param \Alaress_Date_Format $updatedAt
+     * @return self $this
 	 */
 	public function setUpdatedAt($updatedAt) {
 		$this->updatedAt = $updatedAt;
+		return $this;
 	}
 
 	/**
@@ -261,9 +261,11 @@ class EventMetadata {
 	 * Set comment
 	 *
 	 * @param string $comment
+     * @return self $this
 	 */
 	public function setComment($comment) {
 		$this->comment = $comment;
+		return $this;
 	}
 
 	/**
@@ -279,9 +281,11 @@ class EventMetadata {
 	 * Set activity log
 	 *
 	 * @param Collection $activityLog
+     * @return self $this
 	 */
 	public function setActivityLog($activityLog) {
 		$this->activityLog = $activityLog;
+		return $this;
 	}
 
 	/**
@@ -297,9 +301,11 @@ class EventMetadata {
 	 * Set staff attendees
 	 *
 	 * @param Collection $staffAttendees
+     * @return self $this
 	 */
 	public function setStaffAttendees($staffAttendees) {
 		$this->staffAttendees = $staffAttendees;
+		return $this;
 	}
 
 	/**
@@ -315,9 +321,11 @@ class EventMetadata {
 	 * Set student attendees
 	 *
 	 * @param Collection $studentAttendees
+     * @return self $this
 	 */
 	public function setStudentAttendees($studentAttendees) {
 		$this->studentAttendees = $studentAttendees;
+		return $this;
 	}
 
 	/**
@@ -333,9 +341,11 @@ class EventMetadata {
 	 * Set rams files
 	 *
 	 * @param Collection $ramsFiles
+     * @return self $this
 	 */
 	public function setRamsFiles($ramsFiles) {
 		$this->ramsFiles = $ramsFiles;
+		return $this;
 	}
 
 	/**
@@ -349,10 +359,13 @@ class EventMetadata {
 
 	/**
 	 * Set resource bookings
+     *
 	 * @param Collection $resourceBookings
+     * @return self $this
 	 */
 	public function setResourceBookings($resourceBookings) {
 		$this->resourceBookings = $resourceBookings;
+		return $this;
 	}
 
 	/**
