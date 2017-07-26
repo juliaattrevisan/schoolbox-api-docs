@@ -306,22 +306,28 @@ class Model extends AbstractAssessment
             return false;
         }
 
-        // Does this DueWork not accept online responses ?
-        if($this->isAcceptNone()){
-            return false;
-        }
-
         // Not a participant ?
-        if(!$this->isParticipant($learner)){
+        $participant = $this->getParticipantIfExtant($learner);
+        if (!$participant) {
             return false;
         }
 
-        // Has the student already submitted their single permitted response ?
-        if($this->isAcceptSingle() && $this->getParticipant($learner)->hasSubmittedResponse()) {
+        // Does this DueWork not accept online responses ?
+        if ($this->isAcceptNone()) {
             return false;
         }
 
-        return true;
+        if ($this->isAcceptMulti()) {
+            return true;
+        }
+
+        // Has student not submitted their single permitted response ?
+        if ($this->isAcceptSingle() && !$participant->hasSubmittedResponse()) {
+            return true;
+        }
+
+        // Logically impossible - but be defensive
+        return false;
     }
 
 
@@ -330,22 +336,29 @@ class Model extends AbstractAssessment
      */
     public function canInstructorCreateResponse(User $instructor, User $learner)
     {
-        // Does this DueWork not accept online responses ?
-        if($this->isAcceptNone()){
+        // Specified student not a participant ?
+        $participant = $this->getParticipantIfExtant($learner);
+        if (!$participant) {
             return false;
         }
 
-        // Not a participant ?
-        if(!$this->isParticipant($learner)){
-            return false;
+        if ($this->isAcceptMulti()) {
+            return true;
         }
 
-        // Has the student already submitted their single permitted response ?
-        if($this->isAcceptSingle() && $this->getParticipant($learner)->hasSubmittedResponse()) {
-            return false;
+        // No submitted response yet?
+        if (!$participant->hasSubmittedResponse()) {
+            if ($this->isAcceptSingle()) {
+                return true;
+            }
+            // A teacher can SOBO an ack of submission if there are no interactions
+            if ($this->isAcceptNone() && !$participant->hasPublishedFeedback()) {
+                return true;
+            }
         }
 
-        return true;
+        // Student has a submitted response, or accepts none and feedback already provided
+        return false;
     }
 
     /* Getters/Setters
