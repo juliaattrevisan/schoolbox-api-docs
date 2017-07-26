@@ -356,24 +356,26 @@ class EventConnector extends EventMapper
              *
              *  - Superusers can always see it
              *  - Creators can always see it
-             *  - Teachers in Charge should see it in translucent form
-             *  - Staff members should see it in translucent form
-             *  - Students should only see this event if it's Approved and if they are assigned to it as an attendee
-             *  - Anyone in both the Campus and Role of an Approved event
+             *  - Teachers In Charge can always see it, but is shown as translucent
+             *  - Staff Attendees can always see it, but is shown as translucent
+             *  - Student Attendees should only see this event if it's Approved
+             *  - Anyone in both the Campus and Role of an Approved event regardless of attendee-ness
              */
-            $isAttendee = false;
+            $isVisible = false;
 
-            if (
-                $user->isSuperuser() ||
-                $eventItem->getAuthor()->getId() == $user->getId() ||
-                $user->getId() == $eventItem->getTeacherInCharge()->getId() ||
-                $row['staffUserId'] == $this->getUser()->getId() ||
-                ($eventItem->getMetadata()->getStatus()->isApproved()) && ($row['studentUserId'] == $this->getUser()->getId())
-            ) {
-                $isAttendee = true;
+            $isSuperuser = $user->isSuperuser();
+            $isCreator = $eventItem->getAuthor()->getId() == $user->getId();
+            $isTIC = $user->getId() == $eventItem->getTeacherInCharge()->getId();
+            $isStaffAttendee = $row['staffUserId'] == $this->getUser()->getId();
+            $isStudentAttendee = $row['studentUserId'] == $this->getUser()->getId();
+            $isApproved = $eventItem->getMetadata()->getStatus()->isApproved();
+            $inCampusAndRole = $inCampus && $inRole;
+
+            if ($isSuperuser || $isCreator || $isTIC || $isStaffAttendee || ($isApproved && ($isStudentAttendee || $inCampusAndRole))) {
+                $isVisible = true;
             }
 
-            if ($isEOTCManager || $isAttendee || ($eventItem->getMetadata()->getStatus()->isApproved() && $inCampus && $inRole)) {
+            if ($isEOTCManager || $isVisible) {
 
                 /* Translate an \EOTC\Event type into a EventInterface descendant
                  */
