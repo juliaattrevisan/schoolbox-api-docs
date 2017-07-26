@@ -299,12 +299,6 @@ if (is_numeric($_GET['eventID'])) {
             ]);
         }
 
-        /* SB-3911
-		 */
-        if ($i) {
-
-        }
-
         /* Cannot add students until an event is created
 		 */
         $page->parse('can_add_students_block', 'can_add_students');
