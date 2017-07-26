@@ -407,18 +407,18 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
 
     /* Recurrence
 	 */
-    $page->setVar(array(
+    $page->setVar([
         'recurring_reminder_block' => '',
-    ));
+    ]);
 
     $page->parse('recurring_dates_block', 'recurring_dates');
 
     /* Activity Logs
 	 */
-    $page->setVar(array(
+    $page->setVar([
         'has_activity_log_block' => '',
         'activity_log_block' => ''
-    ));
+    ]);
 
     /* Permission Slip Required
      */
@@ -446,21 +446,21 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
 
     /* Cannot add students until an event is created
 	 */
-    $page->setVar(array(
+    $page->setVar([
         'can_add_students_block' => ''
-    ));
+    ]);
 
     /* Cannot add resources until an event is created
 	 */
-    $page->setVar(array(
+    $page->setVar([
         'can_add_resources_block' => ''
-    ));
+    ]);
 
     /* Cannot self-promote until a status is In Principle
  	 */
-    $page->setVar(array(
+    $page->setVar([
         'can_promote_in_principle_block' => ''
-    ));
+    ]);
 }
 /* Nobody else should be here
  */
