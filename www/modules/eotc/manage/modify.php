@@ -25,6 +25,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone as Attachzone;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 
 
@@ -58,6 +60,7 @@ $sessionUser = $_SESSION['user'];
 
 $defaultTypeId = '';
 $defaultCampusId = [];
+$selectedRoles = [];
 
 $configMapper = ConfigMapper::getInstance();
 
@@ -118,6 +121,13 @@ if (is_numeric($_GET['eventID'])) {
         /** @var Campus $currentCampus */
         foreach ($allCampuses as $currentCampus) {
             $defaultCampusId[] = $currentCampus->getId();
+        }
+
+        $allRoles = $event->getRoleCollection()->getAll();
+
+        /** @var Role $currentRole */
+        foreach ($allRoles as $currentRole) {
+            $selectedRoles[] = $currentRole->getId();
         }
 
         /* Default magicsuggest values
@@ -344,6 +354,12 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
 	 */
     $defaultCampusId = null;
 
+    /* This is used in the checkbox preselect outside this if/else
+	 * so we set it to null, to prevent any roles from being
+	 * preselected
+	 */
+    $selectedRoles = [];
+
     /* Miscellaneous setvarring
 	 * Hide advanced options by default
 	 */
@@ -491,10 +507,37 @@ if ($campusList->count()) {
     ]);
 } else {
     $page->setBlock(TEMPLATE_content, 'event_campus_list', 'event_campus_list_block');
-    $page->setVar('event_campus_list_block', '');
+    $page->setVar([
+        'event_campus_list_block' => ''
+    ]);
+}
+
+/* Roles Checkbox Array
+ */
+$rolesList = RoleMapper::getInstance()->findAll();
+
+if ($rolesList->count()) {
+    $allRoles = [];
+
+    foreach ($rolesList as $current) {
+        $allRoles[] = [
+            'id' => $current->getId(),
+            'name' => $current->getName()
+        ];
+    }
+
+    $page->checkList('event_role_list', $allRoles, $selectedRoles, TEMPLATE_content, [
+        'id' => 'EVENT_ROLE_ID',
+        'name' => 'EVENT_ROLE_NAME',
+    ]);
+}
+else {
+    $page->setVar([
+        'event_role_list_block' => ''
+    ]);
 }
 
 // Legacy support for direct access to modify.php
-if(!isset($this)){
+if (!isset($this)) {
     $page->outputPage();
 }
