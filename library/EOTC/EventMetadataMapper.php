@@ -10,14 +10,17 @@
 
 namespace EOTC;
 
-
 use Schoolbox\Collection;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 
-class EventMetadataMapper extends \Schoolbox\Mapper {
+
+class EventMetadataMapper extends BaseMapper {
 
 	/**
 	 * Mapping
@@ -183,7 +186,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'storage_id',
 					'key' => 'storage_id',
-					'mapper' => \Schoolbox\Resource\Storage\Mapper::getInstance()
+					'mapper' => StorageMapper::getInstance()
 				),
 			)
 		);
@@ -447,7 +450,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'booking_id',
 					'key' => 'id',
-					'mapper' => \Schoolbox\ResourceBooking\Booking\Mapper::getInstance()
+					'mapper' => ResourceBookingMapper::getInstance()
 				),
 			)
 		);
@@ -497,7 +500,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'event_id',
 					'key' => 'id',
-					'mapper' => \EOTC\EventMapper::getInstance(),
+					'mapper' => EventMapper::getInstance(),
 				),
 			)
 		);
