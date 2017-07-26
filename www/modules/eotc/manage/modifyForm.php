@@ -59,7 +59,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				}
 			}
 			else {
-				$event = new Event();
+				$event = $eventMapper->createModel();
 			}
 
 			/* Spawn and assign metadata record to event
