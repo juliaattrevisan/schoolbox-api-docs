@@ -84,7 +84,7 @@ class EventPermissionMapper extends BaseMapper {
 	/**
 	 * Find all the permissions for a particular user
 	 *
-	 * @param User
+	 * @param User $user
 	 * @return Collection|EventPermission[]
 	 */
 	public function findByUser(User $user) {
