@@ -73,7 +73,7 @@
                 type: "POST",
                 url: '{{ routeLookupIfAuthorized('learningAssessment.postCreateResponse', { assessmentId: assessment.id, assessment: assessment, studentId: student.id}) }}',
                 data: formContents,
-                complete: function () {
+                always: function () {
                     // Re-init the autosave
                     initAutosave();
 
@@ -81,7 +81,7 @@
                      */
                     $("[data-action-save]").prop('disabled', false);
                 },
-                success: function (responseText) {
+                done: function (responseText) {
 
                     /* Recycle the id ><
                      */
@@ -91,7 +91,7 @@
                         css: 'success'
                     });
                 },
-                error: function (response) {
+                fail: function (response) {
                     var temp = $.parseJSON(response.responseText);
 
                     formSaveLabel.toastTimeout({
