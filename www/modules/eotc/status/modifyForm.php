@@ -122,7 +122,7 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
     $configMapper = new ConfigMapper();
     $externalDbSync = $configMapper->findOneByColumn('name', 'external_db_sync');
 
-    if ($externalDbSync->getValue() == 1) {
+    if ((int)$externalDbSync->getValue() == 1) {
 
         /* Sync to External DB only when:
          * - the current status is Approved and

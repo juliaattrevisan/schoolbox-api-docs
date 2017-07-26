@@ -280,7 +280,7 @@ if (is_numeric($_GET['eventID'])) {
         try {
             $externalDbSync = ConfigMapper::getInstance()->findOneByColumn('name', 'external_db_sync');
 
-            if ($externalDbSync->getValue()) {
+            if ((int)$externalDbSync->getValue() == 1) {
                 $this->setVar([
                     'EVENT_PERMISSION_SLIP_SELECTED' => $event->getMetadata()->getPermissionSlipRequired() ? 'checked="checked"' : ''
                 ]);
@@ -425,7 +425,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     try {
         $externalDbSync = ConfigMapper::getInstance()->findOneByColumn('name', 'external_db_sync');
 
-        if ($externalDbSync->getValue()) {
+        if ((int)$externalDbSync->getValue() == 1) {
             $this->setVar([
                 'EVENT_PERMISSION_SLIP_SELECTED' => $event->getMetadata()->getPermissionSlipRequired() ? 'checked="checked"' : ''
             ]);
