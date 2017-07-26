@@ -28,58 +28,17 @@ class EventMetadataMapper extends BaseMapper {
 	public function mapping() {
 		$this->hasTable('eotc_metadata');
 		$this->hasModel(EventMetadata::class);
-		$this->hasMap(array(
-			'column' => 'id',
-			'property' => 'id',
-			'type' => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column' => 'event_type_id',
-			'property' => 'eventType',
-			'type' => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column' => 'status_id',
-			'property' => 'status',
-			'type' => self::TYPE_MODEL,
-			'join' => 'status',
-		));
-		$this->hasMap(array(
-			'column' => 'rams_required',
-			'property' => 'ramsRequired',
-			'type' => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column' => 'comment',
-			'property' => 'comment',
-			'type' => self::TYPE_STRING,
-		));
-        $this->hasMap(array(
-            'column' => 'permission_slip_required',
-            'property' => 'permissionSlipRequired',
-            'type' => self::TYPE_INTEGER,
-        ));
-		$this->hasMap(array(
-			'column'   => 'created_at',
-			'property' => 'createdAt',
-			'type'     => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'   => 'updated_at',
-			'property' => 'updatedAt',
-			'type'     => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'   => 'deleted_at',
-			'property' => 'deletedAt',
-			'type'     => self::TYPE_DATETIME,
-		));
-		$this->hasJoin('status', array(
-			'mapper'    => '\\EOTC\\EventStatusMapper',
-			'this_key'  => 'status_id',
-			'other_key' => 'id',
-		));
+
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('event_type_id', self::TYPE_INTEGER, null, 'eventType');
+        $this->uses('rams_required', self::TYPE_STRING, null, 'ramsRequired');
+        $this->uses('comment', self::TYPE_STRING, null, 'comment');
+        $this->uses('permission_slip_required', self::TYPE_INTEGER, null, 'permissionSlipRequired');
+        $this->uses('created_at', self::TYPE_DATETIME, null, 'createdAt');
+        $this->uses('updated_at', self::TYPE_DATETIME, null, 'updatedAt');
+        $this->uses('deleted_at', self::TYPE_DATETIME, null, 'deletedAt');
+
+        $this->joins('status_id', EventStatusMapper::class, 'id', null, null, 'status', 'status');
 	}
 
 	/**
