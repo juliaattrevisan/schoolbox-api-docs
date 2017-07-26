@@ -15,6 +15,8 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 
 /**
@@ -131,6 +133,10 @@ class EventMapper extends Calendar\EventMapper {
             /* Accumulate campuses for this event
              */
             $eventItem->setCampusCollection($this->findCampuses($identifier));
+
+            /* Accumulate roles for this event
+             */
+            $eventItem->setRoleCollection($this->findRoles($identifier));
 
             /* Determine current status
              */
@@ -426,6 +432,10 @@ class EventMapper extends Calendar\EventMapper {
         $this->deleteCampusRelations($event);
         $this->createCampus($event);
 
+        $this->deleteRoleRelations($event);
+        $this->createRole($event);
+
+
         $metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
         $metadataMapper->createStaffAttendees($event->getMetadata());
 
@@ -561,6 +571,80 @@ class EventMapper extends Calendar\EventMapper {
 			'eventId' => $event->getId()
 		]);
 	}
+
+    /**
+     * Assign roles to an event
+     *
+     * @param Event $event
+     */
+    private function createRole($event) {
+        $query = "
+			INSERT INTO `eotc_event_role` (event_id, role_id)
+			VALUES (:eventId, :roleId)
+		";
+
+        $statement = $this->database->prepare($query);
+
+        foreach ($event->getRoleCollection() as $currentRole) {
+            $currentRole = ($currentRole instanceof Role)
+                ? $currentRole->getId()
+                : $currentRole;
+
+            $statement->execute([
+                "eventId"  => $event->getId(),
+                "roleId" => $currentRole
+            ]);
+        }
+    }
+
+    /**
+     * Find roles for a particular event
+     *
+     * @param int $identifier
+     * @return Collection|Role[]
+     */
+    protected function findRoles($identifier) {
+        $manyManyRelation = new ManyManyRelation();
+        $manyManyRelation->setup(
+            array(
+                'name' => 'eotc_event_role',
+            ),
+            array(
+                /* Find things to join to this...
+                 */
+                'column' => 'event_id',
+                'value' => $identifier,
+
+                /* ...using this relation, such that column = key
+                 */
+                'relation' => array(
+                    'column' => 'role_id',
+                    'key' => 'id',
+                    'mapper' => RoleMapper::getInstance()
+                ),
+            )
+        );
+
+        return $manyManyRelation->find();
+    }
+
+    /**
+     * Deletes role relations if there are no remaining
+     * events in the series
+     *
+     * @param Event $event
+     */
+    public function deleteRoleRelations($event) {
+        $query = "
+			DELETE FROM `eotc_event_role`
+			WHERE event_id = :eventId
+		";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'eventId' => $event->getId()
+        ]);
+    }
 
     /**
      * Does nothing, EOTC events aren't associated with homepages
