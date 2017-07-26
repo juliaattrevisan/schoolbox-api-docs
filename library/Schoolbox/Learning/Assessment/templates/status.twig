@@ -86,14 +86,12 @@
 
                 {% set routeArgs = { viewee: participant.user, assessmentId: assessment.id, assessment: assessment, student: participant.user, studentId: participant.user.id, participant: participant } %}
 
-                {% set pActionSobo      = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', routeArgs) %}
                 {% set pActionSummary   = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
                 {% set pActionResponses = '' %}
                 {% set pActionCount     = '' %}
                 {% set pStatusText      = '' %}
                 {% set pStatusClass     = '' %}
                 {% set pTooltip         = '' %}
-                {% set pSobo            = '' %}
 
                 {% block config %}
                 <li data-status="{{ pStatusClass }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
@@ -119,9 +117,6 @@
                                     {% endif %}
                                     {% if pActionSummary %}
                                         <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ locale.submissionHistory.proper }}</a></li>
-                                    {% endif %}
-                                    {% if pSobo and pActionSobo %}
-                                    <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
                                     {% endif %}
                                     {{ block('extra_nav_items') }}
                                 {% endspaceless -%}
