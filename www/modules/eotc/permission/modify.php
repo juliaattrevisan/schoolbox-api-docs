@@ -156,10 +156,10 @@ foreach ($allUserIds as $currentUserId) {
     $campusNames = array();
 
     foreach ($allPermissions as $currentPermission) {
-        $campusNames[$currentPermission->getCampusId()->getName()] = '';
+        $campusNames[$currentPermission->getCampus()->getName()] = '';
     }
     foreach ($allSubscriptions as $currentPermission) {
-        $campusNames[$currentPermission->getCampusId()->getName()] = '';
+        $campusNames[$currentPermission->getCampus()->getName()] = '';
     }
 
     $allCampuses = implode(', ', array_keys($campusNames));
@@ -168,11 +168,11 @@ foreach ($allUserIds as $currentUserId) {
      */
     $statusNames = array();
     foreach ($allPermissions as $currentPermission) {
-        $statusNames[$currentPermission->getStatusId()->getName()] = '';
+        $statusNames[$currentPermission->getStatus()->getName()] = '';
     }
     $statusSubscriptionNames = array();
     foreach ($allSubscriptions as $currentSubscription) {
-        $statusSubscriptionNames[$currentSubscription->getStatusId()->getName()] = '';
+        $statusSubscriptionNames[$currentSubscription->getStatus()->getName()] = '';
     }
 
     $this->setVar(
