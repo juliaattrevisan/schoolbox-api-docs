@@ -5,20 +5,20 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace EOTC;
 
+use EOTC\ActivityLog\Log as ActivityLog;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Storage;
+use Schoolbox\User;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBooking;
 
 class EventMetadata {
 
 	/**
-	 * Primary key
-	 * 
 	 * @var int
 	 */
 	private $id = null;
@@ -34,57 +34,43 @@ class EventMetadata {
 	private $status = null;
 
 	/**
-	 * Whether RAMS is selected for this event
-	 *
 	 * @var bool
 	 */
 	private $ramsRequired = false;
 
 	/**
-	 * The latest comment about the event
-	 *
 	 * @var string
 	 */
 	private $comment = '';
 
 	/**
-	 * A collection of ActivityLog
-	 *
-	 * @var Collection
+	 * @var Collection|ActivityLog[]
 	 */
 	protected $activityLog = null;
 
 	/**
-	 * A Collection of User objects
-	 *
-	 * @var Collection
+	 * @var Collection|User[]
 	 */
 	protected $staffAttendees = null;
 
 	/**
-	 * A Collection of User objects
-	 *
-	 * @var Collection
+	 * @var Collection|User[]
 	 */
 	protected $studentAttendees = null;
 
 	/**
-	 * A collection of brownhole files
-	 *
-	 * @var Collection
+	 * @var Collection|Storage\Model[]
 	 */
 	protected $ramsFiles = null;
 
 	/**
 	 * A collection of resource bookings
 	 *
-	 * @var Collection
+	 * @var Collection|ResourceBooking[]
 	 */
 	protected $resourceBookings = null;
 
     /**
-     * Permission slip required
-     *
      * @var int
      */
 	protected $permissionSlipRequired = 0;
@@ -118,8 +104,6 @@ class EventMetadata {
 	 */
 
 	/**
-	 * Set created at
-	 *
 	 * @param \Alaress_Date_Format $createdAt
      * @return self $this
 	 */
@@ -129,8 +113,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get created at
-	 *
 	 * @return \Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
@@ -138,8 +120,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set deleted at
-	 *
 	 * @param \Alaress_Date_Format $deletedAt
      * @return self $this
 	 */
@@ -149,8 +129,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get deleted at
-	 *
 	 * @return \Alaress_Date_Format
 	 */
 	public function getDeletedAt() {
@@ -158,9 +136,7 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set event type
-	 *
-	 * @param int $eventType
+	 * @param EventType $eventType
      * @return self $this
 	 */
 	public function setEventType($eventType) {
@@ -169,8 +145,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get event type
-	 *
 	 * @return EventTYpe $eventType
 	 */
 	public function getEventType() {
@@ -178,8 +152,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set id
-	 *
 	 * @param int $id
      * @return self $this
 	 */
@@ -189,8 +161,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get id
-	 *
 	 * @return int
 	 */
 	public function getId() {
@@ -198,8 +168,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set rams required
-	 *
 	 * @param bool $ramsRequired
      * @return self $this
 	 */
@@ -209,8 +177,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get rams required
-	 *
 	 * @return bool
 	 */
 	public function getRamsRequired() {
@@ -218,8 +184,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set status
-	 *
 	 * @param EventStatus $status
      * @return self $this
 	 */
@@ -229,8 +193,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get status
-	 *
 	 * @return EventStatus
 	 */
 	public function getStatus() {
@@ -238,8 +200,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set updated at
-	 *
 	 * @param \Alaress_Date_Format $updatedAt
      * @return self $this
 	 */
@@ -249,8 +209,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get updated at
-	 *
 	 * @return \Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
@@ -258,8 +216,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set comment
-	 *
 	 * @param string $comment
      * @return self $this
 	 */
@@ -269,8 +225,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get comment
-	 *
 	 * @return string
 	 */
 	public function getComment() {
@@ -278,8 +232,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set activity log
-	 *
 	 * @param Collection $activityLog
      * @return self $this
 	 */
@@ -289,8 +241,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get activity log
-	 *
 	 * @return Collection
 	 */
 	public function getActivityLog() {
@@ -298,8 +248,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set staff attendees
-	 *
 	 * @param Collection $staffAttendees
      * @return self $this
 	 */
@@ -309,8 +257,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get staff attendees
-	 *
 	 * @return Collection
 	 */
 	public function getStaffAttendees() {
@@ -318,8 +264,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set student attendees
-	 *
 	 * @param Collection $studentAttendees
      * @return self $this
 	 */
@@ -329,8 +273,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get student attendees
-	 *
 	 * @return Collection
 	 */
 	public function getStudentAttendees() {
@@ -338,8 +280,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set rams files
-	 *
 	 * @param Collection $ramsFiles
      * @return self $this
 	 */
@@ -349,8 +289,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get rams files
-	 *
 	 * @return Collection|Storage\Model[]
 	 */
 	public function getRamsFiles() {
@@ -358,8 +296,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Set resource bookings
-     *
 	 * @param Collection $resourceBookings
      * @return self $this
 	 */
@@ -369,8 +305,6 @@ class EventMetadata {
 	}
 
 	/**
-	 * Get resource bookings
-	 *
 	 * @return Collection
 	 */
 	public function getResourceBookings() {
