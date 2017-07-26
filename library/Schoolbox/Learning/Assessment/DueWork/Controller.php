@@ -556,8 +556,6 @@ class Controller extends Assessment\Controller
      */
     public function getCreateResponseForm(Participant $participant)
     {
-        $this->assertParticipantAccess($participant);
-
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
@@ -569,18 +567,6 @@ class Controller extends Assessment\Controller
 
         /** @var SubmissionFile $submission */
         $allResponses = $participant->getAllResponses();
-
-        /* Work out if we are going to accept responses
-         */
-        try {
-
-            /* assertAcceptSubmission() requires a list of responses to decide outcome
-             */
-            $assessment->assertAcceptSubmission($allResponses);
-
-        } catch (DomainException $e) {
-            throw $this->getErrorMapper()->generateException($e->getCode());
-        }
 
         /* Otherwise continue
          */
@@ -640,6 +626,7 @@ class Controller extends Assessment\Controller
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'student'        => $student,
+            'participant'    => $participant,
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
