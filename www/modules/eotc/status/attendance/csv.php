@@ -57,9 +57,7 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
     /* A list of everyone
      */
     /** @var Collection $everyone */
-    $everyone = new Collection();
-    $everyone = $everyone->merge($event->getMetadata()->getStaffAttendees());
-    $everyone = $everyone->merge($event->getMetadata()->getStudentAttendees());
+    $everyone = $event->getMetadata()->getStaffAttendees()->merge($event->getMetadata()->getStudentAttendees());
 
     if ($everyone->count()) {
         foreach ($everyone as $current) {
