@@ -161,41 +161,8 @@ class EventConnector extends EventMapper
          * Skip Rejected events
          */
         if ($this->getUser()->isSuperuser()) {
-            $query = "
-                SELECT
-                    {$this->getColumnString('e')},
-                    {$authorMapper->getColumnString('a')},
-                    {$teacherInChargeMapper->getColumnString('c')},
-                    {$eventTypeMapper->getColumnString('t')},
-                    (
-                        SELECT COUNT(*)
-                        FROM eotc_event_metadata
-                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                        LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
-                        WHERE eotc_event_metadata.event_id = e.id
-                        AND eotc_metadata_student.user_id IS NOT NULL
-                    ) AS numStudents,
-                    (
-                        SELECT COUNT(*)+1
-                        FROM eotc_event_metadata
-                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                        LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
-                        WHERE eotc_event_metadata.event_id = e.id
-                        AND eotc_metadata_staff.user_id IS NOT NULL
-                    ) AS numStaff
-                FROM `{$this->table}` e
-                LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-                LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-                LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-                INNER JOIN eotc_event_metadata ON eotc_event_metadata.event_id = e.id
-                INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                WHERE
-                    DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
-                    AND
-                    DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
-                    AND eotc_metadata.status_id != :rejected
-                ORDER BY e.start_datetime, e.end_datetime
-            ";
+            $queryPart1 = '';
+            $queryPart2 = '';
 
             $params = [
                 'startTimestamp' => $startTimestamp,
@@ -212,44 +179,14 @@ class EventConnector extends EventMapper
          * Skip Rejected events
          */
         else {
-            $query = "
-                SELECT
-                    {$this->getColumnString('e')},
-                    {$authorMapper->getColumnString('a')},
-                    {$teacherInChargeMapper->getColumnString('c')},
-                    {$eventTypeMapper->getColumnString('t')},
-                    eotc_metadata_student.user_id as studentUserId,
-                    eotc_metadata_staff.user_id as staffUserId,
-                    (
-                        SELECT COUNT(*)
-                        FROM eotc_event_metadata
-                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                        LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
-                        WHERE eotc_event_metadata.event_id = e.id
-                        AND eotc_metadata_student.user_id IS NOT NULL
-                    ) AS numStudents,
-                    (
-                        SELECT COUNT(*)+1
-                        FROM eotc_event_metadata
-                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                        LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
-                        WHERE eotc_event_metadata.event_id = e.id
-                        AND eotc_metadata_staff.user_id IS NOT NULL
-                    ) AS numStaff
-                FROM `{$this->table}` e
-                LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-                LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-                LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-                INNER JOIN eotc_event_metadata ON eotc_event_metadata.event_id = e.id
-                INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+            $queryPart1 = "
+                eotc_metadata_student.user_id as studentUserId,
+                eotc_metadata_staff.user_id as staffUserId,
+            ";
+
+            $queryPart2 = "
                 LEFT JOIN eotc_metadata_student ON eotc_metadata_student.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_student.user_id = :studentUserId
                 LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_staff.user_id = :staffUserId
-                WHERE
-                    DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
-                    AND
-                    DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
-                    AND eotc_metadata.status_id != :rejected
-                ORDER BY e.start_datetime, e.end_datetime
             ";
 
             $params = [
@@ -260,6 +197,46 @@ class EventConnector extends EventMapper
                 'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
         }
+
+        /* Ram in all the pieces
+         */
+        $query = "
+            SELECT
+                {$this->getColumnString('e')},
+                {$authorMapper->getColumnString('a')},
+                {$teacherInChargeMapper->getColumnString('c')},
+                {$eventTypeMapper->getColumnString('t')},
+                {$queryPart1}
+                (
+                    SELECT COUNT(*)
+                    FROM eotc_event_metadata
+                    LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+                    LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
+                    WHERE eotc_event_metadata.event_id = e.id
+                    AND eotc_metadata_student.user_id IS NOT NULL
+                ) AS numStudents,
+                (
+                    SELECT COUNT(*)+1
+                    FROM eotc_event_metadata
+                    LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+                    LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
+                    WHERE eotc_event_metadata.event_id = e.id
+                    AND eotc_metadata_staff.user_id IS NOT NULL
+                ) AS numStaff
+            FROM `{$this->table}` e
+            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
+            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            INNER JOIN eotc_event_metadata ON eotc_event_metadata.event_id = e.id
+            INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+            {$queryPart2}
+            WHERE
+                DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
+                AND
+                DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
+                AND eotc_metadata.status_id != :rejected
+            ORDER BY e.start_datetime, e.end_datetime
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute($params);
