@@ -21,6 +21,7 @@ use EOTC\EventTypeMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper as EventRecurrenceMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Zone as Attachzone;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
@@ -84,7 +85,7 @@ if (is_numeric($_GET['eventID'])) {
         /** @var Event $event */
         $event = $mapper->findById($_GET['eventID']);
     } catch (MapperException $e) {
-        error(160);
+        error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
     }
 
     /* Edit rules
@@ -475,7 +476,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
 /* Nobody else should be here
  */
 else {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 /* Event Types
