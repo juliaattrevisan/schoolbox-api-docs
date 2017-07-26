@@ -6,8 +6,6 @@
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
-use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use EOTC\ActivityLog\Registry as ActivityLogRegistry;
 use EOTC\ActivityLog\Factory as ActivityLogFactory;
 use EOTC\Authenticator;
@@ -15,11 +13,15 @@ use EOTC\Event;
 use EOTC\EventMapper;
 use EOTC\EventMetadataMapper;
 use EOTC\EventRecurrenceMapper;
+use EOTC\EventStatus;
 use EOTC\EventStatusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\EventRelations;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
@@ -31,7 +33,7 @@ $authenticator = new Authenticator($page);
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	$userMapper = UserMapper::getInstance();
 
-	/** @var Schoolbox\User $user */
+	/** @var User $user */
 	$owner = $_SESSION['user'];
 
 	switch($_POST['action']) {
@@ -92,7 +94,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* Author
 			 */
 			try {
-				/** @var \Schoolbox\User $author */
+				/** @var User $author */
 				$author = $userMapper->findById($_POST['authorId']);
 			}
 			catch (MapperException $e) {
@@ -103,7 +105,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* Teacher in charge
 			 */
 			try {
-				/** @var \Schoolbox\User $teacherInCharge */
+				/** @var User $teacherInCharge */
 				$teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
 			}
 			catch (MapperException $e) {
@@ -113,7 +115,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			// EventType
 			try {
-				/** @var \Schoolbox\Calendar\EventType $eventType */
+				/** @var EventType $eventType */
 				$eventType = EventTypeMapper::getInstance()->findById($_POST['type']);
 			}
 			catch (MapperException $e) {
@@ -242,9 +244,9 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$originalStatus = $event->getMetadata()->getStatus()->getId();
 				$originalComment = $event->getMetadata()->getComment();
 
-				/* Set status id
+				/* Set status
 				 */
-				/** @var \EOTC\EventStatus $eventStatus */
+				/** @var EventStatus $eventStatus */
 				$event->getMetadata()->setStatus($eventStatus);
 				$event->getMetadata()->setComment($_POST['comment']);
 				
