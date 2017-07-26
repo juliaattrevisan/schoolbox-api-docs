@@ -31,12 +31,12 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 
 // Get command line options
 
-$options = getopt('p::h::help', array('start::', 'end::', 'year::', 'semester::', 'update-only', 'dry-run'));
+$options = getopt('vp::h::help', array('start::', 'end::', 'year::', 'semester::', 'update-only', 'dry-run'));
 
 // Setup kernel
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Schoolbox Markbook Sync Script', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
+    'verbose' => isset($options['v']) ? $options['v'] : null,
     'help' => isset($options['h']) || isset($options['help']) ? true : false,
     'parentId' => isset($options['p']) ? $options['p'] : 0,
     'year' => isset($options['year']) ? $options['year'] : false,
