@@ -261,28 +261,18 @@ if (is_numeric($_GET['eventID'])) {
             'has_activity_log_block' => ''
         ]);
 
-        $i = 0;
-
         /** @var ActivityLog $currentLog */
-        foreach ($event->getMetadata()->getActivityLog() as $currentLog) {
-
-            /* If there are no activityLog items, mappers will spawn a single
-			 * object where every property is null
-			 *
-			 * TODO: Mappers probably shouldn't spawn you such objects
-			 */
-            if ($currentLog->getId()) {
+        if ($event->getMetadata()->getActivityLog()->count()) {
+            foreach ($event->getMetadata()->getActivityLog() as $currentLog) {
                 $page->setVar([
                     'ACTIVITY_LOG_CREATED_AT' => $currentLog->getCreatedAt()->getShort(),
-                    'ACTIVITY_LOG_MESSAGE' => $currentLog->getMessage()
+                    'ACTIVITY_LOG_MESSAGE'    => $currentLog->getMessage()
                 ]);
 
                 $page->parse('activity_log_block', 'activity_log', true);
-
-                /* SB-3911
-				 */
-                $i++;
             }
+
+            $page->parse('has_activity_log_block', 'has_activity_log');
         }
 
         /* Permission Slip Required
@@ -312,7 +302,7 @@ if (is_numeric($_GET['eventID'])) {
         /* SB-3911
 		 */
         if ($i) {
-            $page->parse('has_activity_log_block', 'has_activity_log');
+
         }
 
         /* Cannot add students until an event is created
