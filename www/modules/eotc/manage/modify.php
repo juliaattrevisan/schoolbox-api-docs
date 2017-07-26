@@ -10,6 +10,7 @@
  * @version     SVN: $Id$
  */
 
+use EOTC\ActivityLog\Log as ActivityLog;
 use EOTC\Authenticator;
 use EOTC\ConfigMapper;
 use EOTC\Event;
@@ -17,6 +18,7 @@ use EOTC\EventMapper;
 use EOTC\EventMetadata;
 use EOTC\EventStatusMapper;
 use EOTC\EventTypeMapper;
+use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\EventRecurrenceMapper as EventRecurrenceMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -51,7 +53,7 @@ $page->setBlock(TEMPLATE_content, 'can_permission_slip_required', 'can_permissio
 
 $authenticator = new Authenticator($this);
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 $defaultTypeId = '';
@@ -76,7 +78,7 @@ if (is_numeric($_GET['eventID'])) {
     $mapper = EventMapper::getInstance();
 
     try {
-        /** @var EOTC\Event $event */
+        /** @var Event $event */
         $event = $mapper->findById($_GET['eventID']);
     } catch (MapperException $e) {
         error(160);
@@ -113,7 +115,7 @@ if (is_numeric($_GET['eventID'])) {
 
         $allCampuses = $event->getCampusCollection()->getAll();
 
-        /** @var \Schoolbox\Campus $currentCampus */
+        /** @var Campus $currentCampus */
         foreach ($allCampuses as $currentCampus) {
             $defaultCampusId[] = $currentCampus->getId();
         }
@@ -122,7 +124,7 @@ if (is_numeric($_GET['eventID'])) {
 		 */
         $staffSelected = [];
 
-        /** @var \Schoolbox\User $currentStaff */
+        /** @var User $currentStaff */
         foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
             $staffSelected[] = [
                 'id' => $currentStaff->getId(),
@@ -261,7 +263,7 @@ if (is_numeric($_GET['eventID'])) {
 
         $i = 0;
 
-        /** @var \EOTC\ActivityLog\Log $currentLog */
+        /** @var ActivityLog $currentLog */
         foreach ($event->getMetadata()->getActivityLog() as $currentLog) {
 
             /* If there are no activityLog items, mappers will spawn a single
