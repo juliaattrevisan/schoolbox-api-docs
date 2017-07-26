@@ -13,6 +13,7 @@ namespace EOTC;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EOTC\Event;
 use Schoolbox\Calendar\EventType;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class EventConnector extends EventMapper
@@ -308,6 +309,10 @@ class EventConnector extends EventMapper
              */
             $eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
 
+            /* Accumulate roles for this event
+             */
+            $eventItem->setRoleCollection($this->findRoles($eventItem->getId()));
+
             /* Accumulate the metadata for this event
              * Only use the first record
              */
@@ -322,16 +327,24 @@ class EventConnector extends EventMapper
 
             /* For filters
              */
-            $campusIds = array();
+            $campusIds = [];
             $inCampus = false;
+            $inRole = false;
 
+            /* Remember if you're in at least one of the campuses chosen for this event
+             */
             foreach ($eventItem->getCampusCollection() as $currentCampus) {
                 $campusIds[] = $currentCampus->getId();
 
-                if($this->getUser()->isInCampus($currentCampus)) {
+                if ($this->getUser()->isInCampus($currentCampus)) {
                     $inCampus = true;
                 }
+            }
 
+            /* Remember if you're in at least one of the roles chosen for this event
+             */
+            if ($eventItem->getRoleCollection()->getBy('id', $this->getUser()->getRole()->getId()) instanceof Role) {
+                $inRole = true;
             }
 
             /* Only present this event for a particular user if they are
@@ -345,9 +358,8 @@ class EventConnector extends EventMapper
              *  - Creators can always see it
              *  - Teachers in Charge should see it in translucent form
              *  - Staff members should see it in translucent form
-             *  - Students should only see this event if it's Approved and
-             *    if they are assigned to it as an attendee
-             *  IF event is approved and in the campus of the user they can see it
+             *  - Students should only see this event if it's Approved and if they are assigned to it as an attendee
+             *  - Anyone in both the Campus and Role of an Approved event
              */
             $isAttendee = false;
 
@@ -361,11 +373,10 @@ class EventConnector extends EventMapper
                 $isAttendee = true;
             }
 
-            if ($isEOTCManager || $isAttendee || ($eventItem->getMetadata()->getStatus()->isApproved() && $inCampus)) {
+            if ($isEOTCManager || $isAttendee || ($eventItem->getMetadata()->getStatus()->isApproved() && $inCampus && $inRole)) {
 
-
-                /* Translate an \EOTC\Event type into a EventInterface descendant */
-
+                /* Translate an \EOTC\Event type into a EventInterface descendant
+                 */
                 $event = new Event();
                 $event->setAuthorName($eventItem->getAuthor()->getFullname());
                 $event->setAuthorId($eventItem->getAuthor()->getId());
