@@ -1,0 +1,2 @@
+ALTER TABLE subject_news MODIFY datetime_published DATETIME NOT NULL DEFAULT '0000-00-00';
+ALTER TABLE subject_news MODIFY datetime_expires DATETIME NOT NULL DEFAULT '0000-00-00';

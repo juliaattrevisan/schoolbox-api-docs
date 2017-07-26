@@ -37,8 +37,8 @@ if(is_numeric($this->arg[0])) {
 	$this->setTitle('Modify Homepage News');
 	$this->setTab('resources');
 
-	$publishedDate = new Alaress_Date_Format($newsItem['datetime_published'], 'Y-m-d');
-	$expiryDate = new Alaress_Date_Format($newsItem['datetime_expires'], 'Y-m-d');
+	$publishedDate = new Alaress_Date_Format($newsItem['datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
+	$expiryDate = new Alaress_Date_Format($newsItem['datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
     $output = array(
         'ACTION'      => 'Modify',
