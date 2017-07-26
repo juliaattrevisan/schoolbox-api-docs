@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use DueWork_ErrorMapper;
@@ -553,6 +554,7 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessment/:assessmentId/:participantId/submit
      * @level 165
      * @param Participant $participant
+     * @throws ServiceNotFound If unable to locate HTML web Output in DI
      */
     public function getCreateResponseForm(Participant $participant)
     {
@@ -650,54 +652,11 @@ class Controller extends Assessment\Controller
      */
     public function postCreateResponse(Participant $participant)
     {
-        $this->assertParticipantAccess($participant);
-
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
-
-        /* Find all the records spawned by $participant
-         *
-         * Order them by submitted time to find the most recent, and use that
-         */
-
-        /** @var SubmissionFile $submission */
-        $allResponses = $participant->getAllResponses();
-
-        /* Work out if we are going to accept responses
-         */
-        try {
-
-            /* assertAcceptSubmission() requires a list of responses to decide outcome
-             */
-            $assessment->assertAcceptSubmission($allResponses);
-        }
-        catch (DomainException $e) {
-
-            /* When asynchronously saving and suddenly you're not allowed to
-             * ie. when you've run out of time and you left this screen on
-             */
-            if ($rq->isXhr()) {
-                $result['success'] = false;
-                $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
-
-                $rs->status->setCode(403);
-                $rs->content->set($this->buildJsonOutput($result));
-                return;
-            }
-
-            throw $this->getErrorMapper()->generateException($e->getCode());
-        }
-
-        /* Creator is the currently-logged-in user
-         * Participant is the actual owner of the Response
-         *
-         * Usually the same person, unless you're a teacher creating a Response
-         * on behalf of a student (teacher is creator, student is participant)
-         */
-        $creator = $this->getUser();
 
         /* Set in javascript when automatically saving a draft
          * Careful the negation
@@ -712,7 +671,7 @@ class Controller extends Assessment\Controller
             // Create a new response
             $response = new DueWorkSubmission();
             $response
-                ->setSubmittedBy($creator)
+                ->setSubmittedBy($this->getUser())
                 ->setSubmittedOnBehalfOf($participant->getUser())
                 ->setCreatedAt(Alaress_Date_Format::now())
                 ->setUpdatedAt(Alaress_Date_Format::now());
