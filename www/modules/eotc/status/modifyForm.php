@@ -1,6 +1,6 @@
 <?php
 /**
- * ${NAME}
+ * Update an event's status
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -21,6 +21,7 @@ use EOTC\EventMetadataMapper;
 use EOTC\EventStatus;
 use EOTC\EventStatusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -38,7 +39,7 @@ try {
 	$event = $eventMapper->findById($_POST['eventId']);
 }
 catch (MapperException $e) {
-	error(160);
+	error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
 }
 
 /** @var User $sessionUser */
@@ -86,7 +87,7 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	$status = $statusMapper->findById($_POST['statusId']);
 
 	if (!$authenticator->isStatusChangeAllowed($event, $status))  {
-		error(165);
+		error(ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS);
 	}
 
 	$event->getMetadata()->setStatus($status);
@@ -167,5 +168,5 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	$page->localRedir('/modules/eotc/review/');
 }
 else {
-	error(19);
+	error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
