@@ -7,11 +7,11 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 use EOTC\Authenticator;
 use EOTC\EventMapper;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -23,7 +23,7 @@ try {
 	$event = $eventMapper->findById($this->arg[0]);
 }
 catch (MapperException $e) {
-	error(160);
+	error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
 }
 
 /** @var User $sessionUser */
@@ -86,6 +86,6 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 	exit();
 }
 else {
-	error(19);
+	error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 

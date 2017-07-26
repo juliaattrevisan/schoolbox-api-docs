@@ -7,12 +7,13 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 use EOTC\Authenticator;
 use EOTC\EventMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 
 $event = false;
 
@@ -21,10 +22,10 @@ try {
 	$event = $eventMapper->findById($this->arg[0]);
 }
 catch (MapperException $e) {
-	error(160);
+    error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
 }
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 /* Only EOTC Administrators and Subscribed Users can view this page
@@ -43,10 +44,10 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 	$this->setBlock('has_student_attendees', 'student_attendee', 'student_attendee_block');
     $this->setBlock(TEMPLATE_content, 'no_student_attendees', 'no_student_attendees_block');
 
-    $this->setVar(array(
+    $this->setVar([
 		'EVENT_ID' => $event->getId(),
 		'EVENT_NAME' => $event->getTitle(),
-	));
+	]);
 
     $roleMapper = RoleMapper::getInstance();
 
@@ -115,5 +116,5 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 	}
 }
 else {
-	error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
