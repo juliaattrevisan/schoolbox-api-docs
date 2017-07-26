@@ -116,13 +116,13 @@ foreach ($allDocuments as $currentDocument) {
 
         /* Could not transmit this file to plagscan for some reason
          */
-        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
+        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()} (domain exception)");
     }
     catch (\RuntimeException $e) {
 
         /* Could not transmit this file to plagscan for some reason
          */
-        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}; {$e->getMessage()}");
+        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()} (runtime exception)");
     }
 }
 

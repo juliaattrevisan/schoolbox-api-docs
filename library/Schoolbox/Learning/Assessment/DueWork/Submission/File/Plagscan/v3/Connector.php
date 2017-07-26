@@ -134,7 +134,7 @@ class Connector
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
 
-        $response = $client->post("documents/?access_token={$this->getAccessTokenGenerator()->generate()}", [
+        $response = $client->post("documents?access_token={$this->getAccessTokenGenerator()->generate()}", [
             "multipart" => $postData
         ]);
 
