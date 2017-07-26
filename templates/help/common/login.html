@@ -33,10 +33,11 @@
 <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
 <script src="/javascript/shared/browser-redirect.js"></script>
 <script type="text/javascript">
-window.onload = init;
-function init(){
-	document.getElementById('username').focus();
-}
+$(function() {
+    if (!Modernizr.touch) {
+        $('#username').focus();
+    }
+});
 </script>
 </head>
 <body class="login {SIDE}">
@@ -64,6 +65,20 @@ function init(){
                 </div>
             </div>
             <div class="row collapse">
+                <!-- BEGIN login_terms -->
+                <div class="small-12 column">
+                    <input required
+                           class="required"
+                           id="tandc"
+                           name="tandc"
+                           value="1"
+                           type="checkbox"
+                           title="{LOGIN_TERMS_AND_CONDITIONS_ERROR}" />
+                    <label for="tandc" class="tandc">
+                        {LOGIN_TERMS_AND_CONDITIONS}
+                    </label>
+                </div>
+                <!-- END login_terms -->
                 <div class="small-7 medium-12 column">
                     <!-- BEGIN remember_me -->
                     <input id="rememberme" type="checkbox" name="rememberme" value="1" />
@@ -113,6 +128,9 @@ function init(){
             <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
             <li><a href="/policy.php">Terms of Use and Privacy Policy</a></li>
             <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
+            <!-- BEGIN feedback_link -->
+            <li><a href="{FEEDBACK_URL}">{FEEDBACK_TEXT}</a></li>
+            <!-- END feedback_link -->
         </ul>
     </div>
 </div>
@@ -130,10 +148,26 @@ function init(){
             l.css('top', Math.max(0, ($(window).height() - l.height() - fy) / 2));
         }).trigger('resize');
 
-        l.on('submit', function () {
-            $(this).find('input[type=submit]').prop('disabled', true);
+        // Validation of terms and conditions
+        l.alaressValidate({
+            submitHandler: function(form) {
+                form.submit();
+                l.find('input[type=submit]').prop('disabled', true);
+            },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "tandc") {
+                    error.appendTo("#error-msg");
+                } else {
+                    error.appendTo(element);
+                }
+            }
         });
-
+        // T&C: remove error message completely on check
+        l.find('#tandc').on('change', function () {
+            if (this.checked) {
+                $('label.error[for="tandc"]').remove();
+            }
+        });
     });
 </script>
 {SITE_ANALYTICS}
