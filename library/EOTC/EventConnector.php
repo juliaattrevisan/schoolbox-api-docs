@@ -353,7 +353,7 @@ class EventConnector extends EventMapper
             if ($isEOTCManager || $isVisible) {
 
                 /* Translate an \EOTC\Event type into a EventInterface descendant
-                 * Note that this Event() does not have a mapper, so spawn concretely
+                 * Note that this "new Event();" does not have a mapper, so spawn concretely
                  */
                 $event = new Event();
                 $event->setAuthorName($eventItem->getAuthor()->getFullname());
