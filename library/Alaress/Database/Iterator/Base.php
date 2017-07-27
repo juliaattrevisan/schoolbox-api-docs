@@ -15,6 +15,7 @@ namespace Alaress\Database\Iterator;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception as DatabaseException;
+use Alaress\Database\HandlesExceptionTrait;
 use Alaress\Database\Statement\IStatement;
 use PDO;
 use PDOException;
@@ -22,6 +23,8 @@ use PDOStatement;
 
 class Base implements IIterator
 {
+    use HandlesExceptionTrait;
+
     /** @var int $rowIndex Zero-indexed value used for row counting */
     protected $rowIndex = -1;
 
@@ -36,12 +39,6 @@ class Base implements IIterator
 
     /** @var IBroker */
     protected $broker;
-
-    /** @var string $errorInfo If the last statement execution returned an error- this is its message */
-    protected $errorInfo;
-
-    /** @var string $errorCode If the last statement execution returned an error- this is its code */
-    protected $errorCode;
 
     /**
      * Database statement constructor
@@ -168,20 +165,5 @@ class Base implements IIterator
     public function errorCode()
     {
         return $this->errorCode;
-    }
-
-    /**
-     * If we get a PDO exception running a query we DO want to terminate application
-     * execution (or at least force something up the stack to handle this issue).
-     *
-     * @param PDOException $e
-     * @param string $prefix Prefix the returned exception's message with this
-     * @throws DatabaseException
-     */
-    protected function handleException(PDOException $e, $prefix = '')
-    {
-        $this->errorInfo = $e->getMessage();
-        $this->errorCode = $e->getCode();
-        throw new DatabaseException($prefix . $e->getMessage(), $e->getCode(), $e);
     }
 }
