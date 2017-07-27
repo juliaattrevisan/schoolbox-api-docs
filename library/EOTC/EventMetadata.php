@@ -70,7 +70,7 @@ class EventMetadata
     protected $resourceBookings = null;
 
     /**
-     * @var int
+     * @var bool
      */
     protected $permissionSlipRequired = 0;
 
