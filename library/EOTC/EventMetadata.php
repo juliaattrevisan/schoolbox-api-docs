@@ -64,8 +64,6 @@ class EventMetadata {
 	protected $ramsFiles = null;
 
 	/**
-	 * A collection of resource bookings
-	 *
 	 * @var Collection|ResourceBooking[]
 	 */
 	protected $resourceBookings = null;
@@ -145,7 +143,7 @@ class EventMetadata {
 	}
 
 	/**
-	 * @return EventTYpe $eventType
+	 * @return EventType $eventType
 	 */
 	public function getEventType() {
 		return $this->eventType;
