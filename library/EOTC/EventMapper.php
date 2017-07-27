@@ -20,6 +20,7 @@ use Schoolbox\Collection;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Class EventMapper
@@ -55,22 +56,7 @@ class EventMapper extends CalendarEventMapper
         $this->hasTable('eotc_event');
         $this->hasModel(Event::class);
 
-        $this->hasMap(
-            [
-                'column'   => 'teacher_in_charge_id',
-                'property' => 'teacherInCharge',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'teacherInCharge',
-            ]
-        );
-        $this->hasJoin(
-            'teacherInCharge',
-            [
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'teacher_in_charge_id',
-                'other_key' => 'id',
-            ]
-        );
+        $this->joins('teacher_in_charge_id', UserMapper::class, 'id', null, null, 'teacherInCharge', 'teacherInCharge');
     }
 
     /**
