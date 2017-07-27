@@ -445,7 +445,6 @@ class EventMapper extends CalendarEventMapper
         $this->deleteRoleRelations($event);
         $this->createRole($event);
 
-
         $metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
         $metadataMapper->createStaffAttendees($event->getMetadata());
 
