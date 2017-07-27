@@ -5,28 +5,20 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace EOTC;
-
 
 class EventStatus
 {
-
     /**
-     * Primary key
-     *
-     * @var null
-     */
-    private $id = null;
-
-    /**
-     * Name of the status
-     *
      * @var int
      */
-    private $name = -1;
+    private $id;
+
+    /**
+     * @var int
+     */
+    private $name;
 
     /**
      * A unidirectional map of css classes belong to each status
@@ -147,19 +139,17 @@ class EventStatus
      */
 
     /**
-     * Set id
-     *
-     * @param null $id
+     * @param int $id
+     * @return self $this
      */
     public function setId($id)
     {
         $this->id = $id;
+        return $this;
     }
 
     /**
-     * Get id
-     *
-     * @return null
+     * @return int
      */
     public function getId()
     {
@@ -167,19 +157,17 @@ class EventStatus
     }
 
     /**
-     * Set name
-     *
-     * @param int $name
+     * @param string $name
+     * @return self $this
      */
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
-     * Get name
-     *
-     * @return int
+     * @return string
      */
     public function getName()
     {
