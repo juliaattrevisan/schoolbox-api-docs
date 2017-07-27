@@ -10,6 +10,7 @@
 
 namespace Alaress\Database\Iterator;
 
+use Alaress\Database\Exception;
 use Countable;
 use Iterator as BaseIterator;
 
@@ -19,6 +20,7 @@ interface IIterator extends BaseIterator, Countable
      * Execute iterator
      *
      * @return bool
+     * @throws Exception if the iterator didn't execute for whatever reason
      */
     public function execute();
 
