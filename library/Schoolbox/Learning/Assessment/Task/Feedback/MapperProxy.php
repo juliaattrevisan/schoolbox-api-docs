@@ -55,6 +55,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         parent::__construct($mapper);
     }
 
+
+    /**
+     * @return string
+     */
+    protected function getModel()
+    {
+        return DomainObject::class;
+    }
+
+
     /**
      * @return string
      */

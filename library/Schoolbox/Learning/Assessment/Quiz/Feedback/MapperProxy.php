@@ -80,6 +80,16 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         return $this->findByPredicates($pb, $options);
     }
 
+
+    /**
+     * @return string
+     */
+    protected function getModel()
+    {
+        return DomainObject::class;
+    }
+
+
     /**
      * @return string
      */
