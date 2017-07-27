@@ -329,7 +329,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      *
-     * @param ReturnedWork|QuizAttempt $returnedWork
+     * @param ReturnedWork|QuizAttempt $result
      * @return bool
      */
     public function setMark($result)
@@ -416,7 +416,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $assessmentRemote['MarkBookSeq'],
                 $student->getExternalId()
             )) {
-
                 if (isset($mark) || !empty($comment)) {
 
                     $bindings = [
