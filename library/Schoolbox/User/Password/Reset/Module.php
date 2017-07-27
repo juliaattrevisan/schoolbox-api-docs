@@ -7,7 +7,6 @@
 
 namespace Schoolbox\User\Password\Reset;
 
-use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Router\PathMatcher;
@@ -85,8 +84,7 @@ class Module extends BaseModule
                     'passwordService' => $injector->lazyNew(PasswordService::class),
                     'userMapper'      => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'resetMapper'     => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'communityPortal' => $injector->lazyGet('externalCommunityPortal'),
-                    'mailFactory'            => $injector->lazyNew(
+                    'mailFactory'     => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
                         [
                             'context' => $injector->lazyNew(

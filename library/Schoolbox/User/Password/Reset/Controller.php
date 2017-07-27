@@ -9,10 +9,8 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
-use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 /**
  * Controller for password resets
@@ -42,31 +40,23 @@ class Controller extends Base
     protected $passwordService;
 
     /**
-     * @var ICommunityPortal
-     */
-    protected $communityPortal;
-
-    /**
      * Constructor
      *
      * @param UserMapper $userMapper
      * @param Mapper $resetMapper
      * @param TwigEmailFactory $mailFactory
      * @param PasswordService $passwordService
-     * @param ICommunityPortal $communityPortal
      */
     public function __construct(
         UserMapper $userMapper,
         Mapper $resetMapper,
         TwigEmailFactory $mailFactory,
-        PasswordService $passwordService,
-        ICommunityPortal $communityPortal
+        PasswordService $passwordService
     ) {
         $this->userMapper = $userMapper;
         $this->resetMapper = $resetMapper;
         $this->mailFactory = $mailFactory;
         $this->passwordService = $passwordService;
-        $this->communityPortal = $communityPortal;
     }
 
     /**
@@ -258,17 +248,6 @@ class Controller extends Base
                     'userPasswordReset.displaySuccessMessage'
                 )
             );
-
-            // Reset their password in SCP too
-            if ($user->getRole()->isParent()) {
-                try {
-                    $this->communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
-                } catch (UnexpectedValueException $e) {
-                    // Portal integration wasn't set up properly?
-                    // Warn the user
-                    $this->getSessionSegment()->setFlash('isCommunityPortalPasswordSet', false);
-                }
-            }
         } else {
             $this->getSessionSegment()->setFlash('isPasswordValid', false);
             $this->getResponse()->redirect->to(
