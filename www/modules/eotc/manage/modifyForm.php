@@ -31,241 +31,241 @@ $page = new SitePage();
 $authenticator = new Authenticator($page);
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$userMapper = UserMapper::getInstance();
+    $userMapper = UserMapper::getInstance();
 
-	/** @var User $user */
-	$owner = $_SESSION['user'];
+    /** @var User $user */
+    $owner = $_SESSION['user'];
 
-	switch($_POST['action']) {
-		case 'Add':
-		case 'Update':
+    switch ($_POST['action']) {
+        case 'Add':
+        case 'Update':
 
-			/* Default
-			 */
-			$until = null;
+            /* Default
+             */
+            $until = null;
 
-			$eventMapper = EventMapper::getInstance();
+            $eventMapper = EventMapper::getInstance();
 
-			/* Spawn an existing event if id provided
-			 * Otherwise spawn a new one
-			 */
-			if (is_numeric($_POST['id'])) {
-				try {
-					$event = $eventMapper->findById($_POST['id']);
-				}
-				catch (MapperException $e) {
-					error(160);
-					exit;
-				}
-			}
-			else {
-				$event = $eventMapper->createModel();
-			}
-
-			/* Spawn and assign metadata record to event
-			 */
-			try {
-				$metadataMapper = EventMetadataMapper::getInstance();
-				$metadata = $metadataMapper->findByEvent($event);
-			}
-			catch (MapperException $e) {
-				$metadata = EventMetadataMapper::getInstance()->createModel();
-				$metadataStatus = EventStatusMapper::getInstance()->createModel();
-				$metadataStatus->setId(EventStatusMapper::STATUS_DEFAULT);
-				$metadata->setStatus($metadataStatus);
-			}
-
-			/* Cannot submit modification data if event is Approved and you
-			 * are its author, and you haven't got the Approved permission
-			 */
-			if ($_POST['action'] == 'Update') {
-				$isAuthor = (($event->getAuthor()->getId() == $owner->getId()) && $authenticator->isEOTCCreator($owner));
-				$canAdminister = $authenticator->isEOTCAdministrator($owner, $event);
-
-				if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
-					$page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
-				}
-			}
-
-			/* NO RETREAT
-			 * NO SURRENDER
-			 */
-
-			/* Author
-			 */
-			try {
-				/** @var User $author */
-				$author = $userMapper->findById($_POST['authorId']);
-			}
-			catch (MapperException $e) {
-				error(2);
-				exit;
-			}
-
-			/* Teacher in charge
-			 */
-			try {
-				/** @var User $teacherInCharge */
-				$teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
-			}
-			catch (MapperException $e) {
-				error(2);
-				exit;
-			}
-
-			// EventType
-			try {
-				/** @var EventType $eventType */
-				$eventType = EventTypeMapper::getInstance()->findById($_POST['type']);
-			}
-			catch (MapperException $e) {
-				error(2);
-				exit;
-			}
-
-
-			/* Events recur until this time
-			 */
-			if (strlen($_POST['repeat_until'])) {
-				$until = Alaress_Date_Format::newLocalShort($_POST['repeat_until']);
-			}
-
-			/* Start and end dates
-			 * (allday input doesn't exist on form, but is supported in the save method below?)
-			 */
-            if ($_POST['allday']) {
-                $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])->startOfDay();
-                $endDate = Alaress_Date_Format::newLocalShort($_POST['endDate'])->endOfDay();
+            /* Spawn an existing event if id provided
+             * Otherwise spawn a new one
+             */
+            if (is_numeric($_POST['id'])) {
+                try {
+                    $event = $eventMapper->findById($_POST['id']);
+                } catch (MapperException $e) {
+                    error(160);
+                    exit;
+                }
             } else {
-                $startDate = Alaress_Date_Format::newLocal($_POST['startDate']);
-                $endDate = Alaress_Date_Format::newLocal($_POST['endDate']);
+                $event = $eventMapper->createModel();
             }
 
-			/* Start Date cannot be after End Date
-			 */
-			if ($startDate->getDatabase() >= $endDate->getDatabase()) {
-				error(145);
-			}
+            /* Spawn and assign metadata record to event
+             */
+            try {
+                $metadataMapper = EventMetadataMapper::getInstance();
+                $metadata       = $metadataMapper->findByEvent($event);
+            } catch (MapperException $e) {
+                $metadata       = EventMetadataMapper::getInstance()->createModel();
+                $metadataStatus = EventStatusMapper::getInstance()->createModel();
+                $metadataStatus->setId(EventStatusMapper::STATUS_DEFAULT);
+                $metadata->setStatus($metadataStatus);
+            }
 
-			/* Spawned further up
-			 */
-			$metadata->setEventType($_POST['type']);
-			$metadata->setRamsRequired($_POST['ramsRequired']);
-            $metadata->setPermissionSlipRequired($_POST['permissionSlipRequired'] ? $_POST['permissionSlipRequired'] : 0);
+            /* Cannot submit modification data if event is Approved and you
+             * are its author, and you haven't got the Approved permission
+             */
+            if ($_POST['action'] == 'Update') {
+                $isAuthor      = (($event->getAuthor()->getId() == $owner->getId()) && $authenticator->isEOTCCreator(
+                        $owner
+                    ));
+                $canAdminister = $authenticator->isEOTCAdministrator($owner, $event);
 
-			/* Only assign createdAt for new metadata records
-			 */
-			if (!$metadata->getId()) {
-				$metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-			}
+                if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
+                    $page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
+                }
+            }
 
-			$metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+            /* NO RETREAT
+             * NO SURRENDER
+             */
 
-			/* All the staff that were selected
-			 */
-			$staffCollection = new Collection();
+            /* Author
+             */
+            try {
+                /** @var User $author */
+                $author = $userMapper->findById($_POST['authorId']);
+            } catch (MapperException $e) {
+                error(2);
+                exit;
+            }
 
-			if (is_array($_POST['staff']) && count($_POST['staff'])) {
-				$staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
-			}
+            /* Teacher in charge
+             */
+            try {
+                /** @var User $teacherInCharge */
+                $teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
+            } catch (MapperException $e) {
+                error(2);
+                exit;
+            }
 
-			$metadata->setStaffAttendees($staffCollection);
+            // EventType
+            try {
+                /** @var EventType $eventType */
+                $eventType = EventTypeMapper::getInstance()->findById($_POST['type']);
+            } catch (MapperException $e) {
+                error(2);
+                exit;
+            }
 
-			/* All the resources that were selected
-			 */
-			$resourceBookingCollection = new Collection();
 
-			if (is_numeric($event->getId())) {
-				$resourceBookingCollection = EventMetadataMapper::getInstance()->findResourceBookings($metadata->getId());
-			}
+            /* Events recur until this time
+             */
+            if (strlen($_POST['repeat_until'])) {
+                $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until']);
+            }
 
-			$metadata->setResourceBookings($resourceBookingCollection);
+            /* Start and end dates
+             * (allday input doesn't exist on form, but is supported in the save method below?)
+             */
+            if ($_POST['allday']) {
+                $startDate = Alaress_Date_Format::newLocalShort($_POST['startDate'])->startOfDay();
+                $endDate   = Alaress_Date_Format::newLocalShort($_POST['endDate'])->endOfDay();
+            } else {
+                $startDate = Alaress_Date_Format::newLocal($_POST['startDate']);
+                $endDate   = Alaress_Date_Format::newLocal($_POST['endDate']);
+            }
 
-			/* Spawned further up
-			 */
-			$event->setAuthor($author);
-			$event->setTeacherInCharge($teacherInCharge);
-			$event->setType($eventType);
-			$event->setTitle($_POST['note']);
-			$event->setStartDateTime($startDate);
-			$event->setEndDateTime($endDate);
-			$event->setLocation($_POST['location']);
-			$event->setDetail($_POST['detail']);
-			$event->setAllDay($_POST['allday']);
+            /* Start Date cannot be after End Date
+             */
+            if ($startDate->getDatabase() >= $endDate->getDatabase()) {
+                error(145);
+            }
+
+            /* Spawned further up
+             */
+            $metadata->setEventType($_POST['type']);
+            $metadata->setRamsRequired($_POST['ramsRequired']);
+            $metadata->setPermissionSlipRequired(
+                $_POST['permissionSlipRequired'] ? $_POST['permissionSlipRequired'] : 0
+            );
+
+            /* Only assign createdAt for new metadata records
+             */
+            if (!$metadata->getId()) {
+                $metadata->setCreatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+            }
+
+            $metadata->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+            /* All the staff that were selected
+             */
+            $staffCollection = new Collection();
+
+            if (is_array($_POST['staff']) && count($_POST['staff'])) {
+                $staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
+            }
+
+            $metadata->setStaffAttendees($staffCollection);
+
+            /* All the resources that were selected
+             */
+            $resourceBookingCollection = new Collection();
+
+            if (is_numeric($event->getId())) {
+                $resourceBookingCollection = EventMetadataMapper::getInstance()->findResourceBookings(
+                    $metadata->getId()
+                );
+            }
+
+            $metadata->setResourceBookings($resourceBookingCollection);
+
+            /* Spawned further up
+             */
+            $event->setAuthor($author);
+            $event->setTeacherInCharge($teacherInCharge);
+            $event->setType($eventType);
+            $event->setTitle($_POST['note']);
+            $event->setStartDateTime($startDate);
+            $event->setEndDateTime($endDate);
+            $event->setLocation($_POST['location']);
+            $event->setDetail($_POST['detail']);
+            $event->setAllDay($_POST['allday']);
 
             /* EOTC events don't use publishDate values, so hardcode this as per
              * SB-5978 to always be published
              */
             $event->setPublishDate('1970-01-01');
 
-			/* Collections of ids
-			 */
-			$event->setCampusCollection(new Collection($_POST['campus']));
+            /* Collections of ids
+             */
+            $event->setCampusCollection(new Collection($_POST['campus']));
             $event->setRoleCollection(new Collection($_POST['role']));
 
-			/* Store metadata
-			 */
-			$event->setMetadata($metadata);
+            /* Store metadata
+             */
+            $event->setMetadata($metadata);
 
-			if ($event->getMetadata()->getRamsRequired()) {
-				if (count($_POST['attachment'])) {
-					try {
-						$factory = new CollectorFactory();
-						$files   = $factory->build($_POST['attachment'])->getAll();
-					} catch (MapperException $e) {
-						error(41);
-						exit; // shut UP, storm.
-					} catch (\InvalidArgumentException $e) {
-						error(43);
-						exit;
-					}
+            if ($event->getMetadata()->getRamsRequired()) {
+                if (count($_POST['attachment'])) {
+                    try {
+                        $factory = new CollectorFactory();
+                        $files   = $factory->build($_POST['attachment'])->getAll();
+                    } catch (MapperException $e) {
+                        error(41);
+                        exit; // shut UP, storm.
+                    } catch (\InvalidArgumentException $e) {
+                        error(43);
+                        exit;
+                    }
 
-					$event->getMetadata()->setRamsFiles(new Collection($files));
-				}
-			}
+                    $event->getMetadata()->setRamsFiles(new Collection($files));
+                }
+            }
 
-			/* If promoting an event, set to the next status
-			 * This is a special case for event authors and In Principle status
-			 */
-			$canSelfPromote = $authenticator->canSelfPromote($_SESSION['user'], $event);
+            /* If promoting an event, set to the next status
+             * This is a special case for event authors and In Principle status
+             */
+            $canSelfPromote = $authenticator->canSelfPromote($_SESSION['user'], $event);
 
-			if (isset($_POST['promoteInPrinciple']) && ($_POST['promoteInPrinciple'] == 1) && $canSelfPromote) {
-				$eventStatusMapper = EventStatusMapper::getInstance();
-				$nextStatusId = $eventStatusMapper->findNextStatus($event);
-				$eventStatus = $eventStatusMapper->findById($nextStatusId);
+            if (isset($_POST['promoteInPrinciple']) && ($_POST['promoteInPrinciple'] == 1) && $canSelfPromote) {
+                $eventStatusMapper = EventStatusMapper::getInstance();
+                $nextStatusId      = $eventStatusMapper->findNextStatus($event);
+                $eventStatus       = $eventStatusMapper->findById($nextStatusId);
 
-				/* Remember original states so we know which obs to spawn
-				 */
-				$originalStatus = $event->getMetadata()->getStatus()->getId();
-				$originalComment = $event->getMetadata()->getComment();
+                /* Remember original states so we know which obs to spawn
+                 */
+                $originalStatus  = $event->getMetadata()->getStatus()->getId();
+                $originalComment = $event->getMetadata()->getComment();
 
-				/* Set status
-				 */
-				/** @var EventStatus $eventStatus */
-				$event->getMetadata()->setStatus($eventStatus);
-				$event->getMetadata()->setComment($_POST['comment']);
-				
-				/* Activity Log
-				 */
-				$registry = new ActivityLogRegistry();
-				$factory = new ActivityLogFactory($event, $_SESSION['user']);
+                /* Set status
+                 */
+                /** @var EventStatus $eventStatus */
+                $event->getMetadata()->setStatus($eventStatus);
+                $event->getMetadata()->setComment($_POST['comment']);
 
-				/* If a status changed, log it
-				 */
-				if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
-					$registry->add($factory->produce('StatusChange'));
-				}
+                /* Activity Log
+                 */
+                $registry = new ActivityLogRegistry();
+                $factory  = new ActivityLogFactory($event, $_SESSION['user']);
 
-				/* If a comment changed, log it
-				 */
-				if ($originalComment != $event->getMetadata()->getComment()) {
-					$registry->add($factory->produce('CommentChange'));
-				}
+                /* If a status changed, log it
+                 */
+                if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
+                    $registry->add($factory->produce('StatusChange'));
+                }
 
-				/* Notify everyone
-				 */
-				$registry->notify();
-			}
+                /* If a comment changed, log it
+                 */
+                if ($originalComment != $event->getMetadata()->getComment()) {
+                    $registry->add($factory->produce('CommentChange'));
+                }
+
+                /* Notify everyone
+                 */
+                $registry->notify();
+            }
 
             /* Set up individual relations for each event in the series
              * Event object is provided within eventRecurrenceMapper
@@ -274,36 +274,45 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
             /* Save this event and any recurring incidents too
              */
-			try {
-				$eventRecurrenceMapper = new EventRecurrenceMapper($eventMapper);
-				$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, null, $eventRelations);
-			} catch (InvalidArgumentException $e) {
-				error($e->getCode());
-			}
+            try {
+                $eventRecurrenceMapper = new EventRecurrenceMapper($eventMapper);
+                $eventRecurrenceMapper->save(
+                    $event,
+                    $_POST['efficacy'],
+                    $_POST['repeat'],
+                    $until,
+                    $startDate,
+                    $endDate,
+                    null,
+                    $eventRelations
+                );
+            } catch (InvalidArgumentException $e) {
+                error($e->getCode());
+            }
 
-			/* Superuser modifying some arbitrary event
-			 */
-			switch ($_POST['redirect']) {
-				case 'attendances':
-					$page->localRedir(
-						'/modules/eotc/manage/attendance/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
-					);
-					break;
+            /* Superuser modifying some arbitrary event
+             */
+            switch ($_POST['redirect']) {
+                case 'attendances':
+                    $page->localRedir(
+                        '/modules/eotc/manage/attendance/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+                    );
+                    break;
 
-				case 'resources':
-					$page->localRedir(
-						'/modules/eotc/manage/resources/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
-					);
-					break;
+                case 'resources':
+                    $page->localRedir(
+                        '/modules/eotc/manage/resources/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+                    );
+                    break;
 
-				default:
-					$page->localRedir(
-						'/modules/eotc/manage/modify?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries()
-					);
-					break;
-			}
+                default:
+                    $page->localRedir(
+                        '/modules/eotc/manage/modify?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+                    );
+                    break;
+            }
 
-			break;
+            break;
 
         // There's no delete of EOTC events as of EOTC1.1 (SB-5297)
 //		case 'Delete':
@@ -380,11 +389,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 //
 //			break;
 
-		default:
-			error(160);
-			break;
-	}
-}
-else {
-	error(19);
+        default:
+            error(160);
+            break;
+    }
+} else {
+    error(19);
 }
