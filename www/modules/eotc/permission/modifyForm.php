@@ -9,6 +9,7 @@
  * @link        http://www.alaress.com.au/
  */
 use EOTC\Authenticator;
+use EOTC\EventPermission;
 use EOTC\EventPermissionMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -30,8 +31,7 @@ if (!$sessionUser->isSuperuser()) {
 
 try {
 	/** @var User $user */
-	$userMapper = UserMapper::getInstance();
-	$user = $userMapper->findById($_POST['staff']);
+	$user = UserMapper::getInstance()->findById($_POST['staff']);
 }
 catch (MapperException $e) {
 	error(ErrorMapper::ERROR_USER_NOT_FOUND);
@@ -49,14 +49,14 @@ if (is_array($_POST['campus']) && count($_POST['campus'])) {
 		 */
 		if (is_array($_POST['status']) && count($_POST['status'])) {
 			foreach ($_POST['status'] as $currentStatus => $settings) {
+
+			    /** @var EventPermission $permission */
 				$permission = EventPermissionMapper::getInstance()->createModel();
-				$permission->setUser($user->getId());
+				$permission->setUser($user);
 				$permission->setCampus($currentCampus);
 				$permission->setStatus($currentStatus);
 				$permission->setAllowed($settings['allowed']);
 				$permission->setSubscribed($settings['subscribed']);
-				$permission->setCreatedAt($_SERVER['REQUEST_TIME']);
-				$permission->setUpdatedAt($_SERVER['REQUEST_TIME']);
 
 				$permissionMapper->save($permission);
 			}
