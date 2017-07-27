@@ -41,7 +41,6 @@ class Authenticator
      */
     public function __construct(\SitePage $page)
     {
-
         // Return 404 if EOTC is not enabled
         if (0 == SchoolboxConfigMapper::getInstance()->get('eotc_enabled')) {
             $page->pageNotFound();
@@ -49,16 +48,6 @@ class Authenticator
 
         $this->setPermissionMapper(new EventPermissionMapper());
         $this->setConfigMapper(ConfigMapper::getInstance());
-
-        $this->setup();
-    }
-
-    /**
-     * Predetermine what permissions
-     */
-    protected function setup()
-    {
-
     }
 
     /**
