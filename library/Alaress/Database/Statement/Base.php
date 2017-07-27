@@ -282,7 +282,7 @@ abstract Class Base implements IStatement
             return $iterator;
 
         } catch (PDOException $e) {
-            throw new Exception("Exception error executing iterator: " . $e->getMessage());
+            $this->handleException($e, "Exception error executing iterator: ");
         }
     }
 
