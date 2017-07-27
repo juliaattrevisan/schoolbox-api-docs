@@ -223,7 +223,9 @@ class Controller extends Base
             $email->sendToBlackhole();
         }
 
-        $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+        );
     }
 
     /**
@@ -300,15 +302,21 @@ class Controller extends Base
     {
         if (!$reset->getToken()) {
             // Token wasn't found - go elsewhere
-            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+            );
         } elseif (!$reset->getResetTime()->isNull()) {
             // Token already used - go elsewhere
-            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+            );
         } elseif ($reset->getExpiry()->lt(\Alaress_Date_Format::now())) {
             // This request has expired. Create a new one
             // Not setting email - stale requests should not give out this information.
             $this->getSessionSegment()->setFlash('isResetExpired', true);
-            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+            );
         }
     }
 }
