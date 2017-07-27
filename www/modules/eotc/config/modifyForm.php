@@ -7,37 +7,38 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
+use EOTC\Authenticator;
 use EOTC\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\User;
 
 $page = new SitePage();
 
-new \EOTC\Authenticator($page);
+new Authenticator($page);
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 if ($sessionUser->isSuperuser()) {
-	$configMapper = new ConfigMapper();
-    $allConfigs = $configMapper->findAll();
+    $configMapper = new ConfigMapper();
+    $allConfigs   = $configMapper->findAll();
 
-	$firstReminder = $allConfigs->getBy('name', 'first_reminder');
+    $firstReminder = $allConfigs->getBy('name', 'first_reminder');
     $firstReminder->setValue((int)$_POST['firstReminder']);
 
-	$dailyReminder = $allConfigs->getBy('name', 'daily_reminder');
+    $dailyReminder = $allConfigs->getBy('name', 'daily_reminder');
     $dailyReminder->setValue((int)$_POST['dailyReminder']);
 
-	$urgentThreshold = $allConfigs->getBy('name', 'urgent_threshold');
+    $urgentThreshold = $allConfigs->getBy('name', 'urgent_threshold');
     $urgentThreshold->setValue((int)$_POST['urgentThreshold']);
 
-	$policy = $allConfigs->getBy('name', 'policy');
+    $policy = $allConfigs->getBy('name', 'policy');
     $policy->setValue($_POST['policy']);
 
-	$ramsWarning = $allConfigs->getBy('name', 'rams_warning');
+    $ramsWarning = $allConfigs->getBy('name', 'rams_warning');
     $ramsWarning->setValue($_POST['ramsWarning']);
 
     $externalDbSync = $allConfigs->getBy('name', 'external_db_sync');
@@ -47,15 +48,14 @@ if ($sessionUser->isSuperuser()) {
     $mandatoryStudents->setValue((int)$_POST['studentAttendeesRequired']);
 
     $configMapper->save($firstReminder);
-	$configMapper->save($dailyReminder);
-	$configMapper->save($urgentThreshold);
-	$configMapper->save($policy);
-	$configMapper->save($ramsWarning);
+    $configMapper->save($dailyReminder);
+    $configMapper->save($urgentThreshold);
+    $configMapper->save($policy);
+    $configMapper->save($ramsWarning);
     $configMapper->save($externalDbSync);
     $configMapper->save($mandatoryStudents);
 
-	$page->localRedir('/modules/eotc/config/modify');
-}
-else {
-	error(19);
+    $page->localRedir('/modules/eotc/config/modify');
+} else {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
