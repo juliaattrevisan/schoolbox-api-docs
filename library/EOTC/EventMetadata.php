@@ -312,7 +312,7 @@ class EventMetadata {
 	}
 
     /**
-     * @return int
+     * @return bool
      */
     public function getPermissionSlipRequired()
     {
@@ -320,7 +320,7 @@ class EventMetadata {
     }
 
     /**
-     * @param int $permissionSlipRequired
+     * @param bool $permissionSlipRequired
      * @return self $this
      */
     public function setPermissionSlipRequired($permissionSlipRequired)

@@ -33,7 +33,7 @@ class EventMetadataMapper extends BaseMapper {
         $this->uses('event_type_id', self::TYPE_INTEGER, null, 'eventType');
         $this->uses('rams_required', self::TYPE_STRING, null, 'ramsRequired');
         $this->uses('comment', self::TYPE_STRING, null, 'comment');
-        $this->uses('permission_slip_required', self::TYPE_INTEGER, null, 'permissionSlipRequired');
+        $this->uses('permission_slip_required', self::TYPE_BOOLEAN, null, 'permissionSlipRequired');
         $this->uses('created_at', self::TYPE_DATETIME, null, 'createdAt');
         $this->uses('updated_at', self::TYPE_DATETIME, null, 'updatedAt');
         $this->uses('deleted_at', self::TYPE_DATETIME, null, 'deletedAt');
