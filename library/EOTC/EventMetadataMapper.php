@@ -45,7 +45,7 @@ class EventMetadataMapper extends BaseMapper {
 	 * Find out if a relation exists before inserting a new one
 	 *
 	 * @param Event $event
-	 * @throws \Exception
+	 * @throws MapperException
 	 * @return EventMetadata
      */
 	public function findByEvent(Event $event) {
