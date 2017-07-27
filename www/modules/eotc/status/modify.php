@@ -9,33 +9,36 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+use EOTC\Authenticator;
+use EOTC\ConfigMapper;
+use EOTC\EventMapper;
+use Schoolbox\Calendar\EventRecurrenceMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 $event = false;
 
-$mapper = \EOTC\EventMapper::getInstance();
-
 try {
-    $mapper = new \EOTC\EventMapper();
-    $event = $mapper->findById($this->arg[0]);
-}
-catch (\Schoolbox\Mapper\Exception $e) {
-    error(160);
+    $event = EventMapper::getInstance()->findById($this->arg[0]);
+} catch (MapperException $e) {
+    error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
 }
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
  * can view this page
  */
-$authenticator = new \EOTC\Authenticator($this);
+$authenticator = new Authenticator($this);
 
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
-$isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
-$isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
-$isAuthor = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator($sessionUser));
+$isCanSelfPromote    = $authenticator->canSelfPromote($sessionUser, $event);
+$isSubscribedUser    = $authenticator->isSubscribedUser($sessionUser, $event);
+$isAuthor            = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator($sessionUser));
 
 /* All EOTC Administrators can see Approved/Rejected events
  */
@@ -56,17 +59,23 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $this->setBlock(TEMPLATE_content, 'has_modify_event', 'has_modify_event_block');
 
     /* Find out if the external sync config is enabled
+     * Disable when not in db for some magical reason
      */
-    $configMapper = new \EOTC\ConfigMapper();
+    try {
+        $syncConfig = ConfigMapper::getInstance()->findOneByColumn('name', 'external_db_sync')->getValue();
+    }
+    catch (MapperException $e) {
+        $syncConfig = false;
+    }
 
     $this->setVar([
-        'SYNC_ENABLED' => $configMapper->findOneByColumn('name', 'external_db_sync')->getValue() == 1 ? 'true' : 'false'
+        'SYNC_ENABLED' => $syncConfig == 1 ? 'true' : 'false'
     ]);
 
     /* Event details
      */
     $this->setVar(
-        array(
+        [
             'EVENT_ID'           => $event->getId(),
             'EVENT_TITLE'        => $event->getTitle(),
             'EVENT_LOCATION'     => $event->getLocation(),
@@ -77,7 +86,7 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
             'EVENT_END'          => $event->getEndDateTime()->getShort(),
             'EVENT_STATUS'       => $event->getMetadata()->getStatus()->getName(),
             'EVENT_STATUS_CLASS' => $event->getMetadata()->getStatus()->getStyle(),
-        )
+        ]
     );
 
     /* Recurrence
@@ -86,7 +95,7 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $recurrence = [];
 
     if ($event->getSeriesId()) {
-        $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
+        $eventRecurrenceMapper = new EventRecurrenceMapper(EventMapper::getInstance());
         $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
     }
 
@@ -95,56 +104,56 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
         /** @var \Alaress_Date_Format $recurrenceStart */
         /** @var \Alaress_Date_Format $recurrenceEnd */
         $recurrenceStart = $recurrence['start'];
-        $recurrenceEnd = $recurrence['end'];
+        $recurrenceEnd   = $recurrence['end'];
 
         $this->setVar(
-            array(
-                'SERIES_EVENTS_NUM' => $recurrence['num'],
+            [
+                'SERIES_EVENTS_NUM'         => $recurrence['num'],
                 'SERIES_EVENTS_DESCRIPTION' => $recurrence['freq'],
-                'EVENT_REC_FREQ'  => ucfirst($recurrence['freq']),
-                'EVENT_REC_START' => $recurrenceStart->getLongDateOnly(),
-                'EVENT_REC_END'   => $recurrenceEnd->getLongDateOnly(),
-            )
+                'EVENT_REC_FREQ'            => ucfirst($recurrence['freq']),
+                'EVENT_REC_START'           => $recurrenceStart->getLongDateOnly(),
+                'EVENT_REC_END'             => $recurrenceEnd->getLongDateOnly(),
+            ]
         );
+
         $this->parse('recurring_reminder_block', 'recurring_reminder');
     } else {
         $this->setVar(
-            array(
-                'SERIES_EVENTS_NUM' => 0,
+            [
+                'SERIES_EVENTS_NUM'         => 0,
                 'SERIES_EVENTS_DESCRIPTION' => '',
-                'EVENT_REC_FREQ'  => '',
-                'EVENT_REC_START' => '',
-                'EVENT_REC_END'   => '',
-                'recurring_reminder_block' => ''
-            )
+                'EVENT_REC_FREQ'            => '',
+                'EVENT_REC_START'           => '',
+                'EVENT_REC_END'             => '',
+                'recurring_reminder_block'  => ''
+            ]
         );
     }
 
     /* RAMS file requirement
      */
     $this->setVar(
-        array(
+        [
             'has_rams_block'  => '',
             'rams_list_block' => '',
-        )
+        ]
     );
 
     if ($event->getMetadata()->getRamsRequired()) {
-        $mimetypeMapper = \Schoolbox\File\MimetypeMapper::getInstance();
 
         /* Sometimes event/file relations get recorded with a storage_id of 0
          * so we need to check whether one actually legitimately saved properly
          */
         foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
-            $mimetype = $mimetypeMapper->getByFilename($ramsFile->getBasename());
+            $mimetype = MimetypeMapper::getInstance()->getByFilename($ramsFile->getBasename());
 
             $this->setVar(
-                array(
+                [
                     'EVENT_RAMS_FILE'              => $ramsFile->getBasename(),
                     'EVENT_RAMS_FILESIZE'          => $ramsFile->getSize(),
                     'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
                     'EVENT_RAMS_HASH'              => $ramsFile->getHash(),
-                )
+                ]
             );
 
             $this->parse('rams_list_block', 'rams_list', true);
@@ -152,14 +161,17 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
 
         $this->parse('has_rams_block', 'has_rams');
 
-        $this->setVar([
-            'no_rams_block' => '',
-        ]);
-    }
-    else {
-        $this->setVar([
-            'has_rams_block' => '',
-        ]);
+        $this->setVar(
+            [
+                'no_rams_block' => '',
+            ]
+        );
+    } else {
+        $this->setVar(
+            [
+                'has_rams_block' => '',
+            ]
+        );
 
         $this->parse('no_rams_block', 'no_rams');
     }
@@ -167,52 +179,52 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     /* Teacher In Charge
      */
     $this->setVar(
-        array(
+        [
             'EVENT_TEACHER_IN_CHARGE_ID'          => $event->getTeacherInCharge()->getId(),
             'EVENT_TEACHER_IN_CHARGE_EXTERNAL_ID' => $event->getTeacherInCharge()->getExternalId(),
             'EVENT_TEACHER_IN_CHARGE_NAME'        => $event->getTeacherInCharge()->getFullname(),
-        )
+        ]
     );
 
     /* Author
      */
     $this->setVar(
-        array(
+        [
             'EVENT_AUTHOR_ID'   => $event->getAuthor()->getId(),
             'EVENT_AUTHOR_NAME' => $event->getAuthor()->getFullname(),
-        )
+        ]
     );
 
     /* Staff Attendees
      */
     $this->setVar(
-        array(
+        [
             'event_staff_block' => '',
             'EVENT_STAFF_COUNT' => $event->getMetadata()->getStaffAttendees()->count()
-        )
+        ]
     );
 
     /* Student Attendees
      */
     $this->setVar(
-        array(
+        [
             'EVENT_STUDENT_COUNT' => $event->getMetadata()->getStudentAttendees()->count()
-        )
+        ]
     );
 
     /* Related campuses
      */
     $this->setVar(
-        array(
+        [
             'event_campus_block' => ''
-        )
+        ]
     );
 
     foreach ($event->getCampusCollection() as $currentCampus) {
         $this->setVar(
-            array(
+            [
                 'EVENT_CAMPUS_NAME' => $currentCampus->getName()
-            )
+            ]
         );
 
         $this->parse('event_campus_block', 'event_campus', true);
@@ -221,31 +233,31 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     /* Resources
      */
     $this->setVar(
-        array(
+        [
             'EVENT_RESOURCE_COUNT'        => $event->getMetadata()->getResourceBookings()->count(),
             'event_resourcebooking_block' => ''
-        )
+        ]
     );
 
     if ($event->getMetadata()->getResourceBookings()->count()) {
-        $resourceMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+        $resourceMapper        = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
         $resourceBookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
 
-        /* TODO: Optimise this!
+        /* Rely on the cache :3
          */
         foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
-            $resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
+            $resource        = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
             $resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
 
             $this->setVar(
-                array(
+                [
                     'EVENT_RESOURCEBOOKING_ID'    => $resourceBooking->getId(),
                     'EVENT_RESOURCEBOOKING_NAME'  => $resourceBooking->getName(),
                     'EVENT_RESOURCEBOOKING_START' => $resourceBooking->getEvent()->getStartDateTime()->getShort(),
                     'EVENT_RESOURCEBOOKING_END'   => $resourceBooking->getEvent()->getEndDateTime()->getShort(),
                     'EVENT_RESOURCE_ID'           => $resource->getId(),
                     'EVENT_RESOURCE_NAME'         => $resource->getName()
-                )
+                ]
             );
 
             $this->parse('event_resourcebooking_block', 'event_resourcebooking', true);
@@ -255,10 +267,10 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     /* Activity Log
      */
     $this->setVar(
-        array(
+        [
             'event_activity_log_block'     => '',
             'has_event_activity_log_block' => ''
-        )
+        ]
     );
 
     $i = 0;
@@ -272,10 +284,10 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
          */
         if ($currentLog->getId()) {
             $this->setVar(
-                array(
+                [
                     'EVENT_ACTIVITY_LOG_CREATED_AT' => $currentLog->getCreatedAt()->getShort(),
                     'EVENT_ACTIVITY_LOG_MESSAGE'    => $currentLog->getMessage()
-                )
+                ]
             );
 
             $this->parse('event_activity_log_block', 'event_activity_log', true);
@@ -297,11 +309,12 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
      * Special case for authors of approved events who aren't eotc admins
      */
     if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
-        $this->setVar([
-            'has_modify_event_block' => ''
-        ]);
-    }
-    else {
+        $this->setVar(
+            [
+                'has_modify_event_block' => ''
+            ]
+        );
+    } else {
         $this->parse('has_modify_event_block', 'has_modify_event');
     }
 
@@ -310,9 +323,11 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
      * If you don't have permissions to the status of the event, you don't get
      * access to this section anymore
      */
-    $this->setVar([
-        'has_change_event_status_block' => ''
-    ]);
+    $this->setVar(
+        [
+            'has_change_event_status_block' => ''
+        ]
+    );
 
     /* Authors cannot view an event that is in Final Approval
      * Instead redirect to a different place
@@ -324,14 +339,15 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
 
         /* noop
          */
-    }
-    else {
+    } else {
 
         /* Status Comment
          */
-        $this->setVar([
-            'EVENT_COMMENT' => $event->getMetadata()->getComment(),
-        ]);
+        $this->setVar(
+            [
+                'EVENT_COMMENT' => $event->getMetadata()->getComment(),
+            ]
+        );
 
         if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
             $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
@@ -352,18 +368,22 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
              * in the EOTC permissions
              */
             foreach ($allEventStatus as $currentStatus) {
-                $this->setVar([
-                    'EVENT_STATUS_ID'       => $currentStatus->getId(),
-                    'EVENT_STATUS_NAME'     => $currentStatus->getName(),
-                    'EVENT_STATUS_SELECTED' => '',
-                ]);
+                $this->setVar(
+                    [
+                        'EVENT_STATUS_ID'       => $currentStatus->getId(),
+                        'EVENT_STATUS_NAME'     => $currentStatus->getName(),
+                        'EVENT_STATUS_SELECTED' => '',
+                    ]
+                );
 
                 /* Preselect
                  */
                 if ($currentStatus->getId() == $event->getMetadata()->getStatus()->getId()) {
-                    $this->setVar([
-                        'EVENT_STATUS_SELECTED' => 'selected="selected"',
-                    ]);
+                    $this->setVar(
+                        [
+                            'EVENT_STATUS_SELECTED' => 'selected="selected"',
+                        ]
+                    );
                 }
 
                 $this->parse('event_status_block', 'event_status', true);
@@ -372,7 +392,6 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
             $this->parse('has_change_event_status_block', 'has_change_event_status');
         }
     }
-}
-else {
-    error(19);
+} else {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
