@@ -73,6 +73,9 @@ class EventMapper extends CalendarEventMapper
         );
     }
 
+    /**
+     * @return string
+     */
     protected function getSelectString()
     {
         $authorMapper          = $this->getJoinMapper('author');
@@ -88,6 +91,9 @@ class EventMapper extends CalendarEventMapper
         ";
     }
 
+    /**
+     * @return string
+     */
     protected function getFromString()
     {
         return "
@@ -98,6 +104,10 @@ class EventMapper extends CalendarEventMapper
         ";
     }
 
+    /**
+     * @param \PDOStatement $statement
+     * @return \Schoolbox\GenericCollection
+     */
     protected function hydrateSelect(\PDOStatement $statement)
     {
         $authorMapper          = $this->getJoinMapper('author');
