@@ -177,7 +177,7 @@ abstract Class Base implements IStatement
         try {
             return $statement->nextRowset();
         } catch (PDOException $e) {
-            $this->handleException($e);
+            $this->handleException($e, "Error retrieving next rowset: ");
             return null;
         }
     }
@@ -187,13 +187,16 @@ abstract Class Base implements IStatement
      * execution (or at least force something up the stack to handle this issue).
      *
      * @param PDOException $e
-     * @throws PDOException
+     * @param string $prefix Prefix the returned exception's message with this
+     * @throws Exception
      */
-    protected function handleException($e)
+    protected function handleException(PDOException $e, $prefix = '')
     {
         $this->errorInfo = $e->getMessage();
         $this->errorCode = $e->getCode();
-        throw $e;
+        // Query exceptions are usually logic exceptions, not runtime exceptions.
+        // However, PDOException extends RuntimeException, so...
+        throw new Exception($prefix . $e->getMessage(), $e->getCode(), $e);
     }
 
     /**
@@ -213,7 +216,7 @@ abstract Class Base implements IStatement
             try {
                 $this->statement = $this->broker->prepare($this->getSql());
             } catch (PDOException $e) {
-                $this->handleException($e);
+                $this->handleException($e, "Error preparing execution: ");
                 return false;
             }
         }
@@ -252,7 +255,7 @@ abstract Class Base implements IStatement
                 return $this->statement->execute();
             }
         } catch (PDOException $e) {
-            return $this->handleException($e);
+            return $this->handleException($e, "Error executing statement: ");
         }
     }
 
