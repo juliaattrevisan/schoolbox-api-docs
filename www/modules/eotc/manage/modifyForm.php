@@ -1,26 +1,39 @@
 <?php
 /**
- * ${NAME}
+ * Persist event data to the dbs
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
+use EOTC\ActivityLog\Registry as ActivityLogRegistry;
+use EOTC\ActivityLog\Factory as ActivityLogFactory;
+use EOTC\Authenticator;
+use EOTC\Event;
+use EOTC\EventMapper;
+use EOTC\EventMetadataMapper;
+use EOTC\EventRecurrenceMapper;
+use EOTC\EventStatus;
+use EOTC\EventStatusMapper;
+use Schoolbox\Collection;
+use Schoolbox\Calendar\EventRelations;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Storage;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 $page = new SitePage();
 
-$authenticator = new \EOTC\Authenticator($page);
+$authenticator = new Authenticator($page);
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$userMapper = \Schoolbox\UserMapper::getInstance();
+	$userMapper = UserMapper::getInstance();
 
-	/** @var Schoolbox\User $user */
+	/** @var User $user */
 	$owner = $_SESSION['user'];
 
 	switch($_POST['action']) {
@@ -31,7 +44,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 */
 			$until = null;
 
-			$eventMapper = \EOTC\EventMapper::getInstance();
+			$eventMapper = EventMapper::getInstance();
 
 			/* Spawn an existing event if id provided
 			 * Otherwise spawn a new one
@@ -40,26 +53,25 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				try {
 					$event = $eventMapper->findById($_POST['id']);
 				}
-				catch (\Schoolbox\Mapper\Exception $e) {
+				catch (MapperException $e) {
 					error(160);
 					exit;
 				}
 			}
 			else {
-				$event = new \EOTC\Event();
+				$event = $eventMapper->createModel();
 			}
-
 
 			/* Spawn and assign metadata record to event
 			 */
 			try {
-				$metadataMapper = \EOTC\EventMetadataMapper::getInstance();
+				$metadataMapper = EventMetadataMapper::getInstance();
 				$metadata = $metadataMapper->findByEvent($event);
 			}
-			catch (\Exception $e) {
-				$metadata = \EOTC\EventMetadataMapper::getInstance()->createModel();
-				$metadataStatus = \EOTC\EventStatusMapper::getInstance()->createModel();
-				$metadataStatus->setId(\EOTC\EventStatusMapper::STATUS_DEFAULT);
+			catch (MapperException $e) {
+				$metadata = EventMetadataMapper::getInstance()->createModel();
+				$metadataStatus = EventStatusMapper::getInstance()->createModel();
+				$metadataStatus->setId(EventStatusMapper::STATUS_DEFAULT);
 				$metadata->setStatus($metadataStatus);
 			}
 
@@ -82,10 +94,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* Author
 			 */
 			try {
-				/** @var \Schoolbox\User $author */
+				/** @var User $author */
 				$author = $userMapper->findById($_POST['authorId']);
 			}
-			catch (\Schoolbox\Mapper\Exception $e) {
+			catch (MapperException $e) {
 				error(2);
 				exit;
 			}
@@ -93,20 +105,20 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* Teacher in charge
 			 */
 			try {
-				/** @var \Schoolbox\User $teacherInCharge */
+				/** @var User $teacherInCharge */
 				$teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
 			}
-			catch (\Schoolbox\Mapper\Exception $e) {
+			catch (MapperException $e) {
 				error(2);
 				exit;
 			}
 
 			// EventType
 			try {
-				/** @var \Schoolbox\Calendar\EventType $eventType */
-				$eventType = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findById($_POST['type']);
+				/** @var EventType $eventType */
+				$eventType = EventTypeMapper::getInstance()->findById($_POST['type']);
 			}
-			catch (\Schoolbox\Mapper\Exception $e) {
+			catch (MapperException $e) {
 				error(2);
 				exit;
 			}
@@ -139,6 +151,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 */
 			$metadata->setEventType($_POST['type']);
 			$metadata->setRamsRequired($_POST['ramsRequired']);
+            $metadata->setPermissionSlipRequired($_POST['permissionSlipRequired'] ? $_POST['permissionSlipRequired'] : 0);
 
 			/* Only assign createdAt for new metadata records
 			 */
@@ -150,7 +163,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* All the staff that were selected
 			 */
-			$staffCollection = new \Schoolbox\Collection();
+			$staffCollection = new Collection();
 
 			if (is_array($_POST['staff']) && count($_POST['staff'])) {
 				$staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
@@ -160,10 +173,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* All the resources that were selected
 			 */
-			$resourceBookingCollection = new \Schoolbox\Collection();
+			$resourceBookingCollection = new Collection();
 
 			if (is_numeric($event->getId())) {
-				$resourceBookingCollection = \EOTC\EventMetadataMapper::getInstance()->findResourceBookings($metadata->getId());
+				$resourceBookingCollection = EventMetadataMapper::getInstance()->findResourceBookings($metadata->getId());
 			}
 
 			$metadata->setResourceBookings($resourceBookingCollection);
@@ -187,7 +200,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* Collections of ids
 			 */
-			$event->setCampusCollection(new \Schoolbox\Collection($_POST['campus']));
+			$event->setCampusCollection(new Collection($_POST['campus']));
 
 			/* Store metadata
 			 */
@@ -198,7 +211,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					try {
 						$factory = new CollectorFactory();
 						$files   = $factory->build($_POST['attachment'])->getAll();
-					} catch (\Schoolbox\Mapper\Exception $e) {
+					} catch (MapperException $e) {
 						error(41);
 						exit; // shut UP, storm.
 					} catch (\InvalidArgumentException $e) {
@@ -206,14 +219,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 						exit;
 					}
 
-					$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection($files));
+					$event->getMetadata()->setRamsFiles(new Collection($files));
 				}
-				else {
-					$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
-				}
-			}
-			else {
-				$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
 			}
 
 			/* If promoting an event, set to the next status
@@ -222,7 +229,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$canSelfPromote = $authenticator->canSelfPromote($_SESSION['user'], $event);
 
 			if (isset($_POST['promoteInPrinciple']) && ($_POST['promoteInPrinciple'] == 1) && $canSelfPromote) {
-				$eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
+				$eventStatusMapper = EventStatusMapper::getInstance();
 				$nextStatusId = $eventStatusMapper->findNextStatus($event);
 				$eventStatus = $eventStatusMapper->findById($nextStatusId);
 
@@ -231,16 +238,16 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$originalStatus = $event->getMetadata()->getStatus()->getId();
 				$originalComment = $event->getMetadata()->getComment();
 
-				/* Set status id
+				/* Set status
 				 */
-				/** @var \EOTC\EventStatus $eventStatus */
+				/** @var EventStatus $eventStatus */
 				$event->getMetadata()->setStatus($eventStatus);
 				$event->getMetadata()->setComment($_POST['comment']);
 				
 				/* Activity Log
 				 */
-				$registry = new \EOTC\ActivityLog\Registry();
-				$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
+				$registry = new ActivityLogRegistry();
+				$factory = new ActivityLogFactory($event, $_SESSION['user']);
 
 				/* If a status changed, log it
 				 */
@@ -262,12 +269,12 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
             /* Set up individual relations for each event in the series
              * Event object is provided within eventRecurrenceMapper
              */
-            $eventRelations = new \Schoolbox\Calendar\EventRelations(null, null, null);
+            $eventRelations = new EventRelations(null, null, null);
 
             /* Save this event and any recurring incidents too
              */
 			try {
-				$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
+				$eventRecurrenceMapper = new EventRecurrenceMapper($eventMapper);
 				$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, null, $eventRelations);
 			} catch (InvalidArgumentException $e) {
 				error($e->getCode());

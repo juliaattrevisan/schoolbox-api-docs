@@ -1,6 +1,6 @@
 <?php
 /**
- * ${NAME}
+ * Update an event's status
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -10,16 +10,19 @@
 
 $kernel = require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
-use Alaress\Database\Factory;
 use EOTC\Excursion\Connector as ExcursionConnector;
 use EOTC\ActivityLog\Registry as ActivityLogRegistry;
 use EOTC\ActivityLog\Factory as ActivityLogFactory;
 use EOTC\Authenticator;
 use EOTC\ConfigMapper;
+use EOTC\Event;
 use EOTC\EventMapper;
 use EOTC\EventMetadataMapper;
+use EOTC\EventStatus;
 use EOTC\EventStatusMapper;
-use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
 $page = new SitePage();
@@ -32,15 +35,14 @@ $event = false;
 /* Spawn an existing event if id provided
  */
 try {
-
-	/** @var \EOTC\Event $event */
+	/** @var Event $event */
 	$event = $eventMapper->findById($_POST['eventId']);
 }
 catch (MapperException $e) {
-	error(160);
+	error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
 }
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
@@ -70,7 +72,7 @@ if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->is
 }
 /* EOTC Administrators and event authors can edit this event
  */
-else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
+elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
 	/* Remember original states so we know which obs to spawn
 	 */
@@ -81,11 +83,11 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	 */
 	$statusMapper = EventStatusMapper::getInstance();
 
-	/** @var \EOTC\EventStatus $status */
+	/** @var EventStatus $status */
 	$status = $statusMapper->findById($_POST['statusId']);
 
 	if (!$authenticator->isStatusChangeAllowed($event, $status))  {
-		error(165);
+		error(ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS);
 	}
 
 	$event->getMetadata()->setStatus($status);
@@ -120,13 +122,17 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
     $configMapper = new ConfigMapper();
     $externalDbSync = $configMapper->findOneByColumn('name', 'external_db_sync');
 
-    if ($externalDbSync->getValue() == 1) {
+    if ((int)$externalDbSync->getValue() == 1) {
 
-        /* Sync to External DB only when the current status is Approved and
-         * its previous status was not Approved so we can't spam this event
-         * into External DB by altering its contents after the fact
+        /* Sync to External DB only when:
+         * - the current status is Approved and
+         * - its previous status was not Approved
+         * - Permission Slip is required
+         *
+         * We need to check the previous status so we don't spam this event
+         * into External DB by altering its contents after it was already approved
          */
-        if ($status->isApproved() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
+        if ($status->isApproved() && $event->getMetadata()->getPermissionSlipRequired() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
             $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
 
             /* Synchronise all events in a series if appropriate
@@ -136,10 +142,11 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
                 $allEvents = $eventMapper->getAllInSeries($event);
             }
             else {
-                $allEvents = new \Schoolbox\Collection();
+                $allEvents = new Collection();
                 $allEvents->add($event);
             }
 
+            /** @var Event $currentEvent */
             foreach ($allEvents as $currentEvent) {
                 try {
                     $excursionConnector->sync($currentEvent);
@@ -161,5 +168,5 @@ else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 	$page->localRedir('/modules/eotc/review/');
 }
 else {
-	error(19);
+	error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
