@@ -196,7 +196,6 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
      */
     $this->setVar(
         array(
-            'event_student_block' => '',
             'EVENT_STUDENT_COUNT' => $event->getMetadata()->getStudentAttendees()->count()
         )
     );
