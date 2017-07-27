@@ -1,0 +1,61 @@
+{#
+    Renders a participant to-chase in the assessments to-chase section of the pending assessment page
+    In own template to enable AJAX insertion.
+
+    Data:
+        participant:  Participant
+        assessment:   IAssessable
+        isTask:       bool                   (optional) Override to indicate to render as Task
+        isQuiz:       bool                   (optional) Override to indicate to render as Quiz
+        isDueWork:    bool                   (optional) Override to indicate to render as DueWork
+#}
+{# Enable insertion of non IAssessable instance data transfer objects #}
+{% set isTask     = isTask    or assessment is task %}
+{% set isQuiz     = isQuiz    or assessment is quiz %}
+{% set isDueWork  = isDueWork or assessment is dueWork %}
+
+<li data-participant="{{ participant.user.id }}" data-email="{{ participant.user.email }}">
+    {% if isTask %}
+        <div class="compact card small-11">
+            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
+            <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
+        </div>
+        <div class="small-1 columns no-pad">
+            {# An icon that shows if the student has attempted the task or not #}
+            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                assessment:  assessment,
+                participant: participant,
+                writable:    true
+            } only %}
+        </div>
+    {% else %}
+        {% if isDueWork %}
+            {% set href = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) %}
+            {% set title = 'View and ' ~ locale.grades ~ ' submission' %}
+        {% else %}
+            {% set href = '/search/user/' ~ participant.user.id %}
+            {% set title = 'View student profile' %}
+        {% endif %}
+
+        {% set ackReceipt = routeLookupIfAuthorized('learningAssessment.postAcknowledgeSubmission', {
+            assessmentId: assessment.Id,
+            assessment:   assessment,
+            studentId:    participant.user.id,
+            student:      participant.user,
+            participant:  participant
+        }) %}
+        <div class="small-{% if ackReceipt %}10{% else %}12{% endif %} columns no-pad">
+            <a class="link-row" href="{{ href }}" title="{{ title }}">
+                <div class="compact card">
+                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
+                    <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
+                </div>
+            </a>
+        </div>
+        {% if ackReceipt %}
+            <div class="small-2 columns no-pad component-action">
+                <a class="button" data-sobo title="Acknowledge receipt of student submission" href="{{ ackReceipt }}">Submission Received</a>
+            </div>
+        {% endif %}
+    {% endif %}
+</li>

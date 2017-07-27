@@ -1510,12 +1510,20 @@ dl {
     span {
         @include transition(inherit, unquote(''), unquote(''), unquote(''));
     }
+    .meter{
+        &.slow{
+            transition: width 1s;
+        }
+    }
     .pipe-meter{
         width: 0.5rem;
         height: 2rem;
         background-color: darken($accent-foreground, 5%);
         position: absolute;
         top: -9px;
+        &.slow{
+            transition: left 1s;
+        }
     }
 }
 

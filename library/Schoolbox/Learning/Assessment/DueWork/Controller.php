@@ -827,10 +827,16 @@ class Controller extends Assessment\Controller
 
         try{
             $this->dueWorkResponseMapper->save($response);
+            $participant->getAllResponses()[$response->getId()] = $response;
+            $assessment->getResponses()[$response->getId()] = $response;
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
                 'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+                'htmlPending'   => $this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
+                    'participant' => $participant,
+                    'assessment'  => $assessment,
+                ])->getAsString(),
             ];
             $code = 200;
         } catch (\PDOException $e){

@@ -1,0 +1,95 @@
+{#
+    Renders an assessment to-chase section for the pending assessment page.
+    In own fragment so we can render consistently for both visible items, and template for AJAX inserted fragments
+
+    Data:
+        assessment:      IAssessible
+        stats:           Assessment\Statistics
+        studentsToEmail: string[]               An array of student email addresses
+        isTask:          bool                   (optional) Override to indicate to render as Task
+        isQuiz:          bool                   (optional) Override to indicate to render as Quiz
+        isDueWork:       bool                   (optional) Override to indicate to render as DueWork
+#}
+{% import 'sub/assessmentContext.twig' as assessmentContext %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+
+{# Enable insertion of non IAssessable instance data transfer objects #}
+{% set isTask    = isTask    or assessment is task %}
+{% set isQuiz    = isQuiz    or assessment is quiz %}
+{% set isDueWork = isDueWork or assessment is dueWork %}
+
+{%- set icon  = isTask ? 'task' : (isQuiz ? 'quiz' : 'due-work') -%}
+{%- set state = isQuiz ? 'unattempted' : 'unsubmitted' -%}
+
+{%- if isQuiz %}
+    {%- set submitTitleSuffix    = 'attempted this quiz' -%}
+    {%- set markedTitleSuffix    = 'review' -%}
+    {%- set noResultsTitleSuffix = 'attempted this quiz' -%}
+{%- elseif isDueWork %}
+    {%- set submitTitleSuffix    = 'submitted work' -%}
+    {%- set markedTitleSuffix    = 'marking' -%}
+    {%- set noResultsTitleSuffix = 'submitted work or been marked' -%}
+{%- elseif isTask %}
+    {%- set submitTitleSuffix    = 'completed this task' -%}
+    {%- set markedTitleSuffix    = 'teacher assessment' -%}
+    {%- set noResultsTitleSuffix = 'completed this task' -%}
+{%- endif -%}
+
+<section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt.unixTimeStamp }}">
+    <div class="content collapsible">
+        <div class="card small-6 columns no-pad">
+            {#- Dessicator -#}
+            <span data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"></span>
+            <i class="size-32 icon-{{ icon }}"></i>
+            <h3>
+                {#- Dessicator -#}
+                <a data-title href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                {#- Dessicator -#}
+            </h3>
+            <div data-crumbs>{{ assessmentContext.crumbs(assessment) }}</div>
+            <p class="meta" data-due-date>{{ dueDate.dueDate(assessment, USER) }}</p>
+        </div>
+        <div class="small-4 columns hide-for-small-only">
+            <div
+                    class="progress"
+                    data-progress
+                    title="{{ stats.countParticipants - stats.countResponseRequired}} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
+                    data-title-suffix="{{ submitTitleSuffix }}"
+                    data-count-total="{{ stats.countParticipants }}"
+                    data-count-response-required="{{ stats.countResponseRequired }}"
+                    data-count-feedback-required="{{ stats.countFeedbackRequired }}"
+                    data-count-review-complete="{{ stats.countReviewComplete }}"
+            >
+                <span class="meter slow" data-meter style="width:{{ 100 - stats.percentageResponseRequired }}%"></span>
+                <span class="pipe-meter slow" data-pipe style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}" data-title-suffix="{{ markedTitleSuffix }}"></span>
+            </div>
+        </div>
+        <div class="small-6 medium-2 columns text-right">
+            <p data-count-to-chase title="{{ stats.countResponseRequired }} of {{ stats.countParticipants }} students have not {{ noResultsTitleSuffix }}" data-title-suffix="{{ noResultsTitleSuffix }}"><span data-user-count>{{ stats.countResponseRequired }}</span> {{ state }}</p>
+        </div>
+        <ul class="information-list hide" data-participant-list data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
+            {% for participant in assessment.allParticipants %}
+                {% if participant.responseRequired %}
+                    {% include '@learning/fragments/toSubmitParticipant.twig' with {
+                        participant: participant,
+                        assessment:  assessment
+                    } only %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="component-action" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed" style="display: none;">
+        <section>
+            <form action="/mail/createMail.php" method="post" class="no-margin">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="subject" value="Overdue - {{ assessment.title }}"/>
+                        <input type="hidden" name="replyto" value="{{ viewee.email }}"/>
+                        <input data-email-students type="hidden" name="bcc" value="{{ studentsToEmail|join(',') }}"/>
+                        <button type="submit" class="button icon-email">Email all</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</section>

@@ -1,6 +1,13 @@
+{#
+    Renders the content of the filtered pending assessment page
+    Data:
+        statistics:                Assessment\Statistics[]  indexed by assessment.id
+        assessmentsToMark:         IAssessable[]            indexed by assessment.id
+        assessmentsToChase:        IAssessable[]            indexed by assessment.id
+        assessmentStudentsToEmail: string[][]               indexed by assessment.id, user.id
+#}
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
-
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
@@ -23,191 +30,27 @@
 
 <div class="row" id="pending_assessments">
     <div class="small-12 columns island">
-        {% if assessmentsToMark|length %}
-            <h2 class="subheader">Requires {{ locale.assessment.proper }}</h2>
 
+        <h2 data-heading-to-mark class="subheader {% if not assessmentsToMark|length %}hide{% endif %}">Requires {{ locale.assessment.proper }}</h2>
+        <div data-list-to-mark>
             {% for assessment in assessmentsToMark %}
-
-                {% set stats = statistics[assessment.id] %}
-
-                {% set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  %}
-                <section>
-                    <div class="content collapsible">
-                        <div class="card small-6 columns no-pad">
-                            {#- Dessicator -#}
-                            <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"></span>
-                            <i class="size-32 icon-{{ icon }}"></i>
-                            <h3>
-                                {#- Dessicator -#}
-                                <a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
-                                {#- Dessicator -#}
-                            </h3>
-                            {{ assessmentContext.crumbs(assessment) }}
-                            <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
-                        </div>
-                        <div class="small-4 columns hide-for-small-only">
-
-                            {%- if assessment is quiz -%}
-                                {%- set submitTitleSuffix = 'attempted this quiz' -%}
-                                {%- set markedTitleSuffix = 'review' -%}
-                            {%- elseif assessment is dueWork %}
-                                {%- set submitTitleSuffix = 'submitted work' -%}
-                                {%- set markedTitleSuffix = 'marking' -%}
-                            {%- elseif assessment is task -%}
-                                {% set submitTitleSuffix = 'completed this task' -%}
-                                {% set markedTitleSuffix = 'teacher assessment' -%}
-                            {%- endif -%}
-
-                            <div class="progress" title="{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}">
-                                <span class="meter" style="width:{{ 100 - stats.percentageResponseRequired }}%"></span>
-                                <span class="pipe-meter" style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}"></span>
-                            </div>
-                        </div>
-                        <div class="small-6 medium-2 columns text-right">
-                            <p title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require marking">{{ stats.countFeedbackRequired }} unmarked</p>
-                        </div>
-                        <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
-                            {% for participant in assessment.allParticipants %}
-                                {% if participant.isFeedbackRequired %}
-                                    <li>
-                                    {% set response = participant.findMostRecentResponse %}
-                                    {% if assessment is task %}
-                                        <div class="compact card small-6">
-                                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
-                                            <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
-                                        </div>
-                                        <div class="small-5 columns">
-                                            <p title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</p>
-                                        </div>
-                                        <div class="small-1 columns no-pad">
-                                            {# An icon that shows if the student has attempted the task or not #}
-                                            {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                                assessment:  assessment,
-                                                participant: participant,
-                                                writable:    true
-                                            } only %}
-                                        </div>
-                                    {% else %}
-                                        <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
-                                            <div class="compact card small-6">
-                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
-                                                <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
-                                            </div>
-                                            <div class="small-6 columns">
-                                                <p title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</p>
-                                            </div>
-                                        </a>
-                                    {% endif %}
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </section>
-
+                {% include '@learning/fragments/toMarkAssessment.twig' with {
+                    assessment:        assessment,
+                    stats:             statistics[assessment.id]
+                } only %}
             {% endfor %}
-        {% endif %}
+        </div>
 
-        {% if assessmentsToChase|length %}
-            <h2 class="subheader">Not Submitted</h2>
-
-            {% for assessment in assessmentsToChase %}
-
-                {% set stats = statistics[assessment.id] %}
-
-                {%- set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  -%}
-                {%- set state = assessment is quiz ? 'unattempted' : 'unsubmitted' -%}
-                {%- if assessment is quiz %}
-                    {%- set submitTitleSuffix = 'attempted this quiz' -%}
-                    {%- set markedTitleSuffix = 'review' -%}
-                    {%- set noResultsTitleSuffix = 'attempted this quiz' -%}
-                {%- elseif assessment is dueWork %}
-                    {%- set submitTitleSuffix = 'submitted work' -%}
-                    {%- set markedTitleSuffix = 'marking' -%}
-                    {%- set noResultsTitleSuffix = 'submitted work or been marked' -%}
-                {%- elseif assessment is task %}
-                    {%- set submitTitleSuffix = 'completed this task' -%}
-                    {%- set markedTitleSuffix = 'teacher assessment' -%}
-                    {%- set noResultsTitleSuffix = 'completed this task' -%}
-                {%- endif -%}
-                <section>
-                    <div class="content collapsible">
-                        <div class="card small-6 columns no-pad">
-                            {#- Dessicator -#}
-                            <span data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"></span>
-                            <i class="size-32 icon-{{ icon }}"></i>
-                            <h3>
-                                {#- Dessicator -#}
-                                <a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
-                                {#- Dessicator -#}
-                            </h3>
-                            {{ assessmentContext.crumbs(assessment) }}
-                            <p class="meta">{{ dueDate.dueDate(assessment, USER) }}</p>
-                        </div>
-                        <div class="small-4 columns hide-for-small-only">
-                            <div class="progress" title="{{ stats.countParticipants - stats.countResponseRequired}} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}">
-                                <span class="meter" style="width:{{ 100 - stats.percentageResponseRequired }}%"></span>
-                                <span class="pipe-meter" style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}"></span>
-                            </div>
-                        </div>
-                        <div class="small-6 medium-2 columns text-right">
-                            <p title="{{ stats.countNoResponseOrFeedback }} of {{ stats.countParticipants }} students have not {{ noResultsTitleSuffix }}">{{ stats.countResponseRequired }} {{ state }}</p>
-                        </div>
-                        <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
-                            {% set studentEmails = [] %}
-                            {% for participant in assessment.allParticipants %}
-                                {% if participant.responseRequired %}
-                                    {% set studentEmails = studentEmails|merge([participant.user.getEmail()]) %}
-                                    <li>
-                                        {% if assessment is task %}
-                                            <div class="compact card small-11">
-                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
-                                                <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
-                                            </div>
-                                            <div class="small-1 columns no-pad">
-                                                {# An icon that shows if the student has attempted the task or not #}
-                                                {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                                    assessment:  assessment,
-                                                    participant: participant,
-                                                    writable:    true
-                                                } only %}
-                                            </div>
-                                        {% else %}
-                                            {% set href = assessment is dueWork
-                                                ? routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id})
-                                                : '/search/user/' ~ participant.user.id
-                                            %}
-                                            <a class="link-row" href="{{ href }}">
-                                                <div class="compact card small-6">
-                                                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
-                                                    <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
-                                                </div>
-                                            </a>
-                                        {% endif %}
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div class="component-action" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed" style="display: none;">
-                        <section>
-                            <form action="/mail/createMail.php" method="post" class="no-margin">
-                                <div class="row">
-                                    <div class="small-12 columns">
-                                        <input type="hidden" name="subject" value="Overdue - {{ assessment.title }}"/>
-                                        <input type="hidden" name="replyto" value="{{ viewee.getEmail() }}"/>
-                                        <input type="hidden" name="bcc" value="{{ studentEmails|join(',') }}"/>
-                                        <button type="submit" class="button icon-email">Email all</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </section>
-                    </div>
-                </section>
-
-            {% endfor %}
-
-        {% endif %}
+        <h2 data-heading-to-chase class="subheader {% if not assessmentsToChase|length %}hide{% endif %}">Not Submitted</h2>
+        <div data-list-to-chase>
+        {% for assessment in assessmentsToChase %}
+            {% include '@learning/fragments/toSubmitAssessment.twig' with {
+                assessment:      assessment,
+                stats:           statistics[assessment.id],
+                studentsToEmail: assessmentStudentsToEmail[assessment.id]
+            } only %}
+        {% endfor %}
+        </div>
 
         {% if not assessmentsToMark|length and not assessmentsToChase|length %}
             <div class="empty-state">
@@ -217,5 +60,269 @@
         {% endif %}
     </div>
 </div>
+
+<div class="toast" data-toast></div>
+
+<div class="hide" id="template-assessment-to-mark">
+    {% include '@learning/fragments/toMarkAssessment.twig' with {
+        assessment: {
+            id:              0,
+            title:           'TEMPLATE ASSESSMENT TO MARK',
+            allParticipants: []
+        },
+        stats: {
+            countParticipants:     0,
+            countResponseRequired: 0,
+            countFeedbackRequired: 0
+        },
+        isDueWork: true
+    } only %}
+</div>
+
+<script type="text/javascript">
+    $(function() {
+
+        // get handles to static DOM elements
+        var $toast                 = $('[data-toast]'),
+            $toMarkHeading         = $('[data-heading-to-mark]'),
+            $toMarkList            = $('[data-list-to-mark]'),
+            $dueWorkToMarkTemplate = $('#template-assessment-to-mark').find('[data-assessment]').detach(),
+            $toChaseHeading        = $('[data-heading-to-chase]'),
+            $toChaseList           = $('[data-list-to-chase]');
+
+        {# Handle clicks on 'Submission Received' buttons #}
+        $('[data-sobo]').on('click', function (event) {
+            event.preventDefault();
+
+            var $button            = $(this),
+                buttonText         = $button.html();
+
+            $toast.toastActivate({text: 'Submitting...'});
+            $button.html('Submitting...');
+            $button.attr('disabled', '');
+
+            $.post($button.attr('href'))
+                .done(function (response) {
+                    /** @var {bool} response.success */
+                    if(true !== Boolean(response.success)){
+                        soboFailure($button, buttonText);
+                        $toast.toastTimeout({text: 'Acknowledgment failed.', css: 'alert'});
+                        return;
+                    }
+                    /** @var {string} response.htmlPending */
+                    soboSuccess($button, response.htmlPending);
+                    $toast.toastTimeout({text: 'Submission Acknowledged.', css: 'success'});
+                })
+                .fail(function () {
+                    soboFailure($button, buttonText);
+                    $toast.toastTimeout({text: 'Acknowledgment failed.', css: 'alert'});
+                });
+        });
+
+        /**
+         * Handle an 'acknowledgment of submission receipt' success
+         *
+         * @param {jQuery} $button
+         * @param {string} participantHtml
+         */
+        function soboSuccess($button, participantHtml)
+        {
+            var $participantToChase = $button.closest('[data-participant]'),
+                $assessmentToChase  = $participantToChase.closest('[data-assessment]'),
+                assessmentId        = $assessmentToChase.attr('data-assessment'),
+                $assessmentToMark   = $toMarkList.find('[data-assessment='+assessmentId+']');
+
+            // Ensure the 'Requires Assessment' list is visible
+            if($toMarkHeading.hasClass('hide')){
+                $toMarkHeading.removeClass('hide'); // TODO make this transition slide down for smoothness
+            }
+
+            // Ensure the assessment exists in the 'Requires Assessment' list
+            if(!$assessmentToMark.length){
+                $assessmentToMark = insertAssessmentToMark($assessmentToChase, assessmentId);
+            }
+
+            // Insert the participant in the 'to-mark' assessment
+            var $participantsToMarkList = $assessmentToMark.find('[data-participant-list]');
+            $participantsToMarkList.append(participantHtml);
+
+            updateParticipationCounts($assessmentToMark, $assessmentToChase);
+            removeParticipant($assessmentToChase, $participantToChase);
+        }
+
+        /**
+         * Calculate new counts, and update DOM
+         *
+         * @param {jQuery} $assessmentToMark
+         * @param {jQuery} $assessmentToChase
+         */
+        function updateParticipationCounts($assessmentToMark, $assessmentToChase)
+        {
+            // Get handles to DOM elements
+            var $toMarkProgress       = $assessmentToMark.find('[data-progress]'),
+                $toMarkMeter          = $assessmentToMark.find('[data-meter]'),
+                $toMarkPipe           = $assessmentToMark.find('[data-pipe]'),
+                $toMarkSummary        = $assessmentToMark.find('[data-count-to-mark]'),
+                $toMarkCount          = $toMarkSummary.find('[data-user-count]'),
+                $toChaseProgress      = $assessmentToChase.find('[data-progress]'),
+                $toChaseMeter         = $assessmentToChase.find('[data-meter]'),
+                $toChasePipe          = $assessmentToChase.find('[data-pipe]'),
+                $toChaseSummary       = $assessmentToChase.find('[data-count-to-chase]'),
+                $toChaseCount         = $toChaseSummary.find('[data-user-count]'),
+                countTotal            = parseInt($toChaseProgress.attr('data-count-total')),
+                countResponseRequired = parseInt($toChaseProgress.attr('data-count-response-required')),
+                countFeedbackRequired = parseInt($toChaseProgress.attr('data-count-feedback-required')),
+                countReviewComplete   = parseInt($toChaseProgress.attr('data-count-review-complete'));
+
+            // Update the counts
+            countResponseRequired--;
+            countFeedbackRequired++;
+
+            var cssWidth = (100 - (countResponseRequired / countTotal * 100)) + '%',
+                cssLeft  = (countReviewComplete / countTotal * 100) + '%';
+
+            // Update data attributes, CSS + titles
+            $toMarkProgress.attr('data-count-total', countTotal);
+            $toMarkProgress.attr('data-count-response-required', countResponseRequired);
+            $toMarkProgress.attr('data-count-feedback-required', countFeedbackRequired);
+            $toMarkProgress.attr('data-count-review-complete', countReviewComplete);
+            $toMarkProgress.attr('title', (countTotal - countResponseRequired) + ' of ' + countTotal + ' students have ' + $toMarkProgress.attr('data-title-suffix'));
+
+            $toMarkMeter.css({width: cssWidth});
+
+            $toMarkPipe.css({left: cssLeft});
+            $toMarkPipe.attr('title', countFeedbackRequired + ' of ' + countTotal + ' students require ' + $toMarkPipe.attr('data-title-suffix'));
+
+            $toMarkSummary.attr('title', countFeedbackRequired + ' of ' + countTotal + ' students require marking');
+            $toMarkCount.html(countFeedbackRequired);
+
+            $toChaseProgress.attr('data-count-response-required', countResponseRequired);
+            $toChaseProgress.attr('data-count-feedback-required', countFeedbackRequired);
+            $toChaseProgress.attr('title', (countTotal - countResponseRequired) + ' of ' + countTotal + ' students have ' + $toChaseProgress.attr('data-title-suffix'));
+
+            $toChaseMeter.css({width: cssWidth});
+            $toChasePipe.css({left: cssLeft});
+            $toChasePipe.attr('title', countFeedbackRequired + ' of ' + countTotal + ' students require ' + $toChasePipe.attr('data-title-suffix'));
+
+            $toChaseSummary.attr('title', countResponseRequired + ' of ' + countTotal + ' students have not ' + $toChaseSummary.attr('data-title-suffix'));
+            $toChaseCount.html(countResponseRequired);
+        }
+
+        /**
+         * Insert the 'Assessment to-mark' in the 'Assessments-to-mark' list, and copy attributes.
+         *
+         * @param {jQuery} $assessmentToChase
+         * @param {int}    assessmentId
+         * @return {jQuery}
+         */
+        function insertAssessmentToMark($assessmentToChase, assessmentId)
+        {
+            var $assessmentToMark = $dueWorkToMarkTemplate.clone();
+            $assessmentToMark.attr('data-assessment', assessmentId);
+            var dueTimestamp = parseInt($assessmentToChase.attr('data-due-timestamp'));
+            $assessmentToMark.attr('data-due-timestamp', dueTimestamp);
+
+            $assessmentToMark.find('[data-collapser]').attr('data-collapser', 'to-mark-' + assessmentId);
+            $assessmentToMark.find('[data-collapsable]').attr('data-collapsable', 'to-mark-' + assessmentId);
+
+            $assessmentToMark.find('[data-title]').html($assessmentToChase.find('[data-title]').html());
+
+            var href = $assessmentToMark.find('[data-title]').attr('href');
+            $assessmentToMark.find('[data-title]').attr('href', href.replace(/\d+/, assessmentId));
+
+            $assessmentToMark.find('[data-crumbs]').html($assessmentToChase.find('[data-crumbs]').html());
+            $assessmentToMark.find('[data-due-date]').html($assessmentToChase.find('[data-due-date]').html());
+            $assessmentToMark.css({
+                'max-height': 0,
+                overflow:     'hidden'
+            });
+
+            var insertIndex = 0;
+            $toMarkList.find('[data-assessment]').each(function(idx, elem){
+                var currentTimestamp = parseInt($(elem).attr('data-due-timestamp'));
+                insertIndex = idx;
+                return currentTimestamp <= dueTimestamp;
+            });
+
+            if (0 === insertIndex) {
+                $toMarkList.prepend($assessmentToMark);
+            } else {
+                $toMarkList.children().eq(insertIndex - 1).after($assessmentToMark);
+            }
+
+            $assessmentToMark.animate({'max-height': '400px'}, 1000);
+            $assessmentToMark.find('[data-collapser]').collapsable();
+
+            return $assessmentToMark;
+        }
+
+        /**
+         * Either remove participant, or whole assessment if they were the last one
+         *
+         * @param {jQuery} $assessmentToChase
+         * @param {jQuery} $participantToChase
+         */
+        function removeParticipant($assessmentToChase, $participantToChase)
+        {
+            var
+                $participantsToChaseList = $assessmentToChase.find('[data-participant-list]'),
+                isLastParticipant        = 1 === $participantsToChaseList.find('[data-participant]').length,
+                isLastAssessment         = 1 === $toChaseList.find('[data-assessment]').length;
+
+            if(isLastParticipant) {
+                if(isLastAssessment){
+                    // Last participant in last assessment: Remove whole list
+                    $toChaseHeading.hide();
+                    $toChaseList.slideUp();
+                } else {
+                    // Last participant in assessment, other assessments remain: Remove assessment
+                    $assessmentToChase.slideUp({done: function(){
+                        $assessmentToChase.remove();
+                    }})
+                }
+            } else {
+                // Not last participant: Just remove participant
+                $participantToChase.slideUp({
+                    done: function () {
+                        $participantToChase.remove();
+                        updateEmailList($assessmentToChase, $participantsToChaseList);
+                    }
+                });
+            }
+        }
+
+        /**
+         * Update the 'Email All' button to just email the remaining participants
+         *
+         * @param {jQuery} $assessmentToChase
+         * @param {jQuery} $participantsToChaseList
+         */
+        function updateEmailList($assessmentToChase, $participantsToChaseList)
+        {
+            var studentEmailArr = [],
+                $emailList      = $assessmentToChase.find('[data-email-students]');
+
+            $participantsToChaseList.find('[data-participant]').each(function(idx, elem){
+                var email = $(elem).attr('data-email');
+                if(email){
+                    studentEmailArr.push(email);
+                }
+            });
+            $emailList.val(studentEmailArr.join());
+        }
+
+        /**
+         * Handle a submission receipt failure
+         *
+         * @param {jQuery} $button
+         * @param {string} buttonText
+         */
+        function soboFailure($button, buttonText)
+        {
+            $button.html(buttonText);
+            $button.removeAttr('disabled');
+        }
+    });
+</script>
 
 
