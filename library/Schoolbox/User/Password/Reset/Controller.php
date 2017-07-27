@@ -9,7 +9,7 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
-use Schoolbox\External\Connector\CommunityPortalInterface;
+use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -42,7 +42,7 @@ class Controller extends Base
     protected $passwordService;
 
     /**
-     * @var CommunityPortalInterface
+     * @var ICommunityPortal
      */
     protected $communityPortal;
 
@@ -53,14 +53,14 @@ class Controller extends Base
      * @param Mapper $resetMapper
      * @param TwigEmailFactory $mailFactory
      * @param PasswordService $passwordService
-     * @param CommunityPortalInterface $communityPortal
+     * @param ICommunityPortal $communityPortal
      */
     public function __construct(
         UserMapper $userMapper,
         Mapper $resetMapper,
         TwigEmailFactory $mailFactory,
         PasswordService $passwordService,
-        CommunityPortalInterface $communityPortal
+        ICommunityPortal $communityPortal
     ) {
         $this->userMapper = $userMapper;
         $this->resetMapper = $resetMapper;
