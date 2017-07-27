@@ -94,8 +94,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             $response = (new DomainObject())
                 ->setId($studentSubmission->getId())
                 ->setAssessable((new DueWork())->setId($studentSubmission->getSubmissionBox()->getAssessmentModel()->getId()))
-                ->setSubmittedBy($studentSubmission->getOwner())
-                // TODO add submitted on behalf of as a separate column
+                ->setSubmittedBy($studentSubmission->getSubmittedBy())
                 ->setSubmittedOnBehalfOf($studentSubmission->getOwner())
                 ->setCreatedAt($studentSubmission->getCreatedAt())
                 ->setDeletedAt(new \Alaress_Date_NullDate())
@@ -158,6 +157,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                     (new DueWorkDataObject())
                         ->setId($this->getInternalValue($domainObject->getAssessable()->getId()))
                 )
+                ->setSubmittedBy($domainObject->getSubmittedBy())
                 ->setOwner($domainObject->getSubmittedOnBehalfOf())
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setSubmittedAt($domainObject->getSubmittedAt());
