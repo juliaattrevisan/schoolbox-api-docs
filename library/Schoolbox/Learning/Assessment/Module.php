@@ -18,6 +18,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
+use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -88,6 +89,7 @@ class Module extends BaseModule
         $participantView    = $this->buildAuthRuleParticipantView();
         $canSubmit          = $this->buildAuthRuleCanSubmit();
         $canWriteAndNotSpec = $this->buildAuthRuleCanWriteAndNotSpec();
+        $canAckSubmission   = $this->buildAuthRuleCanAcknowledgeSubmission();
 
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) { return $name.'s'; });
@@ -118,6 +120,7 @@ class Module extends BaseModule
         $this->register('GET',      "$assRoute/preview",                'getPreview',               $canRead,               $preloadAssessment); // s || p
         $this->register('GET',      "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,             $preloadParticipant); // p
         $this->register('POST',     "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,             $preloadParticipant); // p
+        $this->register('POST',     "$assRoute/$studentParam/received", 'postAcknowledgeSubmission',$canAckSubmission,      $preloadParticipant); // p
     }
 
     /**
@@ -451,7 +454,8 @@ class Module extends BaseModule
      * @throws \InvalidArgumentException If required object not found in route params
      * @throws NotFound
      */
-    private function buildAuthRuleCanSubmit(){
+    private function buildAuthRuleCanSubmit()
+    {
         return new Rule\Any(
             new Rule\All(
                 new Rule\IsSuperuser(),
@@ -470,6 +474,29 @@ class Module extends BaseModule
                 new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                 new IsAssessmentOpen(),
                 new CanRespondToAssessment($this->getAccess())
+            )
+        );
+    }
+
+
+    /**
+     * @return Rule\Any
+     * @throws \InvalidArgumentException If required objects not found in route params
+     * @throws NotFound If unable to find assessment context in route params
+     */
+    private function buildAuthRuleCanAcknowledgeSubmission()
+    {
+        return new Rule\Any(
+            new Rule\All(
+                new Rule\IsSuperuser(),
+                new ParticipantHasNoInteractions()
+            ),
+            new Rule\All(
+                new Rule\HasRole(Role::STAFF),
+                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                new CanRespondToAssessment($this->getAccess()),
+                new ParticipantHasNoInteractions()
             )
         );
     }

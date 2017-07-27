@@ -628,7 +628,6 @@ class Controller extends Assessment\Controller
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'student'        => $student,
-            'participant'    => $participant,
             'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
             'response'       => $latestResponse,
             'editorContents' => $editorContents,
@@ -669,8 +668,7 @@ class Controller extends Assessment\Controller
             $response = $this->getDueWorkResponseMapper()->findById($rq->post['responseId']);
         } else {
             // Create a new response
-            $response = new DueWorkSubmission();
-            $response
+            $response = $this->dueWorkResponseMapper->createModel()
                 ->setSubmittedBy($this->getUser())
                 ->setSubmittedOnBehalfOf($participant->getUser())
                 ->setCreatedAt(Alaress_Date_Format::now())
@@ -803,6 +801,47 @@ class Controller extends Assessment\Controller
                 )
             );
         }
+    }
+
+
+    /**
+     * Acknowledge receipt of (potentially offline) submission
+     *
+     * Creates an empty SOBO. Needs a different route to postCreateResponse()
+     * to cater for different auth rules.
+     *
+     * @param Participant $participant
+     * @api   POST /learning/assessments/:assessmentId/:studentId/acknowledge
+     * @level 17.0
+     */
+    public function postAcknowledgeSubmission(Participant $participant)
+    {
+        $assessment = $participant->getAssessable();
+        $response   = $this->dueWorkResponseMapper->createModel()
+            ->setAssessable($assessment)
+            ->setSubmittedBy($this->getUser())
+            ->setSubmittedOnBehalfOf($participant->getUser())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        try{
+            $this->dueWorkResponseMapper->save($response);
+            $data = [
+                'success'       => true,
+                'id'            => $response->getId(),
+                'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+            ];
+            $code = 200;
+        } catch (\PDOException $e){
+            $data = [
+                'success'       => false,
+                'message'       => $e->getMessage(),
+            ];
+            $code = 403;
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->getResponse()->status->set($code);
     }
 
 

@@ -37,9 +37,8 @@
     {% endif %}
     {% if not readonly %}
     <li class="separator">Bulk Actions</li>
-    <li>
-        <a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish drafts&hellip;</a>
-    </li>
+    <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish drafts&hellip;</a></li>
+    <li><a class="icon-approve" data-mass="submit"  data-reveal-id="mass-submit" >Submissions received&hellip;</a></li>
     {% endif %}
 {% endblock %}
 
@@ -56,10 +55,10 @@
     {% set pActionResponses  = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
     {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', { assessmentId: participant.assessable.id, studentId: participant.user.id, participant: participant }) %}
     {% set pActionSobo       = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', routeArgs) %}
+    {% set pAckReceipt       = routeLookupIfAuthorized('learningAssessment.postAcknowledgeSubmission', routeArgs) %}
 
     {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed ) %}
     {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.feedbackRequired ? labelPending  : labelReviewed ) %}
-    {% set pSobo        = assessment.acceptOnline %}
 
     {% set pStatusText %}
         {%- spaceless %}
@@ -196,17 +195,19 @@
     {% set feedback            = participant.findMostRecentFeedback %}
     {% set isDraftFeedback     = feedback and not feedback.published %}
     {% set isPublishedFeedback = feedback and feedback.published %}
-    {% set actionStyle         = isDraftFeedback or attachedMsg ? '' : 'display: none;' %}
+    {% set actionStyle         = isDraftFeedback or attachedMsg or pAckReceipt ? '' : 'display: none;' %}
 
     {# Action Bar data attrs #}
     {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
+    {% set massActions = massActions ~ (pAckReceipt ? ' data-mass-submit' : '') %}
     {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
 
 
     {% spaceless %}
         {% set buttons %}
+            {% if pAckReceipt %}<a class="button" data-sobo title="Acknowledge receipt of student submission" href="{{ pAckReceipt }}">Submission Received</a>{% endif %}
             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{% if isDraftFeedback %}Saved as Draft{% endif %}</span>
-            {% if not readonly %}<a class="button" data-draft="publish" {% if feedback.published %}style="display:none;"{% endif %}>Publish</a>{% endif %}
+            {% if not readonly %}<a class="button" data-draft="publish" {% if not feedback or feedback.published %}style="display:none;"{% endif %}>Publish</a>{% endif %}
         {% endset %}
     {% endspaceless %}
 
@@ -244,6 +245,27 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
+<div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true" role="dialog">
+    <h2>Acknowledge Receipt of Submission</h2>
+    <p data-mass-unavailable>You have no students requiring submission.</p>
+    <p data-mass-available>Acknowledge receipt of submission for:</p>
+    <section class="checklist" id="mass-submit-list">
+        <div data-template>{# this will get detached from the DOM on pageload #}
+            <input type="checkbox" data-selected checked />
+            <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+        </div>
+    </section>
+    <div class="component-action">
+        <section>
+            {%- spaceless -%}
+                <a class="button">Cancel</a>
+                <a class="button" data-submit>All Received</a>
+            {%- endspaceless -%}
+        </section>
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
 <div class="toast" data-alert data-save-draft></div>
 
     {# Dynamic Feedback
@@ -269,12 +291,22 @@
                 statusPending: '{{ statusPending }}',
                 statusReviewed: '{{ statusReviewed }}',
                 onDraftCallback: function(userId) {
-                    $('[data-participant='+userId+'] [data-action-bar]').attr('data-mass-publish', '');
+                    var $actionBar = $('[data-participant='+userId+'] [data-action-bar]');
+                    $actionBar.attr('data-mass-publish', '');
+                    $actionBar.removeAttr('data-mass-submit');
                 },
                 onPublishCallback: function(userId) {
-                    $('[data-participant='+userId+'] [data-action-bar]').removeAttr('data-mass-publish');
+                    var $actionBar = $('[data-participant='+userId+'] [data-action-bar]'),
+                        $ackButton = $actionBar.find('[data-sobo]');
+                    $actionBar.removeAttr('data-mass-publish');
+                    $actionBar.removeAttr('data-mass-submit');
+                    $ackButton.fadeOut({done: function(){
+                        $ackButton.remove();
+                    }})
                 }
             });
+
+            var $userList = $('#assessment-status');
 
             $('#mass-publish').bulky({
                 submitText: function (len, all) {
@@ -287,13 +319,104 @@
                     return 'Publish ' + len + ' Selected';
                 },
                 userSelector: '[data-mass-publish]',
-                userList: $('#assessment-status'),
+                userList: $userList,
                 onSubmit: function (toPublish) {
                     toPublish.each(function () {
                         $(this).find('[data-draft="publish"]').trigger('click');
                     });
                 }
             });
+
+            {# Mass acknowledge receipt of submissions #}
+            $('#mass-submit').bulky({
+                submitText: function (len, all) {
+                    if (!len) {
+                        return 'None Selected';
+                    }
+                    if (len === all) {
+                        return 'All Received';
+                    }
+                    return 'Received ' + len + ' selected';
+                },
+                userSelector: '[data-mass-submit]',
+                userList: $userList,
+                onSubmit: function (toSubmit) {
+                    toSubmit.each(function () {
+                        $(this).find('[data-sobo]').trigger('click');
+                    });
+                }
+            });
+
+            {# Handle clicks on 'Submission Received' buttons #}
+            $('[data-sobo]').on('click', function (event) {
+                event.preventDefault();
+
+                var $button      = $(this),
+                    buttonText   = $button.html(),
+                    $actionBar   = $button.closest('[data-action-bar]'),
+                    $participant = $actionBar.closest('[data-participant]'),
+                    $statusIcon  = $participant.find('[data-status]'),
+                    $statusLabel = $participant.find('[data-status-label]'),
+                    $toast       = $('[data-save-draft]');
+
+                $toast.toastActivate({text: 'Submitting...'});
+                $button.html('Submitting...');
+                $button.attr('disabled', '');
+
+                $.post($button.attr('href'))
+                    .done(function (response) {
+                        /** @var {bool} response.success */
+                        if(true !== Boolean(response.success)){
+                            soboFailure($button, buttonText, $toast);
+                            return;
+                        }
+
+                        /** @var {bool} response.submittedLate */
+                        soboSuccess($participant, $button, $actionBar, $statusIcon, $statusLabel, response.submittedLate, $toast)
+                    })
+                    .fail(function () {
+                        soboFailure($button, buttonText, $toast);
+                    });
+            });
+
+            /**
+             * Handle a submission receipt success
+             *
+             * @param {jQuery} $participant
+             * @param {jQuery} $button
+             * @param {jQuery} $actionBar
+             * @param {jQuery} $statusIcon
+             * @param {jQuery} $statusLabel
+             * @param {bool}   submittedLate
+             * @param {jQuery} $toast
+             */
+            function soboSuccess($participant, $button, $actionBar, $statusIcon, $statusLabel, submittedLate, $toast)
+            {
+                $toast.toastTimeout({text: 'Submission Acknowledged.', css: 'success'});
+                $button.fadeOut({done: function(){
+                    $actionBar.slideUp();
+                    $button.remove();
+                }});
+                $participant.attr('data-status', 'pending');
+                $actionBar.removeAttr('data-mass-submit');
+                $statusIcon.addClass('pending');
+                $statusLabel.html('Submitted {% if submittedLate %}late{% else %}on time{% endif %}');
+                $('#filters').find('[data-status="pending"]').prop('checked', true);
+            }
+
+            /**
+             * Handle a submission receipt failure
+             *
+             * @param {jQuery} $button
+             * @param {string} buttonText
+             * @param {jQuery} $toast
+             */
+            function soboFailure($button, buttonText, $toast)
+            {
+                $button.html(buttonText);
+                $button.removeAttr('disabled');
+                $toast.toastTimeout({text: 'Acknowledgment failed.', css: 'alert'});
+            }
         });
     </script>
 {% endif %}
