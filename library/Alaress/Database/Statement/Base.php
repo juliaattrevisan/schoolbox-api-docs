@@ -183,17 +183,17 @@ abstract Class Base implements IStatement
     }
 
     /**
-     * If we get a PDO exception running a query we don't want to terminate application
-     * execution, instead we store the error message/code on the statement and returns false
+     * If we get a PDO exception running a query we DO want to terminate application
+     * execution (or at least force something up the stack to handle this issue).
      *
      * @param PDOException $e
-     * @return bool
+     * @throws PDOException
      */
     protected function handleException($e)
     {
         $this->errorInfo = $e->getMessage();
         $this->errorCode = $e->getCode();
-        return false;
+        throw $e;
     }
 
     /**
