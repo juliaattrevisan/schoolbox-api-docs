@@ -42,6 +42,7 @@ class SubmissionMapper extends BaseMapper implements FindableCrocodoc
         $this->hasModel(Submission::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('submitted_by', UserMapper::class);
         $this->joins('owner', UserMapper::class);
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
