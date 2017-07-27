@@ -133,7 +133,7 @@ class Mapper extends BaseMapper
              * The plagscan mapper itself will still behave as expected.
              */
             if ($plagscan) {
-                $plagscan->setHtml(Plagscan\Mapper::INVALID_HTML_CONTENT);
+                $plagscan->setHtml(Plagscan\Mapper::INVALID_HTML_VALUE);
             }
 
             $submissionFile = $this->hydrate($row);

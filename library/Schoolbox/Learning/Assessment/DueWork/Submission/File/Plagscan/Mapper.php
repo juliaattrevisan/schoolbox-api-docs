@@ -27,7 +27,7 @@ class Mapper extends \Schoolbox\Mapper
      * from accidentally saving back to the database and losing the data.
      * @see SA-746 + SA-4174
      */
-    CONST INVALID_HTML_CONTENT = 'ERROR - THIS VALUE INDICATES THE REAL HTML HAS BEEN TEMPORARILY DISCARDED. DO NOT SAVE!!';
+    const INVALID_HTML_VALUE = 'ERROR: THIS VALUE INDICATES THE REAL HTML HAS BEEN TEMPORARILY DISCARDED. DO NOT SAVE';
 
     /**
      * An instance of the Plagscan Connector
@@ -77,7 +77,7 @@ class Mapper extends \Schoolbox\Mapper
     public function checkHtmlValue(Model $model)
     {
         // By convention we would just return false, but given the risk of data loss we'll throw an Exception to be sure
-        if (self::INVALID_HTML_CONTENT === $model->getHtml()) {
+        if (self::INVALID_HTML_VALUE === $model->getHtml()) {
             throw new \DomainException('Unable to save - Plagscan HTML content is missing!');
         }
         return true;
