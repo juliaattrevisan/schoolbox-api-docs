@@ -162,18 +162,8 @@ class UserMapper extends Mapper
     {
         /** @var User $model */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            $schoolboxFactory = new SchoolboxDatabaseFactory(new AlaressDatabaseFactory());
-            $databaseExternal = $schoolboxFactory->getExternalDatabase($this->getConfigLoader());
-
-            $externalFactory = new ExternalConnectorFactory();
-
             /** @var ICommunityPortal $communityPortal */
-            $communityPortal = $externalFactory->build(
-                $this->getConfigLoader(),
-                $databaseExternal,
-                ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
-            );
-
+            $communityPortal = self::$di->get('externalCommunityPortal');
             try {
                 $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
             } catch (\UnexpectedValueException $e) {
