@@ -7,15 +7,15 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 use EOTC\Authenticator;
 use EOTC\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\User;
 
 new Authenticator($this);
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 if ($sessionUser->isSuperuser()) {
@@ -38,5 +38,5 @@ if ($sessionUser->isSuperuser()) {
 	]);
 }
 else {
-	error(19);
+	error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
