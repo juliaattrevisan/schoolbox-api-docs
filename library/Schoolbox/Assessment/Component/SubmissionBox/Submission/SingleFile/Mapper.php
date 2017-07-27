@@ -14,8 +14,7 @@ use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\File\Mimetype as Mimetype;
 use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFile;
 
 /**
@@ -42,7 +41,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joinsReverseSingle('student_submission_file_id', PlagscanMapper::class, 'plagscan', 'plagscan');
+        $this->joinsReverseSingle('student_submission_file_id', Plagscan\Mapper::class, 'plagscan', 'plagscan');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restorePlagScan'));
@@ -125,8 +124,15 @@ class Mapper extends BaseMapper
             $storage = $this->hydrateJoin($row, 'storage', 'f');
             $storage->setMimetype($mimetype);
 
-            /** @var Plagscan $plagscan */
+            /** @var Plagscan\Model $plagscan */
             $plagscan = $this->hydrateJoin($row, 'plagscan', 'ps');
+
+            /* TODO - WARNING!! Intentionally throwing away data to avoid Out-Of-Mem errors
+             * @see SA-746 + SA-4174
+             * For now, if loading a plagscan via a JOIN we discard the HTML content
+             * The plagscan mapper itself will still behave as expected.
+             */
+            $plagscan->setHtml(Plagscan\Mapper::INVALID_HTML_CONTENT);
 
             $submissionFile = $this->hydrate($row);
             $submissionFile
