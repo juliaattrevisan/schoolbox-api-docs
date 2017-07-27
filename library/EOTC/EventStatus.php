@@ -16,7 +16,7 @@ class EventStatus
     private $id;
 
     /**
-     * @var int
+     * @var string
      */
     private $name;
 
