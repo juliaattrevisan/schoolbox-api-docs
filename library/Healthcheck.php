@@ -361,7 +361,8 @@ class Healthcheck
             'TimetableSubstitutes',
             'wkAttendances',
             'AttendanceMaster',
-            'tAttendances'
+            'tAttendances',
+            'IndividualPlans',
         ];
 
         // Pastoral Care Tables (Only If Module Enabled)
