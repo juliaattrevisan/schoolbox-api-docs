@@ -50,66 +50,62 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>{EVENT_TITLE}</h1>
+        <ul class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <h1>{EVENT_TITLE}</h1>
+                    <ul class="meta">
+                        <li class="icon-calendar">
+                            {EVENT_START} &ndash; {EVENT_END}
+                        </li>
+
+                        <!-- BEGIN recurring_reminder -->
+                        <li class="icon-calendar">
+                            Recurring {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+                        </li>
+                        <!-- END recurring_reminder -->
+
+                        <li class="icon-home">
+                            <strong>Related Campuses:</strong>
+                            <!-- BEGIN event_campus -->
+                            {EVENT_CAMPUS_NAME}
+                            <!-- END event_campus -->
+                        </li>
+
+                        <li class="icon-teacher">
+                            <strong>Teacher in Charge:</strong>
+                            <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
+                                {EVENT_TEACHER_IN_CHARGE_NAME}
+                            </a>
+                        </li>
+
+                        <li class="icon-location">
+                            <strong>Location:</strong> {EVENT_LOCATION}
+                        </li>
+
+                        <li class="icon-staff-students">
+                            <strong>Created by:</strong>
+                            <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
+                            on {EVENT_CREATED_AT}
+                        </li>
+                    </ul>
+                </div>
+                <nav>
+                    <!-- BEGIN has_modify_event -->
+                    <a href="/modules/eotc/manage/modify?eventID={EVENT_ID}" class="icon-modify" title="Modify Event"></a>
+                    <!-- END has_modify_event -->
+                    <a href="/calendar/full/{EVENT_DATESTAMP}/{EVENT_AUTHOR_ID}" class="icon-calendar" title="View In Calendar"></a>
+                </nav>
+            </li>
+        </ul>
     </div>
 </div>
 
+
 <div class="row">
     <div class="small-12 large-8 island">
-        <div class="actions-small-2 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">Event Details</h2>
-                </div>
-            </div>
-            <nav>
-                <!-- BEGIN has_modify_event -->
-                <a href="/modules/eotc/manage/modify?eventID={EVENT_ID}" class="icon-modify" title="Modify Event"></a>
-                <!-- END has_modify_event -->
-                <a href="/calendar/full/{EVENT_DATESTAMP}/{EVENT_AUTHOR_ID}" class="icon-calendar" title="View In Calendar"></a>
-            </nav>
-        </div>
-
         <section class="content">
-            <ul class="meta">
-                <li class="icon-calendar">
-                    {EVENT_START} &ndash; {EVENT_END}
-                </li>
-
-                <!-- BEGIN recurring_reminder -->
-                <li class="icon-calendar">
-                    Recurring {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
-                </li>
-                <!-- END recurring_reminder -->
-
-                <li class="icon-home">
-                    <strong>Related Campuses:</strong>
-                    <!-- BEGIN event_campus -->
-                    {EVENT_CAMPUS_NAME}
-                    <!-- END event_campus -->
-                </li>
-
-                <li class="icon-teacher">
-                    <strong>Teacher in Charge:</strong>
-                    <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
-                        {EVENT_TEACHER_IN_CHARGE_NAME}
-                    </a>
-                </li>
-
-                <li class="icon-location">
-                    <strong>Location:</strong> {EVENT_LOCATION}
-                </li>
-
-                <li class="icon-staff-students">
-                    <strong>Created by:</strong>
-                    <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
-                    on {EVENT_CREATED_AT}
-                </li>
-            </ul>
-
-            <div>
-                {EVENT_DETAIL}
-            </div>
+            {EVENT_DETAIL}
         </section>
     </div>
 
@@ -132,6 +128,13 @@
             </ul>
         </section>
         <!-- END has_rams -->
+
+        <!-- BEGIN no_rams -->
+        <div class="empty-state">
+            <i class="icon-document"></i>
+            <p>There are no {TPL_LOCAL_EOTCRAMSABBREVIATION} files.</p>
+        </div>
+        <!-- END no_rams -->
     </div>
 </div>
 
@@ -149,18 +152,13 @@
             </nav>
         </div>
 
-        <section class="">
+        <section>
             <ul class="information-list">
                 <li class="content">
-                    Staff:
-                    <!-- BEGIN event_staff -->
-                    <a href="/search/user/{EVENT_STAFF_ID}">{EVENT_STAFF_NAME}</a>
-                    <!-- END event_staff -->
+                    Staff: {EVENT_STAFF_COUNT}
                 </li>
                 <li class="content">
                     Students: {EVENT_STUDENT_COUNT}
-                    <!-- BEGIN event_student -->
-                    <!-- END event_student -->
                 </li>
             </ul>
         </section>

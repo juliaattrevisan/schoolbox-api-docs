@@ -7,34 +7,43 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+use EOTC\Authenticator;
+use EOTC\EventPermission;
+use EOTC\EventPermissionMapper;
+use EOTC\EventStatus;
+use EOTC\EventStatusMapper;
+use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 $page = new SitePage();
 
-new \EOTC\Authenticator($page);
+new Authenticator($page);
 
-/** @var \Schoolbox\User $sessionUser */
+/** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
 if (!$sessionUser->isSuperuser()) {
-	error(19);
+	error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 try {
-	/** @var \Schoolbox\User $user */
-	$userMapper = \Schoolbox\UserMapper::getInstance();
-	$user = $userMapper->findById($_POST['staff']);
+	/** @var User $user */
+	$user = UserMapper::getInstance()->findById($_POST['staff']);
 }
-catch (\Schoolbox\Mapper\Exception $e) {
-	error(31);
+catch (MapperException $e) {
+	error(ErrorMapper::ERROR_USER_NOT_FOUND);
 }
 
 /* Delete all perms for this user, and re-add new ones
  */
-$permissionMapper = \EOTC\EventPermissionMapper::getInstance();
+$permissionMapper = EventPermissionMapper::getInstance();
 $permissionMapper->deleteForUser($user);
 
 if (is_array($_POST['campus']) && count($_POST['campus'])) {
@@ -43,17 +52,30 @@ if (is_array($_POST['campus']) && count($_POST['campus'])) {
 		/* Apply the same perms for each campus
 		 */
 		if (is_array($_POST['status']) && count($_POST['status'])) {
-			foreach ($_POST['status'] as $currentStatus => $settings) {
-				$permission = new \EOTC\EventPermission();
-				$permission->setUserId($user->getId());
-				$permission->setCampusId($currentCampus);
-				$permission->setStatusId($currentStatus);
-				$permission->setAllowed($settings['allowed']);
-				$permission->setSubscribed($settings['subscribed']);
-				$permission->setCreatedAt($_SERVER['REQUEST_TIME']);
-				$permission->setUpdatedAt($_SERVER['REQUEST_TIME']);
+            foreach ($_POST['status'] as $currentStatus => $settings) {
+                try {
+                    /** @var Campus $campus */
+                    $campus = CampusMapper::getInstance()->findById($currentCampus);
 
-				$permissionMapper->save($permission);
+                    /** @var EventStatus $status */
+                    $status = EventStatusMapper::getInstance()->findById($currentStatus);
+
+                    /** @var EventPermission $permission */
+                    $permission = EventPermissionMapper::getInstance()->createModel();
+                    $permission->setUser($user);
+                    $permission->setCampus($campus);
+                    $permission->setStatus($status);
+                    $permission->setAllowed($settings['allowed']);
+                    $permission->setSubscribed($settings['subscribed']);
+
+                    $permissionMapper->save($permission);
+                }
+                catch (MapperException $e) {
+
+                    /* noop
+                     * could not save at least one permission due to missing campus and/or status
+                     */
+                }
 			}
 		}
 	}

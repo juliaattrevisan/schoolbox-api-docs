@@ -17,32 +17,30 @@ use Schoolbox\Campus;
 class EventPermission {
 
 	/**
-	 * Identifier
-	 *
 	 * @var int
 	 */
-	private $id = null;
+	private $id;
 
 	/**
 	 * The user to whom this permissions/subscriptions applies
 	 *
-	 * @var int
+	 * @var User
 	 */
-	private $userId = -1;
+	private $user;
 
 	/**
 	 * The campus to which this permissions/subscriptions applies
 	 *
 	 * @var Campus
 	 */
-	private $campusId = -1;
+	private $campus;
 
 	/**
 	 * The status to which this permissions/subscriptions applies
 	 *
-	 * @var int
+	 * @var EventStatus
 	 */
-	private $statusId = -1;
+	private $status;
 
     /**
      * Is this user allowed to edit EOTC events in this status for this campus?
@@ -60,22 +58,16 @@ class EventPermission {
     protected $subscribed = false;
 
 	/**
-	 * When was this created?
-	 *
 	 * @var Alaress_Date_Format
 	 */
 	private $createdAt = null;
 
 	/**
-	 * When was this updated
-	 *
 	 * @var Alaress_Date_Format
 	 */
 	private $updatedAt = null;
 
 	/**
-	 * When was this deleted?
-	 *
 	 * @var Alaress_Date_Format
 	 */
 	private $deletedAt = null;
@@ -90,35 +82,31 @@ class EventPermission {
 	 */
 
 	/**
-	 * Set campus id
-	 *
-	 * @param Campus $campusId
+	 * @param Campus $campus
+     * @return self $this
 	 */
-	public function setCampusId($campusId) {
-		$this->campusId = $campusId;
+	public function setCampus($campus) {
+		$this->campus = $campus;
+        return $this;
 	}
 
 	/**
-	 * Get campus id
-	 *
 	 * @return Campus
 	 */
-	public function getCampusId() {
-		return $this->campusId;
+	public function getCampus() {
+		return $this->campus;
 	}
 
 	/**
-	 * Set id
-	 *
 	 * @param int $id
+     * @return self $this
 	 */
 	public function setId($id) {
 		$this->id = $id;
+		return $this;
 	}
 
 	/**
-	 * Get id
-	 *
 	 * @return int
 	 */
 	public function getId() {
@@ -126,53 +114,47 @@ class EventPermission {
 	}
 
 	/**
-	 * Set status id
-	 *
-	 * @param int $statusId
+	 * @param EventStatus $status
+     * @return self $this
 	 */
-	public function setStatusId($statusId) {
-		$this->statusId = $statusId;
+	public function setStatus($status) {
+		$this->status = $status;
+		return $this;
 	}
 
 	/**
-	 * Get status id
-	 *
-	 * @return int
+	 * @return EventStatus
 	 */
-	public function getStatusId() {
-		return $this->statusId;
+	public function getStatus() {
+		return $this->status;
 	}
 
 	/**
-	 * Set user id
-	 *
-	 * @param int $userId
+	 * @param User
+     * @return self $this
 	 */
-	public function setUserId($userId) {
-		$this->userId = $userId;
+	public function setUser($user) {
+		$this->user = $user;
+		return $this;
 	}
 
 	/**
-	 * Get user id
-	 *
-	 * @return int
+	 * @return User
 	 */
-	public function getUserId() {
-		return $this->userId;
+	public function getUser() {
+		return $this->user;
 	}
 
 	/**
-	 * Set created at
-	 *
 	 * @param Alaress_Date_Format $createdAt
+     * @return self $this
 	 */
 	public function setCreatedAt($createdAt) {
 		$this->createdAt = $createdAt;
+		return $this;
 	}
 
 	/**
-	 * Get created at
-	 *
 	 * @return Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
@@ -180,17 +162,15 @@ class EventPermission {
 	}
 
 	/**
-	 * Set deleted at
-	 *
 	 * @param Alaress_Date_Format $deletedAt
+     * @return self $this
 	 */
 	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
+		return $this;
 	}
 
 	/**
-	 * Get deleted at
-	 *
 	 * @return Alaress_Date_Format
 	 */
 	public function getDeletedAt() {
@@ -198,17 +178,15 @@ class EventPermission {
 	}
 
 	/**
-	 * Set updated at
-	 *
 	 * @param Alaress_Date_Format $updatedAt
+     * @return self $this
 	 */
 	public function setUpdatedAt($updatedAt) {
 		$this->updatedAt = $updatedAt;
+		return $this;
 	}
 
 	/**
-	 * Get updated at
-	 *
 	 * @return Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
@@ -225,7 +203,6 @@ class EventPermission {
 
     /**
      * @param  boolean $allowed
-     *
      * @return $this
      */
     public function setAllowed($allowed)
@@ -244,7 +221,6 @@ class EventPermission {
 
     /**
      * @param  boolean $subscribed
-     *
      * @return $this
      */
     public function setSubscribed($subscribed)

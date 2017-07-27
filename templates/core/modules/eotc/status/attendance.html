@@ -21,6 +21,41 @@
 
 <div class="row">
     <div class="small-12 island">
+        <h2 class="subheader">Staff Attendees</h2>
+        <!-- BEGIN has_staff_attendees -->
+        <section>
+            <ul class="information-list">
+                <!-- BEGIN staff_attendee -->
+                <li>
+                    <div class="small-12 card">
+                        <a href="/search/user/{STAFF_ATTENDEE_ID}" title="{STAFF_ATTENDEE_FIRSTNAME} {STAFF_ATTENDEE_LASTNAME}">
+                            <img src="/portrait.php?userId={STAFF_ATTENDEE_EXTERNAL_ID}&size=square64" />
+                            <p>{STAFF_ATTENDEE_FIRSTNAME} {STAFF_ATTENDEE_LASTNAME}</p>
+                        </a>
+                        <p class="meta">{STAFF_ATTENDEE_ROLE_NAME}</p>
+                        <p class="meta">External ID: {STAFF_ATTENDEE_ID}</p>
+                    </div>
+                </li>
+                <!-- END staff_attendee -->
+            </ul>
+        </section>
+        <!-- END has_staff_attendees -->
+
+        <!-- BEGIN no_staff_attendees -->
+        <div class="empty-state">
+            <i class="icon-staff-students"></i>
+            <p>
+                There are no staff attendees.
+            </p>
+        </div>
+        <!-- END no_staff_attendees -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Student Attendees</h2>
+        <!-- BEGIN has_student_attendees -->
         <section>
             <ul class="information-list">
                 <!-- BEGIN student_attendee -->
@@ -30,12 +65,23 @@
                             <img src="/portrait.php?userId={STUDENT_ATTENDEE_EXTERNAL_ID}&size=square64" />
                             <p>{STUDENT_ATTENDEE_FIRSTNAME} {STUDENT_ATTENDEE_LASTNAME}</p>
                         </a>
-                        <p class="meta">{STUDENT_ATTENDEE_ID}</p>
                         <p class="meta">{STUDENT_ATTENDEE_ROLE_NAME}</p>
+                        <p class="meta">External ID: {STUDENT_ATTENDEE_ID}</p>
                     </div>
                 </li>
                 <!-- END student_attendee -->
             </ul>
         </section>
+        <!-- END has_student_attendees -->
+
+        <!-- BEGIN no_student_attendees -->
+        <div class="empty-state">
+            <i class="icon-staff-students"></i>
+            <p>
+                There are no student attendees.
+            </p>
+        </div>
+        <!-- END no_student_attendees -->
     </div>
 </div>
+

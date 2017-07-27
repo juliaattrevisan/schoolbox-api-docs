@@ -2,111 +2,69 @@
 /**
  * EventPermissionMapper
  *
+ * Persist Event Permission models to the db
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace EOTC;
 
+use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
-class EventPermissionMapper extends \Schoolbox\Mapper {
+class EventPermissionMapper extends BaseMapper
+{
 
-	/**
-	 * Mapping
-	 */
-	public function mapping() {
-		$this->hasTable('eotc_permission');
-		$this->hasModel(EventPermission::class);
-		$this->hasMap(array(
-			'column' => 'id',
-			'property' => 'id',
-			'type' => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column' => 'user_id',
-			'property' => 'userId',
-			'type' => self::TYPE_INTEGER,
-			'join' => 'user',
-		));
-		$this->hasMap(array(
-			'column' => 'campus_id',
-			'property' => 'campusId',
-			'type' => self::TYPE_MODEL,
-			'join' => 'campus',
-		));
-		$this->hasMap(array(
-			'column' => 'status_id',
-			'property' => 'statusId',
-			'type' => self::TYPE_INTEGER,
-		));
-        $this->hasMap(array(
-            'column' => 'is_allowed',
-            'property' => 'allowed',
-            'type' => self::TYPE_BOOLEAN,
-        ));
-        $this->hasMap(array(
-            'column' => 'is_subscribed',
-            'property' => 'subscribed',
-            'type' => self::TYPE_BOOLEAN,
-        ));
-		$this->hasMap(array(
-			'column'   => 'created_at',
-			'property' => 'createdAt',
-			'type'     => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'   => 'updated_at',
-			'property' => 'updatedAt',
-			'type'     => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'   => 'deleted_at',
-			'property' => 'deletedAt',
-			'type'     => self::TYPE_DATETIME,
-		));
-		$this->hasJoin('user', array(
-			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'user_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('campus', array(
-			'mapper'    => '\\Schoolbox\\CampusMapper',
-			'this_key'  => 'campus_id',
-			'other_key' => 'id',
-		));
-		$this->hasJoin('status', array(
-			'mapper'    => '\\EOTC\\EventStatusMapper',
-			'this_key'  => 'status_id',
-			'other_key' => 'id',
-		));
-	}
+    /**
+     * Mapping
+     */
+    public function mapping()
+    {
+        $this->hasTable('eotc_permission');
+        $this->hasModel(EventPermission::class);
 
-	/**
-	 * Delete all the permissions for a user
-	 *
-	 * @param \Schoolbox\User $user
-	 */
-	public function deleteForUser(\Schoolbox\User $user) {
-		$query = "
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('is_allowed', self::TYPE_BOOLEAN, null, 'allowed');
+        $this->uses('is_subscribed', self::TYPE_BOOLEAN, null, 'subscribed');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
+        $this->uses('deleted_at', self::TYPE_DATETIME, null, 'deletedAt');
+
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->joins('campus_id', CampusMapper::class, 'id', null, null, 'campus', 'campus');
+        $this->joins('status_id', EventStatusMapper::class, 'id', null, null, 'status', 'status');
+    }
+
+    /**
+     * Delete all the permissions for a user
+     *
+     * @param User $user
+     */
+    public function deleteForUser(User $user)
+    {
+        $query = "
 			DELETE FROM `{$this->table}`
 			WHERE user_id = :userId
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([ 'userId' => $user->getId() ]);
-	}
+        $statement = $this->database->prepare($query);
+        $statement->execute(['userId' => $user->getId()]);
+    }
 
-	/**
-	 * A unique list of user ids with permissions,
-	 * ordered by surname
-	 *
-	 * @return array
-	 */
-	public function findUserIds() {
-		$query = "
+    /**
+     * A unique list of user ids with permissions,
+     * ordered by surname
+     *
+     * @return array
+     */
+    public function findUserIds()
+    {
+        $query = "
 			SELECT `user_id`
 			FROM `{$this->table}` p
 			LEFT JOIN user ON p.user_id = user.id
@@ -114,26 +72,27 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 			ORDER BY lastname
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute();
+        $statement = $this->database->prepare($query);
+        $statement->execute();
 
-		$userIds = array();
+        $userIds = array();
 
-		foreach ($statement as $row) {
-			$userIds[] = $row['user_id'];
-		}
+        foreach ($statement as $row) {
+            $userIds[] = $row['user_id'];
+        }
 
-		return $userIds;
-	}
+        return $userIds;
+    }
 
-	/**
-	 * Find all the permissions for a particular user
-	 *
-	 * @param \Schoolbox\User
-	 * @return \Schoolbox\Collection|EventPermission[]
-	 */
-	public function findByUser(\Schoolbox\User $user) {
-		$query = "
+    /**
+     * Find all the permissions for a particular user
+     *
+     * @param User $user
+     * @return Collection|EventPermission[]
+     */
+    public function findByUser(User $user)
+    {
+        $query = "
 			SELECT
 				{$this->getColumnString('p')},
 				{$this->getJoinColumnString('campus', 'c')},
@@ -146,18 +105,19 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 			ORDER BY p.campus_id, p.status_id
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([ "userId" => $user->getId() ]);
-		return $this->hydrateWithCampusAndStatus($statement);
-	}
+        $statement = $this->database->prepare($query);
+        $statement->execute(["userId" => $user->getId()]);
+        return $this->hydrateWithCampusAndStatus($statement);
+    }
 
     /**
      * Find all the subscriptions for a particular user.
      *
-     * @param \Schoolbox\User $user
-     * @return \Schoolbox\Collection|EventPermission[]
+     * @param User $user
+     * @return Collection|EventPermission[]
      */
-    public function findSubscriptionsByUser(\Schoolbox\User $user) {
+    public function findSubscriptionsByUser(User $user)
+    {
         $query = "
 			SELECT
 				{$this->getColumnString('p')},
@@ -172,7 +132,7 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->execute([ "userId" => $user->getId() ]);
+        $statement->execute(["userId" => $user->getId()]);
         return $this->hydrateWithCampusAndStatus($statement);
     }
 
@@ -181,19 +141,19 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
      * with attached campus and status.
      *
      * @param \Traversable $statement
-     * @return \Schoolbox\Collection|EventPermission[]
+     * @return Collection|EventPermission[]
      */
     protected function hydrateWithCampusAndStatus($statement)
     {
-        $allPermissions = new \Schoolbox\Collection();
+        $allPermissions = new Collection();
         foreach ($statement as $row) {
             $permissionItem = $this->hydrate($row, 'p');
 
             $campusItem = $this->hydrateJoin($row, 'campus', 'c');
-            $permissionItem->setCampusId($campusItem);
+            $permissionItem->setCampus($campusItem);
 
             $statusItem = $this->hydrateJoin($row, 'status', 's');
-            $permissionItem->setStatusId($statusItem);
+            $permissionItem->setStatus($statusItem);
 
             $allPermissions->add($permissionItem);
         }
