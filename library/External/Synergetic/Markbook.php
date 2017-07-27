@@ -328,6 +328,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
     /**
      * @inheritdoc
+     *
+     * @param ReturnedWork|QuizAttempt $returnedWork
+     * @return bool
      */
     public function setMark($result)
     {

@@ -6,6 +6,8 @@
  */
 
 use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 
 class External_Markbook implements External_MarkbookInterface
 {
@@ -68,6 +70,9 @@ class External_Markbook implements External_MarkbookInterface
     }
 
     /**
+     * @param ReturnedWork|QuizAttempt $returnedWork
+     * @return bool
+     *
      * @inheritdoc
      */
     public function setMark($returnedWork)

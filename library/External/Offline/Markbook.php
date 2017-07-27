@@ -11,7 +11,9 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-use \Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 
 class External_Offline_Markbook implements External_MarkbookInterface
 {
@@ -57,6 +59,9 @@ class External_Offline_Markbook implements External_MarkbookInterface
 
     /**
      * @inheritdoc
+     *
+     * @param ReturnedWork|QuizAttempt $returnedWork
+     * @return bool
      */
     public function setMark($returnedWork)
     {
