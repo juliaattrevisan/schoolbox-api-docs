@@ -1,54 +1,52 @@
 <?php
 /**
  * Provides the offline version of the MarkbookInterface
- * This is used by all connectors if it is not implemented.  The purpose is just to do nothing, because we have no
+ *
+ * This is used by all connectors if it is not implemented. The purpose is just to do nothing, because we have no
  * markbook to integrate with.
+ *
  * At the time of writing this is only implemented for Synergetic so this version will be used for all other systems
  *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-use \Schoolbox\Assessment\Activity;
-use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 
 class External_Offline_Markbook implements External_MarkbookInterface
 {
     /**
-     * Returns the assessment information if found in remote system
-     *
-     * @param Activity $assessment
-     * @return array
+     * @inheritdoc
      */
     public function getAssessment(Activity $assessment)
     {
-        // NOOP
-        return array();
+        return [];
     }
 
     /**
-     * Creates a new assessment item in the markbook
-     *
-     * @param Activity $assessment
-     * @return array
+     * @inheritdoc
+     */
+    public function hasAssessment(Activity $assessment)
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function createAssessment(Activity $assessment)
     {
-        // NOOP
-        return array();
+        return [];
     }
 
     /**
-     * Updates an existing markbook assessment
-     *
-     * @param Activity $assessment
-     * @return array
+     * @inheritdoc
      */
     public function updateAssessment(Activity $assessment)
     {
-        // NOOP
-        return array();
+        return [];
     }
 
     /**
@@ -56,20 +54,17 @@ class External_Offline_Markbook implements External_MarkbookInterface
      */
     public function deleteAssessment(Activity $assessment)
     {
-        // NOOP
         return false;
     }
 
     /**
-     * Creates or updates the mark for a student in the remote markbook
+     * @inheritdoc
      *
      * @param ReturnedWork|QuizAttempt $returnedWork
      * @return bool
      */
     public function setMark($returnedWork)
     {
-        // NOOP
         return false;
     }
-
-} 
+}

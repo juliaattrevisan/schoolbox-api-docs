@@ -4,12 +4,12 @@
  *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 
-use \Schoolbox\Assessment\Activity;
-use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
-
 
 interface External_MarkbookInterface
 {
@@ -21,6 +21,14 @@ interface External_MarkbookInterface
      * @return array
      */
     public function getAssessment(Activity $assessment);
+
+    /**
+     * Indicates if assessment exists
+     *
+     * @param Activity $assessment
+     * @return bool
+     */
+    public function hasAssessment(Activity $assessment);
 
     /**
      * Creates a new assessment item in the markbook
@@ -55,5 +63,4 @@ interface External_MarkbookInterface
     public function setMark($returnedWork);
 
 }
-
 

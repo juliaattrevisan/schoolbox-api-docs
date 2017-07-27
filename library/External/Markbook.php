@@ -1,44 +1,36 @@
 <?php
 /**
- *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 
-use \Schoolbox\Assessment\Activity;
-use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 
 class External_Markbook implements External_MarkbookInterface
 {
-    /**
-     * @var External_MarkbookInterface
-     */
+    /** @var External_MarkbookInterface */
     private $database;
 
-    /**
-     * @var External_Offline_Markbook
-     */
+    /** @var External_Offline_Markbook */
     private $offline;
 
     /**
      * Constructor
      *
-     * @throws Exception
      * @param String $databaseName
      */
-    public function __construct($databaseName = '') {
+    public function __construct($databaseName = '')
+    {
         $factory = new External_DatabaseFactory();
         $this->setDatabase($factory->buildMarkbookConnector($databaseName));
         $this->setOffline(new External_Offline_Markbook());
-
     }
 
     /**
-     * Returns the assessment information if found in remote system
-     *
-     * @param Activity $assessment
-     * @return array
+     * @inheritdoc
      */
     public function getAssessment(Activity $assessment)
     {
@@ -46,10 +38,15 @@ class External_Markbook implements External_MarkbookInterface
     }
 
     /**
-     * Creates a new assessment item in the markbook
-     *
-     * @param Activity $assessment
-     * @return mixed
+     * @inheritdoc
+     */
+    public function hasAssessment(Activity $assessment)
+    {
+        return $this->getDatabase()->hasAssessment($assessment);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function createAssessment(Activity $assessment)
     {
@@ -57,10 +54,7 @@ class External_Markbook implements External_MarkbookInterface
     }
 
     /**
-     * Updates an existing markbook assessment
-     *
-     * @param Activity $assessment
-     * @return mixed
+     * @inheritdoc
      */
     public function updateAssessment(Activity $assessment)
     {
@@ -76,12 +70,12 @@ class External_Markbook implements External_MarkbookInterface
     }
 
     /**
-     * Creates or updates the mark for a student in the remote markbook
-     *
      * @param ReturnedWork|QuizAttempt $returnedWork
      * @return bool
+     *
+     * @inheritdoc
      */
-    public function setMark( $returnedWork)
+    public function setMark($returnedWork)
     {
         return $this->getDatabase()->setMark($returnedWork);
     }
@@ -112,10 +106,11 @@ class External_Markbook implements External_MarkbookInterface
 
     /**
      * @param External_Offline_Markbook $offline
+     * @return $this
      */
-    public function setOffline(External_Offline_Markbook $offline)
+    public function setOffline($offline)
     {
         $this->offline = $offline;
+        return $this;
     }
-
 }
