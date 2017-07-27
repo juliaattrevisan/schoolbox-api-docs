@@ -26,7 +26,18 @@ class CommunityPortal implements ICommunityPortal
     /** @var string $initializationVector The hard-coded IV for the password. This does not need to be secret. */
     private $initializationVector;
 
-    /** @var bool $allowCreateUser */
+    /**
+     * Can community portal passwords be updated?
+     *
+     * @var bool
+     */
+    private $allowUpdate;
+
+    /**
+     * Can new community portal users be created?
+     *
+     * @var bool
+     */
     private $allowCreateUser;
 
     /**
@@ -34,7 +45,8 @@ class CommunityPortal implements ICommunityPortal
      */
     public function __construct($config, $databaseExternal)
     {
-        $this->allowCreateUser = $config['synergetic_portal_create_account'];
+        $this->allowUpdate = (bool)$config['synergetic_password_reset'];
+        $this->allowCreateUser = (bool)$config['synergetic_portal_create_account'];
         $this->databaseExternal = $databaseExternal;
     }
 
@@ -57,6 +69,11 @@ class CommunityPortal implements ICommunityPortal
      */
     public function changePassword($communityId, $newPassword)
     {
+        // Not setting passwords? just return false
+        if ($this->allowUpdate) {
+            return false;
+        }
+
         $encryptedPassword = $this->encryptPassword($newPassword);
 
         // Check to see if they have an existing record in the 'CommunityLogins' table
