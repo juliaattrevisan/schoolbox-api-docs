@@ -3,7 +3,8 @@
  * Synergetic Markbook Connector
  *
  * TODO: Using HdgAbbrev2 is stupid- this can be modified by users in Synergetic.
- * TODO: This should be modified to use MarkBookSeq/StaffAssessmentMarkbookSeq/StudentAssessmentMarkbookSeq which is immutable.
+ * TODO: This should be modified to use MarkBookSeq/StaffAssessmentMarkbookSeq/StudentAssessmentMarkbookSeq
+ *       (which is immutable).
  *
  * @stolenfrom  James Leckie <jleckie@alaress.com.au>
  * @author      Damian Sloane <dsloane@alaress.com.au>
@@ -33,7 +34,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /** @var External_User */
     private $externalUser;
 
-    // These prefixes are prefixed on the "markbook abbeviated heading 2" to signify which table the ID which follows it relate to
+    // These prefixes are prefixed on the "markbook abbeviated heading 2"
+    // to signify which table the ID which follows it relate to
 
     const ASSESSMENT_PREFIX = 'Q-';
     const SUBMISSION_PREFIX = 'W-';
@@ -380,7 +382,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $activity->setOwner($student);
 
-        if (!($this->isExternalIdValid($student->getExternalId()) && $this->isExternalIdValid($marker->getExternalId()))) {
+        if (!(
+            $this->isExternalIdValid($student->getExternalId())
+            && $this->isExternalIdValid($marker->getExternalId())
+        )) {
             return false;
         }
 

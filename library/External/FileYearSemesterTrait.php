@@ -2,8 +2,10 @@
 /**
  * A FileYear/FileSemester trait for Synergetic external classes
  *
- * These are Synergetic specific constructs- as such when using the the external XXXX class it will be necessary to test which external
- * connector is in use and instantiate External_Synergetic_XXXX directly instead of the generic External_XXXX class
+ * These are Synergetic specific constructs; as such when using the the
+ * external XXXX class it will be necessary to test which external connector is
+ * in use and instantiate External_Synergetic_XXXX directly instead of the
+ * generic External_XXXX class.
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
