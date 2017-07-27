@@ -132,7 +132,9 @@ class Mapper extends BaseMapper
              * For now, if loading a plagscan via a JOIN we discard the HTML content
              * The plagscan mapper itself will still behave as expected.
              */
-            $plagscan->setHtml(Plagscan\Mapper::INVALID_HTML_CONTENT);
+            if ($plagscan) {
+                $plagscan->setHtml(Plagscan\Mapper::INVALID_HTML_CONTENT);
+            }
 
             $submissionFile = $this->hydrate($row);
             $submissionFile
