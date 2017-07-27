@@ -3,7 +3,6 @@ Data:
     breadcrumbs:    Collection|string[][]
     assessment:     DueWork/Model
     student:        User
-    participant:    Participant                  For route auth lookup
     attachzone:     mixed[]
     response:       null|DueWork\Response\Model  NULL if not a draft
     editorContents: string                       WYSIWYG content
@@ -83,12 +82,7 @@ Data:
 
             $.ajax({
                 type: "POST",
-                url: '{{ routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
-                    assessmentId: assessment.id,
-                    assessment:   assessment,
-                    studentId:    student.id,
-                    participant:  participant
-                }) }}',
+                url: '{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id}) }}',
                 data: formContents,
                 always: function () {
                     // Re-init the autosave
@@ -120,17 +114,15 @@ Data:
             });
         };
 
-        {% if not assessment.acceptNone %}
-            /* Spawn editors
-             */
-            $.fn.alaressEditor({
-                targetElements: $('textarea[name=body]'),
-                start: function (element) {
-                    initAutosave(element);
-                    autosavePresubmit(element);
-                }
-            });
-        {% endif %}
+        /* Spawn editors
+         */
+        $.fn.alaressEditor({
+            targetElements: $('textarea[name=body]'),
+            start: function (element) {
+                initAutosave(element);
+                autosavePresubmit(element);
+            }
+        });
 
         var emptyDialog = $('#empty-dialog');
         emptyDialog.on('click', '[data-interaction="close"]', function (e) {
@@ -141,20 +133,13 @@ Data:
         var dialog = $('#confirm-dialog');
 
         $("[data-action-save]").click(function (e) {
-            var form   = $(this).closest('form'),
-                submit = form.find(':submit');
+            var form      = $(this).closest('form'),
+                submit    = form.find(':submit'),
+                inlineLen = CKEDITOR.instances['editor-body'].getData().length,
+                filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
 
-            {% if assessment.acceptNone %}
-                {# Is the teacher merely acknowledging receipt of offline submission ? #}
-                var ackSubmission = true;
-            {% else %}
-                {# Or is this a normal submission with WYSIWYG and file attach zone ? #}
-                var inlineLen = CKEDITOR.instances['editor-body'].getData().length,
-                    filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
-            {% endif %}
-
-            if (!ackSubmission && !inlineLen && !filesLen) {
-                // If not merely acknowledging offline receipt, prevent submission without SOMETHING to submit
+            if ({% if student.id != USER.id %}false &&{% endif %} !inlineLen && !filesLen) {
+                // If not a SOBO, prevent submission without SOMETHING to submit
                 e.preventDefault();
                 emptyDialog.foundation('reveal', 'open');
             }
@@ -210,8 +195,6 @@ Data:
             {{ assessment.description|purify }}
         </section>
         {% endif %}
-
-        {% if not assessment.acceptNone %}
         <h2 class="subheader">Submit Response</h2>
         <div class="row">
             <div class="small-12 columns">
@@ -221,40 +204,27 @@ Data:
                 </div>
             </div>
         </div>
-        {% endif %}
-
         <div class="row">
             <div class="small-12 island">
                 {% set formRoute = routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) %}
                 <form id="editor-form" method="post" action="{{ formRoute }}" enctype="multipart/form-data">
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
-                    {% if not assessment.acceptNone %}
-                        <section class="content">
-                            <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                        </section>
-                        <input type="submit" value="Submit for Assessment {% if USER.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
-                    {% else %}
-                        {#
-                            The module Auth rules contain all permission logic regarding whether this page is accessable.
-                            As such, if here and not accepting submissions, the only action available is acknowledging receipt of submission.
-                        #}
-                        <input type="submit" value="Submission Received for {{ student.formatName }}" data-action-save title="Acknowledge receipt of student submission" />
-                        <div class="toast" data-alert data-save-draft></div>
-                    {% endif %}
+                    <section class="content">
+                        <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                    </section>
+                    <input type="submit" value="Submit for Assessment {% if USER.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
                     <div class="toast" data-alert data-save-draft></div>
                 </form>
             </div>
         </div>
 
-        {% if not assessment.acceptNone %}
-            <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
-                <h2 id="empty-dialog-title">Nothing To Submit</h2>
-                <p>You haven't supplied any content for your submission. Provide files and/or edit online and try again.</p>
-                <a class="button full-width" data-interaction="close">OK</a>
-                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-            </div>
-        {% endif %}
+        <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
+            <h2 id="empty-dialog-title">Nothing To Submit</h2>
+            <p>You haven't supplied any content for your submission. Provide files and/or edit online and try again.</p>
+            <a class="button full-width" data-interaction="close">OK</a>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </div>
 
         {% if policy|length %}
         <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog" title="Submit Work Terms">
