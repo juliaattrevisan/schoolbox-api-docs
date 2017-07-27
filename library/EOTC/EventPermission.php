@@ -17,11 +17,9 @@ use Schoolbox\Campus;
 class EventPermission {
 
 	/**
-	 * Identifier
-	 *
 	 * @var int
 	 */
-	private $id = null;
+	private $id;
 
 	/**
 	 * The user to whom this permissions/subscriptions applies
@@ -60,22 +58,16 @@ class EventPermission {
     protected $subscribed = false;
 
 	/**
-	 * When was this created?
-	 *
 	 * @var Alaress_Date_Format
 	 */
 	private $createdAt = null;
 
 	/**
-	 * When was this updated
-	 *
 	 * @var Alaress_Date_Format
 	 */
 	private $updatedAt = null;
 
 	/**
-	 * When was this deleted?
-	 *
 	 * @var Alaress_Date_Format
 	 */
 	private $deletedAt = null;
@@ -90,8 +82,6 @@ class EventPermission {
 	 */
 
 	/**
-	 * Set campus
-	 *
 	 * @param Campus $campus
      * @return self $this
 	 */
@@ -101,8 +91,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Get campus
-	 *
 	 * @return Campus
 	 */
 	public function getCampus() {
@@ -110,8 +98,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Set id
-	 *
 	 * @param int $id
      * @return self $this
 	 */
@@ -121,8 +107,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Get id
-	 *
 	 * @return int
 	 */
 	public function getId() {
@@ -130,8 +114,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Set status
-	 *
 	 * @param EventStatus $status
      * @return self $this
 	 */
@@ -141,8 +123,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Get status
-	 *
 	 * @return EventStatus
 	 */
 	public function getStatus() {
@@ -150,8 +130,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Set user id
-	 *
 	 * @param User
      * @return self $this
 	 */
@@ -161,8 +139,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Get user
-	 *
 	 * @return User
 	 */
 	public function getUser() {
@@ -170,8 +146,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Set created at
-	 *
 	 * @param Alaress_Date_Format $createdAt
      * @return self $this
 	 */
@@ -181,8 +155,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Get created at
-	 *
 	 * @return Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
@@ -190,8 +162,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Set deleted at
-	 *
 	 * @param Alaress_Date_Format $deletedAt
      * @return self $this
 	 */
@@ -201,8 +171,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Get deleted at
-	 *
 	 * @return Alaress_Date_Format
 	 */
 	public function getDeletedAt() {
@@ -210,8 +178,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Set updated at
-	 *
 	 * @param Alaress_Date_Format $updatedAt
      * @return self $this
 	 */
@@ -221,8 +187,6 @@ class EventPermission {
 	}
 
 	/**
-	 * Get updated at
-	 *
 	 * @return Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
@@ -239,7 +203,6 @@ class EventPermission {
 
     /**
      * @param  boolean $allowed
-     *
      * @return $this
      */
     public function setAllowed($allowed)
@@ -258,7 +221,6 @@ class EventPermission {
 
     /**
      * @param  boolean $subscribed
-     *
      * @return $this
      */
     public function setSubscribed($subscribed)
