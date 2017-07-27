@@ -342,23 +342,8 @@ class Model extends AbstractAssessment
             return false;
         }
 
-        if ($this->isAcceptMulti()) {
-            return true;
-        }
-
-        // No submitted response yet?
-        if (!$participant->hasSubmittedResponse()) {
-            if ($this->isAcceptSingle()) {
-                return true;
-            }
-            // A teacher can SOBO an ack of submission if there are no interactions
-            if ($this->isAcceptNone() && !$participant->hasPublishedFeedback()) {
-                return true;
-            }
-        }
-
-        // Student has a submitted response, or accepts none and feedback already provided
-        return false;
+        // Instructors are not constrained by the submission limit, or the open duration
+        return true;
     }
 
     /* Getters/Setters
