@@ -409,7 +409,7 @@ class EventMapper extends CalendarEventMapper
      *
      * Override to prevent base postSave from occurring
      *
-     * @param \EOTC\Event $event
+     * @param Event $event
      */
     protected function postSave($event)
     {
