@@ -72,7 +72,7 @@ class EventMetadata
     /**
      * @var bool
      */
-    protected $permissionSlipRequired = 0;
+    protected $permissionSlipRequired = false;
 
     /**
      * @var \Alaress_Date_Format
