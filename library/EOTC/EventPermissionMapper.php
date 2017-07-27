@@ -17,15 +17,16 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+class EventPermissionMapper extends BaseMapper
+{
 
-class EventPermissionMapper extends BaseMapper {
-
-	/**
-	 * Mapping
-	 */
-	public function mapping() {
-		$this->hasTable('eotc_permission');
-		$this->hasModel(EventPermission::class);
+    /**
+     * Mapping
+     */
+    public function mapping()
+    {
+        $this->hasTable('eotc_permission');
+        $this->hasModel(EventPermission::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses('is_allowed', self::TYPE_BOOLEAN, null, 'allowed');
@@ -37,31 +38,33 @@ class EventPermissionMapper extends BaseMapper {
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('campus_id', CampusMapper::class, 'id', null, null, 'campus', 'campus');
         $this->joins('status_id', EventStatusMapper::class, 'id', null, null, 'status', 'status');
-	}
+    }
 
-	/**
-	 * Delete all the permissions for a user
-	 *
-	 * @param User $user
-	 */
-	public function deleteForUser(User $user) {
-		$query = "
+    /**
+     * Delete all the permissions for a user
+     *
+     * @param User $user
+     */
+    public function deleteForUser(User $user)
+    {
+        $query = "
 			DELETE FROM `{$this->table}`
 			WHERE user_id = :userId
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([ 'userId' => $user->getId() ]);
-	}
+        $statement = $this->database->prepare($query);
+        $statement->execute(['userId' => $user->getId()]);
+    }
 
-	/**
-	 * A unique list of user ids with permissions,
-	 * ordered by surname
-	 *
-	 * @return array
-	 */
-	public function findUserIds() {
-		$query = "
+    /**
+     * A unique list of user ids with permissions,
+     * ordered by surname
+     *
+     * @return array
+     */
+    public function findUserIds()
+    {
+        $query = "
 			SELECT `user_id`
 			FROM `{$this->table}` p
 			LEFT JOIN user ON p.user_id = user.id
@@ -69,26 +72,27 @@ class EventPermissionMapper extends BaseMapper {
 			ORDER BY lastname
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute();
+        $statement = $this->database->prepare($query);
+        $statement->execute();
 
-		$userIds = array();
+        $userIds = array();
 
-		foreach ($statement as $row) {
-			$userIds[] = $row['user_id'];
-		}
+        foreach ($statement as $row) {
+            $userIds[] = $row['user_id'];
+        }
 
-		return $userIds;
-	}
+        return $userIds;
+    }
 
-	/**
-	 * Find all the permissions for a particular user
-	 *
-	 * @param User $user
-	 * @return Collection|EventPermission[]
-	 */
-	public function findByUser(User $user) {
-		$query = "
+    /**
+     * Find all the permissions for a particular user
+     *
+     * @param User $user
+     * @return Collection|EventPermission[]
+     */
+    public function findByUser(User $user)
+    {
+        $query = "
 			SELECT
 				{$this->getColumnString('p')},
 				{$this->getJoinColumnString('campus', 'c')},
@@ -101,10 +105,10 @@ class EventPermissionMapper extends BaseMapper {
 			ORDER BY p.campus_id, p.status_id
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([ "userId" => $user->getId() ]);
-		return $this->hydrateWithCampusAndStatus($statement);
-	}
+        $statement = $this->database->prepare($query);
+        $statement->execute(["userId" => $user->getId()]);
+        return $this->hydrateWithCampusAndStatus($statement);
+    }
 
     /**
      * Find all the subscriptions for a particular user.
@@ -112,7 +116,8 @@ class EventPermissionMapper extends BaseMapper {
      * @param User $user
      * @return Collection|EventPermission[]
      */
-    public function findSubscriptionsByUser(User $user) {
+    public function findSubscriptionsByUser(User $user)
+    {
         $query = "
 			SELECT
 				{$this->getColumnString('p')},
@@ -127,7 +132,7 @@ class EventPermissionMapper extends BaseMapper {
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->execute([ "userId" => $user->getId() ]);
+        $statement->execute(["userId" => $user->getId()]);
         return $this->hydrateWithCampusAndStatus($statement);
     }
 
