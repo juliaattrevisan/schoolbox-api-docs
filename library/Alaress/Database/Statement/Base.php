@@ -13,23 +13,20 @@ namespace Alaress\Database\Statement;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception;
+use Alaress\Database\HandlesExceptionTrait;
 use PDO;
 use PDOException;
 use PDOStatement;
 
 abstract Class Base implements IStatement
 {
+    use HandlesExceptionTrait;
+
     /** @var IBroker */
     protected $broker;
 
     /** @var PDOStatement This is the PDO statement that will do the actual work */
     protected $statement;
-
-    /** @var string $errorInfo If the last statement execution returned an error- this is its message */
-    protected $errorInfo;
-
-    /** @var string $errorCode If the last statement execution returned an error- this is its code */
-    protected $errorCode;
 
     /** @var array $parameters This is an array that contains parameters we intend to bind to the PDO statement */
     protected $parameters = [];
@@ -180,23 +177,6 @@ abstract Class Base implements IStatement
             $this->handleException($e, "Error retrieving next rowset: ");
             return null;
         }
-    }
-
-    /**
-     * If we get a PDO exception running a query we DO want to terminate application
-     * execution (or at least force something up the stack to handle this issue).
-     *
-     * @param PDOException $e
-     * @param string $prefix Prefix the returned exception's message with this
-     * @throws Exception
-     */
-    protected function handleException(PDOException $e, $prefix = '')
-    {
-        $this->errorInfo = $e->getMessage();
-        $this->errorCode = $e->getCode();
-        // Query exceptions are usually logic exceptions, not runtime exceptions.
-        // However, PDOException extends RuntimeException, so...
-        throw new Exception($prefix . $e->getMessage(), $e->getCode(), $e);
     }
 
     /**
