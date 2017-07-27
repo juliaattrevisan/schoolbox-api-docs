@@ -391,7 +391,6 @@ class External_Synergetic_User implements External_UserInterface
             WHERE       vStudents.StudentID = :externalId
         ";
 
-        print $query;
         $student = [];
 
         $iteratorStudents = $this->getConnector()->executeQueryIterator($query, ['externalId' => $synID]);
