@@ -11,165 +11,178 @@
 namespace EOTC;
 
 
-class EventStatus {
+class EventStatus
+{
 
-	/**
-	 * Primary key
-	 *
-	 * @var null
-	 */
-	private $id = null;
+    /**
+     * Primary key
+     *
+     * @var null
+     */
+    private $id = null;
 
-	/**
-	 * Name of the status
-	 *
-	 * @var int
-	 */
-	private $name = -1;
+    /**
+     * Name of the status
+     *
+     * @var int
+     */
+    private $name = -1;
 
-	/**
-	 * A unidirectional map of css classes belong to each status
-	 *
-	 * @var array
-	 */
-	private $cssMap = array(
-		1 => 'status-draft',
-		2 => 'status-in-principle',
-		3 => 'status-rams-approved',
-		4 => 'status-rams-confirmed',
-		5 => 'status-approved',
-		6 => 'status-rejected',
-	);
+    /**
+     * A unidirectional map of css classes belong to each status
+     *
+     * @var array
+     */
+    private $cssMap = array(
+        1 => 'status-draft',
+        2 => 'status-in-principle',
+        3 => 'status-rams-approved',
+        4 => 'status-rams-confirmed',
+        5 => 'status-approved',
+        6 => 'status-rejected',
+    );
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/**
-	 * Determine whether this event is in Draft
-	 *
-	 * @return bool
-	 */
-	public function isDraft() {
-		if ($this->getId() == EventStatusMapper::STATUS_DRAFT) {
-			return true;
-		}
+    /**
+     * Determine whether this event is in Draft
+     *
+     * @return bool
+     */
+    public function isDraft()
+    {
+        if ($this->getId() == EventStatusMapper::STATUS_DRAFT) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Determine whether this event is In Principle
-	 *
-	 * @return bool
-	 */
-	public function isInPrinciple() {
-		if ($this->getId() == EventStatusMapper::STATUS_INPRINCIPLE) {
-			return true;
-		}
+    /**
+     * Determine whether this event is In Principle
+     *
+     * @return bool
+     */
+    public function isInPrinciple()
+    {
+        if ($this->getId() == EventStatusMapper::STATUS_INPRINCIPLE) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Determine whether this event is Details Completed
-	 *
-	 * @return bool
-	 */
-	public function isDetailsCompleted() {
-		if ($this->getId() == EventStatusMapper::STATUS_DETAILSCOMPLETED) {
-			return true;
-		}
+    /**
+     * Determine whether this event is Details Completed
+     *
+     * @return bool
+     */
+    public function isDetailsCompleted()
+    {
+        if ($this->getId() == EventStatusMapper::STATUS_DETAILSCOMPLETED) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Determine whether this event is Awaiting Final Approval
-	 *
-	 * @return bool
-	 */
-	public function isAwaitingFinalApproval() {
-		if ($this->getId() == EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL) {
-			return true;
-		}
+    /**
+     * Determine whether this event is Awaiting Final Approval
+     *
+     * @return bool
+     */
+    public function isAwaitingFinalApproval()
+    {
+        if ($this->getId() == EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Determine whether this event is Final Approved
-	 *
-	 * @return bool
-	 */
-	public function isApproved() {
-		if ($this->getId() == EventStatusMapper::STATUS_APPROVED) {
-			return true;
-		}
+    /**
+     * Determine whether this event is Final Approved
+     *
+     * @return bool
+     */
+    public function isApproved()
+    {
+        if ($this->getId() == EventStatusMapper::STATUS_APPROVED) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Determine whether this event is Final Approved
-	 *
-	 * @return bool
-	 */
-	public function isRejected() {
-		if ($this->getId() == EventStatusMapper::STATUS_REJECTED) {
-			return true;
-		}
+    /**
+     * Determine whether this event is Final Approved
+     *
+     * @return bool
+     */
+    public function isRejected()
+    {
+        if ($this->getId() == EventStatusMapper::STATUS_REJECTED) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Get the css style associated with this status
-	 *
-	 * @return mixed
-	 */
-	public function getStyle() {
-		return $this->cssMap[$this->getId()];
-	}
+    /**
+     * Get the css style associated with this status
+     *
+     * @return mixed
+     */
+    public function getStyle()
+    {
+        return $this->cssMap[$this->getId()];
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set id
-	 *
-	 * @param null $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * Set id
+     *
+     * @param null $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Get id
-	 *
-	 * @return null
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Get id
+     *
+     * @return null
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Set name
-	 *
-	 * @param int $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
+    /**
+     * Set name
+     *
+     * @param int $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	/**
-	 * Get name
-	 *
-	 * @return int
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * Get name
+     *
+     * @return int
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 }
