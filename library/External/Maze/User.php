@@ -434,7 +434,7 @@ class External_Maze_User implements External_UserInterface {
 				ADDRESS01 AS StudentContactAddress1,
 				ADDRESS02 AS StudentContactAddress2,
 				ADDRESS03 AS StudentContactAddress3,
-				UM.SUBURB AS StudentContactSuburb,
+				'' AS StudentContactSuburb,
 				POSTCODE AS StudentContactPostCode,
 				STATE AS StudentContactState,
 				TELEPHONE AS StudentContactPhoneActual,

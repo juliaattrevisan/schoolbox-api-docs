@@ -126,6 +126,50 @@ class External_Maze_Loreto_User extends External_Maze_User {
 	}
 
 	/**
+	 * Get a list of student contacts (parents) and their contact information
+	 *
+	 * @param string $externalUserId
+	 * @return mixed
+	 */
+	public function getStudentContactList($externalUserId) {
+		$query = "
+			SELECT
+				DFKEY AS StudentContactID,
+				MTITLE AS StudentContactTitle,
+				MNAME AS StudentContactPreferred,
+				MSURNAME AS StudentContactSurname,
+				M_EMAIL AS StudentContactDefaultEmail,
+				ADDRESS01 AS StudentContactAddress1,
+				ADDRESS02 AS StudentContactAddress2,
+				ADDRESS03 AS StudentContactAddress3,
+				UM.SUBURB AS StudentContactSuburb,
+				POSTCODE AS StudentContactPostCode,
+				STATE AS StudentContactState,
+				TELEPHONE AS StudentContactPhoneActual,
+				MMOBILE AS StudentContactMobilePhone,
+				MBUS_PHONE AS StudentContactOccupPhone,
+				'' AS StudentContactRelation,
+				DFKEY AS StudentContactSpouseID,
+				FTITLE AS StudentContactSpouseTitle,
+				FNAME AS StudentContactSpousePreferred,
+				FSURNAME AS StudentContactSpouseSurname,
+				F_EMAIL AS StudentContactSpouseDefaultEmail,
+				TELEPHONE AS StudentContactSpousePhoneActual,
+				FMOBILE AS StudentContactSpouseMobilePhone,
+				FBUS_PHONE AS StudentContactSpouseOccupPhone,
+				'' AS StudentContactSpouseRelation,
+				CASE WHEN DF.DFKEY = ST.FAMILY THEN 1 ELSE 0 END as primaryFamily
+			FROM DF
+			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
+			LEFT JOIN ST ON (DF.DFKEY = ST.FAMILY OR (ST.FAMB = DF.DFKEY AND ST.LIVING_B != 'N'))
+			WHERE ST.STKEY = '{$externalUserId}'
+			ORDER BY primaryFamily DESC
+		";
+
+		return $this->getDb()->getAll($query);
+	}
+
+	/**
 	 * Gets a list of Contacts for all Students in a particular year level. The
 	 * year level is stored in Synergetic.
 	 *
