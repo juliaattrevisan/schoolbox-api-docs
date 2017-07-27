@@ -47,8 +47,8 @@ if(is_numeric($this->arg[0])) {
         'BODY'        => $newsItem['body'],
         'CATEGORY_ID' => $newsItem['code'],
 		'CATEGORY_NAME' => Scrub::text($folder->getName()),
-		'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
-		'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
+		'DATETIME_PUBLISHED' => $publishedDate->getLocal(),
+		'DATETIME_EXPIRES' => $expiryDate->getLocal(),
     );
 						
 	$this->setVar($output);
