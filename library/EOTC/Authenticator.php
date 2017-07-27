@@ -8,8 +8,7 @@
  */
 namespace EOTC;
 
-use EOTC\ConfigMapper as EOTCConfigMapper;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\ConfigMapper as SchoolboxConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
@@ -22,7 +21,7 @@ class Authenticator
     private $permissionMapper = null;
 
     /**
-     * @var EOTCConfigMapper
+     * @var ConfigMapper
      */
     private $configMapper;
 
@@ -44,12 +43,12 @@ class Authenticator
     {
 
         // Return 404 if EOTC is not enabled
-        if (0 == ConfigMapper::getInstance()->get('eotc_enabled')) {
+        if (0 == SchoolboxConfigMapper::getInstance()->get('eotc_enabled')) {
             $page->pageNotFound();
         }
 
         $this->setPermissionMapper(new EventPermissionMapper());
-        $this->setConfigMapper(EOTCConfigMapper::getInstance());
+        $this->setConfigMapper(ConfigMapper::getInstance());
 
         $this->setup();
     }
@@ -338,7 +337,7 @@ class Authenticator
     }
 
     /**
-     * @return EOTCConfigMapper
+     * @return ConfigMapper
      */
     private function getConfigMapper()
     {
@@ -346,7 +345,7 @@ class Authenticator
     }
 
     /**
-     * @param EOTCConfigMapper $configMapper
+     * @param ConfigMapper $configMapper
      * @return self $this
      */
     private function setConfigMapper($configMapper)
