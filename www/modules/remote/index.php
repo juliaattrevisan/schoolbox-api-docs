@@ -17,8 +17,11 @@ if ($lastPart === 'window') {
 // Fortunately we can convert spaces to +, and directory splits to / chars.
 $remoteUrl = base64_decode(str_replace(' ', '+', implode('/', $encodedUrlParts)));
 
-// is this specifying a height for the parent frame?
-$height = '460px';
+// For specifying the height styling of the parent frame
+// Use fullscreen class if no height specified
+$height = '';
+$heightStyle = '';
+$class = '';
 
 $url = new Uri($remoteUrl);
 if (!$url->isValid()) {
@@ -30,8 +33,13 @@ if(stripos($fragment, 'zx_h=') !== false) {
     preg_match("#zx_h=([0-9]*(?:%|px|&))#", $fragment, $matches);
     if(isset($matches[1])) {
         $height = str_replace('&', '', $matches[1]);
+        $heightStyle = "height:".$height;
     }
+
     $url->setFragment('');
+}
+else{
+    $class = "fullscreen";
 }
 
 $query = $url->getQueryAsArray();
@@ -55,7 +63,8 @@ if ($isWindow) {
     $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
     $this->setVar(array(
         'REMOTE_URL' => addslashes($url->toString()),
-        'FRAME_HEIGHT' => $height,
+        'HEIGHT_STYLE' => $heightStyle,
+        'FRAME_CLASS' => $class,
     ));
 }
 
