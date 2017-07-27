@@ -31,8 +31,8 @@ class EventPermissionMapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses('is_allowed', self::TYPE_BOOLEAN, null, 'allowed');
         $this->uses('is_subscribed', self::TYPE_BOOLEAN, null, 'subscribed');
-        $this->uses('created_at', self::TYPE_DATETIME, null, 'createdAt');
-        $this->uses('updated_at', self::TYPE_DATETIME, null, 'updatedAt');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
         $this->uses('deleted_at', self::TYPE_DATETIME, null, 'deletedAt');
 
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
