@@ -272,10 +272,17 @@ abstract Class Base implements IStatement
             $iterator = $this->broker->getIterator($this, $this->statement);
 
             // Execute the statement
-            if (!$iterator->execute()) {
-
-                // Query execution failed
-                throw new Exception("Error executing iterator: " . $iterator->errorInfo());
+            try {
+                $iterator->execute();
+            } catch (Exception $e) {
+                // Handle as best I can, with a rethrown exception if possible.
+                $previous = $e->getPrevious();
+                $prefix   = "Error executing iterator: ";
+                if ($previous instanceof PDOException) {
+                    $this->handleException($previous, $prefix);
+                } else {
+                    throw new Exception($prefix . $iterator->errorInfo(), $e->getCode(), $e);
+                }
             }
 
             // If we got to this point we got a valid iterator which had rows
