@@ -138,8 +138,8 @@ Data:
                 inlineLen = CKEDITOR.instances['editor-body'].getData().length,
                 filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
 
-            if ({% if student.id != USER.id %}false &&{% endif %} !inlineLen && !filesLen) {
-                // If not a SOBO, prevent submission without SOMETHING to submit
+            if (!inlineLen && !filesLen) {
+                // prevent submission without SOMETHING to submit
                 e.preventDefault();
                 emptyDialog.foundation('reveal', 'open');
             }
@@ -206,8 +206,7 @@ Data:
         </div>
         <div class="row">
             <div class="small-12 island">
-                {% set formRoute = routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) %}
-                <form id="editor-form" method="post" action="{{ formRoute }}" enctype="multipart/form-data">
+                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}" enctype="multipart/form-data">
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
                     <section class="content">
                         <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
