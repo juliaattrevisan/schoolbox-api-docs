@@ -18,7 +18,7 @@ class Authenticator
     /**
      * @var EventPermissionMapper
      */
-    private $permissionMapper = null;
+    private $permissionMapper;
 
     /**
      * @var ConfigMapper
@@ -299,10 +299,12 @@ class Authenticator
      * Set permission mapper
      *
      * @param EventPermissionMapper $permissionMapper
+     * @return self $this
      */
     private function setPermissionMapper($permissionMapper)
     {
         $this->permissionMapper = $permissionMapper;
+        return $this;
     }
 
     /**
