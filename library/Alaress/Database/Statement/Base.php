@@ -209,6 +209,7 @@ abstract Class Base implements IStatement
      *
      * @param $values
      * @return bool
+     * @throws Exception if preparing execution failed for some reason
      */
     private function prepareExecution($values)
     {
