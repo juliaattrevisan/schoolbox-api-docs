@@ -111,6 +111,7 @@ interface IStatement
      * Moves to the next result set in a stored procedure that returns multiple sets of results
      *
      * @return bool
+     * @throws Exception if moving to next result set failed for some reason
      */
     public function nextRowset();
 
@@ -133,6 +134,7 @@ interface IStatement
      *
      * @param array|null $values
      * @return bool
+     * @throws Exception if execution failed for some reason
      */
     public function execute($values = null);
 
