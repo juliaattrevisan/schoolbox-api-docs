@@ -11,6 +11,10 @@
 use EOTC\Authenticator;
 use EOTC\EventPermission;
 use EOTC\EventPermissionMapper;
+use EOTC\EventStatus;
+use EOTC\EventStatusMapper;
+use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -48,17 +52,30 @@ if (is_array($_POST['campus']) && count($_POST['campus'])) {
 		/* Apply the same perms for each campus
 		 */
 		if (is_array($_POST['status']) && count($_POST['status'])) {
-			foreach ($_POST['status'] as $currentStatus => $settings) {
+            foreach ($_POST['status'] as $currentStatus => $settings) {
+                try {
+                    /** @var Campus $campus */
+                    $campus = CampusMapper::getInstance()->findById($currentCampus);
 
-			    /** @var EventPermission $permission */
-				$permission = EventPermissionMapper::getInstance()->createModel();
-				$permission->setUser($user);
-				$permission->setCampus($currentCampus);
-				$permission->setStatus($currentStatus);
-				$permission->setAllowed($settings['allowed']);
-				$permission->setSubscribed($settings['subscribed']);
+                    /** @var EventStatus $status */
+                    $status = EventStatusMapper::getInstance()->findById($currentStatus);
 
-				$permissionMapper->save($permission);
+                    /** @var EventPermission $permission */
+                    $permission = EventPermissionMapper::getInstance()->createModel();
+                    $permission->setUser($user);
+                    $permission->setCampus($campus);
+                    $permission->setStatus($status);
+                    $permission->setAllowed($settings['allowed']);
+                    $permission->setSubscribed($settings['subscribed']);
+
+                    $permissionMapper->save($permission);
+                }
+                catch (MapperException $e) {
+
+                    /* noop
+                     * could not save at least one permission due to missing campus and/or status
+                     */
+                }
 			}
 		}
 	}
