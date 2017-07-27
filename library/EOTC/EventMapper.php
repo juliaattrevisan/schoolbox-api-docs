@@ -10,7 +10,9 @@
 
 namespace EOTC;
 
-use Schoolbox\Calendar;
+use EOTC\ActivityLog\Mapper as ActivityLogMapper;
+use EOTC\ListGroup\Collection as ListGroupCollection;
+use Schoolbox\Calendar\EventMapper as CalendarEventMapper;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
@@ -24,50 +26,57 @@ use Schoolbox\User;
  * @method Event hydrate(array $row, $alias = '', $callback = null)
  * @method Event findById($identifierValue)
  */
-class EventMapper extends Calendar\EventMapper {
+class EventMapper extends CalendarEventMapper
+{
 
-	/**
-	 * Only show events that are at most 6 months old
-	 */
-	const INTERVAL_MAX_6MONTH_OLD = 2;
+    /**
+     * Only show events that are at most 6 months old
+     */
+    const INTERVAL_MAX_6MONTH_OLD = 2;
 
-	/**
-	 * Only show events that are at most 1 month old
-	 * and also show all future events
-	 */
-	const INTERVAL_MAX_1MONTH_OLD_AND_FUTURE = 1;
+    /**
+     * Only show events that are at most 1 month old
+     * and also show all future events
+     */
+    const INTERVAL_MAX_1MONTH_OLD_AND_FUTURE = 1;
 
-	/**
-	 * Show all events (very heavy)
-	 */
-	const INTERVAL_ALL = 0;
+    /**
+     * Show all events (very heavy)
+     */
+    const INTERVAL_ALL = 0;
 
-	/**
-	 * Calls for the core mapping of events, then extends it
-	 */
-	protected function mapping() {
-		$this->coreMapping();
+    /**
+     * Calls for the core mapping of events, then extends it
+     */
+    protected function mapping()
+    {
+        $this->coreMapping();
 
-		$this->hasTable('eotc_event');
-		$this->hasModel(Event::class);
+        $this->hasTable('eotc_event');
+        $this->hasModel(Event::class);
 
-		$this->hasMap(array(
-			'column' => 'teacher_in_charge_id',
-			'property' => 'teacherInCharge',
-			'type' => self::TYPE_MODEL,
-			'join' => 'teacherInCharge',
-		));
-		$this->hasJoin('teacherInCharge', array(
-			'mapper'    => '\\Schoolbox\\UserMapper',
-			'this_key'  => 'teacher_in_charge_id',
-			'other_key' => 'id',
-		));
-	}
+        $this->hasMap(
+            [
+                'column'   => 'teacher_in_charge_id',
+                'property' => 'teacherInCharge',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'teacherInCharge',
+            ]
+        );
+        $this->hasJoin(
+            'teacherInCharge',
+            [
+                'mapper'    => '\\Schoolbox\\UserMapper',
+                'this_key'  => 'teacher_in_charge_id',
+                'other_key' => 'id',
+            ]
+        );
+    }
 
     protected function getSelectString()
     {
-        $authorMapper = $this->getJoinMapper('author');
-        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         return "
@@ -91,8 +100,8 @@ class EventMapper extends Calendar\EventMapper {
 
     protected function hydrateSelect(\PDOStatement $statement)
     {
-        $authorMapper = $this->getJoinMapper('author');
-        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         /* Hydrate or die
@@ -166,13 +175,15 @@ class EventMapper extends Calendar\EventMapper {
 
                 /* Activity logs
                  */
-                $activityLogMapper = ActivityLog\Mapper::getInstance();
-
-                $allActivityLogs = $activityLogMapper->findByColumn('metadata_id', $eventItem->getMetadata()->getId(), array(
-                    'order' => array(
-                        'created_at' => 'DESC'
-                    )
-                ));
+                $allActivityLogs = ActivityLogMapper::getInstance()->findByColumn(
+                    'metadata_id',
+                    $eventItem->getMetadata()->getId(),
+                    [
+                        'order' => [
+                            'created_at' => 'DESC'
+                        ]
+                    ]
+                );
 
                 $eventItem->getMetadata()->setActivityLog($allActivityLogs);
             }
@@ -182,48 +193,49 @@ class EventMapper extends Calendar\EventMapper {
         return $this->createCollection($allEvents);
     }
 
-	/**
-	 * Custom findAllByListGroups
-	 *
-	 * Use $allowedStatus to only show events matching a particular
-	 * set of of EOTC\EventStatus ids. Leaving $allowedStatus empty
-	 * will spawn all events regardless of status (it will not skip
-	 * over any events)
-	 *
-	 * @param array $allowedStatus an array of EOTC\EventStatus ids
-	 * @param int $interval a const which determines filtering
-	 * @return ListGroup\Collection
-	 */
-	public function findAllByListGroups($allowedStatus = [], $interval) {
-		$authorMapper = $this->getJoinMapper('author');
-		$eventTypeMapper = $this->getJoinMapper('eventType');
-		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+    /**
+     * Custom findAllByListGroups
+     *
+     * Use $allowedStatus to only show events matching a particular
+     * set of of EOTC\EventStatus ids. Leaving $allowedStatus empty
+     * will spawn all events regardless of status (it will not skip
+     * over any events)
+     *
+     * @param array $allowedStatus an array of EOTC\EventStatus ids
+     * @param int $interval a const which determines filtering
+     * @return ListGroup\Collection
+     */
+    public function findAllByListGroups($allowedStatus = [], $interval)
+    {
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
+        $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
-		/* Choose which hardcoded fragment to use
-		 */
-		switch ($interval) {
-			case self::INTERVAL_MAX_1MONTH_OLD_AND_FUTURE:
-				$sql = 'WHERE (e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 1 MONTH)) OR (e.start_datetime >= NOW())';
-				break;
+        /* Choose which hardcoded fragment to use
+         */
+        switch ($interval) {
+            case self::INTERVAL_MAX_1MONTH_OLD_AND_FUTURE:
+                $sql = 'WHERE (e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 1 MONTH)) OR (e.start_datetime >= NOW())';
+                break;
 
-			case self::INTERVAL_MAX_6MONTH_OLD:
-				$sql = 'WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)';
-				break;
+            case self::INTERVAL_MAX_6MONTH_OLD:
+                $sql = 'WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)';
+                break;
 
-			default:
-				$sql = '';
-				break;
-		}
+            default:
+                $sql = '';
+                break;
+        }
 
-		/* Looked for a way to convince GROUP BY to group records with
-		 * integer series_id's, but leave NULL ones individual
-		 *
-		 * Thought about using GROUP BY IFNULL(e.series_id, e.id) but it
-		 * didn't really work very well
-		 *
-		 * I'll just postprocess them
-		 */
-		$query = "
+        /* Looked for a way to convince GROUP BY to group records with
+         * integer series_id's, but leave NULL ones individual
+         *
+         * Thought about using GROUP BY IFNULL(e.series_id, e.id) but it
+         * didn't really work very well
+         *
+         * I'll just postprocess them
+         */
+        $query = "
 			SELECT
 				{$this->getColumnString('e')},
 				{$authorMapper->getColumnString('a')},
@@ -237,91 +249,92 @@ class EventMapper extends Calendar\EventMapper {
 			ORDER BY e.start_datetime
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute();
+        $statement = $this->database->prepare($query);
+        $statement->execute();
 
-		/* Postprocess this list of events based on status and
-		 * organise them into a collection of collections
-		 */
-		$listGroup = new ListGroup\Collection();
-		$listGroup->setup();
+        /* Postprocess this list of events based on status and
+         * organise them into a collection of collections
+         */
+        $listGroup = new ListGroupCollection();
+        $listGroup->setup();
 
-		/* Hydrate or die
-		 */
-		foreach($statement as $row) {
-			/** @var Event $eventItem */
-			$eventItem = $this->hydrate($row, 'e');
+        /* Hydrate or die
+         */
+        foreach ($statement as $row) {
+            /** @var Event $eventItem */
+            $eventItem = $this->hydrate($row, 'e');
 
-			/* Accumulate the metadata for this event
-			 * Only use the first record
-			 */
-			$eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
+            /* Accumulate the metadata for this event
+             * Only use the first record
+             */
+            $eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
 
-			/* Determine current status
-			 */
-			if ($eventItem->getMetadata()) {
-				$metadataMapper = EventMetadataMapper::getInstance();
-				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+            /* Determine current status
+             */
+            if ($eventItem->getMetadata()) {
+                $metadataMapper = EventMetadataMapper::getInstance();
+                $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
-				/* Ignore this event, because it's not one of the Status
-				 * we've chosen to include
-				 */
-				if (count($allowedStatus) && !in_array($eventItem->getMetadata()->getStatus()->getId(), $allowedStatus)) {
-					continue;
-				}
+                /* Ignore this event, because it's not one of the Status
+                 * we've chosen to include
+                 */
+                if (count($allowedStatus) && !in_array($eventItem->getMetadata()->getStatus()->getId(), $allowedStatus)) {
+                    continue;
+                }
 
-				/* Accumulate student attendees for this event
-				 */
-				$allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
-				$eventItem->getMetadata()->setStudentAttendees($allStudents);
-			}
+                /* Accumulate student attendees for this event
+                 */
+                $allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
+                $eventItem->getMetadata()->setStudentAttendees($allStudents);
+            }
 
-			/** @var User $teacherInChargeItem */
-			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
-			$eventItem->setTeacherInCharge($teacherInChargeItem);
+            /** @var User $teacherInChargeItem */
+            $teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
+            $eventItem->setTeacherInCharge($teacherInChargeItem);
 
-			/** @var EventType $eventTypeItem */
-			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setType($eventTypeItem);
+            /** @var EventType $eventTypeItem */
+            $eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+            $eventItem->setType($eventTypeItem);
 
-			/* Accumulate campuses for this event
-			 */
-			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
+            /* Accumulate campuses for this event
+             */
+            $eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
 
-			/* Assign it to an Event List Group
-			 */
-			$listGroup->assign($eventItem);
-		}
+            /* Assign it to an Event List Group
+             */
+            $listGroup->assign($eventItem);
+        }
 
-		/* Sort each grouping in a special way
-		 */
-		$listGroup->sortEventsByStartDate();
+        /* Sort each grouping in a special way
+         */
+        $listGroup->sortEventsByStartDate();
 
-		return $listGroup;
-	}
+        return $listGroup;
+    }
 
-	/**
-	 * Custom findAllByListGroups for a particular user
-	 *
-	 * This is used on the My EOTC screen
-	 *
-	 * @param User $user
-	 * @return ListGroup\Collection
-	 */
-	public function findAllByListGroupsForUser($user) {
-		$authorMapper = $this->getJoinMapper('author');
-		$eventTypeMapper = $this->getJoinMapper('eventType');
-		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+    /**
+     * Custom findAllByListGroups for a particular user
+     *
+     * This is used on the My EOTC screen
+     *
+     * @param User $user
+     * @return ListGroup\Collection
+     */
+    public function findAllByListGroupsForUser($user)
+    {
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
+        $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
-		/* Looked for a way to convince GROUP BY to group records with
-		 * integer series_id's, but leave NULL ones individual
-		 *
-		 * Thought about using GROUP BY IFNULL(e.series_id, e.id) but it
-		 * didn't really work very well
-		 *
-		 * I'll just postprocess them
-		 */
-		$query = "
+        /* Looked for a way to convince GROUP BY to group records with
+         * integer series_id's, but leave NULL ones individual
+         *
+         * Thought about using GROUP BY IFNULL(e.series_id, e.id) but it
+         * didn't really work very well
+         *
+         * I'll just postprocess them
+         */
+        $query = "
 			SELECT
 				{$this->getColumnString('e')},
 				{$authorMapper->getColumnString('a')},
@@ -336,63 +349,64 @@ class EventMapper extends Calendar\EventMapper {
 			ORDER BY e.start_datetime
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([
-			'userId' => $user->getId()
-		]);
+        $statement = $this->database->prepare($query);
+        $statement->execute(
+            [
+                'userId' => $user->getId()
+            ]
+        );
 
-		$allEvents = new Collection();
-		$processedSeriesIds = array();
+        $allEvents          = new ListGroupCollection();
+        $processedSeriesIds = [];
 
-		/* Hydrate or die
-		 */
-		foreach($statement as $row) {
-			/** @var Event $eventItem */
-			$eventItem = $this->hydrate($row, 'e');
+        /* Hydrate or die
+         */
+        foreach ($statement as $row) {
+            /** @var Event $eventItem */
+            $eventItem = $this->hydrate($row, 'e');
 
-			/** @var User $teacherInChargeItem */
-			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
-			$eventItem->setTeacherInCharge($teacherInChargeItem);
+            /** @var User $teacherInChargeItem */
+            $teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
+            $eventItem->setTeacherInCharge($teacherInChargeItem);
 
-			/** @var EventType $eventTypeItem */
-			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setType($eventTypeItem);
+            /** @var EventType $eventTypeItem */
+            $eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+            $eventItem->setType($eventTypeItem);
 
-			/* Accumulate the metadata for this event
-			 * Only use the first record
+            /* Accumulate the metadata for this event
+             * Only use the first record
+             */
+            $eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
+
+            /* Determine current status
+             */
+            if ($eventItem->getMetadata()) {
+                $metadataMapper = EventMetadataMapper::getInstance();
+                $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+
+                /* Accumulate student attendees for this event
+                 */
+                $allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
+                $eventItem->getMetadata()->setStudentAttendees($allStudents);
+            }
+
+            /* Only add the first in a series; ignore the others
+             */
+            if (is_numeric($eventItem->getSeriesId())) {
+                if (!in_array($eventItem->getSeriesId(), $processedSeriesIds)) {
+                    $processedSeriesIds[] = $eventItem->getSeriesId();
+
+                    $allEvents->add($eventItem);
+                }
+            } /* Otherwise just add the one-off event
 			 */
-			$eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
+            else {
+                $allEvents->add($eventItem);
+            }
+        }
 
-			/* Determine current status
-			 */
-			if ($eventItem->getMetadata()) {
-				$metadataMapper = EventMetadataMapper::getInstance();
-				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
-
-				/* Accumulate student attendees for this event
-				 */
-				$allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
-				$eventItem->getMetadata()->setStudentAttendees($allStudents);
-			}
-
-			/* Only add the first in a series; ignore the others
-			 */
-			if (is_numeric($eventItem->getSeriesId())) {
-				if (!in_array($eventItem->getSeriesId(), $processedSeriesIds)) {
-					$processedSeriesIds[] = $eventItem->getSeriesId();
-
-					$allEvents->add($eventItem);
-				}
-			}
-			/* Otherwise just add the one-off event
-			 */
-			else {
-				$allEvents->add($eventItem);
-			}
-		}
-
-		return $allEvents;
-	}
+        return $allEvents;
+    }
 
     /**
      * Postsave hook
@@ -449,135 +463,147 @@ class EventMapper extends Calendar\EventMapper {
         $metadataMapper->createResourceBookings($event->getMetadata());
     }
 
-	/**
-	 * Find metadata for a particular event
-	 *
-	 * @param int $identifier
-	 * @return Collection|EventMetadata[]
-	 */
-	protected function findMetadata($identifier) {
-		$manyManyRelation = new ManyManyRelation();
-		$manyManyRelation->setup(
-			array(
-				'name' => 'eotc_event_metadata',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'event_id',
-				'value' => $identifier,
+    /**
+     * Find metadata for a particular event
+     *
+     * @param int $identifier
+     * @return Collection|EventMetadata[]
+     */
+    protected function findMetadata($identifier)
+    {
+        $manyManyRelation = new ManyManyRelation();
+        $manyManyRelation->setup(
+            [
+                'name' => 'eotc_event_metadata',
+            ],
+            [
+                /* Find things to join to this...
+                 */
+                'column'   => 'event_id',
+                'value'    => $identifier,
 
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'metadata_id',
-					'key' => 'id',
-					'mapper' => EventMetadataMapper::getInstance()
-				),
-			)
-		);
+                /* ...using this relation, such that column = key
+                 */
+                'relation' => [
+                    'column' => 'metadata_id',
+                    'key'    => 'id',
+                    'mapper' => EventMetadataMapper::getInstance()
+                ],
+            ]
+        );
 
-		return $manyManyRelation->find();
-	}
+        return $manyManyRelation->find();
+    }
 
-	/**
-	 * Deletes metadata relations if there are no remaining
-	 * events in the series
-	 *
-	 * @param Event $event
-	 */
-	public function deleteMetadataRelations($event) {
-		$query = "
+    /**
+     * Deletes metadata relations if there are no remaining
+     * events in the series
+     *
+     * @param Event $event
+     */
+    public function deleteMetadataRelations($event)
+    {
+        $query = "
 			DELETE FROM `eotc_event_metadata`
 			WHERE event_id = :eventId
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([
-			'eventId' => $event->getId()
-		]);
-	}
+        $statement = $this->database->prepare($query);
+        $statement->execute(
+            [
+                'eventId' => $event->getId()
+            ]
+        );
+    }
 
-	/**
-	 * Assign campuses to an event
-	 *
-	 * @param Event $event
-	 */
-	private function createCampus($event) {
-		$query = "
+    /**
+     * Assign campuses to an event
+     *
+     * @param Event $event
+     */
+    private function createCampus($event)
+    {
+        $query = "
 			INSERT INTO `eotc_event_campus` (event_id, campus_id)
 			VALUES (:eventId, :campusId)
 		";
 
-		$statement = $this->database->prepare($query);
+        $statement = $this->database->prepare($query);
 
-		foreach ($event->getCampusCollection() as $currentCampus) {
-			$currentCampus = ($currentCampus instanceof \Schoolbox\Campus)
-				? $currentCampus->getId()
-				: $currentCampus;
+        foreach ($event->getCampusCollection() as $currentCampus) {
+            $currentCampus = ($currentCampus instanceof Campus)
+                ? $currentCampus->getId()
+                : $currentCampus;
 
-			$statement->execute([
-				"eventId"  => $event->getId(),
-				"campusId" => $currentCampus
-			]);
-		}
-	}
+            $statement->execute(
+                [
+                    "eventId"  => $event->getId(),
+                    "campusId" => $currentCampus
+                ]
+            );
+        }
+    }
 
-	/**
-	 * Find campuses for a particular event
-	 *
-	 * @param int $identifier
-	 * @return Collection|Campus[]
-	 */
-	protected function findCampuses($identifier) {
-		$manyManyRelation = new ManyManyRelation();
-		$manyManyRelation->setup(
-			array(
-				'name' => 'eotc_event_campus',
-			),
-			array(
-				/* Find things to join to this...
-				 */
-				'column' => 'event_id',
-				'value' => $identifier,
+    /**
+     * Find campuses for a particular event
+     *
+     * @param int $identifier
+     * @return Collection|Campus[]
+     */
+    protected function findCampuses($identifier)
+    {
+        $manyManyRelation = new ManyManyRelation();
+        $manyManyRelation->setup(
+            [
+                'name' => 'eotc_event_campus',
+            ],
+            [
+                /* Find things to join to this...
+                 */
+                'column'   => 'event_id',
+                'value'    => $identifier,
 
-				/* ...using this relation, such that column = key
-				 */
-				'relation' => array(
-					'column' => 'campus_id',
-					'key' => 'id',
-					'mapper' => CampusMapper::getInstance()
-				),
-			)
-		);
+                /* ...using this relation, such that column = key
+                 */
+                'relation' => [
+                    'column' => 'campus_id',
+                    'key'    => 'id',
+                    'mapper' => CampusMapper::getInstance()
+                ],
+            ]
+        );
 
-		return $manyManyRelation->find();
-	}
+        return $manyManyRelation->find();
+    }
 
-	/**
-	 * Deletes campus relations if there are no remaining
-	 * events in the series
-	 *
-	 * @param Event $event
-	 */
-	public function deleteCampusRelations($event) {
-		$query = "
+    /**
+     * Deletes campus relations if there are no remaining
+     * events in the series
+     *
+     * @param Event $event
+     */
+    public function deleteCampusRelations($event)
+    {
+        $query = "
 			DELETE FROM `eotc_event_campus`
 			WHERE event_id = :eventId
 		";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([
-			'eventId' => $event->getId()
-		]);
-	}
+        $statement = $this->database->prepare($query);
+        $statement->execute(
+            [
+                'eventId' => $event->getId()
+            ]
+        );
+    }
 
     /**
      * Assign roles to an event
      *
      * @param Event $event
      */
-    private function createRole($event) {
+    private function createRole($event)
+    {
         $query = "
 			INSERT INTO `eotc_event_role` (event_id, role_id)
 			VALUES (:eventId, :roleId)
@@ -590,10 +616,12 @@ class EventMapper extends Calendar\EventMapper {
                 ? $currentRole->getId()
                 : $currentRole;
 
-            $statement->execute([
-                "eventId"  => $event->getId(),
-                "roleId" => $currentRole
-            ]);
+            $statement->execute(
+                [
+                    "eventId" => $event->getId(),
+                    "roleId"  => $currentRole
+                ]
+            );
         }
     }
 
@@ -603,26 +631,27 @@ class EventMapper extends Calendar\EventMapper {
      * @param int $identifier
      * @return Collection|Role[]
      */
-    protected function findRoles($identifier) {
+    protected function findRoles($identifier)
+    {
         $manyManyRelation = new ManyManyRelation();
         $manyManyRelation->setup(
-            array(
+            [
                 'name' => 'eotc_event_role',
-            ),
-            array(
+            ],
+            [
                 /* Find things to join to this...
                  */
-                'column' => 'event_id',
-                'value' => $identifier,
+                'column'   => 'event_id',
+                'value'    => $identifier,
 
                 /* ...using this relation, such that column = key
                  */
-                'relation' => array(
+                'relation' => [
                     'column' => 'role_id',
-                    'key' => 'id',
+                    'key'    => 'id',
                     'mapper' => RoleMapper::getInstance()
-                ),
-            )
+                ],
+            ]
         );
 
         return $manyManyRelation->find();
@@ -634,16 +663,19 @@ class EventMapper extends Calendar\EventMapper {
      *
      * @param Event $event
      */
-    public function deleteRoleRelations($event) {
+    public function deleteRoleRelations($event)
+    {
         $query = "
 			DELETE FROM `eotc_event_role`
 			WHERE event_id = :eventId
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->execute([
-            'eventId' => $event->getId()
-        ]);
+        $statement->execute(
+            [
+                'eventId' => $event->getId()
+            ]
+        );
     }
 
     /**
