@@ -171,16 +171,17 @@ class Base implements IIterator
     }
 
     /**
-     * If we get a PDO exception running a query we don't want to terminate application
-     * execution, instead we store the error message/code on the statement and returns false
+     * If we get a PDO exception running a query we DO want to terminate application
+     * execution (or at least force something up the stack to handle this issue).
      *
-     * @param PDOException|DatabaseException $e
-     * @return bool
+     * @param PDOException $e
+     * @param string $prefix Prefix the returned exception's message with this
+     * @throws DatabaseException
      */
-    protected function handleException($e)
+    protected function handleException(PDOException $e, $prefix = '')
     {
         $this->errorInfo = $e->getMessage();
         $this->errorCode = $e->getCode();
-        return false;
+        throw new DatabaseException($prefix . $e->getMessage(), $e->getCode(), $e);
     }
 }
