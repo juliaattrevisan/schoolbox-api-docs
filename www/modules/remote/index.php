@@ -19,7 +19,6 @@ $remoteUrl = base64_decode(str_replace(' ', '+', implode('/', $encodedUrlParts))
 
 // For specifying the height styling of the parent frame
 // Use fullscreen class if no height specified
-$height = '';
 $heightStyle = '';
 $class = '';
 
@@ -32,8 +31,7 @@ $fragment = $url->getFragment();
 if(stripos($fragment, 'zx_h=') !== false) {
     preg_match("#zx_h=([0-9]*(?:%|px|&))#", $fragment, $matches);
     if(isset($matches[1])) {
-        $height = str_replace('&', '', $matches[1]);
-        $heightStyle = "height:".$height;
+        $heightStyle = 'height: '.str_replace('&', '', $matches[1]);
     }
 
     $url->setFragment('');
