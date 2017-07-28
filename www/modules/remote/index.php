@@ -28,17 +28,19 @@ if (!$url->isValid()) {
 }
 
 $fragment = $url->getFragment();
-if(stripos($fragment, 'zx_h=') !== false) {
-    preg_match("#zx_h=([0-9]*(?:%|px|&))#", $fragment, $matches);
-    if(isset($matches[1])) {
-        $heightStyle = 'height: '.str_replace('&', '', $matches[1]);
-    }
 
-    $url->setFragment('');
+preg_match("#zx_h=([0-9]+)#", $fragment, $matches);
+
+if (isset($matches[1])) {
+    //Assume px
+    $heightStyle = 'height: '.$matches[1].'px';
 }
-else{
+else {
+    //Bad or no data supplied
     $class = "fullscreen";
 }
+
+$url->setFragment('');
 
 $query = $url->getQueryAsArray();
 
