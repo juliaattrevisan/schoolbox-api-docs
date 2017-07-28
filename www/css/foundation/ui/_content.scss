@@ -659,6 +659,7 @@ $rotate-th-width: $square-grid-td-size;
             padding: 0.25rem 0;
         }
     }
+
 }
 
 // Labels
@@ -672,6 +673,20 @@ $rotate-th-width: $square-grid-td-size;
     &.highlight {
         color: $accent-foreground;
         background-color: $accent-background;
+    }
+    &.filter{
+        @extend .highlight;
+        padding-right: 2rem;
+        .close{
+            font-size: 1.5rem;
+            font-weight: normal;
+            position: absolute;
+            right: 10px;
+            top: -2px;
+            &:hover{
+                color: $alert-color;
+            }
+        }
     }
 }
 .submitted {

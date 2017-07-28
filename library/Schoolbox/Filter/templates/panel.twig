@@ -378,7 +378,7 @@ Usage:
          */
         function hideFilterLoader() {
             $filterLoaderIcon.prop('disabled', true);
-            $filterLoaderIcon.css('opacity', 0);
+            $filterLoaderIcon.css({'opacity': '0', 'width':'0'});
         }
 
         /**
@@ -397,22 +397,13 @@ Usage:
 </script>
 
 {# Rip outta DOM on load, and remove 'hide' #}
-<span data-applied-filter-tab class="label highlight hide"><span data-filter></span> <a href="#" data-close class="close" title="Remove filter" style="font-size: 24px;line-height: 14px; vertical-align: text-bottom;" >×</a></span>
+<span data-applied-filter-tab class="label filter hide"><span data-filter></span> <a href="#" data-close class="close" title="Remove filter">×</a></span>
 
 <style>
     .flex-container{
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-    }
-
-    #filter_panel .label{
-        cursor: default;
-        margin-bottom: 8px;
-    }
-
-    #filter_panel .label .close:hover{
-        color: red;
     }
 
     #submit_button{
@@ -443,17 +434,14 @@ Usage:
                     {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
                     <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ...">
 
-                    <span id="filter-loader" class="loader" title="request sent ..." style="position: relative; top: 3px;"></span>Filters: <span id="applied_filters" data-applied-filters></span>
+                    <span id="filter-loader" class="loader" title="Request sent ..."></span>Filters: <span id="applied_filters" data-applied-filters></span>
                 </legend>
             </fieldset>
 
-            <fieldset class="content" data-collapsable="panel-components" data-collapse-state="collapsed" style="display: none;">
-                <div style="text-align: right; padding-right: 1rem;">
-                    <a id="defaults_reset" class="button" title="Revert to default selections" style="width: auto; min-width: 150px;">Reset to Defaults</a>
-                    <a id="cancel_changes" class="button" title="Revert to your most recently applied filter" style="width: auto; min-width: 150px;">Cancel Changes</a>
-                </div>
-
-                <div class="flex-container" style="margin: 0;">
+            <fieldset data-collapsable="panel-components" data-collapse-state="collapsed" style="display: none;">
+                <a id="defaults_reset" class="button" title="Revert to default selections">Reset to Defaults</a>
+                <a id="cancel_changes" class="button" title="Revert to your most recently applied filter">Cancel Changes</a>
+                <div class="content flex-container">
                     {% set countComponents = 0 %}
                     {% for component in panel.components %}
                         {% set template = component.template %}
@@ -465,14 +453,13 @@ Usage:
                     {% endfor %}
 
                     {% if not countComponents %}
-                        <div class="empty-state" style="flex-grow: 1; margin: 16px 20px 0;">
+                        <div class="empty-state">
                             <i class="icon-info"></i>
                             <p>No filters are user-configurable on this page.</p>
                         </div>
                     {% endif %}
                 </div>
             </fieldset>
-
         </section>
 
         {# Will contain error message HTML, as defined in template below #}
