@@ -30,7 +30,7 @@
 
         {% if noInstall %}
             <p>The sports fixtures module is currently not installed, please ask your System Administrator about how to enable this component.</p>
-        {% elseif (readOnly or ((matches is empty) and (team is not empty))) %}
+        {% elseif (readOnly or ((matches is empty) and ((team is not empty) and team != '0'))) %}
             <p>There are no upcoming matches to display at this time.</p>
         {% else %}
 
