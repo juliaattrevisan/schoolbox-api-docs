@@ -179,14 +179,10 @@ class TestStatement extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test stored procedures
+     * Test a stored procedure with boring old input values.
      */
     public function testStoredProcedure()
     {
-        // ----------------------------------------------------------------------------------------------------------------
-        // Execute a stored procedure with boring old input values
-        // ----------------------------------------------------------------------------------------------------------------
-
         $this->connectSynergetic68();
 
         $statement = $this->synergetic68->executeStoredProcedure('spsStudentPersonal', [
@@ -198,10 +194,14 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $this->assertSame(strtolower($student['Surname']), 'rhodes');
         $this->assertSame(strtolower($student['Given1']), 'rachel');
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // Execute a stored procedure with output parameters and a return value
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Test a stored procedure with output parameters and a return value.
+     */
+    public function testStoredProcedureWithOutputParameters()
+    {
+        $this->connectSynergetic68();
 
         $currentDay = null;
         $calendarDate = null;
@@ -237,10 +237,14 @@ class TestStatement extends PHPUnit_Framework_TestCase
         $this->assertSame($message, 'No classes on this day');
         $this->assertSame($definitionDay, null);
         $this->assertSame($result, 1);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // Test iterating multiple recordsets returned by stored procedure
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Test iterating multiple recordsets returned by stored procedure
+     */
+    public function testStoredProcedureWithMultipleRecordSets()
+    {
+        $this->connectSynergetic68();
 
         $iterator = $this->synergetic68->executeStoredProcedureIterator('uTestMultipleRecordsets');
 
@@ -259,16 +263,19 @@ class TestStatement extends PHPUnit_Framework_TestCase
         foreach ($iterator as $row) {
             $this->assertEquals($expectedResults[$count++], $row['test']);
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // Test function call
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Test function call stored procedure
+     */
+    public function testStoredProcedureFunctionCall()
+    {
+        $this->connectSynergetic68();
 
         $function = $this->synergetic68->executeFunctionCall('dbo.fnTimeStr', [
-             'ADateTime' => '2016-01-05 13:47:27'
+            'ADateTime' => '2016-01-05 13:47:27'
         ]);
 
         $this->assertSame($function->fetchColumn(), "1:47pm");
-
     }
 }
