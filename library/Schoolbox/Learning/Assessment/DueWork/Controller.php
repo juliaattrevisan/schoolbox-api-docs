@@ -825,10 +825,10 @@ class Controller extends Assessment\Controller
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
-        try{
+        try {
             $this->dueWorkResponseMapper->save($response);
             $participant->getAllResponses()[$response->getId()] = $response;
-            $assessment->getResponses()[$response->getId()] = $response;
+            $assessment->getResponses()[$response->getId()]     = $response;
             $data = [
                 'success'       => true,
                 'id'            => $response->getId(),
@@ -839,10 +839,10 @@ class Controller extends Assessment\Controller
                 ])->getAsString(),
             ];
             $code = 200;
-        } catch (\PDOException $e){
+        } catch (\PDOException $e) {
             $data = [
-                'success'       => false,
-                'message'       => $e->getMessage(),
+                'success' => false,
+                'message' => $e->getMessage(),
             ];
             $code = 403;
         }
