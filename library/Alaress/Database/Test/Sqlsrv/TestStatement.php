@@ -248,7 +248,7 @@ class TestStatement extends PHPUnit_Framework_TestCase
         $expectedResults = ['1', '2', '3', '4'];
 
         foreach ($iterator as $row) {
-            $this->assertSame($expectedResults[$count++], $row['test']);
+            $this->assertEquals($expectedResults[$count++], $row['test']);
         }
 
         $iterator->nextRowset();
@@ -257,7 +257,7 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $count = 0;
         foreach ($iterator as $row) {
-            $this->assertSame($expectedResults[$count++], $row['test']);
+            $this->assertEquals($expectedResults[$count++], $row['test']);
         }
 
         // ----------------------------------------------------------------------------------------------------------------
