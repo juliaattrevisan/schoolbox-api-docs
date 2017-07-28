@@ -46,6 +46,11 @@ REFERENCES `submission_mark_type` (`mark_type_id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+UPDATE project
+  LEFT JOIN `user` ON `owner_id` = `user`.id
+SET owner_id = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
+WHERE `user`.id is null;
+
 ALTER TABLE `project`
   CHANGE COLUMN `owner_id` `owner_id` INT(11) UNSIGNED NOT NULL ;
 
