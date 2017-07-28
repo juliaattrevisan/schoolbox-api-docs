@@ -394,7 +394,9 @@
             {
                 $toast.toastTimeout({text: 'Submission Acknowledged.', css: 'success'});
                 $button.fadeOut({done: function(){
-                    $actionBar.slideUp();
+                    if(!$actionBar.is('[data-mass-publish]')){
+                         $actionBar.slideUp();
+                    }
                     $button.remove();
                 }});
                 $participant.attr('data-status', 'pending');
