@@ -112,43 +112,38 @@ class External_Maze_User implements External_UserInterface
              */
             if (strlen($family['Email'])) {
                 $newFamily['Email'] = $family['Email'];
-            } else {
-                if (strlen($family['SpouseEmail'])) {
-                    $newFamily['Email'] = $family['SpouseEmail'];
-                }
+            } elseif (strlen($family['SpouseEmail'])) {
+                $newFamily['Email'] = $family['SpouseEmail'];
             }
 
             /* Decide whose mobile to use
              */
             if (strlen($family['MobilePhone'])) {
                 $newFamily['MobilePhone'] = $family['MobilePhone'];
-            } else {
-                if (strlen($family['SpouseMobilePhone'])) {
-                    $newFamily['SpouseMobilePhone'] = $family['SpouseMobilePhone'];
-                }
+            }
+            elseif (strlen($family['SpouseMobilePhone'])) {
+                $newFamily['SpouseMobilePhone'] = $family['SpouseMobilePhone'];
             }
 
             /* Decide whose home phone to use
              */
             $newFamily['HomePhone'] = $family['HomePhone'];
-        } else {
-            if (strlen($family['Preferred'])) {
-                $newFamily['Title'] = $family['Title'];
-                $newFamily['Preferred'] = $family['Preferred'];
-                $newFamily['Surname'] = $family['Surname'];
-                $newFamily['Email'] = $family['Email'];
-                $newFamily['HomePhone'] = $family['HomePhone'];
-                $newFamily['MobilePhone'] = $family['MobilePhone'];
-            } else {
-                if (strlen($family['SpousePreferred'])) {
-                    $newFamily['Title'] = $family['SpouseTitle'];
-                    $newFamily['Preferred'] = $family['SpousePreferred'];
-                    $newFamily['Surname'] = $family['SpouseSurname'];
-                    $newFamily['Email'] = $family['SpouseDefaultEmail'];
-                    $newFamily['HomePhone'] = $family['SpouseHomePhone'];
-                    $newFamily['MobilePhone'] = $family['SpouseMobilePhone'];
-                }
-            }
+        }
+        elseif (strlen($family['Preferred'])) {
+            $newFamily['Title']       = $family['Title'];
+            $newFamily['Preferred']   = $family['Preferred'];
+            $newFamily['Surname']     = $family['Surname'];
+            $newFamily['Email']       = $family['Email'];
+            $newFamily['HomePhone']   = $family['HomePhone'];
+            $newFamily['MobilePhone'] = $family['MobilePhone'];
+        }
+        elseif (strlen($family['SpousePreferred'])) {
+            $newFamily['Title'] = $family['SpouseTitle'];
+            $newFamily['Preferred'] = $family['SpousePreferred'];
+            $newFamily['Surname'] = $family['SpouseSurname'];
+            $newFamily['Email'] = $family['SpouseDefaultEmail'];
+            $newFamily['HomePhone'] = $family['SpouseHomePhone'];
+            $newFamily['MobilePhone'] = $family['SpouseMobilePhone'];
         }
 
         return $newFamily;
@@ -210,7 +205,6 @@ class External_Maze_User implements External_UserInterface
             $processed['ID'] = $currentFamily['ContactID'];
 
             $allFamilies = $this->recombine($processed);
-
         }
 
         return $allFamilies;
@@ -261,10 +255,8 @@ class External_Maze_User implements External_UserInterface
                     if (strlen($currentEmail['RelatedID1'])) {
                         if (strlen($currentEmail['FamilyEmail1'])) {
                             $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
-                        } else {
-                            if (strlen($currentEmail['FamilyEmail2'])) {
-                                $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail2'];
-                            }
+                        } elseif (strlen($currentEmail['FamilyEmail2'])) {
+                            $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail2'];
                         }
                     }
 
@@ -277,10 +269,9 @@ class External_Maze_User implements External_UserInterface
                     if (strlen($currentEmail['RelatedID2'])) {
                         if (strlen($currentEmail['AltFamilyEmail1'])) {
                             $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
-                        } else {
-                            if (strlen($currentEmail['AltFamilyEmail2'])) {
-                                $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail2'];
-                            }
+                        }
+                        elseif (strlen($currentEmail['AltFamilyEmail2'])) {
+                            $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail2'];
                         }
                     }
                 }
@@ -576,7 +567,6 @@ class External_Maze_User implements External_UserInterface
         /* Search for a student name
          */
         if (strlen($name)) {
-
             $splitNames = explode(' ', $name);
 
             foreach ($splitNames as $splitName) {
@@ -594,19 +584,16 @@ class External_Maze_User implements External_UserInterface
         /* Search for a particular boarding status
          */
         if ($boardingStatus == '') {
-
             /* No restrictions on result set
              */
+        } elseif ($boardingStatus == 'yes') {
+            $query .= "
+                AND ST.BOARDER = 'Y'
+            ";
         } else {
-            if ($boardingStatus == 'yes') {
-                $query .= "
-				AND ST.BOARDER = 'Y'
-			";
-            } else {
-                $query .= "
-				AND ST.BOARDER != 'Y'
-			";
-            }
+            $query .= "
+                AND ST.BOARDER != 'Y'
+            ";
         }
 
         /* Search for a particular form
@@ -645,12 +632,17 @@ class External_Maze_User implements External_UserInterface
      * $row['CURRENT_SEMESTER'] = '1998S4';
      *
      * @param null $externalUserId
+     * @return string
      */
     public function getCurrentSemester($externalUserId = null)
     {
         return $this->getHelper()->getCurrentSemester();
     }
 
+    /**
+     * @param null $externalUserId
+     * @return string
+     */
     public function getCurrentYear($externalUserId = null)
     {
         return $this->getHelper()->getCurrentYear();
@@ -665,7 +657,6 @@ class External_Maze_User implements External_UserInterface
     public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
-        $allSubjects = array();
 
         if (empty($externalId)) {
             return [];
@@ -717,48 +708,48 @@ class External_Maze_User implements External_UserInterface
             }
 
             $allSubjects = array_merge($part1, $part2);
-        } else {
-            if ($user->getRole()->isStaff()) {
-                $query = "
-				SELECT
-					KGC.ROLL_GROUP AS ClassCode,
-					'' AS ClassNumber,
-					'' AS classType,
-					'' AS ClassCampus,
-					KGC.DESCRIPTION AS name
-				FROM KGC
-				WHERE TEACHER = '{$externalId}'
-			";
+        }
+        elseif ($user->getRole()->isStaff()) {
+            $query = "
+                SELECT
+                    KGC.ROLL_GROUP AS ClassCode,
+                    '' AS ClassNumber,
+                    '' AS classType,
+                    '' AS ClassCampus,
+                    KGC.DESCRIPTION AS name
+                FROM KGC
+                WHERE TEACHER = '{$externalId}'
+            ";
 
-                $part1 = $this->getDb()->getAll($query);
+            $part1 = $this->getDb()->getAll($query);
 
-                if (!$part1) {
-                    $part1 = array();
-                }
-
-                $query = "
-				SELECT
-					THTQ.SUBJ AS ClassCode,
-					THTQ.CLASS AS ClassNumber,
-					SU.FULLNAME AS name,
-					'' AS classType,
-					'' AS ClassCampus
-				FROM THTQ
-				INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
-				WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-				AND (THTQ.T1TEACH = '{$externalId}' OR THTQ.T2TEACH = '{$externalId}')
-			";
-
-                $part2 = $this->getDb()->getAll($query);
-
-                if (!$part2) {
-                    $part2 = array();
-                }
-
-                $allSubjects = array_merge($part1, $part2);
-            } else {
-                return [];
+            if (!$part1) {
+                $part1 = array();
             }
+
+            $query = "
+                SELECT
+                    THTQ.SUBJ AS ClassCode,
+                    THTQ.CLASS AS ClassNumber,
+                    SU.FULLNAME AS name,
+                    '' AS classType,
+                    '' AS ClassCampus
+                FROM THTQ
+                INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
+                WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+                AND (THTQ.T1TEACH = '{$externalId}' OR THTQ.T2TEACH = '{$externalId}')
+            ";
+
+            $part2 = $this->getDb()->getAll($query);
+
+            if (!$part2) {
+                $part2 = array();
+            }
+
+            $allSubjects = array_merge($part1, $part2);
+        }
+        else {
+            return [];
         }
 
         /* Return structure
@@ -828,7 +819,6 @@ class External_Maze_User implements External_UserInterface
      */
     public function getEmail($externalUserId)
     {
-
         /* TODO: This doesn't seem to be used in Schoolbox?
          */
     }
@@ -868,15 +858,14 @@ class External_Maze_User implements External_UserInterface
 				FROM ST
 				WHERE ST.STKEY = '{$externalUserId}'
 			";
-        } else {
-            if ($this->getGroup()->isStaff($user->getId())) {
-                $query = "
-				SELECT
-					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
-				FROM SF
-				WHERE SF.SFKEY = '{$externalUserId}'
-			";
-            }
+        }
+        elseif ($this->getGroup()->isStaff($user->getId())) {
+            $query = "
+                SELECT
+                    CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
+                FROM SF
+                WHERE SF.SFKEY = '{$externalUserId}'
+            ";
         }
 
         if ($photo = $this->getDb()->getRow($query)) {
@@ -900,15 +889,14 @@ class External_Maze_User implements External_UserInterface
 						FROM ST
 						WHERE ST.STKEY = '{$externalUserId}'
 					";
-                } else {
-                    if ($this->getGroup()->isStaff($user->getId())) {
-                        $query = "
-						SELECT
-							STAFF_PIC AS Photo
-						FROM SF
-						WHERE SF.SFKEY = '{$externalUserId}'
-					";
-                    }
+                }
+                elseif ($this->getGroup()->isStaff($user->getId())) {
+                    $query = "
+                    SELECT
+                        STAFF_PIC AS Photo
+                    FROM SF
+                    WHERE SF.SFKEY = '{$externalUserId}'
+                ";
                 }
 
                 $photo = $this->getDb()->getRow($query);
@@ -1056,7 +1044,6 @@ class External_Maze_User implements External_UserInterface
     {
         return array();
     }
-
 
     /**
      * Determine what kind of boarder this person is
