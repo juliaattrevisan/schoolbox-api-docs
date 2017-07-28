@@ -31,6 +31,7 @@ trait HandlesExceptionTrait
         $this->errorCode = $e->getCode();
         // Query exceptions are usually logic exceptions, not runtime exceptions.
         // However, PDOException extends RuntimeException, so...
-        throw new Exception($prefix . $e->getMessage(), $e->getCode(), $e);
+        // (PHP5.5 refuses to accept a string as $code parameter, so pass 0)
+        throw new Exception($prefix . $e->getMessage(), 0, $e);
     }
 }
