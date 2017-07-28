@@ -165,7 +165,6 @@ abstract class AbstractMapperProxy
 
     /**
      * @return object
-     * @throws Exception
      * @todo Update signature to accept optional $id and leverage a model cache
      */
     public function createModel()
