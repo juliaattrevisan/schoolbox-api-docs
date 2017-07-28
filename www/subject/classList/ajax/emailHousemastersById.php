@@ -7,8 +7,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
-require_once('../../../../library/Bootstrap.php');
+require_once __DIR__ . '/../../../../library/Bootstrap.php';
 
 // Bedankt voor het bellen van Alaress. Uw oproep is erg belangrijk voor ons...
 
