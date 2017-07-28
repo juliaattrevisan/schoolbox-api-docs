@@ -31,9 +31,9 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
 				  LEFT JOIN user u ON u.id = n.owner
 				  WHERE code = '$categoryID'  AND deleted = 0 ";
 		if ($archive)
-			$query .= " AND (datetime_published <= CURDATE() OR owner = $userID) AND datetime_expires <  CURDATE()";
+			$query .= " AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = $userID) AND datetime_expires <  CURRENT_TIMESTAMP()";
     	else
-			$query .= " AND (datetime_published <= CURDATE() OR owner = $userID) AND datetime_expires >= CURDATE()";
+			$query .= " AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = $userID) AND datetime_expires >= CURRENT_TIMESTAMP()";
 
 		$query .= "ORDER BY datetime_posted DESC";
 
