@@ -9,10 +9,8 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
-use Schoolbox\External\Connector\CommunityPortalInterface;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 /**
  * Controller for password resets
@@ -42,31 +40,23 @@ class Controller extends Base
     protected $passwordService;
 
     /**
-     * @var CommunityPortalInterface
-     */
-    protected $communityPortal;
-
-    /**
      * Constructor
      *
      * @param UserMapper $userMapper
      * @param Mapper $resetMapper
      * @param TwigEmailFactory $mailFactory
      * @param PasswordService $passwordService
-     * @param CommunityPortalInterface $communityPortal
      */
     public function __construct(
         UserMapper $userMapper,
         Mapper $resetMapper,
         TwigEmailFactory $mailFactory,
-        PasswordService $passwordService,
-        CommunityPortalInterface $communityPortal
+        PasswordService $passwordService
     ) {
         $this->userMapper = $userMapper;
         $this->resetMapper = $resetMapper;
         $this->mailFactory = $mailFactory;
         $this->passwordService = $passwordService;
-        $this->communityPortal = $communityPortal;
     }
 
     /**
@@ -223,7 +213,9 @@ class Controller extends Base
             $email->sendToBlackhole();
         }
 
-        $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+        );
     }
 
     /**
@@ -256,17 +248,6 @@ class Controller extends Base
                     'userPasswordReset.displaySuccessMessage'
                 )
             );
-
-            // Reset their password in SCP too
-            if ($user->getRole()->isParent()) {
-                try {
-                    $this->communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
-                } catch (UnexpectedValueException $e) {
-                    // Portal integration wasn't set up properly?
-                    // Warn the user
-                    $this->getSessionSegment()->setFlash('isCommunityPortalPasswordSet', false);
-                }
-            }
         } else {
             $this->getSessionSegment()->setFlash('isPasswordValid', false);
             $this->getResponse()->redirect->to(
@@ -300,15 +281,21 @@ class Controller extends Base
     {
         if (!$reset->getToken()) {
             // Token wasn't found - go elsewhere
-            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+            );
         } elseif (!$reset->getResetTime()->isNull()) {
             // Token already used - go elsewhere
-            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+            );
         } elseif ($reset->getExpiry()->lt(\Alaress_Date_Format::now())) {
             // This request has expired. Create a new one
             // Not setting email - stale requests should not give out this information.
             $this->getSessionSegment()->setFlash('isResetExpired', true);
-            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+            );
         }
     }
 }
