@@ -84,32 +84,38 @@ class Base extends BaseQuery implements IStoredProcedure
     /**
      * @inheritdoc
      */
-    protected function bindStatement() {
-
-        /** @var PDOStatement $statement */
-        $statement = $this->statement;
-
-        // Bind inputs
-
+    protected function bindStatement()
+    {
         parent::bindStatement();
+        $this->internalBindOutputs();
+        $this->internalBindReturnValue();
+    }
 
-        // Bind output parameters
-
+    /**
+     * Internal method for binding output values to stored procedures.
+     */
+    protected function internalBindOutputs()
+    {
         if (isset($this->parameters['output'])) {
             foreach ($this->parameters['output'] as $name => &$output) {
-                $statement->bindParam(
+                $this->statement->bindParam(
                     $name,
                     $output['value'],
                     $output['type'] | PDO::PARAM_INPUT_OUTPUT,
                     $output['length']
                 );
             }
+            unset($output);
         }
+    }
 
-        // Bind return value
-
+    /**
+     * Internal method for binding return values to stored procedures.
+     */
+    protected function internalBindReturnValue()
+    {
         if (isset($this->parameters['return'])) {
-            $statement->bindParam(
+            $this->statement->bindParam(
                 'return',
                 $this->parameters['return']['value'],
                 $this->parameters['return']['type'] | PDO::PARAM_INPUT_OUTPUT,
