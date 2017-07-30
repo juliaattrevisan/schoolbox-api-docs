@@ -82,9 +82,9 @@ Data:
 
             $.ajax({
                 type: "POST",
-                url: '{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id}) }}',
+                url: '{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: student.id}) }}',
                 data: formContents,
-                always: function () {
+                complete: function () {
                     // Re-init the autosave
                     initAutosave();
 
@@ -92,7 +92,7 @@ Data:
                      */
                     $("[data-action-save]").prop('disabled', false);
                 },
-                done: function (responseText) {
+                success: function (responseText) {
 
                     /* Recycle the id ><
                      */
@@ -102,7 +102,7 @@ Data:
                         css: 'success'
                     });
                 },
-                fail: function (response) {
+                error: function (response) {
                     var temp = $.parseJSON(response.responseText);
 
                     formSaveLabel.toastTimeout({
@@ -196,6 +196,7 @@ Data:
         </section>
         {% endif %}
         <h2 class="subheader">Submit Response</h2>
+
         <div class="row">
             <div class="small-12 columns">
                 <div class="alert-box">
@@ -210,6 +211,7 @@ Data:
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
                     <section class="content">
                         <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+
                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                     </section>
                     <input type="submit" value="Submit for Assessment {% if USER.id != student.id %}On Behalf Of {{ student.formatName }}{% endif %}" data-action-save />
