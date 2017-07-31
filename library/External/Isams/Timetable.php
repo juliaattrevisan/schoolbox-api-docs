@@ -283,7 +283,8 @@ class External_Isams_Timetable implements External_TimetableInterface
             JOIN    V_Class ON V_Class.ClassCode = V_TimetableSchedule.ClassCode
             JOIN    V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
             JOIN    V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
-            WHERE   V_TimetableStructure.PeriodID IN (SELECT PeriodID FROM V_TimetableStructure WHERE DayID = {$dayNumber}) AND     
+            WHERE   V_TimetableStructure.PeriodID IN (SELECT PeriodID FROM V_TimetableStructure WHERE DayID = {$dayNumber}) AND   
+                    CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}' AND
                     (
                         V_Class.Tutor1ID = '{$this->database->quote($externalUserId)}' OR
                         V_Class.Tutor2ID = '{$this->database->quote($externalUserId)}' OR
@@ -364,6 +365,7 @@ class External_Isams_Timetable implements External_TimetableInterface
                             V_Class.Tutor2ID = '{$externalUserId}' OR
                             V_Class.StudentID = '{$externalUserId}'
                         )
+                        AND CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}'
             ORDER BY V_Days.intOrder, V_Periods.intOrder
         ";
 
