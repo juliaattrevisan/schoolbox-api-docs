@@ -72,7 +72,6 @@ class StoredProcedure extends Base
                     $parameterPlaceholders .= ", ";
                 }
                 $parameterPlaceholders .= "@{$name} = :{$name}";
-                $outputSelectPlaceholders[] = $this->buildOutputSelect($name);
             }
         }
 
@@ -92,8 +91,9 @@ class StoredProcedure extends Base
         $prefix = "EXEC";
 
         if (isset($this->parameters['return'])) {
-            $declarePlaceholders[] = $this->buildDeclare('return', $this->parameters['return']);
-            $prefix = "EXEC @return =";
+            $declarePlaceholders[] = $this->buildDeclare('Outputreturn', $this->parameters['return']);
+            $outputSelectPlaceholders[] = $this->buildOutputSelect('return');
+            $prefix = "EXEC @Outputreturn =";
         }
 
         // Add SELECT parts
