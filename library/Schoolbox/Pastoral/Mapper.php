@@ -65,8 +65,7 @@ class Mapper extends BaseMapper
         $this->uses('points', self::TYPE_DECIMAL);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joinsReverseMulti('pastoral_id', AccessMapper::class, 'access', 'access');
         $this->joinsReverseMulti('pastoral_id', CommentMapper::class, 'comments', 'comments');
