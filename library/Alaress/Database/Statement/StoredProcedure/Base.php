@@ -92,18 +92,29 @@ class Base extends BaseQuery implements IStoredProcedure
     }
 
     /**
+     * Bind a single output parameter.
+     *
+     * @param string $name
+     * @param &array $param
+     */
+    protected function internalBindOutputParam($name, &$param)
+    {
+        $this->statement->bindParam(
+            $name,
+            $param['value'],
+            $param['type'] | PDO::PARAM_INPUT_OUTPUT,
+            $param['length']
+        );
+    }
+
+    /**
      * Internal method for binding output values to stored procedures.
      */
     protected function internalBindOutputs()
     {
         if (isset($this->parameters['output'])) {
             foreach ($this->parameters['output'] as $name => &$output) {
-                $this->statement->bindParam(
-                    $name,
-                    $output['value'],
-                    $output['type'] | PDO::PARAM_INPUT_OUTPUT,
-                    $output['length']
-                );
+                $this->internalBindOutputParam($name, $output);
             }
             unset($output);
         }
@@ -115,12 +126,7 @@ class Base extends BaseQuery implements IStoredProcedure
     protected function internalBindReturnValue()
     {
         if (isset($this->parameters['return'])) {
-            $this->statement->bindParam(
-                'return',
-                $this->parameters['return']['value'],
-                $this->parameters['return']['type'] | PDO::PARAM_INPUT_OUTPUT,
-                $this->parameters['return']['length']
-            );
+            $this->internalBindOutputParam('return', $this->parameters['return']);
         }
     }
 }
