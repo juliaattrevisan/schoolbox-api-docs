@@ -73,13 +73,6 @@ class EventPermission
      */
     private $deletedAt = null;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-    }
-
     /* Getters/Setters
      */
 
