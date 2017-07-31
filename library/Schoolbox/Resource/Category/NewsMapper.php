@@ -278,7 +278,8 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
             SELECT    COUNT(*)
             FROM      `{$this->getTable()}` `n`
             WHERE     `n`.`code` = :catId 
-                      AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = :userId) AND datetime_expires < CURRENT_TIMESTAMP()
+                      AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = :userId)
+                      AND datetime_expires < CURRENT_TIMESTAMP()
                       AND `n`.deleted = 0
         ";
 

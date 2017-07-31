@@ -24,7 +24,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
      * @param int $userID
      * @return array|bool
      */
-    public function getAllForCategory($categoryID, $config = false, $archive = false, $userID = 0)
+    public function getAllForCategory($categoryID, $config = [], $archive = false, $userID = 0)
     {
         $userID = $userID ? $userID : $_SESSION['id'];
         $query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, UNIX_TIMESTAMP(datetime_published) published,
@@ -67,10 +67,10 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
 
     /**
      * @deprecated use Schoolbox\Resource\Category\NewsMapper::save()
-     * @param $news
+     * @param array $news
      * @return int|string|void
      */
-    private function create($news)
+    public function create($news)
     {
         $news['datetime_posted'] = 'NOW()';
         parent::create($news);
@@ -81,7 +81,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
      * @param $id
      * @return bool
      */
-    private function delete($id)
+    public function delete($id)
     {
         $this->update(array('id' => $id, 'deleted' => 1));
     }

@@ -70,8 +70,14 @@ class Renderer extends Handler
                     }
 
                     $now = Alaress_Date_Format::now();
-                    $expiryDate = new Alaress_Date_Format($news['datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
-                    $createdTime = new Alaress_Date_Format($news['datetime_posted'], Alaress_Date_Format::DATABASE_FORMAT);
+                    $expiryDate = new Alaress_Date_Format(
+                        $news['datetime_expires'],
+                        Alaress_Date_Format::DATABASE_FORMAT
+                    );
+                    $createdTime = new Alaress_Date_Format(
+                        $news['datetime_posted'],
+                        Alaress_Date_Format::DATABASE_FORMAT
+                    );
 
                     if ($now->gt($expiryDate)) {
                         $news['link'] = "/homepage/newsArchive/{$news['code']}#{$news['id']}";
