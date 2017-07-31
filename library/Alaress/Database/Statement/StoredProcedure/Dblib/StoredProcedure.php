@@ -95,4 +95,40 @@ class StoredProcedure extends Base
     {
         $this->statement->bindValue($name, $param['value'], $param['type']);
     }
+
+    /**
+     * Creates a DECLARE statement for an output or return parameter.
+     *
+     * @param string $name
+     * @param array  $param
+     * @return string
+     * @throws Exception if param's type isn't PARAM_BOOL, PARAM_STR or PARAM_INT
+     */
+    protected function buildDeclare($name, $param)
+    {
+        $type = $param['type'];
+        $size = $param['length'];
+        switch ($type) {
+            case PDO::PARAM_BOOL:
+                $sqlType = 'BIT';
+                break;
+
+            case PDO::PARAM_STR:
+                $sqlType = sprintf('VARCHAR(%d)', $size);
+                break;
+
+            case PDO::PARAM_INT:
+                $sqlType = 'BIGINT';
+                break;
+
+            case PDO::PARAM_LOB:
+                // GET OUT
+                throw new Exception('Invalid return type (PDO::PARAM_LOB)');
+
+            default:
+                // ¯\_(ツ)_/¯
+                throw new Exception('Unknown return type');
+        }
+        return "DECLARE @$name $sqlType = :$name;";
+    }
 }
