@@ -182,7 +182,7 @@ class Mapper extends BaseMapper
      *
      * @param PDOStatement $statement
      * @param bool         $hydrateRelatedRecords
-     * @return Collection
+     * @return Collection|Model[]
      */
     protected function hydrateSelectInternal(PDOStatement $statement, $hydrateRelatedRecords = true)
     {
@@ -194,7 +194,7 @@ class Mapper extends BaseMapper
             $model = $this->hydrateRow($row, $hydrateRelatedRecords);
 
             if ($model instanceof Model) {
-                $collection->add($model);
+                $collection[$model->getId()] = $model;
             }
         }
 
@@ -392,7 +392,7 @@ class Mapper extends BaseMapper
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
      * @param int $count Number of recent records to display
-     * @return Collection
+     * @return Collection|Model[]
      */
     public function findRecentDashboard($count = 5)
     {
@@ -403,12 +403,12 @@ class Mapper extends BaseMapper
             ['order' => ['created_at' => 'DESC']],
         ]);
 
-        $displayed = new Collection();
+        $displayed = $this->createCollection();
 
         /** @var Model $record */
         foreach ($records as $record) {
             if ($record->getOwner()->getId() == $this->getSessionUser()->getId()) {
-                $displayed->add($record);;
+                $displayed->add($record);
                 continue;
             }
 
@@ -500,7 +500,7 @@ class Mapper extends BaseMapper
      * Perform a search of pastoral records (currently searches the heading, body and comments)
      *
      * @param string $search
-     * @return Collection
+     * @return Collection|Model[]
      */
     public function getSearchResults($search)
     {
@@ -636,7 +636,7 @@ class Mapper extends BaseMapper
      * @param bool                $involved
      * @param Collection          $years
      *
-     * @return Collection
+     * @return Collection|Model[]
      */
     public function getReportData(
         User $user,
@@ -754,7 +754,7 @@ class Mapper extends BaseMapper
         // Otherwise, check each record has at least one of the tags we are searching for
 
         $pastoralTagMapper = PastoralTagMapper::getInstance();
-        $resultsFiltered = new Collection();
+        $resultsFiltered = $this->createCollection();
 
         /** @var Model $result */
         foreach ($results as $result) {
