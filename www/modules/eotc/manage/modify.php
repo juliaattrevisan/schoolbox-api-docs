@@ -59,9 +59,20 @@ $authenticator = new Authenticator($this);
 /** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
-$defaultTypeId   = '';
+/* Event type
+ */
+$defaultTypeId = '';
+
+/* This is used in the checkbox preselect outside this if/else
+ * so we set it to null, to prevent any campuses from being
+ * preselected
+ */
 $defaultCampusId = [];
-$selectedRoles   = [];
+
+/* This is used in the checkbox preselect outside this if/else
+ * so we set it to null, to prevent any roles from being preselected
+ */
+$selectedRoles = [];
 
 $configMapper = ConfigMapper::getInstance();
 
@@ -385,20 +396,6 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
 
     $metadata = new EventMetadata();
     $event->setMetadata($metadata);
-
-    $defaultTypeId = '';
-
-    /* This is used in the checkbox preselect outside this if/else
-	 * so we set it to null, to prevent any campuses from being
-	 * preselected
-	 */
-    $defaultCampusId = null;
-
-    /* This is used in the checkbox preselect outside this if/else
-	 * so we set it to null, to prevent any roles from being
-	 * preselected
-	 */
-    $selectedRoles = [];
 
     /* Miscellaneous setvarring
 	 * Hide advanced options by default
