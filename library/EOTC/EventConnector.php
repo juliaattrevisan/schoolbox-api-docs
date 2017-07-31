@@ -255,9 +255,8 @@ class EventConnector extends EventMapper
         $isEOTCAdministrator = false;
 
         $user = $this->getUser();
-        if ($user->isSuperuser()) {
-            $isEOTCAdministrator = true;
-        } else {
+
+        if (!$user->isSuperuser()) {
             $permissionMapper = EventPermissionMapper::getInstance();
             $allPermissions   = $permissionMapper->findByUser($user);
 
@@ -336,8 +335,6 @@ class EventConnector extends EventMapper
              *  - Student Attendees should only see this event if it's Approved
              *  - Anyone in both the Campus and Role of an Approved event regardless of attendee-ness
              */
-            $isVisible = false;
-
             $isSuperuser = $user->isSuperuser();
             $isCreator = $eventItem->getAuthor()->getId() == $user->getId();
             $isTIC = $user->getId() == $eventItem->getTeacherInCharge()->getId();
@@ -347,10 +344,6 @@ class EventConnector extends EventMapper
             $inCampusAndRole = $inCampus && $inRole;
 
             if ($isEOTCAdministrator || $isSuperuser || $isCreator || $isTIC || $isStaffAttendee || ($isApproved && ($isStudentAttendee || $inCampusAndRole))) {
-                $isVisible = true;
-            }
-
-            if ($isVisible) {
 
                 /* Translate an \EOTC\Event type into a EventInterface descendant
                  * Note that this "new Event();" does not have a mapper, so spawn concretely
