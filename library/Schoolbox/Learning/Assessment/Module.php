@@ -444,11 +444,11 @@ class Module extends BaseModule
 
     /**
      * Rules in order of preference:
-     * - Nobody can submit if reached response limit
      * - SU can submit
      * - staff/students cannot if due in archived term (ie 'interaction locked')
      * - staff must have WRITE+ perm to folder
      * - students cannot if not open
+     * - Students cannot submit if reached response limit
      * - students cannot if not participant, or a different student to that indicated in URL
      *
      * @return Rule\IAuthorizationRule

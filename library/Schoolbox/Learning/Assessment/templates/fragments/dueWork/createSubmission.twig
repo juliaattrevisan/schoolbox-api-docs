@@ -130,13 +130,14 @@ Data:
             emptyDialog.foundation('reveal', 'close');
         });
 
-        var dialog = $('#confirm-dialog');
+        var confirmDialog = $('#confirm-dialog');
 
         $("[data-action-save]").click(function (e) {
-            var form      = $(this).closest('form'),
-                submit    = form.find(':submit'),
-                inlineLen = CKEDITOR.instances['editor-body'].getData().length,
-                filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
+            var form = $(this).closest('form'),
+                    dialog = confirmDialog,
+                    submit = form.find(':submit'),
+                    inlineLen = CKEDITOR.instances['editor-body'].getData().length,
+                    filesLen = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
 
             if (!inlineLen && !filesLen) {
                 // prevent submission without SOMETHING to submit
@@ -160,7 +161,7 @@ Data:
                     dialog.foundation('reveal', 'close');
                 });
 
-                dialog.foundation('reveal').foundation('reveal', 'open');
+                confirmDialog.foundation('reveal').foundation('reveal', 'open');
             }
             else {
                 // checks pass: go for broke
