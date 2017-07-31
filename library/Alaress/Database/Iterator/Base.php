@@ -16,7 +16,6 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Exception;
-use Alaress\Database\HandlesExceptionTrait;
 use Alaress\Database\Statement\IStatement;
 use PDO;
 use PDOException;
@@ -24,8 +23,6 @@ use PDOStatement;
 
 class Base implements IIterator
 {
-    use HandlesExceptionTrait;
-
     /** @var int $rowIndex Zero-indexed value used for row counting */
     protected $rowIndex = -1;
 
@@ -150,21 +147,5 @@ class Base implements IIterator
         }
 
         return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function errorInfo()
-    {
-        return $this->errorInfo;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function errorCode()
-    {
-        return $this->errorCode;
     }
 }
