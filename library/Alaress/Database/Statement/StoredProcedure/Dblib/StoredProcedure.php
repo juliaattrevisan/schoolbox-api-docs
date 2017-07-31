@@ -81,7 +81,7 @@ class StoredProcedure extends Base
                 if (!empty($parameterPlaceholders)) {
                     $parameterPlaceholders .= ", ";
                 }
-                $parameterPlaceholders .= "@{$name} = @Output{$name}";
+                $parameterPlaceholders .= "@{$name} = @Output{$name} OUTPUT";
                 $outputSelectPlaceholders[] = $this->buildOutputSelect($name);
             }
         }
