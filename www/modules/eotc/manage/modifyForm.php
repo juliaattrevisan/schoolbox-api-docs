@@ -146,9 +146,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
              */
             $metadata->setEventType($_POST['type']);
             $metadata->setRamsRequired($_POST['ramsRequired']);
-            $metadata->setPermissionSlipRequired(
-                $_POST['permissionSlipRequired'] ? $_POST['permissionSlipRequired'] : 0
-            );
+            $metadata->setPermissionSlipRequired(isset($_POST['permissionSlipRequired']));
 
             /* Only assign createdAt for new metadata records
              */
