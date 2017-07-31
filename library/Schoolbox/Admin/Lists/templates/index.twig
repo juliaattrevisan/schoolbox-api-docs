@@ -12,6 +12,7 @@
         var newId = -1;
 
         var dataList = $('[data-list]');
+        var listEditor = $('#listEditor');
 
         dataList.on('change', '[data-nullcheck]', function() {
             // Find closest input
@@ -25,7 +26,7 @@
             }
         });
 
-        $('[data-button=add-row]').click(function(event) {
+        $(document).on('click', '[data-button=add-row]', function (event) {
             event.preventDefault();
 
             var listEmptyState = $('#listEmptyState');
@@ -36,27 +37,19 @@
                 listEmptyState.addClass('hide');
             }
 
-            var newRow = $('[data-clone]').find('li').clone()
-
-            {#
-                Ninja ID numbers into the cloned HTML. We also have to rename the data-colour-picker class so that
-                when we wire it up the template row doesn't get wired up- otherwise this screws up any subsequent
-                adds. Bit hacky, but works.
-            #}
-
-            newRow[0].innerHTML = newRow[0].innerHTML
-                    .replace(/#ID#/g, newId--)
-                    .replace(/data-colour-picker-clone/g, 'data-colour-picker-new');
+            {# yank the innerHTML of the clone element and ninja the ID into it #}
+            var newRow = $($('[data-clone]').html().replace(/#ID#/g, newId--));
 
             dataList
-                .append(newRow)
-                .find('[data-focus]')
-                .last()
+                .append(newRow);
+
+            newRow
+                .find(':input:visible')
+                .eq(0)
                 .focus();
 
             {# Wire up any colour pickers that were just added #}
-
-            $("[data-colour-picker-new]").spectrum({
+            newRow.find("[data-colour-picker]").spectrum({
                 allowEmpty: false,
                 showAlpha: true,
                 showInput: true,
@@ -68,23 +61,24 @@
                 }
             });
 
-            {#
-                Attach delete event to new rows, this doesn't ask for confirmation because
-                its not in the database, so its not going to do anything irreversable
-            #}
-
-            $('[data-delete-new]').click(function(event)
-            {
-                event.preventDefault();
-                $(this).closest('li').remove();
-            });
         });
 
-        $('[data-delete]').click(function (event) {
+        {#
+            Attach delete event to new rows, this doesn't ask for confirmation because
+            its not in the database, so its not going to do anything irreversable
+        #}
+
+        listEditor.on('click', '[data-delete-new]', function (event) {
+            event.preventDefault();
+            var id = $(this).data('delete-new');
+            $('[data-record-id="' + id + '"]').slideUp(function () { $(this).remove(); });
+        });
+
+        listEditor.on('click', '[data-delete]', function (event) {
             event.preventDefault();
 
             var deleteId = $(this).data('delete');
-            var listItem = $(this).closest('li');
+            var listItem = $('[data-record-id="' + deleteId + '"]');
 
             $(this).confirmDialog({
                 text: '{{ tables[table].deleteWarning }}',
@@ -99,18 +93,21 @@
                     })
                     .done(function (response) {
                         if (response.result !== false) {
-                            listItem.remove();
-                        $toast.toastTimeout({text: 'Item deleted', css: 'success'});
+                            listItem.slideUp(function () { $(this).remove(); });
+                            $toast.toastTimeout({text: 'Item deleted', css: 'success'});
                         } else {
-                            $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});}
+                            $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});
+                        }
+                    })
+                    .fail(function (response) {
+                        $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});
                     });
                 }
             });
         });
 
         {# Wire up colour pickers #}
-
-        $("[data-colour-picker]").spectrum({
+        listEditor.find("[data-colour-picker]").spectrum({
             allowEmpty: false,
             showAlpha: true,
             showInput: true,
