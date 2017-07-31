@@ -108,7 +108,7 @@ class StoredProcedure extends Base
             $declarePart = implode(";\n", $declarePlaceholders).";\n";
         }
 
-        return "{$declarePart} {$prefix} {$this->name} {$parameterPlaceholders} {$outputSelectPart}";
+        return "{$declarePart}{$prefix} {$this->name} {$parameterPlaceholders} {$outputSelectPart}";
     }
 
     /**
@@ -155,7 +155,7 @@ class StoredProcedure extends Base
             // ¯\_(ツ)_/¯
             throw new Exception('Unknown return type');
         }
-        return "DECLARE @$name $sqlType = :$name";
+        return "DECLARE @$name $sqlType";
     }
 
     /**
