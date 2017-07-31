@@ -11,6 +11,8 @@ namespace EOTC;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EOTC\Event;
 use Schoolbox\Calendar\EventType;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -148,8 +150,9 @@ class EventConnector extends EventMapper
      *
      * @param $startTimestamp
      * @param $endTimestamp
-     *
      * @return Collection
+     * @throws MapperException
+     * @throws DefinitionException
      */
     public function getDayEvents($startTimestamp, $endTimestamp)
     {
