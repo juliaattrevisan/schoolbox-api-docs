@@ -1,0 +1,85 @@
+{% set recordIndex = recordIndex ?: loop.index %}
+{% set idIsNumeric = recordIndex matches '/^\\d+$/' %}
+{% set deleteAttr  = deleteAttr ?: 'data-delete' %}
+
+<li data-record-id="{{ key }}">
+    <input type="hidden" name="id[{{ recordIndex }}]" value="{{ key }}" />
+    <div class="actions-small-{{ deletable ? 1 : 0 }}">
+        {% if sortable %}
+            <div class="grip ui-sortable-handle"></div>
+        {% endif %}
+        <div class="list-item">
+            {% for field_key, field in tables[table].fields if not field.hidden %}
+                {% set disabledAttr = (field.nullable is not empty and record[field_key] is null) ? 'disabled' : '' %}
+                <div class="small-12 medium-{{ field.width is not empty ? field.width : 2 }} column">
+                    {% if field.readonly %}
+                        {#- Read only field, just display the value -#}
+                        <p>{{ record[field_key] }}</p>
+                    {% else %}
+                        <label>
+                            <span class="hide-for-medium-up">{{ field.caption }}</span>
+                            {% if field.radio is not empty %}
+                                {# Radio field, shared between all rows #}
+                                <div class="radiolist">
+                                    <input type="radio"
+                                           name="radio-{{ field_key }}"
+                                           value="{{ recordIndex }}"
+                                           id="{{ field_key }}-{{ recordIndex }}"
+                                        {% if (record[field_key] == 1) %} checked {% endif %}"
+                                    {{ disabledAttr }}
+                                    />
+                                    <label for="{{ field_key }}-{{ recordIndex }}"></label>
+                                </div>
+                            {% elseif field.lookup is iterable %}
+                                {# Lookup select box #}
+                                {% if field.lookup | length == 0 %}
+                                    <select name="value-{{ field_key }}[{{ recordIndex }}]" disabled>
+                                        <option value="" disabled>None Available</option>
+                                    </select>
+                                {% else %}
+                                    <select name="value-{{ field_key }}[{{ recordIndex }}]" {{ disabledAttr }}>
+                                        {% if not field.mandatory %}
+                                            <option value="">Not Selected</option>
+                                        {% endif %}
+                                        {% for option in field.lookup %}
+                                            <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            {% elseif field.colour is not empty %}
+                                {# Color picker #}
+                                <input name="value-{{field_key}}[{{ recordIndex }}]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" data-colour-picker {{ disabledAttr }} />
+                            {% else %}
+                                {# All other fields are just text boxes #}
+                                <input name="value-{{field_key}}[{{ recordIndex }}]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" maxlength="{{field.maxLength}}" {{ disabledAttr }} />
+                            {% endif %}
+                            {# All nullable fields get a tickbox #}
+                            {% if field.nullable is not empty %}
+                                <div class="checklist">
+                                    <input name="null-{{ field_key }}[{{ recordIndex }}]"
+                                           value="{{ idIsNumeric ? recordIndex - 1 : recordIndex }}"
+                                           id="{{ field_key }}-{{ recordIndex }}"
+                                           type="checkbox"
+                                           {% if record[field_key] is null %}checked{% endif %}
+                                           data-nullcheck
+                                    />
+                                    <label for="{{ field_key }}-{{ recordIndex }}">
+                                        {{- field.nullable_label | default('Null') -}}
+                                    </label>
+                                </div>
+                            {% endif %}
+                        </label>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% if deletable %}
+            <nav>
+                <a class="icon-overflow no-text" data-dropdown="menu-{{ key }}" href="#" title="Actions"></a>
+            </nav>
+        {% endif %}
+    </div>
+    <ul id="menu-{{ key }}" data-dropdown-content class="f-dropdown">
+        <li><a href="#" class="icon-delete" {{ deleteAttr | raw }}="{{ key }}">Delete row</a></li>
+    </ul>
+</li>
