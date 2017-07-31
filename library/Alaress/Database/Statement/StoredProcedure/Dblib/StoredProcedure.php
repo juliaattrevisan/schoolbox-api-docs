@@ -14,6 +14,12 @@ use PDO;
 
 /**
  * Stored procedure class for DBLib databases.
+ *
+ * DBLib stored procs have a known limitation; they cannot return a usable
+ * result set AND return or output vars in the same query. This is due to DBLib
+ * not supporting true prepared statements or bound outputs; we work around the
+ * limitation by extracting return/output vars from the last rowset of the
+ * query, but to do this we need to skip any rowsets from the stored proc.
  */
 class StoredProcedure extends Base
 {
