@@ -382,7 +382,7 @@ if (is_numeric($_GET['eventID'])) {
                 );
             }
         } else {
-            error(19);
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
     }
 } /* Create new event
