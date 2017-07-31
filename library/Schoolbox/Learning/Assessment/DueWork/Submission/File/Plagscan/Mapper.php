@@ -20,6 +20,14 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class Mapper extends \Schoolbox\Mapper
 {
+    /* TODO WARNING!!!
+     * This is arbitrary content to clobber the HTML field in the event it is not needed as a temp
+     * measure to avoid Out-Of-Memory errors until we migrate this field to OTFS.
+     * Mappers that join to this mapper can clobber the html field with this value and be safe
+     * from accidentally saving back to the database and losing the data.
+     * @see SA-746 + SA-4174
+     */
+    const INVALID_HTML_VALUE = 'ERROR: THIS VALUE INDICATES THE REAL HTML HAS BEEN TEMPORARILY DISCARDED. DO NOT SAVE';
 
     /**
      * An instance of the Plagscan Connector
@@ -53,6 +61,26 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'checkHtmlValue']);
+    }
+
+
+    /**
+     * Pre-save callback to ensure we don't save a model that has
+     * temporarily had its HTML value discarded.
+     *
+     * @param Model $model
+     * @return bool
+     * @throws \DomainException If the HTML has been temporarily discarded
+     */
+    public function checkHtmlValue(Model $model)
+    {
+        // By convention we would just return false, but given the risk of data loss we'll throw an Exception to be sure
+        if (self::INVALID_HTML_VALUE === $model->getHtml()) {
+            throw new \DomainException('Unable to save - Plagscan HTML content is missing!');
+        }
+        return true;
     }
 
     /**
