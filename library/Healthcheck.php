@@ -103,11 +103,12 @@ class Healthcheck
             $sql = str_replace(':object', $object, $query);
             $statement = $this->connector->prepareQuery($sql);
 
-            if ($statement->execute()) {
+            try {
+                $statement->execute();
                 $this->log .= "OK\n";
-            } else {
+            } catch (\Alaress\Database\Exception $e) {
                 $this->log .= "FAILED\n";
-                $this->errors[] = "$sql\n{$statement->errorInfo()}";
+                $this->errors[] = "$sql\n{$e->getMessage()}";
             }
         }
     }
@@ -129,11 +130,12 @@ class Healthcheck
                 $statement->bindInputs($parameters);
             }
 
-            if ($statement->execute()) {
+            try {
+                $statement->execute();
                 $this->log .= "OK\n";
-            } else {
+            } catch (\Alaress\Database\Exception $e) {
                 $this->log .= "FAILED\n";
-                $this->errors[] = "EXEC {$name}\n{$statement->errorInfo()}";
+                $this->errors[] = "EXEC {$name}\n{$e->getMessage()}";
             }
 
             unset($outputValues);
@@ -170,12 +172,13 @@ class Healthcheck
                 $statement->bindOutputs($object['outputParameters']);
             }
 
-            if ($statement->execute()) {
+            try {
+                $statement->execute();
                 $this->log .= "OK\n";
-            } else {
+            } catch (\Alaress\Database\Exception $e) {
                 $this->log .= "FAILED\n";
 
-                $error = "EXECUTE {$object['name']}\n{$statement->errorInfo()}\n";
+                $error = "EXECUTE {$object['name']}\n{$e->getMessage()}\n";
 
                 $error .= "\n{$statement->getSql()}\n";
 
