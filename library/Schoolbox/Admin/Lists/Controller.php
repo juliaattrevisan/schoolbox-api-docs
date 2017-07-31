@@ -487,6 +487,7 @@ class Controller extends Base
                 'title'             => 'Components',
                 'mapper'            => Component_DefinitionMapper::class,
                 'findAllMethod'     => 'findAllIncludeHidden',
+                'noNewRecords'      => true,
                 'fields'            => [
                     'module'        => [
                         'caption'   => 'Module',
