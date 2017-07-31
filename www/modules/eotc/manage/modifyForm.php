@@ -18,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\Calendar\EventRelations;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\User;
@@ -52,7 +53,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                 try {
                     $event = $eventMapper->findById($_POST['id']);
                 } catch (MapperException $e) {
-                    error(160);
+                    error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
                     exit;
                 }
             } else {
@@ -75,9 +76,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
              * are its author, and you haven't got the Approved permission
              */
             if ($_POST['action'] == 'Update') {
-                $isAuthor      = (($event->getAuthor()->getId() == $owner->getId()) && $authenticator->isEOTCCreator(
-                        $owner
-                    ));
+                $isAuthor = (($event->getAuthor()->getId() == $owner->getId()) && $authenticator->isEOTCCreator($owner));
                 $canAdminister = $authenticator->isEOTCAdministrator($owner, $event);
 
                 if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
@@ -95,7 +94,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                 /** @var User $author */
                 $author = $userMapper->findById($_POST['authorId']);
             } catch (MapperException $e) {
-                error(2);
+                error(ErrorMapper::ERROR_INFORMATION_MISSING);
                 exit;
             }
 
@@ -105,7 +104,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                 /** @var User $teacherInCharge */
                 $teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
             } catch (MapperException $e) {
-                error(2);
+                error(ErrorMapper::ERROR_INFORMATION_MISSING);
                 exit;
             }
 
@@ -114,10 +113,9 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                 /** @var EventType $eventType */
                 $eventType = EventTypeMapper::getInstance()->findById($_POST['type']);
             } catch (MapperException $e) {
-                error(2);
+                error(ErrorMapper::ERROR_INFORMATION_MISSING);
                 exit;
             }
-
 
             /* Events recur until this time
              */
@@ -139,7 +137,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
             /* Start Date cannot be after End Date
              */
             if ($startDate->getDatabase() >= $endDate->getDatabase()) {
-                error(145);
+                error(ErrorMapper::ERROR_START_TIME_GREATER);
             }
 
             /* Spawned further up
@@ -210,10 +208,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                         $factory = new CollectorFactory();
                         $files   = $factory->build($_POST['attachment'])->getAll();
                     } catch (MapperException $e) {
-                        error(41);
+                        error(ErrorMapper::ERROR_FILE_NOT_FOUND);
                         exit; // shut UP, storm.
                     } catch (\InvalidArgumentException $e) {
-                        error(43);
+                        error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
                         exit;
                     }
 
@@ -387,9 +385,9 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 //			break;
 
         default:
-            error(160);
+            error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
             break;
     }
 } else {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
