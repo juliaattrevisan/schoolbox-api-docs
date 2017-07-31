@@ -174,8 +174,7 @@ abstract Class Base implements IStatement
         try {
             return $statement->nextRowset();
         } catch (PDOException $e) {
-            $this->handleException($e, "Error retrieving next rowset: ");
-            return null;
+            throw new Exception("Error retrieving next rowset: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -197,8 +196,7 @@ abstract Class Base implements IStatement
             try {
                 $this->statement = $this->broker->prepare($this->getSql());
             } catch (PDOException $e) {
-                $this->handleException($e, "Error preparing execution: ");
-                return false;
+                throw new Exception("Error preparing execution: " . $e->getMessage(), 0, $e);
             }
         }
 
@@ -236,7 +234,7 @@ abstract Class Base implements IStatement
                 return $this->statement->execute();
             }
         } catch (PDOException $e) {
-            return $this->handleException($e, "Error executing statement: ");
+            throw new Exception("Error executing statement: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -252,24 +250,13 @@ abstract Class Base implements IStatement
             $iterator = $this->broker->getIterator($this, $this->statement);
 
             // Execute the statement
-            try {
-                $iterator->execute();
-            } catch (Exception $e) {
-                // Handle as best I can, with a rethrown exception if possible.
-                $previous = $e->getPrevious();
-                $prefix   = "Error executing iterator: ";
-                if ($previous instanceof PDOException) {
-                    $this->handleException($previous, $prefix);
-                } else {
-                    throw new Exception($prefix . $iterator->errorInfo(), $e->getCode(), $e);
-                }
-            }
+            $iterator->execute();
 
             // If we got to this point we got a valid iterator which had rows
             return $iterator;
 
         } catch (PDOException $e) {
-            $this->handleException($e, "Exception error executing iterator: ");
+            throw new Exception("Exception error executing iterator: " . $e->getMessage(), 0, $e);
         }
     }
 
