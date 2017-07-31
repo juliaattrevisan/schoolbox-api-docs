@@ -13,15 +13,12 @@ namespace Alaress\Database\Statement;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception;
-use Alaress\Database\HandlesExceptionTrait;
 use PDO;
 use PDOException;
 use PDOStatement;
 
 abstract Class Base implements IStatement
 {
-    use HandlesExceptionTrait;
-
     /** @var IBroker */
     protected $broker;
 
@@ -145,22 +142,6 @@ abstract Class Base implements IStatement
         }
 
         return $returnArray;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function errorInfo()
-    {
-        return $this->errorInfo;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function errorCode()
-    {
-        return $this->errorCode;
     }
 
     /**
