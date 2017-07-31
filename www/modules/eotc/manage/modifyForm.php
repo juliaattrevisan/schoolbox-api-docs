@@ -9,7 +9,6 @@
 use EOTC\ActivityLog\Registry as ActivityLogRegistry;
 use EOTC\ActivityLog\Factory as ActivityLogFactory;
 use EOTC\Authenticator;
-use EOTC\Event;
 use EOTC\EventMapper;
 use EOTC\EventMetadataMapper;
 use EOTC\EventRecurrenceMapper;
