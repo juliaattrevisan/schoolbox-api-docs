@@ -521,7 +521,6 @@ class Mapper extends BaseMapper
         }
 
         if (count($words)) {
-
             // Search heading & body of pastoral record
             $pbRecordSearch = $this->getPredicateBuilder();
             $pbRecordSearch->like('pastoral.body', $words);
@@ -554,7 +553,12 @@ class Mapper extends BaseMapper
             $statement = $this->database->prepare($sql);
 
             // Retrieve the hydrated records
-            $statement->execute(array_merge($pbRecordSearch->getParams(), $pbCommentSearch->getParams(), $pbCommentDeletion->getParams(), $pbRecordDeletion->getParams()));
+            $statement->execute(array_merge(
+                $pbRecordSearch->getParams(),
+                $pbCommentSearch->getParams(),
+                $pbCommentDeletion->getParams(),
+                $pbRecordDeletion->getParams())
+            );
 
             $results = $this->hydrateSelect($statement);
 
