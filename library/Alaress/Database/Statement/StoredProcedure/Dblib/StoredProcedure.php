@@ -40,8 +40,13 @@ class StoredProcedure extends Base
 
             $hasRowset = true;
             while ($hasRowset) {
-                $rowFromLastRowset = $this->statement->fetch(PDO::FETCH_ASSOC);
-                $hasRowset         = $this->statement->nextRowset();
+                // Under PHP5.5:
+                // Fetching the first row then skipping to next rowset errors.
+                // Work around by iterating entire result set.
+                foreach ($this->statement as $row) {
+                    $rowFromLastRowset = $row;
+                }
+                $hasRowset = $this->statement->nextRowset();
             }
 
             if (!empty($this->parameters['output'])) {
