@@ -250,19 +250,19 @@ class EventConnector extends EventMapper
          * We don't need to iterate with this, since $user doesn't
          * actually change between iterations
          *
-         * EOTC managers and superusers always see events
+         * EOTC Administrators and superusers always see events
          */
-        $isEOTCManager = false;
+        $isEOTCAdministrator = false;
 
         $user = $this->getUser();
         if ($user->isSuperuser()) {
-            $isEOTCManager = true;
+            $isEOTCAdministrator = true;
         } else {
             $permissionMapper = EventPermissionMapper::getInstance();
             $allPermissions   = $permissionMapper->findByUser($user);
 
             if ($allPermissions->count()) {
-                $isEOTCManager = true;
+                $isEOTCAdministrator = true;
             }
         }
 
@@ -329,7 +329,7 @@ class EventConnector extends EventMapper
              * superuser or attendee (teacher in charge, staff, student)
              * or are in the EOTC permissions system
              *
-             * Save some hassle if you're already an EOTC manager, skip all
+             * Save some hassle if you're already an EOTC Administrator, skip all
              * this other mapper stuff
              *
              *  - Superusers can always see it
@@ -353,7 +353,7 @@ class EventConnector extends EventMapper
                 $isVisible = true;
             }
 
-            if ($isEOTCManager || $isVisible) {
+            if ($isEOTCAdministrator || $isVisible) {
 
                 /* Translate an \EOTC\Event type into a EventInterface descendant
                  * Note that this "new Event();" does not have a mapper, so spawn concretely
