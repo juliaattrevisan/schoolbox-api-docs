@@ -92,7 +92,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
                         AND `userAccess`.uid = {$_SESSION['id']}
                     WHERE (`perms`.cid OR `userAccess`.sid)
                         AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                        AND (`subject_news`.datetime_published <= CURDATE() OR `subject_news`.owner = {$_SESSION['id']})
+                        AND (`subject_news`.datetime_published <= CURRENT_TIMESTAMP() OR `subject_news`.owner = {$_SESSION['id']})
                         AND `deleted` = FALSE
                     ORDER BY `$sort_by` $sort_dir
                     LIMIT $offset, $limit;
@@ -110,7 +110,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND (`subject_news`.datetime_published <= CURDATE() OR `subject_news`.owner = {$_SESSION['id']})
+                            AND (`subject_news`.datetime_published <= CURRENT_TIMESTAMP() OR `subject_news`.owner = {$_SESSION['id']})
                             AND `deleted` = FALSE
         ";
 
