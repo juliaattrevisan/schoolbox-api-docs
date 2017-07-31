@@ -118,7 +118,7 @@ class Controller extends Base
         }
 
         $mapper_name     = $tableData[$tableKey]['mapper'];
-        $sortable_column = $this->getRequest()->post["sortable_column"];
+        $sortable_column = trim($this->getRequest()->post["sortable_column"]);
 
         $mapper = $this->mapperFactory->get($mapper_name);
 
@@ -202,7 +202,7 @@ class Controller extends Base
                 }
             }
 
-            if (trim($sortable_column) != "") {
+            if ($sortable_column != "") {
                 $setter = "set" . $this->underscoreToCamelCase($sortable_column);
                 $model->$setter($currentIndex);
             }
