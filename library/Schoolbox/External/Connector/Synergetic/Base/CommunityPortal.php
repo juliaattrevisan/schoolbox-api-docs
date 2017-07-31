@@ -70,7 +70,7 @@ class CommunityPortal implements ICommunityPortal
     public function changePassword($communityId, $newPassword)
     {
         // Not setting passwords? just return false
-        if ($this->allowUpdate) {
+        if (!$this->allowUpdate) {
             return false;
         }
 
