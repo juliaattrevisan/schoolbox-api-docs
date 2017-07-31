@@ -161,8 +161,8 @@ class EventConnector extends EventMapper
          * Skip Rejected events
          */
         if ($this->getUser()->isSuperuser()) {
-            $queryPart1 = '';
-            $queryPart2 = '';
+            $querySelect = '';
+            $queryJoin = '';
 
             $params = [
                 'startTimestamp' => $startTimestamp,
@@ -179,12 +179,12 @@ class EventConnector extends EventMapper
          * Skip Rejected events
          */
         else {
-            $queryPart1 = "
+            $querySelect = "
                 eotc_metadata_student.user_id as studentUserId,
                 eotc_metadata_staff.user_id as staffUserId,
             ";
 
-            $queryPart2 = "
+            $queryJoin = "
                 LEFT JOIN eotc_metadata_student ON eotc_metadata_student.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_student.user_id = :studentUserId
                 LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_staff.user_id = :staffUserId
             ";
@@ -206,7 +206,7 @@ class EventConnector extends EventMapper
                 {$authorMapper->getColumnString('a')},
                 {$teacherInChargeMapper->getColumnString('c')},
                 {$eventTypeMapper->getColumnString('t')},
-                {$queryPart1}
+                {$querySelect}
                 (
                     SELECT COUNT(*)
                     FROM eotc_event_metadata
@@ -229,7 +229,7 @@ class EventConnector extends EventMapper
             LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
             INNER JOIN eotc_event_metadata ON eotc_event_metadata.event_id = e.id
             INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-            {$queryPart2}
+            {$queryJoin}
             WHERE
                 DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
                 AND
