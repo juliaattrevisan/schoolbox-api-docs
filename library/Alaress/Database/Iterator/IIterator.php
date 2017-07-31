@@ -30,18 +30,4 @@ interface IIterator extends BaseIterator, Countable
      * @return bool
      */
     public function nextRowset();
-
-    /**
-     * Returns last error message this statement generated
-     *
-     * @return string
-     */
-    public function errorInfo();
-
-    /**
-     * Returns last error message this statement generated
-     *
-     * @return string
-     */
-    public function errorCode();
 }
