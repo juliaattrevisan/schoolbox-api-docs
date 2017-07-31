@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Aura\Di\Exception\ServiceNotFound;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
@@ -52,7 +53,13 @@ class UserMapper extends Mapper
      */
     protected function setup()
     {
-        $this->externalCommunityPortal = self::$di->get('externalCommunityPortal');
+        try {
+            $this->externalCommunityPortal = self::$di->get('externalCommunityPortal');
+        } catch (ServiceNotFound $e) {
+            // Hopefully we're in a test, and therefore won't try to save.
+            // If we actually attempt to save a user in the middle of a test,
+            // or this doesn't exist, we'll get an exception, which is fine.
+        }
     }
 
     /**
