@@ -694,10 +694,11 @@ class Controller extends Base
                     {
                         // And only if there is a mapper function to retrieve its value
 
-                        if (isset($tables[$table]['fields'][$prop->getName()]['getter']))
+                        if (isset($tables[$table]['fields'][$prop->getName()]['getter'])) {
                             $getter = $tables[$table]['fields'][$prop->getName()]['getter'];
-                        else
+                        } else {
                             $getter = "get" . $this->underscoreToCamelCase($prop->getName());
+                        }
 
                         if ($reflect->hasMethod($getter)) {
 
