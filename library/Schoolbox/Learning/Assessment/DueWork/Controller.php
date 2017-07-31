@@ -805,16 +805,76 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * Acknowledge receipt of (potentially offline) submission from dueWork status page
+     *
+     * Creates an empty SOBO. Needs a different route to postCreateResponse()
+     * to cater for different auth rules.
+     *
+     * @param Participant $participant
+     * @api   POST /learning/assessments/:assessmentId/:studentId/received
+     * @level 17.0
+     */
+    public function postStatusAcknowledge(Participant $participant)
+    {
+        $assessment = $participant->getAssessable();
+        try {
+            $response = $this->persistEmptySobo($participant);
+            $data = [
+                'success'       => true,
+                'id'            => $response->getId(),
+                'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+            ];
+            $code = 200;
+        } catch (\PDOException $e) {
+            $data = [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+            $code = 403;
+        }
+        $this->getResponse()->status->set($code);
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
      * Acknowledge receipt of (potentially offline) submission
      *
      * Creates an empty SOBO. Needs a different route to postCreateResponse()
      * to cater for different auth rules.
      *
      * @param Participant $participant
-     * @api   POST /learning/assessments/:assessmentId/:studentId/acknowledge
+     * @api   POST /learning/assessments/:assessmentId/:studentId/ack
      * @level 17.0
      */
-    public function postAcknowledgeSubmission(Participant $participant)
+    public function postPendingAcknowledge(Participant $participant)
+    {
+        try {
+            $this->persistEmptySobo($participant);
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
+                'participant' => $participant,
+                'assessment'  => $participant->getAssessable(),
+            ]));
+            $code = 200;
+        } catch (\PDOException $e) {
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]));
+            $code = 403;
+        }
+        $this->getResponse()->status->set($code);
+    }
+
+
+    /**
+     * Common logic for 'dueWork status' and 'pending assessments' pages 'acknowledgement of submission receipt'.
+     *
+     * @param Participant $participant
+     * @return Submission
+     * @throws \PDOException If something went wrong in the save process
+     */
+    private function persistEmptySobo(Participant $participant)
     {
         $assessment = $participant->getAssessable();
         $response   = $this->dueWorkResponseMapper->createModel()
@@ -825,29 +885,11 @@ class Controller extends Assessment\Controller
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
-        try {
-            $this->dueWorkResponseMapper->save($response);
-            $participant->getAllResponses()[$response->getId()] = $response;
-            $assessment->getResponses()[$response->getId()]     = $response;
-            $data = [
-                'success'       => true,
-                'id'            => $response->getId(),
-                'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
-                'htmlPending'   => $this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
-                    'participant' => $participant,
-                    'assessment'  => $assessment,
-                ])->getAsString(),
-            ];
-            $code = 200;
-        } catch (\PDOException $e) {
-            $data = [
-                'success' => false,
-                'message' => $e->getMessage(),
-            ];
-            $code = 403;
-        }
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
-        $this->getResponse()->status->set($code);
+        $this->dueWorkResponseMapper->save($response);
+        $participant->getAllResponses()[$response->getId()] = $response;
+        $assessment->getResponses()[$response->getId()]     = $response;
+
+        return $response;
     }
 
 

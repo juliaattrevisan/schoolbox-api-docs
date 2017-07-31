@@ -103,14 +103,7 @@
 
             $.post($button.attr('href'))
                 .done(function (response) {
-                    /** @var {bool} response.success */
-                    if(true !== Boolean(response.success)){
-                        soboFailure($button, buttonText);
-                        $toast.toastTimeout({text: 'Acknowledgment failed.', css: 'alert'});
-                        return;
-                    }
-                    /** @var {string} response.htmlPending */
-                    soboSuccess($button, response.htmlPending);
+                    soboSuccess($button, response);
                     $toast.toastTimeout({text: 'Submission Acknowledged.', css: 'success'});
                 })
                 .fail(function () {

@@ -37,7 +37,7 @@
             {% set title = 'View student profile' %}
         {% endif %}
 
-        {% set ackReceipt = routeLookupIfAuthorized('learningAssessment.postAcknowledgeSubmission', {
+        {% set ackReceipt = routeLookupIfAuthorized('learningAssessment.postPendingAcknowledge', {
             assessmentId: assessment.Id,
             assessment:   assessment,
             studentId:    participant.user.id,
