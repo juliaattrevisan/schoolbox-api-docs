@@ -506,11 +506,8 @@ class Mapper extends BaseMapper
         $search = trim($search);
 
         // Keep an audit trail of searches
-
         $pastoralAuditMapper = PastoralAuditMapper::getInstance();
-
-        $auditRecord = $pastoralAuditMapper->createModel();
-
+        $auditRecord         = $pastoralAuditMapper->createModel();
         $auditRecord->setUser($this->getSessionUser());
         $auditRecord->setSearch($search);
 
@@ -526,38 +523,38 @@ class Mapper extends BaseMapper
         if (count($words)) {
 
             // Search heading & body of pastoral record
-            $pbInner1 = $this->getPredicateBuilder();
-            $pbInner1->like('pastoral.body', $words);
-            $pbInner1->like('pastoral.heading', $words);
+            $pbRecordSearch = $this->getPredicateBuilder();
+            $pbRecordSearch->like('pastoral.body', $words);
+            $pbRecordSearch->like('pastoral.heading', $words);
 
-            $pbOuter = $this->getPredicateBuilder();
-            $pbOuter->isNull('pastoral.deleted_at');
+            $pbRecordDeletion = $this->getPredicateBuilder();
+            $pbRecordDeletion->isNull('pastoral.deleted_at');
 
             // Search comments
-            $pbInner2 = $this->getPredicateBuilder();
-            $pbInner2->like('pastoral_comment.body', $words);
+            $pbCommentSearch = $this->getPredicateBuilder();
+            $pbCommentSearch->like('pastoral_comment.body', $words);
 
-            $pbInner3 = $this->getPredicateBuilder();
-            $pbInner3->isNull('pastoral_comment.deleted_at');
+            $pbCommentDeletion = $this->getPredicateBuilder();
+            $pbCommentDeletion->isNull('pastoral_comment.deleted_at');
 
-            $innerClause1 = implode(' OR ', $pbInner1->getWhere());
-            $innerClause2 = implode(' OR ', $pbInner2->getWhere());
-            $innerClause3 = implode(' AND ', $pbInner3->getWhere());
-            $outerClause  = implode(' AND ', $pbOuter->getWhere());
+            $recordBodyAndHeadingClause = implode(' OR ', $pbRecordSearch->getWhere());
+            $commentBodyClause          = implode(' OR ', $pbCommentSearch->getWhere());
+            $commentDeletionClause      = implode(' AND ', $pbCommentDeletion->getWhere());
+            $recordDeletionClause       = implode(' AND ', $pbRecordDeletion->getWhere());
 
             $sql = $this->getSelectString() . "
             WHERE (
-                ($innerClause1)
+                ($recordBodyAndHeadingClause)
                 OR
-                (`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE ($innerClause2) AND $innerClause3))
+                (`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE ($commentBodyClause) AND $commentDeletionClause))
             )
-            AND $outerClause";
+            AND $recordDeletionClause";
 
             // Bind the parameters
             $statement = $this->database->prepare($sql);
 
             // Retrieve the hydrated records
-            $statement->execute(array_merge($pbInner1->getParams(), $pbInner2->getParams(), $pbInner3->getParams(), $pbOuter->getParams()));
+            $statement->execute(array_merge($pbRecordSearch->getParams(), $pbCommentSearch->getParams(), $pbCommentDeletion->getParams(), $pbRecordDeletion->getParams()));
 
             $results = $this->hydrateSelect($statement);
 
