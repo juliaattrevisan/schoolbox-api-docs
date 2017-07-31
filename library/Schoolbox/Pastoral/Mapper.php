@@ -188,7 +188,7 @@ class Mapper extends BaseMapper
     {
         // Return pastoral records fully hydrated by default
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
             $model = $this->hydrateRow($row, $hydrateRelatedRecords);
