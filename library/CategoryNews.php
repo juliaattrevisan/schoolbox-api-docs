@@ -7,7 +7,7 @@
 class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
 
-    function __construct()
+    public function __construct()
     {
 
         $this->_table = "subject_news";
@@ -19,12 +19,12 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
     /**
      * @deprecated use Schoolbox\Resource\Category\NewsMapper::findByColumnList()->filterBy()
      * @param $categoryID
-     * @param bool $config
+     * @param array $config
      * @param bool $archive
      * @param int $userID
      * @return array|bool
      */
-    function getAllForCategory($categoryID, $config = false, $archive = false, $userID = 0)
+    public function getAllForCategory($categoryID, $config = false, $archive = false, $userID = 0)
     {
         $userID = $userID ? $userID : $_SESSION['id'];
         $query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, UNIX_TIMESTAMP(datetime_published) published,
@@ -54,7 +54,13 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
         return $this->db->getAll($query);
     }
 
-    function homepageClean($cid)
+    /**
+     * @inheritdoc
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid)
     {
         $this->db->delete('subject_news', 'code', $cid);
     }
@@ -64,7 +70,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
      * @param $news
      * @return int|string|void
      */
-    function create($news)
+    private function create($news)
     {
         $news['datetime_posted'] = 'NOW()';
         parent::create($news);
@@ -75,7 +81,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
      * @param $id
      * @return bool
      */
-    function delete($id)
+    private function delete($id)
     {
         $this->update(array('id' => $id, 'deleted' => 1));
     }
@@ -90,7 +96,7 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
      * @param string $sort_dir
      * @return array|bool
      */
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
     {
         $keyword = $this->db->quote($keyword);
 
