@@ -15,6 +15,7 @@ namespace Alaress\Database\Iterator;
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception as DatabaseException;
+use Alaress\Database\Exception;
 use Alaress\Database\HandlesExceptionTrait;
 use Alaress\Database\Statement\IStatement;
 use PDO;
@@ -70,7 +71,7 @@ class Base implements IIterator
                 $this->next();
             }
         } catch (PDOException $e) {
-            return $this->handleException($e);
+            throw new Exception($e->getMessage(), 0, $e);
         }
 
         return $result;
