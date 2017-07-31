@@ -18,6 +18,42 @@ use PDO;
 class StoredProcedure extends Base
 {
     /**
+     * Execute query, and account for output and return vars by extracting them
+     * from the last rowset.
+     *
+     * @param array $values
+     * @return bool
+     */
+    public function execute($values = null)
+    {
+        $return = parent::execute($values);
+
+        if (!empty($this->parameters['output']) || !empty($this->parameters['return'])) {
+            // Finagle output and return out of last rowset
+            $rowFromLastRowset = [];
+
+            $hasRowset = true;
+            while ($hasRowset) {
+                $rowFromLastRowset = $this->statement->fetch(PDO::FETCH_ASSOC);
+                $hasRowset         = $this->statement->nextRowset();
+            }
+
+            if (!empty($this->parameters['output'])) {
+                foreach ($this->parameters['output'] as $name => &$parameter) {
+                    $parameter['value'] = $rowFromLastRowset[$name];
+                }
+                unset($parameter);
+            }
+
+            if (!empty($this->parameters['return'])) {
+                $this->parameters['return']['value'] = $rowFromLastRowset['return'];
+            }
+        }
+
+        return $return;
+    }
+
+    /**
      * @inheritdoc
      *
      * @throws Exception if return parameter is provided, but it's an unknown type
