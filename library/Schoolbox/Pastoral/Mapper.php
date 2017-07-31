@@ -530,21 +530,34 @@ class Mapper extends BaseMapper
             $pbInner1->like('pastoral.body', $words);
             $pbInner1->like('pastoral.heading', $words);
 
+            $pbOuter = $this->getPredicateBuilder();
+            $pbOuter->isNull('pastoral.deleted_at');
+
             // Search comments
             $pbInner2 = $this->getPredicateBuilder();
             $pbInner2->like('pastoral_comment.body', $words);
 
+            $pbInner3 = $this->getPredicateBuilder();
+            $pbInner3->isNull('pastoral_comment.deleted_at');
+
             $innerClause1 = implode(' OR ', $pbInner1->getWhere());
             $innerClause2 = implode(' OR ', $pbInner2->getWhere());
+            $innerClause3 = implode(' AND ', $pbInner3->getWhere());
+            $outerClause  = implode(' AND ', $pbOuter->getWhere());
 
-            $sql = $this->getSelectString() . ' WHERE ((' . $innerClause1 . ') OR ' .
-                '(`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE (' . $innerClause2 . '))))';
+            $sql = $this->getSelectString() . "
+            WHERE (
+                ($innerClause1)
+                OR
+                (`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE ($innerClause2) AND $innerClause3))
+            )
+            AND $outerClause";
 
             // Bind the parameters
             $statement = $this->database->prepare($sql);
 
             // Retrieve the hydrated records
-            $statement->execute(array_merge($pbInner1->getParams(), $pbInner2->getParams()));
+            $statement->execute(array_merge($pbInner1->getParams(), $pbInner2->getParams(), $pbInner3->getParams(), $pbOuter->getParams()));
 
             $results = $this->hydrateSelect($statement);
 
