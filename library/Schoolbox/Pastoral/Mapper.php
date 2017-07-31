@@ -68,38 +68,9 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('deleted_at');
 
-        // Anyone got a shorthand version of these?
-
-        $this->hasJoin(
-            'access',
-            [
-                'mapper'    => AccessMapper::class,
-                'other_key' => 'pastoral_id',
-                'this_key'  => 'id',
-                'multiple'  => true,
-            ]
-        );
-
-        $this->hasJoin(
-            'comments',
-            [
-                'mapper'    => CommentMapper::class,
-                'other_key' => 'pastoral_id',
-                'this_key'  => 'id',
-                'multiple'  => true,
-            ]
-        );
-
-        $this->hasJoin(
-            'attachments',
-            [
-                'mapper'    => AttachmentMapper::class,
-                'other_key' => 'pastoral_id',
-                'this_key'  => 'id',
-                'multiple'  => true,
-            ]
-        );
-
+        $this->joinsReverseMulti('pastoral_id', AccessMapper::class, 'access', 'access');
+        $this->joinsReverseMulti('pastoral_id', CommentMapper::class, 'comments', 'comments');
+        $this->joinsReverseMulti('pastoral_id', AttachmentMapper::class, 'attachments', 'attachments');
 
         $this->registerCallback(Mapper::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
         $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteReferences']);
