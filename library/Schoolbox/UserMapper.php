@@ -9,18 +9,14 @@
 
 namespace Schoolbox;
 
-use Alaress\Database\Factory as AlaressDatabaseFactory;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\External\Connector\ICommunityPortal;
-use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Search\Results;
 use UnexpectedValueException;
-use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
-use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Class UserMapper
@@ -43,6 +39,21 @@ class UserMapper extends Mapper
      * @var array|null $usernameCache Maps 'username' => 'id'.
      */
     protected $usernameCache;
+
+    /**
+     * Container for an external community portal.
+     *
+     * @var ICommunityPortal
+     */
+    private $externalCommunityPortal;
+
+    /**
+     * Install external community portal connection into mapper
+     */
+    protected function setup()
+    {
+        $this->externalCommunityPortal = self::$di->get('externalCommunityPortal');
+    }
 
     /**
      * Setup mapping
@@ -162,10 +173,11 @@ class UserMapper extends Mapper
     {
         /** @var User $model */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            /** @var ICommunityPortal $communityPortal */
-            $communityPortal = self::$di->get('externalCommunityPortal');
             try {
-                $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
+                $this->externalCommunityPortal->changePassword(
+                    $model->getExternalId(),
+                    $model->getRetrievablePassword()
+                );
             } catch (\UnexpectedValueException $e) {
                 // It wasn't set up properly? noop?
             }
