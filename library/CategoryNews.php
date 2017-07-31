@@ -4,79 +4,94 @@
  * @deprecated use Schoolbox\Resource\Category\NewsMapper
  * Class CategoryNews
  */
-class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
+class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
+{
 
-	function __construct() {
+    function __construct()
+    {
 
-		$this->_table = "subject_news";
-		$this->_index = "id";
+        $this->_table = "subject_news";
+        $this->_index = "id";
 
-		parent::__construct();
-	}
+        parent::__construct();
+    }
 
-	/**
-	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::findByColumnList()->filterBy()
-	 * @param $categoryID
-	 * @param bool $config
-	 * @param bool $archive
-	 * @param int $userID
-	 * @return array|bool
-	 */
-	function getAllForCategory($categoryID, $config = false, $archive = false, $userID = 0) {
+    /**
+     * @deprecated use Schoolbox\Resource\Category\NewsMapper::findByColumnList()->filterBy()
+     * @param $categoryID
+     * @param bool $config
+     * @param bool $archive
+     * @param int $userID
+     * @return array|bool
+     */
+    function getAllForCategory($categoryID, $config = false, $archive = false, $userID = 0)
+    {
         $userID = $userID ? $userID : $_SESSION['id'];
-		$query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, UNIX_TIMESTAMP(datetime_published) published,
+        $query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, UNIX_TIMESTAMP(datetime_published) published,
 					UNIX_TIMESTAMP(datetime_expires) expires, body, deleted, code, owner, u.firstname, u.lastname, u.title,
 					u.id uid, u.synergy_id synid
-				  FROM ".$this->_table." n
+				  FROM " . $this->_table . " n
 				  LEFT JOIN user u ON u.id = n.owner
 				  WHERE code = '$categoryID'  AND deleted = 0 ";
-		if ($archive)
-			$query .= " AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = $userID) AND datetime_expires <  CURRENT_TIMESTAMP()";
-    	else
-			$query .= " AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = $userID) AND datetime_expires >= CURRENT_TIMESTAMP()";
+        if ($archive) {
+            $query .= "
+                AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = $userID)
+                AND datetime_expires <  CURRENT_TIMESTAMP()
+            ";
+        } else {
+            $query .= "
+                AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = $userID)
+                AND datetime_expires >= CURRENT_TIMESTAMP()
+            ";
+        }
 
-		$query .= "ORDER BY datetime_posted DESC";
+        $query .= "ORDER BY datetime_posted DESC";
 
-		if($config['size'] > 0)
-			$query .= " LIMIT 0, " . $config['size'];
+        if ($config['size'] > 0) {
+            $query .= " LIMIT 0, " . $config['size'];
+        }
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	function homepageClean($cid) {
-		$this->db->delete('subject_news', 'code', $cid);
-	}
+    function homepageClean($cid)
+    {
+        $this->db->delete('subject_news', 'code', $cid);
+    }
 
-	/**
-	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::save()
-	 * @param $news
-	 * @return int|string|void
-	 */
-	function create($news) {
-		$news['datetime_posted'] = 'NOW()';
-		parent::create($news);
-	}
+    /**
+     * @deprecated use Schoolbox\Resource\Category\NewsMapper::save()
+     * @param $news
+     * @return int|string|void
+     */
+    function create($news)
+    {
+        $news['datetime_posted'] = 'NOW()';
+        parent::create($news);
+    }
 
-	/**
-	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::delete()
-	 * @param $id
-	 * @return bool
-	 */
-	function delete($id) {
-		$this->update(array('id'=>$id,'deleted'=>1));
-	}
+    /**
+     * @deprecated use Schoolbox\Resource\Category\NewsMapper::delete()
+     * @param $id
+     * @return bool
+     */
+    function delete($id)
+    {
+        $this->update(array('id' => $id, 'deleted' => 1));
+    }
 
-	/**
-	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::search()
-	 * @param $keyword
-	 * @param int $offset
-	 * @param int $limit
-	 * @param null $count
-	 * @param string $sort_by
-	 * @param string $sort_dir
-	 * @return array|bool
-	 */
-	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+    /**
+     * @deprecated use Schoolbox\Resource\Category\NewsMapper::search()
+     * @param $keyword
+     * @param int $offset
+     * @param int $limit
+     * @param null $count
+     * @param string $sort_by
+     * @param string $sort_dir
+     * @return array|bool
+     */
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc')
+    {
         $keyword = $this->db->quote($keyword);
 
         $query = "SELECT `subject_news`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
@@ -92,7 +107,10 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
                         AND `userAccess`.uid = {$_SESSION['id']}
                     WHERE (`perms`.cid OR `userAccess`.sid)
                         AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                        AND (`subject_news`.datetime_published <= CURRENT_TIMESTAMP() OR `subject_news`.owner = {$_SESSION['id']})
+                        AND (
+                          `subject_news`.datetime_published <= CURRENT_TIMESTAMP() OR
+                          `subject_news`.owner = {$_SESSION['id']}
+                        )
                         AND `deleted` = FALSE
                     ORDER BY `$sort_by` $sort_dir
                     LIMIT $offset, $limit;
@@ -110,7 +128,10 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND (`subject_news`.datetime_published <= CURRENT_TIMESTAMP() OR `subject_news`.owner = {$_SESSION['id']})
+                            AND (
+                              `subject_news`.datetime_published <= CURRENT_TIMESTAMP() OR
+                              `subject_news`.owner = {$_SESSION['id']}
+                            )
                             AND `deleted` = FALSE
         ";
 
@@ -119,5 +140,3 @@ class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleana
         return $this->db->getAll($query);
     }
 }
-
-?>
