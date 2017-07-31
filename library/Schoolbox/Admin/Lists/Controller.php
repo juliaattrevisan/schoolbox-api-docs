@@ -504,7 +504,7 @@ class Controller extends Base
                         'width'     => 6,
                     ],
                     'visible'       => [
-                        'caption'   => 'visible',
+                        'caption'   => 'Visible',
                         'lookup'    => [
                             ['key' => 'true', 'value' => 'Yes'],
                             ['key' => 'false', 'value' => 'No'],
