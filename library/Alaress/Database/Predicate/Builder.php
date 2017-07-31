@@ -195,9 +195,9 @@ class Builder implements IBuilder
      *
      * To get student names that match ('A%' AND '%Y') you need to chain two calls to like()
      *
-     * @param string $columnName
-     * @param string $columnValue Used directly in LIKE statement.
-     *                            @see \Database::escapeForLike for escaping user input.
+     * @param string          $columnName
+     * @param string|string[] $columnValue Used directly in LIKE statement.
+     * @see \Database::escapeForLike for escaping user input.
      * @return Builder
      */
     public function like($columnName, $columnValue)

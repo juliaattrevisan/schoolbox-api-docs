@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Pastoral;
 
+use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use External_Pastoral;
@@ -500,8 +501,8 @@ class Mapper extends BaseMapper
      * @param string $search
      * @return Collection
      */
-    public function getSearchResults($search) {
-        
+    public function getSearchResults($search)
+    {
         $search = trim($search);
 
         // Keep an audit trail of searches
@@ -513,57 +514,41 @@ class Mapper extends BaseMapper
         $auditRecord->setUser($this->getSessionUser());
         $auditRecord->setSearch($search);
 
-        if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
+        $words = [];
+        /** @var IQuoter $database */
+        $database = $this->getDatabase();
+        foreach (explode(' ', $search) as $word) {
+            if (strlen($word) >= Results::MIN_SEARCH_LENGTH) {
+                $words[] = "%{$database->escapeForLike($word)}%";
+            }
+        }
 
-            $searchArray = explode(' ', $search);
-
-            $sql = $this->getSelectString() . " WHERE (";
+        if (count($words)) {
 
             // Search heading & body of pastoral record
-
-            foreach ($searchArray as $index => $search) {
-                if ($index > 0) {
-                    $sql .= " OR ";
-                }
-
-                $sql .= "
-                `pastoral`.`body` LIKE :body_{$index} OR 
-                `pastoral`.`heading` LIKE :heading_{$index}
-            ";
-            }
+            $pbInner1 = $this->getPredicateBuilder();
+            $pbInner1->like('pastoral.body', $words);
+            $pbInner1->like('pastoral.heading', $words);
 
             // Search comments
+            $pbInner2 = $this->getPredicateBuilder();
+            $pbInner2->like('pastoral_comment.body', $words);
 
-            $sql .= ") OR (`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE ";
+            $innerClause1 = implode(' OR ', $pbInner1->getWhere());
+            $innerClause2 = implode(' OR ', $pbInner2->getWhere());
 
-            foreach ($searchArray as $index => $search) {
-                if ($index > 0) {
-                    $sql .= " OR ";
-                }
-
-                $sql .= "`body` LIKE :comment_{$index} ";
-            }
-
-            $sql .= "))";
+            $sql = $this->getSelectString() . ' WHERE ((' . $innerClause1 . ') OR ' .
+                '(`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE (' . $innerClause2 . '))))';
 
             // Bind the parameters
-
             $statement = $this->database->prepare($sql);
 
-            foreach ($searchArray as $index => $search) {
-                $statement->bindValue("body_{$index}", "%{$search}%");
-                $statement->bindValue("heading_{$index}", "%{$search}%");
-                $statement->bindValue("comment_{$index}", "%{$search}%");
-            }
-
             // Retrieve the hydrated records
-
-            $statement->execute();
+            $statement->execute(array_merge($pbInner1->getParams(), $pbInner2->getParams()));
 
             $results = $this->hydrateSelect($statement);
 
             // Keep a record of all searches performed by users, and what results were displayed
-
             $searchResults = [];
 
             /** @var Model $record */
@@ -572,20 +557,16 @@ class Mapper extends BaseMapper
             }
 
             // Record the search results that were returned by the search by imploding their IDs down into CSV
-
             if (count($searchResults) > 0) {
                 $auditRecord->setSearchResult(implode(',', $searchResults));
             }
 
         } else {
-
-            // Search was too short
-
+            // All search words were too short
             $results = $this->createCollection();
         }
 
         // Save the audit record of the search
-
         $pastoralAuditMapper->save($auditRecord);
 
         return $results;
