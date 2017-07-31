@@ -296,7 +296,7 @@ class Controller extends Base
                 'fields'            => [                                        // This is a list of all of the updateable fields
                     'name'          => [
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
-                        'width'     => 6,                                       // Width of the column on anything bigger than 'small'
+                        'width'     => 7,                                       // Width of the column on anything bigger than 'small'
                     ],
                     'type' => [
                         //'radio'     => '1'                                    // If defined the column will be a radio button shared by every item
@@ -348,7 +348,7 @@ class Controller extends Base
                     ],
                     'path'           => [
                         'caption'   => 'Path',
-                        'width'     => 2,
+                        'width'     => 3,
                         'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
                     ],
                     'usernamePrefix' => [
@@ -440,7 +440,7 @@ class Controller extends Base
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 11,
+                        'width'     => 12,
                     ],
                 ]
             ],
@@ -610,7 +610,7 @@ class Controller extends Base
                     ],
                     'dashboard' => [
                         'caption' => 'Show On Pastoral Dashboard',
-                        'width' => 3,
+                        'width' => 4,
                         'mandatory' => true,
                         'lookup' => [
                             ['key' => '1', 'value' => 'Yes'],
