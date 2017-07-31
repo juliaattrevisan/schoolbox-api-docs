@@ -63,6 +63,7 @@ class StoredProcedure extends Base
         // Create input/output parameter placeholders
 
         $declarePlaceholders = [];
+        $outputSelectPlaceholders = [];
         $parameterPlaceholders = '';
 
         if (isset($this->parameters['input'])) {
@@ -71,16 +72,18 @@ class StoredProcedure extends Base
                     $parameterPlaceholders .= ", ";
                 }
                 $parameterPlaceholders .= "@{$name} = :{$name}";
+                $outputSelectPlaceholders[] = $this->buildOutputSelect($name);
             }
         }
 
         if (isset($this->parameters['output'])) {
             foreach ($this->parameters['output'] as $name => $parameter) {
-                $declarePlaceholders[] = $this->buildDeclare($name, $parameter);
+                $declarePlaceholders[] = $this->buildDeclare('Output'.$name, $parameter);
                 if (!empty($parameterPlaceholders)) {
                     $parameterPlaceholders .= ", ";
                 }
-                $parameterPlaceholders .= "@{$name} = :{$name}";
+                $parameterPlaceholders .= "@{$name} = @Output{$name}";
+                $outputSelectPlaceholders[] = $this->buildOutputSelect($name);
             }
         }
 
@@ -93,10 +96,19 @@ class StoredProcedure extends Base
             $prefix = "EXEC @return =";
         }
 
-        // Add the function name and its parameter placeholders
-        $declarePart = implode('; ', $declarePlaceholders);
+        // Add SELECT parts
+        $outputSelectPart = '';
+        if (count($outputSelectPlaceholders)) {
+            $outputSelectPart = ";\nSELECT " . implode(', ', $outputSelectPlaceholders);
+        }
 
-        return "{$declarePart} {$prefix} {$this->name} {$parameterPlaceholders}";
+        // Add the function name and its parameter placeholders
+        $declarePart = '';
+        if (count($declarePlaceholders)) {
+            $declarePart = implode(";\n", $declarePlaceholders).";\n";
+        }
+
+        return "{$declarePart} {$prefix} {$this->name} {$parameterPlaceholders} {$outputSelectPart}";
     }
 
     /**
@@ -144,5 +156,16 @@ class StoredProcedure extends Base
             throw new Exception('Unknown return type');
         }
         return "DECLARE @$name $sqlType = :$name";
+    }
+
+    /**
+     * Creates a SELECT part for an output or return parameter.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function buildOutputSelect($name)
+    {
+        return "@Output{$name} AS \"{$name}\"";
     }
 }
