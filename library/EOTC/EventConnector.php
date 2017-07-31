@@ -334,6 +334,7 @@ class EventConnector extends EventMapper
              *  - Staff Attendees can always see it, but is shown as translucent
              *  - Student Attendees should only see this event if it's Approved
              *  - Anyone in both the Campus and Role of an Approved event regardless of attendee-ness
+             *  - Staff in at least one of the event campuses AND status is between Approved In Principle and Approved
              */
             $isSuperuser = $user->isSuperuser();
             $isCreator = $eventItem->getAuthor()->getId() == $user->getId();
@@ -343,7 +344,16 @@ class EventConnector extends EventMapper
             $isApproved = $eventItem->getMetadata()->getStatus()->isApproved();
             $inCampusAndRole = $inCampus && $inRole;
 
-            if ($isEOTCAdministrator || $isSuperuser || $isCreator || $isTIC || $isStaffAttendee || ($isApproved && ($isStudentAttendee || $inCampusAndRole))) {
+            /* Staff in at least one of the event campuses AND status is between Approved In Principle and Approved
+             *
+             * When an event transitions out of Initial Application, it is no longer just an idea but an actual
+             * event that can potentially occur. Staff need to be aware of its presence so they can organise
+             * events around this and not inadvertently double-book. Therefore we check whether the event is in
+             * a staff member's campus; if it is, show it when it's potentially going to happen
+             */
+            $isInStaffCampus = $user->getRole()->isStaff() && $inCampus && $eventItem->getMetadata()->getStatus()->between(EventStatusMapper::STATUS_INPRINCIPLE, EventStatusMapper::STATUS_APPROVED);
+
+            if ($isEOTCAdministrator || $isSuperuser || $isCreator || $isTIC || $isStaffAttendee || $isInStaffCampus || ($isApproved && ($isStudentAttendee || $inCampusAndRole))) {
 
                 /* Translate an \EOTC\Event type into a EventInterface descendant
                  * Note that this "new Event();" does not have a mapper, so spawn concretely
