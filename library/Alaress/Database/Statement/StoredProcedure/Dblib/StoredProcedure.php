@@ -87,26 +87,25 @@ class StoredProcedure extends Base
     {
         $type = $param['type'];
         $size = $param['length'];
-        switch ($type) {
-            case PDO::PARAM_BOOL:
-                $sqlType = 'BIT';
-                break;
 
-            case PDO::PARAM_STR:
-                $sqlType = sprintf('VARCHAR(%d)', $size);
-                break;
+        // Figure out what type of var this is
+        // PDO::PARAM_* vars are NOT bitflags -_- so need to compare values directly
+        if (($type & PDO::PARAM_BOOL) === PDO::PARAM_BOOL) {
+            $sqlType = 'BIT';
 
-            case PDO::PARAM_INT:
-                $sqlType = 'BIGINT';
-                break;
+        } elseif (($type & PDO::PARAM_STR) === PDO::PARAM_STR) {
+            $sqlType = sprintf('VARCHAR(%d)', $size);
 
-            case PDO::PARAM_LOB:
-                // GET OUT
-                throw new Exception('Invalid return type (PDO::PARAM_LOB)');
+        } elseif (($type & PDO::PARAM_INT) === PDO::PARAM_INT) {
+            $sqlType = 'BIGINT';
 
-            default:
-                // ¯\_(ツ)_/¯
-                throw new Exception('Unknown return type');
+        } elseif (($type & PDO::PARAM_LOB) === PDO::PARAM_LOB) {
+            // GET OUT
+            throw new Exception('Invalid return type (PDO::PARAM_LOB)');
+
+        } else {
+            // ¯\_(ツ)_/¯
+            throw new Exception('Unknown return type');
         }
         return "DECLARE @$name $sqlType = :$name";
     }
