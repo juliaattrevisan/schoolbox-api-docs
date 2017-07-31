@@ -113,14 +113,16 @@ class StoredProcedure extends Base
 
     /**
      * DBLib doesn't support true prepared statements, or output/returns from
-     * stored procedures, so bind as normal parameters and wrangle in the query.
+     * stored procedures.
+     *
+     * No binding of output params is done here; "output" params are instead
+     * added to a select statement, and retrieved from the final rowset.
      *
      * @param string $name
      * @param &array $param
      */
     protected function internalBindOutputParam($name, &$param)
     {
-        $this->statement->bindValue($name, $param['value'], $param['type']);
     }
 
     /**
