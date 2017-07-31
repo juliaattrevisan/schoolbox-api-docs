@@ -31,14 +31,14 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getParent($externalId)
     {
-        $vars = array(
+        $vars = [
             'sbGetParent',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', $externalId, SQLINT4, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+                'pSchoolNum' => $externalId,
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -77,14 +77,14 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getParentSync($externalId)
     {
-        $vars = array(
+        $vars = [
             'sbGetParent',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', $externalId, SQLINT4, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+                'pSchoolNum' => $externalId,
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -119,14 +119,14 @@ class External_Schoolpro_User implements External_UserInterface
     {
         $medicalNoteStr = '';
 
-        $vars = array(
+        $vars = [
             'sbGetStudent',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', $synId, SQLINT4, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+                'pSchoolNum' => $synId,
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -135,14 +135,14 @@ class External_Schoolpro_User implements External_UserInterface
 
             /* Get the medical data for him too
              */
-            $medicalVars = array(
+            $medicalVars = [
                 'sbGetStudentMedicalConditions',
-                array(
-                    array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                    array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                    array('@pSchoolNum', $synId, SQLINT4, false, false, -1),
-                )
-            );
+                [
+                    'pUserName' => 'alaress',
+                    'pUserPass' => 'alaress',
+                    'pSchoolNum' => $synId,
+                ]
+            ];
 
             $medicalResult = $this->getConnector()->executeStoredProcedure($medicalVars[0], $medicalVars[1])->fetchAll();
 
@@ -207,14 +207,14 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
-        $vars = array(
+        $vars = [
             'sbGetStudentContact',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+                'pSchoolNum' => $externalUserId,
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -302,14 +302,14 @@ class External_Schoolpro_User implements External_UserInterface
         }
 
         if ($user->getRole()->isStudent()) {
-            $vars = array(
+            $vars = [
                 'sbGetStudentSubjectList',
-                array(
-                    array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                    array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                    array('@pSchoolNum', $externalId, SQLINT4, false, false, -1),
-                )
-            );
+                [
+                    'pUserName' => 'alaress',
+                    'pUserPass' => 'alaress',
+                    'pSchoolNum' => $externalId,
+                ]
+            ];
 
             $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -328,14 +328,14 @@ class External_Schoolpro_User implements External_UserInterface
                 return $subjectList;
             }
         } else if ($user->getRole()->isStaff()) {
-            $vars = array(
+            $vars = [
                 'sbGetStaffSubjectList',
-                array(
-                    array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                    array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                    array('@pSchoolNum', $externalId, SQLINT4, false, false, -1),
-                )
-            );
+                [
+                    'pUserName' => 'alaress',
+                    'pUserPass' => 'alaress',
+                    'pSchoolNum' => $externalId,
+                ]
+            ];
 
             $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -371,14 +371,14 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getEnrolledStudents($synergyID)
     {
-        $vars = array(
+        $vars = [
             'sbGetEnrolledStudents',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', $synergyID, SQLINT4, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+                'pSchoolNum' => $synergyID,
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -462,14 +462,14 @@ class External_Schoolpro_User implements External_UserInterface
                 return false;
         }
 
-        $vars = array(
+        $vars = [
             'sbGetPortraitLastUpdated',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+                'pSchoolNum' => $externalUserId,
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -490,14 +490,14 @@ class External_Schoolpro_User implements External_UserInterface
             $modifiedTime = strtotime($result['result'][0]['CaptureDate']);
 
             if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-                $vars = array(
+                $vars = [
                     'sbGetPortraitFile',
-                    array(
-                        array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                        array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                        array('@pSchoolNum', $externalUserId, SQLINT4, false, false, -1),
-                    )
-                );
+                    [
+                        'pUserName' => 'alaress',
+                        'pUserPass' => 'alaress',
+                        'pSchoolNum' => $externalUserId,
+                    ]
+                ];
 
                 $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -532,13 +532,13 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
-        $vars = array(
+        $vars = [
             'sbGetStudentAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -550,13 +550,13 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
-        $vars = array(
+        $vars = [
             'sbGetGuardianAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
@@ -568,13 +568,13 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStaffUserAccountInfo()
     {
-        $vars = array(
+        $vars = [
             'sbGetStaffAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+            ]
+        ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
