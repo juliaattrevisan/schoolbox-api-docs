@@ -231,12 +231,12 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $statement->nextRowset();
 
-        $this->assertSame($currentDay, 0);
-        $this->assertSame($calendarDate, 'Dec 30 1899 12:00AM');
-        $this->assertSame($calendarDay, 0);
-        $this->assertSame($message, 'No classes on this day');
-        $this->assertSame($definitionDay, null);
-        $this->assertSame($result, 1);
+        $this->assertEquals($currentDay, 0);
+        $this->assertEquals($calendarDate, 'Dec 30 1899 12:00AM');
+        $this->assertEquals($calendarDay, 0);
+        $this->assertEquals($message, 'No classes on this day');
+        $this->assertNull($definitionDay, null);
+        $this->assertEquals($result, 1);
     }
 
     /**
