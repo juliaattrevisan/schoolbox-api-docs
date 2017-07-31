@@ -37,6 +37,7 @@ class StoredProcedure extends Base
             }
         }
 
+        // Output or return parameters cause a completely different problem
         if (isset($this->parameters['output'])) {
             foreach ($this->parameters['output'] as $name => $parameter) {
                 if (!empty($parameterPlaceholders)) {
@@ -61,7 +62,6 @@ class StoredProcedure extends Base
 
                 case PDO::PARAM_STR:
                     $sqlType = sprintf('VARCHAR(%d)', $size);
-                    // varchar(length)
                     break;
 
                 case PDO::PARAM_INT:
@@ -82,5 +82,17 @@ class StoredProcedure extends Base
         // Add the function name and its parameter placeholders
 
         return "{$prefix} {$this->name} {$parameterPlaceholders}";
+    }
+
+    /**
+     * DBLib doesn't support true prepared statements, or output/returns from
+     * stored procedures, so bind as normal parameters and wrangle in the query.
+     *
+     * @param string $name
+     * @param &array $param
+     */
+    protected function internalBindOutputParam($name, &$param)
+    {
+        $this->statement->bindValue($name, $param['value'], $param['type']);
     }
 }
