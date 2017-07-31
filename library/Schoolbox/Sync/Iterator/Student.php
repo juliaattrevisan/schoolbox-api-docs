@@ -89,7 +89,7 @@ class Student extends IteratorIterator
          */
         $currentResult = $this->getInnerIterator()->current();
 
-        if(!is_array($currentResult)){
+        if (!is_array($currentResult)) {
             $this->currentItem = null;
             return;
         }
