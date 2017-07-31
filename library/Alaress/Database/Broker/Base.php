@@ -38,9 +38,6 @@ abstract class Base implements IBroker
     /** @var PDO $pdo The PDO object that does all the real work */
     protected $pdo;
 
-    /** @var Cache|PDOStatement[] $statementCache PDO Prepared statement cache */
-    protected $statementCache = [];
-
     /** @var Collector The debugging collector */
     protected $collector = null;
 
@@ -57,17 +54,10 @@ abstract class Base implements IBroker
     private $quoter;
 
     /**
-     * Constructor. Sets up the statement cache, and grabs a handle to the connector that holds all
-     * of the relevant information we require to connect
+     * Constructor
      */
     public function __construct()
     {
-        // Setup PDO statement cache
-
-        $this->statementCache = new Cache(function ($statement, $options) {
-            return $this->pdo->prepare($statement, $options);
-        });
-
         $this->quoter = $this->buildQuoter();
     }
 
@@ -191,7 +181,7 @@ abstract class Base implements IBroker
     }
 
     // ----------------------------------------------------------------------------------------------------------------
-    // This performs the low level PDO statement preparation via the caching mechanism
+    // This performs the low level PDO statement preparation
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -199,7 +189,7 @@ abstract class Base implements IBroker
      */
     public function prepare($query, $options = [])
     {
-        return $this->statementCache->get(sha1($query), [$query, $options]);
+        return $this->pdo->prepare($query, $options);
     }
 
     /**
