@@ -329,9 +329,6 @@ class EventConnector extends EventMapper
              * superuser or attendee (teacher in charge, staff, student)
              * or are in the EOTC permissions system
              *
-             * Save some hassle if you're already an EOTC Administrator, skip all
-             * this other mapper stuff
-             *
              *  - Superusers can always see it
              *  - Creators can always see it
              *  - Teachers In Charge can always see it, but is shown as translucent
@@ -349,11 +346,11 @@ class EventConnector extends EventMapper
             $isApproved = $eventItem->getMetadata()->getStatus()->isApproved();
             $inCampusAndRole = $inCampus && $inRole;
 
-            if ($isSuperuser || $isCreator || $isTIC || $isStaffAttendee || ($isApproved && ($isStudentAttendee || $inCampusAndRole))) {
+            if ($isEOTCAdministrator || $isSuperuser || $isCreator || $isTIC || $isStaffAttendee || ($isApproved && ($isStudentAttendee || $inCampusAndRole))) {
                 $isVisible = true;
             }
 
-            if ($isEOTCAdministrator || $isVisible) {
+            if ($isVisible) {
 
                 /* Translate an \EOTC\Event type into a EventInterface descendant
                  * Note that this "new Event();" does not have a mapper, so spawn concretely
