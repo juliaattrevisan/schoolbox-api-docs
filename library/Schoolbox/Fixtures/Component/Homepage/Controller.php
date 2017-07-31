@@ -109,7 +109,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'readOnly'            => $this->readOnly,
                 'fixtureAdmin'        => $this->fixtureAdmin,
                 'noConfig'            => $this->noConfig,
-                'noInstall'           => $this->noInstall
+                'noInstall'           => $this->noInstall,
+                'team'                => $this->getConfig('team')
             ]
         );
     }
