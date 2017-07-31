@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Lists;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\MapperFactory;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
@@ -33,6 +34,19 @@ use Timetable_ColourMapper;
 
 class Controller extends Base
 {
+    /** @var MapperFactory */
+    private $mapperFactory;
+
+
+    /**
+     * @param MapperFactory $mapperFactory
+     */
+    public function __construct(MapperFactory $mapperFactory)
+    {
+        $this->mapperFactory = $mapperFactory;
+    }
+
+
     /**
      * Converts "strings_like_this" to "StringsLikeThis"
      *
@@ -106,9 +120,7 @@ class Controller extends Base
         $mapper_name     = $tableData[$tableKey]['mapper'];
         $sortable_column = $this->getRequest()->post["sortable_column"];
 
-        /** @var Mapper $mapper */
-        $mapper = new $mapper_name;
-        $model_name = $mapper->getModel();
+        $mapper = $this->mapperFactory->get($mapper_name);
 
         $ids    = [];
         $values = [];
@@ -140,9 +152,11 @@ class Controller extends Base
             if ($id > 0) {
                 // Lookup existing record
                 $model = $mapper->findById($id);
+
             } else {
                 // Create new record
-                $model = new $model_name;
+                $model = $mapper->createModel();
+
                 foreach ($fixed as $field => $value) {
                     $setter = "set" . $this->underscoreToCamelCase($field);
 
