@@ -42,6 +42,19 @@ class EventStatus
     }
 
     /**
+     * Determine if the event status is between $status1 and $status2
+     * Status ids are sequential
+     *
+     * @param int $status1 A const from EventStatusMapper
+     * @param int $status2 A const from EventStatusMapper
+     * @return bool
+     */
+    public function between($status1, $status2)
+    {
+        return ($this->getId() >= $status1) && ($this->getId() <= $status2);
+    }
+
+    /**
      * Determine whether this event is in Draft
      *
      * @return bool
