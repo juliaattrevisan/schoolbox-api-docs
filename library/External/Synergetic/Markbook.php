@@ -270,8 +270,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                         studentBook.ClassCampus = staffBook.ClassCampus AND
                         studentBook.ClassCode = staffBook.ClassCode
             WHERE       staffBook.HdgAbbrev2 = :headingAbbreviation2 AND 
-                        FileYear = :fileYear AND
-                        FileSemester = :fileSemester
+                        studentBook.FileYear = :fileYear AND
+                        studentBook.FileSemester = :fileSemester
         ";
 
         $this->getConnector()->executeQuery($sql, [
