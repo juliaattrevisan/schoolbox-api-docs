@@ -14,33 +14,34 @@ use Alaress_Date_Format;
 use Schoolbox\User;
 use Schoolbox\Campus;
 
-class EventPermission {
+class EventPermission
+{
 
-	/**
-	 * @var int
-	 */
-	private $id;
+    /**
+     * @var int
+     */
+    private $id;
 
-	/**
-	 * The user to whom this permissions/subscriptions applies
-	 *
-	 * @var User
-	 */
-	private $user;
+    /**
+     * The user to whom this permissions/subscriptions applies
+     *
+     * @var User
+     */
+    private $user;
 
-	/**
-	 * The campus to which this permissions/subscriptions applies
-	 *
-	 * @var Campus
-	 */
-	private $campus;
+    /**
+     * The campus to which this permissions/subscriptions applies
+     *
+     * @var Campus
+     */
+    private $campus;
 
-	/**
-	 * The status to which this permissions/subscriptions applies
-	 *
-	 * @var EventStatus
-	 */
-	private $status;
+    /**
+     * The status to which this permissions/subscriptions applies
+     *
+     * @var EventStatus
+     */
+    private $status;
 
     /**
      * Is this user allowed to edit EOTC events in this status for this campus?
@@ -57,141 +58,149 @@ class EventPermission {
      */
     protected $subscribed = false;
 
-	/**
-	 * @var Alaress_Date_Format
-	 */
-	private $createdAt = null;
+    /**
+     * @var Alaress_Date_Format
+     */
+    private $createdAt = null;
 
-	/**
-	 * @var Alaress_Date_Format
-	 */
-	private $updatedAt = null;
+    /**
+     * @var Alaress_Date_Format
+     */
+    private $updatedAt = null;
 
-	/**
-	 * @var Alaress_Date_Format
-	 */
-	private $deletedAt = null;
+    /**
+     * @var Alaress_Date_Format
+     */
+    private $deletedAt = null;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /* Getters/Setters
+     */
 
-	/* Getters/Setters
-	 */
-
-	/**
-	 * @param Campus $campus
+    /**
+     * @param Campus $campus
      * @return self $this
-	 */
-	public function setCampus($campus) {
-		$this->campus = $campus;
+     */
+    public function setCampus($campus)
+    {
+        $this->campus = $campus;
         return $this;
-	}
+    }
 
-	/**
-	 * @return Campus
-	 */
-	public function getCampus() {
-		return $this->campus;
-	}
+    /**
+     * @return Campus
+     */
+    public function getCampus()
+    {
+        return $this->campus;
+    }
 
-	/**
-	 * @param int $id
+    /**
+     * @param int $id
      * @return self $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param EventStatus $status
+    /**
+     * @param EventStatus $status
      * @return self $this
-	 */
-	public function setStatus($status) {
-		$this->status = $status;
-		return $this;
-	}
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+        return $this;
+    }
 
-	/**
-	 * @return EventStatus
-	 */
-	public function getStatus() {
-		return $this->status;
-	}
+    /**
+     * @return EventStatus
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
 
-	/**
-	 * @param User
+    /**
+     * @param User
      * @return self $this
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-		return $this;
-	}
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+        return $this;
+    }
 
-	/**
-	 * @return User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
-	/**
-	 * @param Alaress_Date_Format $createdAt
+    /**
+     * @param Alaress_Date_Format $createdAt
      * @return self $this
-	 */
-	public function setCreatedAt($createdAt) {
-		$this->createdAt = $createdAt;
-		return $this;
-	}
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
 
-	/**
-	 * @return Alaress_Date_Format
-	 */
-	public function getCreatedAt() {
-		return $this->createdAt;
-	}
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
 
-	/**
-	 * @param Alaress_Date_Format $deletedAt
+    /**
+     * @param Alaress_Date_Format $deletedAt
      * @return self $this
-	 */
-	public function setDeletedAt($deletedAt) {
-		$this->deletedAt = $deletedAt;
-		return $this;
-	}
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
 
-	/**
-	 * @return Alaress_Date_Format
-	 */
-	public function getDeletedAt() {
-		return $this->deletedAt;
-	}
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
 
-	/**
-	 * @param Alaress_Date_Format $updatedAt
+    /**
+     * @param Alaress_Date_Format $updatedAt
      * @return self $this
-	 */
-	public function setUpdatedAt($updatedAt) {
-		$this->updatedAt = $updatedAt;
-		return $this;
-	}
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
 
-	/**
-	 * @return Alaress_Date_Format
-	 */
-	public function getUpdatedAt() {
-		return $this->updatedAt;
-	}
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
 
     /**
      * @return boolean

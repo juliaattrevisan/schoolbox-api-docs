@@ -5,14 +5,15 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace EOTC;
 
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EOTC\Event;
 use Schoolbox\Calendar\EventType;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class EventConnector extends EventMapper
@@ -149,8 +150,9 @@ class EventConnector extends EventMapper
      *
      * @param $startTimestamp
      * @param $endTimestamp
-     *
      * @return Collection
+     * @throws MapperException
+     * @throws DefinitionException
      */
     public function getDayEvents($startTimestamp, $endTimestamp)
     {
@@ -162,41 +164,8 @@ class EventConnector extends EventMapper
          * Skip Rejected events
          */
         if ($this->getUser()->isSuperuser()) {
-            $query = "
-                SELECT
-                    {$this->getColumnString('e')},
-                    {$authorMapper->getColumnString('a')},
-                    {$teacherInChargeMapper->getColumnString('c')},
-                    {$eventTypeMapper->getColumnString('t')},
-                    (
-                        SELECT COUNT(*)
-                        FROM eotc_event_metadata
-                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                        LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
-                        WHERE eotc_event_metadata.event_id = e.id
-                        AND eotc_metadata_student.user_id IS NOT NULL
-                    ) AS numStudents,
-                    (
-                        SELECT COUNT(*)+1
-                        FROM eotc_event_metadata
-                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                        LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
-                        WHERE eotc_event_metadata.event_id = e.id
-                        AND eotc_metadata_staff.user_id IS NOT NULL
-                    ) AS numStaff
-                FROM `{$this->table}` e
-                LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-                LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-                LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-                INNER JOIN eotc_event_metadata ON eotc_event_metadata.event_id = e.id
-                INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                WHERE
-                    DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
-                    AND
-                    DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
-                    AND eotc_metadata.status_id != :rejected
-                ORDER BY e.start_datetime, e.end_datetime
-            ";
+            $querySelect = '';
+            $queryJoin = '';
 
             $params = [
                 'startTimestamp' => $startTimestamp,
@@ -213,44 +182,14 @@ class EventConnector extends EventMapper
          * Skip Rejected events
          */
         else {
-            $query = "
-                SELECT
-                    {$this->getColumnString('e')},
-                    {$authorMapper->getColumnString('a')},
-                    {$teacherInChargeMapper->getColumnString('c')},
-                    {$eventTypeMapper->getColumnString('t')},
-                    eotc_metadata_student.user_id as studentUserId,
-                    eotc_metadata_staff.user_id as staffUserId,
-                    (
-                        SELECT COUNT(*)
-                        FROM eotc_event_metadata
-                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                        LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
-                        WHERE eotc_event_metadata.event_id = e.id
-                        AND eotc_metadata_student.user_id IS NOT NULL
-                    ) AS numStudents,
-                    (
-                        SELECT COUNT(*)+1
-                        FROM eotc_event_metadata
-                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
-                        LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
-                        WHERE eotc_event_metadata.event_id = e.id
-                        AND eotc_metadata_staff.user_id IS NOT NULL
-                    ) AS numStaff
-                FROM `{$this->table}` e
-                LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-                LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-                LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-                INNER JOIN eotc_event_metadata ON eotc_event_metadata.event_id = e.id
-                INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+            $querySelect = "
+                eotc_metadata_student.user_id as studentUserId,
+                eotc_metadata_staff.user_id as staffUserId,
+            ";
+
+            $queryJoin = "
                 LEFT JOIN eotc_metadata_student ON eotc_metadata_student.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_student.user_id = :studentUserId
                 LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_staff.user_id = :staffUserId
-                WHERE
-                    DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
-                    AND
-                    DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
-                    AND eotc_metadata.status_id != :rejected
-                ORDER BY e.start_datetime, e.end_datetime
             ";
 
             $params = [
@@ -262,6 +201,46 @@ class EventConnector extends EventMapper
             ];
         }
 
+        /* Ram in all the pieces
+         */
+        $query = "
+            SELECT
+                {$this->getColumnString('e')},
+                {$authorMapper->getColumnString('a')},
+                {$teacherInChargeMapper->getColumnString('c')},
+                {$eventTypeMapper->getColumnString('t')},
+                {$querySelect}
+                (
+                    SELECT COUNT(*)
+                    FROM eotc_event_metadata
+                    LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+                    LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
+                    WHERE eotc_event_metadata.event_id = e.id
+                    AND eotc_metadata_student.user_id IS NOT NULL
+                ) AS numStudents,
+                (
+                    SELECT COUNT(*)+1
+                    FROM eotc_event_metadata
+                    LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+                    LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
+                    WHERE eotc_event_metadata.event_id = e.id
+                    AND eotc_metadata_staff.user_id IS NOT NULL
+                ) AS numStaff
+            FROM `{$this->table}` e
+            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
+            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            INNER JOIN eotc_event_metadata ON eotc_event_metadata.event_id = e.id
+            INNER JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+            {$queryJoin}
+            WHERE
+                DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
+                AND
+                DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
+                AND eotc_metadata.status_id != :rejected
+            ORDER BY e.start_datetime, e.end_datetime
+        ";
+
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
@@ -271,19 +250,18 @@ class EventConnector extends EventMapper
          * We don't need to iterate with this, since $user doesn't
          * actually change between iterations
          *
-         * EOTC managers and superusers always see events
+         * EOTC Administrators and superusers always see events
          */
-        $isEOTCManager = false;
+        $isEOTCAdministrator = false;
 
         $user = $this->getUser();
-        if ($user->isSuperuser()) {
-            $isEOTCManager = true;
-        } else {
+
+        if (!$user->isSuperuser()) {
             $permissionMapper = EventPermissionMapper::getInstance();
             $allPermissions   = $permissionMapper->findByUser($user);
 
             if ($allPermissions->count()) {
-                $isEOTCManager = true;
+                $isEOTCAdministrator = true;
             }
         }
 
@@ -308,6 +286,10 @@ class EventConnector extends EventMapper
              */
             $eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
 
+            /* Accumulate roles for this event
+             */
+            $eventItem->setRoleCollection($this->findRoles($eventItem->getId()));
+
             /* Accumulate the metadata for this event
              * Only use the first record
              */
@@ -322,50 +304,50 @@ class EventConnector extends EventMapper
 
             /* For filters
              */
-            $campusIds = array();
+            $campusIds = [];
             $inCampus = false;
+            $inRole = false;
 
+            /* Remember if you're in at least one of the campuses chosen for this event
+             */
             foreach ($eventItem->getCampusCollection() as $currentCampus) {
                 $campusIds[] = $currentCampus->getId();
 
-                if($this->getUser()->isInCampus($currentCampus)) {
+                if ($this->getUser()->isInCampus($currentCampus)) {
                     $inCampus = true;
                 }
+            }
 
+            /* Remember if you're in at least one of the roles chosen for this event
+             */
+            if ($eventItem->getRoleCollection()->getBy('id', $this->getUser()->getRole()->getId()) instanceof Role) {
+                $inRole = true;
             }
 
             /* Only present this event for a particular user if they are
              * superuser or attendee (teacher in charge, staff, student)
              * or are in the EOTC permissions system
              *
-             * Save some hassle if you're already an EOTC manager, skip all
-             * this other mapper stuff
-             *
              *  - Superusers can always see it
              *  - Creators can always see it
-             *  - Teachers in Charge should see it in translucent form
-             *  - Staff members should see it in translucent form
-             *  - Students should only see this event if it's Approved and
-             *    if they are assigned to it as an attendee
-             *  IF event is approved and in the campus of the user they can see it
+             *  - Teachers In Charge can always see it, but is shown as translucent
+             *  - Staff Attendees can always see it, but is shown as translucent
+             *  - Student Attendees should only see this event if it's Approved
+             *  - Anyone in both the Campus and Role of an Approved event regardless of attendee-ness
              */
-            $isAttendee = false;
+            $isSuperuser = $user->isSuperuser();
+            $isCreator = $eventItem->getAuthor()->getId() == $user->getId();
+            $isTIC = $user->getId() == $eventItem->getTeacherInCharge()->getId();
+            $isStaffAttendee = $row['staffUserId'] == $this->getUser()->getId();
+            $isStudentAttendee = $row['studentUserId'] == $this->getUser()->getId();
+            $isApproved = $eventItem->getMetadata()->getStatus()->isApproved();
+            $inCampusAndRole = $inCampus && $inRole;
 
-            if (
-                $user->isSuperuser() ||
-                $eventItem->getAuthor()->getId() == $user->getId() ||
-                $user->getId() == $eventItem->getTeacherInCharge()->getId() ||
-                $row['staffUserId'] == $this->getUser()->getId() ||
-                ($eventItem->getMetadata()->getStatus()->isApproved()) && ($row['studentUserId'] == $this->getUser()->getId())
-            ) {
-                $isAttendee = true;
-            }
+            if ($isEOTCAdministrator || $isSuperuser || $isCreator || $isTIC || $isStaffAttendee || ($isApproved && ($isStudentAttendee || $inCampusAndRole))) {
 
-            if ($isEOTCManager || $isAttendee || ($eventItem->getMetadata()->getStatus()->isApproved() && $inCampus)) {
-
-
-                /* Translate an \EOTC\Event type into a EventInterface descendant */
-
+                /* Translate an \EOTC\Event type into a EventInterface descendant
+                 * Note that this "new Event();" does not have a mapper, so spawn concretely
+                 */
                 $event = new Event();
                 $event->setAuthorName($eventItem->getAuthor()->getFullname());
                 $event->setAuthorId($eventItem->getAuthor()->getId());
@@ -381,8 +363,7 @@ class EventConnector extends EventMapper
                 $event->setType($eventItem->getType()->getId());
 
                 /* Augment title with student counts
-                 *
-                 * TODO: Probably will include students + staff + 1 TIC
+                 * students + staff + 1 TIC
                  */
                 $event->setTitle("{$eventItem->getTitle()} ({$row['numStudents']},{$row['numStaff']})");
 

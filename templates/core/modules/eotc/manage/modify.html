@@ -240,6 +240,17 @@
             </fieldset>
 
             <fieldset class="content">
+                <legend>Role <span class='hint has-tip tip-top' data-tooltip title="Select the roles which will be able to view this event.">?</span></legend>
+
+                <div class="small-12 columns">
+                    <!-- BEGIN event_role_list -->
+                    <input id="roleCheckbox{EVENT_ROLE_ID}" type="checkbox" name="role[]" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
+                    <label for="roleCheckbox{EVENT_ROLE_ID}" class="checkbox-label">{EVENT_ROLE_NAME}</label>
+                    <!-- END event_role_list -->
+                </div>
+            </fieldset>
+
+            <fieldset class="content">
                 <legend>
                     {TPL_LOCAL_EOTCRAMSABBREVIATION} Required?
                     <span class='hint has-tip tip-top' data-tooltip title="Please confirm if {TPL_LOCAL_EOTCRAMSABBREVIATION} is required for this event to take place.">?</span>
