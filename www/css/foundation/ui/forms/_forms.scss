@@ -655,15 +655,6 @@ select.visibility {
     }
 }
 
-form .information-list {
-	li{
-		padding-top: 1rem;
-	}
-	nav {
-		position: relative;
-	}
-}
-
 section > fieldset {
     @include easy-transition(opacity 360ms cubic-bezier(0.2,1,0,1));
 	@include grid-row(nest-collapse);
@@ -702,6 +693,10 @@ section > fieldset {
 	@media #{$small-only} {
 		padding: 0;
 	}
+}
+
+form .information-list .sp-replacer {
+	margin-bottom: 1rem;
 }
 
 @import 'dropzone';
