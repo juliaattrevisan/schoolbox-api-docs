@@ -581,7 +581,7 @@ class Mapper extends BaseMapper
 
             // Search was too short
 
-            $results = new Collection();
+            $results = $this->createCollection();
         }
 
         // Save the audit record of the search
