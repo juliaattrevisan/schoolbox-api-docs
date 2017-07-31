@@ -26,6 +26,7 @@ class StoredProcedure extends Base
     {
         // Create input/output parameter placeholders
 
+        $declarePlaceholders = [];
         $parameterPlaceholders = '';
 
         if (isset($this->parameters['input'])) {
@@ -37,13 +38,13 @@ class StoredProcedure extends Base
             }
         }
 
-        // Output or return parameters cause a completely different problem
         if (isset($this->parameters['output'])) {
             foreach ($this->parameters['output'] as $name => $parameter) {
+                $declarePlaceholders[] = $this->buildDeclare($name, $parameter);
                 if (!empty($parameterPlaceholders)) {
                     $parameterPlaceholders .= ", ";
                 }
-                $parameterPlaceholders .= "@{$name} = :{$name}";
+                $parameterPlaceholders .= "@{$name} = :{$name} OUTPUT";
             }
         }
 
@@ -52,36 +53,14 @@ class StoredProcedure extends Base
         $prefix = "EXEC";
 
         if (isset($this->parameters['return'])) {
-            // Figure out what type of var to declare
-            $type = $this->parameters['return']['type'];
-            $size = $this->parameters['return']['length'];
-            switch ($type) {
-                case PDO::PARAM_BOOL:
-                    $sqlType = 'BIT';
-                    break;
-
-                case PDO::PARAM_STR:
-                    $sqlType = sprintf('VARCHAR(%d)', $size);
-                    break;
-
-                case PDO::PARAM_INT:
-                    $sqlType = 'BIGINT';
-                    break;
-
-                case PDO::PARAM_LOB:
-                    // GET OUT
-                    throw new Exception('Invalid return type (PDO::PARAM_LOB)');
-
-                default:
-                    // ¯\_(ツ)_/¯
-                    throw new Exception('Unknown return type');
-            }
-            $prefix = "DECLARE @return $sqlType = :return; EXEC @return =";
+            $declarePlaceholders[] = $this->buildDeclare('return', $this->parameters['return']);
+            $prefix = "EXEC @return =";
         }
 
         // Add the function name and its parameter placeholders
+        $declarePart = implode('; ', $declarePlaceholders);
 
-        return "{$prefix} {$this->name} {$parameterPlaceholders}";
+        return "{$declarePart} {$prefix} {$this->name} {$parameterPlaceholders}";
     }
 
     /**
@@ -129,6 +108,6 @@ class StoredProcedure extends Base
                 // ¯\_(ツ)_/¯
                 throw new Exception('Unknown return type');
         }
-        return "DECLARE @$name $sqlType = :$name;";
+        return "DECLARE @$name $sqlType = :$name";
     }
 }
