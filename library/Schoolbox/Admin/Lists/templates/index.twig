@@ -130,11 +130,16 @@
 
 {{ renderAdminNavigation(pageCurrent) }}
 
+{# some vars we'll need throughout the page #}
+{% set deletable = tables[table].delete %}
+{% set sortable  = tables[table].sortable %}
+{% set canSpawn  = not tables[table].noNewRecords %}
+
 <div class="row">
     <div class="small-12 island">
         <dl class="sub-nav">
             {% for tableKey, tableCurrent in tables %}
-                <dd {% if tableKey == table %}class="active"{% endif %}><a href="/adminv2/lists/{{ tableKey }}">{{ tableCurrent.title }}</a></dd>
+                <dd {% if tableKey == table %}class="active"{% endif %}><a href="/adminv2/lists/{{ tableKey }}">{{ tableCurrent.title }}</a></dd>{# TODO routeLookup #}
             {% endfor %}
         </dl>
 
