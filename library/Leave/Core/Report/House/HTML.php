@@ -44,8 +44,8 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
      */
     public function render()
     {
-        $this->renderMetaDetails();
         $this->renderHouseList();
+        $this->renderMetaDetails();
         $this->renderTimespanOptions();
         $this->renderTableHeaders();
         $this->renderTableRowsAndFooter();
