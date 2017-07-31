@@ -145,6 +145,9 @@ class Controller extends Base
             }
         }
 
+        // for database purposes, sequencing begins at 1
+        $sequence = 1;
+
         foreach ($ids as $currentIndex => $id)
         {
             // Negative ID numbers indicate new records
@@ -168,29 +171,27 @@ class Controller extends Base
                 }
             }
 
-            foreach ($values as $field => $value)
-            {
+            // set literal values
+            foreach ($values as $field => $value) {
                 // Update values
-
                 $setter = "set" . $this->underscoreToCamelCase($field);
 
                 $model->$setter($value[$currentIndex]);
+            }
 
-                // Override nullable fields where appropriate
+            // Override nullable fields where appropriate
+            foreach ($nulls as $field => $value) {
+                $setter = "set" . $this->underscoreToCamelCase($field);
 
-                if (isset($nulls[$field])) {
-                    foreach ($nulls[$field] as $nullableField => $index) {
-                        if ($currentIndex == $index) {
-                            $model->$setter(null);
-                        }
+                foreach ($value as $index => $_) {
+                    if ($currentIndex == $index) {
+                        $model->$setter(null);
                     }
                 }
             }
 
             // Process any radio buttons for this list
-
-            foreach ($radios as $field => $index)
-            {
+            foreach ($radios as $field => $index) {
                 $setter = "set" . $this->underscoreToCamelCase($field);
 
                 // Radio buttons can only be on for one row, so set that row to true and all others to false
@@ -204,12 +205,15 @@ class Controller extends Base
 
             if ($sortable_column != "") {
                 $setter = "set" . $this->underscoreToCamelCase($sortable_column);
-                $model->$setter($currentIndex);
+                $model->$setter($sequence);
             }
 
             // Save the changes
 
             $mapper->save($model);
+
+            // increment the sequence counter
+            ++$sequence;
         }
 
         $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
