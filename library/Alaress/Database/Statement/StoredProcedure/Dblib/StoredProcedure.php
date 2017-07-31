@@ -44,7 +44,7 @@ class StoredProcedure extends Base
                 if (!empty($parameterPlaceholders)) {
                     $parameterPlaceholders .= ", ";
                 }
-                $parameterPlaceholders .= "@{$name} = :{$name} OUTPUT";
+                $parameterPlaceholders .= "@{$name} = :{$name}";
             }
         }
 
