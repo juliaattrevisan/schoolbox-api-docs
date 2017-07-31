@@ -354,13 +354,15 @@ class External_Isams_User implements External_UserInterface
      */
     public function getSubjectList(User $user)
     {
-        $externalId = $user->getExternalId();
+        $externalId =  $this->getDatabase()->smartQuote($user->getExternalId());
 
         $sql =
             "
           SELECT DISTINCT   V_Class.ClassCode AS code
           FROM              V_Class
-          WHERE             V_Class.StudentID = '{$this->database->quote($externalId)}'
+          WHERE             V_Class.StudentID = $externalId OR
+                            V_Class.Tutor1ID = $externalId OR
+                            V_Class.Tutor2ID = $externalId
         ";
 
         $this->getDatabase()->query($sql);
