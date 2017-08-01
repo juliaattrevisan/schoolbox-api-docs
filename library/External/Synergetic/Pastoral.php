@@ -242,8 +242,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                           dbo.tPastoralCare.Details, 
                           dbo.tPastoralCare.PrivateDetails, 
                           dbo.tPastoralCare.InitiatorCode, 
-                          dbo.tPastoralCare.TypeCode, 
+                          dbo.tPastoralCare.TypeCode,
+                          dbo.luPastoralCareType.Description AS TypeDescription,
                           dbo.tPastoralCare.CategoryCode,
+                          dbo.luPastoralCareCategory.Description AS CategoryDescription,
                           dbo.tPastoralCare.ClassificationCode, 
                           dbo.tPastoralCare.IsFollowUpFlag, 
                           dbo.tPastoralCare.FollowUpDate, 
@@ -255,13 +257,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                           dbo.tPastoralCare.EmailSentByID, 
                           dbo.tPastoralCare.DuplicateFromSeq, 
                           dbo.tPastoralCare.SubjectClassesSeq,
-                          dbo.luPastoralCareType.Description AS TypeDescription, 
                           Community_1.Surname AS StudentLastname, 
                           Community_1.Given1 AS StudentFirstname,
                           dbo.Community.Surname AS OwnerLastname, 
                           dbo.Community.Given1 AS OwnerFirstname
             FROM          dbo.tPastoralCare 
-            INNER JOIN    dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code 
+            LEFT JOIN     dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code
+            LEFT JOIN     dbo.luPastoralCareCategory ON dbo.tPastoralCare.CategoryCode = dbo.luPastoralCareCategory.Code
             INNER JOIN    dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
             INNER JOIN    dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
             INNER JOIN    dbo.vStudents ON dbo.vStudents.ID = dbo.tPastoralCare.ID
@@ -887,11 +889,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      * @param array $record Pastoral care record
      * @return PastoralCategory
      */
-    private function getPastoralCategory($record)
+    private function getPastoralCategory(array $record)
     {
         // Check the cache first
 
-        if (!isset($this->categoryCache[$record["CategoryDescription"]])) {
+        if (!isset($this->categoryCache[$record['CategoryCode']])) {
 
             // Didn't find a cached record. Try to retrieve an existing pastoral category from Schoolbox
 
