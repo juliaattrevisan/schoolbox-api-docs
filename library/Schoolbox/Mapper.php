@@ -3400,6 +3400,15 @@ abstract class Mapper implements IMapper, Serializable
         return $this;
     }
 
+
+    /**
+     * If callback fails and you want it to be silent, return false.
+     * If caller should know why it failed, throw an UnexpectedValueException explaining failure.
+     *
+     * @param string $point  One of the self::CALLBACK_* constants
+     * @return bool
+     * @throws \UnexpectedValueException If callback failed and caller should know why
+     */
     public function triggerCallbacks($point)
     {
         $params = array_slice(func_get_args(), 1);
