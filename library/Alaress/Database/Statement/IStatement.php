@@ -94,23 +94,10 @@ interface IStatement
     public function fetchRowArray($index);
 
     /**
-     * Returns last error message this statement generated
-     *
-     * @return string
-     */
-    public function errorInfo();
-
-    /**
-     * Returns last error message this statement generated
-     *
-     * @return string
-     */
-    public function errorCode();
-
-    /**
      * Moves to the next result set in a stored procedure that returns multiple sets of results
      *
      * @return bool
+     * @throws Exception if moving to next result set failed for some reason
      */
     public function nextRowset();
 
@@ -133,6 +120,7 @@ interface IStatement
      *
      * @param array|null $values
      * @return bool
+     * @throws Exception if execution failed for some reason
      */
     public function execute($values = null);
 

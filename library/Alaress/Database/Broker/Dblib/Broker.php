@@ -15,7 +15,7 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
 use Alaress\Database\Quoter\Dblib\Quoter as DblibQuoter;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
-use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
+use Alaress\Database\Statement\StoredProcedure\Dblib\StoredProcedure;
 use PDO;
 
 class Broker extends Base implements IBroker

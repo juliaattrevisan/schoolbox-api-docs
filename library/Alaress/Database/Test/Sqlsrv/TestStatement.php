@@ -10,6 +10,7 @@
 
 namespace Alaress\Database\Test\Sqlsrv;
 
+use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
 use PHPUnit_Framework_TestCase;
@@ -179,14 +180,10 @@ class TestStatement extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test stored procedures
+     * Test a stored procedure with boring old input values.
      */
     public function testStoredProcedure()
     {
-        // ----------------------------------------------------------------------------------------------------------------
-        // Execute a stored procedure with boring old input values
-        // ----------------------------------------------------------------------------------------------------------------
-
         $this->connectSynergetic68();
 
         $statement = $this->synergetic68->executeStoredProcedure('spsStudentPersonal', [
@@ -198,10 +195,14 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $this->assertSame(strtolower($student['Surname']), 'rhodes');
         $this->assertSame(strtolower($student['Given1']), 'rachel');
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // Execute a stored procedure with output parameters and a return value
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Test a stored procedure with output parameters and a return value.
+     */
+    public function testStoredProcedureWithOutputParameters()
+    {
+        $this->connectSynergetic68();
 
         $currentDay = null;
         $calendarDate = null;
@@ -231,16 +232,58 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $statement->nextRowset();
 
-        $this->assertSame($currentDay, 0);
-        $this->assertSame($calendarDate, 'Dec 30 1899 12:00AM');
-        $this->assertSame($calendarDay, 0);
-        $this->assertSame($message, 'No classes on this day');
-        $this->assertSame($definitionDay, null);
-        $this->assertSame($result, 1);
+        $this->assertEquals($currentDay, 0);
+        $this->assertEquals($calendarDate, 'Dec 30 1899 12:00AM');
+        $this->assertEquals($calendarDay, 0);
+        $this->assertEquals($message, 'No classes on this day');
+        $this->assertNull($definitionDay, null);
+        $this->assertEquals($result, 1);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // Test iterating multiple recordsets returned by stored procedure
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Test iteration of a stored procedure with output parameters and a return value.
+     *
+     * This doesn't work under the DBLib driver, but does under the SqlSrv driver.
+     */
+    public function testStoredProcedureIteratorWithOutputParameters()
+    {
+        $this->connectSynergetic68();
+
+        // This fails under DBLib
+        if (!SqlsrvBroker::isAvailable()) {
+            $this->setExpectedException(\DomainException::class);
+        }
+
+        $result   = null;
+        $returns  = ['value' => &$result, 'type' => PDO::PARAM_INT, 'length' => 4];
+        $outputs  = [];
+        $iterator = $this->synergetic68->executeStoredProcedureIterator(
+            'uReturnValueTest',
+            [],
+            $outputs,
+            $returns
+        );
+
+        // Verify rows
+        $rows = [];
+        foreach ($iterator as $row) {
+            $rows[] = $row;
+        }
+        $this->assertCount(1, $rows);
+        $this->assertEquals(1, $rows[0]['id']);
+        $this->assertEquals('Alaress', $rows[0]['value']);
+
+        // Result is not applied until next rowset
+        $iterator->nextRowset();
+        $this->assertEquals(-5, $result);
+    }
+
+    /**
+     * Test iterating multiple recordsets returned by stored procedure
+     */
+    public function testStoredProcedureWithMultipleRecordSets()
+    {
+        $this->connectSynergetic68();
 
         $iterator = $this->synergetic68->executeStoredProcedureIterator('uTestMultipleRecordsets');
 
@@ -248,7 +291,7 @@ class TestStatement extends PHPUnit_Framework_TestCase
         $expectedResults = ['1', '2', '3', '4'];
 
         foreach ($iterator as $row) {
-            $this->assertSame($expectedResults[$count++], $row['test']);
+            $this->assertEquals($expectedResults[$count++], $row['test']);
         }
 
         $iterator->nextRowset();
@@ -257,18 +300,21 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $count = 0;
         foreach ($iterator as $row) {
-            $this->assertSame($expectedResults[$count++], $row['test']);
+            $this->assertEquals($expectedResults[$count++], $row['test']);
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // Test function call
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Test function call stored procedure
+     */
+    public function testStoredProcedureFunctionCall()
+    {
+        $this->connectSynergetic68();
 
         $function = $this->synergetic68->executeFunctionCall('dbo.fnTimeStr', [
-             'ADateTime' => '2016-01-05 13:47:27'
+            'ADateTime' => '2016-01-05 13:47:27'
         ]);
 
         $this->assertSame($function->fetchColumn(), "1:47pm");
-
     }
 }

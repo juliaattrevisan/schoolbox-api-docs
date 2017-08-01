@@ -84,37 +84,49 @@ class Base extends BaseQuery implements IStoredProcedure
     /**
      * @inheritdoc
      */
-    protected function bindStatement() {
-
-        /** @var PDOStatement $statement */
-        $statement = $this->statement;
-
-        // Bind inputs
-
+    protected function bindStatement()
+    {
         parent::bindStatement();
+        $this->internalBindOutputs();
+        $this->internalBindReturnValue();
+    }
 
-        // Bind output parameters
+    /**
+     * Bind a single output parameter.
+     *
+     * @param string $name
+     * @param &array $param
+     */
+    protected function internalBindOutputParam($name, &$param)
+    {
+        $this->statement->bindParam(
+            $name,
+            $param['value'],
+            $param['type'] | PDO::PARAM_INPUT_OUTPUT,
+            $param['length']
+        );
+    }
 
+    /**
+     * Internal method for binding output values to stored procedures.
+     */
+    protected function internalBindOutputs()
+    {
         if (isset($this->parameters['output'])) {
             foreach ($this->parameters['output'] as $name => &$output) {
-                $statement->bindParam(
-                    $name,
-                    $output['value'],
-                    $output['type'] | PDO::PARAM_INPUT_OUTPUT,
-                    $output['length']
-                );
+                $this->internalBindOutputParam($name, $output);
             }
+            unset($output);
         }
+    }
 
-        // Bind return value
-
+    /**
+     * Internal method for binding return values to stored procedures.
+     */
+    protected function internalBindReturnValue()
+    {
         if (isset($this->parameters['return'])) {
-            $statement->bindParam(
-                'return',
-                $this->parameters['return']['value'],
-                $this->parameters['return']['type'] | PDO::PARAM_INPUT_OUTPUT,
-                $this->parameters['return']['length']
-            );
+            $this->internalBindOutputParam('return', $this->parameters['return']);
         }
     }
 }

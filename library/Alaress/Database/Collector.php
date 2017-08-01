@@ -78,8 +78,8 @@ class Collector extends DataCollector implements Renderable, AssetProvider
             'params' => [],
             'is_success' => $result,
             'row_count' => $statement->rowCount(),
-            'error_code' => $statement->errorCode(),
-            'error_message' => $statement->errorInfo()
+            'error_code' => '',
+            'error_message' => '',
         ];
 
         $duration = microtime(true) - $start;

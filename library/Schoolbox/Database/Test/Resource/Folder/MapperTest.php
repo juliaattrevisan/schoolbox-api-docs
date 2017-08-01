@@ -112,9 +112,9 @@ class MapperTest extends TestCase
                 'pa' => $parent
             ];
 
-            $X = $db->executeQuery('INSERT INTO `folder` (`id`, `name`, `parent`) VALUES (:id, :nm, :pa)', $params)->errorInfo();
-
-            if ($X) {
+            try {
+                $db->executeQuery('INSERT INTO `folder` (`id`, `name`, `parent`) VALUES (:id, :nm, :pa)', $params);
+            } catch (Alaress\Database\Exception $e) {
                 $db->executeQuery('UPDATE `folder` SET `name` = :nm, `parent` = :pa, deleted_at = NULL WHERE id = :id', $params);
             }
 

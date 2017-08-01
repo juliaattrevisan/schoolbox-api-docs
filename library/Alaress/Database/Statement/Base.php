@@ -25,12 +25,6 @@ abstract Class Base implements IStatement
     /** @var PDOStatement This is the PDO statement that will do the actual work */
     protected $statement;
 
-    /** @var string $errorInfo If the last statement execution returned an error- this is its message */
-    protected $errorInfo;
-
-    /** @var string $errorCode If the last statement execution returned an error- this is its code */
-    protected $errorCode;
-
     /** @var array $parameters This is an array that contains parameters we intend to bind to the PDO statement */
     protected $parameters = [];
 
@@ -153,22 +147,6 @@ abstract Class Base implements IStatement
     /**
      * @inheritdoc
      */
-    public function errorInfo()
-    {
-        return $this->errorInfo;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function errorCode()
-    {
-        return $this->errorCode;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function nextRowset()
     {
         /** @var PDOStatement $statement */
@@ -177,23 +155,8 @@ abstract Class Base implements IStatement
         try {
             return $statement->nextRowset();
         } catch (PDOException $e) {
-            $this->handleException($e);
-            return null;
+            throw new Exception("Error retrieving next rowset: " . $e->getMessage(), 0, $e);
         }
-    }
-
-    /**
-     * If we get a PDO exception running a query we don't want to terminate application
-     * execution, instead we store the error message/code on the statement and returns false
-     *
-     * @param PDOException $e
-     * @return bool
-     */
-    protected function handleException($e)
-    {
-        $this->errorInfo = $e->getMessage();
-        $this->errorCode = $e->getCode();
-        return false;
     }
 
     /**
@@ -206,6 +169,7 @@ abstract Class Base implements IStatement
      *
      * @param $values
      * @return bool
+     * @throws Exception if preparing execution failed for some reason
      */
     private function prepareExecution($values)
     {
@@ -213,8 +177,7 @@ abstract Class Base implements IStatement
             try {
                 $this->statement = $this->broker->prepare($this->getSql());
             } catch (PDOException $e) {
-                $this->handleException($e);
-                return false;
+                throw new Exception("Error preparing execution: " . $e->getMessage(), 0, $e);
             }
         }
 
@@ -252,7 +215,7 @@ abstract Class Base implements IStatement
                 return $this->statement->execute();
             }
         } catch (PDOException $e) {
-            return $this->handleException($e);
+            throw new Exception("Error executing statement: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -268,17 +231,13 @@ abstract Class Base implements IStatement
             $iterator = $this->broker->getIterator($this, $this->statement);
 
             // Execute the statement
-            if (!$iterator->execute()) {
-
-                // Query execution failed
-                throw new Exception("Error executing iterator: " . $iterator->errorInfo());
-            }
+            $iterator->execute();
 
             // If we got to this point we got a valid iterator which had rows
             return $iterator;
 
         } catch (PDOException $e) {
-            throw new Exception("Exception error executing iterator: " . $e->getMessage());
+            throw new Exception("Exception error executing iterator: " . $e->getMessage(), 0, $e);
         }
     }
 
