@@ -60,6 +60,7 @@
 @import "layout/sidebar";
 @import "layout/container";
 @import "layout/login";
+@import "layout/flex";
 
 // Schoolbox Areas
 @import "components/evaluation/evaluation";
@@ -71,8 +72,6 @@
 @import "components/calendar/calendar";
 @import "components/curriculum/curriculum";
 @import "components/course/course";
-@import "components/filters/admin";
-@import "components/filters/public";
 
 // Select Source shard
 @import "components/sourceSelect";

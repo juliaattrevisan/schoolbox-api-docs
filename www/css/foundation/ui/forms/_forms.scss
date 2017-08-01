@@ -665,7 +665,7 @@ section > fieldset {
     }
 
 	// second sibling onwards
-	~ fieldset {
+	fieldset {
 		border-top: solid $fieldset-border-width $body-bg;
 	}
 

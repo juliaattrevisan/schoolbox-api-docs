@@ -399,31 +399,6 @@ Usage:
 {# Rip outta DOM on load, and remove 'hide' #}
 <span data-applied-filter-tab class="label filter hide"><span data-filter></span> <a href="#" data-close class="close" title="Remove filter">×</a></span>
 
-<style>
-    .flex-container{
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    #submit_button{
-        width: auto;
-        min-width: 150px;
-        right: 1rem;
-        top: -3px;
-        float: right;
-        margin: 0 -1rem 0 0;
-    }
-    #applied_filters{
-        display: inline-block;
-    }
-
-    #panel-summary{
-        margin: 0;
-    }
-
-</style>
-
 <div class="toast" data-alert data-relation="submit-label"></div>
 
 <div class="row">
@@ -431,16 +406,17 @@ Usage:
         <section>
             <fieldset class="content">
                 <legend id="panel-summary" data-collapser="panel-components" class="icon-down-arrow columns">
-                    {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
-                    <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ...">
-
                     <span id="filter-loader" class="loader" title="Request sent ..."></span>Filters: <span id="applied_filters" data-applied-filters></span>
                 </legend>
             </fieldset>
 
             <fieldset data-collapsable="panel-components" data-collapse-state="collapsed" style="display: none;">
-                <a id="defaults_reset" class="button" title="Revert to default selections">Reset to Defaults</a>
-                <a id="cancel_changes" class="button" title="Revert to your most recently applied filter">Cancel Changes</a>
+                <ul class="flex-list buttons">
+                {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
+                    <li><input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ..."></li>
+                    <li><a id="defaults_reset" title="Revert to default selections">Reset to Defaults</a></li>
+                    <li><a id="cancel_changes" title="Revert to your most recently applied filter">Cancel Changes</a></li>
+                </ul>
                 <div class="content flex-container">
                     {% set countComponents = 0 %}
                     {% for component in panel.components %}

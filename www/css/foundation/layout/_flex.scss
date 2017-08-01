@@ -1,0 +1,9 @@
+.flex-container{
+	display: flex;
+	flex-flow: row wrap;
+
+	.item {
+		flex-grow: 1;
+		@include responsive-sides(1, padding);
+	}
+}

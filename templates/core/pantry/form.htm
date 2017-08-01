@@ -288,6 +288,24 @@
                             });
                         </script>
                     </div>
+                    <div class="column small-12">
+                        <label>Multi-Select Option Selectize</label>
+                        <select id="select-tools" multiple placeholder="Pick a work type..."></select>
+                        <script type="text/javascript">
+                            $('#select-tools').selectize({
+                                maxItems: null,
+                                valueField: 'id',
+                                labelField: 'title',
+                                searchField: 'title',
+                                options: [
+                                    {id: 1, title: 'Assessment Task'},
+                                    {id: 2, title: 'Homework'},
+                                    {id: 3, title: 'Quiz'}
+                                ],
+                                create: false
+                            });
+                        </script>
+                    </div>
                     <div class="column small-12 medium-2">
                         <label>Visibility
                             <select class="visibility">
