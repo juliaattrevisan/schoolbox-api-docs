@@ -27,9 +27,9 @@ class SelfSendFilter implements FilterInterface
     public function validate(Instance $message, User $user)
     {
         // if we do not allow self send
-        if (!(isset($message->getContext()['allowSelfSend']) && $message->getContext()['allowSelfSend'] === true) ) {
+        if (!(isset($message->getContext()['allowSelfSend']) && $message->getContext()['allowSelfSend'] === true)) {
             // if the originating user matches current, dismiss
-            if(isset($message->getContext()['user']) && $message->getContext()['user'] == $user->getId()) {
+            if (isset($message->getContext()['user']) && $message->getContext()['user'] == $user->getId()) {
                 throw new FilterException("User effected this message");
             }
         }
