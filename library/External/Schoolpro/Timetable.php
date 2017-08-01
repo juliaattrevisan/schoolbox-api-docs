@@ -96,10 +96,10 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
 
             $statement = $this->getConnector()->prepareStoredProcedure('sbGetDayNumber');
             $statement->bindInputs([
-                ['name' => 'pUserName', 'value' => 'alaress'],
-                ['name' => 'pUserPass', 'value' => 'alaress'],
-                ['name' => 'pCampusID', 'value' => $campus->getExtTimetableCode()],
-                ['name' => 'pCampusID', 'value' => $dateToUse]
+                'pUserName'  => 'alaress',
+                'pUserPass'  => 'alaress',
+                'pCampusID'  => $campus->getExtTimetableCode(),
+                'pDateToUse' => $dateToUse,
             ]);
 
             $statement->execute();
@@ -133,9 +133,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     {
         $statement = $this->getConnector()->prepareStoredProcedure('sbGetPeriodNumber');
         $statement->bindInputs([
-            ['name' => 'pUserName', 'value' => 'alaress'],
-            ['name' => 'pUserPass', 'value' => 'alaress'],
-            ['name' => 'pCampusID', 'value' => $campus->getExtTimetableCode()]
+            'pUserName' => 'alaress',
+            'pUserPass' => 'alaress',
+            'pCampusID' => $campus->getExtTimetableCode(),
         ]);
 
         $statement->execute();
@@ -163,11 +163,11 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     {
         $statement = $this->getConnector()->prepareStoredProcedure('sbGetStaffDayTimetable');
         $statement->bindInputs([
-            ['name' => 'pUserName', 'value' => 'alaress'],
-            ['name' => 'pUserPass', 'value' => 'alaress'],
-            ['name' => 'pSchoolNum', 'value' => $externalUserId],
-            ['name' => 'pCampusID', 'value' => $campus->getExtTimetableCode()],
-            ['name' => 'pDayNumber', 'value' => $dayNumber],
+            'pUserName'  => 'alaress',
+            'pUserPass'  => 'alaress',
+            'pSchoolNum' => $externalUserId,
+            'pCampusID'  => $campus->getExtTimetableCode(),
+            'pDayNumber' => $dayNumber,
         ]);
 
         return $statement->executeIterator();
@@ -186,11 +186,11 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     {
         $statement = $this->getConnector()->prepareStoredProcedure('sbGetStudentDayTimetable');
         $statement->bindInputs([
-            ['name' => 'pUserName', 'value' => 'alaress'],
-            ['name' => 'pUserPass', 'value' => 'alaress'],
-            ['name' => 'pSchoolNum', 'value' => $externalUserId],
-            ['name' => 'pCampusID', 'value' => $campus->getExtTimetableCode()],
-            ['name' => 'pDayNumber', 'value' => $dayNumber],
+            'pUserName'  => 'alaress',
+            'pUserPass'  => 'alaress',
+            'pSchoolNum' => $externalUserId,
+            'pCampusID'  => $campus->getExtTimetableCode(),
+            'pDayNumber' => $dayNumber,
         ]);
 
         return $statement->executeIterator();
