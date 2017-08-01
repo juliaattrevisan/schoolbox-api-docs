@@ -867,22 +867,30 @@ class External_Pcschools_User implements External_UserInterface
                 return [];
             }
 
+            // Ordering of result sets from spSelTimetable:
+            // Day periods
+            // Day classes
+            // Home classes
+            // Week days
+            // Terms
             $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
             $statement->bindInputs([
-                ['name' => 'DATE', 'value' => date('Ymd')],
-                ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
-                ['name' => 'STUDKEY', 'value' => $studentExternalId],
-                ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+                'DATE' => date('Ymd'),
+                'TIMEPERIOD' => $timePeriod,
+                'STUDKEY' => $studentExternalId,
+                'TEACHERCODE' => $teacherExternalId,
             ]);
 
             $statement->execute();
-            $row = $statement->fetch();
 
-            list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
+            // Need only day classes
+            $statement->nextRowset();
+            $dayClasses = $statement->fetchAll();
+            $statement->close();
 
             // Add classes for each day into it
             if (!empty($dayClasses)) {
-                foreach ($dayClasses as $dayClass) {
+                foreach ($statement->fetchAll() as $dayClass) {
                     $code = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
                     $classes[$code] = [
                         'code'       => $code,
