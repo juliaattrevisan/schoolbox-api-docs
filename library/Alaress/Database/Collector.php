@@ -43,11 +43,21 @@ class Collector extends DataCollector implements Renderable, AssetProvider
      *
      * @param IStatement $statement
      * @return bool
+     * @throws \Exception Any exception that the statement throws in execution
+     *                    gets thrown here.
      */
     public function execute($statement)
     {
         $start = microtime(true);
-        $result = $statement->getPDOStatement()->execute();
+
+        // Catch and throw exception later
+        $queryException = null;
+        try {
+            $result = $statement->getPDOStatement()->execute();
+        } catch (\Exception $e) {
+            $queryException = $e;
+            $result = false;
+        }
 
         $backtrace = debug_backtrace();
 
@@ -91,7 +101,16 @@ class Collector extends DataCollector implements Renderable, AssetProvider
         $statementSummary['memory'] = $memory;
         $statementSummary['memory_str'] = $this->formatBytes($memory);
 
+        if ($queryException instanceof \Exception) {
+            $statementSummary['error_code'] = $queryException->getCode();
+            $statementSummary['error_message'] = $queryException->getMessage();
+        }
+
         $this->statements[] = $statementSummary;
+
+        if ($queryException instanceof \Exception) {
+            throw $queryException;
+        }
 
         return $result;
     }
