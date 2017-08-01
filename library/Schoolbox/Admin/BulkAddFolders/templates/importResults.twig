@@ -23,11 +23,13 @@
             <tbody>
                 {% for folder in folders %}
                     <tr>
+                        <td>
                         {% if folder.id %}
                             <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
                         {% else %}
                             {{ folder.name }}
                         {% endif %}
+                        </td>
                         <td>{{ folder.status }}</td>
                         <td>{{ folder.error }}</td>
                     </tr>
