@@ -31,7 +31,6 @@ $dryRun  = isset($options['dry-run']);
 
 // Logging
 $log = new \Alaress\Lumberjack\Logger(STDOUT, STDERR);
-$log->setLevel(Monolog\Logger::INFO);
 
 // File - from last positional parameter
 $file = array_pop($argv);
