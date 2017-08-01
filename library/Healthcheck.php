@@ -307,6 +307,7 @@ class Healthcheck
             'family',
             'persondefs',
             'studcommrules',
+            'eventcalendar',
         ];
         $this->selectTest($tables);
     }
