@@ -49,13 +49,13 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		$this->hasMap(array(
 			'column'     => 'datetime_published',
 			'property'   => 'publishDate',
-			'type'       => self::TYPE_DATE
+			'type'       => self::TYPE_DATETIME
 		));
 
 		$this->hasMap(array(
 			'column'     => 'datetime_expires',
 			'property'   => 'expiryDate',
-			'type'       => self::TYPE_DATE
+			'type'       => self::TYPE_DATETIME
 		));
 
 		$this->hasMap(array(
@@ -278,7 +278,8 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
             SELECT    COUNT(*)
             FROM      `{$this->getTable()}` `n`
             WHERE     `n`.`code` = :catId 
-                      AND (datetime_published <= CURDATE() OR owner = :userId) AND datetime_expires < CURDATE()
+                      AND (datetime_published <= CURRENT_TIMESTAMP() OR owner = :userId)
+                      AND datetime_expires < CURRENT_TIMESTAMP()
                       AND `n`.deleted = 0
         ";
 

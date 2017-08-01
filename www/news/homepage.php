@@ -37,8 +37,8 @@ if(is_numeric($this->arg[0])) {
 	$this->setTitle('Modify Homepage News');
 	$this->setTab('resources');
 
-	$publishedDate = new Alaress_Date_Format($newsItem['datetime_published'], 'Y-m-d');
-	$expiryDate = new Alaress_Date_Format($newsItem['datetime_expires'], 'Y-m-d');
+	$publishedDate = new Alaress_Date_Format($newsItem['datetime_published'], Alaress_Date_Format::DATABASE_FORMAT);
+	$expiryDate = new Alaress_Date_Format($newsItem['datetime_expires'], Alaress_Date_Format::DATABASE_FORMAT);
 
     $output = array(
         'ACTION'      => 'Modify',
@@ -47,8 +47,8 @@ if(is_numeric($this->arg[0])) {
         'BODY'        => $newsItem['body'],
         'CATEGORY_ID' => $newsItem['code'],
 		'CATEGORY_NAME' => Scrub::text($folder->getName()),
-		'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
-		'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
+		'DATETIME_PUBLISHED' => $publishedDate->getLocal(),
+		'DATETIME_EXPIRES' => $expiryDate->getLocal(),
     );
 						
 	$this->setVar($output);
@@ -87,8 +87,8 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 						'CATEGORY_ID'			=> $this->arg[1],
 						'CATEGORY_NAME'			=> scrub::Text($folder->getName()),
 						'delete_button_block'	=> '',
-		                'DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
-		                'DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
+		                'DATETIME_PUBLISHED' => $publishedDate->startOfDay()->getLocal(),
+		                'DATETIME_EXPIRES' => $expiryDate->endOfDay()->getLocal(),
 					);
 						
 	$this->setVar($output);

@@ -152,7 +152,7 @@ abstract class Handler
      * Augmented getter
      *
      * @param string $type
-     * @return Base|Base[]
+     * @return array
      */
     protected function getResult($type = null)
     {
