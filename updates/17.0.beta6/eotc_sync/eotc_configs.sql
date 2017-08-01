@@ -1,3 +1,6 @@
+-- Allow EOTC to shove events into Synergetic
+INSERT INTO `eotc_config` (`name`, `value`) VALUES ('external_db_sync', '0');
+
 -- Config for whether student attendees are mandatory
 INSERT INTO `eotc_config` (`name`, `value`) VALUES ('student_attendees_required', '1');
 
