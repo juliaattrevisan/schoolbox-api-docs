@@ -40,8 +40,8 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('datetime_posted', self::TYPE_DATETIME, null, 'postDate');
-        $this->uses('datetime_published', self::TYPE_DATE, null, 'publishDate');
-        $this->uses('datetime_expires', self::TYPE_DATE, null, 'expiryDate');
+        $this->uses('datetime_published', self::TYPE_DATETIME, null, 'publishDate');
+        $this->uses('datetime_expires', self::TYPE_DATETIME, null, 'expiryDate');
         $this->uses('body', self::TYPE_STRING);
         $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
 
