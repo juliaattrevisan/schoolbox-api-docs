@@ -55,29 +55,6 @@ if (isset($_POST['current_password'])) {
         // Try this
         // I shouldn't have to send all those damn password change mails anymore either
         $redirect = '/account/modify/success';
-        if ($user->getRole()->isParent()) {
-
-            /** @var \Alaress\Database\Connector\IConnector $databaseExternal */
-            $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
-
-            $factory = new ExternalConnectorFactory();
-
-            /** @var ICommunityPortal $communityPortal */
-            $communityPortal = $factory->build(
-                $configMapper,
-                $databaseExternal,
-                ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
-            );
-
-            try {
-                $communityPortal->changePassword($user->getExternalId(), $_POST['new_password']);
-            } catch (\UnexpectedValueException $e) {
-                // Portal integration wasn't set up properly?
-                // Warn the user, but don't stop password from getting set.
-                $redirect = '/account/modify/success/portalPasswordNotSet';
-            }
-        }
-
         $userHandler->logUserPasswordChange($user->getUsername(), 'email_change_pwd', 'info');
         $passwordMailService->sendChangePasswordEmail($user);
         $_SESSION['password'] = $_POST['new_password'];
