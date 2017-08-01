@@ -45,7 +45,7 @@ class Guardian extends IteratorIterator
      * @param  array $preStack
      * @return User\Guardian
      */
-    protected function buildFromStack($preStack)
+    protected function buildFromStack(array $preStack)
     {
 
         // Forge a single parent out of the disparate parts of the prestack
