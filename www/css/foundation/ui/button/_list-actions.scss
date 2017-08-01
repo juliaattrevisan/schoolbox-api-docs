@@ -3,6 +3,18 @@
  * column. Typically this will look like .actions-small-12.row
  */
 @mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
+
+	// forms + list items: compensate for input{margin-bottom:1rem}
+	form {
+		@for $i from 0 through 4 {
+			.actions-#{$size}-#{$i} {
+				.list-item {
+					padding-top: 1rem;
+				}
+			}
+		}
+	}
+
 	// We shoudln't use more than 4 action buttons in a row
 	@for $i from 1 through 4 {
 		.actions-#{$size}-#{$i},
@@ -84,6 +96,38 @@
 				 }
 			 }
 		 }
+	}
+}
+
+.list-item {
+	width: 100%;
+}
+
+// headers for lists
+.list-header {
+	@extend .show-for-medium-up;
+	font-weight: $font-weight-bold;
+	font-size: $paragraph-font-size;
+}
+
+.sortable, .sortable-card {
+	.list-header {
+		padding-left: 40px; // TODO needs to be not hardcoded, but vars don't exist - see %interaction-selector
+	}
+}
+
+// small behaves a little differently to the other viewports
+@media #{$small-only} {
+	.list-item {
+		// restore guttering
+		padding-right: 0.5rem;
+		padding-left: 0.5rem;
+	}
+	.sortable, .sortable-card {
+		.list-item {
+			// remove guttering if there's a grip handle
+			padding-left: 0;
+		}
 	}
 }
 

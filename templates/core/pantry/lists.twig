@@ -1,0 +1,122 @@
+{% set content %}
+    <div class="small-12 medium-8 column">
+        <label><span class="hide-for-medium-up">Subject</span>
+            <input type="text" name="title" value="My Subjects" placeholder="My Subjects">
+        </label>
+    </div>
+    <div class="small-12 medium-4 column">
+        <label><span class="hide-for-medium-up">Visibility</span>
+            <select name="visible">
+                <option value="0">Hidden</option>
+                <option selected="" value="1">Visible</option>
+            </select>
+        </label>
+    </div>
+{% endset %}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1 id="forms">Pantry - Lists</h1>
+        <ul class="sub-nav">
+            {% set current = '/lists' %}
+            {% for href, title in subnav %}
+                <li{% if href == current %} class="active"{% endif %}>
+                    <a href="/pantry{{ href }}">{{ title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <ul class="meta">
+            <li class="icon-star">To align your headers, use the matching <code>.actions-small-$i</code> on your
+                <code>&lt;header class="list-header"></code> to offset the space reserved for line-item actions.
+                To maintain consistent markup for the sake of twigging, use <code>.actions-small-0</code> if there
+                are no line-item actions.
+            </li>
+        </ul>
+
+        <h2 class="subheader">Sortable</h2>
+        <ul class="meta">
+            <li class="icon-info">(JS not implemented, sorting shown for markup purposes)</li>
+        </ul>
+        <form id="sortable" class="no-margin" data-nosubmit>
+            <section>
+                <div class="sortable-card">
+                    <header class="list-header actions-small-0">
+                        <div class="list-item">
+                            <div class="medium-8 column">Subject</div>
+                            <div class="medium-4 column">Visibility</div>
+                        </div>
+                    </header>
+                </div>
+                <ul class="information-list sortable-card">
+                    {% for item in items %}
+                        {% set c = item | length %}
+                        <li>
+                            <div class="actions-small-{{ c }}">
+                                <div class="grip"></div>
+                                <div class="list-item">{{ content }}</div>
+                                <nav>
+                                    {% for icon in item %}{% spaceless %}
+                                    <a title="I do nothing" class="icon-{{ icon }}"></a>
+                                    {% endspaceless %}{% endfor %}
+                                </nav>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            <input type="submit" value="Submit" />
+        </form>
+
+        <h2 class="subheader">Unsortable, with Action Bar</h2>
+        <ul class="meta">
+            <li class="icon-info">(JS not implemented, spawn button shown for markup purposes)</li>
+        </ul>
+
+        <form id="unsortable" class="no-margin" data-nosubmit>
+            <section>
+                <header class="list-header actions-small-0">
+                    <div class="list-item">
+                        <div class="medium-8 column">Subject</div>
+                        <div class="medium-4 column">Visibility</div>
+                    </div>
+                </header>
+                <ul class="information-list">
+                    {% for item in items %}
+                        {% set c = item | length %}
+                        <li>
+                            <div class="actions-small-{{ c }}">
+                                <div class="list-item">{{ content }}</div>
+                                <nav>
+                                    {% for icon in item %}{% spaceless %}
+                                        <a class="icon-{{ icon }}"></a>
+                                    {% endspaceless %}{% endfor %}
+                                </nav>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="component-action">
+                    <section>
+                        <a class="button">Spawn Another</a>
+                    </section>
+                </div>
+            </section>
+            <input type="submit" value="Submit" />
+        </form>
+
+        <h2 class="subheader">Form Submit Payload</h2>
+        <section class="content">
+            <pre id="submit-output">(submit a form to see output)</pre>
+        </section>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('[data-nosubmit]').on('submit', function (e) {
+            e.preventDefault();
+            $('#submit-output').text(JSON.stringify($(this).serializeArray(), null, 2));
+        });
+    });
+</script>

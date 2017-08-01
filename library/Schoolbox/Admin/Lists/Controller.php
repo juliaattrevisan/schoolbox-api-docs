@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Lists;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\MapperFactory;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
@@ -33,6 +34,19 @@ use Timetable_ColourMapper;
 
 class Controller extends Base
 {
+    /** @var MapperFactory */
+    private $mapperFactory;
+
+
+    /**
+     * @param MapperFactory $mapperFactory
+     */
+    public function __construct(MapperFactory $mapperFactory)
+    {
+        $this->mapperFactory = $mapperFactory;
+    }
+
+
     /**
      * Converts "strings_like_this" to "StringsLikeThis"
      *
@@ -104,11 +118,9 @@ class Controller extends Base
         }
 
         $mapper_name     = $tableData[$tableKey]['mapper'];
-        $sortable_column = $this->getRequest()->post["sortable_column"];
+        $sortable_column = trim($this->getRequest()->post["sortable_column"]);
 
-        /** @var Mapper $mapper */
-        $mapper = new $mapper_name;
-        $model_name = $mapper->getModel();
+        $mapper = $this->mapperFactory->get($mapper_name);
 
         $ids    = [];
         $values = [];
@@ -133,6 +145,9 @@ class Controller extends Base
             }
         }
 
+        // for database purposes, sequencing begins at 1
+        $sequence = 1;
+
         foreach ($ids as $currentIndex => $id)
         {
             // Negative ID numbers indicate new records
@@ -140,9 +155,11 @@ class Controller extends Base
             if ($id > 0) {
                 // Lookup existing record
                 $model = $mapper->findById($id);
+
             } else {
                 // Create new record
-                $model = new $model_name;
+                $model = $mapper->createModel();
+
                 foreach ($fixed as $field => $value) {
                     $setter = "set" . $this->underscoreToCamelCase($field);
 
@@ -154,29 +171,27 @@ class Controller extends Base
                 }
             }
 
-            foreach ($values as $field => $value)
-            {
+            // set literal values
+            foreach ($values as $field => $value) {
                 // Update values
-
                 $setter = "set" . $this->underscoreToCamelCase($field);
 
                 $model->$setter($value[$currentIndex]);
+            }
 
-                // Override nullable fields where appropriate
+            // Override nullable fields where appropriate
+            foreach ($nulls as $field => $value) {
+                $setter = "set" . $this->underscoreToCamelCase($field);
 
-                if (isset($nulls[$field])) {
-                    foreach ($nulls[$field] as $nullableField => $index) {
-                        if ($currentIndex == $index) {
-                            $model->$setter(null);
-                        }
+                foreach ($value as $index => $_) {
+                    if ($currentIndex == $index) {
+                        $model->$setter(null);
                     }
                 }
             }
 
             // Process any radio buttons for this list
-
-            foreach ($radios as $field => $index)
-            {
+            foreach ($radios as $field => $index) {
                 $setter = "set" . $this->underscoreToCamelCase($field);
 
                 // Radio buttons can only be on for one row, so set that row to true and all others to false
@@ -188,14 +203,17 @@ class Controller extends Base
                 }
             }
 
-            if (trim($sortable_column) != "") {
+            if ($sortable_column != "") {
                 $setter = "set" . $this->underscoreToCamelCase($sortable_column);
-                $model->$setter($currentIndex);
+                $model->$setter($sequence);
             }
 
             // Save the changes
 
             $mapper->save($model);
+
+            // increment the sequence counter
+            ++$sequence;
         }
 
         $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
@@ -278,7 +296,7 @@ class Controller extends Base
                 'fields'            => [                                        // This is a list of all of the updateable fields
                     'name'          => [
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
-                        'width'     => 6,                                       // Width of the column on anything bigger than 'small'
+                        'width'     => 7,                                       // Width of the column on anything bigger than 'small'
                     ],
                     'type' => [
                         //'radio'     => '1'                                    // If defined the column will be a radio button shared by every item
@@ -330,7 +348,7 @@ class Controller extends Base
                     ],
                     'path'           => [
                         'caption'   => 'Path',
-                        'width'     => 2,
+                        'width'     => 3,
                         'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
                     ],
                     'usernamePrefix' => [
@@ -422,7 +440,7 @@ class Controller extends Base
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 11,
+                        'width'     => 12,
                     ],
                 ]
             ],
@@ -469,6 +487,7 @@ class Controller extends Base
                 'title'             => 'Components',
                 'mapper'            => Component_DefinitionMapper::class,
                 'findAllMethod'     => 'findAllIncludeHidden',
+                'noNewRecords'      => true,
                 'fields'            => [
                     'module'        => [
                         'caption'   => 'Module',
@@ -486,7 +505,7 @@ class Controller extends Base
                         'width'     => 6,
                     ],
                     'visible'       => [
-                        'caption'   => 'visible',
+                        'caption'   => 'Visible',
                         'lookup'    => [
                             ['key' => 'true', 'value' => 'Yes'],
                             ['key' => 'false', 'value' => 'No'],
@@ -592,7 +611,7 @@ class Controller extends Base
                     ],
                     'dashboard' => [
                         'caption' => 'Show On Pastoral Dashboard',
-                        'width' => 3,
+                        'width' => 4,
                         'mandatory' => true,
                         'lookup' => [
                             ['key' => '1', 'value' => 'Yes'],
@@ -676,10 +695,11 @@ class Controller extends Base
                     {
                         // And only if there is a mapper function to retrieve its value
 
-                        if (isset($tables[$table]['fields'][$prop->getName()]['getter']))
+                        if (isset($tables[$table]['fields'][$prop->getName()]['getter'])) {
                             $getter = $tables[$table]['fields'][$prop->getName()]['getter'];
-                        else
+                        } else {
                             $getter = "get" . $this->underscoreToCamelCase($prop->getName());
+                        }
 
                         if ($reflect->hasMethod($getter)) {
 

@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Loader_Chain;
@@ -43,8 +44,13 @@ class Module extends BaseModule
 
     /**
      * {@inheritdoc}
+     *
+     * @param ContainerInterface|Container $injector
      */
     public function initControllers(ContainerInterface $injector) {
+
+        $injector->params[Controller::class]['mapperFactory'] = $injector->get('mapperFactory');
+
         $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
     }
 

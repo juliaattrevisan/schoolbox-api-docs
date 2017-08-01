@@ -12,6 +12,7 @@
         var newId = -1;
 
         var dataList = $('[data-list]');
+        var listEditor = $('#listEditor');
 
         dataList.on('change', '[data-nullcheck]', function() {
             // Find closest input
@@ -25,7 +26,7 @@
             }
         });
 
-        $('[data-button=add-row]').click(function(event) {
+        $(document).on('click', '[data-button=add-row]', function (event) {
             event.preventDefault();
 
             var listEmptyState = $('#listEmptyState');
@@ -36,27 +37,19 @@
                 listEmptyState.addClass('hide');
             }
 
-            var newRow = $('[data-clone]').find('li').clone()
-
-            {#
-                Ninja ID numbers into the cloned HTML. We also have to rename the data-colour-picker class so that
-                when we wire it up the template row doesn't get wired up- otherwise this screws up any subsequent
-                adds. Bit hacky, but works.
-            #}
-
-            newRow[0].innerHTML = newRow[0].innerHTML
-                    .replace(/#ID#/g, newId--)
-                    .replace(/data-colour-picker-clone/g, 'data-colour-picker-new');
+            {# yank the innerHTML of the clone element and ninja the ID into it #}
+            var newRow = $($('[data-clone]').html().replace(/#ID#/g, newId--));
 
             dataList
-                .append(newRow)
-                .find('[data-focus]')
-                .last()
+                .append(newRow);
+
+            newRow
+                .find(':input:visible')
+                .eq(0)
                 .focus();
 
             {# Wire up any colour pickers that were just added #}
-
-            $("[data-colour-picker-new]").spectrum({
+            newRow.find("[data-colour-picker]").spectrum({
                 allowEmpty: false,
                 showAlpha: true,
                 showInput: true,
@@ -68,23 +61,24 @@
                 }
             });
 
-            {#
-                Attach delete event to new rows, this doesn't ask for confirmation because
-                its not in the database, so its not going to do anything irreversable
-            #}
-
-            $('[data-delete-new]').click(function(event)
-            {
-                event.preventDefault();
-                $(this).closest('li').remove();
-            });
         });
 
-        $('[data-delete]').click(function (event) {
+        {#
+            Attach delete event to new rows, this doesn't ask for confirmation because
+            its not in the database, so its not going to do anything irreversable
+        #}
+
+        listEditor.on('click', '[data-delete-new]', function (event) {
+            event.preventDefault();
+            var id = $(this).data('delete-new');
+            $('[data-record-id="' + id + '"]').slideUp(function () { $(this).remove(); });
+        });
+
+        listEditor.on('click', '[data-delete]', function (event) {
             event.preventDefault();
 
             var deleteId = $(this).data('delete');
-            var listItem = $(this).closest('li');
+            var listItem = $('[data-record-id="' + deleteId + '"]');
 
             $(this).confirmDialog({
                 text: '{{ tables[table].deleteWarning }}',
@@ -99,18 +93,21 @@
                     })
                     .done(function (response) {
                         if (response.result !== false) {
-                            listItem.remove();
-                        $toast.toastTimeout({text: 'Item deleted', css: 'success'});
+                            listItem.slideUp(function () { $(this).remove(); });
+                            $toast.toastTimeout({text: 'Item deleted', css: 'success'});
                         } else {
-                            $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});}
+                            $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});
+                        }
+                    })
+                    .fail(function (response) {
+                        $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});
                     });
                 }
             });
         });
 
         {# Wire up colour pickers #}
-
-        $("[data-colour-picker]").spectrum({
+        listEditor.find("[data-colour-picker]").spectrum({
             allowEmpty: false,
             showAlpha: true,
             showInput: true,
@@ -133,11 +130,16 @@
 
 {{ renderAdminNavigation(pageCurrent) }}
 
+{# some vars we'll need throughout the page #}
+{% set deletable = tables[table].delete %}
+{% set sortable  = tables[table].sortable %}
+{% set canSpawn  = not tables[table].noNewRecords %}
+
 <div class="row">
     <div class="small-12 island">
         <dl class="sub-nav">
             {% for tableKey, tableCurrent in tables %}
-                <dd {% if tableKey == table %}class="active"{% endif %}><a href="/adminv2/lists/{{ tableKey }}">{{ tableCurrent.title }}</a></dd>
+                <dd {% if tableKey == table %}class="active"{% endif %}><a href="/adminv2/lists/{{ tableKey }}">{{ tableCurrent.title }}</a></dd>{# TODO routeLookup #}
             {% endfor %}
         </dl>
 
@@ -152,166 +154,50 @@
             <p>The {{ tables[table].title }} list is empty.<br><a href="#" data-button="add-row">Add an item to this list</a>.</p>
         </div>
 
-        <form method="post" action="/adminv2/lists/save">
+        <form method="post" action="/adminv2/lists/save">{# TODO routeLookup #}
+
             <input name="table" type="hidden" value="{{ table }}" />
-            <input name="sortable_column" type="hidden" value="{{ tables[table].sortable }}">
+            <input name="sortable_column" type="hidden" value="{{ sortable }}" />
 
             {# This is used when hidden fields cannot be NULL. Existing records should already be set in DB #}
 
             {% for field_key, value in tables[table].fixed %}
-                <input type="hidden" name="fixed-{{field_key}}" value="{{ value }}">
+                <input type="hidden" name="fixed-{{field_key}}" value="{{ value }}" />
             {% endfor %}
 
             <section id="listEditor" class="{{ listClass }}">
-
-                <ul class="information-list sortable ui-sortable" data-sortable data-list>
-
-                    {# Heading row #}
-
-                    <li class="show-for-medium-up">
+                <div{% if sortable %} class="sortable"{% endif %}>
+                    <header class="list-header actions-small-{{ deletable ? 1 : 0 }}">
                         <div class="list-item">
-
-                            {# If the data is sortable need to add a blank column for drag handle #}
-
-                            {% if tables[table].sortable %}
-                                <div class="small-1 columns">
-                                    <h3>Order</h3>
-                                </div>
-                            {% endif %}
-
                             {% for field_key, field in tables[table].fields %}
                                 {% if field.hidden is empty %}
                                     <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
-                                        <h3>
-                                            {{ field.caption }}
-                                            {% if field.tooltip %}
-                                                <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>
-                                            {% endif %}
-                                        </h3>
+                                        {{ field.caption }}
+                                        {% if field.tooltip %}
+                                            <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>
+                                        {% endif %}
                                     </div>
                                 {% endif %}
                             {% endfor %}
-
                         </div>
-                    </li>
+                    </header>
+                </div>
 
+                {% set ulAttr = sortable ? 'class="information-list sortable ui-sortable" data-sortable data-list' : 'class="information-list" data-list' %}
+
+                <ul {{ ulAttr | raw }}>
                     {# Render each row of data#}
-
-                    {% for key,record in records %}
-
-                        <li class="{% if tables[table].delete %}actions-small-1{% endif %}">
-                            <input type="hidden" name="id[]" value="{{ key }}">
-
-                            {% set recordIndex = loop.index %}
-
-                                {% if tables[table].sortable %}
-                                    <div class="small-1 column grip">&nbsp;</div>
-                                {% endif %}
-
-                                {% for field_key, field in tables[table].fields %}
-
-                                    {% set disabledAttr = (field.nullable is not empty and record[field_key] is null) ? 'disabled' : '' %}
-
-                                    <div class="small-12 column hide-for-medium-up">
-                                        <label>
-                                            {{ field.caption }}
-                                        </label>
-                                    </div>
-
-                                    {% if field.hidden is empty %}
-
-                                        <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
-
-                                            {% if field.readonly is not empty %}
-
-                                                {# Read only field, just display label #}
-
-                                                {{ record[field_key] }}
-
-                                            {% elseif field.radio is not empty %}
-
-                                                {# Radio field, shared between all rows #}
-
-                                                <div class="radiolist">
-                                                    <input type="radio"
-                                                           name="radio-{{ field_key }}"
-                                                           value="{{ recordIndex - 1 }}"
-                                                           id="{{ field_key }}-{{ recordIndex }}"
-                                                           {% if (record[field_key] == 1) %} checked {% endif %}"
-                                                           {{ disabledAttr }}
-                                                    >
-                                                    <label for="{{ field_key }}-{{ recordIndex }}"></label>
-                                                </div>
-
-                                            {% elseif field.lookup is iterable %}
-
-                                                {# Lookup select box #}
-
-                                                {% if field.lookup | length == 0 %}
-
-                                                    <select name="value-{{ field_key }}[]" disabled>
-                                                        <option value="">None Available</option>
-                                                    </select>
-
-                                                {% else %}
-
-                                                    <select name="value-{{ field_key }}[]" {{ disabledAttr }}>
-                                                        {% if not field.mandatory %}
-                                                            <option value="">Not Selected</option>
-                                                        {% endif %}
-                                                        {% for option in field.lookup %}
-                                                            <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
-                                                        {% endfor %}
-                                                    </select>
-
-                                                {% endif %}
-
-                                            {% elseif field.colour is not empty %}
-
-                                                {# Color picker #}
-
-                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" data-colour-picker {{ disabledAttr }} />
-
-                                            {% else %}
-
-                                                {# All other fields are just text boxes #}
-
-                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" maxlength="{{field.maxLength}}" {{ disabledAttr }} />
-
-                                            {% endif %}
-
-                                            {# All nullable fields get a tickbox #}
-                                            {% if field.nullable is not empty %}
-                                                <div class="checklist">
-                                                    <input name="null-{{ field_key }}[]"
-                                                           value="{{ recordIndex - 1 }}"
-                                                           id="{{ field_key }}-{{ recordIndex }}"
-                                                           type="checkbox"
-                                                           {% if record[field_key] is null %}checked{% endif %}
-                                                           data-nullcheck
-                                                    >
-                                                    <label for="{{ field_key }}-{{ recordIndex }}">
-                                                        {{ field.nullable_label | default('Null') }}
-                                                    </label>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-
-                            {% if tables[table].delete %}
-                                <nav class="hide-for-small-down">
-                                    <a class="icon-delete no-text" href="#" data-delete="{{ key }}" title="Delete"></a>
-                                </nav>
-                            {% endif %}
-                        </li>
+                    {% for key, record in records %}
+                        {% include '@adminLists/list-item.twig' %}
                     {% endfor %}
                 </ul>
-            <div class="component-action">
-                <section>
-                    <a href="#" data-button="add-row" class="button">Add New Row</a>
-                </section>
-            </div>
+                {% if canSpawn %}
+                <div class="component-action">
+                    <section>
+                        <a href="#" data-button="add-row" class="button">Add New Row</a>
+                    </section>
+                </div>
+                {% endif %}
             </section>
             <input type="submit" value="Save"/>
         </form>
@@ -321,102 +207,14 @@
 {# Draw cloneable row for use when adding new rows#}
 {# #ID# is used as a placeholder for an ID that is preg_replaced in JS when rows are inserted. #}
 
-<div data-clone class="hide">
-    <li class="{% if tables[table].delete %}actions-small-1{% endif %}">
-        <input type="hidden" name="id[]" value="#ID#">
-
-        {# The first non-hidden input field needs to have the data-focus attribute set, this variable keeps track of that #}
-
-        {% set focusSet = false %}
-
-        {% if tables[table].sortable %}
-            <div class="small-1 column grip">&nbsp;</div>
-        {% endif %}
-
-        {% for field_key, field in tables[table].fields %}
-            {% if field.hidden is empty %}
-
-                <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
-
-                    {% if field.readonly is not empty %}
-
-                        {# Read only field, just display label #}
-
-                        {{ record[field_key] }}
-
-                    {% elseif field.radio is not empty %}
-
-                        {# Radio field, shared between all rows #}
-
-                        <div class="radiolist">
-                            <input {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} type="radio" name="radio-{{ field_key }}" value="#ID#" id="{{ field_key }}-{{ recordIndex }}">
-                            <label for="{{ field_key }}-{{ recordIndex }}"></label>
-                        </div>
-
-                    {% elseif field.lookup is iterable %}
-
-                        {# Lookup select box #}
-
-                        <select {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} name="value-{{ field_key }}[]">
-                            {% if not field.mandatory %}
-                                <option value="">Not Selected</option>
-                            {% endif %}
-                            {% if field.lookup is not empty %}
-                                {% for option in field.lookup %}
-                                    <option value="{{ option.key }}">{{ option.value }}</option>
-                                {% endfor %}
-                            {% else %}
-                                <option value="">None Available</option>
-                            {% endif %}
-                        </select>
-
-                        {# Nullable selects get a tickbox as well #}
-
-                        {% if field.nullable is not empty %}
-                            <div class="checklist">
-                                <input name="null-{{ field_key }}[]"
-                                       id="{{ field_key }}-{{ recordIndex }}"
-                                       value="#ID#"
-                                       type="checkbox"
-                                       data-nullcheck>
-                                <label for="{{ field_key }}-{{ recordIndex }}">
-                                    {{ field.nullable_label | default('Null') }}
-                                </label>
-                            </div>
-                        {% endif %}
-
-                    {% elseif field.colour is not empty %}
-
-                        {# Color picker #}
-
-                        <input {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" data-colour-picker-clone />
-
-                    {% else %}
-
-                        {# All other fields are just text boxes #}
-
-                        <input {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}"/>
-
-                        {# Nullable text boxes get a tickbox as well #}
-
-                        {% if field.nullable is not empty %}
-                            <div class="checklist">
-                                <input name="null-{{ field_key }}[]" id="{{ field_key }}-{{ recordIndex }}" value="#ID#" type="checkbox">
-                                <label for="{{ field_key }}-{{ recordIndex }}">
-                                    {{ field.nullable_label | default('Null') }}
-                                </label>
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            {% endif %}
-        {% endfor %}
-        {% if tables[table].delete %}
-            <nav class="hide-for-small-down">
-                <a class="icon-delete no-text" href="#" data-delete-new="#ID#" title="Delete"></a>
-            </nav>
-        {% endif %}
-    </li>
-</div>
+{% if canSpawn %}
+<ul data-clone class="hide">
+    {% include '@adminLists/list-item.twig' with {
+        key: "#ID#",
+        recordIndex: "#ID#",
+        deleteAttr: 'data-delete-new'
+    } %}
+</ul>
+{% endif %}
 
 <div id="toast" class="toast" data-alert></div>

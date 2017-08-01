@@ -857,6 +857,9 @@ $selector-width: 2.25rem;
     }
     &.sortable, &.sortable-card {
         @include list-interaction(grip, move, grip);
+        .grip:before {
+            font-size: 1rem; // enforce grips being full size
+        }
         .ui-sortable-helper {
             @extend %ui-sortable-helper;
         }
