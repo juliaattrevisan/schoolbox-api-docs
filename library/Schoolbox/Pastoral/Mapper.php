@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Pastoral;
 
+use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use External_Pastoral;
@@ -187,7 +188,7 @@ class Mapper extends BaseMapper
     {
         // Return pastoral records fully hydrated by default
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
             $model = $this->hydrateRow($row, $hydrateRelatedRecords);
@@ -500,70 +501,65 @@ class Mapper extends BaseMapper
      * @param string $search
      * @return Collection
      */
-    public function getSearchResults($search) {
-        
+    public function getSearchResults($search)
+    {
         $search = trim($search);
 
         // Keep an audit trail of searches
-
         $pastoralAuditMapper = PastoralAuditMapper::getInstance();
-
-        $auditRecord = $pastoralAuditMapper->createModel();
-
+        $auditRecord         = $pastoralAuditMapper->createModel();
         $auditRecord->setUser($this->getSessionUser());
         $auditRecord->setSearch($search);
 
-        if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
-
-            $searchArray = explode(' ', $search);
-
-            $sql = $this->getSelectString() . " WHERE (";
-
-            // Search heading & body of pastoral record
-
-            foreach ($searchArray as $index => $search) {
-                if ($index > 0) {
-                    $sql .= " OR ";
-                }
-
-                $sql .= "
-                `pastoral`.`body` LIKE :body_{$index} OR 
-                `pastoral`.`heading` LIKE :heading_{$index}
-            ";
+        $words = [];
+        /** @var IQuoter $database */
+        $database = $this->getDatabase();
+        foreach (explode(' ', $search) as $word) {
+            if (strlen($word) >= Results::MIN_SEARCH_LENGTH) {
+                $words[] = "%{$database->escapeForLike($word)}%";
             }
+        }
+
+        if (count($words)) {
+            // Search heading & body of pastoral record
+            $pbRecordSearch = $this->getPredicateBuilder();
+            $pbRecordSearch->like('pastoral.body', $words);
+            $pbRecordSearch->like('pastoral.heading', $words);
+            $recordBodyAndHeadingClause = implode(' OR ', $pbRecordSearch->getWhere());
+
+            // Ensure record is not deleted
+            $recordDeletionClause = $this->getPredicateBuilder()
+                                         ->isNull('pastoral.deleted_at')
+                                         ->getWhere()[0];
 
             // Search comments
+            $pbCommentSearch = $this->getPredicateBuilder();
+            $pbCommentSearch->like('pastoral_comment.body', $words);
+            $commentBodyClause = implode(' OR ', $pbCommentSearch->getWhere());
 
-            $sql .= ") OR (`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE ";
+            // Ensure comment is not deleted
+            $commentDeleteClause  = $this->getPredicateBuilder()
+                                         ->isNull('pastoral_comment.deleted_at')
+                                         ->getWhere()[0];
 
-            foreach ($searchArray as $index => $search) {
-                if ($index > 0) {
-                    $sql .= " OR ";
-                }
 
-                $sql .= "`body` LIKE :comment_{$index} ";
-            }
-
-            $sql .= "))";
+            $sql = $this->getSelectString() . "
+            WHERE (
+                ($recordBodyAndHeadingClause)
+                OR
+                (pastoral.id IN (SELECT pastoral_id FROM pastoral_comment WHERE ($commentBodyClause) AND $commentDeleteClause))
+            )
+            AND $recordDeletionClause";
 
             // Bind the parameters
-
             $statement = $this->database->prepare($sql);
 
-            foreach ($searchArray as $index => $search) {
-                $statement->bindValue("body_{$index}", "%{$search}%");
-                $statement->bindValue("heading_{$index}", "%{$search}%");
-                $statement->bindValue("comment_{$index}", "%{$search}%");
-            }
-
             // Retrieve the hydrated records
-
-            $statement->execute();
+            $statement->execute(array_merge($pbRecordSearch->getParams(), $pbCommentSearch->getParams()));
 
             $results = $this->hydrateSelect($statement);
 
             // Keep a record of all searches performed by users, and what results were displayed
-
             $searchResults = [];
 
             /** @var Model $record */
@@ -572,20 +568,16 @@ class Mapper extends BaseMapper
             }
 
             // Record the search results that were returned by the search by imploding their IDs down into CSV
-
             if (count($searchResults) > 0) {
                 $auditRecord->setSearchResult(implode(',', $searchResults));
             }
 
         } else {
-
-            // Search was too short
-
-            $results = new Collection();
+            // All search words were too short
+            $results = $this->createCollection();
         }
 
         // Save the audit record of the search
-
         $pastoralAuditMapper->save($auditRecord);
 
         return $results;
