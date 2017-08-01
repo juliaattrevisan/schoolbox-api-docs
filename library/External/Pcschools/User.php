@@ -885,21 +885,19 @@ class External_Pcschools_User implements External_UserInterface
 
             // Need only day classes
             $statement->nextRowset();
-            $dayClasses = $statement->fetchAll();
-            $statement->close();
 
             // Add classes for each day into it
-            if (!empty($dayClasses)) {
-                foreach ($statement->fetchAll() as $dayClass) {
-                    $code = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
-                    $classes[$code] = [
-                        'code'       => $code,
-                        'name'       => $dayClass['DESC'],
-                        'classType'  => '',
-                        'campusCode' => $timePeriod,
-                    ];
-                }
+            /** @noinspection PhpAssignmentInConditionInspection */
+            while ($dayClass = $statement->fetch()) {
+                $code = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
+                $classes[$code] = [
+                    'code'       => $code,
+                    'name'       => $dayClass['DESC'],
+                    'classType'  => '',
+                    'campusCode' => $timePeriod,
+                ];
             }
+            $statement->close();
         }
         return array_values($classes);
     }
