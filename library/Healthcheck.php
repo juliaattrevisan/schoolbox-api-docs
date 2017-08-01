@@ -284,6 +284,34 @@ class Healthcheck
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
+    private function tassTest() {
+        $tables = [
+            'studsub',
+            'student',
+            'tchsub',
+            'subtab',
+            'ttperiod',
+            'ttdays',
+            'ttcalendar',
+            'ttmast',
+            'paraddress',
+            'house',
+            'teacher',
+            'parent',
+            'pia_sfaccess',
+            'tchdept',
+            'portalusers',
+            'studboard',
+            'tel_vw_telemf',
+            'ttparms',
+            'family',
+            'persondefs',
+            'studcommrules',
+        ];
+        $this->selectTest($tables);
+    }
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     private function pcschoolsTest()
     {
         $tables = [
