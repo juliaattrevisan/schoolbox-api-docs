@@ -21,45 +21,46 @@ class External_Schoolpro_Class implements External_ClassInterface
     }
 
     /**
-	 * Get a list of students that are in a particular class
-	 *
-	 * @param $classCode
-	 * @return array|bool
-	 */
-	public function getStudents($classCode) {
-		$allStudents = array();
+     * Get a list of students that are in a particular class
+     *
+     * @param $classCode
+     * @return array|bool
+     */
+    public function getStudents($classCode)
+    {
+        $allStudents = [];
 
-		/* Class Codes, when combined, are joined by a comma
-		 * so split them out and combine request results
-		 */
-		$allClassCodes = explode(',', $classCode);
+        /* Class Codes, when combined, are joined by a comma
+         * so split them out and combine request results
+         */
+        $allClassCodes = explode(',', $classCode);
 
-		foreach($allClassCodes as $currentClassCode) {
+        foreach ($allClassCodes as $currentClassCode) {
             $vars = [
                 'sbGetStudents',
                 [
                     'pUserName' => 'alaress',
                     'pUserPass' => 'alaress',
                     'pClassID'  => trim($currentClassCode),
-                ]
+                ],
             ];
 
-			$result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
+            $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
 
-			if ($result['success'] && count($result['result'])) {
-				foreach($result['result'] as $currentStudent) {
+            if ($result['success'] && count($result['result'])) {
+                foreach ($result['result'] as $currentStudent) {
                     $medicalNoteStr = '';
-                    
+
                     /* Get the medical data for him too
                      */
-                    $medicalVars = array(
+                    $medicalVars = [
                         'sbGetStudentMedicalConditions',
-                        array(
-                            array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                            array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                            array('@pSchoolNum', $currentStudent['ID'], SQLINT4, false, false, -1),
-                        )
-                    );
+                        [
+                            ['@pUserName', 'alaress', SQLVARCHAR, false, false, -1],
+                            ['@pUserPass', 'alaress', SQLVARCHAR, false, false, -1],
+                            ['@pSchoolNum', $currentStudent['ID'], SQLINT4, false, false, -1],
+                        ],
+                    ];
 
                     $medicalResult = $this->getConnector()->executeStoredProcedure($medicalVars[0], $medicalVars[1]);
 
@@ -79,34 +80,35 @@ class External_Schoolpro_Class implements External_ClassInterface
                         }
                     }
 
-					$student = array(
-						'synergy_id' => $currentStudent['ID'],
-						'firstname' => $currentStudent['Firstname'],
-						'lastname' => $currentStudent['Surname'],
-						'yearlevel '=> $currentStudent['YearLevel'],
-						'house' => $currentStudent['House'],
-						'StudentMedicalAlert' => $medicalNoteStr,
-						'StudentSpecialNeedsFlag' => '',
-						'ClassCampus' => '',
-					);
+                    $student = [
+                        'synergy_id'              => $currentStudent['ID'],
+                        'firstname'               => $currentStudent['Firstname'],
+                        'lastname'                => $currentStudent['Surname'],
+                        'yearlevel '              => $currentStudent['YearLevel'],
+                        'house'                   => $currentStudent['House'],
+                        'StudentMedicalAlert'     => $medicalNoteStr,
+                        'StudentSpecialNeedsFlag' => '',
+                        'ClassCampus'             => '',
+                    ];
 
-					$allStudents[] = $student;
-				}
-			}
-		}
-		return $allStudents;
-	}
+                    $allStudents[] = $student;
+                }
+            }
+        }
+        return $allStudents;
+    }
 
-	/**
-	 * Get the class' teacher's name
-	 *
-	 * Wait, what - it returns a list of unique teacher externalIds...?
-	 *
-	 * @param $classCode
-	 * @return array|bool
-	 */
-	public function getTeacherName($classCode) {
-		$allTeachers = array();
+    /**
+     * Get the class' teacher's name
+     *
+     * Wait, what - it returns a list of unique teacher externalIds...?
+     *
+     * @param $classCode
+     * @return array|bool
+     */
+    public function getTeacherName($classCode)
+    {
+        $allTeachers = [];
 
         $vars = [
             'sbGetTeacherName',
@@ -114,17 +116,17 @@ class External_Schoolpro_Class implements External_ClassInterface
                 'pUserName' => 'alaress',
                 'pUserPass' => 'alaress',
                 'pClassID'  => trim($classCode),
-            ]
+            ],
         ];
 
-		$result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
 
-		if ($result['success'] && count($result['result'])) {
-			foreach($result['result'] as $currentTeacher) {
-				$allTeachers[] = $currentTeacher['ID'];
-			}
-		}
+        if ($result['success'] && count($result['result'])) {
+            foreach ($result['result'] as $currentTeacher) {
+                $allTeachers[] = $currentTeacher['ID'];
+            }
+        }
 
-		return array_unique($allTeachers);
-	}
+        return array_unique($allTeachers);
+    }
 }
