@@ -736,7 +736,7 @@ class External_Pcschools_User implements External_UserInterface
     public function getStaffUserAccountInfo()
     {
         return $this->getDatabase()->trimAll(
-            $this->getDatabase()->trimAll("
+            $this->getDatabase()->getAll("
                 SELECT
                     T.TEACHER# AS StaffID,
                     ID.LOGIN AS NetworkLogin,
