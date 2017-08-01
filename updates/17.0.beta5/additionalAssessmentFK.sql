@@ -36,6 +36,10 @@ REFERENCES `submission_box` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+UPDATE project
+  LEFT JOIN `submission_mark_type` ON project.`mark_type_id` = `submission_mark_type`.mark_type_id
+SET project.`mark_type_id` =  (SELECT `id` FROM `submission_mark_type` WHERE slug LIKE 'none')
+WHERE `submission_mark_type`.mark_type_id is null;
 
 ALTER TABLE `project`
   ADD INDEX `fk_project_mark_type_id_idx` (`mark_type_id` ASC);
