@@ -357,7 +357,7 @@ ALTER TABLE user MODIFY username varchar(60) CHARACTER SET utf8mb4 COLLATE utf8m
                                             MODIFY firstname varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
                                             MODIFY lastname varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
                                             MODIFY email_pass varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-                                            MODIFY synergy_id varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+                                            MODIFY synergy_id varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
                                             MODIFY year varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
                                             MODIFY boarding_status varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
                                             MODIFY alt_email varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
