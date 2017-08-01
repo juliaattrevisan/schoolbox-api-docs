@@ -23,7 +23,6 @@ class Mapper extends BaseMapper
         $this->uses('order', self::TYPE_INTEGER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('dashboard', self::TYPE_BOOLEAN);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 }
