@@ -1,3 +1,14 @@
+{#
+Data:
+    breadcrumbs:    Collection|string[][]
+    assessment:     DueWork/Model
+    student:        User
+    attachzone:     mixed[]
+    response:       null|DueWork\Response\Model  NULL if not a draft
+    editorContents: string                       WYSIWYG content
+    policy:         string                       If non-empty, display an additional confirm dialog with school policy
+    errorMessage:   null|string                  If re-loading this page because user attempted to upload bad MIME types
+#}
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
@@ -197,10 +208,7 @@
         </div>
         <div class="row">
             <div class="small-12 island">
-                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', { assessmentId: assessment.id, studentId: student.id}) }}" enctype="multipart/form-data">
-                    <input type="hidden" name="creatorId" value="{{ USER.id }}"/>
-                    <input type="hidden" name="studentId" value="{{ student.id }}" />
-                    <input type="hidden" name="assessmentId" value="{{ assessment.id }}"/>
+                <form id="editor-form" method="post" action="{{ routeLookup('learningAssessment.postCreateResponse', {assessmentId: assessment.id, studentId: student.id }) }}" enctype="multipart/form-data">
                     <input type="hidden" name="responseId" value="{{ response.id }}"/>
                     <section class="content">
                         <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>

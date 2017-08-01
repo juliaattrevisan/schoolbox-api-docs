@@ -219,16 +219,16 @@ class Model extends AbstractAssessment
             return false;
         }
 
+        $participant = $this->getParticipantIfExtant($learner);
+
         // Not a participant ?
-        if(!$this->isParticipant($learner)){
+        if(!$participant){
             return false;
         }
 
-        if ($this->getMaxAttempts() == self::ATTEMPTS_UNLIMITED) {
+        if ($this->getMaxAttempts() === self::ATTEMPTS_UNLIMITED) {
             return true;
         }
-
-        $participant = $this->getParticipant($learner);
 
         /* Responses less than maximum allowed
          */
@@ -238,7 +238,7 @@ class Model extends AbstractAssessment
 
         /* Response count is the same as the maximum allowed
          */
-        if ($participant->getAllResponses()->count() == $this->getMaxAttempts()) {
+        if ($participant->getAllResponses()->count() === $this->getMaxAttempts()) {
             $mostRecentResponse = $participant->findMostRecentResponse();
 
             /* Check whether the most recent response is officially submitted

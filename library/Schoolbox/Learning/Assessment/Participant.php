@@ -138,12 +138,19 @@ class Participant
      *
      * Important: This will still return TRUE if task has been marked as 'incomplete'.
      *
-     * @throws DomainException
      * @return bool
      */
     public function hasSubmittedResponse()
     {
-        return $this->assessable->hasSubmittedResponse($this);
+        try {
+            return $this->assessable->hasSubmittedResponse($this);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
     }
 
 
@@ -151,14 +158,22 @@ class Participant
      * Has a teacher given a published mark to this participant.
      *
      * For clarity - a self-assessed task, while complete, is not marked by teacher
+     *
      * @see $this->hasMark to include self-assessed marks.
      *
-     * @throws DomainException
      * @return bool
      */
     public function hasPublishedFeedback()
     {
-        return $this->assessable->hasPublishedFeedback($this);
+        try {
+            return $this->assessable->hasPublishedFeedback($this);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error(null, $e);
+            }
+            return null;
+        }
     }
 
 

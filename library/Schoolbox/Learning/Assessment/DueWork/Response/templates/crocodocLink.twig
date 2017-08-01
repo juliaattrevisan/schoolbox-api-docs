@@ -1,5 +1,5 @@
 {% if file.crocodocId and feedback.id %}
-    {% set crocodocRoute = routeLookupIfAuthorized('learningResponse.getCrocodocDownload', {
+    {% set crocodocRoute = routeLookupIfAuthorized('learningDueWorkResponse.getCrocodocDownload', {
         assessment:   assessment,
         assessmentId: assessment.id,
         feedback:     feedback,

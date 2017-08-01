@@ -13,9 +13,12 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
-use Schoolbox\GenericCollection;
-use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeAssessment;
+use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
+use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
+use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -45,6 +48,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use UnexpectedValueException;
+use Schoolbox\Assessment\Term;
 
 class Module extends BaseModule
 {
@@ -67,6 +71,8 @@ class Module extends BaseModule
      *
      * @return void
      * @throws \InvalidArgumentException
+     * @throws NotFound
+     * @throws InvalidPath
      */
     protected function registerRoutes()
     {
@@ -76,80 +82,14 @@ class Module extends BaseModule
         $preloadParticipant = function ($params) { return $this->preloadParticipant($params); };
 
         // rules in use
-        $isSuper   = $this->getAuthRule('isSuperuser');
-        $loggedIn  = $this->getAuthRule('isLoggedIn');
-        $canWrite  = new Rule\HasHomepageAccess(
-            UserAccess::ACCESS_WRITE,
-            function (array $params)
-            {
-                if (isset($params['assessment'])) {
-                    $ctx = $params['assessment']->getContext()->getFolder()->getId();
-                } elseif (isset($params['context'])) {
-                    $ctx = $params['context']->getFolder()->getId();
-                } else {
-                    throw new NotFound("No assessment or context preloaded");
-                }
-
-                return $ctx;
-            },
-            $this->getAccess()
-        );
-
-        $canRead = new Rule\HasHomepageAccess (
-                UserAccess::ACCESS_READ,
-                function (array $params)
-                {
-                    if (isset($params['assessment'])) {
-                        $ctx = $params['assessment']->getContext()->getFolder()->getId();
-                    } elseif (isset($params['context'])) {
-                        $ctx = $params['context']->getFolder()->getId();
-                    } else {
-                        throw new NotFound("No assessment or context preloaded");
-                    }
-
-                    return $ctx;
-                },
-                $this->getAccess()
-        );
-
-        $participantView = new Rule\All(
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new CanSeeAssessment($this->getAccess(), $this->getConfig())
-            ),
-            new Rule\Callback(function(array $params){
-                if (!isset($params['assessment']) && !isset($params['participant'])) {
-                    throw new NotFound("No assessment or participant preloaded");
-                }
-                /** @var IAssessable $assessment */
-                $assessment = $params['assessment'] ?: $params['participant']->getAssessable() ;
-                if($assessment->getBaseContext() instanceof UnitSpecification){
-                    throw new InvalidPath("Cannot view a summary page for an Assessment Specification");
-                }
-            })
-        );
-
-        $canSubmit = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsUser('studentId')
-        );
-
-        // Prevent navigation to non-project assessment spec status pages
-        $canWriteAndNotSpec = new Rule\All(
-            $canWrite,
-            new Rule\Callback(function(array $params){
-                if (!isset($params['assessment'])) {
-                    throw new NotFound("No assessment preloaded");
-                }
-                /** @var IAssessable $assessment */
-                $assessment = $params['assessment'];
-                if(!$assessment instanceof Project && $assessment->getBaseContext() instanceof UnitSpecification){
-                    throw new InvalidPath("Cannot view a status page for an Assessment Specification");
-                }
-            })
-        );
-
+        $isSuper            = $this->getAuthRule('isSuperuser');
+        $loggedIn           = $this->getAuthRule('isLoggedIn');
+        $canWrite           = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE);
+        $canRead            = $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_READ);
+        $participantView    = $this->buildAuthRuleParticipantView();
+        $canSubmit          = $this->buildAuthRuleCanSubmit();
+        $canWriteAndNotSpec = $this->buildAuthRuleCanWriteAndNotSpec();
+        $canAckSubmission   = $this->buildAuthRuleCanAcknowledgeSubmission();
 
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) { return $name.'s'; });
@@ -180,6 +120,8 @@ class Module extends BaseModule
         $this->register('GET',      "$assRoute/preview",                'getPreview',               $canRead,               $preloadAssessment); // s || p
         $this->register('GET',      "$assRoute/$studentParam/submit",   'getCreateResponseForm',    $canSubmit,             $preloadParticipant); // p
         $this->register('POST',     "$assRoute/$studentParam/submit",   'postCreateResponse',       $canSubmit,             $preloadParticipant); // p
+        $this->register('POST',     "$assRoute/$studentParam/received", 'postStatusAcknowledge',    $canAckSubmission,      $preloadParticipant); // p
+        $this->register('POST',     "$assRoute/$studentParam/ack",      'postPendingAcknowledge',   $canAckSubmission,      $preloadParticipant); // p
     }
 
     /**
@@ -321,7 +263,6 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-        $this->addTemplatePath($templateLoader, __DIR__ . '/../MarkScheme/templates', 'learningMarkScheme');
     }
 
     /**
@@ -349,7 +290,8 @@ class Module extends BaseModule
         $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
             'router' => $injector->lazyGet('router')
         ]);
-        $ac['workTypeMapper']           = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
+        $ac['workTypeMapper'] = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
+        $ac['termMapper']     = $this->getMapperFactory()->getLazy(Term\Mapper::class);
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
@@ -413,6 +355,17 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
+
+
+    /**
+     * @return Mapper|Term\Mapper
+     * @throws \InvalidArgumentException If unable to find mapper class
+     */
+    private function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(Term\Mapper::class);
+    }
+
 
     /**
      * @return Mapper|ErrorMapper
@@ -486,6 +439,148 @@ class Module extends BaseModule
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Access::class);
+    }
+
+
+    /**
+     * Rules in order of preference:
+     * - SU can submit
+     * - staff/students cannot if due in archived term (ie 'interaction locked')
+     * - staff must have WRITE+ perm to folder
+     * - students cannot if not open
+     * - Students cannot submit if reached response limit
+     * - students cannot if not participant, or a different student to that indicated in URL
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws \InvalidArgumentException If required object not found in route params
+     * @throws NotFound
+     */
+    private function buildAuthRuleCanSubmit()
+    {
+        return new Rule\Any(
+            new Rule\All(
+                new Rule\IsSuperuser(),
+                new CanRespondToAssessment($this->getAccess())
+            ),
+            new Rule\All(
+                new Rule\HasRole(Role::STAFF),
+                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                new CanRespondToAssessment($this->getAccess())
+            ),
+            new Rule\All(
+                new Rule\HasRole(Role::STUDENT),
+                new Rule\IsUser('studentId'),
+                new IsParticipant(),
+                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                new IsAssessmentOpen(),
+                new CanRespondToAssessment($this->getAccess())
+            )
+        );
+    }
+
+
+    /**
+     * @return Rule\Any
+     * @throws \InvalidArgumentException If required objects not found in route params
+     * @throws NotFound If unable to find assessment context in route params
+     */
+    private function buildAuthRuleCanAcknowledgeSubmission()
+    {
+        return new Rule\Any(
+            new Rule\All(
+                new Rule\IsSuperuser(),
+                new ParticipantHasNoInteractions()
+            ),
+            new Rule\All(
+                new Rule\HasRole(Role::STAFF),
+                $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+                new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                new CanRespondToAssessment($this->getAccess()),
+                new ParticipantHasNoInteractions()
+            )
+        );
+    }
+
+
+    /**
+     * Prevent navigation to non-project assessment spec status pages
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws \InvalidArgumentException If unable to locate required object in route params
+     * @throws NotFound
+     * @throws InvalidPath
+     */
+    private function buildAuthRuleCanWriteAndNotSpec()
+    {
+        return new Rule\All(
+            $this->buildAuthRuleHomepageAccess(UserAccess::ACCESS_WRITE),
+            new Rule\Callback(function(array $params){
+                if (!isset($params['assessment'])) {
+                    throw new NotFound('No assessment preloaded');
+                }
+                /** @var IAssessable $assessment */
+                $assessment = $params['assessment'];
+                if(!$assessment instanceof Project && $assessment->getBaseContext() instanceof UnitSpecification){
+                    throw new InvalidPath('Cannot view a status page for an Assessment Specification');
+                }
+            })
+        );
+    }
+
+
+    /**
+     * @param int $accessLevel One of the UserAccess::ACCESS_* constants
+     * @return Rule\HasHomepageAccess
+     * @throws NotFound
+     */
+    private function buildAuthRuleHomepageAccess($accessLevel)
+    {
+        return new Rule\HasHomepageAccess (
+            $accessLevel,
+            function (array $params)
+            {
+                if (isset($params['assessment'])) {
+                    $ctx = $params['assessment']->getContext()->getFolder()->getId();
+                } elseif (isset($params['participant'])) {
+                    $ctx = $params['participant']->getAssessable()->getContext()->getFolder()->getId();
+                } elseif (isset($params['context'])) {
+                    $ctx = $params['context']->getFolder()->getId();
+                } else {
+                    throw new NotFound('No assessment or context preloaded');
+                }
+
+                return $ctx;
+            },
+            $this->getAccess()
+        );
+    }
+
+
+    /**
+     * @return Rule\IAuthorizationRule
+     * @throws \InvalidArgumentException
+     * @throws NotFound
+     * @throws InvalidPath
+     */
+    private function buildAuthRuleParticipantView()
+    {
+        return new Rule\All(
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new CanSeeAssessment($this->getAccess(), $this->getConfig())
+            ),
+            new Rule\Callback(function(array $params){
+                if (!isset($params['assessment']) && !isset($params['participant'])) {
+                    throw new NotFound('No assessment or participant preloaded');
+                }
+                /** @var IAssessable $assessment */
+                $assessment = $params['assessment'] ?: $params['participant']->getAssessable() ;
+                if($assessment->getBaseContext() instanceof UnitSpecification){
+                    throw new InvalidPath('Cannot view a summary page for an Assessment Specification');
+                }
+            })
+        );
     }
 
 }

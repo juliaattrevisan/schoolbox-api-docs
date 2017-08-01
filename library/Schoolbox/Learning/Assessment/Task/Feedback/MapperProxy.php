@@ -55,6 +55,28 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         parent::__construct($mapper);
     }
 
+
+    /**
+     * @return Model
+     */
+    public function createModel()
+    {
+        /** @var Model $model */
+        $model = parent::createModel();
+        $model->setResponse(new TaskResponseDomainObject());
+        return $model;
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getModel()
+    {
+        return DomainObject::class;
+    }
+
+
     /**
      * @return string
      */

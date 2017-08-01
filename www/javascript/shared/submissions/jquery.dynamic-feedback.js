@@ -5,7 +5,6 @@
  * Usage:
 
  $.fn.dynamicFeedback({
-    errors: {{ errors | json_encode | raw }},
     statusIncomplete: {{ statusIncomplete }},
     statusPending: {{ statusPending }},
     statusReviewed: {{ statusReviewed }}
@@ -61,10 +60,6 @@
                  */
                 filters: $('#filters'),
 
-                /* A list of "Feedback States"
-                 */
-                errors: [],
-
                 /* CSS classes representing incomplete/pending/reviewed states
                  */
                 statusIncomplete: 'incomplete',
@@ -75,9 +70,9 @@
                  */
                 publishText: 'Publish',
 
-                /* A callback to execute upon successful completion of Publish action
-                 */
-                onPublishCallback: function() {}
+                // Callbacks to execute upon successful completion of Draft and Publish actions
+                onDraftCallback: $.noop,
+                onPublishCallback: $.noop
             };
 
             var derived = {
@@ -96,10 +91,6 @@
                 // stash the current state, so we can compare on blur and prevent unnecessary firing
                 $(this).data('preval', $(this).val());
             });
-
-            /* Feedback States
-             */
-            $('[data-combobox]').combobox(config.errors);
 
             /* Set initial state of the Publish button
              */
@@ -126,11 +117,11 @@
             $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                var $form      = $(this).closest('form'),
-                    $actionBar = $form.find('[data-interaction-draft]');
-
-                var $btnDrafted = $actionBar.find('[data-draft=drafted]'),
-                    $btnPublish = $actionBar.find('[data-draft=publish]');
+                var $participant = $(this).closest('[data-participant]'),
+                    $form        = $participant.find('[data-feedback-form]'),
+                    $actionBar   = $participant.find('[data-action-bar]'),
+                    $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
+                    $btnPublish  = $actionBar.find('[data-draft=publish]');
 
                 $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
@@ -146,12 +137,9 @@
                     data:  formData,
                     type: 'post'
                 }).done(function () {
-                    // Get handle to participant row
-                    var $li = $form.closest('[data-participant]');
 
-                    var $actionBar = $li.find('[data-interaction-draft]');
-
-                    if ($actionBar.find('.component-action-info').length) {
+                    // Have we inserted feedback meta message into action bar ?
+                    if ($actionBar.find('[data-feedback-attach-info]').length) {
                         $btnPublish.text(config.publishText).addClass('hide');
                         $btnDrafted.text('');
                     } else {
@@ -162,32 +150,29 @@
                     }
 
                     // Update this participant's status
-                    $li.attr('data-status', config.statusReviewed);
+                    $participant.attr('data-status', config.statusReviewed);
 
                     // Update the icon
-                    $li.find('[data-status]')
+                    $participant.find('[data-status]')
                         .removeClass(config.statusIncomplete + ' ' + config.statusPending)
                         .addClass(config.statusReviewed);
 
                     // Update the text
-                    $li.find('[data-status-label]').html('Reviewed');
+                    $participant.find('[data-status-label]').html('Reviewed');
 
                     // Ensure the 'display reviewed' filter is ON
                     $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
 
-                    // Store that this has been published in a data var, so that component info can be deleted if needed
-                    // on new feedback creation
-                    $actionBar.attr('data-published', true);
+                    // Store that this has been published in a data var, so that component info msg
+                    // can be deleted if needed on new feedback creation
+                    $actionBar.attr('data-published', '');
 
-                    toast.call($form, 'Feedback published', true, false);
-                    config.onPublishCallback();
+                    toast.call($participant, 'Feedback published', true, false);
+                    config.onPublishCallback($participant.data('participant'));
 
                 }).fail(function (xhr) {
-                    toast.call($form, xhr.responseText, false, false);
+                    toast.call($participant, xhr.responseText, false, false);
                     $btnPublish.removeAttr('disabled').text(config.publishText);
-
-                }).always(function () {
-
                 });
             });
         }
@@ -208,12 +193,12 @@
             }
 
             var $form = $(this).closest('form');
-            $form.find('[data-interaction-draft]').slideDown();
-            $form.find('[data-interaction-draft] [data-draft=publish]').removeClass('hide');
+            $form.find('[data-action-bar]').slideDown();
+            $form.find('[data-action-bar] [data-draft=publish]').removeClass('hide');
         }
 
         /**
-         * Save Feedback contents upon blur
+         * Save Draft Feedback contents upon blur or after timeout
          */
         function doASaveActionNao() {
             // do a preval comparison to find out if we can skip AJAX
@@ -226,7 +211,11 @@
             // update the pre-value
             $this.data('preval', $this.val());
 
-            var $form = $this.closest('form');
+            var $participant = $this.closest('[data-participant]'),
+                $form        = $participant.find('[data-feedback-form]'),
+                $actionBar   = $participant.find('[data-action-bar]'),
+                $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
+                $btnPublish  = $actionBar.find('[data-draft=publish]');
 
             var data = {
                 type: $form.attr('method'),
@@ -234,8 +223,8 @@
                 data: $form.serializeArray()
             };
 
-            $form.find('[data-draft]').attr('disabled', 'disabled');
-            $form.find('[data-draft="drafted"]').text('Saving...');
+            $actionBar.find('[data-draft]').attr('disabled', 'disabled');
+            $btnDrafted.text('Saving...');
 
             $(config.formSaveLabel).toastActivate({
                 text: 'Autosaving...'
@@ -243,20 +232,27 @@
 
             $.ajax($form.attr('action'), data)
                 .done(function () {
-                    toast.call($form, 'Draft saved', true, true);
-                    $form.find('[data-draft="drafted"]').text('Saved as draft');
+                    toast.call($participant, 'Draft saved', true, true);
 
-                    // If this was just published and this is the first change afterwards - removing any info about being linked to a response & having attachments
-                    if ($form.find('[data-published="true"]').length) {
-                        $form.find('[data-feedback-attach-info]').html('');
-                        $form.find('[data-interaction-draft][data-published=true]').removeAttr('data-published');
+                    // Show the action bar and buttons
+                    $actionBar.show();
+                    $btnDrafted.show().text('Saved as Draft');
+                    $btnPublish.show();
+
+                    // If published feedback already existed, and this is the first change afterwards,
+                    // remove any info about being linked to a response & having attachments
+                    if ($actionBar.is('[data-published]')) {
+                        $actionBar.find('[data-feedback-attach-info]').html('');
+                        $actionBar.removeAttr('data-published');
                     }
+
+                    config.onDraftCallback($participant.data('participant'));
                 })
                 .fail(function (xhr) {
-                    toast.call($form, xhr.responseText, false, false);
+                    toast.call($participant, xhr.responseText, false, false);
                 })
                 .always(function () {
-                    $form.find('[data-draft=publish]').removeAttr("disabled");
+                    $btnPublish.removeAttr("disabled");
                 });
         }
 
@@ -275,8 +271,8 @@
             });
 
             if(openActionBar){
-                this.find('[data-interaction-draft]').slideDown();
-                this.find('[data-interaction-draft] [data-draft=publish]').removeClass('hide');
+                this.find('[data-action-bar]').slideDown();
+                this.find('[data-action-bar] [data-draft=publish]').removeClass('hide');
             }
         }
     }

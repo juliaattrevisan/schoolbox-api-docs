@@ -13,11 +13,18 @@
      - statusReviewed:   a string representing the 'reviewed' state
 
 #}
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import 'sub/assessmentResponse.twig' as assessmentResponse %}
+
 {% extends '@learningAssessment/status.twig' %}
+
 
 {% set labelIncomplete = 'Not Attempted' %}
 {% set labelPending    = 'Review required' %}
 {% set labelReviewed   = 'Reviewed' %}
+
+{# Override default route #}
+{% set routeModify = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id}) %}
 
 {% block headerOptions %}
     <li>
@@ -49,45 +56,12 @@
         {% set pActionSummary    = '' %}
     {% endif %}
 
-    {% if latestResponse %}
-        {% if latestResponse.isSubmitted %}
-            {% if latestFeedback %}
-                {% if latestFeedback.publishedAt.lt(latestResponse.submittedAt) %}
-                    {# Feedback Required
-                     # Published feedback is outdated - attempt was finished more recently
-                     #}
-                    {% set pStatusClass = statusPending %}
-                    {% set pTooltip     = labelPending %}
-                {% else %}
-                    {# No feedback required
-                     # Published feedback is more recent than latest finished attempt
-                     #}
-                    {% set pStatusClass = statusReviewed %}
-                    {% set pTooltip = labelReviewed %}
-                {% endif %}
-            {% else %}
-                {# Feedback Required
-                 # No published feedback ever existed
-                 #}
-                {% set pStatusClass = statusPending %}
-                {% set pTooltip = labelPending %}
-            {% endif %}
-        {% else %}
-            {# Feedback Required
-             # Current attempt is being undertaken, and -will- require feedback or other kind
-             # of teacher intervention (this situation is not Reviewed or Not Attempted which is
-             # where Bagius' light turns green)
-             #}
-            {% set pStatusClass = statusPending %}
-            {% set pTooltip = 'Review will be required when this attempt is finished' %}
-        {% endif %}
-    {% else %}
-        {# No Feedback Required
-         # Not Attempted yet
-         #}
-        {% set pStatusClass = statusIncomplete %}
-        {% set pTooltip = 'Not attempted' %}
-    {% endif %}
+    {# Progress icon #}
+    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.reviewRequired ? statusPending : statusReviewed) %}
+
+    {# Progress icon tool tip #}
+    {% set pTooltip     = participant.responseRequired ? labelIncomplete  : (participant.reviewRequired ? labelPending  : labelReviewed)  %}
+    {% set pTooltip     = latestResponse and not latestResponse.isSubmitted ? 'Review will be required when this attempt is finished' : pTooltip %}
 
     {% set pStatusText %}
         {%- spaceless %}
@@ -115,9 +89,68 @@
     {{ parent() }}
 {% endblock %}
 
+{% block meta %}
+    {% if participant.allResponses | length %}
+        <div class="small-12 large-4 column content">
+            {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
 
-{% block grading %}
-    {% include '@learningMarkScheme/'~markScheme~'.twig' with { markScheme: assessment.markScheme } %}
+            {% if latestResponse %}
+                {% if latestResponse.submitted %}
+                    {% if latestFeedback %}
+                        <span class="grade {{ urgencyClass }}">
+                            <span>{{ latestFeedback.humanReadableMark }}</span>
+                         </span>
+                    {% else %}
+                        {#<a href="#" class="button expand">Review</a>#}
+                        <h4>Awaiting Review</h4>
+                    {% endif %}
+                {% else %}
+                    <h4>In Progress</h4>
+                {% endif %}
+            {% else %}
+                &ndash;
+            {% endif %}
+        </div>
+        <div class="small-12 large-8 column content">
+            {% if latestResponse.submitted %}
+                Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong>
+                {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{% block action_bar %}
+
+    {% set latestResponse    = participant.findMostRecentResponse %}
+    {% set latestFeedback    = latestResponse.findMostRecentFeedback %}
+    {% set canFinish         = latestResponse and not latestResponse.submitted %}
+    {% set canPublish        = latestResponse.submitted and (not latestFeedback or not latestFeedback.published) %}
+    {% set canDelete         = latestResponse and (not latestFeedback or not latestFeedback.published) %}
+
+    {# Hide if no attempts, or attempt has published review #}
+    {% set actionStyle = not latestResponse or latestFeedback.published ? 'display:none;' : '' %}
+
+    {# Mass/Bulk actions #}
+    {% set massActions = '' %}
+    {% if canPublish %}{% set massActions = massActions ~ ' data-mass-review' %}{% endif %}
+    {% if canDelete %}{% set massActions = massActions ~ ' data-mass-delete' %}{% endif %}
+
+    {# Buttons #}
+    {% spaceless %}
+        {% set buttons %}
+            <a class="button" {% if not canDelete  %}style="display:none;"{% endif %} data-interaction-delete="{{ latestResponse.id }}" href="/assess/deleteAttempt" >Delete Attempt</a>
+            <a class="button" {% if not canFinish  %}style="display:none;"{% endif %} data-interaction-finish="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learningQuiz.postQuizSubmit')}}">Mark as Submitted</a>
+            <a class="button" {% if not canPublish %}style="display:none;"{% endif %} data-interaction-review="{{ latestResponse.id }}" href="{{ assessmentResponse.localUrl(latestResponse) }}">Review Attempt</a>
+        {% endset %}
+    {% endspaceless %}
+
+    {% include '@learningAssessment/fragments/actionBar.twig' with {
+        actionStyle:  actionStyle,
+        massActions:  massActions,
+        buttons:      buttons
+    } only %}
 {% endblock %}
 
 
@@ -171,10 +204,12 @@
     </div>
 
     <script type="text/javascript">
+
         $(function () {
 
             var $participantList  = $('#assessment-status');
 
+            {# Mass review submitted but unreviewed quiz attempts #}
             $('#mass-review').bulky({
                 submitText: function (len, all) {
                     if (!len) {
@@ -186,20 +221,20 @@
                     return 'Mark ' + len + ' Selected as Reviewed';
                 },
                 userList: $participantList,
+                userSelector: '[data-mass-review]',
                 onSubmit: function (toReview) {
-                    var list = toReview.map(function () {
-                        return $(this).find('[data-interaction-review]').data('interactionReview');
-                    }).get();
+                    var list = toReview.map(function () { return $(this).find('[data-interaction-review]').attr('data-interaction-review') }).get();
 
                     $.post(
                         '/assess/reviewAttempt',
                         { selectedIds: list }
-                    ).always(function () {
+                    ).done(function () {
                         location.reload();
                     });
                 }
             });
 
+            {# Mass delete unreviewed quiz attempts #}
             $('#mass-delete').bulky({
                 submitText: function (len, all) {
                     if (!len) {
@@ -211,8 +246,10 @@
                     return 'Delete ' + len + ' Selected';
                 },
                 userList: $participantList,
+                userSelector: '[data-mass-delete]',
                 onSubmit: function (toDelete) {
-                    var userList = toDelete.map(function () { return $(this).data('interactionDraft'); }).get();
+
+                    var userList = toDelete.map(function () { return $(this).closest('[data-participant]').attr('data-participant') }).get();
 
                     $.post(
                         '/assess/deleteAttempt',
@@ -223,6 +260,7 @@
                 }
             });
 
+            {# Delete attempt for single participant #}
             $participantList.on('click', '[data-interaction-delete]', function (e) {
                 e.preventDefault();
 
@@ -234,10 +272,27 @@
                         $.post(
                             '/assess/deleteAttempt',
                             { attemptIds: [ $a.attr('data-interaction-delete') ]}
-                        ).always(function () {
+                        ).done(function () {
+                            // We must reload page to populate the action bar with the previous attempt
                             location.reload();
                         });
                     }
+                });
+            });
+
+            {# Submit/Finish an unfinished/unsubmitted/in-progress quiz attempt #}
+            $participantList.on('click', '[data-interaction-finish]', function (e) {
+                e.preventDefault();
+                var $a = $(this);
+
+                $.post(
+                    $a.attr('href'),
+                    { attemptId: $a.attr('data-interaction-finish')}
+                ).done(function () {
+                    var $actionBar = $a.closest('[data-action-bar]');
+                    $actionBar.attr('data-mass-review', '');
+                    $actionBar.find('[data-interaction-review]').show();
+                    $a.hide();
                 });
             });
         });

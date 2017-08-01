@@ -255,25 +255,35 @@ class Controller extends Base
         foreach ($assessments as $assessment) {
             $assessmentStatistics[$assessment->getId()] = new Statistics($assessment);
             if ($assessmentStatistics[$assessment->getId()]->getCountFeedbackRequired()) {
-                $assessmentsToMark->add($assessment);
+                $assessmentsToMark[$assessment->getId()] = $assessment;
             }
         }
-        $assessmentsToMark->sortBy('dueAt', 'asc');
+        $assessmentsToMark->sortBy('dueAt', 'asc', null, true);
 
         /** @var IAssessable[] $assessmentsToMark */
         $assessmentsToChase = $this->assessmentMapperProxy->createCollection();
 
+        $assessmentStudentsToEmail = [];
+
         foreach ($assessments as $assessment) {
             if ($assessment->getDueAt()->lt($toChaseLimit) && $assessmentStatistics[$assessment->getId()]->getCountResponseRequired()) {
-                $assessmentsToChase->add($assessment);
+                $assessmentsToChase[$assessment->getId()] = $assessment;
+                $assessmentStudentsToEmail[$assessment->getId()] = [];
+                foreach($assessment->getAllParticipants() as $participant){
+                    if($participant->isResponseRequired()){
+                        $student = $participant->getUser();
+                        $assessmentStudentsToEmail[$assessment->getId()][$student->getId()] = $student->getEmail();
+                    }
+                }
             }
         }
-        $assessmentsToChase->sortBy('dueAt', 'asc');
+        $assessmentsToChase->sortBy('dueAt', 'asc', null, true);
 
         return $this->buildUnthemedHtmlOutput('@learning/pendingAssessmentsContent.twig', [
-            'statistics'         => $assessmentStatistics,
-            'assessmentsToMark'  => $assessmentsToMark,
-            'assessmentsToChase' => $assessmentsToChase,
+            'statistics'                => $assessmentStatistics,
+            'assessmentsToMark'         => $assessmentsToMark,
+            'assessmentsToChase'        => $assessmentsToChase,
+            'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
         ])->getAsString();
     }
 

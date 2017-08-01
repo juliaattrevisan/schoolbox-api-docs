@@ -1,11 +1,13 @@
 {##
- # Student Selector Carousel
- #
- # Cycle through students participating in an $assessment
- #
- # @param array allPeople - an array of people who populate the selector
- # @param string currentPerson - the getParticularResponse url for the current response's submittedOnBehalfOf
- # @param DueWork assessment - the assessment to which this Submission belongs
+  Student Selector Carousel
+
+  Cycle through students participating in an $assessment
+
+  Usage:
+    @param array       carousel.allPeople     - an array of people who populate the selector
+    @param string      carousel.currentPerson - the getParticularResponse url for the current response's submittedOnBehalfOf
+    @param Participant participant            - currently displayed participant
+    @param DueWork     participant.assessable - the assessment to which this Submission belongs
  #}
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
 <script type="text/javascript">
@@ -139,7 +141,7 @@
     </div>
     <div class="small-12 medium-4 columns">
         <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id, assessment: participant.assessable }) }}" method="post">
-            <input type="hidden" name='assessmentId' value="{{ assessment.id }}" />
+            <input type="hidden" name='assessmentId' value="{{ participant.assessable.id }}" />
             <input type="hidden" name="skipUnsubmitted" value="0" />
             <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if participant.assessable.showSubmittedOnly %}checked="checked"{% endif %} value='1' />
             <label for="showSubmittedOnly" class="checkbox-label">Show unmarked submissions <span class='hint has-tip tip-top' title="If selected, you will only see student submissions that need to be marked." data-tooltip="">?</span></label>

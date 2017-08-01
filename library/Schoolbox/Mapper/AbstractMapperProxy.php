@@ -127,6 +127,14 @@ abstract class AbstractMapperProxy
         return true;
     }
 
+
+    /**
+     * Get the domain model class
+     *
+     * @return string
+     */
+    protected abstract function getModel();
+
     /**
      * Overridable post-save stub.
      *
@@ -157,11 +165,12 @@ abstract class AbstractMapperProxy
 
     /**
      * @return object
-     * @throws Exception
+     * @todo Update signature to accept optional $id and leverage a model cache
      */
     public function createModel()
     {
-        return $this->transformModels(new Collection([ $this->getMapper()->createModel() ]))->first();
+        $modelClass = $this->getModel();
+        return new $modelClass;
     }
 
     /**

@@ -1,12 +1,22 @@
-{% extends '@learningMarkScheme/commentable.twig' %}
+{#
+    Text-input for 'percentage' markScheme.
 
-{% block grading %}
+    Usage: [
+        markScheme:  MarkScheme\Percentage
+        tabIndex:    int
+        errors:      string[]       Admin-configured submission states
+        readonly:     bool          Should this form input be rendered as readonly?
+    ]
+#}
 
-    {% set inclusion = {
-        maxLength: 16,
-        inputTitle: 'Percentage',
-        placeholder: 'Percentage mark'
-    } %}
 
-    {% include '@learningMarkScheme/text-input.twig' with inclusion %}
-{% endblock %}
+{% include '@learningMarkScheme/fragments/text-input.twig' with {
+    participant: participant,
+    tabIndex:    tabIndex,
+    placeholder: 'Percentage mark',
+    limit:       100,
+    maxLength:   16,
+    inputTitle:  'Percentage',
+    errors:      errors,
+    readonly:    readonly
+} only %}

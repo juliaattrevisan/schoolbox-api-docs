@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Response;
+namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\Client;
@@ -17,6 +17,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Response\DataSource;
@@ -25,6 +26,7 @@ use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Attachzone;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
@@ -37,6 +39,7 @@ use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use DueWork_ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Application\Exception as ApplicationException;
 
 class Controller extends Base
@@ -53,6 +56,9 @@ class Controller extends Base
     /** @var BreadcrumbFactory */
     protected $bakery;
 
+    /** @var Term\Mapper */
+    private $termMapper;
+
 
     /**
      * Controller constructor.
@@ -61,11 +67,12 @@ class Controller extends Base
      * @param DataSource  $responseDataSource
      * @param BreadcrumbFactory $bakery
      */
-    public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource, BreadcrumbFactory $bakery)
+    public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource, BreadcrumbFactory $bakery, Term\Mapper $termMapper)
     {
         $this->setErrorMapper($errorMapper);
         $this->responseDataSource = $responseDataSource;
         $this->bakery = $bakery;
+        $this->termMapper = $termMapper;
 
     }
 
@@ -83,6 +90,7 @@ class Controller extends Base
      * @param Submission $response
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
+     * @throws \InvalidArgumentException If assessment due date is null.
      */
     public function getParticularResponse(IAssessable $assessment, Participant $participant, Submission $response = null)
     {
@@ -131,13 +139,15 @@ class Controller extends Base
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
 
+        // Is the page being displayed in readonly mode?
+        $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
+
         /* ResponseFile Factory might throw exceptions if you're viewing
          * crocodocable files that somehow die
          */
         try {
 
             $data = [
-                'MARK_TYPE_NONE' => MarkType::TYPE_NONE,
                 'assessment' => $assessment,
                 'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                     ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
@@ -146,7 +156,7 @@ class Controller extends Base
                 'latestFeedback' => $latestFeedback,
                 'attachzone' => $attachZone->getTwigContext(),
                 'selectedFileHash' => $this->getRequest()->query['hash'],
-                'markScheme' => $this->deriveSchemeName($assessment->getMarkScheme()),
+                'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
                 'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment))->produce(),
                 'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
 
@@ -167,10 +177,7 @@ class Controller extends Base
                 /* Plagscan status
                  */
                 'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-
-                // A bool that can be used from a twig fragment to determine if it has been called from the inline
-                // grader or quick mark screen
-                'inlineGrader' => true,
+                'interactionLocked' => $isInteractionLocked,
             ];
 
             if($assessment instanceof DueWork){
@@ -180,10 +187,15 @@ class Controller extends Base
                 if($assessment->getUseRubric()){
                     $assessment->setRubric($rubricMapper->findByDueWork($assessment));
                 }
-                $data['rubricContext'] = (new RubricContext($rubricMapper))->generateMarkable($assessment, $participant->getUser());
+                $rubricContext = new RubricContext($rubricMapper);
+
+                // Should rubric be readonly or markable?
+                $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
+                    ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
+                    : $rubricContext->generateMarkable($assessment, $participant->getUser());
             }
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/response.twig', $data));
+            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/response.twig', $data));
         }
         catch (\RangeException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
@@ -283,7 +295,7 @@ class Controller extends Base
             'file'        => $file,
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/crocodocView.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/crocodocView.twig', $data));
     }
 
     /**
@@ -352,7 +364,7 @@ class Controller extends Base
             'interactiveAvailable' => $interactiveAvailable
         ];
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningResponse/plagscan/iframe.twig', $data));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/plagscan/iframe.twig', $data));
     }
 
     /**
@@ -368,7 +380,7 @@ class Controller extends Base
             'html' => $plagscan->getHtml(),
         ];
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningResponse/plagscan/contents.twig', $data));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
     }
 
     /* Getters/Setters

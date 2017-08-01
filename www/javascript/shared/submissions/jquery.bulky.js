@@ -11,7 +11,7 @@
     var currentlyOpenModal = null;
 
     var defaults = {
-        onSubmit: $.noop,
+        onSubmit: $.noop,  // action-bar DOM element
         submitText: $.noop, // checkedCount, totalCount
         userList: null,
         templateSelector: '[data-template]',
@@ -20,7 +20,9 @@
         labelSelector: '[data-participant-name]',
         unavailableTextSelector: '[data-mass-unavailable]',
         availableTextSelector: '[data-mass-available]',
-        actionBarSelector: '[data-interaction-draft]'
+        participantSelector: '[data-participant]',
+        actionBarSelector: '[data-action-bar]',
+        userSelector: null
     };
 
     function Bulky(element, options) {
@@ -35,6 +37,10 @@
         // validate a couple things
         if (!options.userList) {
             throw "userList option must be a jQuery object";
+        }
+
+        if (!options.userSelector) {
+            throw "userSelector option must be a string";
         }
 
         if (!this.list.length) {
@@ -72,13 +78,13 @@
 
             bulky.list.html(
 
-                opt.userList.find(opt.actionBarSelector + ':not([data-published=true])').closest(opt.labelSelector).map(function () {
+                opt.userList.find(opt.actionBarSelector + opt.userSelector).closest(opt.labelSelector).map(function () {
 
                     var $item = bulky.template.clone(),
                         tag   = $item.prop("tagName").toLowerCase(),
                         $lbl  = $item.find(opt.labelSelector),
                         $chk  = $item.find(opt.checkboxSelector),
-                        id    = $(this).find(opt.actionBarSelector).data('interactionDraft'),
+                        id    = $(this).closest(opt.participantSelector).data('participant'),
                         html;
 
                     $chk.attr('id', id);
@@ -133,7 +139,7 @@
 
         this.submitButton.on('click', function (e) {
             e.preventDefault();
-            opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function () { return opt.userList.find('[data-interaction-draft="' + this.id + '"]').get(); }));
+            opt.onSubmit.call(bulky, bulky.element.find(':checked').map(function () { return opt.userList.find('[data-participant='+this.id+'] [data-action-bar]').get(); }));
         });
 
         this.element.on('click', '.button', function () {

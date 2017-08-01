@@ -9,6 +9,8 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use DueWork_ErrorMapper;
 use Schoolbox\Application\Exception\NotFound;
@@ -40,6 +42,8 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
+use Schoolbox\Assessment\Term;
+use Schoolbox\Application\Exception as ApplicationException;
 
 class Controller extends Assessment\Controller
 {
@@ -67,6 +71,7 @@ class Controller extends Assessment\Controller
      * @param Rubric\ResultMapper           $resultSetMapper
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
      * @param ParticipantMapper             $participantMapper
+     * @param Term\Mapper                   $termMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -79,9 +84,10 @@ class Controller extends Assessment\Controller
         Rubric\RubricMapper $rubricMapper,
         Rubric\ResultMapper $resultSetMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
-        ParticipantMapper $participantMapper
+        ParticipantMapper $participantMapper,
+        Term\Mapper $termMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
@@ -124,19 +130,21 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
+     * @throws \InvalidArgumentException If assessment due date is null.
      */
     public function getStatus(IAssessable $assessment)
     {
         // Only display download link if there are actually files to download
 
         $twigData = [
-            'errors'      => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
-            'type'        => Assessment\AssessmentType::objectToString($assessment),
-            'markScheme'  => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
-            'assessment'  => $assessment,
-            'download'    => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks' =>  Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'errors'         => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+            'type'           => Assessment\AssessmentType::objectToString($assessment),
+            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
+            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
+            'assessment'     => $assessment,
+            'download'       => $this->hasDownloadableSubmissionFiles($assessment),
+            'rubricMarks'    => Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
         ];
 
         $this->getResponse()->content->set(
@@ -546,11 +554,10 @@ class Controller extends Assessment\Controller
      * @api   GET /learning/assessment/:assessmentId/:participantId/submit
      * @level 165
      * @param Participant $participant
+     * @throws ServiceNotFound If unable to locate HTML web Output in DI
      */
     public function getCreateResponseForm(Participant $participant)
     {
-        $this->assertParticipantAccess($participant);
-
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
         $student    = $participant->getUser();
@@ -562,18 +569,6 @@ class Controller extends Assessment\Controller
 
         /** @var SubmissionFile $submission */
         $allResponses = $participant->getAllResponses();
-
-        /* Work out if we are going to accept responses
-         */
-        try {
-
-            /* assertAcceptSubmission() requires a list of responses to decide outcome
-             */
-            $assessment->assertAcceptSubmission($allResponses);
-
-        } catch (DomainException $e) {
-            throw $this->getErrorMapper()->generateException($e->getCode());
-        }
 
         /* Otherwise continue
          */
@@ -645,60 +640,22 @@ class Controller extends Assessment\Controller
     /**
      * Save a Response, on behalf of a User, for a particular Assessment
      *
-     * @api POST /learning/assessments/:assessmentId/:participantId/submit
+     * @api POST /learning/assessments/:assessmentId/:studentId/submit
      * @param Participant $participant
      * @return void
+     * @throws RouteNotFound If unable to generate a specified Route
+     * @throws \PDOException If unable to save the Response
+     * @throws ApplicationException\Exception If not accepting submissions
+     * @throws MapperException\Deleted If specified Response is deleted
+     * @throws MapperException If unable to create new Response object
      */
     public function postCreateResponse(Participant $participant)
     {
-        $this->assertParticipantAccess($participant);
-
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
         /** @var Model $assessment */
         $assessment = $participant->getAssessable();
-
-        /* Find all the records spawned by $participant
-         *
-         * Order them by submitted time to find the most recent, and use that
-         */
-
-        /** @var SubmissionFile $submission */
-        $allResponses = $participant->getAllResponses();
-
-        /* Work out if we are going to accept responses
-         */
-        try {
-
-            /* assertAcceptSubmission() requires a list of responses to decide outcome
-             */
-            $assessment->assertAcceptSubmission($allResponses);
-        }
-        catch (DomainException $e) {
-
-            /* When asynchronously saving and suddenly you're not allowed to
-             * ie. when you've run out of time and you left this screen on
-             */
-            if ($rq->isXhr()) {
-                $result['success'] = false;
-                $result['message'] = $this->getErrorMapper()->getMessageById($e->getCode());
-
-                $rs->status->setCode(403);
-                $rs->content->set($this->buildJsonOutput($result));
-                return;
-            }
-
-            throw $this->getErrorMapper()->generateException($e->getCode());
-        }
-
-        /* Creator is the currently-logged-in user
-         * Participant is the actual owner of the Response
-         *
-         * Usually the same person, unless you're a teacher creating a Response
-         * on behalf of a student (teacher is creator, student is participant)
-         */
-        $creator = $this->getUser();
 
         /* Set in javascript when automatically saving a draft
          * Careful the negation
@@ -711,9 +668,8 @@ class Controller extends Assessment\Controller
             $response = $this->getDueWorkResponseMapper()->findById($rq->post['responseId']);
         } else {
             // Create a new response
-            $response = new DueWorkSubmission();
-            $response
-                ->setSubmittedBy($creator)
+            $response = $this->dueWorkResponseMapper->createModel()
+                ->setSubmittedBy($this->getUser())
                 ->setSubmittedOnBehalfOf($participant->getUser())
                 ->setCreatedAt(Alaress_Date_Format::now())
                 ->setUpdatedAt(Alaress_Date_Format::now());
@@ -845,6 +801,95 @@ class Controller extends Assessment\Controller
                 )
             );
         }
+    }
+
+
+    /**
+     * Acknowledge receipt of (potentially offline) submission from dueWork status page
+     *
+     * Creates an empty SOBO. Needs a different route to postCreateResponse()
+     * to cater for different auth rules.
+     *
+     * @param Participant $participant
+     * @api   POST /learning/assessments/:assessmentId/:studentId/received
+     * @level 17.0
+     */
+    public function postStatusAcknowledge(Participant $participant)
+    {
+        $assessment = $participant->getAssessable();
+        try {
+            $response = $this->persistEmptySobo($participant);
+            $data = [
+                'success'       => true,
+                'id'            => $response->getId(),
+                'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+            ];
+            $code = 200;
+        } catch (\PDOException $e) {
+            $data = [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+            $code = 403;
+        }
+        $this->getResponse()->status->set($code);
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * Acknowledge receipt of (potentially offline) submission
+     *
+     * Creates an empty SOBO. Needs a different route to postCreateResponse()
+     * to cater for different auth rules.
+     *
+     * @param Participant $participant
+     * @api   POST /learning/assessments/:assessmentId/:studentId/ack
+     * @level 17.0
+     */
+    public function postPendingAcknowledge(Participant $participant)
+    {
+        try {
+            $this->persistEmptySobo($participant);
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
+                'participant' => $participant,
+                'assessment'  => $participant->getAssessable(),
+            ]));
+            $code = 200;
+        } catch (\PDOException $e) {
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]));
+            $code = 403;
+        }
+        $this->getResponse()->status->set($code);
+    }
+
+
+    /**
+     * Common logic for 'dueWork status' and 'pending assessments' pages 'acknowledgement of submission receipt'.
+     *
+     * @param Participant $participant
+     * @return Submission
+     * @throws \PDOException If something went wrong in the save process
+     */
+    private function persistEmptySobo(Participant $participant)
+    {
+        $assessment = $participant->getAssessable();
+        $response   = $this->dueWorkResponseMapper->createModel()
+            ->setAssessable($assessment)
+            ->setSubmittedBy($this->getUser())
+            ->setSubmittedOnBehalfOf($participant->getUser())
+            ->setSubmittedAt(Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        $this->dueWorkResponseMapper->save($response);
+        $participant->getAllResponses()[$response->getId()] = $response;
+        $assessment->getResponses()[$response->getId()]     = $response;
+
+        return $response;
     }
 
 

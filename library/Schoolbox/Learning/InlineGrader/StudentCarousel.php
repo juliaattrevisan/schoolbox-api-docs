@@ -105,7 +105,7 @@ class StudentCarousel
 
             /* Viewing the most recent response for the next student
              */
-            $urlValue = $this->getRouter()->generate('learningResponse.getParticularResponse', [
+            $urlValue = $this->getRouter()->generate('learningDueWorkResponse.getParticularResponse', [
                 'assessmentId' => $this->getAssessment()->getId(),
                 'studentId'    => $currentParticipant->getUser()->getId(),
                 'assessment'   => $this->getAssessment()
@@ -139,7 +139,7 @@ class StudentCarousel
      */
     private function getCurrentPerson()
     {
-        return $this->getRouter()->generate('learningResponse.getParticularResponse', [
+        return $this->getRouter()->generate('learningDueWorkResponse.getParticularResponse', [
             'assessmentId' => $this->getAssessment()->getId(),
             'studentId'    => $this->getStudent()->getId(),
             'assessment'   => $this->getAssessment()
