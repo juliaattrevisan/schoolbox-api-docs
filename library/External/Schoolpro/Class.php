@@ -47,18 +47,19 @@ class External_Schoolpro_Class implements External_ClassInterface
 
             $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
 
-            $medicalProc = $this->getConnector()->prepareStoredProcedure('sbGetStudentMedicalConditions');
-
             foreach ($result as $currentStudent) {
                 $medicalNoteStr = '';
 
                 /* Get the medical data for him too
                  */
-                $medicalResult = $medicalProc->executeIterator([
-                    'pUserName'  => 'alaress',
-                    'pUserPass'  => 'alaress',
-                    'pSchoolNum' => $currentStudent['ID'],
-                ]);
+                $medicalResult = $this->getConnector()->executeStoredProcedureIterator(
+                    'sbGetStudentMedicalConditions',
+                    [
+                        'pUserName'  => 'alaress',
+                        'pUserPass'  => 'alaress',
+                        'pSchoolNum' => $currentStudent['ID'],
+                    ]
+                );
 
                 /* These arrive in a variety of formats
                  */
