@@ -300,15 +300,24 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
         $statement->bindInputs([
-            ['name' => 'DATE', 'value' => $date->getUsingFormat('Ymd')],
-            ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
-            ['name' => 'STUDKEY', 'value' => $studentExternalId],
-            ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+            'DATE' => $date->getUsingFormat('Ymd'),
+            'TIMEPERIOD' => $timePeriod,
+            'STUDKEY' => $studentExternalId,
+            'TEACHERCODE' => $teacherExternalId,
         ]);
 
         $statement->execute();
-        $row = $statement->fetch();
-        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
+
+        $dayPeriods = $statement->fetchAll();
+        $statement->nextRowset();
+        $dayClasses = $statement->fetchAll();
+        $statement->nextRowset();
+//        $homeClasses = $statement->fetchAll();
+        $statement->nextRowset();
+        $weekDays = $statement->fetchAll();
+        $statement->nextRowset();
+//        $terms = $statement->fetchAll();
+        $statement->close();
 
         // The $homeClasses definition is mostly included within dayPeriods
         $timetable = [];
