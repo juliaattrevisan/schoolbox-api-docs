@@ -76,7 +76,6 @@
     /** Default booking color, if you don't have a event type called "Booking" **/
     background-color: #eeeeee;
     border-color: #eeeeee;
-    height:100%;
 }
 .fc .fc-event.booking.approved .fc-event-inner:before {
     /** Put a tick mark before confirmed bookings **/
@@ -104,6 +103,10 @@
 }
 .fc-toolbar {
     margin-bottom: 0;
+}
+
+.fc-timeline-event {
+    height: 100%;
 }
 
 /* Overcome specificity
