@@ -173,6 +173,9 @@ abstract class Base {
     /**
      * Gets the current authenticated user out of the session.
      *
+     * WARNING: Do not call this in post-request detached-client callbacks,
+     *          as at that point the session has been destroyed.
+     *
      * @return User
      */
     public function getUser() {

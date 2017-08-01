@@ -163,8 +163,10 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        // Do the import in a detached state so it doesn't time out
+        // We must cache the session user if used in post-detach callbacks as session no longer exists at that point
+        $sessionUser = $this->getUser();
 
+        // Do the import in a detached state so it doesn't time out
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/log.twig',
             'data'     => array(
@@ -174,8 +176,8 @@ class Controller extends Base
                 'message'       => true
             ),
             'postOutput' => [
-                function() use ($defaultOwner, $importParentAccess) {
-                    $this->importCallback($defaultOwner, $importParentAccess);
+                function() use ($sessionUser, $defaultOwner, $importParentAccess) {
+                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess);
                 }
             ],
         ]);
@@ -184,15 +186,16 @@ class Controller extends Base
     /**
      * Do pastoral record import in a detached state so it doesn't block the user
      *
-     * @param User $defaultOwner Fallback owner when cannot be located in Schoolbox
+     * @param User $user               Schoolbox user doing the import
+     * @param User $defaultOwner       Fallback owner when cannot be located in Schoolbox
      * @param bool $importParentAccess Flag indicating if parents should be imported to the pastoral_access table
      */
-    public function importCallback($defaultOwner, $importParentAccess)
+    public function importCallback(User $user, User $defaultOwner, $importParentAccess)
     {
         try
         {
             $pastoralExternal = new \External_Pastoral();
-            $pastoralExternal->importPastoral($this->getUser(), $defaultOwner, $importParentAccess);
+            $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess);
         }
         catch (\Exception $e)
         {

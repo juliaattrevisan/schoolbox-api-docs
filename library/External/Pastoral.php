@@ -7,6 +7,7 @@
 use \Schoolbox\Pastoral\Model as PastoralModel;
 use \Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
+use Schoolbox\User;
 
 class External_Pastoral implements External_PastoralInterface
 {
@@ -31,7 +32,7 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral($user, $defaultOwner, $importParentAccess)
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess)
     {
         return $this->getDatabase()->importPastoral($user, $defaultOwner, $importParentAccess);
     }

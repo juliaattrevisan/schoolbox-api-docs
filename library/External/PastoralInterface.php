@@ -17,12 +17,12 @@ interface External_PastoralInterface
     /**
      * Import pastoral care records from external SIS
      *
-     * @param User $user Schoolbox user ID of person doing the import
+     * @param User $user Schoolbox user doing the import
      * @param User $defaultOwner Schoolbox user ID of person who should be set at fallback owner of record
      * @param bool $importParentAccess Flag indicating if parent contacts should be added to the pastoral_access table
      * @return bool
      */
-    public function importPastoral($user, $defaultOwner, $importParentAccess);
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess);
 
     /**
      * Returns the pastoral record if found in remote system

@@ -12,6 +12,7 @@
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
+use Schoolbox\User;
 
 class External_Offline_Pastoral implements External_PastoralInterface
 {
@@ -81,7 +82,7 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral($userId, $defaultOwnerId, $importParentAccess)
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess)
     {
         // NOOP
     }
