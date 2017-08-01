@@ -157,7 +157,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral($user, $defaultOwner, $importParentAccess)
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess)
     {
         // Given the size of the result set here (in some schools 100,000+ records) we need to use an iterator to process the results, otherwise
         // PHP is going to crap out with memory problems in some schools. Unfortunately we also need to do queries inside the iterator- this is not
