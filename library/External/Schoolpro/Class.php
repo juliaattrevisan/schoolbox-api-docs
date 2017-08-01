@@ -35,14 +35,14 @@ class External_Schoolpro_Class implements External_ClassInterface
 		$allClassCodes = explode(',', $classCode);
 
 		foreach($allClassCodes as $currentClassCode) {
-			$vars = array(
-				'sbGetStudents',
-				array(
-					array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-					array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-					array('@pClassID', trim($currentClassCode), SQLINT4, false, false, -1),
-				)
-			);
+            $vars = [
+                'sbGetStudents',
+                [
+                    'pUserName' => 'alaress',
+                    'pUserPass' => 'alaress',
+                    'pClassID'  => trim($currentClassCode),
+                ]
+            ];
 
 			$result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
 
@@ -108,14 +108,14 @@ class External_Schoolpro_Class implements External_ClassInterface
 	public function getTeacherName($classCode) {
 		$allTeachers = array();
 
-		$vars = array(
-			'sbGetTeacherName',
-			array(
-				array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-				array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-				array('@pClassID', $classCode, SQLINT4, false, false, -1),
-			)
-		);
+        $vars = [
+            'sbGetTeacherName',
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+                'pClassID'  => trim($classCode),
+            ]
+        ];
 
 		$result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
 
