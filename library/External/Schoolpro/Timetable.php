@@ -10,20 +10,14 @@ use Alaress\Database\Iterator\IIterator;
  */
 class External_Schoolpro_Timetable implements External_TimetableInterface
 {
-
-    /**
-     * An instance of MSSQL
-     *
-     * @var MSSQL
-     */
-    private $db = null;
+    use External_MssqlConnector;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->setDb(MSSQL::getInstance());
+        $this->setupDatabase();
     }
 
     /**
@@ -49,7 +43,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     {
         $this->setCycleLength($campus->getTimetableDay());
 
-        $statement = $this->getDb()->prepareProcedure('sbGetTimetableDefinition');
+        $statement = $this->getConnector()->prepareStoredProcedure('sbGetTimetableDefinition');
         $statement->bindInputs([
             ['name' => 'pUserName', 'value' => 'alaress'],
             ['name' => 'pUserPass', 'value' => 'alaress'],
@@ -100,7 +94,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
             $dateObj = new Alaress_Date_Format($date, 'U');
             $dateToUse = $dateObj->getDatabaseDate();
 
-            $statement = $this->getDb()->prepareProcedure('sbGetDayNumber');
+            $statement = $this->getConnector()->prepareStoredProcedure('sbGetDayNumber');
             $statement->bindInputs([
                 ['name' => 'pUserName', 'value' => 'alaress'],
                 ['name' => 'pUserPass', 'value' => 'alaress'],
@@ -137,7 +131,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      */
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
-        $statement = $this->getDb()->prepareProcedure('sbGetPeriodNumber');
+        $statement = $this->getConnector()->prepareStoredProcedure('sbGetPeriodNumber');
         $statement->bindInputs([
             ['name' => 'pUserName', 'value' => 'alaress'],
             ['name' => 'pUserPass', 'value' => 'alaress'],
@@ -167,7 +161,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      */
     private function getStaffDayTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        $statement = $this->getDb()->prepareProcedure('sbGetStaffDayTimetable');
+        $statement = $this->getConnector()->prepareStoredProcedure('sbGetStaffDayTimetable');
         $statement->bindInputs([
             ['name' => 'pUserName', 'value' => 'alaress'],
             ['name' => 'pUserPass', 'value' => 'alaress'],
@@ -190,7 +184,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      */
     private function getStudentDayTimetable($externalUserId, $campus, $dayNumber)
     {
-        $statement = $this->getDb()->prepareProcedure('sbGetStudentDayTimetable');
+        $statement = $this->getConnector()->prepareStoredProcedure('sbGetStudentDayTimetable');
         $statement->bindInputs([
             ['name' => 'pUserName', 'value' => 'alaress'],
             ['name' => 'pUserPass', 'value' => 'alaress'],
@@ -373,25 +367,5 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     private function getCycleLength()
     {
         return $this->cycleLength;
-    }
-
-    /**
-     * Set db
-     *
-     * @param MSSQL $db
-     */
-    private function setDb(\MSSQL $db)
-    {
-        $this->db = $db;
-    }
-
-    /**
-     * Get db
-     *
-     * @return MSSQL
-     */
-    private function getDb()
-    {
-        return $this->db;
     }
 }
