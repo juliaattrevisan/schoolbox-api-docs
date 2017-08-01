@@ -8,21 +8,17 @@
  * @version     SVN: $Id$
  */
 
-class External_Schoolpro_Class implements External_ClassInterface {
+class External_Schoolpro_Class implements External_ClassInterface
+{
+    use External_MssqlConnector;
 
-	/**
-	 * An instance of MSSQL
-	 *
-	 * @var null
-	 */
-	private $db = null;
-
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->setDb(MSSQL::getInstance());
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->setupDatabase();
+    }
 
     /**
 	 * Get a list of students that are in a particular class
@@ -48,7 +44,7 @@ class External_Schoolpro_Class implements External_ClassInterface {
 				)
 			);
 
-			$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+			$result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
 
 			if ($result['success'] && count($result['result'])) {
 				foreach($result['result'] as $currentStudent) {
@@ -65,7 +61,7 @@ class External_Schoolpro_Class implements External_ClassInterface {
                         )
                     );
 
-                    $medicalResult = $this->getDb()->executeProcedure($medicalVars[0], $medicalVars[1]);
+                    $medicalResult = $this->getConnector()->executeStoredProcedure($medicalVars[0], $medicalVars[1]);
 
                     /* These arrive in a variety of formats
                      */
@@ -121,7 +117,7 @@ class External_Schoolpro_Class implements External_ClassInterface {
 			)
 		);
 
-		$result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
+		$result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
 
 		if ($result['success'] && count($result['result'])) {
 			foreach($result['result'] as $currentTeacher) {
@@ -131,25 +127,4 @@ class External_Schoolpro_Class implements External_ClassInterface {
 
 		return array_unique($allTeachers);
 	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set db
-	 *
-	 * @param null $db
-	 */
-	private function setDb($db) {
-		$this->db = $db;
-	}
-
-	/**
-	 * Get db
-	 *
-	 * @return null
-	 */
-	private function getDb() {
-		return $this->db;
-	}
-} 
+}
