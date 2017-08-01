@@ -123,7 +123,7 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
             FROM `$table`
             LEFT JOIN {$this->getJoinSql('hash', $table, 'h')}
             LEFT JOIN {$hashJoin->getJoinSql('allowedFileExtension', 'h', 'm', true)}
-            LEFT JOIN {$this->getJoinSql('owner', $table, 'u')}
+            LEFT JOIN {$this->getJoinSql('owner', $table, 'u', true)}
             LEFT JOIN {$this->getJoinSql($this->getFolderFieldname(), $table, 'c')}
         ";
     }
