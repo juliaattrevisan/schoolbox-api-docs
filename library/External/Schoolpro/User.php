@@ -40,10 +40,9 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+        $currentParent = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
-        if ($result['success'] && count($result['result'])) {
-            $currentParent = $result['result'][0];
+        if ($currentParent) {
 
             $parent = array(
                 'ContactID'        => $currentParent['ID'],
@@ -128,10 +127,9 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+        $currentStudent = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
-        if ($result['success'] && count($result['result'])) {
-            $currentStudent = $result['result'][0];
+        if ($currentStudent) {
 
             /* Get the medical data for him too
              */
@@ -144,21 +142,19 @@ class External_Schoolpro_User implements External_UserInterface
                 ]
             ];
 
-            $medicalResult = $this->getConnector()->executeStoredProcedure($medicalVars[0], $medicalVars[1])->fetchAll();
+            $medicalResult = $this->getConnector()->executeStoredProcedureIterator($medicalVars[0], $medicalVars[1]);
 
             /* These arrive in a variety of formats
              */
-            if ($medicalResult['success'] && count($medicalResult['result'])) {
-                foreach ($medicalResult['result'] as $currentCondition) {
+            foreach ($medicalResult as $currentCondition) {
 
-                    /* Only include medical issues that are Applicable == 1
-                     * Just use a basic message to hide the sensitive data,
-                     * and bust out of the loop after the first positive result
-                     */
-                    if ($currentCondition['Applicable']) {
-                        $medicalNoteStr = 'This student has medical conditions.';
-                        break;
-                    }
+                /* Only include medical issues that are Applicable == 1
+                 * Just use a basic message to hide the sensitive data,
+                 * and bust out of the loop after the first positive result
+                 */
+                if ($currentCondition['Applicable']) {
+                    $medicalNoteStr = 'This student has medical conditions.';
+                    break;
                 }
             }
 
@@ -216,10 +212,9 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+        $currentStudentContact = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
-        if ($result['success'] && count($result['result'])) {
-            $currentStudentContact = $result['result'][0];
+        if ($currentStudentContact) {
 
             $studentContact = array(
 
@@ -282,6 +277,7 @@ class External_Schoolpro_User implements External_UserInterface
      * TODO: Not specified in a stored proc
      *
      * @param null $externalUserId
+     * @return int
      */
     public function getCurrentSemester($externalUserId = null) {
         return date('m') < 6 ? 1 : 2;
@@ -311,22 +307,20 @@ class External_Schoolpro_User implements External_UserInterface
                 ]
             ];
 
-            $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+            $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
 
-            if ($result['success'] && count($result['result'])) {
-                $subjectList = array();
+            $subjectList = array();
 
-                foreach ($result['result'] as $currentSubject) {
-                    $subject = array(
-                        'code' => $currentSubject['ClassID'],
-                        'name' => $currentSubject['ItemName']
-                    );
+            foreach ($result as $currentSubject) {
+                $subject = array(
+                    'code' => $currentSubject['ClassID'],
+                    'name' => $currentSubject['ItemName']
+                );
 
-                    $subjectList[] = $subject;
-                }
-
-                return $subjectList;
+                $subjectList[] = $subject;
             }
+
+            return $subjectList;
         } else if ($user->getRole()->isStaff()) {
             $vars = [
                 'sbGetStaffSubjectList',
@@ -337,25 +331,23 @@ class External_Schoolpro_User implements External_UserInterface
                 ]
             ];
 
-            $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+            $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
 
-            if ($result['success'] && count($result['result'])) {
-                $subjectList = array();
+            $subjectList = array();
 
-                /* TODO: Make stored proc consistent with the StudentSubjectList one
-                 * Have to confer with Scoolpro to do that.
-                 */
-                foreach ($result['result'] as $currentSubject) {
-                    $subject = array(
-                        'code' => $currentSubject['ID'],
-                        'name' => $currentSubject['ItemName']
-                    );
+            /* TODO: Make stored proc consistent with the StudentSubjectList one
+             * Have to confer with Scoolpro to do that.
+             */
+            foreach ($result as $currentSubject) {
+                $subject = array(
+                    'code' => $currentSubject['ID'],
+                    'name' => $currentSubject['ItemName']
+                );
 
-                    $subjectList[] = $subject;
-                }
-
-                return $subjectList;
+                $subjectList[] = $subject;
             }
+
+            return $subjectList;
         } else {
             return [];
         }
@@ -380,19 +372,16 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+        $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
 
-        if ($result['success'] && count($result['result'])) {
-            $allStudents = array();
+        $allStudents = array();
 
-            foreach ($result['result'] as $currentStudent) {
-                $allStudents[] = ['RelatedID' => $currentStudent['RelationSchoolNum']];
-            }
-
-            return $allStudents;
+        foreach ($result as $currentStudent) {
+            $allStudents[] = ['RelatedID' => $currentStudent['RelationSchoolNum']];
         }
 
-        return false;
+        return $allStudents;
+
     }
 
     /**
@@ -471,11 +460,11 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
         /* Find the last updated datetime
          */
-        if ($result['success'] && count($result['result'])) {
+        if ($result) {
             $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
             //TODO: delete photos on rollover
@@ -487,7 +476,7 @@ class External_Schoolpro_User implements External_UserInterface
              * version, or if the cache version doesn't already exist.
              */
             $cacheTime    = @filemtime($photoPath);
-            $modifiedTime = strtotime($result['result'][0]['CaptureDate']);
+            $modifiedTime = strtotime($result['CaptureDate']);
 
             if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 $vars = [
@@ -499,11 +488,11 @@ class External_Schoolpro_User implements External_UserInterface
                     ]
                 ];
 
-                $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+                $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
                 /* Get the binary data and dump it into a file
                  */
-                if ($result['success'] && count($result['result'])) {
+                if ($result) {
 
                     /* Purge all previously transformed copies
                      */
@@ -516,7 +505,7 @@ class External_Schoolpro_User implements External_UserInterface
                     /* Save the image
                      */
                     $photoHandle = fopen($photoPath, "wb");
-                    fwrite($photoHandle, $result['result'][0]['RawData']);
+                    fwrite($photoHandle, $result['RawData']);
                     fclose($photoHandle);
                 }
             }
