@@ -48,40 +48,13 @@ class External_Schoolpro_Class implements External_ClassInterface
             $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
 
             foreach ($result as $currentStudent) {
-                $medicalNoteStr = '';
-
-                /* Get the medical data for him too
-                 */
-                $medicalResult = $this->getConnector()->executeStoredProcedureIterator(
-                    'sbGetStudentMedicalConditions',
-                    [
-                        'pUserName'  => 'alaress',
-                        'pUserPass'  => 'alaress',
-                        'pSchoolNum' => $currentStudent['ID'],
-                    ]
-                );
-
-                /* These arrive in a variety of formats
-                 */
-                foreach ($medicalResult as $currentCondition) {
-
-                    /* Only include medical issues that are Applicable == 1
-                     * Just use a basic message to hide the sensitive data,
-                     * and bust out of the loop after the first positive result
-                     */
-                    if ($currentCondition['Applicable']) {
-                        $medicalNoteStr = 'This student has medical conditions.';
-                        break;
-                    }
-                }
-
                 $student = [
                     'synergy_id'              => $currentStudent['ID'],
                     'firstname'               => $currentStudent['Firstname'],
                     'lastname'                => $currentStudent['Surname'],
                     'yearlevel '              => $currentStudent['YearLevel'],
                     'house'                   => $currentStudent['House'],
-                    'StudentMedicalAlert'     => $medicalNoteStr,
+                    'StudentMedicalAlert'     => '',
                     'StudentSpecialNeedsFlag' => '',
                     'ClassCampus'             => '',
                 ];
@@ -89,6 +62,38 @@ class External_Schoolpro_Class implements External_ClassInterface
                 $allStudents[] = $student;
             }
         }
+
+        // Move medical result to outside the result iteration
+        // Otherwise second iterator clobbers the first
+        foreach ($allStudents as &$student) {
+
+            /* Get the medical data for him too
+             */
+            $medicalResult = $this->getConnector()->executeStoredProcedureIterator(
+                'sbGetStudentMedicalConditions',
+                [
+                    'pUserName'  => 'alaress',
+                    'pUserPass'  => 'alaress',
+                    'pSchoolNum' => $student['synergy_id'],
+                ]
+            );
+
+            /* These arrive in a variety of formats
+             */
+            foreach ($medicalResult as $currentCondition) {
+
+                /* Only include medical issues that are Applicable == 1
+                 * Just use a basic message to hide the sensitive data,
+                 * and bust out of the loop after the first positive result
+                 */
+                if ($currentCondition['Applicable']) {
+                    $student['StudentMedicalAlert'] = 'This student has medical conditions.';
+                    break;
+                }
+            }
+        }
+        unset($student);
+
         return $allStudents;
     }
 
