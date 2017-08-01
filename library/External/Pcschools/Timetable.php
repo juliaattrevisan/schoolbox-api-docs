@@ -239,8 +239,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             // Order the list by sortOrder
             $order = $period['SORT_ORDER'];
             $timetable[$order]['periodName']     = $period['HEADING'];
-            $timetable[$order]['periodStart']    = $period['TIME_START'];
-            $timetable[$order]['periodEnd']      = $period['TIME_END'];
+            $timetable[$order]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
+            $timetable[$order]['periodEnd']      = sprintf('%.2f', $period['TIME_END']);
             $timetable[$order]['periodNumber']   = $order;
             $timetable[$order]['periodSequence'] = 1;
             $timetable[$order]['class']          = [];
@@ -372,8 +372,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             // Order the list by sortOrder
             $order = $period['SORT_ORDER'];
             $timetable[$order]['periodName']     = $period['HEADING'];
-            $timetable[$order]['periodStart']    = $period['TIME_START'];
-            $timetable[$order]['periodEnd']      = $period['TIME_END'];
+            $timetable[$order]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
+            $timetable[$order]['periodEnd']      = sprintf('%.2f', $period['TIME_END']);
             $timetable[$order]['periodNumber']   = $order;
             $timetable[$order]['periodSequence'] = 1;
             $timetable[$order]['day']            = array_fill(1, $dayCount, array());
