@@ -691,6 +691,9 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function setDefaultOpenSpan($defaultOpenSpan)
     {
+        if ($defaultOpenSpan < 0) {
+            throw new \DomainException("Activity Duration cannot be less than zero");
+        }
         $this->defaultOpenSpan = $defaultOpenSpan;
         return $this;
     }

@@ -26,6 +26,9 @@ var validateOptions = {
         dueTime: {
             required: true,
             timepickerTime: true
+        },
+        default_open_span: {
+            required: true,
         }
     },
     messages: {
