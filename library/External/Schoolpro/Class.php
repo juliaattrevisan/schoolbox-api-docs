@@ -102,20 +102,21 @@ class External_Schoolpro_Class implements External_ClassInterface
     public function getTeacherName($classCode)
     {
         $allTeachers = [];
+        $allClassCodes = explode(',', $classCode);
+        foreach ($allClassCodes as $currentClassCode) {
+            $vars = [
+                'sbGetTeacherName',
+                [
+                    'pUserName' => 'alaress',
+                    'pUserPass' => 'alaress',
+                    'pClassID'  => trim($currentClassCode),
+                ],
+            ];
 
-        $vars = [
-            'sbGetTeacherName',
-            [
-                'pUserName' => 'alaress',
-                'pUserPass' => 'alaress',
-                'pClassID'  => trim($classCode),
-            ],
-        ];
-
-        $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
-
-        foreach ($result as $currentTeacher) {
-            $allTeachers[] = $currentTeacher['ID'];
+            $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
+            foreach ($result as $currentTeacher) {
+                $allTeachers[] = $currentTeacher['ID'];
+            }
         }
 
         return array_unique($allTeachers);
