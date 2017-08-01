@@ -38,7 +38,18 @@ class Submission implements IStorage
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var User */
+    /**
+     * The user who actually performed the create action for this submission
+     *
+     * @var User
+     */
+    private $submittedBy;
+
+    /**
+     * The user whom this submission was created for
+     *
+     * @var User
+     */
     protected $owner;
 
     /** @var SubmissionBox */
@@ -166,6 +177,25 @@ class Submission implements IStorage
 
     /* Getters / Setters
      */
+
+    /**
+     * @return User
+     */
+    public function getSubmittedBy()
+    {
+        return $this->submittedBy;
+    }
+
+
+    /**
+     * @param User $submittedBy
+     * @return $this
+     */
+    public function setSubmittedBy(User $submittedBy)
+    {
+        $this->submittedBy = $submittedBy;
+        return $this;
+    }
 
 
     /**
