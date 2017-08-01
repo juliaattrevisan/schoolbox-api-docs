@@ -600,7 +600,7 @@ class Builder implements IBuilder
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getWhere()
     {

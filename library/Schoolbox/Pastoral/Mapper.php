@@ -525,27 +525,29 @@ class Mapper extends BaseMapper
             $pbRecordSearch = $this->getPredicateBuilder();
             $pbRecordSearch->like('pastoral.body', $words);
             $pbRecordSearch->like('pastoral.heading', $words);
+            $recordBodyAndHeadingClause = implode(' OR ', $pbRecordSearch->getWhere());
 
-            $pbRecordDeletion = $this->getPredicateBuilder();
-            $pbRecordDeletion->isNull('pastoral.deleted_at');
+            // Ensure record is not deleted
+            $recordDeletionClause = $this->getPredicateBuilder()
+                                         ->isNull('pastoral.deleted_at')
+                                         ->getWhere()[0];
 
             // Search comments
             $pbCommentSearch = $this->getPredicateBuilder();
             $pbCommentSearch->like('pastoral_comment.body', $words);
+            $commentBodyClause = implode(' OR ', $pbCommentSearch->getWhere());
 
-            $pbCommentDeletion = $this->getPredicateBuilder();
-            $pbCommentDeletion->isNull('pastoral_comment.deleted_at');
+            // Ensure comment is not deleted
+            $commentDeleteClause  = $this->getPredicateBuilder()
+                                         ->isNull('pastoral_comment.deleted_at')
+                                         ->getWhere()[0];
 
-            $recordBodyAndHeadingClause = implode(' OR ', $pbRecordSearch->getWhere());
-            $commentBodyClause          = implode(' OR ', $pbCommentSearch->getWhere());
-            $commentDeletionClause      = implode(' AND ', $pbCommentDeletion->getWhere());
-            $recordDeletionClause       = implode(' AND ', $pbRecordDeletion->getWhere());
 
             $sql = $this->getSelectString() . "
             WHERE (
                 ($recordBodyAndHeadingClause)
                 OR
-                (`pastoral`.`id` IN (SELECT `pastoral_id` FROM `pastoral_comment` WHERE ($commentBodyClause) AND $commentDeletionClause))
+                (pastoral.id IN (SELECT pastoral_id FROM pastoral_comment WHERE ($commentBodyClause) AND $commentDeleteClause))
             )
             AND $recordDeletionClause";
 
@@ -553,12 +555,7 @@ class Mapper extends BaseMapper
             $statement = $this->database->prepare($sql);
 
             // Retrieve the hydrated records
-            $statement->execute(array_merge(
-                $pbRecordSearch->getParams(),
-                $pbCommentSearch->getParams(),
-                $pbCommentDeletion->getParams(),
-                $pbRecordDeletion->getParams())
-            );
+            $statement->execute(array_merge($pbRecordSearch->getParams(), $pbCommentSearch->getParams()));
 
             $results = $this->hydrateSelect($statement);
 
