@@ -57,11 +57,6 @@ class External_Isams_Timetable implements External_TimetableInterface
         if (empty($day)) {
             // If no day number is specified, use the current one for this campus
             $day = $this->getDayNumber($campus);
-
-            // If that falls in a heap, use the default one specified in the config
-            if (empty($day)) {
-                $day = intval(Config::get('external_isams_default_day_id'));
-            }
         }
 
         $query =
@@ -76,7 +71,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             FROM V_TimetableStructure
             JOIN V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
             JOIN V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID 
-            WHERE CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}' AND DayID = {$this->database->quote($day)}
+            WHERE CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}' AND DayID = {$this->database->smartQuote($day)}
             ORDER BY DayID, CAST(StartTime AS TIME)
 	    ";
         $periods = $this->getDatabase()->getAll($query);
@@ -99,7 +94,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         $queryPeriodCount = "
             SELECT      COUNT(*) As PeriodCount 
             FROM        V_TimetableStructure 
-            WHERE       DayID = {$day}
+            WHERE       DayID = {$this->database->smartQuote($day)}
         ";
 
         $periods = $this->getDatabase()->getRow($queryPeriodCount);
@@ -121,7 +116,7 @@ class External_Isams_Timetable implements External_TimetableInterface
      *
      * @param CampusModel $campus Campus of the date we are looking at
      * @param int $date UNIX timestamp of the date we are looking at
-     * @return bool|string              Day number
+     * @return int              Day number
      */
     public function getDayNumber(CampusModel $campus, $date = 0)
     {
@@ -153,10 +148,11 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         $day = $this->getDatabase()->getRow($queryDay);
 
-        if ($day) {
+        if ($day['DayID']) {
             return $day['DayID'];
         } else {
-            return false;
+            // If that falls in a heap, use the default one specified in the config
+            return intval(Config::get('external_isams_default_day_id'));
         }
     }
 
@@ -283,7 +279,8 @@ class External_Isams_Timetable implements External_TimetableInterface
             JOIN    V_Class ON V_Class.ClassCode = V_TimetableSchedule.ClassCode
             JOIN    V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
             JOIN    V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
-            WHERE   V_TimetableStructure.PeriodID IN (SELECT PeriodID FROM V_TimetableStructure WHERE DayID = {$dayNumber}) AND     
+            WHERE   V_TimetableStructure.PeriodID IN (SELECT PeriodID FROM V_TimetableStructure WHERE DayID = {$this->database->smartQuote($dayNumber)}) AND   
+                    CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}' AND
                     (
                         V_Class.Tutor1ID = '{$this->database->quote($externalUserId)}' OR
                         V_Class.Tutor2ID = '{$this->database->quote($externalUserId)}' OR
@@ -356,14 +353,15 @@ class External_Isams_Timetable implements External_TimetableInterface
             FROM        V_TimetableSchedule
             JOIN        V_Class ON V_Class.ClassCode = V_TimetableSchedule.ClassCode
             JOIN        V_TimetableStructure ON V_TimetableStructure.PeriodID = V_TimetableSchedule.PeriodID
-	    JOIN	V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
-	    JOIN        V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
+            JOIN        V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
+            JOIN        V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
             LEFT JOIN   V_Staff ON V_Staff.StaffID = V_Class.Tutor1ID 
             WHERE       (
                             V_Class.Tutor1ID = '{$externalUserId}' OR
                             V_Class.Tutor2ID = '{$externalUserId}' OR
                             V_Class.StudentID = '{$externalUserId}'
                         )
+                        AND CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}'
             ORDER BY V_Days.intOrder, V_Periods.intOrder
         ";
 
