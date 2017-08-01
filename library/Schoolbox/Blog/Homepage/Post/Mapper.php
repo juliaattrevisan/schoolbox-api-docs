@@ -177,7 +177,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
 				{$this->getJoinColumnString('owner', 'u')},
 				{$this->getJoinColumnString('folder', 'c')}
 			FROM `{$this->getTable()}` AS `b`
-				LEFT JOIN {$this->getJoinSql('owner', 'b', 'u')}
+				LEFT JOIN {$this->getJoinSql('owner', 'b', 'u', true)}
 				INNER JOIN {$this->getJoinSql('folder', 'b', 'c')}
 			WHERE `b`.`deleted_at` IS NULL
 				AND `b`.`folder_id` = :folder_id

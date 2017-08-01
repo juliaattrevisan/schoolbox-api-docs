@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Mapper\Exception\Deleted;
 use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_PollController extends Component_Homepage_ControllerAbstract
@@ -44,7 +45,10 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             // $this->setBlock('poll_responses', 'series_separator', 'series_separator_block');
             $this->setVar('poll_responses_block', '');
 
+            $this->setBlock('poll_question', 'owner_exists', 'owner_exists_block');
+            $this->setBlock('poll_question', 'owner_deleted', 'owner_deleted_block');
             $this->setBlock('poll_question', "modify_poll", "modify_poll_block");
+
 
             $this->setVar([
                 'empty_state_block' => '',
@@ -59,6 +63,8 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
             try {
                 $author = \Schoolbox\UserMapper::getInstance()->findById($poll['created_by']);
+            } catch (Deleted $de) {
+                $author = $de->getDeletedObject();
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $author = \Schoolbox\UserMapper::getInstance()->getUnknownUser();
             }
@@ -73,6 +79,15 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                     'POLL_AUTHOR_NAME' => $author->getFullName(),
                     'POLL_CREATED' => $created->getRelativeTime(),
                 ]);
+
+                // Owner name and optional link
+                if($author->isDeleted()){
+                    $this->setVar('owner_exists_block', '');
+                    $this->parse('owner_deleted_block', 'owner_deleted');
+                } else {
+                    $this->parse('owner_exists_block', 'owner_exists');
+                    $this->setVar('owner_deleted_block', '');
+                }
 
                 $pollData = $pollHandler->getData($poll['pollID']);
 

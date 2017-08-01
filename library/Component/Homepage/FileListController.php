@@ -16,15 +16,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      */
     private $fileMapper;
 
-    /**
-     * @var AllowedFile
-     */
-    private $allowedFileHandler;
-
-    /**
-     * @var Schoolbox\UserMapper
-     */
-    private $userMapper;
 
     /**
      * Available filters for this component.
@@ -52,8 +43,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         parent::__construct($instance, $user, $sitepage);
 
         $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
-        $this->userMapper         = Schoolbox\UserMapper::getInstance();
-        $this->allowedFileHandler = new AllowedFile();
     }
 
     /**
@@ -94,7 +83,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
         $configValue = $this->getConfig('filter');
         $filter = array();
-        for ($i = 0; $i < count($this->filterFields); $i++) {
+        $countFilterFields = count($this->filterFields);
+        for ($i = 0; $i < $countFilterFields; $i++) {
             $j = $configValue % 2;
             if ($j) {
                 $filter[] = $this->filterFields[$i];
@@ -149,6 +139,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->setBlock('files', 'file_url', 'file_url_block');
             $this->setBlock('files', 'file_no_url', 'file_no_url_block');
             $this->setBlock('files', 'modify_file', 'modify_file_block');
+            $this->setBlock('files', 'owner_exists', 'owner_exists_block');
+            $this->setBlock('files', 'owner_deleted', 'owner_deleted_block');
+
 
             $this->setVar('empty_state_block', '');
 
@@ -168,7 +161,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 $this->setVar([
                     'source_folder_deleted_block' => '',
-                    'files_block' => '',
+                    'files_block'                 => '',
                 ]);
 
                 /** @var Schoolbox\Resource\File\Model[] $fileList */
@@ -179,17 +172,17 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         }
 
                         $this->setVar([
-                            'FILE_DESCRIPTION' => Scrub::text($file->getTitle()),
-                            'FILE_ID' => $file->getId(),
-                            'FILE_MIME_IMAGE' => $file->getStorage()->getMimetype()->getIconFile(),
-                            'FILE_MIME_TYPE' => $file->getStorage()->getMimetype()->getDescription(),
-                            'FILE_POSTED_BY' => $file->getOwner()->formatName(),
-                            'FILE_POSTED_BY_ID' => $file->getOwner()->getId(),
-                            'FILE_POSTED_DATE' => $file->getCreatedAt()->getShort(),
+                            'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
+                            'FILE_ID'              => $file->getId(),
+                            'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
+                            'FILE_MIME_TYPE'       => $file->getStorage()->getMimetype()->getDescription(),
+                            'FILE_POSTED_BY'       => $file->getOwner()->formatName(),
+                            'FILE_POSTED_BY_ID'    => $file->getOwner()->getId(),
+                            'FILE_POSTED_DATE'     => $file->getCreatedAt()->getShort(),
                             'FILE_POSTED_RELATIVE' => $file->getCreatedAt()->getRelativeTime(),
-                            'FILE_MODIFIED_DATE' => $file->getModifiedAt()->getRelativeTime(),
-                            'FILE_COMMENT' => nl2br(Scrub::text($file->getDescription())),
-                            'HIDDEN' => $file->isHidden() ? 'translucent' : '',
+                            'FILE_MODIFIED_DATE'   => $file->getModifiedAt()->getRelativeTime(),
+                            'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
+                            'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
                         ]);
 
                         if ($this->getConfig('compactMode')) {
@@ -198,11 +191,20 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                             ]);
                         }
 
+                        // Owner name and optional link
+                        if ($file->getOwner()->isDeleted()) {
+                            $this->setVar('owner_exists_block', '');
+                            $this->parse('owner_deleted_block', 'owner_deleted');
+                        } else {
+                            $this->parse('owner_exists_block', 'owner_exists');
+                            $this->setVar('owner_deleted_block', '');
+                        }
+
                         //set name
                         if ($file->getFilename() != "") {
                             $this->setVar([
-                                'FILE_URL' => '/send.php?id=' . $file->getId(),
-                                'FILE_TARGET' => '_blank',
+                                'FILE_URL'          => '/send.php?id=' . $file->getId(),
+                                'FILE_TARGET'       => '_blank',
                                 'file_no_url_block' => '',
                             ]);
                             $this->parse('file_url_block', 'file_url');

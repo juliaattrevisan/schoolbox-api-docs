@@ -122,7 +122,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
                     'uid' => $itemCurrent['uid'],
                     'image' => $itemCurrent['item_image'],
                     'heading' => $itemCurrent['item_heading'],
-                    'author' => "{$itemCurrent['title']} {$itemCurrent['firstname']} {$itemCurrent['lastname']}"
+                    'author' => "{$itemCurrent['title']} {$itemCurrent['firstname']} {$itemCurrent['lastname']}",
+                    'authorDeleted' => null !== $itemCurrent['u.deleted_at'],
                 ];
 
                 if (!isset($newsByTopic[$itemCurrent['newsTopicID']])) {

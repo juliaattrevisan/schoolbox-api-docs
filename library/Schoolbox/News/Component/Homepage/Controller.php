@@ -7,93 +7,65 @@
 
 namespace Schoolbox\News\Component\Homepage;
 
-use CategoryNews;
 use Component_Homepage_ControllerAbstract;
-use Schoolbox\Permission\Access\UserAccess;
 use News;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Category\NewsMapper;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * @param News $news
      */
-    protected $news;
+    private $newsItems;
 
     /**
-     * @var CategoryNews
+     * @var bool
      */
-    protected $newsHandler;
+    private $showArchive;
+
 
     /**
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    protected $source;
-
-    /**
-     * Loads the grid component into its set configuration.
-     *
-     * @return true
+     * @inheritdoc
+     * @throws \InvalidArgumentException If unable to locate Mapper class
      */
     public function execute()
     {
-        $this->newsHandler  = new CategoryNews();
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getFolderMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
+        if (false === parent::execute()) {
+            return false;
         }
+
+        /** @var NewsMapper $newsMapper */
+        $newsMapper      = $this->getMapperFactory()->get(NewsMapper::class);
+        $limit           = '0' === $this->getConfig('size') ? null : (int)$this->getConfig('size');
+        $this->newsItems = $newsMapper->findForFolder($this->getSource()->getId(), $limit);
+
+        // Check if there's any news items in the archive to conditionally show the archive link
+        $this->showArchive = $newsMapper->checkArchive($this->getSource()->getId(), $this->getUser()->getId());
 
         return true;
     }
 
+
     /**
      * @param String $templateHandle
      * @return bool
+     * @throws \Exception If something went wrong while rendering the twig and 'debug_mode' is ON
      */
     public function renderTemplate($templateHandle)
     {
-        $newsMapper = new NewsMapper();
-
-        if ($this->getContentPermission() < READ_ACCESS) {
-            $news = null;
-        } else {
-            $news = $this->newsHandler->getAllForCategory($this->source->getId(),
-                ['size' => $this->getConfig('size')]);
-        }
-
-        /**
-         * Check if there's any news items in the archive to conditionally show the archive link
-         */
-        $showArchive = $newsMapper->checkArchive($this->source->getId(), $_SESSION['id']);
-
-        $moderate =  $this->getContentPermission() >= UserAccess::ACCESS_FULL;
-        $modify =  $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
-
-        if (is_array($news)) {
-            foreach ($news as &$item) {
-                $item['posted'] = new \Alaress_Date_Format($item['posted'], \Alaress_Date_Format::TIMESTAMP);
-                $item['published'] = new \Alaress_Date_Format($item['published'], \Alaress_Date_Format::TIMESTAMP);
-            }
-        }
-
         return $this->renderTwigTemplate(
             $templateHandle,
             '@newsHomepage/component.twig',
             [
-                'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName(),
-                'news'                  => $news,
-                'modify'                => $modify,
-                'moderate'              => $moderate,
-                'code'                  => $this->source->getId(),
-                'compact'               => $this->getConfig('compactMode','value'),
-                'showArchive'           => $showArchive,
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'componentClass'      => $this->getComponentName(),
+                'news'                => $this->newsItems,
+                'modify'              => $this->hasWriteAccess(),
+                'moderate'            => $this->hasFullAccess(),
+                'code'                => $this->getSource()->getId(),
+                'compact'             => (bool)$this->getConfig('compactMode', 'value'),
+                'showArchive'         => $this->showArchive,
             ]
         );
     }

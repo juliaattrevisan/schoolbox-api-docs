@@ -84,7 +84,7 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
+        $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
 						af.description as type, inline, c.name as cat_name, c.id as cat_id
 				  FROM file f
 				  LEFT JOIN storage s on f.hash = s.hash
@@ -112,9 +112,7 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'icon-files',
                 'message' => $userHandler->formatName($row) . ' uploaded the file ' . Scrub::text($row['name']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> uploaded the file ' . $url,
+                'messageHTML' => "{$this->buildUsernameHTML($row, $row['uid'], $userHandler)} uploaded the file  $url",
                 'external_id' => $row['external_id'],
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
@@ -134,7 +132,7 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
+        $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
 				  LEFT JOIN folder c ON c.id = l.category
@@ -160,9 +158,7 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'icon-link',
                 'message' => $userHandler->formatName($row) . ' submitted the link ' . Scrub::text($row['name']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) .' submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text(
                     $row['name']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -193,10 +189,10 @@ class Feed {
         $query = "
           SELECT
               assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
-              user.title, user.firstname, user.lastname,
-              user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
+              u.title, u.firstname, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+              c.name as cat_name, c.id as cat_id
           FROM assess
-          LEFT JOIN user ON assess.user_id = user.id
+          LEFT JOIN user u ON assess.user_id = u.id
           LEFT JOIN folder c ON c.id = assess.category_id
           WHERE assess.category_id $where
           AND assess.start < NOW()
@@ -216,8 +212,7 @@ class Feed {
                 'message' => $userHandler->formatName($row)
                     . ' opened the quiz '
                     . Scrub::text( $row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row)
-                    . '</a> opened the quiz <a href="/assess/intro/' . $row['assess_id'] . '">'
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' opened the quiz <a href="/assess/intro/' . $row['assess_id'] . '">'
                     . Scrub::text($row['heading']) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name' => $userHandler->formatName($row),
@@ -247,10 +242,10 @@ class Feed {
         $query = "
           SELECT
               assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
-              user.title, user.firstname, user.lastname,
-              user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
+              u.title, u.firstname, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+              c.name as cat_name, c.id as cat_id
           FROM assess
-          LEFT JOIN user ON assess.user_id = user.id
+          LEFT JOIN user u ON assess.user_id = u.id
           LEFT JOIN folder c ON c.id = assess.category_id
           WHERE assess.category_id $where
           AND assess.start < NOW()
@@ -270,8 +265,7 @@ class Feed {
                 'message' => $userHandler->formatName($row)
                     . ' opened the survey '
                     . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row)
-                    . '</a> opened the survey <a href="/survey/intro/' . $row['assess_id'] . '">'
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' opened the survey <a href="/survey/intro/' . $row['assess_id'] . '">'
                     . Scrub::text($row['heading']) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name' => $userHandler->formatName($row),
@@ -298,7 +292,7 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
+        $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
 					FROM subject_news sn
 					JOIN user u ON owner = u.id
 					LEFT JOIN folder c ON c.id = sn.code
@@ -315,8 +309,7 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'icon-news',
                 'message' => $userHandler->formatName($row) . ' posted the news ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName( $row ) .
-                                 '</a> posted the news '. Scrub::text( $row['heading'] ),
+                'messageHTML' => "{$this->buildUsernameHTML($row, $row['uid'], $userHandler)} posted the news ". Scrub::text( $row['heading'] ),
                 'external_id' => $row['external_id'],
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
@@ -335,7 +328,7 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT c.id, c.name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, pc.name as cat_name, pc.id as cat_id
+        $query = "SELECT c.id, c.name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', pc.name as cat_name, pc.id as cat_id
 					FROM cmsLog
 					JOIN folder c ON objectId = c.id
 					JOIN user u ON user = u.id
@@ -352,9 +345,7 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'icon-folder',
                 'message' => $userHandler->formatName($row) . ' created the folder ' . Scrub::text($row['name']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
                     $row['name']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -375,7 +366,7 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
+        $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
 					FROM forumThread f
                     JOIN user u ON u.id = f.userID
                     LEFT JOIN folder c ON c.id = f.categoryID
@@ -392,9 +383,7 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'icon-forum',
                 'message' => $userHandler->formatName($row) . ' started the thread ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) .' started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text(
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -425,7 +414,7 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
+        $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
 					FROM wikiRevision r
 						JOIN wiki w ON w.wikiID = r.wikiID
 						JOIN user u ON u.id = r.userID
@@ -442,9 +431,7 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'icon-wiki',
                 'message' => $userHandler->formatName($row) . ' updated the wiki ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text(
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -473,7 +460,7 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created_at) AS submitted, c.name as cat_name, c.id as cat_id
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at', b.id AS blogID, heading, UNIX_TIMESTAMP(b.created_at) AS submitted, c.name as cat_name, c.id as cat_id
 			FROM user u
 			JOIN blog b
 			ON u.id = b.owner_id
@@ -491,9 +478,7 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'icon-blog',
                 'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) .' updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -522,7 +507,7 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, 
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
             UNIX_TIMESTAMP(bc.created_at) AS submitted, b.id AS blogID, heading, folder_id, c.name as cat_name, c.id as cat_id
 			FROM `user` u
 			JOIN blog_comment bc ON u.id = bc.owner_id
@@ -541,9 +526,7 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'icon-blog',
                 'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
+                'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
@@ -578,7 +561,20 @@ class Feed {
         return ($a['date'] > $b['date']) ? -1 : 1;
     }
 
-
+    /**
+     * Helper to consistently build a HTML of a user's name, with link if user not deleted
+     *
+     * @param array $row
+     * @param int   $userId
+     * @param User  $userHandler
+     * @return string
+     */
+    private function buildUsernameHTML($row, $userId, User $userHandler)
+    {
+        return null === $row['u.deleted_at']
+            ? sprintf('<a href="/search/user/%s">%s</a>', $userId, $userHandler->formatName($row))
+            : $userHandler->formatName($row);
+    }
 }
 
 ?>

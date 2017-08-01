@@ -567,7 +567,7 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
 				`{$this->getTable()}` `a`
 				LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
 				LEFT JOIN {$this->getJoinSql('work_type', 'a', 't')}
-				LEFT JOIN {$this->getJoinSql('user', 'a', 'u')}
+				LEFT JOIN {$this->getJoinSql('user', 'a', 'u', true)}
 			WHERE
 				`a`.`category_id` = :cat_id
 				AND ( `a`.`start` < :time OR `a`.`finish` < :time )

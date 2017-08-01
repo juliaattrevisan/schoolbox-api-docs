@@ -157,7 +157,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 {$this->getColumnString('p')},
                 {$user_mapper->getColumnString('u')}
             FROM `{$this->table}` p
-            LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
+            LEFT JOIN {$this->getJoinSql('user', 'p', 'u', true)}
             WHERE p.post_id = :postId
         ";
 
@@ -228,7 +228,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 {$this->getColumnString('p')},
                 {$user_mapper->getColumnString('u')}
             FROM `{$this->table}` p
-            LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
+            LEFT JOIN {$this->getJoinSql('user', 'p', 'u', true)}
             WHERE p.homepage_id = :homepageId
             AND p.parent_id = 0
             AND p.deleted_at IS NULL
@@ -289,7 +289,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 {$this->getColumnString('p')},
                 {$user_mapper->getColumnString('u')}
             FROM `{$this->table}` p
-            LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
+            LEFT JOIN {$this->getJoinSql('user', 'p', 'u', true)}
             WHERE p.homepage_id = :homepageId
             AND p.parent_id = 0
             AND p.deleted_at IS NULL
@@ -339,7 +339,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 {$this->getColumnString('p')},
                 {$user_mapper->getColumnString('u')}
             FROM `{$this->table}` p
-            LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
+            LEFT JOIN {$this->getJoinSql('user', 'p', 'u', true)}
             WHERE p.root_id IN {$this->getArrayPlaceholders($ids, 'val')}
             AND p.deleted_at IS NULL
             ORDER BY p.parent_id DESC, p.created_at

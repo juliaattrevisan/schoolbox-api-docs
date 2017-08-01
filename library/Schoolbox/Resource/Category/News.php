@@ -39,7 +39,7 @@ class News {
 	/** @var Folder */
 	protected $category;
 
-	/** @var int */
+	/** @var User */
 	protected $owner;
 
 

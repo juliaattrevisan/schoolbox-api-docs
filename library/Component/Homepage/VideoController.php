@@ -102,6 +102,8 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             $this->setBlock('source_folder_exists', 'video_list', 'video_list_block');
             $this->setBlock('source_folder_exists', 'video_pending_list', 'video_pending_list_block');
             $this->setBlock('source_folder_exists', 'submit_video', 'submit_video_block');
+            $this->setBlock('video_list', 'owner_exists', 'owner_exists_block');
+            $this->setBlock('video_list', 'owner_deleted', 'owner_deleted_block');
 
             $this->setVar('empty_state_block', '');
 
@@ -164,6 +166,15 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                             'VIDEO_LIST_POSTER_ID' =>   $video->getFile()->getOwner()->getId(),
                             'VIDEO_LIST_POSTER' =>      $video->getFile()->getOwner()->getFullName(),
                         ]);
+
+                        // Owner name and optional link
+                        if($video->getFile()->getOwner()->isDeleted()){
+                            $this->setVar('owner_exists_block', '');
+                            $this->parse('owner_deleted_block', 'owner_deleted');
+                        } else {
+                            $this->parse('owner_exists_block', 'owner_exists');
+                            $this->setVar('owner_deleted_block', '');
+                        }
 
                         $j++;
 

@@ -93,11 +93,11 @@ class ResourceVideoMapper extends Mapper
      * @param  array $options  sort, sortdir, mime
      * @param  bool  $limit
      *
-     * @return Collection
+     * @return Collection|ResourceVideo[]
      */
     public function findByCategory($category, $options, $limit = false)
     {
-        $videoList  = new Collection();
+        $videoList  = $this->createCollection();
         $fileMapper = Resource\File\Mapper::getInstance();
 
         $query = "
@@ -106,7 +106,7 @@ class ResourceVideoMapper extends Mapper
                       {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
             FROM      `{$this->getTable()}` vq
             JOIN      {$this->getJoinSQL('file', 'vq', 'f')}
-            LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u')}
+            LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u', true)}
             JOIN      storage s ON s.hash = f.hash
             JOIN      allowedFileExtension e ON s.ext = e.extension
             JOIN      allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID

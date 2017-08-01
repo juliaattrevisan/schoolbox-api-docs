@@ -6,8 +6,11 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Collection;
 use Schoolbox\Resource\File\Model;
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Video\ResourceVideo;
+use Schoolbox\Video\ResourceVideoMapper;
 
 class Component_Homepage_AudioController extends Component_Homepage_ControllerAbstract
 {
@@ -18,9 +21,14 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
     private $allowedFileHandler;
 
     /**
-     * @var \Schoolbox\Collection|\Schoolbox\Video\ResourceVideo[]
+     * @var Collection|ResourceVideo[]
      */
-    protected $outputList;
+    private $outputList;
+
+    /**
+     * @var ResourceVideoMapper
+     */
+    private $videoResourceMapper;
 
     /**
      * Available sort fields for this component.
@@ -33,6 +41,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
+     * @throws InvalidArgumentException If unable to locate specified mapper class
      */
     public function execute()
     {
@@ -42,7 +51,8 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             return $this->hasContextWriteAccess();
         }
 
-        $this->allowedFileHandler = new AllowedFile();
+        $this->allowedFileHandler  = new AllowedFile();
+        $this->videoResourceMapper = $this->getMapperFactory()->get(ResourceVideoMapper::class);
         return true;
     }
 
@@ -64,7 +74,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
         // There's not (yet) any default for the audio player.
         // Just use the first in the list
-        $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
         /* Sort order
          */
@@ -75,13 +84,13 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         );
 
         if ($this->getConfig('size') >= 1) {
-            $this->outputList = $videoResourceMapper->findByCategory(
+            $this->outputList = $this->videoResourceMapper->findByCategory(
                 $this->getSource()->getId(),
                 $sortConfig,
                 $this->getConfig('size')
             );
         } elseif ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByCategory($this->getSource()->getId(), $sortConfig);
+            $this->outputList = $this->videoResourceMapper->findByCategory($this->getSource()->getId(), $sortConfig);
         } else {
             $this->outputList = new \Schoolbox\Collection(array());
         }
@@ -115,6 +124,8 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
             $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
             $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
+            $this->setBlock('audio_list', 'owner_exists', 'owner_exists_block');
+            $this->setBlock('audio_list', 'owner_deleted', 'owner_deleted_block');
 
             $this->setVar([
                 'empty_state_block' => '',
@@ -162,9 +173,18 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                         'AUDIO_LIST_POSTER' => $file->getOwner()->getFullName(),
                     ]);
 
+                    // Owner name and optional link
+                    if($file->getOwner()->isDeleted()){
+                        $this->setVar('owner_exists_block', '');
+                        $this->parse('owner_deleted_block', 'owner_deleted');
+                    } else {
+                        $this->parse('owner_exists_block', 'owner_exists');
+                        $this->setVar('owner_deleted_block', '');
+                    }
+
                     $j++;
 
-                    if ($audio->getStatus() == "completed") {
+                    if ($audio->getStatus() === "completed") {
 
                         if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
                             $this->parse('audio_edit_block', 'audio_edit', true);

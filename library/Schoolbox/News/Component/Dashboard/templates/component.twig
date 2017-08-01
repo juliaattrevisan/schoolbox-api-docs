@@ -57,7 +57,13 @@
                                             {% endif %}
 
                                             <p class="meta">
-                                                Posted by <a href="/search/user/{{ item.uid }}">{{ item.author }}</a> {{ item.date.getRelativeTime }}
+                                                Posted by
+                                                {% if item.authorDeleted %}
+                                                    {{ item.author }}
+                                                {% else %}
+                                                    <a href="/search/user/{{ item.uid }}">{{ item.author }}</a>
+                                                {% endif %}
+                                                {{ item.date.getRelativeTime }}
                                             </p>
                                         </div>
                                     </div>
@@ -84,7 +90,13 @@
                                         <h3>{{ item.heading }}</h3>
                                     </a>
                                     <p class="meta">
-                                        Posted by <a href="/search/user/{{ item.uid }}">{{ item.author }}</a> {{ item.date.getRelativeTime }}
+                                        Posted by
+                                        {% if item.authorDeleted %}
+                                            {{ item.author }}
+                                        {% else %}
+                                            <a href="/search/user/{{ item.uid }}">{{ item.author }}</a>
+                                        {% endif %}
+                                        {{ item.date.getRelativeTime }}
                                     </p>
                                 </div>
                             </div>

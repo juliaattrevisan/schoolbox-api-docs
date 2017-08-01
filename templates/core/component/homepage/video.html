@@ -145,7 +145,12 @@
                                     <p class="meta">{VIDEO_LIST_DURATION}</p>
                                     <p class="meta">
                                         Posted by
+                                        <!-- BEGIN owner_exists -->
                                         <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
+                                        <!-- END owner_exists -->
+                                        <!-- BEGIN owner_deleted -->
+                                        {VIDEO_LIST_POSTER}
+                                        <!-- END owner_deleted -->
                                     </p>
                                 </div>
                             </div>
