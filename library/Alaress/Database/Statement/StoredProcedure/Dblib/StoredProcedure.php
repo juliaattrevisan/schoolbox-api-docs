@@ -9,7 +9,9 @@
 namespace Alaress\Database\Statement\StoredProcedure\Dblib;
 
 use Alaress\Database\Exception;
+use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Statement\StoredProcedure\Base;
+use DomainException;
 use PDO;
 
 /**
@@ -62,6 +64,25 @@ class StoredProcedure extends Base
         }
 
         return $return;
+    }
+
+    /**
+     * Query iteration is unable to populate return or output vars;
+     * if this query uses them, then this will raise an exception.
+     *
+     * @param array $values
+     * @return IIterator
+     * @throws DomainException if this has output or return parameters
+     */
+    public function executeIterator($values = null)
+    {
+        if (!empty($this->parameters['output']) || !empty($this->parameters['return'])) {
+            throw new DomainException(
+                'DBLib cannot retrieve output or return values for iterated procedures; '.
+                'Use `execute()` instead, or remove output and return values.'
+            );
+        }
+        return parent::executeIterator($values);
     }
 
     /**
