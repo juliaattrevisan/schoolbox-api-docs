@@ -45,9 +45,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
 
         $statement = $this->getConnector()->prepareStoredProcedure('sbGetTimetableDefinition');
         $statement->bindInputs([
-            ['name' => 'pUserName', 'value' => 'alaress'],
-            ['name' => 'pUserPass', 'value' => 'alaress'],
-            ['name' => 'pCampusID', 'value' => $campus->getExtTimetableCode()],
+            'pUserName' => 'alaress',
+            'pUserPass' => 'alaress',
+            'pCampusID' => $campus->getExtTimetableCode(),
         ]);
         $iterator = $statement->executeIterator();
 
