@@ -10,6 +10,7 @@
 
 namespace Alaress\Database\Test\Sqlsrv;
 
+use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
 use PHPUnit_Framework_TestCase;
@@ -237,6 +238,44 @@ class TestStatement extends PHPUnit_Framework_TestCase
         $this->assertEquals($message, 'No classes on this day');
         $this->assertNull($definitionDay, null);
         $this->assertEquals($result, 1);
+    }
+
+    /**
+     * Test iteration of a stored procedure with output parameters and a return value.
+     *
+     * This doesn't work under the DBLib driver, but does under the SqlSrv driver.
+     */
+    public function testStoredProcedureIteratorWithOutputParameters()
+    {
+        $this->connectSynergetic68();
+
+        // This fails under DBLib
+        if (!SqlsrvBroker::isAvailable()) {
+            $this->setExpectedException(\DomainException::class);
+        }
+
+        $result   = null;
+        $returns  = ['value' => &$result, 'type' => PDO::PARAM_INT, 'length' => 4];
+        $outputs  = [];
+        $iterator = $this->synergetic68->executeStoredProcedureIterator(
+            'uReturnValueTest',
+            [],
+            $outputs,
+            $returns
+        );
+
+        // Verify rows
+        $rows = [];
+        foreach ($iterator as $row) {
+            $rows[] = $row;
+        }
+        $this->assertCount(1, $rows);
+        $this->assertEquals(1, $rows[0]['id']);
+        $this->assertEquals('Alaress', $rows[0]['value']);
+
+        // Result is not applied until next rowset
+        $iterator->nextRowset();
+        $this->assertEquals(-5, $result);
     }
 
     /**
