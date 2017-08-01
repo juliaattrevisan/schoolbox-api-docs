@@ -45,54 +45,50 @@ class External_Schoolpro_Class implements External_ClassInterface
                 ],
             ];
 
-            $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
+            $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
 
-            if ($result['success'] && count($result['result'])) {
-                foreach ($result['result'] as $currentStudent) {
-                    $medicalNoteStr = '';
+            foreach ($result as $currentStudent) {
+                $medicalNoteStr = '';
 
-                    /* Get the medical data for him too
+                /* Get the medical data for him too
+                 */
+                $medicalVars = [
+                    'sbGetStudentMedicalConditions',
+                    [
+                        ['@pUserName', 'alaress', SQLVARCHAR, false, false, -1],
+                        ['@pUserPass', 'alaress', SQLVARCHAR, false, false, -1],
+                        ['@pSchoolNum', $currentStudent['ID'], SQLINT4, false, false, -1],
+                    ],
+                ];
+
+                $medicalResult = $this->getConnector()->executeStoredProcedureIterator($medicalVars[0], $medicalVars[1]);
+
+                /* These arrive in a variety of formats
+                 */
+                foreach ($medicalResult as $currentCondition) {
+
+                    /* Only include medical issues that are Applicable == 1
+                     * Just use a basic message to hide the sensitive data,
+                     * and bust out of the loop after the first positive result
                      */
-                    $medicalVars = [
-                        'sbGetStudentMedicalConditions',
-                        [
-                            ['@pUserName', 'alaress', SQLVARCHAR, false, false, -1],
-                            ['@pUserPass', 'alaress', SQLVARCHAR, false, false, -1],
-                            ['@pSchoolNum', $currentStudent['ID'], SQLINT4, false, false, -1],
-                        ],
-                    ];
-
-                    $medicalResult = $this->getConnector()->executeStoredProcedure($medicalVars[0], $medicalVars[1]);
-
-                    /* These arrive in a variety of formats
-                     */
-                    if ($medicalResult['success'] && count($medicalResult['result'])) {
-                        foreach ($medicalResult['result'] as $currentCondition) {
-
-                            /* Only include medical issues that are Applicable == 1
-                             * Just use a basic message to hide the sensitive data,
-                             * and bust out of the loop after the first positive result
-                             */
-                            if ($currentCondition['Applicable']) {
-                                $medicalNoteStr = 'This student has medical conditions.';
-                                break;
-                            }
-                        }
+                    if ($currentCondition['Applicable']) {
+                        $medicalNoteStr = 'This student has medical conditions.';
+                        break;
                     }
-
-                    $student = [
-                        'synergy_id'              => $currentStudent['ID'],
-                        'firstname'               => $currentStudent['Firstname'],
-                        'lastname'                => $currentStudent['Surname'],
-                        'yearlevel '              => $currentStudent['YearLevel'],
-                        'house'                   => $currentStudent['House'],
-                        'StudentMedicalAlert'     => $medicalNoteStr,
-                        'StudentSpecialNeedsFlag' => '',
-                        'ClassCampus'             => '',
-                    ];
-
-                    $allStudents[] = $student;
                 }
+
+                $student = [
+                    'synergy_id'              => $currentStudent['ID'],
+                    'firstname'               => $currentStudent['Firstname'],
+                    'lastname'                => $currentStudent['Surname'],
+                    'yearlevel '              => $currentStudent['YearLevel'],
+                    'house'                   => $currentStudent['House'],
+                    'StudentMedicalAlert'     => $medicalNoteStr,
+                    'StudentSpecialNeedsFlag' => '',
+                    'ClassCampus'             => '',
+                ];
+
+                $allStudents[] = $student;
             }
         }
         return $allStudents;
@@ -119,12 +115,10 @@ class External_Schoolpro_Class implements External_ClassInterface
             ],
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1]);
+        $result = $this->getConnector()->executeStoredProcedureIterator($vars[0], $vars[1]);
 
-        if ($result['success'] && count($result['result'])) {
-            foreach ($result['result'] as $currentTeacher) {
-                $allTeachers[] = $currentTeacher['ID'];
-            }
+        foreach ($result as $currentTeacher) {
+            $allTeachers[] = $currentTeacher['ID'];
         }
 
         return array_unique($allTeachers);
