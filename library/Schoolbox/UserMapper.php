@@ -54,7 +54,7 @@ class UserMapper extends Mapper
     protected function setup()
     {
         try {
-            $this->externalCommunityPortal = self::$di->get('externalCommunityPortal');
+            $this->externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
         } catch (ServiceNotFound $e) {
             // Hopefully we're in a test, and therefore won't try to save.
             // If we actually attempt to save a user in the middle of a test,
