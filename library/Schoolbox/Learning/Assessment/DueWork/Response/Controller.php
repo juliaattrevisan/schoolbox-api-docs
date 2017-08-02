@@ -66,6 +66,7 @@ class Controller extends Base
      * @param ErrorMapper $errorMapper
      * @param DataSource  $responseDataSource
      * @param BreadcrumbFactory $bakery
+     * @param Term\Mapper $termMapper
      */
     public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource, BreadcrumbFactory $bakery, Term\Mapper $termMapper)
     {
