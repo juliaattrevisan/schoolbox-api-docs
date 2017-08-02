@@ -298,6 +298,12 @@ class Controller extends Base\Base
         $courseSpecId = trim($this->getRequest()->post["course_spec_id"]);
         $componentId = trim($this->getRequest()->post["component_id"]);
 
+        if (!$ownerships) {
+            // verify that ownership data actually came through, not just blindly assume
+            $this->sendError('No classes specified: ensure you specified at least one destination class for import');
+            return;
+        }
+
         // build implementation objects from the specs
         $unitSpecs = $this->getUnitSpecificationMapper()->findAllByCourseId($courseSpecId);
         $unitImpls = $this->getUnitImplementationMapper()->createCollection();
