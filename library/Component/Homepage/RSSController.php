@@ -78,6 +78,9 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
             $this->setBlock('rss_stories', 'rss_brief_output', 'rss_brief_output_block');
 
+            //Clear data from previous RSS feed
+            $this->setVar('rss_stories_block', '');
+
             $title = Scrub::text($rss->getTitle());
 
             if (strlen($title)) {
