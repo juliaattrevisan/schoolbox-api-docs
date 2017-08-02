@@ -83,6 +83,16 @@ class Module extends RestfulModule
         /* Apply route permissions here as you add them to initRoutes()
          * Note that if the perms change you need to log out/log in to refresh
          */
-        $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
+
+        // Match all routes except for 'getList'
+        $this->addRoutePermission($authorizer, '^(?!getList$).*', $isSportsAdministrator);
+
+        /*
+         * This route has a JSON and HTML version.
+         * JSON is available to any logged in user, HTML is only for sports admin.
+         * We cannot detect that until the request comes in, so must handle in the controller.
+         */
+        $this->addRoutePermission($authorizer, 'getList', new Rule\IsLoggedIn());
+
     }
 }
