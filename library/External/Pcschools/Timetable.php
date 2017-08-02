@@ -168,92 +168,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a user's timetable for a specific day
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
-     * Has the structure for each period
-     * periodName
-     * periodStart
-     * periodEnd
-     * periodNumber
-     * periodSequence
-     * description
-     * code
-     * room
-     * staffID
-     * staffTitle
-     * staffFirstname
-     * staffSurname
-     *
-     * @param                  $externalUserId
-     * @param                  $userId
-     * @param Schoolbox\Campus $campus
-     * @param                  $dayNumber
-     *
-     * @return mixed
-     */
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
-    {
-        // I need to know if $userId is a teacher or student
-        try {
-            $user = $this->userMapper->findById($userId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            return [];
-        }
-
-        $studentExternalId = '';
-        $teacherExternalId = '';
-        $timePeriod        = $campus->getExtTimetableCode();
-        if ($user->getRole()->isStudent()) {
-            $studentExternalId = $user->getExternalId();
-        } elseif ($user->getRole()->isStaff()) {
-            $teacherExternalId = $user->getExternalId();
-        }
-
-        $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
-        $statement->bindInputs([
-            ['name' => 'DATE', 'value' => date('Ymd')],
-            ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
-            ['name' => 'STUDKEY', 'value' => $studentExternalId],
-            ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
-        ]);
-
-        $statement->execute();
-        $row = $statement->fetch();
-        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
-
-        // The $homeClasses definition is mostly included within dayPeriods
-        $timetable = [];
-        foreach ($dayPeriods as $period) {
-            // Order the list by sortOrder
-            $order = $period['SORT_ORDER'];
-            $timetable[$order]['periodName']     = $period['HEADING'];
-            $timetable[$order]['periodStart']    = $period['TIME_START'];
-            $timetable[$order]['periodEnd']      = $period['TIME_END'];
-            $timetable[$order]['periodNumber']   = $order;
-            $timetable[$order]['periodSequence'] = 1;
-            $timetable[$order]['class']          = [];
-        }
-        ksort($timetable);
-
-        // Add classes for each day into it
-        foreach ($dayClasses as $dayClass) {
-            $period = $dayClass['PERIOD'];
-            $code   = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
-            if ($dayNumber == $dayClass['DAY']) {
-                $timetable[$period]['class'][$code] = array(
-                    'description'        => $dayClass['DESC'],
-                    'code'               => $code,
-                    'campus'             => $timePeriod,
-                    'room'               => $dayClass['ROOM'],
-                    'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
-                );
-            }
-        }
-        return $timetable;
-    }
-
-    /**
      * Return a user's timetable for a specific date
      * This was developed as synergetic has substitutions and attendance data available in a stored proc which
      * is date dependent
@@ -300,15 +214,24 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
         $statement->bindInputs([
-            ['name' => 'DATE', 'value' => $date->getUsingFormat('Ymd')],
-            ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
-            ['name' => 'STUDKEY', 'value' => $studentExternalId],
-            ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+            'DATE' => $date->getUsingFormat('Ymd'),
+            'TIMEPERIOD' => $timePeriod,
+            'STUDKEY' => $studentExternalId,
+            'TEACHERCODE' => $teacherExternalId,
         ]);
 
         $statement->execute();
-        $row = $statement->fetch();
-        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
+
+        $dayPeriods = $statement->fetchAll();
+        $statement->nextRowset();
+        $dayClasses = $statement->fetchAll();
+        $statement->nextRowset();
+//        $homeClasses = $statement->fetchAll();
+        $statement->nextRowset();
+        $weekDays = $statement->fetchAll();
+        $statement->nextRowset();
+//        $terms = $statement->fetchAll();
+        $statement->close();
 
         // The $homeClasses definition is mostly included within dayPeriods
         $timetable = [];
@@ -316,8 +239,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             // Order the list by sortOrder
             $order = $period['SORT_ORDER'];
             $timetable[$order]['periodName']     = $period['HEADING'];
-            $timetable[$order]['periodStart']    = $period['TIME_START'];
-            $timetable[$order]['periodEnd']      = $period['TIME_END'];
+            $timetable[$order]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
+            $timetable[$order]['periodEnd']      = sprintf('%.2f', $period['TIME_END']);
             $timetable[$order]['periodNumber']   = $order;
             $timetable[$order]['periodSequence'] = 1;
             $timetable[$order]['class']          = [];
@@ -421,15 +344,24 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
         $statement->bindInputs([
-            ['name' => 'DATE', 'value' => date('Ymd')],
-            ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
-            ['name' => 'STUDKEY', 'value' => $studentExternalId],
-            ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+            'DATE' => date('Ymd'),
+            'TIMEPERIOD' => $timePeriod,
+            'STUDKEY' => $studentExternalId,
+            'TEACHERCODE' => $teacherExternalId,
         ]);
 
         $statement->execute();
-        $row = $statement->fetch();
-        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
+
+        $dayPeriods = $statement->fetchAll();
+        $statement->nextRowset();
+        $dayClasses = $statement->fetchAll();
+        $statement->nextRowset();
+//        $homeClasses = $statement->fetchAll();
+        $statement->nextRowset();
+//        $weekDays = $statement->fetchAll();
+        $statement->nextRowset();
+        $terms = $statement->fetchAll();
+        $statement->close();
 
         $term = array_shift($terms);
 
@@ -440,8 +372,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             // Order the list by sortOrder
             $order = $period['SORT_ORDER'];
             $timetable[$order]['periodName']     = $period['HEADING'];
-            $timetable[$order]['periodStart']    = $period['TIME_START'];
-            $timetable[$order]['periodEnd']      = $period['TIME_END'];
+            $timetable[$order]['periodStart']    = sprintf('%.2f', $period['TIME_START']);
+            $timetable[$order]['periodEnd']      = sprintf('%.2f', $period['TIME_END']);
             $timetable[$order]['periodNumber']   = $order;
             $timetable[$order]['periodSequence'] = 1;
             $timetable[$order]['day']            = array_fill(1, $dayCount, array());
