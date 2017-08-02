@@ -238,9 +238,10 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Reference to global DI container; lord forgive me for what I have done
      *
+     * @deprecated
      * @var Di\ContainerInterface
      */
-    protected static $di;
+    private static $di;
 
     /**
      * @param Di\ContainerInterface $di
@@ -283,6 +284,16 @@ abstract class Mapper implements IMapper, Serializable
             // relied upon in development
             self::$prop = new MockPropagator();
         }
+    }
+
+
+    /**
+     * @deprecated under pain of death DO NOT USE THIS; refactor the Mapper instead
+     * @return Di\ContainerInterface
+     */
+    protected static function getDi()
+    {
+        return static::$di;
     }
 
     /**
