@@ -60,6 +60,12 @@
         &:hover{
             background-color: $content-ui-hover;
         }
+        &:disabled, &.disabled {
+            &:hover {
+                // don't show a hover if it's disabled
+                background-color: transparent;
+            }
+        }
     }
     p{
         display: inline-block;
