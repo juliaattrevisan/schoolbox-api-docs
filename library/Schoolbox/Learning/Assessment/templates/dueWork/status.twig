@@ -203,13 +203,13 @@
     {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
 
 
-    {% spaceless %}
-        {% set buttons %}
-            {% if pAckReceipt %}<a class="button" data-sobo title="Acknowledge receipt of student submission" href="{{ pAckReceipt }}">Submission Received</a>{% endif %}
+    {% set buttons %}
+        {%- spaceless %}
+            {% if pAckReceipt %}<a class="button" data-sobo title="Acknowledge receipt of student submission" href="{{ pAckReceipt }}">Mark as Submitted</a>{% endif %}
             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{% if isDraftFeedback %}Saved as Draft{% endif %}</span>
             {% if not readonly %}<a class="button" data-draft="publish" {% if not feedback or feedback.published %}style="display:none;"{% endif %}>Publish</a>{% endif %}
-        {% endset %}
-    {% endspaceless %}
+        {% endspaceless -%}
+    {% endset %}
 
     {% include '@learningAssessment/fragments/actionBar.twig' with {
         actionStyle:  actionStyle,
@@ -359,8 +359,8 @@
                     $statusLabel = $participant.find('[data-status-label]'),
                     $toast       = $('[data-save-draft]');
 
-                $toast.toastActivate({text: 'Submitting...'});
-                $button.html('Submitting...');
+                $toast.toastActivate({text: 'Marking submission as received...'});
+                $button.html('Working...');
                 $button.attr('disabled', '');
 
                 $.post($button.attr('href'))
@@ -392,7 +392,7 @@
              */
             function soboSuccess($participant, $button, $actionBar, $statusIcon, $statusLabel, submittedLate, $toast)
             {
-                $toast.toastTimeout({text: 'Submission Acknowledged.', css: 'success'});
+                $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
                 $button.fadeOut({done: function(){
                     if(!$actionBar.is('[data-mass-publish]')){
                          $actionBar.slideUp();
@@ -417,7 +417,7 @@
             {
                 $button.html(buttonText);
                 $button.removeAttr('disabled');
-                $toast.toastTimeout({text: 'Acknowledgment failed.', css: 'alert'});
+                $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
             }
         });
     </script>
