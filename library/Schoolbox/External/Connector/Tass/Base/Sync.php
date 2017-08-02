@@ -107,6 +107,7 @@ class Sync extends Base implements ISync
             "
                 SELECT DISTINCT
                     'P' + p.par_code AS student_contact_id,
+                    f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
                     p.f_name         AS student_contact_given_name,
                     p.f_name         AS student_contact_preferred,
@@ -143,6 +144,7 @@ class Sync extends Base implements ISync
     
                 SELECT DISTINCT
                     'S' + p.par_code AS student_contact_id,
+                    f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
                     p.m_name         AS student_contact_given_name,
                     p.m_name         AS student_contact_preferred,
