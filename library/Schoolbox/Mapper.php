@@ -293,7 +293,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected static function getDi()
     {
-        return static::$di;
+        return self::$di;
     }
 
     /**
