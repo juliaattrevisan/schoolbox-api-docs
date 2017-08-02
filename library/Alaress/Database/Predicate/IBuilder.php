@@ -55,7 +55,7 @@ interface IBuilder
     /**
      * @param string $columnName
      * @param string|int|string[]|int[] $columnValue
-     * @return Ibuilder
+     * @return IBuilder
      */
     public function equals($columnName, $columnValue);
 
@@ -113,14 +113,14 @@ interface IBuilder
     /**
      * @param string     $columnName
      * @param int|string $columnValue  if string, must be datetime
-     * @return Builder
+     * @return IBuilder
      */
     public function lessThanOrEqualTo($columnName, $columnValue);
 
     /**
      * @param string     $columnName
      * @param int|string $columnValue If string, must be datetime
-     * @return Builder
+     * @return IBuilder
      */
     public function greaterThanOrEqualTo($columnName, $columnValue);
 
