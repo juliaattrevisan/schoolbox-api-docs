@@ -179,21 +179,18 @@ class UserMapper extends Mapper
      * Update password in community portal.
      *
      * @param User $model
-     * @return bool Always true
+     * @throws DomainException if community portal isn't set up at all
+     * @throws UnexpectedValueException if community portal wasn't set up properly
+     *                                  (it may be missing an encryption key or something)
      */
     public function updateCommunityPortalPassword(User $model)
     {
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            try {
-                $this->retrieveExternalCommunityPortal()->changePassword(
-                    $model->getExternalId(),
-                    $model->getRetrievablePassword()
-                );
-            } catch (\UnexpectedValueException $e) {
-                // It wasn't set up properly? noop?
-            }
+            $this->retrieveExternalCommunityPortal()->changePassword(
+                $model->getExternalId(),
+                $model->getRetrievablePassword()
+            );
         }
-        return true;
     }
 
     /**
