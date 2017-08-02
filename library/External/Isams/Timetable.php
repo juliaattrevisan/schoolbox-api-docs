@@ -342,7 +342,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         $queryTimetable = "
             SELECT 
                         V_TimetableSchedule.venue AS Room,
-                        V_TimetableSchedule.ClassCode AS Description,
+                        V_TimetableSchedule.ClassName AS Description,
                         V_Days.intOrder AS DayNumber,
                         V_Periods.intOrder AS PeriodNumber,
                         V_TimetableSchedule.ClassCode AS ClassCode,
