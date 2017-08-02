@@ -87,6 +87,7 @@ foreach ($csv as $row) {
     $event->setAuthor($creator);
     $event->setTitle($row['Bookingshortname']);
     $event->setDetail(nl2br($row['bookingdescription']));
+    $event->setType(Calendar\EventTypeMapper::getInstance()->createModel()->setId(1));
     $event->setStartDateTime(new Alaress_Date_Format($startTime));
     $event->setEndDateTime(new Alaress_Date_Format($endTime));
     // Blargh
