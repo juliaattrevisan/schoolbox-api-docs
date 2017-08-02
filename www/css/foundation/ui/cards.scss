@@ -233,10 +233,6 @@
 	&.attachment{
 		padding: 0.5rem;
 		width: calc(100% - 1rem);
-		a{
-			display: flex;
-			align-items: center;
-		}
 		img{
 			margin: 0rem 0.5rem 0 -0.25rem;
 			width: 3rem;
