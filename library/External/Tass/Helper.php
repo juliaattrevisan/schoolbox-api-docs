@@ -72,7 +72,7 @@ class External_Tass_Helper
     public function getAddNumFather()
     {
         $addnum = '';
-        $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_mother')));
+        $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_father')));
         if (strlen($addnum) < 1 ) {
             $addnum = "'5'"; // TASS default
         }
