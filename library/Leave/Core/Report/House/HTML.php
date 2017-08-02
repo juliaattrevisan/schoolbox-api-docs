@@ -86,15 +86,15 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
             foreach ($this->getHouseList() as $house) {
                 $this->getPage()->setVar(
                     array(
-                        'HOUSE_ID'   => $house->getId(),
-                        'HOUSE_NAME' => Scrub::text($house->getHouse())
+                        'HOUSE_LIST_ID'   => $house->getId(),
+                        'HOUSE_LIST_NAME' => Scrub::text($house->getHouse())
                     )
                 );
 
                 if ($house->getId() == $this->getCurrentHouse()->getId()) {
-                    $this->getPage()->setVar('HOUSE_SELECTED', 'selected="selected"');
+                    $this->getPage()->setVar('HOUSE_LIST_SELECTED', 'selected="selected"');
                 } else {
-                    $this->getPage()->setVar('HOUSE_SELECTED', '');
+                    $this->getPage()->setVar('HOUSE_LIST_SELECTED', '');
                 }
 
                 $this->getPage()->parse('house_block', 'house', true);
