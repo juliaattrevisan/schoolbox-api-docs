@@ -54,7 +54,10 @@ class UserMapper extends Mapper
     protected function setup()
     {
         try {
+            /*** Do not explode if the integrations is not configured ***/
+            set_error_handler(function () { return true; }, E_USER_WARNING);
             $this->externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
+            restore_error_handler();
         } catch (ServiceNotFound $e) {
             // Hopefully we're in a test, and therefore won't try to save.
             // If we actually attempt to save a user in the middle of a test,
