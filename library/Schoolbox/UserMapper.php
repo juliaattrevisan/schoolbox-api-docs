@@ -9,18 +9,15 @@
 
 namespace Schoolbox;
 
-use Alaress\Database\Factory as AlaressDatabaseFactory;
+use Aura\Di\Exception\ServiceNotFound;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\External\Connector\ICommunityPortal;
-use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Search\Results;
 use UnexpectedValueException;
-use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
-use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Class UserMapper
@@ -43,6 +40,30 @@ class UserMapper extends Mapper
      * @var array|null $usernameCache Maps 'username' => 'id'.
      */
     protected $usernameCache;
+
+    /**
+     * Container for an external community portal.
+     *
+     * @var ICommunityPortal
+     */
+    private $externalCommunityPortal;
+
+    /**
+     * Install external community portal connection into mapper
+     */
+    protected function setup()
+    {
+        try {
+            /*** Do not explode if the integrations is not configured ***/
+            set_error_handler(function () { return true; }, E_USER_WARNING);
+            $this->externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
+            restore_error_handler();
+        } catch (ServiceNotFound $e) {
+            // Hopefully we're in a test, and therefore won't try to save.
+            // If we actually attempt to save a user in the middle of a test,
+            // or this doesn't exist, we'll get an exception, which is fine.
+        }
+    }
 
     /**
      * Setup mapping
@@ -162,20 +183,11 @@ class UserMapper extends Mapper
     {
         /** @var User $model */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            $schoolboxFactory = new SchoolboxDatabaseFactory(new AlaressDatabaseFactory());
-            $databaseExternal = $schoolboxFactory->getExternalDatabase($this->getConfigLoader());
-
-            $externalFactory = new ExternalConnectorFactory();
-
-            /** @var ICommunityPortal $communityPortal */
-            $communityPortal = $externalFactory->build(
-                $this->getConfigLoader(),
-                $databaseExternal,
-                ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
-            );
-
             try {
-                $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
+                $this->externalCommunityPortal->changePassword(
+                    $model->getExternalId(),
+                    $model->getRetrievablePassword()
+                );
             } catch (\UnexpectedValueException $e) {
                 // It wasn't set up properly? noop?
             }
