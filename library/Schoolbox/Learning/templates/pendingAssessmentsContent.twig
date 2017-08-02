@@ -104,7 +104,7 @@
             $.post($button.attr('href'))
                 .done(function (response) {
                     soboSuccess($button, response);
-                    $toast.toastTimeout({text: 'Submission marked as received.', css: 'success'});
+                    $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
                 })
                 .fail(function () {
                     soboFailure($button, buttonText);
