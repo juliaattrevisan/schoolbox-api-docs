@@ -97,18 +97,18 @@
             var $button            = $(this),
                 buttonText         = $button.html();
 
-            $toast.toastActivate({text: 'Submitting...'});
-            $button.html('Submitting...');
+            $toast.toastActivate({text: 'Marking submission as received...'});
+            $button.html('Working...');
             $button.attr('disabled', '');
 
             $.post($button.attr('href'))
                 .done(function (response) {
                     soboSuccess($button, response);
-                    $toast.toastTimeout({text: 'Submission Acknowledged.', css: 'success'});
+                    $toast.toastTimeout({text: 'Submission marked as received.', css: 'success'});
                 })
                 .fail(function () {
                     soboFailure($button, buttonText);
-                    $toast.toastTimeout({text: 'Acknowledgment failed.', css: 'alert'});
+                    $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
                 });
         });
 
