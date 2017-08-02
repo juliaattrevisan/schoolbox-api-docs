@@ -77,6 +77,13 @@
         font-size: 0.8125rem;
         padding: 0.5rem 0.5rem 0;
     }
+    @media #{$small-only} {
+        // full-width buttons on small viewports
+        .button, button, input {
+            width: 100%;
+            text-align: right;
+        }
+    }
 }
 
 @media #{$medium-up} {
