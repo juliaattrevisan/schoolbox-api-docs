@@ -143,7 +143,7 @@ class Controller extends AbstractController
              * We must perform this auth check here, rather than the module as this route
              * is shared with a JSON version, with different auth rules.
              */
-            if (!$this->isSportsAdmin($this->getUser())) {
+            if (!$this->getUser()->isSuperuser() && !$this->isSportsAdmin($this->getUser())) {
                 throw new Forbidden();
             }
 
