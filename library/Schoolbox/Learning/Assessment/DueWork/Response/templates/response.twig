@@ -34,7 +34,10 @@ Usage:
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id, response: response }) %}
 {% set readonly    = interactionLocked and not USER.superUser %}
 
+{% if not readonly %}
 <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
+{% endif %}
+
 <script type="text/javascript">
     $(function() {
         var nextUrl = findNext(tgt);
