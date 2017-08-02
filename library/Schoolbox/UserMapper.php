@@ -139,12 +139,12 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidWebmail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateCommunityPortalPassword']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCommunityPortalPassword']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
@@ -181,7 +181,6 @@ class UserMapper extends Mapper
      */
     public function updateCommunityPortalPassword(User $model)
     {
-        /** @var User $model */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
             try {
                 $this->externalCommunityPortal->changePassword(
