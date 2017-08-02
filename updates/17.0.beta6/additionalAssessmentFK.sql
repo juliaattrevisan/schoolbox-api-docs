@@ -24,18 +24,6 @@ REFERENCES `submission_grade_group` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-
-DELETE rubric_mark FROM rubric_mark
-  LEFT JOIN `submission_box` ON submission_box_id = `submission_box`.id
-WHERE `submission_box`.id is null;
-
-ALTER TABLE `rubric_mark`
-  ADD CONSTRAINT `fk_rubric_mark_submission_box_id`
-FOREIGN KEY (`submission_box_id`)
-REFERENCES `submission_box` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
 UPDATE project
   LEFT JOIN `submission_mark_type` ON project.`mark_type_id` = `submission_mark_type`.mark_type_id
 SET project.`mark_type_id` =  (SELECT `id` FROM `submission_mark_type` WHERE slug LIKE 'none')
