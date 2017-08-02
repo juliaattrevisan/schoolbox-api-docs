@@ -238,7 +238,13 @@ class Controller extends Base
             $user
                 ->setPassword($this->passwordService->hash($password))
                 ->setRetrievablePassword($password);
-            $this->userMapper->save($user);
+
+            try {
+                $this->userMapper->save($user);
+            } catch (\UnexpectedValueException $e) {
+                // Community portal integration was misconfigured
+                $this->getSessionSegment()->setFlash('isCommunityPortalPasswordSet', false);
+            }
 
             // This reset has been used, save it
             $this->resetMapper->save($reset->setResetTime(\Alaress_Date_Format::now()));
