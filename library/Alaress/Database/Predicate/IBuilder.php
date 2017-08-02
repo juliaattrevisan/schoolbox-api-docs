@@ -55,7 +55,7 @@ interface IBuilder
     /**
      * @param string $columnName
      * @param string|int|string[]|int[] $columnValue
-     * @return Builder
+     * @return Ibuilder
      */
     public function equals($columnName, $columnValue);
 
