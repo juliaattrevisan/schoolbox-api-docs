@@ -59,10 +59,9 @@ class External_Tass_Helper
     {
         $addnum = '';
         $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_mother')));
-        if (strlen($addnum) < 1 ) {
+        if ($addnum == "''") {
             $addnum = "'4'"; // TASS default
         }
-
         return $addnum;
     }
 
@@ -73,7 +72,7 @@ class External_Tass_Helper
     {
         $addnum = '';
         $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_father')));
-        if (strlen($addnum) < 1 ) {
+        if ($addnum == "''" ) {
             $addnum = "'5'"; // TASS default
         }
 

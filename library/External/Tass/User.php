@@ -254,7 +254,6 @@ class External_Tass_User implements External_UserInterface
                       AND parent.cmpy_code = sf.cmpy_code
                   WHERE stud_code = '$tassID'
         ";
-
         $parents = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 
         foreach ($parents as $key => $parent) {
@@ -270,13 +269,12 @@ class External_Tass_User implements External_UserInterface
              */
             if ($parent['StudentContactAddressNumber'] == '1') {
                 foreach ($parents as $key2 => $parent2) {
-                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($parent2['StudentContactAddressNumber'] == $addnum_mother OR $parent2['StudentContactAddressNumber'] == $addnum_father)) {
+                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($this->getDatabase()->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_mother OR $this->getDatabase()->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_father)) {
                         unset($parents[$key]);
                     }
                 }
             }
         }
-
         return $parents;
     }
 
