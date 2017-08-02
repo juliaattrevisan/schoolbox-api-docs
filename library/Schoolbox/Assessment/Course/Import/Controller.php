@@ -212,7 +212,7 @@ class Controller extends Base\Base
     public function postClasses()
     {
         $courseSpecId = trim($this->getRequest()->post['course_spec_id']);
-        $targetFolderIds = explode(',', trim($this->getRequest()->post['import_folders']));
+        $targetFolderIds = array_filter(explode(',', trim($this->getRequest()->post['import_folders'])));
         $componentId = trim($this->getRequest()->post['component_id']);
 
         try {
