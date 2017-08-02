@@ -359,8 +359,8 @@
                     $statusLabel = $participant.find('[data-status-label]'),
                     $toast       = $('[data-save-draft]');
 
-                $toast.toastActivate({text: 'Submitting...'});
-                $button.html('Submitting...');
+                $toast.toastActivate({text: 'Submitting on behalf of student...'});
+                $button.html('Working...');
                 $button.attr('disabled', '');
 
                 $.post($button.attr('href'))
@@ -392,7 +392,7 @@
              */
             function soboSuccess($participant, $button, $actionBar, $statusIcon, $statusLabel, submittedLate, $toast)
             {
-                $toast.toastTimeout({text: 'Submission Acknowledged.', css: 'success'});
+                $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
                 $button.fadeOut({done: function(){
                     if(!$actionBar.is('[data-mass-publish]')){
                          $actionBar.slideUp();
@@ -417,7 +417,7 @@
             {
                 $button.html(buttonText);
                 $button.removeAttr('disabled');
-                $toast.toastTimeout({text: 'Acknowledgment failed.', css: 'alert'});
+                $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
             }
         });
     </script>
