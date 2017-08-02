@@ -205,7 +205,7 @@
 
     {% set buttons %}
         {%- spaceless %}
-            {% if pAckReceipt %}<a class="button" data-sobo title="Acknowledge receipt of student submission" href="{{ pAckReceipt }}">Submission Received</a>{% endif %}
+            {% if pAckReceipt %}<a class="button" data-sobo title="Acknowledge receipt of student submission" href="{{ pAckReceipt }}">Mark as Submitted</a>{% endif %}
             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen">{% if isDraftFeedback %}Saved as Draft{% endif %}</span>
             {% if not readonly %}<a class="button" data-draft="publish" {% if not feedback or feedback.published %}style="display:none;"{% endif %}>Publish</a>{% endif %}
         {% endspaceless -%}
