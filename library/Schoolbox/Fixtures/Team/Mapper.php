@@ -121,7 +121,6 @@ class Mapper extends BaseMapper
      * @param int $divisionId
      * @param string $keyword
      * @return Collection|Team[]
-     * @throws Exception
      */
     public function findByName($divisionId, $keyword)
     {
