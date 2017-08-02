@@ -10,6 +10,7 @@
 namespace Schoolbox;
 
 use Aura\Di\Exception\ServiceNotFound;
+use DomainException;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
@@ -42,27 +43,28 @@ class UserMapper extends Mapper
     protected $usernameCache;
 
     /**
-     * Container for an external community portal.
+     * Fetches the community portal out of DI on a need-to-know basis only.
      *
-     * @var ICommunityPortal
+     * @return ICommunityPortal
+     * @throws DomainException if it wasn't in the injector, or it was but wasn't an ICommunityPortal instance
      */
-    private $externalCommunityPortal;
-
-    /**
-     * Install external community portal connection into mapper
-     */
-    protected function setup()
+    protected function retrieveExternalCommunityPortal()
     {
         try {
             /*** Do not explode if the integrations is not configured ***/
             set_error_handler(function () { return true; }, E_USER_WARNING);
-            $this->externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
+            $externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
             restore_error_handler();
         } catch (ServiceNotFound $e) {
-            // Hopefully we're in a test, and therefore won't try to save.
-            // If we actually attempt to save a user in the middle of a test,
-            // or this doesn't exist, we'll get an exception, which is fine.
+            throw new DomainException('externalCommunityPortal service is not configured');
         }
+
+        if ($externalCommunityPortal instanceof ICommunityPortal) {
+            return $externalCommunityPortal;
+        }
+        throw new DomainException(
+            'externalCommunityPortal service is not an \Schoolbox\External\Connector\ICommunityPortal instance'
+        );
     }
 
     /**
@@ -183,7 +185,7 @@ class UserMapper extends Mapper
     {
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
             try {
-                $this->externalCommunityPortal->changePassword(
+                $this->retrieveExternalCommunityPortal()->changePassword(
                     $model->getExternalId(),
                     $model->getRetrievablePassword()
                 );
