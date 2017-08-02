@@ -39,15 +39,18 @@
                     {% else %}
                         Draft Feedback
                     {% endif %}
-                        by {{ currentFeedback.reviewer.fullname }}
+                    by {{ currentFeedback.reviewer.fullname }}
+                    {% if currentFeedback.response.id %}
                     <span class="pipe meta">
-                        {% if currentFeedback.published %}
-                            {{ currentFeedback.publishedAt.short }}
-                        {% else %}
-                            {{ currentFeedback.updatedAt.short }}
-                        {% endif %}
+                        {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
                     </span>
+                    {% endif %}
                 </p>
+                {% if not currentFeedback.response.id %}
+                <p class="meta">
+                    {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
+                </p>
+                {% endif %}
             {% if url %}
             </a>
             {% endif %}
