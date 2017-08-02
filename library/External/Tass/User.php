@@ -184,6 +184,8 @@ class External_Tass_User implements External_UserInterface
     {
         /* students profile should provide all parents, but only show contact info if not in a split family
          */
+        $addnum_mother = $this->helper->getAddNumMother();
+        $addnum_father = $this->helper->getAddNumFather();
         $query = "SELECT DISTINCT
                       CASE
                           WHEN (sf.sfa_num) IS NULL
@@ -210,7 +212,7 @@ class External_Tass_User implements External_UserInterface
                       pa.mobile2          AS StudentContactSpouseMobilePhone
                   FROM student
                   JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
-                  JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ('5','1')
+                  JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ($addnum_father,'1')
                   LEFT JOIN pia_sfaccess AS sf
                       ON parent.par_code = sf.par_code
                       AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
@@ -245,7 +247,7 @@ class External_Tass_User implements External_UserInterface
                       pa.mobile2          AS StudentContactSpouseMobilePhone
                   FROM student
                   JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
-                  JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ('4','1')
+                  JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ($addnum_mother,'1')
                   LEFT JOIN pia_sfaccess AS sf
                       ON parent.par_code = sf.par_code
                       AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
@@ -264,11 +266,11 @@ class External_Tass_User implements External_UserInterface
                 unset($parents[$key]);
             }
 
-            /* Fallback to add_num 1 when there is no add_num 4 or add_num 5
+            /* Fallback to add_num 1 when there is no add_num mother or add_num father
              */
             if ($parent['StudentContactAddressNumber'] == '1') {
                 foreach ($parents as $key2 => $parent2) {
-                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($parent2['StudentContactAddressNumber'] == '4' OR $parent2['StudentContactAddressNumber'] == '5')) {
+                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($parent2['StudentContactAddressNumber'] == $addnum_mother OR $parent2['StudentContactAddressNumber'] == $addnum_father)) {
                         unset($parents[$key]);
                     }
                 }
