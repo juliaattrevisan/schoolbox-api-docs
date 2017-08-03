@@ -42,6 +42,7 @@ Usage:
     $(function() {
         var nextUrl = findNext(tgt);
 
+        {% if not readonly %}
         $.fn.dynamicFeedback({
             {# Special behaviour of the Publish button on this screen
              # Publishing on this screen should be synonymous with the
@@ -58,6 +59,7 @@ Usage:
                     : '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}';
             }
         });
+        {% endif %}
 
         {# When a different response is selected from dropdown, navigate to its URL #}
         $('#response-selector').change(function(event) {
