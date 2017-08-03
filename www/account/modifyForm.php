@@ -43,7 +43,13 @@ if (isset($_POST['current_password'])) {
             $user
                 ->setRetrievablePassword($_POST['new_password'])
                 ->setPassword($passwordService->hash($_POST['new_password']));
-            $userMapper->save($user);
+            try {
+                $userMapper->save($user);
+            } catch (\UnexpectedValueException $e) {
+                // Portal integration wasn't set up properly?
+                // Warn the user, but don't stop password from getting set.
+                $redirect = '/account/modify/success/portalPasswordNotSet';
+            }
             $_SESSION['password'] = $_POST['new_password'];
         } else {
             $userHandler->logUserPasswordChange($user->getUsername(), 'change_pwd_fail', 'warn');

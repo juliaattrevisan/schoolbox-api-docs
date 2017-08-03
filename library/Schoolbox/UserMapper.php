@@ -10,6 +10,7 @@
 namespace Schoolbox;
 
 use Aura\Di\Exception\ServiceNotFound;
+use DomainException;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
@@ -42,27 +43,28 @@ class UserMapper extends Mapper
     protected $usernameCache;
 
     /**
-     * Container for an external community portal.
+     * Fetches the community portal out of DI on a need-to-know basis only.
      *
-     * @var ICommunityPortal
+     * @return ICommunityPortal
+     * @throws DomainException if it wasn't in the injector, or it was but wasn't an ICommunityPortal instance
      */
-    private $externalCommunityPortal;
-
-    /**
-     * Install external community portal connection into mapper
-     */
-    protected function setup()
+    protected function retrieveExternalCommunityPortal()
     {
         try {
             /*** Do not explode if the integrations is not configured ***/
             set_error_handler(function () { return true; }, E_USER_WARNING);
-            $this->externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
+            $externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
             restore_error_handler();
         } catch (ServiceNotFound $e) {
-            // Hopefully we're in a test, and therefore won't try to save.
-            // If we actually attempt to save a user in the middle of a test,
-            // or this doesn't exist, we'll get an exception, which is fine.
+            throw new DomainException('externalCommunityPortal service is not configured');
         }
+
+        if ($externalCommunityPortal instanceof ICommunityPortal) {
+            return $externalCommunityPortal;
+        }
+        throw new DomainException(
+            'externalCommunityPortal service is not an \Schoolbox\External\Connector\ICommunityPortal instance'
+        );
     }
 
     /**
@@ -139,12 +141,12 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidWebmail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateCommunityPortalPassword']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCommunityPortalPassword']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
@@ -177,22 +179,18 @@ class UserMapper extends Mapper
      * Update password in community portal.
      *
      * @param User $model
-     * @return bool Always true
+     * @throws DomainException if community portal isn't set up at all
+     * @throws UnexpectedValueException if community portal wasn't set up properly
+     *                                  (it may be missing an encryption key or something)
      */
     public function updateCommunityPortalPassword(User $model)
     {
-        /** @var User $model */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
-            try {
-                $this->externalCommunityPortal->changePassword(
-                    $model->getExternalId(),
-                    $model->getRetrievablePassword()
-                );
-            } catch (\UnexpectedValueException $e) {
-                // It wasn't set up properly? noop?
-            }
+            $this->retrieveExternalCommunityPortal()->changePassword(
+                $model->getExternalId(),
+                $model->getRetrievablePassword()
+            );
         }
-        return true;
     }
 
     /**
