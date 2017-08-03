@@ -36,7 +36,7 @@
         });
 
         dataCheckAllYear.change(function (e) {
-           dataCheckYear.prop('checked', $(e.target)[0].checked);
+            dataCheckYear.prop('checked', $(e.target)[0].checked);
         });
 
         {# Whenever a type checkbox is changed disable the 'Select All' box #}
@@ -86,7 +86,7 @@
             },
             value: [
                 {% for student in studentsSelected %}
-                    {'id': '{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
+                {'id': '{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
                 {% endfor %}
             ]
         });
@@ -100,7 +100,7 @@
             },
             value: [
                 {% for tag in tagsSelected %}
-                    {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
+                {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
                 {% endfor %}
             ]
         });
@@ -115,7 +115,7 @@
             },
             value: [
                 {% for author in authorsSelected %}
-                    {'id': '{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
+                {'id': '{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
                 {% endfor %}
             ]
         });
@@ -150,7 +150,7 @@
 
         {# Prior to submitting the form we need to set the hidden `order` #}
 
-        $('[data-submit]').click(function() {
+        $('[data-submit]').click(function () {
 
             var order = '';
 
@@ -240,13 +240,15 @@
                     <div class="small-12 large-6 columns">
                         <label for="datetime_after">
                             Published On Or After
-                            <input type="text"  name="after" id="datetime_after" maxlength="50" value="{{ report.afterDate.usingFormat('d/m/Y') }}" data-datepicker data-datesync-enddate="#datetime_before" />
+                            <input type="text" name="after" id="datetime_after" maxlength="50" value="{{ report.afterDate.usingFormat('d/m/Y') }}"
+                                   data-datepicker data-datesync-enddate="#datetime_before"/>
                         </label>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="item_datetime_published">
                             Published On Or Before
-                            <input type="text" name="before" id="datetime_before" maxlength="50" value="{{ report.beforeDate.usingFormat('d/m/Y') }}" data-datepicker data-datesync-startdate="#datetime_after" />
+                            <input type="text" name="before" id="datetime_before" maxlength="50" value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
+                                   data-datepicker data-datesync-startdate="#datetime_after"/>
                         </label>
                     </div>
                     <div class="small-12 columns">
@@ -267,9 +269,9 @@
                         <label for="type-all">Select All</label>
                         {% for type in types %}
                             <input data-check-type id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
-                                {% for typeSelected in report.types %}
-                                    {% if typeSelected.id == type.id %}checked{% endif %}
-                                {% endfor %}
+                                    {% for typeSelected in report.types %}
+                                        {% if typeSelected.id == type.id %}checked{% endif %}
+                                    {% endfor %}
                             >
                             <label for="type-{{ type.id }}">
                                 {{ type.name }}
@@ -314,11 +316,11 @@
                         <label for="year-all">Select All</label>
                         {% for year in years %}
                             <input data-check-year id="year-{{ year }}" name="years[]" value="{{ year }}" type="checkbox"
-                                {% for yearSelected in report.years %}
-                                    {% if yearSelected == year %}
-                                        checked
-                                    {% endif %}
-                                {% endfor %}
+                                    {% for yearSelected in report.years %}
+                                        {% if yearSelected == year %}
+                                            checked
+                                        {% endif %}
+                                    {% endfor %}
                             >
                             <label for="year-{{ year }}">{{ year }}</label>
                         {% endfor %}
@@ -389,7 +391,8 @@
                                     <div class="card small-12 wrap-down">
                                         <p>
                                             {{ locale.severity.proper }}
-                                            <span class="meta"> ({% for severity in severities %}{{ severity.name }}{% if not loop.last %}, {% endif %}{% endfor %})</span>
+                                            <span class="meta"> ({% for severity in severities %}{{ severity.name }}{% if not loop.last %}, {% endif %}{% endfor %}
+                                                )</span>
                                         </p>
                                     </div>
                                 </div>
@@ -438,7 +441,7 @@
                 </section>
             {% endif %}
 
-            <input data-submit type="submit" value="Save Report" />
+            <input data-submit type="submit" value="Save Report"/>
         </form>
     </div>
 </div>
