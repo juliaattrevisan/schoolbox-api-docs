@@ -15,14 +15,14 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Fixtures\Coach;
-use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Division;
+use Schoolbox\Fixtures\Season;
 
 /**
  * Class Mapper
- * @method Team createModel($idValue = null)
- * @method Team findById($id)
- * @method Team hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($idValue = null)
+ * @method Model findById($id)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  *
  * @package Schoolbox\Fixtures\Division
  */
@@ -34,10 +34,10 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_team');
-        $this->hasModel(Team::class);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('division_id', DivisionMapper::class, 'id', null, null, 'division', 'division');
+        $this->joins('division_id', Division\Mapper::class, 'id', null, null, 'division', 'division');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -69,7 +69,9 @@ class Mapper extends BaseMapper
         return "
             SELECT 
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('sportsfixtures_team_coach', 'coaches')}
+                {$this->getJoinColumnString('sportsfixtures_team_coach', 'coaches')},
+                {$this->getJoinColumnString('division', 'd')},
+                {$this->getJoinColumnString('division.season', 's')}
         ";
     }
 
@@ -85,6 +87,8 @@ class Mapper extends BaseMapper
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('sportsfixtures_team_coach', null, 'coaches')}
+            JOIN {$this->getJoinSql('division', null, 'd', true)}
+            JOIN {$this->getJoinSql('division.season', 'd', 's', true)}
         ";
     }
 
@@ -95,9 +99,10 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Team[] $cache */
+        /** @var Model[] $cache */
         $cache = [];
 
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
             $teamId = $r['id'];
@@ -110,6 +115,13 @@ class Mapper extends BaseMapper
                 $cache[$teamId]->getCoaches()->add($this->hydrateJoin($r, 'sportsfixtures_team_coach', 'coaches'));
             }
 
+            /** @var Division\Model $division */
+            $division = $this->hydrateJoin($r, 'division', 'd');
+            $cache[$teamId]->setDivision($division);
+
+            /** @var Season\Model $season */
+            $season = $this->hydrateJoin($r, 'division.season', 's');
+            $cache[$teamId]->getDivision()->setSeason($season);
         }
 
         return $this->createCollection($cache);
@@ -121,7 +133,7 @@ class Mapper extends BaseMapper
      *
      * @param int $divisionId
      * @param string $keyword
-     * @return Collection|Team[]
+     * @return Collection|Model[]
      */
     public function findByName($divisionId, $keyword)
     {
@@ -135,9 +147,9 @@ class Mapper extends BaseMapper
      * Delete all Players associated with this Team
      * when it's being deleted
      *
-     * @param Team $team
+     * @param Model $team
      */
-    public function deletePlayers(Team $team)
+    public function deletePlayers(Model $team)
     {
         $teamPlayerMapper = Player\Mapper::getInstance();
         $teamPlayerMapper->delete($teamPlayerMapper->findByColumn('team_id', $team->getId()));
