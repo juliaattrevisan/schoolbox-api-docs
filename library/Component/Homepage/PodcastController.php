@@ -38,12 +38,11 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
             }
         }
 
+        $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
+        $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
+        $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
+
         if ($emptyState) {
-
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
-            $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
-
             $this->setVar([
                 'podcast_block' => '',
                 'empty_read_block' => '',
@@ -109,11 +108,16 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                 }
             }
             // If there are no podcasts in the list
-            if ($j == 0) {
+            if ($j === 0) {
                 $this->setVar([
-                    'PODCAST_COMPONENT_TITLE' => 'Podcast - URL does not contain any valid audio podcasts',
-                    'podcast_list_block' => '',
+                    'PODCAST_COMPONENT_TITLE'     => 'Podcast - URL does not contain any valid audio podcasts',
+                    'podcast_list_block'          => '',
+                    'default_podcast_block'       => '',
+                    'empty_read_block'            => '',
+                    'empty_config_block'          => ''
                 ]);
+                $this->parse('empty_invalid_block', 'empty_invalid');
+                $this->parse('empty_state_block', 'empty_state');
             }
 
             $this->parse('podcast_block', 'podcast');
