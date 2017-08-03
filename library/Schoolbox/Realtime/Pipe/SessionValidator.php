@@ -70,7 +70,10 @@ class SessionValidator
             if (empty($this->userIdCache[$username])) {
                 // *sigh*
                 $id = (int)$this->database
-                    ->executeQuery('SELECT `id` FROM `user` WHERE `username` = ? LIMIT 0, 1', [ $username ])
+                    ->executeQuery(
+                        'SELECT `id` FROM `user` WHERE `username` = :username LIMIT 0, 1',
+                        [ 'username' => $username ]
+                    )
                     ->fetchColumn()
                 ;
 
