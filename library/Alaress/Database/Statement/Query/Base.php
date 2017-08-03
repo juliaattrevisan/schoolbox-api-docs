@@ -53,6 +53,17 @@ class Base extends BaseStatement
 
         foreach ($values as $key => $value) {
 
+            // Numeric keys (for non-named parameters, i.e. ?) need to be mangled here.
+            // * PDOStatement::execute($params) expects a 0-indexed array
+            // * PDOStatement::bindValue($param, $value) expects $param to be 1-indexed
+            // This method was called with the expectation of 0-indexes (as $params was passed directly),
+            // but it requires 1-indexes, as each param is bound separately.
+            // It's tempting to just ban non-named parameters,
+            // but they are more concise than named ones if you just want to pass a single param.
+            if (preg_match('/^\\d+$/', $key)) {
+                ++$key;
+            }
+
             // Inputs could in a simple key/value pair, or could be in a key/array pair (which contains the
             // optional value/type/length keys). Probably makes more sense with an example...
             //
