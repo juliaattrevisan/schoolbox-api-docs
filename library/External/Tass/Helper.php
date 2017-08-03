@@ -55,6 +55,33 @@ class External_Tass_Helper
     /**
      * @return string
      */
+    public function getAddNumMother()
+    {
+        $addnum = '';
+        $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_mother')));
+        if ($addnum == "''") {
+            $addnum = "'4'"; // TASS default
+        }
+        return $addnum;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAddNumFather()
+    {
+        $addnum = '';
+        $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_father')));
+        if ($addnum == "''" ) {
+            $addnum = "'5'"; // TASS default
+        }
+
+        return $addnum;
+    }
+
+    /**
+     * @return string
+     */
     public function getTypeCode()
     {
         $typecode = '';
