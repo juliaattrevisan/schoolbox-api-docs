@@ -16,7 +16,7 @@ VALUES (
         'external_tass_addnum_father',
         '5',
         'TASS Address Number for Father',
-        'Address Number (add_num) block IDs to use for the Mother in TASS E.g. 5',
+        'Address Number (add_num) block IDs to use for the Father in TASS E.g. 5',
         '1',
         '',
         '7',
