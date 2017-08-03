@@ -67,32 +67,25 @@ class Module extends RestfulModule
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException If any sub-rules to composite do not implement IAuthorizationRule
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
-
-        /* Permissions requirements for being a Sports Administrator
-         */
-        $isSportsAdministrator = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE)
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $canMutateTeams = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\HasServicePermission(
+                    UserAccess::SERVICE_SPORTS_ADMINISTRATOR,
+                    UserAccess::ACCESS_WRITE
+                )
             )
         );
 
-        /* Apply route permissions here as you add them to initRoutes()
-         * Note that if the perms change you need to log out/log in to refresh
-         */
+        // Match all routes except for 'getList' and 'getEntity'
+        $this->addRoutePermission($authorizer, '(?!(getList|getEntity)$).*', $canMutateTeams);
 
-        // Match all routes except for 'getList'
-        $this->addRoutePermission($authorizer, '(?!getList$).*', $isSportsAdministrator);
-
-        /*
-         * This route has a JSON and HTML version.
-         * JSON is available to any logged in user, HTML is only for sports admin.
-         * We cannot detect that until the request comes in, so must handle in the controller.
-         */
-        $this->addRoutePermission($authorizer, 'getList', new Rule\IsLoggedIn());
-
+        // Any logged in user can see a list of teams (whether AJAX JSON or HTML page), or team details
+        $this->addRoutePermission($authorizer, 'getList|getEntity', new Rule\IsLoggedIn());
     }
 }
