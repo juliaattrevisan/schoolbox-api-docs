@@ -127,15 +127,27 @@
                                         <div class="list-item">
                                             <div class="card compact small-12">
                                             <span class="icon-team"></span>
-                                                <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}">{{ team.name }}</a>
-                                                {% if team.coaches | length %}
-                                                    | <span class="meta">({{ team.coaches | column('name') | join(', ') }})</span>
+                                                {% set routeModifyTeam = routeLookupIfAuthorized('sportsfixturesTeam.getModifyForm', {
+                                                    entityId: team.id,
+                                                    entity:   team,
+                                                }) %}
+                                                {% if routeModifyTeam %}
+                                                    <a href="{{ routeModifyTeam }}">{{ team.name }}</a>
+                                                    {% if team.coaches | length %}
+                                                        | <span class="meta">({{ team.coaches | column('name') | join(', ') }})</span>
+                                                    {% endif %}
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <nav>
-                                            <a href="{{ routeLookup('sportsfixturesTeam.deleteEntity', {entityId: team.id}) }}" class="icon-delete" title="Delete Team" data-delete-team="{{ team.id }}"></a>
-                                        </nav>
+                                        {% set routeDeleteTeam = routeLookupIfAuthorized('sportsfixturesTeam.deleteEntity', {
+                                            entityId: team.id,
+                                            entity:   team
+                                        }) %}
+                                        {% if routeDeleteTeam %}
+                                            <nav>
+                                                <a href="{{ routeDeleteTeam }}" class="icon-delete" title="Delete Team" data-delete-team="{{ team.id }}"></a>
+                                            </nav>
+                                        {% endif %}
                                     </div>
                                 </li>
                             {% endfor %}

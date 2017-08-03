@@ -54,7 +54,7 @@
             </div>
             {% set routeCreateTeam = routeLookupIfAuthorized('sportsfixturesTeam.getCreateForm', {
                 contextId: division.id,
-                season:    division.season
+                context:   division
             }) %}
             {% if routeCreateTeam %}
             <nav>
@@ -77,12 +77,12 @@
 
                     {% set routeModifyTeam = routeLookupIfAuthorized('sportsfixturesTeam.getModifyForm', {
                         entityId: currentTeam.id,
-                        season:   division.season
+                        entity:   currentTeam
                     }) %}
 
                     {% set routeDeleteTeam = routeLookupIfAuthorized('sportsfixturesTeam.deleteEntity', {
                         entityId: currentTeam.id,
-                        season:   division.season
+                        entity:   currentTeam
                     }) %}
 
                     {% if routeModifyTeam or routeDeleteTeam %}
@@ -109,10 +109,6 @@
         <div class="empty-state">
             <i class="icon-team"></i>
             <p>There are no Teams in {{ division.name }}.</p>
-            {% set routeCreateTeam = routeLookupIfAuthorized('sportsfixturesTeam.getCreateForm', {
-                entityId: currentTeam.id,
-                season:   division.season
-            }) %}
             {% if routeCreateTeam %}
             <p><a href="{{ routeCreateTeam }}" title="Add a Team">Add a Team</a></p>
             {% endif %}
