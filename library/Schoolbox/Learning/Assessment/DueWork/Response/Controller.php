@@ -66,6 +66,7 @@ class Controller extends Base
      * @param ErrorMapper $errorMapper
      * @param DataSource  $responseDataSource
      * @param BreadcrumbFactory $bakery
+     * @param Term\Mapper $termMapper
      */
     public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource, BreadcrumbFactory $bakery, Term\Mapper $termMapper)
     {
@@ -85,14 +86,14 @@ class Controller extends Base
      *
      * I can't call it getResponse() lol wups
      *
-     * @param IAssessable $assessment
+     * @param DueWork $assessment
      * @param Participant $participant
      * @param Submission $response
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      * @throws \InvalidArgumentException If assessment due date is null.
      */
-    public function getParticularResponse(IAssessable $assessment, Participant $participant, Submission $response = null)
+    public function getParticularResponse(DueWork $assessment, Participant $participant, Submission $response = null)
     {
         /* Module doesn't have access to $this->getUser()
          *
@@ -180,20 +181,18 @@ class Controller extends Base
                 'interactionLocked' => $isInteractionLocked,
             ];
 
-            if($assessment instanceof DueWork){
-                /* Rubrics data
-                */
-                $rubricMapper = RubricMapper::getInstance();
-                if($assessment->getUseRubric()){
-                    $assessment->setRubric($rubricMapper->findByDueWork($assessment));
-                }
-                $rubricContext = new RubricContext($rubricMapper);
-
-                // Should rubric be readonly or markable?
-                $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
-                    ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
-                    : $rubricContext->generateMarkable($assessment, $participant->getUser());
+            /* Rubrics data
+            */
+            $rubricMapper = RubricMapper::getInstance();
+            if($assessment->getUseRubric()){
+                $assessment->setRubric($rubricMapper->findByDueWork($assessment));
             }
+            $rubricContext = new RubricContext($rubricMapper);
+
+            // Should rubric be readonly or markable?
+            $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
+                ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
+                : $rubricContext->generateMarkable($assessment, $participant->getUser());
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/response.twig', $data));
         }
