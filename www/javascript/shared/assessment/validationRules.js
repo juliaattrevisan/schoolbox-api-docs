@@ -27,9 +27,6 @@ var validateOptions = {
             required: true,
             timepickerTime: true
         },
-        default_open_span: {
-            required: true,
-        }
     },
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater'
