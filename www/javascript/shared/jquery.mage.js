@@ -247,6 +247,9 @@
 
         $e.closest('[data-mage-collapsed]').slideUp(slideSlow, function () {
 
+            // hide any previous errors
+            $(this).find('[data-mage-error]').hide();
+
             // at this point you might think "wait what??" - what we're doing is hiding the overall
             // wrapper of this content, but preparing the content for the next time it's displayed
             $e.closest('[data-mage-submitrow]').show();

@@ -212,7 +212,7 @@ class Controller extends Base\Base
     public function postClasses()
     {
         $courseSpecId = trim($this->getRequest()->post['course_spec_id']);
-        $targetFolderIds = explode(',', trim($this->getRequest()->post['import_folders']));
+        $targetFolderIds = array_filter(explode(',', trim($this->getRequest()->post['import_folders'])));
         $componentId = trim($this->getRequest()->post['component_id']);
 
         try {
@@ -297,6 +297,12 @@ class Controller extends Base\Base
         $ownerships = $this->getRequest()->post["ownership"];
         $courseSpecId = trim($this->getRequest()->post["course_spec_id"]);
         $componentId = trim($this->getRequest()->post["component_id"]);
+
+        if (!$ownerships) {
+            // verify that ownership data actually came through, not just blindly assume
+            $this->sendError('No classes specified: ensure you specified at least one destination class for import');
+            return;
+        }
 
         // build implementation objects from the specs
         $unitSpecs = $this->getUnitSpecificationMapper()->findAllByCourseId($courseSpecId);
