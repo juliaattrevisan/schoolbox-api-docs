@@ -19,12 +19,14 @@
  *    '{_}`
  */
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
+use Schoolbox\Database\Factory as DatabaseFactory;
 
 class External_Isams_User implements External_UserInterface
 {
-    /** @var MSSQL */
+    /** @var IConnector */
     private $database;
 
     /** @var Group $groupHandler */
@@ -37,7 +39,7 @@ class External_Isams_User implements External_UserInterface
     public function __construct()
     {
         $this->setConfigMapper(ConfigMapper::getInstance());
-        $this->setDatabase(MSSQL::getInstance());
+        $this->setDatabase(DatabaseFactory::getInstanceExternal());
         $this->setGroup(new Group());
     }
 
@@ -90,11 +92,11 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS SpouseMobilePhone,
                         1                             AS SpouseDirectoryIncludeFlag
             FROM        V_Student
-            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = '{$this->database->quote($externalUserId)}'
-            WHERE       V_Student.StudentID = '{$this->database->quote($externalUserId)}'
+            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = '{$this->database->quoteIdentifier($externalUserId)}'
+            WHERE       V_Student.StudentID = '{$this->database->quoteIdentifier($externalUserId)}'
         ";
 
-        $parent = $this->getDatabase()->getRow($query);
+        $parent = $this->getDatabase()->executeQuery($query)->fetch();
 
         return $parent;
     }
@@ -117,7 +119,7 @@ class External_Isams_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = [];
-        $id_list = implode(',', array_map([$this->database, 'smartQuote'], $synergyIds));
+        $id_list = implode(',', array_map([$this->database, 'quoteIdentifier'], $synergyIds));
 
         if (empty($id_list)) {
             return [];
@@ -131,9 +133,9 @@ class External_Isams_User implements External_UserInterface
             AND V_Parent.CISEmail <> ''
         ";
 
-        $this->getDatabase()->query($query);
+        $data = $this->getDatabase()->executeQuery($query);
 
-        while ($row = $this->getDatabase()->getNextArray()) {
+        while ($row = $data->fetch()) {
             if (!isset($emailList[$row['ParentID']])) {
                 $emailList[$row['ParentID']] = $row['CISEmail'];
             }
@@ -178,10 +180,10 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentBoarder,
                         0 AS countIndividualEducationPlans
             FROM        V_Student
-            WHERE       StudentID = '{$this->database->quote($externalUserId)}'
+            WHERE       StudentID = '{$this->database->quoteIdentifier($externalUserId)}'
         ";
 
-        return $this->getDatabase()->getRow($query);
+        return $this->getDatabase()->executeQuery($query)->fetch();
     }
 
     /**
@@ -203,10 +205,10 @@ class External_Isams_User implements External_UserInterface
                             ''                  AS StaffDepartment,
                             ''                  AS StaffVoiceMail
             FROM            V_Staff
-            WHERE           StaffID = '{$this->database->quote($externalUserId)}'
+            WHERE           StaffID = '{$this->database->quoteIdentifier($externalUserId)}'
         ";
 
-        return $this->getDatabase()->getRow($staff);
+        return $this->getDatabase()->executeQuery($staff)->fetch();
     }
 
     /**
@@ -275,12 +277,12 @@ class External_Isams_User implements External_UserInterface
         ";
 
         if (!empty($yearlevel)) {
-            $query .= "WHERE V_Student.Grade = '{$this->getDatabase()->quote($yearlevel)}'";
+            $query .= "WHERE V_Student.Grade = '{$this->getDatabase()->quoteIdentifier($yearlevel)}'";
         }
 
         $query .= " ORDER BY StudentSurname, StudentGiven1, StudentID";
 
-        return $this->getDatabase()->getAll($query) ?: [];
+        return $this->getDatabase()->executeQuery($query)->fetchAll()  ?: [];
     }
 
     /**
@@ -318,10 +320,10 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
             JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
-            WHERE       V_Student.StudentID = '{$this->database->quote($externalUserId)}'
+            WHERE       V_Student.StudentID = '{$this->database->quoteIdentifier($externalUserId)}'
         ";
 
-        return $this->getDatabase()->getAll($query) ?: [];
+        return $this->getDatabase()->executeQuery($query)->fetchAll() ?: [];
     }
 
     /**
@@ -354,7 +356,7 @@ class External_Isams_User implements External_UserInterface
      */
     public function getSubjectList(User $user)
     {
-        $externalId =  $this->getDatabase()->smartQuote($user->getExternalId());
+        $externalId =  $this->getDatabase()->quoteIdentifier($user->getExternalId());
 
         $sql =
             "
@@ -365,10 +367,10 @@ class External_Isams_User implements External_UserInterface
                             V_Class.Tutor2ID = $externalId
         ";
 
-        $this->getDatabase()->query($sql);
+        $data = $this->getDatabase()->executeQuery($sql);
         $subjectList = [];
 
-        while ($subject = $this->getDatabase()->getNextArray()) {
+        while ($subject = $data->fetch()) {
             $subjectList[] = array(
                 'code' => $subject['code'],
                 'name' => $subject['code'],
@@ -390,10 +392,10 @@ class External_Isams_User implements External_UserInterface
         $query = "
             SELECT    StudentID AS RelatedID
             FROM      V_Parent   
-            WHERE     V_Parent.ParentID = '{$this->database->quote($externalUserId)}'
+            WHERE     V_Parent.ParentID = '{$this->database->quoteIdentifier($externalUserId)}'
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->getDatabase()->executeQuery($query)->fetchAll();
     }
 
     /**
@@ -407,10 +409,10 @@ class External_Isams_User implements External_UserInterface
             "
           SELECT  V_Parent.CISEmail 
           FROM    V_Parent 
-          WHERE   V_Parent.ParentID = '{$this->database->quote($id)}'
+          WHERE   V_Parent.ParentID = '{$this->database->quoteIdentifier($id)}'
         ";
 
-        return $this->getDatabase()->getOne($query);
+        return $this->getDatabase()->executeQuery($query)->fetch();
     }
 
     /**
@@ -437,7 +439,7 @@ class External_Isams_User implements External_UserInterface
             FROM        V_Student
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->getDatabase()->executeQuery($query)->fetchAll();
     }
 
     /**
@@ -468,7 +470,7 @@ class External_Isams_User implements External_UserInterface
             LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = V_Student.StudentID
         ";
 
-        return $this->getDatabase()->getAll($query) ?: [];
+        return $this->getDatabase()->executeQuery($query)->fetchAll() ?: [];
     }
 
 
@@ -497,7 +499,7 @@ class External_Isams_User implements External_UserInterface
             ORDER BY    teacherlastname, PreferredName
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->getDatabase()->executeQuery($query)->fetchAll();
 
     }
 
@@ -542,7 +544,7 @@ class External_Isams_User implements External_UserInterface
             ORDER BY    teacherlastname, PreferredName
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->getDatabase()->executeQuery($query)->fetchAll();
     }
 
     /**
@@ -597,7 +599,9 @@ class External_Isams_User implements External_UserInterface
       */
 
     /**
-     * @param $database
+     * Set database
+     *
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {
@@ -605,7 +609,9 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * @return MSSQL
+     * Get database
+     *
+     * @return IConnector
      */
     private function getDatabase()
     {
