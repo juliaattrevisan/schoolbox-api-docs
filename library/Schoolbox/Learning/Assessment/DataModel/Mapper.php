@@ -149,6 +149,7 @@ class Mapper extends BaseMapper
 
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'validateOpenSpan'));
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCurriculumNodes']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
@@ -955,5 +956,17 @@ class Mapper extends BaseMapper
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
         $assessment->setSequence($statement->fetch(\PDO::FETCH_COLUMN));
+    }
+
+    /**
+     * Pre-save callback.
+     *
+     * @param Model $assessment
+     */
+    protected function validateOpenSpan(Model $assessment)
+    {
+        if ($assessment->getDefaultOpenSpan() < 0) {
+            throw new \DomainException("Activity Duration cannot be less than zero");
+        }
     }
 }
