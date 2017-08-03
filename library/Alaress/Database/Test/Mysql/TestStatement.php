@@ -97,8 +97,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
     {
         // Test a second positional parameter, to ensure they're positioned appropriately
         $statement = $this->schoolbox->executeQuery(
-            'SELECT `lastname` FROM `user` WHERE `lastname` = ? AND `lastname` != ?',
-            ['rhodes', 'notrhodes']
+            'SELECT `firstname`, `lastname` FROM `user` WHERE `lastname` = ? AND `firstname` = ?',
+            ['rhodes', 'rachel']
         );
 
         $count = 0;
@@ -106,9 +106,10 @@ class TestStatement extends PHPUnit_Framework_TestCase
         while ($row = $statement->fetch()) {
             $count++;
             $this->assertSame(strtolower($row['lastname']), 'rhodes');
+            $this->assertSame(strtolower($row['firstname']), 'rachel');
         }
 
-        $this->assertGreaterThan(1, $count);
+        $this->assertEquals(1, $count);
     }
 
     /**
