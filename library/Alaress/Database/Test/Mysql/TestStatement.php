@@ -19,12 +19,18 @@ class TestStatement extends PHPUnit_Framework_TestCase
     use TestConnectorTrait;
 
     /**
+     * Set up Schoolbox DB
+     */
+    public function setUp()
+    {
+        $this->connectSchoolbox();
+    }
+
+    /**
      * Test fetch with concise preparation and binding
      */
     public function testStatementWithConciseBinding()
     {
-        $this->connectSchoolbox();
-
         $statement = $this->schoolbox->prepareQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname');
         $statement->bindInputs(['lastname' => 'rhodes']);
         $statement->execute();
@@ -45,8 +51,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementWithVerboseBinding()
     {
-        $this->connectSchoolbox();
-
         $statement = $this->schoolbox->prepareQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname');
         $statement->bindInputs([
             'lastname' => [
@@ -72,8 +76,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementWithNamedParameters()
     {
-        $this->connectSchoolbox();
-
         $statement = $this->schoolbox->executeQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'rhodes']
         );
@@ -93,8 +95,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementWithPositionalParameters()
     {
-        $this->connectSchoolbox();
-
         // Test a second positional parameter, to ensure they're positioned appropriately
         $statement = $this->schoolbox->executeQuery(
             'SELECT `lastname` FROM `user` WHERE `lastname` = ? AND `lastname` != ?',
@@ -116,8 +116,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementIterator()
     {
-        $this->connectSchoolbox();
-
         $iterator = $this->schoolbox->executeQueryIterator(
             'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
@@ -146,8 +144,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementFetchColumn()
     {
-        $this->connectSchoolbox();
-
         $statement = $this->schoolbox->executeQuery(
             'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
@@ -165,8 +161,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementFetchColumnArray()
     {
-        $this->connectSchoolbox();
-
         $statement = $this->schoolbox->executeQuery(
             'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
@@ -186,8 +180,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementFetchRowArray()
     {
-        $this->connectSchoolbox();
-
         $statement = $this->schoolbox->executeQuery(
             'SELECT `id`, `firstname`, `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
@@ -222,12 +214,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testFunctionCall()
     {
-        $this->connectSchoolbox();
-
-        // ----------------------------------------------------------------------------------------------------------------
-        // Test function call
-        // ----------------------------------------------------------------------------------------------------------------
-
         $function = $this->schoolbox->executeFunctionCall('testFunction', [
             'input' => 'Got Milk?'
         ]);
