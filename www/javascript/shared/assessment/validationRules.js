@@ -26,7 +26,7 @@ var validateOptions = {
         dueTime: {
             required: true,
             timepickerTime: true
-        }
+        },
     },
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater'
