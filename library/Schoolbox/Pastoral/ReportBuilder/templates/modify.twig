@@ -147,6 +147,35 @@
                 'years[]': 'You must select at least one year level to show in the report'
             }
         });
+
+        {# Prior to submitting the form we need to set the hidden `order` #}
+
+        $('[data-submit]').click(function() {
+
+            var order = '';
+
+            {# Iterate each item in the sort order drag-drop sortable #}
+
+            $('#sort-order').children('li').each(function (d) {
+
+                {# Add the current column to a CSV string #}
+
+                if (order !== '') {
+                    order += ',';
+                }
+
+                order += $(this).data('order');
+            });
+
+            {# Just in case something has gone wrong and there was no order- we set the default #}
+
+            if (order === '') {
+                order = 'student,date,category,author,points,year,severity';
+            }
+
+            $('#order').val(order);
+        });
+
     });
 
 </script>
@@ -409,7 +438,7 @@
                 </section>
             {% endif %}
 
-            <input type="submit" value="Save Report" />
+            <input data-submit type="submit" value="Save Report" />
         </form>
     </div>
 </div>
