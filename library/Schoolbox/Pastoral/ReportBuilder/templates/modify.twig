@@ -17,6 +17,7 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
+<!--suppress JSValidateTypes -->
 <script type="text/javascript">
 
     $(function () {
@@ -44,7 +45,7 @@
         {# Dynamically decide when all checkboxes are selected while you're ticking boxes #}
 
         dataCheckType.change(function () {
-            if ($('[data-check-type]:checked').length == dataCheckType.length) {
+            if ($('[data-check-type]:checked').length === dataCheckType.length) {
                 dataCheckAllType.prop('checked', true);
             }
             else {
@@ -55,7 +56,7 @@
         {# Dynamically decide when all checkboxes are selected while you're ticking boxes #}
 
         dataCheckYear.change(function () {
-            if ($('[data-check-year]:checked').length == dataCheckYear.length) {
+            if ($('[data-check-year]:checked').length === dataCheckYear.length) {
                 dataCheckAllYear.prop('checked', true);
             }
             else {
@@ -66,11 +67,11 @@
         {# If we are changing report criteria this will tick the 'Select All' box if every type was selected;
          # this occurs upon page load
          #}
-        if ($('[data-check-type]:checked').length == dataCheckType.length) {
+        if ($('[data-check-type]:checked').length === dataCheckType.length) {
             dataCheckAllType.prop('checked', true);
         }
 
-        if ($('[data-check-year]:checked').length == dataCheckYear.length) {
+        if ($('[data-check-year]:checked').length === dataCheckYear.length) {
             dataCheckAllYear.prop('checked', true);
         }
 
@@ -156,7 +157,7 @@
 
             {# Iterate each item in the sort order drag-drop sortable #}
 
-            $('#sort-order').children('li').each(function (d) {
+            $('#sort-order').children('li').each(function () {
 
                 {# Add the current column to a CSV string #}
 
@@ -199,7 +200,7 @@
                     <div class="small-12 columns">
                         <label for="name">
                             Report Name
-                            <input id="name" type="text" name="name" value="{{ report.name }}"/>
+                            <input id="name" name="name" value="{{ report.name }}"/>
                         </label>
                         <div class="checklist">
                             <input id="dashboard" name="dashboard" value="1" type="checkbox" {% if report.dashboard %}checked{% endif %}>
@@ -217,10 +218,12 @@
                     <div class="small-12 columns">
                         <label>
                             Filter By Student
+                            <!--suppress HtmlUnknownAttribute -->
                             <select id="filterStudents" name="students[]" multiple placeholder="Select Students"></select>
                         </label>
                         <label>
                             Filter By Author
+                            <!--suppress HtmlUnknownAttribute -->
                             <select id="filterAuthors" name="authors[]" multiple placeholder="Select Authors"></select>
                         </label>
                         {% if severities | length %}
@@ -240,20 +243,21 @@
                     <div class="small-12 large-6 columns">
                         <label for="datetime_after">
                             Published On Or After
-                            <input type="text" name="after" id="datetime_after" maxlength="50" value="{{ report.afterDate.usingFormat('d/m/Y') }}"
+                            <input name="after" id="datetime_after" maxlength="50" value="{{ report.afterDate.usingFormat('d/m/Y') }}"
                                    data-datepicker data-datesync-enddate="#datetime_before"/>
                         </label>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="item_datetime_published">
                             Published On Or Before
-                            <input type="text" name="before" id="datetime_before" maxlength="50" value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
+                            <input name="before" id="datetime_before" maxlength="50" value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
                                    data-datepicker data-datesync-startdate="#datetime_after"/>
                         </label>
                     </div>
                     <div class="small-12 columns">
                         <label for="item_datetime_published">
                             Filter By Tags
+                            <!--suppress HtmlUnknownAttribute -->
                             <select id="filterTags" name="tags[]" multiple placeholder="Select Tags"></select>
                         </label>
                     </div>
