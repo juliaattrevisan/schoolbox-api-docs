@@ -60,6 +60,7 @@ class Sync extends BaseSync
                     THEN 'P' + RTRIM(p.par_code)
                     ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
                 END                 AS student_contact_id,
+                f.person_num        AS student_contact_network_login,
                 LEFT(pa.salutation, CHARINDEX(' ', pa.salutation))    AS student_contact_title,
                 RTRIM(p.f_name)         AS student_contact_given_name,
                 RTRIM(p.f_name)         AS student_contact_preferred,
@@ -100,6 +101,7 @@ class Sync extends BaseSync
                     THEN 'S' + RTRIM(p.par_code)
                     ELSE 'S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
                 END                     AS student_contact_id,
+                f.person_num            AS student_contact_network_login,
                 LEFT(pa.salutation, CHARINDEX(' ', pa.salutation))    AS student_contact_title,
                 RTRIM(p.m_name)         AS student_contact_given_name,
                 RTRIM(p.m_name)         AS student_contact_preferred,
