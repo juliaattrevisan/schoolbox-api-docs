@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Fixtures\Team;
 
-use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\Web\Controller\Exception;
 use Aura\Di\Exception\ServiceNotFound;
@@ -26,9 +25,6 @@ use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
 use \Schoolbox\Fixtures\Division\Helper\Collector;
 use \Schoolbox\Fixtures\Division\Helper\Translator;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -131,7 +127,6 @@ class Controller extends AbstractController
      * @param null|Division $context
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws ApplicationException\Exception If no sport found in DB
-     * @throws Forbidden If session user is not a Sports Admin requests HTML version
      */
     public function getList($context = null)
     {
@@ -424,26 +419,6 @@ class Controller extends AbstractController
             )
         );
     }
-
-
-    /**
-     * Returns whether the specified user a Sports Admin?
-     *
-     * @param User $user
-     * @return bool
-     */
-    private function isSportsAdmin(User $user)
-    {
-        foreach ($user->getAccessList() as $access) {
-            if ($access->getService() === UserAccess::SERVICE_SPORTS_ADMINISTRATOR &&
-                $access->getAccessLevel() >= UserAccess::ACCESS_WRITE
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     /* Getters/Setters
      */

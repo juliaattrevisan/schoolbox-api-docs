@@ -15,7 +15,7 @@ use Schoolbox\Fixtures\Team;
 use \Alaress_Date_Format;
 use \Alaress_Date_NullDate;
 
-class AuthRules extends \PHPUnit_Framework_TestCase
+class ArchivedSeason extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -48,7 +48,7 @@ class AuthRules extends \PHPUnit_Framework_TestCase
      * @param array $routeParams
      * @expectedException \InvalidArgumentException
      */
-    public function testSeasonAuthRuleNotFound(array $routeParams)
+    public function testSeasonNotFoundInParams(array $routeParams)
     {
         $rule = new IsSeasonNotArchived();
         $rule->authorize($routeParams);
@@ -59,7 +59,7 @@ class AuthRules extends \PHPUnit_Framework_TestCase
      * @dataProvider providerSeasonNotArchived
      * @param array $routeParams
      */
-    public function testSeasonAuthRuleNotArchived(array $routeParams)
+    public function testSeasonNotArchived(array $routeParams)
     {
         $rule = new IsSeasonNotArchived();
         $rule->authorize($routeParams);
@@ -71,7 +71,7 @@ class AuthRules extends \PHPUnit_Framework_TestCase
      * @param array $routeParams
      * @expectedException \Alaress\Authorizer\Failure\Unauthorized
      */
-    public function testSeasonAuthRuleIsArchived(array $routeParams)
+    public function testSeasonIsArchived(array $routeParams)
     {
         $rule = new IsSeasonNotArchived();
         $rule->authorize($routeParams);
