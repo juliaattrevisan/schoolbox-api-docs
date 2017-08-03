@@ -67,6 +67,11 @@
             }
         }
     }
+    .button, button {
+        &:empty {
+            display: none;
+        }
+    }
     p{
         display: inline-block;
         margin: 0;

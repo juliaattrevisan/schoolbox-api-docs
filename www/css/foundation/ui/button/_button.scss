@@ -52,7 +52,6 @@ a[disabled], a.disabled {
 
 	&:empty {
 		@extend .no-text;
-		display: none;
 		&:after {
 			// Use dark magic to ensure empty buttons have line-height of button's non-Schoolbox font.
 			content: ".";
