@@ -64,7 +64,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
     if (is_array($allFiletypes) && count($allFiletypes)) {
         foreach ($allFiletypes as $currentFiletype) {
-
             $fileType = trim(strtoupper($currentFiletype['Code']));
 
             // Ensure this file type is not in blacklist
