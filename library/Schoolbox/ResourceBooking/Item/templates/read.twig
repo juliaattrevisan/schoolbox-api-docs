@@ -59,8 +59,10 @@
                 listViewButton: false
             },
             fullCalendar: {
-                firstHour: 9,
                 allDaySlot: false,
+                slotDuration: '00:15:00',
+                slotLabelInterval: '01:00:00',
+                scrollTime: '08:00',
                 defaultDate: calendarDate,
                 defaultView: calendarView,
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
@@ -109,12 +111,9 @@
                     if (!event.data) {
                         return false;
                     }
-                    // Set data as attributes, that way selectors can query them
-                    // End of event might not be defined if it's the same as
-                    // start, too.
                     element.attr({
                         'data-start':  event.start.format(),
-                        'data-end':    (event.end || event.start).format(),
+                        'data-end':    event.end.format(),
                         'data-allday': event.allDay ? 1 : 0
                     })
 
