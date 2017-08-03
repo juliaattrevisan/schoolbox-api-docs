@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -223,12 +224,19 @@ class Controller extends Assessment\Controller
             }
         }
 
+        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/'.$task->getBaseContext()->getFolder()->getId();
+        }
+
         $twigData = [
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($task, $this->getUser())->add([ $task->getTitle(), '' ]),
             'assessment'   => $task,
             'hasWritePerm' => $this->getAccess()->isInstructor($this->getUser(), $task->getBaseContext()->getFolder()),
             'preview'      => $previewFragment,
             'participant'  => $participant,
+            'returnUrl'    => $returnUrl,
         ];
 
         $this->getResponse()->content->set(
