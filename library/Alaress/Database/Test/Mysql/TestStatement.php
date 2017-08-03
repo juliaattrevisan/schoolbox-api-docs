@@ -89,6 +89,29 @@ class TestStatement extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test fetch with positional parameters
+     */
+    public function testStatementWithPositionalParameters()
+    {
+        $this->connectSchoolbox();
+
+        // Test a second positional parameter, to ensure they're positioned appropriately
+        $statement = $this->schoolbox->executeQuery(
+            'SELECT `lastname` FROM `user` WHERE `lastname` = ? AND `lastname` != ?',
+            ['rhodes', 'notrhodes']
+        );
+
+        $count = 0;
+
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame(strtolower($row['lastname']), 'rhodes');
+        }
+
+        $this->assertGreaterThan(1, $count);
+    }
+
+    /**
      * Test iterator
      */
     public function testStatementIterator()
