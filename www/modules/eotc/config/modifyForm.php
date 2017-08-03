@@ -1,19 +1,18 @@
 <?php
 /**
- * Config ModifyForm
- *
- * Process new Config settings
+ * Save changes to EOTC configuration
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 use EOTC\Authenticator;
 use EOTC\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
+
+require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 $page = new SitePage();
 
@@ -23,8 +22,8 @@ new Authenticator($page);
 $sessionUser = $_SESSION['user'];
 
 if ($sessionUser->isSuperuser()) {
-    $configMapper = new ConfigMapper();
-    $allConfigs   = $configMapper->findAll();
+    $configMapper = ConfigMapper::getInstance();
+    $allConfigs = $configMapper->findAll();
 
     $firstReminder = $allConfigs->getBy('name', 'first_reminder');
     $firstReminder->setValue((int)$_POST['firstReminder']);
@@ -47,15 +46,48 @@ if ($sessionUser->isSuperuser()) {
     $mandatoryStudents = $allConfigs->getBy('name', 'student_attendees_required');
     $mandatoryStudents->setValue((int)$_POST['studentAttendeesRequired']);
 
+    // Split file type string into an array
+
+    $arrayFileTypes = explode(",", $_POST['externalFiletypeBlacklist']);
+
+    // Iterate each item to find syntactically valid Synergetic FileTypes (single alpha character, uppercase)
+
+    $validFileTypes = [];
+
+    foreach ($arrayFileTypes as $fileType) {
+        // Trim and convert to uppercase
+
+        $fileType = strtoupper(trim($fileType));
+
+        // Make sure it is a single alpha character, otherwise ignore it
+
+        if (strlen($fileType) == 1 && ctype_alpha($fileType)) {
+            $validFileTypes[] = $fileType;
+        }
+    }
+
+    // Sort it alphabetically
+
+    asort($validFileTypes);
+
+    $externalFiletypeBlacklist = $allConfigs->getBy('name', 'external_filetype_blacklist');
+    $externalFiletypeBlacklist->setValue(implode(",", $validFileTypes));
+
+    // Save config changes back to database
+
     $configMapper->save($firstReminder);
     $configMapper->save($dailyReminder);
     $configMapper->save($urgentThreshold);
     $configMapper->save($policy);
     $configMapper->save($ramsWarning);
     $configMapper->save($externalDbSync);
+    $configMapper->save($externalFiletypeBlacklist);
     $configMapper->save($mandatoryStudents);
 
+    // Redirect back to the config page
+
     $page->localRedir('/modules/eotc/config/modify');
+
 } else {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
