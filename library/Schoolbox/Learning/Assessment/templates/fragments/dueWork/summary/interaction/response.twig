@@ -26,9 +26,9 @@
                             {% endif %}
                             by {{ participant.user.fullname }}
                         {% if currentInteraction.isSubmitted %}
-                            | <span class="meta">{{ currentInteraction.submittedAt.short }}</span>
+                            <p class="meta">{{ currentInteraction.submittedAt.short }}</p>
                         {% else %}
-                            | <span class="meta">{{ currentInteraction.updatedAt.short }}</span>
+                            <p class="meta">{{ currentInteraction.updatedAt.short }}</p>
                         {% endif %}
                         </p>
 
