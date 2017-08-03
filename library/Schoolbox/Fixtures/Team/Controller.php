@@ -139,14 +139,6 @@ class Controller extends AbstractController
         if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
             $this->getJsonList($context);
         } else {
-            /*
-             * We must perform this auth check here, rather than the module as this route
-             * is shared with a JSON version, with different auth rules.
-             */
-            if (!$this->getUser()->isSuperuser() && !$this->isSportsAdmin($this->getUser())) {
-                throw new Forbidden();
-            }
-
             $this->getHtmlList($context);
         }
     }

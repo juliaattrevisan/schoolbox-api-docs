@@ -23,9 +23,10 @@ use Schoolbox\Fixtures\Division\Model as Division;
 
 /**
  * Class Mapper
- * @method Division createModel()
+ * @method Division createModel($idValue = null)
  * @method Division findById($id)
  * @method Collection|Division[] findByColumn($columnName, $columnValue, $options = array())
+ *
  * @package Schoolbox\Fixtures\Division
  */
 class Mapper extends BaseMapper

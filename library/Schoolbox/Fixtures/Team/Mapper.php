@@ -20,9 +20,10 @@ use Schoolbox\Fixtures\Team\Model as Team;
 
 /**
  * Class Mapper
- * @method Team createModel()
+ * @method Team createModel($idValue = null)
  * @method Team findById($id)
  * @method Team hydrate(array $row, $alias = '', $callback = null)
+ *
  * @package Schoolbox\Fixtures\Division
  */
 class Mapper extends BaseMapper

@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Fixtures\Authorizer\Rule\IsSeasonNotArchived;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use \Schoolbox\Permission\Access\UserAccess;
@@ -71,6 +72,7 @@ class Module extends RestfulModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
+        // SU can do mutate whatever, whenever. Sports Admin can mutate if not archived.
         $canMutateTeams = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\All(
@@ -78,7 +80,8 @@ class Module extends RestfulModule
                 new Rule\HasServicePermission(
                     UserAccess::SERVICE_SPORTS_ADMINISTRATOR,
                     UserAccess::ACCESS_WRITE
-                )
+                ),
+                new IsSeasonNotArchived()
             )
         );
 

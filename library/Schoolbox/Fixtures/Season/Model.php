@@ -35,7 +35,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
     protected $end;
 
     /** @var Alaress_Date_Format */
-    protected $archivedAt;
+    private $archivedAt;
 
     /** @var Alaress_Date_Format */
     protected $createdAt;
@@ -63,11 +63,14 @@ class Model implements ISoftDeletable, ValueLabelInterface
         ];
     }
 
+
     /**
      * Return whether this season has been archived
+     *
      * @return bool
      */
-    public function isArchived(){
+    public function isArchived()
+    {
         return !$this->getArchivedAt()->isNull();
     }
 

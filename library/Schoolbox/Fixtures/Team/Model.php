@@ -153,10 +153,12 @@ class Model implements ISoftDeletable, ValueLabelInterface {
 
     /**
      * @param Division $division
+     * @return $this
      */
     public function setDivision($division)
     {
         $this->division = $division;
+        return $this;
     }
 
     /**
