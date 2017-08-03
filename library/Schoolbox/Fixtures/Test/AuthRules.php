@@ -115,6 +115,11 @@ class AuthRules extends \PHPUnit_Framework_TestCase
                     'season' => $this->buildTeamInArchivedSeason(),
                 ],
             ],
+            [
+                [
+                    'context' => $this->buildTeamInArchivedSeason(),
+                ],
+            ],
         ];
     }
 
@@ -147,6 +152,11 @@ class AuthRules extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
+                    'context' => $this->buildDivisionInNonArchivedSeason(),
+                ],
+            ],
+            [
+                [
                     'team' => $this->buildTeamInNonArchivedSeason(),
                 ],
             ],
@@ -160,6 +170,7 @@ class AuthRules extends \PHPUnit_Framework_TestCase
                     'season'   => $this->buildNonArchivedSeason(),
                     'team'     => $this->buildTeamInArchivedSeason(),
                     'division' => $this->buildDivisionInArchivedSeason(),
+                    'context'  => $this->buildDivisionInArchivedSeason(),
                 ],
             ],
             [
@@ -167,6 +178,7 @@ class AuthRules extends \PHPUnit_Framework_TestCase
                     'entity'   => $this->buildNonArchivedSeason(),
                     'team'     => $this->buildTeamInArchivedSeason(),
                     'division' => $this->buildDivisionInArchivedSeason(),
+                    'context'  => $this->buildDivisionInArchivedSeason(),
                 ],
             ],
         ];

@@ -65,6 +65,11 @@ class IsSeasonNotArchived implements IAuthorizationRule
             $division = $params['entity'];
             return $division->getSeason();
         }
+        if (isset($params['context']) && $params['context'] instanceof Division\Model) {
+            /** @var Division\Model $division */
+            $division = $params['context'];
+            return $division->getSeason();
+        }
         if (isset($params['team']) && $params['team'] instanceof Team\Model) {
             /** @var Team\Model $team */
             $team = $params['team'];
