@@ -85,7 +85,7 @@ class Module extends RestfulModule
          */
 
         // Match all routes except for 'getList'
-        $this->addRoutePermission($authorizer, '^(?!getList$).*', $isSportsAdministrator);
+        $this->addRoutePermission($authorizer, '(?!getList$).*', $isSportsAdministrator);
 
         /*
          * This route has a JSON and HTML version.
