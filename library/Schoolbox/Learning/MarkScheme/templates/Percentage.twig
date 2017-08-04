@@ -13,7 +13,7 @@
 {% include '@learningMarkScheme/fragments/text-input.twig' with {
     participant: participant,
     tabIndex:    tabIndex,
-    placeholder: 'Percentage mark',
+    placeholder: readonly ? '(No mark given)' : 'Percentage mark',
     limit:       100,
     maxLength:   16,
     inputTitle:  'Percentage',
