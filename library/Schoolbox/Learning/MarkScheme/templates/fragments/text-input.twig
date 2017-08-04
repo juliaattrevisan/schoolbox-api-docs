@@ -28,11 +28,13 @@
         {% if readonly %}readonly{% endif %}
 />
 
+{% if not readonly %}
 <script type="text/javascript">
     $(function() {
         $('[data-combobox]').combobox({{ errors | json_encode | raw }});
     });
 </script>
+{% endif %}
 
 
 
