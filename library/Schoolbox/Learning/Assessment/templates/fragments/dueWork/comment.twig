@@ -13,7 +13,7 @@
     <textarea
             tabindex="{{ tabIndex }}"
             name="comment"
-            placeholder="Feedback for {{ participant.user.firstName }}"
+            placeholder="{% if readonly %}(No comment given){% else %}Feedback for {{ participant.user.firstName }}{% endif %}"
             rows="3"
             {% if readonly %}readonly{% endif %}
     >{{ latestFeedback.comment }}</textarea>
