@@ -10,7 +10,6 @@
 
 namespace Custom\Diocesan\AchievementReport;
 
-use Alaress_Probe as Probe;
 use Schoolbox\User;
 use Schoolbox\Campus;
 use MSSQL;

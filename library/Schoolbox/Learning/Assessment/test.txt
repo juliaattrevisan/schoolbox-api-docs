@@ -703,8 +703,6 @@ $allSummators = [
     new Summator\Sum()
 ];
 
-new \Alaress_Probe('Summator', 'Published Mark', 'Unpublished Mark');
-
 foreach ($allSummators as $currentSummator) {
     $project = new Project($currentSummator);
     $project
@@ -719,8 +717,6 @@ foreach ($allSummators as $currentSummator) {
         ->add($task2)
         ->add($task3)
     ;
-
-    new \Alaress_Probe((new ReflectionClass($currentSummator))->getShortName(), $project->getNormalisedMark($selectedUser, true), $project->getNormalisedMark($selectedUser, false));
 }
 
 
@@ -742,46 +738,16 @@ $project
     ->add($task3)
 ;
 
-new \Alaress_Probe('ID, Title', '% of Project Marked', '% of Project Marked And Published');
-new \Alaress_Probe(
-    "{$project->getId()} {$project->getTitle()}",
-    "{$project->getCountMarkedByTeacher()}/{$project->getCountParticipants()} = {$project->calculatePercentageMarked()}",
-    "{$project->getCountPublished()}/{$project->getCountParticipants()} = {$project->calculatePercentagePublished()}"
-);
-
 echo "<h1>Types and Visibility</h1>";
-
-new \Alaress_Probe('ID, Title', 'Type', 'Accept Online?', 'Accepts Multi?', 'Show Unsubmitted?', 'Has Rubric?');
 
 foreach ($project->getAssessables() as $currentAssessable) {
     if ($currentAssessable instanceof DueWork) {
-        new \Alaress_Probe(
-            "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-            $currentAssessable->getTypeName(),
-            $currentAssessable->getAcceptOnline(),
-            $currentAssessable->isAcceptMulti(),
-            !$currentAssessable->getShowSubmittedOnly(),
-            $currentAssessable->useRubric()
-        );
     }
     else {
-        new \Alaress_Probe(
-            "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-            $currentAssessable->getTypeName(),
-            '',
-            '',
-            '',
-            ''
-        );
     }
 }
 
-new \Alaress_Probe("{$project->getId()} {$project->getTitle()}", $project->getTypeName(), '', '', '', '');
-
-
 echo "<h1>Submission</h1>";
-
-new \Alaress_Probe('ID, Title', 'User', 'Files', 'Plagscan', 'Submitted By', 'Submitted On Behalf Of', 'Submitted At');
 
 foreach ($project->getAssessables() as $currentAssessable) {
     if ($currentAssessable instanceof DueWork) {
@@ -820,17 +786,6 @@ foreach ($project->getAssessables() as $currentAssessable) {
                     }
                 }
             }
-
-            new \Alaress_Probe('<hr>');
-            new \Alaress_Probe(
-                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-                $currentParticipant->getUser()->getId(),
-                implode('<br />', $allFiles),
-                implode('<br />', $allPlagscan),
-                $submittedBy ? $submittedBy->getFullname() : '',
-                $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
-                $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
-            );
         }
     }
     elseif ($currentAssessable instanceof Quiz) {
@@ -851,17 +806,6 @@ foreach ($project->getAssessables() as $currentAssessable) {
                     $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
                 }
             }
-
-            new \Alaress_Probe('<hr>');
-            new \Alaress_Probe(
-                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-                $currentParticipant->getUser()->getId(),
-                '',
-                '',
-                $submittedBy ? $submittedBy->getFullname() : '',
-                $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
-                $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
-            );
         }
     }
     elseif ($currentAssessable instanceof Task) {
@@ -882,25 +826,12 @@ foreach ($project->getAssessables() as $currentAssessable) {
                     $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
                 }
             }
-
-            new \Alaress_Probe('<hr>');
-            new \Alaress_Probe(
-                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-                $currentParticipant->getUser()->getId(),
-                '',
-                '',
-                $submittedBy ? $submittedBy->getFullname() : '',
-                $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
-                $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
-            );
         }
     }
 }
 
 
 echo "<h1>Feedbacks</h1>";
-
-new \Alaress_Probe('ID, Title', 'User', 'Files', 'Mark', 'Comment', 'Published At');
 
 foreach ($project->getAssessables() as $currentAssessable) {
     if ($currentAssessable instanceof DueWork) {
@@ -940,16 +871,6 @@ foreach ($project->getAssessables() as $currentAssessable) {
                     }
                 }
             }
-
-            new \Alaress_Probe('<hr>');
-            new \Alaress_Probe(
-                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-                $currentParticipant->getUser()->getId(),
-                implode('<br />', $allFiles),
-                $latestFeedback ? $latestFeedback->getNormalisedMark() : '',
-                $latestFeedback ? $latestFeedback->getComment() : '',
-                $latestFeedback && $latestFeedback->isPublished() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
-            );
         }
     }
     elseif ($currentAssessable instanceof Quiz) {
@@ -978,16 +899,6 @@ foreach ($project->getAssessables() as $currentAssessable) {
                     $latestFeedback = $latestSubmission->findMostRecentFeedback();
                 }
             }
-
-            new \Alaress_Probe('<hr>');
-            new \Alaress_Probe(
-                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-                $currentParticipant->getUser()->getId(),
-                implode('<br />', $allFiles),
-                $latestFeedback ? $latestFeedback->getNormalisedMark() : '',
-                '',
-                $latestFeedback && $latestFeedback->isPublished() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
-            );
         }
     }
     elseif ($currentAssessable instanceof Task) {
@@ -1024,56 +935,25 @@ foreach ($project->getAssessables() as $currentAssessable) {
                     }
                 }
             }
-
-            new \Alaress_Probe('<hr>');
-            new \Alaress_Probe(
-                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-                $currentParticipant->getUser()->getId(),
-                '',
-                $completionString,
-                '',
-                $latestFeedback && $latestFeedback->isPublished() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
-            );
         }
     }
 }
 
 echo "<h1>Marks</h1>";
 
-new \Alaress_Probe('ID, Title', 'Normalised Mark', 'Human Readable Mark');
 try {
-    new \Alaress_Probe(
-        "{$project->getId()} {$project->getTitle()}",
-        "{$project->getNormalisedMark($hodes, true)}",
-        "{$project->getHumanReadableMark($hodes, true)}"
-    );
 }
     /* User not found
      */
 catch (\UnexpectedValueException $e) {
-    new \Alaress_Probe(
-        "{$project->getId()} {$project->getTitle()}",
-        '',
-        ''
-    );
 }
 
 foreach ($project->getAssessables() as $currentAssessable) {
     try {
-        new \Alaress_Probe(
-            "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-            "{$currentAssessable->getNormalisedMark($hodes, true)}",
-            "{$currentAssessable->getHumanReadableMark($hodes, true)}"
-        );
     }
         /* User not found
          */
     catch (\UnexpectedValueException $e) {
-        new \Alaress_Probe(
-            "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-            '',
-            ''
-        );
     }
 }
 
