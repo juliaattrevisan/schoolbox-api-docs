@@ -225,7 +225,13 @@ class Healthcheck
                     }
                 }
 
-                $this->errors[] = $error;
+                // Unfortunately we can't test some procedures without generating an error (because we don't
+                // have the correct data to pass it)- so if 'ignoreError' is set, and the error message
+                // contains this text we will let it slide...
+
+                if (!isset($object['ignoreError']) || stripos($error, $object['ignoreError']) === false) {
+                    $this->errors[] = $error;
+                }
             }
         }
 
@@ -513,6 +519,7 @@ class Healthcheck
             ],
             [
                 'name' => 'sptwkAttendances',
+                'ignoreError' => 'No matching class found',
                 'inputParameters' => [
                     'wkAttendanceMasterSeq' => $attendanceMasterSeq,
                     'AttendanceSeq' => null,
