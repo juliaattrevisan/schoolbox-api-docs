@@ -193,7 +193,6 @@ class Healthcheck
                 $statement->execute();
                 $this->log .= "OK\n";
             } catch (\Alaress\Database\Exception $e) {
-                $this->log .= "FAILED\n";
 
                 $error = "EXECUTE {$object['name']}\n{$e->getMessage()}\n";
 
@@ -231,6 +230,9 @@ class Healthcheck
 
                 if (!isset($object['ignoreError']) || stripos($error, $object['ignoreError']) === false) {
                     $this->errors[] = $error;
+                    $this->log .= "FAILED\n";
+                } else {
+                    $this->log .= "OK\n";
                 }
             }
         }
