@@ -12,7 +12,7 @@
 {% include '@learningMarkScheme/fragments/text-input.twig' with {
     participant: participant,
     tabIndex:    tabIndex,
-    placeholder: readonly ? '(No mark given)' : 'Mark out of ' ~ markScheme.totalMark,
+    placeholder: readonly ? '(no mark given)' : 'Mark out of ' ~ markScheme.totalMark,
     limit:       markScheme.totalMark,
     maxLength:   16,
     inputTitle:  'Maximum Mark: ' ~ markScheme.totalMark,
