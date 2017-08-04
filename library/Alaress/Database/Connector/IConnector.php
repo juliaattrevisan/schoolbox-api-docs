@@ -160,6 +160,36 @@ interface IConnector extends IQuoter
     public function lastInsertId($name = null);
 
     // ----------------------------------------------------------------------------------------------------------------
+    // Database transaction functions
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Begin a database transaction
+     */
+    public function beginTransaction();
+
+    /**
+     * Check if we are in a database transaction
+     *
+     * @return bool
+     */
+    public function inTransaction();
+
+    /**
+     * Commit current transaction to database
+     *
+     * @return bool
+     */
+    public function commit();
+
+    /**
+     * Rollback current transaction
+     *
+     * @return bool
+     */
+    public function rollBack();
+
+    // ----------------------------------------------------------------------------------------------------------------
     // Getters for immutable properties
     // ----------------------------------------------------------------------------------------------------------------
 

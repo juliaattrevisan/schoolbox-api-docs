@@ -62,10 +62,16 @@ class Healthcheck
             $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
         }
 
+        // Do the healthcheck inside a transaction
+
+        $this->connector->beginTransaction();
+
         /** @var IConnector $connector */
         foreach ($this->secondaryConnectors as $connector) {
             if ($connector == null) {
                 $this->log .= "ERROR: Unable to connect to database '{$connector->getDatabase()}' (Hostname: {$connector->getHostname()})\n";
+            } else {
+                $connector->beginTransaction();
             }
         };
 
@@ -75,6 +81,17 @@ class Healthcheck
         $testFunctionName = "{$this->externalType}Test";
 
         $this->$testFunctionName();
+
+        // Rollback transactions so we don't end up inserting anything into the SIS
+
+        $this->connector->rollback();
+
+        /** @var IConnector $connector */
+        foreach ($this->secondaryConnectors as $connector) {
+            if ($connector != null) {
+                $connector->rollBack();
+            }
+        };
 
         return [
             'log' => trim($this->log) . "\n",
@@ -416,6 +433,17 @@ class Healthcheck
 
         $this->selectTest(['CommunityLogins'], "UPDATE :object SET Password = '' WHERE 1 = 0");
 
+        // The 'sptwkAttendances' procedure requires an 'attendanceMasterSeq' value which we must get
+        // before we define the stored procedures below
+
+        $result = $this->connector->executeQuery("SELECT TOP 1 AttendanceMasterSeq FROM AttendanceMaster ORDER BY AttendanceMasterSeq DESC");
+
+        if ($row = $result->fetch()) {
+            $attendanceMasterSeq = $row['AttendanceMasterSeq'];
+        } else {
+            $attendanceMasterSeq = null;
+        }
+
         // Stored Procedures
 
         $procedures = [
@@ -486,12 +514,12 @@ class Healthcheck
             [
                 'name' => 'sptwkAttendances',
                 'inputParameters' => [
-                    'wkAttendanceMasterSeq' => 1,
+                    'wkAttendanceMasterSeq' => $attendanceMasterSeq,
                     'AttendanceSeq' => null,
-                    'HoldFlag' => 0,
-                    'ClassCancelledFlag' => 0,
-                    'SystemProcessNumber' => 0,
-                    'AllowMultiPeriodFlag' => 0,
+                    'HoldFlag' => null,
+                    'ClassCancelledFlag' => null,
+                    'SystemProcessNumber' => null,
+                    'AllowMultiPeriodFlag' => null,
                     'DebugPrintFlag' => 0,
                 ],
                 'outputParameters' => [
@@ -503,6 +531,45 @@ class Healthcheck
                         'type' => PDO::PARAM_INT,
                         'length' => 11
                     ]
+                ]
+            ],
+
+            // The procedures below actually mutate data in the DB- so it is imperative
+            // that they get rolled back after excution
+
+            [
+                'name' => 'spiExcursions',
+                'inputParameters' => [
+                    'EventCode' => 0,
+                    'Description' => null
+                ]
+            ],
+            [
+                'name' => 'spuExcursionDetails',
+                'inputParameters' => [
+                    'EventSeq' => 0,
+                    'Description' => null,
+                    'Objective' => null,
+                    'Attire' => null,
+                    'Type' => null,
+                    'Status' => null,
+                    'MaxAttendance' => null,
+                    'MaxTickets' => null,
+                    'EventFrom' => null,
+                    'EventTo' => null,
+                    'InviteDate' => null,
+                    'RSVPDueBy' => null,
+                    'Comments' => null
+                ]
+            ],
+            [
+                'name' => 'spiCommunityEventsCurrent',
+                'inputParameters' => [
+                    'ID' => 0,
+                    'EventCode' => null,
+                    'VerifyOnlyFlag' => 1,
+                    'NewEventCurrentSeq' => null,
+                    'Message' => null
                 ]
             ]
         ];
