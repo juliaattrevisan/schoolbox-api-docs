@@ -441,17 +441,6 @@ class Healthcheck
 
         $this->selectTest(['CommunityLogins'], "UPDATE :object SET Password = '' WHERE 1 = 0");
 
-        // The 'sptwkAttendances' procedure requires an 'attendanceMasterSeq' value which we must get
-        // before we define the stored procedures below
-
-        $result = $this->connector->executeQuery("SELECT TOP 1 AttendanceMasterSeq FROM AttendanceMaster ORDER BY AttendanceMasterSeq DESC");
-
-        if ($row = $result->fetch()) {
-            $attendanceMasterSeq = $row['AttendanceMasterSeq'];
-        } else {
-            $attendanceMasterSeq = null;
-        }
-
         // Stored Procedures
 
         $procedures = [
@@ -523,7 +512,7 @@ class Healthcheck
                 'name' => 'sptwkAttendances',
                 'ignoreError' => 'No matching class found',
                 'inputParameters' => [
-                    'wkAttendanceMasterSeq' => $attendanceMasterSeq,
+                    'wkAttendanceMasterSeq' => null,
                     'AttendanceSeq' => null,
                     'HoldFlag' => null,
                     'ClassCancelledFlag' => null,
