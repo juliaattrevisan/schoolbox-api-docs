@@ -85,7 +85,7 @@
                                     {% if assessment is quiz and participant.allResponses | length %}
                                         <a class="icon-view" href="{{ routeLookup('learningQuiz.getQuizAttemptsByUser', {assessmentId: assessment.id, userId: student.id}) }}" title="View Attempts"></a>
                                     {% endif %}
-                                    {% if assessment.getFamilyName == 'dueWork' and feedback %}
+                                    {% if assessment.getFamilyName == 'dueWork' and feedback and student.eportfolioEnable %}
                                         {# TODO convert this to AJAX #}
                                         <a class="icon-showcase" title="Publish to ePortfolio" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0"></a>
                                         <form action="/eportfolio/showcase/modifyForm.php" method="post" data-publish-to-eportfolio-form="{{ assessment.id }}">
