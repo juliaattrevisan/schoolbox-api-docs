@@ -56,42 +56,70 @@ class Healthcheck
      */
     public function run()
     {
-        // Make sure databases connected correctly
+        // To prevent doing anything unintended to the clients external SIS DB we need to wrap the healthcheck
+        // in a transaction which we will rollback- thus we should only proceed if transaction support is
+        // available on all external connections
+
+        /** @var bool $transactionsSupported */
+        $transactionsSupported = true;
+
+        // Make sure all databases connected correctly
 
         if ($this->connector == null) {
             $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
         }
 
-        // Do the healthcheck inside a transaction
+        // Attempt to being transactions on all connections
 
-        $this->connector->beginTransaction();
+        if (!$this->connector->beginTransaction()) {
+            // Transactions not supported
+
+            $this->log .= 'ERROR: Database ({$connector->getDatabase()}) does not support transactions';
+            $transactionsSupported = false;
+        }
 
         /** @var IConnector $connector */
         foreach ($this->secondaryConnectors as $connector) {
             if ($connector == null) {
                 $this->log .= "ERROR: Unable to connect to database '{$connector->getDatabase()}' (Hostname: {$connector->getHostname()})\n";
             } else {
-                $connector->beginTransaction();
+                if (!$connector->beginTransaction()) {
+                    // Transactions not supported
+
+                    $this->log .= 'ERROR: Database ({$connector->getDatabase()}) does not support transactions';
+                    $transactionsSupported = false;
+                }
             }
-        };
+        }
 
-        $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
-        $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
+        // Only proceed if database transactions could be successfully started on all connectors
 
-        $testFunctionName = "{$this->externalType}Test";
+        if ($transactionsSupported) {
 
-        $this->$testFunctionName();
+            $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
+            $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
 
-        // Rollback transactions so we don't end up inserting anything into the SIS
+            $testFunctionName = "{$this->externalType}Test";
 
-        $this->connector->rollback();
+            $this->$testFunctionName();
+        }
+
+        // Rollback any transactions we were able to start so we don't end up inserting anything into the SIS
+
+        if ($this->connector->inTransaction()) {
+            $this->connector->rollback();
+        }
 
         /** @var IConnector $connector */
         foreach ($this->secondaryConnectors as $connector) {
             if ($connector != null) {
-                $connector->rollBack();
+                if ($connector->inTransaction()) {
+                    $connector->rollBack();
+                }
             }
         };
+
+        // Return the results
 
         return [
             'log' => trim($this->log) . "\n",
