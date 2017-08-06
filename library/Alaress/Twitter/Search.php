@@ -76,12 +76,14 @@ class Alaress_Twitter_Search
             if (is_array($all_tweets)) {
                 foreach ($all_tweets as $result) {
 
-                    if ($result->possibly_sensitive || $result->retweeted_status->possibly_sensitive || $result->quoted_status->possible_sensitive) {
+                    if ($result->possibly_sensitive ||
+                        $result->retweeted_status->possibly_sensitive ||
+                        $result->quoted_status->possible_sensitive) {
                         // This might be not safe for work or children
                         continue;
                     }
 
-                    if(isset($result->retweeted_status)) {
+                    if (isset($result->retweeted_status)) {
                         if (!in_array($result->retweeted_status->text, $tweetText)) {
                             $processed[] = array(
                                 'text'     => $this->getFilter()->filterText($result->retweeted_status->text),
