@@ -223,14 +223,14 @@ class DueWork_Rubric_Handler
         $stmt = Database::getInstance()->prepare(
             "
                 SELECT
-                    sb.id AS box_id,
-                    rm.criterion_id,
+                    ru.submission_box_id AS box_id,
+                    rd.criterion_id,
                     rd.value mark,
                     rc.name,
                     (
-                        SELECT MAX(rd.value)
-                        FROM rubric_descriptor rd
-                        WHERE rm.criterion_id = rd.criterion_id
+                        SELECT MAX(rdt.value)
+                        FROM rubric_descriptor rdt
+                        WHERE rd.criterion_id = rdt.criterion_id
                         AND sb.rubric_result_set = 0
                     ) AS dmax_mark,
                     (
@@ -241,20 +241,23 @@ class DueWork_Rubric_Handler
                     ) AS rmax_mark,
                     rm.created_at
                 FROM rubric_mark rm
-                LEFT JOIN rubric_descriptor rd
+                JOIN rubric_descriptor rd
                     ON rm.descriptor_id = rd.id
-                LEFT JOIN rubric_criterion rc
-                    ON rm.criterion_id = rc.id
-                LEFT JOIN
+                JOIN rubric_criterion rc
+                    ON rd.criterion_id = rc.id
+                JOIN
+                    rubric_usage ru
+                    ON rd.criterion_id = ru.criterion_id
+                JOIN
                     submission_box sb
-                    ON rm.submission_box_id = sb.id
+                    ON ru.submission_box_id = sb.id
                 WHERE rm.valid = 1
                     AND rm.student_id = :student_id
                     AND sb.category = :category_id
                     AND sb.deleted IS FALSE
                 ORDER BY
-                    sb.id ASC,
-                    rm.criterion_id ASC,
+                    ru.submission_box_id ASC,
+                    rd.criterion_id ASC,
                     rm.created_at DESC,
                     rm.mark DESC
             "
