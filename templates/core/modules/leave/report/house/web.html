@@ -43,6 +43,11 @@
                 location += '/' + dateEnd;
             }
 
+            if (action == 'print') {
+                window.print();
+                return;
+            }
+
             if ('search' !== action) {
                 location += '/' + action;
             }
