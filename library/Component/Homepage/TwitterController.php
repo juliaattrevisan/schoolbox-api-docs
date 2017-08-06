@@ -124,6 +124,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 $avatarUrl->setScheme(null);
                 $this->setVar([
                     'TWEET_TEXT'     => Scrub::html($currentTweet['text']),
+                    'TWEET_ACTION'   => Scrub::text($currentTweet['action']),
                     'TWEET_DATE'     => $date->getShort(),
                     'TWEET_AUTHOR'   => Scrub::text($currentTweet['author']),
                     'TWEET_FULLNAME' => Scrub::text($currentTweet['fullname']),

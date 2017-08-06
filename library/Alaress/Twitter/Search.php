@@ -75,21 +75,42 @@ class Alaress_Twitter_Search
 
             if (is_array($all_tweets)) {
                 foreach ($all_tweets as $result) {
-                    if ($result->possibly_sensitive || $result->retweeted_status->possibly_sensitive) {
+
+                    if ($result->possibly_sensitive || $result->retweeted_status->possibly_sensitive || $result->quoted_status->possible_sensitive) {
                         // This might be not safe for work or children
                         continue;
                     }
-                    if (!in_array($result->text, $tweetText)) {
-                        $processed[] = array(
-                            'text'     => $this->getFilter()->filterText($result->text),
-                            'date'     => $result->created_at,
-                            'fullname' => $result->user->name,
-                            'author'   => $result->user->screen_name,
-                            'avatar'   => str_replace('_normal', '_bigger', $result->user->profile_image_url),
-                            'media'    => isset($result->retweeted_status) ? $result->retweeted_status->entities->media : $result->entities->media,
-                        );
-                        $tweetText[] = $result->text;
+
+                    if(isset($result->retweeted_status)) {
+                        if (!in_array($result->retweeted_status->text, $tweetText)) {
+                            $processed[] = array(
+                                'text'     => $this->getFilter()->filterText($result->retweeted_status->text),
+                                'action'   => 'Retweeted by '.$result->user->name,
+                                'date'     => $result->created_at,
+                                'fullname' => $result->retweeted_status->user->name,
+                                'author'   => $result->retweeted_status->user->screen_name,
+                                'avatar'   => str_replace('_normal', '_bigger', $result->retweeted_status->user->profile_image_url),
+                                'media'    => $result->retweeted_status->entities->media,
+                            );
+                            $tweetText[] = $result->retweeted_status->text;
+                        }
                     }
+                    else {
+                        if (!in_array($result->text, $tweetText)) {
+                            $processed[] = array(
+                                'text'     => $this->getFilter()->filterText($result->text),
+                                'action'   => 'Tweeted',
+                                'date'     => $result->created_at,
+                                'fullname' => $result->user->name,
+                                'author'   => $result->user->screen_name,
+                                'avatar'   => str_replace('_normal', '_bigger', $result->user->profile_image_url),
+                                'media'    => $result->entities->media,
+                            );
+                            $tweetText[] = $result->text;
+                        }
+                    }
+
+
                 }
 
 
