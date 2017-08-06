@@ -66,9 +66,9 @@ class Sync extends Base implements ISync
         $query =
         "
             SELECT DISTINCT 
-                        Username                        AS student_contact_network_login,
+                        V_Parent.Username               AS student_contact_network_login,
                         ParentID                        AS student_contact_id,
-                        Title                           AS student_contact_title,
+                        V_Parent.Title                  AS student_contact_title,
                         ParentFirstname                 AS student_contact_preferred,
                         ParentFirstname                 AS student_contact_given_name,
                         ParentSurname                   AS student_contact_surname,

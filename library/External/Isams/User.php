@@ -372,8 +372,7 @@ class External_Isams_User implements External_UserInterface
             $subjectList[] = array(
                 'code' => $subject['code'],
                 'name' => $subject['code'],
-                'classType' => '',
-                'campusCode' => $user->getCampusCollection()->first()->getExtTimetableCode()
+                'classType' => ''
             );
         }
 
