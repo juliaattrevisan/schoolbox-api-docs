@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Calendar\Event;
+use Schoolbox\Collection;
 
 /* Use $_POST['action'] to separate screens
  */
@@ -92,7 +93,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
 
                     /* Ram in this new record
                      */
-                    $allConfigs = new Schoolbox\Collection([$configRecord]);
+                    $allConfigs = new Collection([$configRecord]);
                 }
             }
 
