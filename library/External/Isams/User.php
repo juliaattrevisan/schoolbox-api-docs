@@ -51,7 +51,7 @@ class External_Isams_User implements External_UserInterface
     {
         $photoPath = realpath($this->config->get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
-        if ($this->config->get('photo_sis_import') === 0) {
+        if ($this->config->get('photo_sis_import') == 0) {
             if (file_exists($photoPath)) {
                 return $photoPath;
             }
@@ -277,7 +277,7 @@ class External_Isams_User implements External_UserInterface
 
         $query .= " ORDER BY StudentSurname, StudentGiven1, StudentID";
 
-        return $this->getConnector()->executeQuery($query, ['year_level' => $yearlevel])->fetchAll()  ?: [];
+        return $this->getConnector()->executeQuery($query, ['year_level' => $yearlevel])->fetchAll();
     }
 
     /**
@@ -318,7 +318,7 @@ class External_Isams_User implements External_UserInterface
             WHERE       V_Student.StudentID = :external_user_id
         ";
 
-        return $this->getConnector()->executeQuery($query , ['external_user_id' => $externalUserId])->fetchAll() ?: [];
+        return $this->getConnector()->executeQuery($query , ['external_user_id' => $externalUserId])->fetchAll();
     }
 
     /**
@@ -464,7 +464,7 @@ class External_Isams_User implements External_UserInterface
             LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = V_Student.StudentID
         ";
 
-        return $this->getConnector()->executeQuery($query)->fetchAll() ?: [];
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
 
