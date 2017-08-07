@@ -212,7 +212,9 @@ class DueWork_Rubric_Handler
      * @param $studentID
      * @param $categoryID
      *
-     * @return array
+     * @return array Indexed by criterion.id
+     * @var string $return[rc.id]['name']     Criterion.name
+     * @var int    $return[rc.id]['value']    Normalised mark (0 - 100)
      */
     public function getStudentMarksByCriteriaInCategory($studentID, $categoryID)
     {
