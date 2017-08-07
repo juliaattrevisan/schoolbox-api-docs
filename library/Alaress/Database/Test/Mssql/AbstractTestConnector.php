@@ -19,14 +19,6 @@ abstract class AbstractTestConnector extends PHPUnit_Framework_TestCase
     use TestConnectorTrait;
 
     /**
-     * Skip if SQLSrv driver is not available
-     */
-    public function setUp()
-    {
-        $this->skipIfDriverNotAvailable();
-    }
-
-    /**
      * This method should call `$this->markTestSkipped` if the database
      * connector is unavailable.
      */
@@ -38,6 +30,14 @@ abstract class AbstractTestConnector extends PHPUnit_Framework_TestCase
      * @return bool
      */
     abstract public function connect();
+
+    /**
+     * Skip if SQLSrv driver is not available
+     */
+    public function setUp()
+    {
+        $this->skipIfDriverNotAvailable();
+    }
 
     /**
      * Ensure we can establish a connection to test MSSQL database on AWS

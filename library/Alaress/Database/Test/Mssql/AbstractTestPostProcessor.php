@@ -31,6 +31,15 @@ abstract class AbstractTestPostProcessor extends PHPUnit_Framework_TestCase
     abstract public function connect();
 
     /**
+     * Skip if SQLSrv driver is not available
+     */
+    public function setUp()
+    {
+        $this->skipIfDriverNotAvailable();
+        $this->connect();
+    }
+
+    /**
      * Test function to trim whitespace from array/value
      *
      * @param array|string $input
@@ -54,8 +63,6 @@ abstract class AbstractTestPostProcessor extends PHPUnit_Framework_TestCase
      */
     public function testPostProcessor()
     {
-        $this->connect();
-
         $this->mssqlTest->addPostProcessor([$this, 'trimWhitespace']);
 
         // ----------------------------------------------------------------------------------------------------------------

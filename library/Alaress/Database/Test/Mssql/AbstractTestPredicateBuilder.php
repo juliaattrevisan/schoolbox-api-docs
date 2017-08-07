@@ -32,12 +32,19 @@ abstract class AbstractTestPredicateBuilder extends PHPUnit_Framework_TestCase
     abstract public function connect();
 
     /**
+     * Skip if SQLSrv driver is not available
+     */
+    public function setUp()
+    {
+        $this->skipIfDriverNotAvailable();
+        $this->connect();
+    }
+
+    /**
      * Test predicate builder quoting
      */
     public function testPredicateBuilder()
     {
-        $this->connect();
-
         $predicateBuilder = new PredicateBuilder($this->mssqlTest, 'Community');
         $predicateBuilder->equals('Surname', 'rhodes');
 
