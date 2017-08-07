@@ -2,6 +2,8 @@
 /**
  * ConfigMapper
  *
+ * EOTC Configuration instances are persisted via this mapper
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,10 +11,11 @@
 namespace EOTC;
 
 use Calendar_Api_Config_Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 
-class ConfigMapper extends \Schoolbox\Mapper
+class ConfigMapper extends BaseMapper
 {
     const EOTC_SUBSCRIPTION_EVENT_TYPE = 'Custom';
     const EOTC_SUBSCRIPTION_CONNECTOR_CLASS = 'EOTC';
