@@ -10,7 +10,7 @@
 
 namespace Alaress\Database\Test\Mssql;
 
-use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
 use PHPUnit_Framework_TestCase;
@@ -40,7 +40,9 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
     {
         $this->skipIfDriverNotAvailable();
         $this->connect();
-        $this->mssqlTest->beginTransaction();
+        if ($this->mssqlTest instanceof IConnector) {
+            $this->mssqlTest->beginTransaction();
+        }
     }
 
     /**
@@ -48,7 +50,9 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        $this->mssqlTest->rollBack();
+        if ($this->mssqlTest instanceof IConnector) {
+            $this->mssqlTest->rollBack();
+        }
     }
 
     /**
