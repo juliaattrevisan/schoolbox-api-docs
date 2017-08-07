@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\Test\Sqlsrv;
+namespace Alaress\Database\Test\Mssql\Sqlsrv;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Database\Test\TestConnectorTrait;

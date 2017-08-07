@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\Test\Sqlsrv;
+namespace Alaress\Database\Test\Mssql\Sqlsrv;
 
 use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
 use Alaress\Database\Connector\IConnector;
