@@ -74,10 +74,10 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         foreach ($configs as $record) {
             /** @var Calendar_Api_Config_Record $record */
             try {
-                $sourceList[] = array(
+                $sourceList[] = [
                     'id'   => $record->getId(),
                     'name' => $record->decodeConfig()->getLabel()
-                );
+                ];
             } catch (DomainException $e) {
                 //config does not exist or is disabled
             }
@@ -91,7 +91,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
                 $name = $item['name'];
                 if (!array_key_exists($name, $carry)) {
                     $carry[$name]       = $item;
-                    $carry[$name]['id'] = array();
+                    $carry[$name]['id'] = [];
                 }
                 $carry[$name]['id'][] = $id;
                 return $carry;
@@ -149,12 +149,10 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      */
     public function deactivateAll()
     {
-        $statement = $this->database->prepare(
-            "
+        $statement = $this->database->prepare("
             UPDATE `{$this->table}`
             SET status = 0
-        "
-        );
+        ");
 
         $statement->execute();
 
@@ -171,14 +169,12 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      */
     public function activate($eventType, $connectorClass)
     {
-        $statement = $this->database->prepare(
-            "
+        $statement = $this->database->prepare("
             UPDATE `{$this->table}`
             SET status = 1
             WHERE event_type = :eventType
             AND connector_class = :connectorClass
-        "
-        );
+        ");
 
         $statement->bindParam(':eventType', $eventType);
         $statement->bindParam(':connectorClass', $connectorClass);
@@ -201,7 +197,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
          */
         $path = '../library/Calendar/Api/EventType';
 
-        $allApi = array();
+        $allApi = [];
 
         /* Just get the dir names (these correspond to event types)
          */
@@ -253,7 +249,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         $configRecord->setConnectorClass('Vcal');
         $configRecord->updateConfig($config);
 
-        $this->save(array($configRecord));
+        $this->save([$configRecord]);
 
         $config = new Calendar_Api_Config_Connector_Vcal();
         $config->setId($start++);
