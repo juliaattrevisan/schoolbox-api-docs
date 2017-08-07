@@ -121,7 +121,7 @@ $term = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
 if (isset($_GET["returnUrl"])) {
     $returnUrl = \Schoolbox\Learning\Assessment\Redirect::decode($_GET["returnUrl"]);
 } else {
-    $returnUrl = "/submission/listSubmission/{$term->getCode()}/{$folder->getId()}";
+    $returnUrl = '/learning/pending';
 }
 
 $this->setVar(
