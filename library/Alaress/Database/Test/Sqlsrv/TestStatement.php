@@ -20,16 +20,27 @@ class TestStatement extends PHPUnit_Framework_TestCase
     use TestConnectorTrait;
 
     /**
-     * Test plain old boring statements
+     * Connect to database, begin transaction
      */
-    public function testStatement()
+    public function setUp()
     {
         $this->connectSynergetic68();
+        $this->synergetic68->beginTransaction();
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch with long-winded preparation and binding
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Roll back when done
+     */
+    public function tearDown()
+    {
+        $this->synergetic68->rollBack();
+    }
 
+    /**
+     * Test with long-winded preparation and binding
+     */
+    public function testStatementWithPreparationAndBinding()
+    {
         $statement = $this->synergetic68->prepareQuery('SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname');
         $statement->bindInputs(['Surname' => 'rhodes']);
         $statement->execute();
@@ -42,11 +53,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch with long-winded preparation and binding (with type and length specified)
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test with long-winded preparation and binding (with type and length specified)
+     */
+    public function testStatementWithPreparationAndFullBinding()
+    {
         $statement = $this->synergetic68->prepareQuery('SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname');
         $statement->bindInputs([
             'Surname' => [
@@ -65,11 +78,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetch() method
+     */
+    public function testFetch()
+    {
         $statement = $this->synergetic68->executeQuery(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
@@ -82,11 +97,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // executeIterator
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test executeIterator() method
+     */
+    public function testExecuteIterator()
+    {
         $iterator = $this->synergetic68->executeQueryIterator(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
@@ -111,11 +128,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $this->assertSame($count1, $count2);
         */
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchColumn
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetchColumn() method
+     */
+    public function testFetchColumn()
+    {
         $statement = $this->synergetic68->executeQuery(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
@@ -126,11 +145,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         while ($lastName = $statement->fetchColumn()) {
             $this->assertSame(strtolower($lastName), 'rhodes');
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchColumnArray
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test columnArray() method
+     */
+    public function testColumnArray()
+    {
         $statement = $this->synergetic68->executeQuery(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
@@ -143,11 +164,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         foreach ($arrayLastName as $lastName) {
             $this->assertSame(strtolower($lastName), 'rhodes');
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchRowArray
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test rowArray() method
+     */
+    public function testRowArray()
+    {
         $statement = $this->synergetic68->executeQuery(
             'SELECT [ID], [Given1], [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
@@ -184,8 +207,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedure()
     {
-        $this->connectSynergetic68();
-
         $statement = $this->synergetic68->executeStoredProcedure('spsStudentPersonal', [
             'ID' => ['value' => 133, 'type' => PDO::PARAM_INT],
             'FileYear' => ['value' => 2010, 'type' => PDO::PARAM_INT]
@@ -202,8 +223,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedureWithOutputParameters()
     {
-        $this->connectSynergetic68();
-
         $currentDay = null;
         $calendarDate = null;
         $calendarDay = null;
@@ -247,8 +266,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedureIteratorWithOutputParameters()
     {
-        $this->connectSynergetic68();
-
         // This fails under DBLib
         if (!SqlsrvBroker::isAvailable()) {
             $this->setExpectedException(\DomainException::class);
@@ -283,8 +300,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedureWithMultipleRecordSets()
     {
-        $this->connectSynergetic68();
-
         $iterator = $this->synergetic68->executeStoredProcedureIterator('uTestMultipleRecordsets');
 
         $count = 0;
@@ -309,8 +324,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedureFunctionCall()
     {
-        $this->connectSynergetic68();
-
         $function = $this->synergetic68->executeFunctionCall('dbo.fnTimeStr', [
             'ADateTime' => '2016-01-05 13:47:27'
         ]);
