@@ -24,22 +24,9 @@ class ConfigMapper extends \Schoolbox\Mapper
     {
         $this->hasTable('eotc_config');
         $this->hasModel(Config::class);
-        $this->hasMap(array(
-            'column' => 'id',
-            'property' => 'id',
-            'type' => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column' => 'name',
-            'property' => 'name',
-            'type' => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column' => 'value',
-            'property' => 'value',
-            'type' => self::TYPE_STRING,
-        ));
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('name', self::TYPE_STRING, self::COLUMN_IDENTIFIER, 'name');
+        $this->uses('value', self::TYPE_STRING, self::COLUMN_IDENTIFIER, 'value');
     }
 
     /**
