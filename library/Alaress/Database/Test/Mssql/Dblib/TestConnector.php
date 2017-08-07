@@ -10,31 +10,9 @@
 
 namespace Alaress\Database\Test\Mssql\Dblib;
 
-use Alaress\Database\Broker\Dblib\Broker as DblibBroker;
 use Alaress\Database\Test\Mssql\AbstractTestConnector;
-use Alaress\Database\Test\TestConnectorTrait;
 
 class TestConnector extends AbstractTestConnector
 {
-    use TestConnectorTrait;
-
-    /**
-     * Skip if DBLib driver is not available
-     */
-    public function skipIfDriverNotAvailable()
-    {
-        if (!DblibBroker::isAvailable()) {
-            $this->markTestSkipped();
-        }
-    }
-
-    /**
-     * Connect using DBLib
-     *
-     * @return bool
-     */
-    public function connect()
-    {
-        return $this->connectDblibTest();
-    }
+    use SetupTestTrait;
 }

@@ -10,31 +10,9 @@
 
 namespace Alaress\Database\Test\Mssql\Sqlsrv;
 
-use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
 use Alaress\Database\Test\Mssql\AbstractTestConnector;
-use Alaress\Database\Test\TestConnectorTrait;
 
 class TestConnector extends AbstractTestConnector
 {
-    use TestConnectorTrait;
-
-    /**
-     * Skip if DBLib driver is not available
-     */
-    public function skipIfDriverNotAvailable()
-    {
-        if (!SqlsrvBroker::isAvailable()) {
-            $this->markTestSkipped();
-        }
-    }
-
-    /**
-     * Connect using DBLib
-     *
-     * @return bool
-     */
-    public function connect()
-    {
-        return $this->connectSqlsrvTest();
-    }
+    use SetupTestTrait;
 }
