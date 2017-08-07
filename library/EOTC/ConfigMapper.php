@@ -12,6 +12,8 @@ namespace EOTC;
 
 
 class ConfigMapper extends \Schoolbox\Mapper {
+    const EOTC_SUBSCRIPTION_EVENT_TYPE ='Custom';
+    const EOTC_SUBSCRIPTION_CONNECTOR_CLASS = 'EOTC';
 
 	/**
 	 * Mapping
