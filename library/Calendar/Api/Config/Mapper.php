@@ -181,10 +181,10 @@ class Calendar_Api_Config_Mapper extends BaseMapper
             AND connector_class = :connectorClass
         ");
 
-        $statement->bindParam(':eventType', $eventType);
-        $statement->bindParam(':connectorClass', $connectorClass);
-
-        $statement->execute();
+        $statement->execute([
+            'eventType' => $eventType,
+            'connectorClass' => $connectorClass
+        ]);
 
         return $this;
     }
