@@ -407,8 +407,8 @@ class UsageMapper
                 AND `student_submission_file`.`deleted_at` IS NULL)
                 UNION
                 (SELECT
-                    `f`.`id` AS id,
-                    COALESCE(`submission_return_file`.`realname`, `s`.`filename`) AS `name`,
+                    `srf`.`id` AS id,
+                    COALESCE(srf.`realname`, `s`.`filename`) AS `name`,
                     'Return' AS groupName,
                     `s`.`filesize` AS bytes,
                     `t`.`mime` AS mime_type,
@@ -416,12 +416,12 @@ class UsageMapper
                     `c`.`id` AS categoryId,
                     `c`.`name` AS categoryName
                 FROM `submission_return` `f`
-                INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
-                INNER JOIN `storage` `s` ON `s`.hash = `submission_return_file`.hash
+                INNER JOIN `submission_return_file` srf ON srf.submission_return_id = `f`.id
+                INNER JOIN `storage` `s` ON `s`.hash = srf.hash
                 $mimeJoin
                 $boxJoin
                 WHERE `f`.`owner` = :userId
-                AND `submission_return_file`.`deleted_at` IS NULL)
+                AND srf.`deleted_at` IS NULL)
             ) AS allTotals
         ";
 
