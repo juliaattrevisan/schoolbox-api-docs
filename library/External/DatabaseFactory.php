@@ -123,6 +123,17 @@ class External_DatabaseFactory
     }
 
     /**
+     * Builds a document connector.
+     *
+     * @param  string $databaseName
+     * @return External_DocumentInterface
+     */
+    public function buildDocumentConnector($databaseName = '')
+    {
+        return $this->buildConnector('Document', $databaseName);
+    }    
+
+    /**
      * Builds a user detention connector.
      *
      * @param  string $databaseName

@@ -1,0 +1,21 @@
+<?php
+/**
+ * This interface defines how to store documents in a remote SIS
+ *
+ * @author      Damian Sloane <dsloane@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+use Schoolbox\User;
+
+interface External_DocumentInterface
+{
+    /**
+     * Retrieve all archived school reports from external SIS for a selected user
+     *
+     * @param User $student
+     * @return array
+     */
+    public function getAcademicReportsForStudent(User $student);
+}

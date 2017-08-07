@@ -8,6 +8,7 @@
 namespace Schoolbox\User\Profile\DocumentManagement;
 
 use Alaress\Web\Controller\Base;
+use External_Document;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -16,15 +17,17 @@ class Controller extends Base
     /** @var UserMapper $userMapper */
     private $userMapper;
 
+    /** @var External_Document $externalDocument */
+    private $externalDocument;
+
     /**
      * Constructor
      *
      * @param UserMapper $userMapper
      */
-    public function __construct(
-        UserMapper $userMapper
-    ) {
+    public function __construct(UserMapper $userMapper) {
         $this->userMapper = $userMapper;
+        $this->externalDocument = new External_Document();
     }
 
     /**
@@ -40,8 +43,8 @@ class Controller extends Base
             array(
                 'template' => '@profileDocumentManagement/index.twig',
                 'data' => array(
-                    'user' => $this->getUser(),
-                    'student' => $student
+                    'student' => $student,
+                    'reports' => $this->externalDocument->getAcademicReportsForStudent($student)
                 ),
             )
         );
