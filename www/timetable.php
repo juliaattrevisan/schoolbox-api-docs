@@ -213,6 +213,7 @@ foreach ($userList as $user) {
                                         switch (Cfg::get('external_type')) {
                                             case 'maze':
                                             case 'synergetic':
+                                            case 'isams':
                                             case 'schoolbox':
                                                 $period_staff = $userHandler->formatName(
                                                     array(
