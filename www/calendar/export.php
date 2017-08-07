@@ -162,6 +162,7 @@ try {
                 // Resource bookings too for now, as there's no other place for them
                 $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, array()));
                 $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($user, array()));
+                $api->add(new Calendar_Api_EventType_Custom_EOTC_Default($user, []));
             } catch(DomainException $e){
                 // Do nothing. This is expected if Resource Booking is disabled
             }
