@@ -1,155 +1,119 @@
-(function($j) {
-	$j.fn.addSelectAll = function(options) {
-		var config = init(options, this);
+(function ($j) {
+    $j.fn.addSelectAll = function (options) {
+        var config = init(options, this);
 
-		addSelectAll();
+        addSelectAll();
 
-		/**
-		 * Init
-		 *
-		 * @param options
-		 * @param element
-		 * @returns {*|void|Function|extend|extend|extend}
-		 */
-		function init(options, element) {
-			var defaults = {
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*|void|Function|extend|extend|extend}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,		// The checkbox which selects/deselects everything
+                source: null			// The element containing all the checkboxes
+            };
 
-				/* The checkbox which selects/deselects everything
-				 */
-				element: element,
+            return $j.extend(defaults, {}, options);
+        }
 
-				/* The element containing all the checkboxes
-				 */
-				source: null
-			}
+        /**
+         * Add select-all functionality to a checkbox
+         */
+        function addSelectAll() {
+            config.element.click(function () {
+                var elements = config.source.find('input[name="selected[]"]');
 
-			var derived = {
-			}
+                if ($j(this).is(':checked')) {
+                    elements.prop('checked', true);
+                } else {
+                    elements.prop('checked', false);
+                }
+            });
+        }
+    };
 
-			var merged = $j.extend(defaults, derived, options);
+    $j.fn.emailSelected = function (options) {
 
-			return merged;
-		}
+        var config = init(options, this);
 
-		/**
-		 * Add select-all functionality to a checkbox
-		 */
-		function addSelectAll() {
-			config.element.click(function() {
-				var elements = config.source.find('input[name="selected[]"]');
+        fetchEmails();
 
-				if ($j(this).is(':checked')) {
-					elements.prop('checked', true);
-				}
-				else {
-					elements.prop('checked', false);
-				}
-			});
-		}
-	}
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*|void|Function|extend|extend|extend}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,       // The email form belonging to this plugin instance
+                source: null,           // The element containing all the checkboxes
+                url: '',                // The url to access, to provide a list of recipient emails
+                classCode: '',          // The class code for the current list of people
+                target: null            // A jquery-selected element in the form. All the emails get rammed into here
+            };
 
-	$j.fn.emailSelected = function(options) {
+            return $j.extend(defaults, {}, options);
+        }
 
-		var config = init(options, this);
+        /**
+         * Get a list of checked checkboxes containing externalIds
+         */
+        function gatherSelectedIds() {
+            var ids = [];
+            var allSelected = config.source.find('input[name="selected[]"]:checked');
 
-		fetchEmails();
+            for (var i = 0; i < allSelected.length; i++) {
+                var currentSelected = allSelected[i];
+                ids.push(currentSelected.value);
+            }
 
-		/**
-		 * Init
-		 *
-		 * @param options
-		 * @param element
-		 * @returns {*|void|Function|extend|extend|extend}
-		 */
-		function init(options, element) {
-			var defaults = {
+            return ids;
+        }
 
-				/* The email form belonging to this plugin instance
-				 */
-				element: element,
+        /**
+         * A list of all the emails associated with the selected people
+         */
+        function fetchEmails() {
+            var payload = {
+                allIds: gatherSelectedIds(),
+                classCode: config.classCode
+            };
 
-				/* The element containing all the checkboxes
-				 */
-				source: null,
+            $j.post(config.url, payload, function (allEmails) {
 
-				/* The url to access, to provide a list of recipient emails
-				 */
-				url: '',
+                // Inject and redirect only if emails were found
 
-				/* The class code for the current list of people
-				 */
-				classCode: '',
+                if (allEmails.length) {
+                    inject(allEmails);
+                    redirect();
+                }
+                else {
+                    config.element.trigger('emailSelected.noEmail');
+                }
+            }, 'json');
+        }
 
-				/* A jquery-selected element in the form. All the
-				 * emails get rammed into here
-				 */
-				target: null
-			}
+        /**
+         * Inject emails into target form element as a concatenated CSV string
+         */
+        function inject(allEmails) {
+            config.target.val(allEmails.join(','));
+        }
 
-			var derived = {
-			}
+        /**
+         * Submit the form as originally intended
+         */
+        function redirect() {
+            $j(config.element).unbind('submit');
+            config.element.submit();
+        }
 
-			var merged = $j.extend(defaults, derived, options);
-
-			return merged;
-		}
-
-		/**
-		 * Get a list of checked checkboxes containing externalIds
-		 */
-		function gatherSelectedIds() {
-			var allSelected = config.source.find('input[name="selected[]"]:checked');
-			var ids = [];
-
-			for (var i = 0; i < allSelected.length; i++) {
-				var currentSelected = allSelected[i];
-
-				ids.push(currentSelected.value);
-			}
-
-			return ids;
-		}
-
-		/**
-		 * A list of all the emails associated with the selected people
-		 */
-		function fetchEmails() {
-			var payload = {
-				allIds: gatherSelectedIds(),
-				classCode: config.classCode
-			}
-
-			$j.post(config.url, payload, function(responseText) {
-				var allEmails = JSON.parse(responseText);
-
-				/* Inject and redirect only if emails were found
-				 */
-				if (allEmails.length) {
-					inject(allEmails);
-					redirect();
-				}
-				else {
-					config.element.trigger('emailSelected.noEmail');
-				}
-			});
-		}
-
-		/**
-		 * Inject emails into target form element
-		 */
-		function inject(allEmails) {
-			config.target.val(allEmails.join(','));
-		}
-
-		/**
-		 * Submit the form as originally intended
-		 */
-		function redirect() {
-			$j(config.element).unbind('submit');
-			config.element.submit();
-		}
-
-		// And chain
-		return this;
-	}
+        return this;
+    }
 }(jQuery));

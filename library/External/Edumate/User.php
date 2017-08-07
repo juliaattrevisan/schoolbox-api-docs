@@ -495,6 +495,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getStaffContactListExtended()
     {
         return [];

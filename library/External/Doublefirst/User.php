@@ -1173,6 +1173,14 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        return [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getStudentForms()

@@ -170,9 +170,7 @@ class Builder implements IBuilder
     }
 
     /**
-     * @param string                    $columnName
-     * @param string|int|string[]|int[] $columnValue
-     * @return Builder
+     * @inheritdoc
      */
     public function equals($columnName, $columnValue)
     {

@@ -5,57 +5,59 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 use Schoolbox\User;
 
-class External_Maze_User implements External_UserInterface {
+class External_Maze_User implements External_UserInterface
+{
 
-	/**
-	 * An instance of MSSQL
-	 *
-	 * @var null
-	 */
-	protected $db = null;
+    /**
+     * An instance of MSSQL
+     *
+     * @var MSSQL $db
+     */
+    protected $db = null;
 
-	/**
-	 * A Handler of Groups
-	 *
-	 * @var
-	 */
-	protected $groupHandler;
+    /**
+     * A Handler of Groups
+     *
+     * @var Group $groupHandler
+     */
+    protected $groupHandler;
 
-	/**
-	 * Helper
-	 *
-	 * @var External_Maze_Helper
-	 */
-	protected $helper = null;
+    /**
+     * Helper
+     *
+     * @var External_Maze_Helper $helper
+     */
+    protected $helper = null;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->setDb(MSSQL::getInstance());
-		$this->setGroup(new Group());
-		$this->setHelper(new External_Maze_Helper());
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->setDb(MSSQL::getInstance());
+        $this->setGroup(new Group());
+        $this->setHelper(new External_Maze_Helper());
+    }
 
-	/**
-	 * Gets the contact info of the person who is a Student's Contact. The ID
-	 * passed is the ExternalId of the Contact, not the Student.
-	 *
-	 * In Maze, Parents aren't considered atomic units of people, so always
-	 * refer to them in a joint account.
-	 *
-	 * SynergyId is DFKEY
-	 *
-	 * @param $externalId
-	 * @return array|bool
-	 */
-	public function getParent($externalId) {
-		$query = "
+    /**
+     * Gets the contact info of the person who is a Student's Contact. The ID
+     * passed is the ExternalId of the Contact, not the Student.
+     *
+     * In Maze, Parents aren't considered atomic units of people, so always
+     * refer to them in a joint account.
+     *
+     * SynergyId is DFKEY
+     *
+     * @param $externalId
+     * @return array|bool
+     */
+    public function getParent($externalId)
+    {
+        $query = "
 			SELECT
 				DFKEY AS ContactID,
 				MTITLE AS ContactTitle,
@@ -78,95 +80,95 @@ class External_Maze_User implements External_UserInterface {
 			WHERE DFKEY = '{$externalId}'
 		";
 
-		return $this->getDb()->getRow($query);
-	}
+        return $this->getDb()->getRow($query);
+    }
 
-	/**
-	 * 1 + 1 = 1
-	 *
-	 * @param $family
-	 * @return array
-	 */
-	protected function recombine($family) {
+    /**
+     * 1 + 1 = 1
+     *
+     * @param $family
+     * @return array
+     */
+    protected function recombine($family)
+    {
 
-		/* Combine everything into a joint account
-		 *
-		 * Try to accommodate single-parent families listed as either the
-		 * mother or the father
-		 */
-		$newFamily = array();
-		$newFamily['ContactID'] = $family['ContactID'];
+        /* Combine everything into a joint account
+         *
+         * Try to accommodate single-parent families listed as either the
+         * mother or the father
+         */
+        $newFamily = array();
+        $newFamily['ContactID'] = $family['ContactID'];
 
-		if (strlen($family['Preferred']) && strlen($family['SpousePreferred'])) {
-			$newFamily['Title'] = "{$family['Title']} & {$family['SpouseTitle']}";
-			$newFamily['Preferred'] = "{$family['Preferred']} & {$family['SpousePreferred']}";
+        if (strlen($family['Preferred']) && strlen($family['SpousePreferred'])) {
+            $newFamily['Title'] = "{$family['Title']} & {$family['SpouseTitle']}";
+            $newFamily['Preferred'] = "{$family['Preferred']} & {$family['SpousePreferred']}";
 
-			/* Decide whose surname to use
-			 */
-			$newFamily['Surname'] = $family['Surname'];
+            /* Decide whose surname to use
+             */
+            $newFamily['Surname'] = $family['Surname'];
 
-			/* Decide whose email to use
-			 */
-			if (strlen($family['Email'])) {
-				$newFamily['Email'] = $family['Email'];
-			}
-			else if (strlen($family['SpouseEmail'])) {
-				$newFamily['Email'] = $family['SpouseEmail'];
-			}
+            /* Decide whose email to use
+             */
+            if (strlen($family['Email'])) {
+                $newFamily['Email'] = $family['Email'];
+            } elseif (strlen($family['SpouseEmail'])) {
+                $newFamily['Email'] = $family['SpouseEmail'];
+            }
 
-			/* Decide whose mobile to use
-			 */
-			if (strlen($family['MobilePhone'])) {
-				$newFamily['MobilePhone'] = $family['MobilePhone'];
-			}
-			else if (strlen($family['SpouseMobilePhone'])) {
-				$newFamily['SpouseMobilePhone'] = $family['SpouseMobilePhone'];
-			}
+            /* Decide whose mobile to use
+             */
+            if (strlen($family['MobilePhone'])) {
+                $newFamily['MobilePhone'] = $family['MobilePhone'];
+            }
+            elseif (strlen($family['SpouseMobilePhone'])) {
+                $newFamily['SpouseMobilePhone'] = $family['SpouseMobilePhone'];
+            }
 
-			/* Decide whose home phone to use
-			 */
-			$newFamily['HomePhone'] = $family['HomePhone'];
-		}
-		else if (strlen($family['Preferred'])) {
-			$newFamily['Title'] = $family['Title'];
-			$newFamily['Preferred'] = $family['Preferred'];
-			$newFamily['Surname'] = $family['Surname'];
-			$newFamily['Email'] = $family['Email'];
-			$newFamily['HomePhone'] = $family['HomePhone'];
-			$newFamily['MobilePhone'] = $family['MobilePhone'];
-		}
-		else if (strlen($family['SpousePreferred'])) {
-			$newFamily['Title'] = $family['SpouseTitle'];
-			$newFamily['Preferred'] = $family['SpousePreferred'];
-			$newFamily['Surname'] = $family['SpouseSurname'];
-			$newFamily['Email'] = $family['SpouseDefaultEmail'];
-			$newFamily['HomePhone'] = $family['SpouseHomePhone'];
-			$newFamily['MobilePhone'] = $family['SpouseMobilePhone'];
-		}
+            /* Decide whose home phone to use
+             */
+            $newFamily['HomePhone'] = $family['HomePhone'];
+        }
+        elseif (strlen($family['Preferred'])) {
+            $newFamily['Title']       = $family['Title'];
+            $newFamily['Preferred']   = $family['Preferred'];
+            $newFamily['Surname']     = $family['Surname'];
+            $newFamily['Email']       = $family['Email'];
+            $newFamily['HomePhone']   = $family['HomePhone'];
+            $newFamily['MobilePhone'] = $family['MobilePhone'];
+        }
+        elseif (strlen($family['SpousePreferred'])) {
+            $newFamily['Title'] = $family['SpouseTitle'];
+            $newFamily['Preferred'] = $family['SpousePreferred'];
+            $newFamily['Surname'] = $family['SpouseSurname'];
+            $newFamily['Email'] = $family['SpouseDefaultEmail'];
+            $newFamily['HomePhone'] = $family['SpouseHomePhone'];
+            $newFamily['MobilePhone'] = $family['SpouseMobilePhone'];
+        }
 
-		return $newFamily;
-	}
+        return $newFamily;
+    }
 
-	/**
-	 * Gets the contact info of the person who is a Student's Contact. The ID
-	 * passed is the ExternalId of the Contact, not the Student. Anyone who is
-	 * not supposed to be having their details publicised (via the
-	 * DirectoryIncludeFlag) are not included in the result set.
-	 * Accept array of ExternalIDs, or just an int
-	 *
-	 * @param $externalId
-	 *
-	 * @return mixed
-	 */
-	public function getParentSync($externalId) {
-		if (is_array($externalId)) {
-			$assignation = ' IN (\'' . implode('\',\'', $externalId) . '\')';
-		}
-		else {
-			$assignation = " = '$externalId'";
-		}
+    /**
+     * Gets the contact info of the person who is a Student's Contact. The ID
+     * passed is the ExternalId of the Contact, not the Student. Anyone who is
+     * not supposed to be having their details publicised (via the
+     * DirectoryIncludeFlag) are not included in the result set.
+     * Accept array of ExternalIDs, or just an int
+     *
+     * @param $externalId
+     *
+     * @return mixed
+     */
+    public function getParentSync($externalId)
+    {
+        if (is_array($externalId)) {
+            $assignation = ' IN (\'' . implode('\',\'', $externalId) . '\')';
+        } else {
+            $assignation = " = '$externalId'";
+        }
 
-		$query = "
+        $query = "
 			SELECT
 				DFKEY AS ContactID,
 				MTITLE AS Title,
@@ -185,46 +187,44 @@ class External_Maze_User implements External_UserInterface {
 			WHERE DFKEY $assignation
 		";
 
-		if (is_array($externalId)) {
-			$families = $this->getDb()->getAll($query);
+        if (is_array($externalId)) {
+            $families = $this->getDb()->getAll($query);
 
-			$allFamilies = array();
+            $allFamilies = array();
 
-			foreach($families as $currentFamily) {
-				$processed = $this->recombine($currentFamily);
-				$processed['ID'] = $currentFamily['ContactID'];
+            foreach ($families as $currentFamily) {
+                $processed = $this->recombine($currentFamily);
+                $processed['ID'] = $currentFamily['ContactID'];
 
-				$allFamilies[] = $processed;
-			}
-		}
-		else {
-			$currentFamily = $this->getDb()->getRow($query);
+                $allFamilies[] = $processed;
+            }
+        } else {
+            $currentFamily = $this->getDb()->getRow($query);
 
-			$processed = $this->recombine($currentFamily);
-			$processed['ID'] = $currentFamily['ContactID'];
+            $processed = $this->recombine($currentFamily);
+            $processed['ID'] = $currentFamily['ContactID'];
 
-			$allFamilies = $this->recombine($processed);
+            $allFamilies = $this->recombine($processed);
+        }
 
-		}
+        return $allFamilies;
+    }
 
-		return $allFamilies;
-	}
+    /**
+     * Get all the parents emails for a class, or group of students
+     *
+     * @param array $synergyIds
+     *
+     * @return array
+     */
+    public function getParentEmails($synergyIds)
+    {
+        if (!count($synergyIds)) {
+            return array();
+        } else {
+            $allIds = '(\'' . implode('\',\'', $synergyIds) . '\')';
 
-	/**
-	 * Get all the parents emails for a class, or group of students
-	 *
-	 * @param array $synergyIds
-	 *
-	 * @return array
-	 */
-	public function getParentEmails($synergyIds) {
-		if (!count($synergyIds)) {
-			return array();
-		}
-		else {
-			$allIds = '(\'' . implode('\',\'', $synergyIds) . '\')';
-
-			$query = "
+            $query = "
 				SELECT
 					DF1.DFKEY AS RelatedID1,
 					DF2.DFKEY AS RelatedID2,
@@ -238,12 +238,12 @@ class External_Maze_User implements External_UserInterface {
 				WHERE ST.STKEY IN $allIds
 			";
 
-			$allEmails = $this->getDb()->getAll($query);
+            $allEmails = $this->getDb()->getAll($query);
 
-			$processed = array();
+            $processed = array();
 
-			if (is_array($allEmails) && count($allEmails)) {
-				foreach($allEmails as $currentEmail) {
+            if (is_array($allEmails) && count($allEmails)) {
+                foreach ($allEmails as $currentEmail) {
 
                     /* Choose one of two possibilities
                      *
@@ -255,8 +255,7 @@ class External_Maze_User implements External_UserInterface {
                     if (strlen($currentEmail['RelatedID1'])) {
                         if (strlen($currentEmail['FamilyEmail1'])) {
                             $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
-                        }
-                        else if (strlen($currentEmail['FamilyEmail2'])) {
+                        } elseif (strlen($currentEmail['FamilyEmail2'])) {
                             $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail2'];
                         }
                     }
@@ -271,39 +270,40 @@ class External_Maze_User implements External_UserInterface {
                         if (strlen($currentEmail['AltFamilyEmail1'])) {
                             $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
                         }
-                        else if (strlen($currentEmail['AltFamilyEmail2'])) {
+                        elseif (strlen($currentEmail['AltFamilyEmail2'])) {
                             $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail2'];
                         }
                     }
-				}
-			}
-            
-			return $processed;
-		}
-	}
+                }
+            }
 
-	/**
-	 * Get a guy's info from Maze
-	 *
-	 * $synId is the STKEY value.
-	 *
-	 * @param  $synId
-	 * @return array|bool
-	 */
-	public function getStudent($synId) {
+            return $processed;
+        }
+    }
 
-		/* The School Year is never represented as just an int, it's always a
-		 * string of some sort like "Y04" or "Year 2" or "Students In Year 3"
-		 * so you have to replace chars
-		 *
-		 * Student Tutor, Name and Description are Initials, Formal Name and
-		 * Full Name respectively.
-		 *
-		 * Student Head Of House is also their full name.
-		 *
-		 * StudentForm is an identifier; StudentFormStaffName is their full name.
-		 */
-		$query = "
+    /**
+     * Get a guy's info from Maze
+     *
+     * $synId is the STKEY value.
+     *
+     * @param  $synId
+     * @return array|bool
+     */
+    public function getStudent($synId)
+    {
+
+        /* The School Year is never represented as just an int, it's always a
+         * string of some sort like "Y04" or "Year 2" or "Students In Year 3"
+         * so you have to replace chars
+         *
+         * Student Tutor, Name and Description are Initials, Formal Name and
+         * Full Name respectively.
+         *
+         * Student Head Of House is also their full name.
+         *
+         * StudentForm is an identifier; StudentFormStaffName is their full name.
+         */
+        $query = "
 			SELECT
 				ST.STKEY AS StudentID,
 				ST.FIRST_NAME AS StudentGiven1,
@@ -351,16 +351,16 @@ class External_Maze_User implements External_UserInterface {
 			WHERE STKEY = '{$synId}'
 		";
 
-		$student = $this->getDb()->getRow($query);
+        $student = $this->getDb()->getRow($query);
 
-		/* Assign birthday
-		 */
-		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'Y-m-d');
-		$student['StudentBirthDate'] = $birthday->getUnixTimestamp();
+        /* Assign birthday
+         */
+        $birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'Y-m-d');
+        $student['StudentBirthDate'] = $birthday->getUnixTimestamp();
 
-		/* Find one or more homeroom teachers and condense them
-		 */
-		$query = "
+        /* Find one or more homeroom teachers and condense them
+         */
+        $query = "
 			SELECT
 				SF.FIRST_NAME AS FIRSTNAME,
 				SF.SURNAME
@@ -369,35 +369,36 @@ class External_Maze_User implements External_UserInterface {
 			WHERE KGC.ROLL_GROUP = '{$student['ROLL_GROUP']}'
 		";
 
-		$allHomeroomTeachers = $this->getDb()->getAll($query);
+        $allHomeroomTeachers = $this->getDb()->getAll($query);
 
-		if (is_array($allHomeroomTeachers) && count($allHomeroomTeachers)) {
-			$processed = array();
+        if (is_array($allHomeroomTeachers) && count($allHomeroomTeachers)) {
+            $processed = array();
 
-			foreach ($allHomeroomTeachers as $currentHomeroomTeacher) {
-				$processed[] = $currentHomeroomTeacher['FIRSTNAME'] . ' ' . $currentHomeroomTeacher['SURNAME'];
-			}
+            foreach ($allHomeroomTeachers as $currentHomeroomTeacher) {
+                $processed[] = $currentHomeroomTeacher['FIRSTNAME'] . ' ' . $currentHomeroomTeacher['SURNAME'];
+            }
 
-			/* Uniques only
-			 */
-			$processed = array_values(array_unique($processed));
+            /* Uniques only
+             */
+            $processed = array_values(array_unique($processed));
 
-			$student['StudentHeadOfHouse'] = implode(', ', $processed);
-		}
+            $student['StudentHeadOfHouse'] = implode(', ', $processed);
+        }
 
-		return $student;
-	}
+        return $student;
+    }
 
-	/**
-	 * Get a guy's info from Maze
-	 *
-	 * None of the users seem to have any value for CAMPUS
-	 *
-	 * @param  $synId
-	 * @return array|bool
-	 */
-	public function getStaff($synId) {
-		$query = "
+    /**
+     * Get a guy's info from Maze
+     *
+     * None of the users seem to have any value for CAMPUS
+     *
+     * @param  $synId
+     * @return array|bool
+     */
+    public function getStaff($synId)
+    {
+        $query = "
 			SELECT
 				SFKEY AS SchoolStaffCode,
 				'' AS StaffBuilding,
@@ -414,17 +415,18 @@ class External_Maze_User implements External_UserInterface {
 			WHERE SFKEY = '{$synId}'
 		";
 
-		return $this->getDb()->getRow($query);
-	}
+        return $this->getDb()->getRow($query);
+    }
 
-	/**
-	 * Get a list of student contacts (parents) and their contact information
-	 *
-	 * @param string $externalUserId
-	 * @return mixed
-	 */
-	public function getStudentContactList($externalUserId) {
-		$query = "
+    /**
+     * Get a list of student contacts (parents) and their contact information
+     *
+     * @param string $externalUserId
+     * @return mixed
+     */
+    public function getStudentContactList($externalUserId)
+    {
+        $query = "
 			SELECT
 				DFKEY AS StudentContactID,
 				MTITLE AS StudentContactTitle,
@@ -458,33 +460,34 @@ class External_Maze_User implements External_UserInterface {
 			ORDER BY primaryFamily DESC
 		";
 
-	        return $this->getDb()->getAll($query);
-	}
+        return $this->getDb()->getAll($query);
+    }
 
-	/**
-	 * Gets a list of Contacts for all Students in a particular year level. The
-	 * year level is stored in Synergetic.
-	 *
-	 * Used in reporting.
-	 *
-	 * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
-	 * so I changed it to use CountryCode instead.
-    	 *
-     	 * Note that if a student has split parents, they will appear more than once.
-     	 * They will appear once for each split parent.
-	 *
-	 * @param $yearlevel
-	 * @param $name
-	 * @param $boardingStatus
-	 * @param $form
-	 *
-	 * @return mixed
-	 */
-	public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
+    /**
+     * Gets a list of Contacts for all Students in a particular year level. The
+     * year level is stored in Synergetic.
+     *
+     * Used in reporting.
+     *
+     * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
+     * so I changed it to use CountryCode instead.
+     *
+     * Note that if a student has split parents, they will appear more than once.
+     * They will appear once for each split parent.
+     *
+     * @param $yearlevel
+     * @param $name
+     * @param $boardingStatus
+     * @param $form
+     *
+     * @return mixed
+     */
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    {
 
-		/* Mega select
-		 */
-		$query = "
+        /* Mega select
+         */
+        $query = "
 			SELECT
 				ST.STKEY AS StudentID,
 				ST.FIRST_NAME AS StudentGiven1,
@@ -540,31 +543,30 @@ class External_Maze_User implements External_UserInterface {
 			WHERE 1 = 1
 		";
 
-		/* Search for a particular year level
-		 */
-		if (strlen($yearlevel)) {
+        /* Search for a particular year level
+         */
+        if (strlen($yearlevel)) {
 
-			/* Translate back to Maze-specific
-			 */
-			if (is_numeric($yearlevel)) {
-				$mazeYearLevel = $yearlevel;
+            /* Translate back to Maze-specific
+             */
+            if (is_numeric($yearlevel)) {
+                $mazeYearLevel = $yearlevel;
 
-				if ($yearlevel < 10) {
-					$mazeYearLevel = '0' . $yearlevel;
-				}
+                if ($yearlevel < 10) {
+                    $mazeYearLevel = '0' . $yearlevel;
+                }
 
-				$mazeYearLevel = 'Y' . $mazeYearLevel;
+                $mazeYearLevel = 'Y' . $mazeYearLevel;
 
-				$query .= "
+                $query .= "
 					AND (ST.SCHOOL_YEAR = '{$mazeYearLevel}')
 				";
-			}
-		}
+            }
+        }
 
-		/* Search for a student name
-		 */
-		if (strlen($name)) {
-
+        /* Search for a student name
+         */
+        if (strlen($name)) {
             $splitNames = explode(' ', $name);
 
             foreach ($splitNames as $splitName) {
@@ -577,91 +579,94 @@ class External_Maze_User implements External_UserInterface {
                     )
                 ";
             }
-		}
+        }
 
-		/* Search for a particular boarding status
-		 */
-		if ($boardingStatus == '') {
+        /* Search for a particular boarding status
+         */
+        if ($boardingStatus == '') {
+            /* No restrictions on result set
+             */
+        } elseif ($boardingStatus == 'yes') {
+            $query .= "
+                AND ST.BOARDER = 'Y'
+            ";
+        } else {
+            $query .= "
+                AND ST.BOARDER != 'Y'
+            ";
+        }
 
-			/* No restrictions on result set
-			 */
-		}
-		else if ($boardingStatus == 'yes') {
-			$query .= "
-				AND ST.BOARDER = 'Y'
-			";
-		}
-		else {
-			$query .= "
-				AND ST.BOARDER != 'Y'
-			";
-		}
+        /* Search for a particular form
+         */
+        if ($form) {
+            $form = $this->getDb()->quote($form);
 
-		/* Search for a particular form
-		 */
-		if ($form) {
-			$form = $this->getDb()->quote($form);
-
-			$query .= "
+            $query .= "
 				AND KGC.DESCRIPTION = '{$form}'
 			";
-		}
+        }
 
-		$query .= "
+        $query .= "
 			ORDER BY StudentSurname, StudentID, StudentContactType
 		";
 
-		return $this->getDb()->getAll($query);
-	}
+        return $this->getDb()->getAll($query);
+    }
 
-	/**
-	 * Gets a list of Contacts for all Student Boarders.
-	 *
-	 * Used in reporting.
-	 *
-	 * @return mixed
-	 */
-	public function getStudentBoarderContactListExtended() {
-		return $this->getStudentContactListExtended('', '', 'Y', '');
-	}
+    /**
+     * Gets a list of Contacts for all Student Boarders.
+     *
+     * Used in reporting.
+     *
+     * @return mixed
+     */
+    public function getStudentBoarderContactListExtended()
+    {
+        return $this->getStudentContactListExtended('', '', 'Y', '');
+    }
 
-	/**
-	 * Get the current semester
-	 *
-	 * This should take the form below:
-	 * $row['CURRENT_SEMESTER'] = '1998S4';
-	 *
-	 * @param null $externalUserId
-	 */
-	public function getCurrentSemester($externalUserId = null) {
+    /**
+     * Get the current semester
+     *
+     * This should take the form below:
+     * $row['CURRENT_SEMESTER'] = '1998S4';
+     *
+     * @param null $externalUserId
+     * @return string
+     */
+    public function getCurrentSemester($externalUserId = null)
+    {
         return $this->getHelper()->getCurrentSemester();
-	}
+    }
 
+    /**
+     * @param null $externalUserId
+     * @return string
+     */
     public function getCurrentYear($externalUserId = null)
     {
         return $this->getHelper()->getCurrentYear();
     }
 
-	/**
-	 * Get a list of subjects for a particular user
-	 *
-	 * @param User $user
-	 * @return array
-	 */
-	public function getSubjectList(User $user)
+    /**
+     * Get a list of subjects for a particular user
+     *
+     * @param User $user
+     * @return array
+     */
+    public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
-        $allSubjects = array();
 
         if (empty($externalId)) {
             return [];
         }
 
-		if ($user->getRole()->isStudent()) {
+        if ($user->getRole()->isStudent()) {
 
-			/* Get roll groups
-			 */
-			$query = "
+            /* Get roll groups
+             */
+            $query = "
 				SELECT
 					ST.FIRST_NAME,
 					ST.SURNAME,
@@ -675,15 +680,15 @@ class External_Maze_User implements External_UserInterface {
 				WHERE ST.STKEY = '{$externalId}'
 			";
 
-			$part1 = $this->getDb()->getAll($query);
+            $part1 = $this->getDb()->getAll($query);
 
-			if (!$part1) {
-				$part1 = array();
-			}
+            if (!$part1) {
+                $part1 = array();
+            }
 
-			/* Get regular classes
-			 */
-			$query = "
+            /* Get regular classes
+             */
+            $query = "
 				SELECT
 					STMA.MKEY AS ClassCode,
 					STMA.CLASS AS ClassNumber,
@@ -696,126 +701,127 @@ class External_Maze_User implements External_UserInterface {
 				AND STMA.TTPERIOD = '{$this->getHelper()->getCurrentTTPERIOD()}'
 			";
 
-			$part2 = $this->getDb()->getAll($query);
+            $part2 = $this->getDb()->getAll($query);
 
-			if (!$part2) {
-				$part2 = array();
-			}
+            if (!$part2) {
+                $part2 = array();
+            }
 
-			$allSubjects = array_merge($part1, $part2);
-		}
-		else if ($user->getRole()->isStaff()) {
-			$query = "
-				SELECT
-					KGC.ROLL_GROUP AS ClassCode,
-					'' AS ClassNumber,
-					'' AS classType,
-					'' AS ClassCampus,
-					KGC.DESCRIPTION AS name
-				FROM KGC
-				WHERE TEACHER = '{$externalId}'
-			";
+            $allSubjects = array_merge($part1, $part2);
+        }
+        elseif ($user->getRole()->isStaff()) {
+            $query = "
+                SELECT
+                    KGC.ROLL_GROUP AS ClassCode,
+                    '' AS ClassNumber,
+                    '' AS classType,
+                    '' AS ClassCampus,
+                    KGC.DESCRIPTION AS name
+                FROM KGC
+                WHERE TEACHER = '{$externalId}'
+            ";
 
-			$part1 = $this->getDb()->getAll($query);
+            $part1 = $this->getDb()->getAll($query);
 
-			if (!$part1) {
-				$part1 = array();
-			}
+            if (!$part1) {
+                $part1 = array();
+            }
 
-			$query = "
-				SELECT
-					THTQ.SUBJ AS ClassCode,
-					THTQ.CLASS AS ClassNumber,
-					SU.FULLNAME AS name,
-					'' AS classType,
-					'' AS ClassCampus
-				FROM THTQ
-				INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
-				WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-				AND (THTQ.T1TEACH = '{$externalId}' OR THTQ.T2TEACH = '{$externalId}')
-			";
+            $query = "
+                SELECT
+                    THTQ.SUBJ AS ClassCode,
+                    THTQ.CLASS AS ClassNumber,
+                    SU.FULLNAME AS name,
+                    '' AS classType,
+                    '' AS ClassCampus
+                FROM THTQ
+                INNER JOIN SU ON SU.SUKEY = THTQ.SUBJ
+                WHERE THTQ.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+                AND (THTQ.T1TEACH = '{$externalId}' OR THTQ.T2TEACH = '{$externalId}')
+            ";
 
-			$part2 = $this->getDb()->getAll($query);
+            $part2 = $this->getDb()->getAll($query);
 
-			if (!$part2) {
-				$part2 = array();
-			}
+            if (!$part2) {
+                $part2 = array();
+            }
 
-			$allSubjects = array_merge($part1, $part2);
-		} else {
-		    return [];
+            $allSubjects = array_merge($part1, $part2);
+        }
+        else {
+            return [];
         }
 
-		/* Return structure
-		 */
-		$subjectList = array();
+        /* Return structure
+         */
+        $subjectList = array();
 
-		$processedIds = array();
+        $processedIds = array();
 
-		/* Format it in a schoolbox-friendly way
-		 * Also uniqueify this list using classCode/classNumber combination
-		 */
-		if (is_array($allSubjects) && count($allSubjects)) {
-			foreach($allSubjects as $currentSubject) {
+        /* Format it in a schoolbox-friendly way
+         * Also uniqueify this list using classCode/classNumber combination
+         */
+        if (is_array($allSubjects) && count($allSubjects)) {
+            foreach ($allSubjects as $currentSubject) {
 
-				/* Don't display these timetable items as part of Subject List
-				 * (Not Available, Faculty Meetings, Gate Duty, etc)
-				 */
-				$match = preg_match('#^NOT|^FACUL|^MEET|^TSHOP|^FRONT|^STAFF|\d?A/F|^QUAD#', $currentSubject['ClassCode']);
+                /* Don't display these timetable items as part of Subject List
+                 * (Not Available, Faculty Meetings, Gate Duty, etc)
+                 */
+                $match = preg_match('#^NOT|^FACUL|^MEET|^TSHOP|^FRONT|^STAFF|\d?A/F|^QUAD#', $currentSubject['ClassCode']);
 
-				if (!$match) {
-					if (strlen($currentSubject['ClassNumber'])) {
-						$classCode = $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']);
-					}
-					else {
-						$classCode = $currentSubject['ClassCode'];
-					}
+                if (!$match) {
+                    if (strlen($currentSubject['ClassNumber'])) {
+                        $classCode = $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']);
+                    } else {
+                        $classCode = $currentSubject['ClassCode'];
+                    }
 
-					if (!in_array($classCode, $processedIds)) {
-						$subjectList[] = array(
-							'code' => $classCode,
-							'name' => $currentSubject['name'],
-							'classType' => $currentSubject['classType'],
-							'campusCode' => $currentSubject['ClassCampus']
-						);
+                    if (!in_array($classCode, $processedIds)) {
+                        $subjectList[] = array(
+                            'code' => $classCode,
+                            'name' => $currentSubject['name'],
+                            'classType' => $currentSubject['classType'],
+                            'campusCode' => $currentSubject['ClassCampus']
+                        );
 
-						$processedIds[] = $classCode;
-					}
-				}
-			}
-		}
+                        $processedIds[] = $classCode;
+                    }
+                }
+            }
+        }
 
-		return $subjectList;
-	}
+        return $subjectList;
+    }
 
-	/**
-	 * Returns a list of externalIds
-	 *
-	 * @param $synergyID
-	 * @return array|bool
-	 */
-	public function getEnrolledStudents($synergyID) {
-		$query = "
+    /**
+     * Returns a list of externalIds
+     *
+     * @param $synergyID
+     * @return array|bool
+     */
+    public function getEnrolledStudents($synergyID)
+    {
+        $query = "
 			SELECT ST.STKEY AS RelatedID
 			FROM ST
 			WHERE FAMILY = '{$synergyID}'
 			OR FAMB = '{$synergyID}'
 		";
 
-		return $this->getDb()->getAll($query);
-	}
+        return $this->getDb()->getAll($query);
+    }
 
-	/**
-	 * Get an email address for a particular person
-	 *
-	 * @param $externalUserId
-	 * @return bool
-	 */
-	public function getEmail($externalUserId) {
-
-		/* TODO: This doesn't seem to be used in Schoolbox?
-		 */
-	}
+    /**
+     * Get an email address for a particular person
+     *
+     * @param $externalUserId
+     * @return bool
+     */
+    public function getEmail($externalUserId)
+    {
+        /* TODO: This doesn't seem to be used in Schoolbox?
+         */
+    }
 
 	/**
 	 * Returns a local path to the user's portrait
@@ -827,99 +833,101 @@ class External_Maze_User implements External_UserInterface {
 	{
 		$photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
-		if (Config::get('photo_sis_import') == 0) {
-			if (file_exists($photoPath))
-				return $photoPath;
-			else
-				return false;
-		}
+        if (Config::get('photo_sis_import') == 0) {
+            if (file_exists($photoPath)) {
+                return $photoPath;
+            } else {
+                return false;
+            }
+        }
 
-		$userMapper = new \Schoolbox\UserMapper();
+        $userMapper = new \Schoolbox\UserMapper();
         try {
-		    $user = $userMapper->findByExternalId($externalUserId);
+            $user = $userMapper->findByExternalId($externalUserId);
         } catch (Schoolbox\Mapper\Exception $e) {
             /* User not found */
             return false;
         }
 
-		/* Students and staff store their pics in different places
-		 */
-		if ($this->getGroup()->isStudent($user->getId())) {
-			$query = "
+        /* Students and staff store their pics in different places
+         */
+        if ($this->getGroup()->isStudent($user->getId())) {
+            $query = "
 				SELECT
 					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
 				FROM ST
 				WHERE ST.STKEY = '{$externalUserId}'
 			";
-		}
-		else if ($this->getGroup()->isStaff($user->getId())) {
-			$query = "
-				SELECT
-					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
-				FROM SF
-				WHERE SF.SFKEY = '{$externalUserId}'
-			";
-		}
+        }
+        elseif ($this->getGroup()->isStaff($user->getId())) {
+            $query = "
+                SELECT
+                    CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
+                FROM SF
+                WHERE SF.SFKEY = '{$externalUserId}'
+            ";
+        }
 
-		if ($photo = $this->getDb()->getRow($query)) {
+        if ($photo = $this->getDb()->getRow($query)) {
 
-			//TODO: delete photos on rollover
+            //TODO: delete photos on rollover
 
-			/* If the cached file doesn't exist, or the synergetic image is more recent than our
-			 * last known cached version, regenerate cached version.
-			 *
-			 * Separate the queries out, fetching the photo data only if it's newer than the cached
-			 * version, or if the cache version doesn't already exist.
-			 */
-			$cacheTime = @filemtime($photoPath);
-			$modifiedTime = strtotime($photo['ModifiedDate']);
+            /* If the cached file doesn't exist, or the synergetic image is more recent than our
+             * last known cached version, regenerate cached version.
+             *
+             * Separate the queries out, fetching the photo data only if it's newer than the cached
+             * version, or if the cache version doesn't already exist.
+             */
+            $cacheTime = @filemtime($photoPath);
+            $modifiedTime = strtotime($photo['ModifiedDate']);
 
-			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-				if ($this->getGroup()->isStudent($user->getId())) {
-					$query = "
+            if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
+                if ($this->getGroup()->isStudent($user->getId())) {
+                    $query = "
 						SELECT
 							STUDENT_PIC AS Photo
 						FROM ST
 						WHERE ST.STKEY = '{$externalUserId}'
 					";
-				}
-				else if ($this->getGroup()->isStaff($user->getId())) {
-					$query = "
-						SELECT
-							STAFF_PIC AS Photo
-						FROM SF
-						WHERE SF.SFKEY = '{$externalUserId}'
-					";
-				}
+                }
+                elseif ($this->getGroup()->isStaff($user->getId())) {
+                    $query = "
+                    SELECT
+                        STAFF_PIC AS Photo
+                    FROM SF
+                    WHERE SF.SFKEY = '{$externalUserId}'
+                ";
+                }
 
-				$photo = $this->getDb()->getRow($query);
+                $photo = $this->getDb()->getRow($query);
 
-				/* Purge all previously transformed copies
-				 */
-				$pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
+                /* Purge all previously transformed copies
+                 */
+                $pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
 
-				foreach (glob($pattern) as $oldCacheFile) {
-					unlink($oldCacheFile);
-				}
+                foreach (glob($pattern) as $oldCacheFile) {
+                    unlink($oldCacheFile);
+                }
 
-				/* Save the image
-				 */
-				$photoHandle = fopen($photoPath, "w");
-				fwrite($photoHandle, $photo['Photo']);
-				fclose($photoHandle);
-			}
+                /* Save the image
+                 */
+                $photoHandle = fopen($photoPath, "w");
+                fwrite($photoHandle, $photo['Photo']);
+                fclose($photoHandle);
+            }
 
-			return $photoPath;
-		}
+            return $photoPath;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Used in sync scripts
-	 */
-	public function getStudentUserAccountInfo() {
-		$query = "
+    /**
+     * Used in sync scripts
+     */
+    public function getStudentUserAccountInfo()
+    {
+        $query = "
 			SELECT
 				USER_NAME AS NetworkLogin,
 				NULL AS StudentTitle,
@@ -935,14 +943,15 @@ class External_Maze_User implements External_UserInterface {
 			WHERE STATUS != 'LEFT'
 		";
 
-		return $this->getDb()->getAll($query);
-	}
+        return $this->getDb()->getAll($query);
+    }
 
-	/**
-	 * Used in sync scripts
-	 */
-	public function getParentUserAccountInfo() {
-		$query = "
+    /**
+     * Used in sync scripts
+     */
+    public function getParentUserAccountInfo()
+    {
+        $query = "
 			SELECT
 				DF.DFKEY AS DFKEY,
 				DF.DFKEY AS ID,
@@ -960,49 +969,49 @@ class External_Maze_User implements External_UserInterface {
 			LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
 		";
 
-		$allFamilies = $this->getDb()->getAll($query);
+        $allFamilies = $this->getDb()->getAll($query);
 
-		$families = array();
+        $families = array();
 
-		foreach($allFamilies as $currentFamily) {
-			$newFamily = $this->recombine($currentFamily);
-			$newFamily['ID'] = $currentFamily['ID'];
+        foreach ($allFamilies as $currentFamily) {
+            $newFamily = $this->recombine($currentFamily);
+            $newFamily['ID'] = $currentFamily['ID'];
 
-			/* Change the key names with "StudentContact" as a prefix
-			 * due to different interfaces from the original scenario
-			 * recombine() was built for
-			 */
-			$allKeys = array_keys($newFamily);
+            /* Change the key names with "StudentContact" as a prefix
+             * due to different interfaces from the original scenario
+             * recombine() was built for
+             */
+            $allKeys = array_keys($newFamily);
 
-			$updatedFamily = array();
+            $updatedFamily = array();
 
-			foreach($allKeys as $currentKey) {
-				if ($currentKey == 'ContactID') {
-					$key = 'Student' . $currentKey;
-					$updatedFamily[$key] = $currentFamily[$currentKey];
-				}
-				else {
-					$key = 'StudentContact' . $currentKey;
-					$updatedFamily[$key] = $newFamily[$currentKey];
-				}
-			}
+            foreach ($allKeys as $currentKey) {
+                if ($currentKey == 'ContactID') {
+                    $key = 'Student' . $currentKey;
+                    $updatedFamily[$key] = $currentFamily[$currentKey];
+                } else {
+                    $key = 'StudentContact' . $currentKey;
+                    $updatedFamily[$key] = $newFamily[$currentKey];
+                }
+            }
 
-			$families[$currentFamily['DFKEY']] = $updatedFamily;
-		}
+            $families[$currentFamily['DFKEY']] = $updatedFamily;
+        }
 
-		$data = array_values($families);
+        $data = array_values($families);
 
-		return $data;
-	}
+        return $data;
+    }
 
-	/**
-	 * Used in sync scripts
-	 *
-	 * Staff members with a Finish date are ignored
-	 * Staff members with staff_type L (left/departed) are ignored
-	 */
-	public function getStaffUserAccountInfo() {
-		$query = "
+    /**
+     * Used in sync scripts
+     *
+     * Staff members with a Finish date are ignored
+     * Staff members with staff_type L (left/departed) are ignored
+     */
+    public function getStaffUserAccountInfo()
+    {
+        $query = "
 			SELECT
 				SFKEY AS StaffID,
 				USER_NAME AS NetworkLogin,
@@ -1022,8 +1031,8 @@ class External_Maze_User implements External_UserInterface {
 			AND STAFF_TYPE != 'L'
 		";
 
-		return $this->getDb()->getAll($query);
-	}
+        return $this->getDb()->getAll($query);
+    }
 
     /**
      * List of campuses a staff member is involved in based on timetable
@@ -1036,33 +1045,44 @@ class External_Maze_User implements External_UserInterface {
         return array();
     }
 
+    /**
+     * Determine what kind of boarder this person is
+     */
+    public function determineBoarderType($boarderValue)
+    {
+        if ($boarderValue == 'Y') {
+            return 'Boarder';
+        }
+
+        return 'Day';
+    }
 
     /**
-	 * Determine what kind of boarder this person is
-	 */
-	public function determineBoarderType($boarderValue) {
-		if ($boarderValue == 'Y') {
-			return 'Boarder';
-		}
+     * Get contact list for staff directory
+     *
+     * @return array
+     */
+    public function getStaffContactListExtended()
+    {
+        // TODO: Implement getStaffContactListExtended() method.
+        return array();
+    }
 
-		return 'Day';
-	}
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterByHouseId($houseID)
+    {
+        // Return nothing
+    }
 
-	/**
-	 * Get contact list for staff directory
-	 *
-	 * @return array
-	 */
-	public function getStaffContactListExtended() {
-		// TODO: Implement getStaffContactListExtended() method.
-		return array();
-	}
-
-	/**
-	 * Stub method, probably not used
-	 */
-	public function getHousemasterByHouseId($houseID) {
-	}
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        return [];
+    }
 
     /**
      * Not yet implemented for this connector
@@ -1074,60 +1094,66 @@ class External_Maze_User implements External_UserInterface {
         return [];
     }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set db
-	 *
-	 * @param null $db
-	 */
-	protected function setDb($db) {
-		$this->db = $db;
-	}
+    /**
+     * Set db
+     *
+     * @param null $db
+     */
+    protected function setDb($db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 * Get db
-	 *
-	 * @return null
-	 */
-	protected function getDb() {
-		return $this->db;
-	}
+    /**
+     * Get db
+     *
+     * @return null
+     */
+    protected function getDb()
+    {
+        return $this->db;
+    }
 
-	/**
-	 * Set group
-	 *
-	 * @param Group $groupHandler
-	 */
-	protected function setGroup($groupHandler) {
-		$this->groupHandler = $groupHandler;
-	}
+    /**
+     * Set group
+     *
+     * @param Group $groupHandler
+     */
+    protected function setGroup($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
 
-	/**
-	 * Get group
-	 *
-	 * @return Group
-	 */
-	protected function getGroup() {
-		return $this->groupHandler;
-	}
+    /**
+     * Get group
+     *
+     * @return Group
+     */
+    protected function getGroup()
+    {
+        return $this->groupHandler;
+    }
 
-	/**
-	 * Set helper
-	 *
-	 * @param External_Maze_Helper $helper
-	 */
-	protected function setHelper($helper) {
-		$this->helper = $helper;
-	}
+    /**
+     * Set helper
+     *
+     * @param External_Maze_Helper $helper
+     */
+    protected function setHelper($helper)
+    {
+        $this->helper = $helper;
+    }
 
-	/**
-	 * Get helper
-	 *
-	 * @return External_Maze_Helper
-	 */
-	protected function getHelper() {
-		return $this->helper;
-	}
+    /**
+     * Get helper
+     *
+     * @return External_Maze_Helper
+     */
+    protected function getHelper()
+    {
+        return $this->helper;
+    }
 }

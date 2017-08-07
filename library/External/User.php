@@ -40,6 +40,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param Integer $externalUserId
+     * @return String
      */
     public function getPortrait($externalUserId)
     {
@@ -47,7 +50,10 @@ class External_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * Used in search
+     *
+     * @param Integer $externalUserId
+     * @return array
      */
     public function getParent($externalUserId)
     {
@@ -55,7 +61,10 @@ class External_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * No usages found
+     *
+     * @param Integer $externalUserId
+     * @return array
      */
     public function getParentSync($externalUserId)
     {
@@ -64,14 +73,21 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param array $synergyIds
+     * @return array
      */
     public function getParentEmails($synergyIds)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
+
     /**
      * @inheritdoc
+     *
+     * @param Integer $externalUserId
+     * @return array
      */
     public function getStudent($externalUserId)
     {
@@ -80,6 +96,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param Integer $externalUserId
+     * @return array
      */
     function getStaff($externalUserId)
     {
@@ -88,6 +107,14 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param $yearlevel
+     * @param $name
+     * @param $boardingStatus
+     * @param $form
+     *
+     * @internal param int $yearLevel
+     * @return array
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
@@ -96,6 +123,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param string $externalUserId
+     * @return array
      */
     function getStudentContactList($externalUserId)
     {
@@ -104,6 +134,8 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @return Integer
      */
     function getCurrentSemester($externalUserId = null)
     {
@@ -120,6 +152,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param User $user
+     * @return array
      */
     function getSubjectList(User $user)
     {
@@ -128,6 +163,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param Integer $externalUserId
+     * @return array
      */
     function getEnrolledStudents($externalUserId)
     {
@@ -136,6 +174,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param Integer $externalUserId
+     * @return String
      */
     function getEmail($externalUserId)
     {
@@ -144,6 +185,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @todo Review usage of method
+     * @return array
      */
     public function getStudentUserAccountInfo()
     {
@@ -152,6 +196,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @todo Review usage of method
+     * @return array
      */
     public function getParentUserAccountInfo()
     {
@@ -160,6 +207,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @todo Review usage of method
+     * @return array
      */
     public function getStaffUserAccountInfo()
     {
@@ -168,6 +218,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param $boarderValue
+     * @return mixed
      */
     public function determineBoarderType($boarderValue)
     {
@@ -176,6 +229,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param $houseID
+     * @return mixed
      */
     public function getHousemasterByHouseId($houseID)
     {
@@ -184,6 +240,19 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param array $externalUserIds
+     * @return mixed
+     */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return array
      */
     public function getStaffContactListExtended()
     {
@@ -192,6 +261,9 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param int $staffID
+     * @return array|bool
      */
     public function getCampusFromTimetable($staffID)
     {
@@ -200,6 +272,8 @@ class External_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @return array [['Code' => string, 'Description' => string], ...]
      */
     public function getStudentForms()
     {
@@ -221,7 +295,7 @@ class External_User implements External_UserInterface
     }
 
     /**
-     * @param $database
+     * @param External_UserInterface $database
      */
     private function setDatabase($database)
     {

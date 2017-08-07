@@ -6,6 +6,7 @@
  */
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
@@ -1165,6 +1166,44 @@ class External_Synergetic_User implements External_UserInterface
     public function getHousemasterByHouseId($houseID)
     {
         return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        // Make sure an array of valid external ID's was passed
+
+        $ids = array_filter($externalUserIds, function ($externalUserId) {
+            return self::isExternalIdValid($externalUserId);
+        });
+
+        if (count($ids) == 0) {
+            return [];
+        }
+
+        $fileYearSemester = $this->findFileYearAndSemester();
+
+        $predicateBuilder = $this->getConnector()
+            ->buildPredicateBuilder('StudentYears')
+            ->equals('StudentYears.FileYear', $fileYearSemester['year'])
+            ->equals('StudentYears.ID', $ids);
+
+        $where = implode(' AND ', $predicateBuilder->getWhere());
+
+        $sql = "
+            SELECT DISTINCT OccupEmail FROM Community 
+            JOIN luHouse ON HeadOfHouseID = Community.ID
+            JOIN StudentYears ON StudentYears.House = luHouse.Code
+            WHERE {$where}
+        ";
+
+        $bindings = $predicateBuilder->getParams();
+
+        return $this->getConnector()
+            ->executeQuery($sql, $bindings)
+            ->fetchColumnArray('OccupEmail');
     }
 
     /**

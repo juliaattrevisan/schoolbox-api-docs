@@ -536,6 +536,14 @@ class External_Humanedge_User implements External_UserInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        return [];
+    }
+
+    /**
      * @inheritDoc
      */
     public function getCampusFromTimetable($staffID)

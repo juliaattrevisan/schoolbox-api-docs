@@ -561,7 +561,6 @@ class External_Isams_User implements External_UserInterface
      * Returns a human-readable string
      *
      * @param $boarderValue
-     *
      * @return string
      */
     public function determineBoarderType($boarderValue)
@@ -579,6 +578,14 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        return [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getStudentForms()
@@ -590,8 +597,6 @@ class External_Isams_User implements External_UserInterface
       */
 
     /**
-     * Set database
-     *
      * @param $database
      */
     private function setDatabase($database)
@@ -600,8 +605,6 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * Get database
-     *
      * @return MSSQL
      */
     private function getDatabase()

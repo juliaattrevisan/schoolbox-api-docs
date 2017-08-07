@@ -91,6 +91,14 @@ class External_Denbigh_User implements External_UserInterface {
         return $requestList['housemaster_id'];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        return [];
+    }
+
     public function getParent($externalUserId) {
         // Get addresses with a phone number first.
         // Then, sort by address ID (so that first 2 results have the same

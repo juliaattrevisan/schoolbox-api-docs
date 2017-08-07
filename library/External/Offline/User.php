@@ -86,7 +86,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function getSubjectList(User $user)
     {
-        return array();
+        return [];
     }
 
     /**
@@ -156,6 +156,16 @@ class External_Offline_User implements External_UserInterface
     /**
      * @inheritdoc
      */
+    public function getHousemasterEmails($externalUserIds)
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return array
+     */
     public function getStaffContactListExtended()
     {
         return [];
@@ -163,6 +173,8 @@ class External_Offline_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @return array
      */
     public function getStudentForms()
     {
@@ -171,9 +183,12 @@ class External_Offline_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     *
+     * @param int $staffID
+     * @return array|bool
      */
     public function getCampusFromTimetable($staffID)
     {
-        return array();
+        return [];
     }
 }
