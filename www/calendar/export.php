@@ -30,10 +30,10 @@ try {
     $resourceId = $_GET['resource_id'];
     $resourceCategoryId = $_GET['resource_category_id'];
     $eventTypeId = $_GET['event_type'];
-    if($resourceId > 0) {
+    if ($resourceId > 0) {
         $export_type = 'resource';
     }
-    if($resourceCategoryId >0) {
+    if ($resourceCategoryId > 0) {
         $export_type = 'resource_category';
     }
     if (empty($token)) {
@@ -63,16 +63,16 @@ try {
 
     // Default start and end times
     $start = strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
-    $end   = strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
+    $end = strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
 
     switch ($export_type) {
         case 'personal':
-            $api = new Calendar_Api_EventType_Event_Schoolbox_Personal($user, array());
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Personal($user, []);
             $filename = 'personal';
             break;
 
         case 'group':
-            $api = new Calendar_Api_EventType_Event_Schoolbox_Group($user, array());
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Group($user, []);
             $export_id = intval($_GET['group']);
             if ($export_id > 0) {
                 $api->setGroupId($export_id);
@@ -83,7 +83,7 @@ try {
             break;
 
         case 'campus':
-            $api = new Calendar_Api_EventType_Event_Schoolbox_Campus($user, array());
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Campus($user, []);
             $export_id = intval($_GET['campus']);
             if ($export_id > 0) {
                 $api->setCampusId($export_id);
@@ -97,45 +97,45 @@ try {
 
             $page = new SitePage(false);
             $page->setDi($kernel->getDependencyInjector());
-            $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, array(),  $page->getDi()->get('assessmentDataSource'));
+            $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, [], $page->getDi()->get('assessmentDataSource'));
             $filename = 'duework';
             break;
 
         case 'timetable':
-            $api = new Calendar_Api_EventType_Timetable_External_Default($user, array());
+            $api = new Calendar_Api_EventType_Timetable_External_Default($user, []);
             $filename = 'timetable';
             $start = $_SERVER['REQUEST_TIME'];
             $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'timetabledays':
-            $api = new Calendar_Api_EventType_TimetableDays_External_Default($user, array());
+            $api = new Calendar_Api_EventType_TimetableDays_External_Default($user, []);
             $filename = 'timetabledays';
             $start = $_SERVER['REQUEST_TIME'];
             $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'resources':
-            $api = new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, array());
+            $api = new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, []);
             $filename = 'resources';
             break;
 
         case 'resource':
-            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem($user, array());
+            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem($user, []);
             $api->setResourceId($resourceId);
-            $filename =  sprintf('resource%d', $resourceId);
+            $filename = sprintf('resource%d', $resourceId);
             break;
 
         case 'resource_category':
-            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($user, array());
+            $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory($user, []);
             $api->setCategoryId($resourceCategoryId);
-            $filename =  sprintf('resourceCategory%d', $resourceCategoryId);
+            $filename = sprintf('resourceCategory%d', $resourceCategoryId);
             break;
 
         case 'event_type':
-            $api = new Calendar_Api_EventType_Event_Schoolbox_Type($user, array());
+            $api = new Calendar_Api_EventType_Event_Schoolbox_Type($user, []);
             $api->setEventTypeId($eventTypeId);
-            $filename =  sprintf('eventType%d', $eventTypeId);
+            $filename = sprintf('eventType%d', $eventTypeId);
             break;
 
         case 'external':
@@ -143,8 +143,8 @@ try {
             $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
             $factory = new ExternalConnectorFactory();
             $externalEvents = $factory->build(new \Schoolbox\Config\Loader(), $databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
-            $api = new Calendar_Api_EventType_Event_External_Default($user, array(),$externalEvents);
-            $filename =  'external';
+            $api = new Calendar_Api_EventType_Event_External_Default($user, [], $externalEvents);
+            $filename = 'external';
             break;
 
         /* All EOTC Events
@@ -157,8 +157,7 @@ try {
             if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
                 $api = new Calendar_Api_EventType_Custom_EOTC_Default($user, []);
                 $filename = 'eotc_all';
-            }
-            else {
+            } else {
                 throw new SchoolboxException('EOTC module not enabled', 400);
             }
 
@@ -168,17 +167,16 @@ try {
 
             // All day events, but exclude other sources
             $api = new Calendar_Api_Composite();
-            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Default($user, array()));
+            $api->add(new Calendar_Api_EventType_Event_Schoolbox_Default($user, []));
             try {
                 // Resource bookings too for now, as there's no other place for them
-                $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, array()));
-                $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($user, array()));
+                $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, []));
+                $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($user, []));
 
                 if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
                     $api->add(new Calendar_Api_EventType_Custom_EOTC_Default($user, []));
                 }
-
-            } catch(DomainException $e){
+            } catch (DomainException $e) {
                 // Do nothing. This is expected if Resource Booking is disabled
             }
             break;
@@ -192,12 +190,10 @@ try {
             break;
     }
 
-
-    if($_GET['format'] == 'csv') {
-
+    if ($_GET['format'] == 'csv') {
         header('Cache-Control: private');
         header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: filename='.$filename.'.csv');
+        header('Content-Disposition: filename=' . $filename . '.csv');
 
         $exporter = new CSVExporter(
             $api,
@@ -207,11 +203,10 @@ try {
             new SitePage(false),
             $viewer
         );
-    }
-    else {
+    } else {
         header('Cache-Control: private');
         header('Content-Type: text/calendar; charset=utf-8');
-        header('Content-Disposition: filename='.$filename.'.ics');
+        header('Content-Disposition: filename=' . $filename . '.ics');
 
         $exporter = new Exporter(
             $api,
