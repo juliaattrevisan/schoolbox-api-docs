@@ -44,7 +44,7 @@
         <tr>
             <td>
                 {% if workItem.assessment %}
-                    <a href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
+                    <a href="/learning/assessments/{{ workItem.assessment.id }}/{{ student.id }}">
                         {{ workItem.assessment.name }}
                     </a>
                 {% elseif workItem.quiz %}
