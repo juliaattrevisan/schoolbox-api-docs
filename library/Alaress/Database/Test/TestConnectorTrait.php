@@ -28,6 +28,9 @@ trait TestConnectorTrait
     /** @var IConnector $db2Test */
     private $db2Test;
 
+    /** @var IConnector $db2Test */
+    protected $mssqlTest;
+
     /**
      * Connect to DB2 test database
      *
@@ -146,8 +149,8 @@ trait TestConnectorTrait
 
         $factory = new Factory();
 
-        $this->synergetic68 = $factory->createSqlsrv();
-        return $this->synergetic68->connect(
+        $this->mssqlTest = $factory->createSqlsrv();
+        return $this->mssqlTest->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',
             'sa',
@@ -172,8 +175,8 @@ trait TestConnectorTrait
 
         $factory = new Factory();
 
-        $this->synergetic68 = $factory->createDblib();
-        return $this->synergetic68->connect(
+        $this->mssqlTest = $factory->createDblib();
+        return $this->mssqlTest->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',
             'sa',
