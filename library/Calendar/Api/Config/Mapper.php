@@ -107,6 +107,8 @@ class Calendar_Api_Config_Mapper extends BaseMapper
     public function getSourceListForCalendar()
     {
         $configs = $this->getAllConfigRecords();
+        $sourceList = [];
+
         foreach ($configs as $record) {
             /** @var Calendar_Api_Config_Record $record */
             try {
