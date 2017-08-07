@@ -80,6 +80,24 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     }
 
     /**
+     * The provided eventType and connectorClass combination is an active source
+     * in Calendar subscription
+     *
+     * @param $eventType
+     * @param $connectorClass
+     * @return bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function isSourceEnabled($eventType, $connectorClass)
+    {
+        return Calendar_Api_Config_Mapper::getInstance()->findByColumnList([
+            'event_type'      => $eventType,
+            'connector_class' => $connectorClass,
+            'status'          => 1
+        ])->count() > 0;
+    }
+
+    /**
      * Retrieves a list of sources for the calendar.
      *
      * @return array
