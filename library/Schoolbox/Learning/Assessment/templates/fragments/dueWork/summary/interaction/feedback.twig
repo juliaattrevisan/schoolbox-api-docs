@@ -26,105 +26,107 @@
     {% endif %}
 {% endif %}
 
-<li {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row class="actions-small-1">
-    <div class="list-item flex-grade">
-        <div class="card small-12">
-            {% if url %}
-            <a href="{{ url }}" title="{{ tooltip }}">
-            {% endif %}
-                <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
-                <p>
-                    {% if currentFeedback.published %}
-                        Feedback
-                    {% else %}
-                        Draft Feedback
-                    {% endif %}
-                    by {{ currentFeedback.reviewer.fullname }}
-                    {% if currentFeedback.response.id %}
-                    <span class="pipe meta">
-                        {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
-                    </span>
-                    {% endif %}
-                </p>
-                {% if not currentFeedback.response.id %}
-                <p class="meta">
-                    {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
-                </p>
+<ul class="information-list reply">
+    <li {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row class="actions-small-1">
+        <div class="list-item flex-grade">
+            <div class="card small-12">
+                {% if url %}
+                <a href="{{ url }}" title="{{ tooltip }}">
                 {% endif %}
-            {% if url %}
-            </a>
-            {% endif %}
+                    <img src="/portrait.php?userId={{ currentFeedback.reviewer.externalId }}&amp;size=square64" alt="">
+                    <p>
+                        {% if currentFeedback.published %}
+                            Feedback
+                        {% else %}
+                            Draft Feedback
+                        {% endif %}
+                        by {{ currentFeedback.reviewer.fullname }}
+                        {% if currentFeedback.response.id %}
+                        <span class="pipe meta">
+                            {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
+                        </span>
+                        {% endif %}
+                    </p>
+                    {% if not currentFeedback.response.id %}
+                    <p class="meta">
+                        {{ currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short }}
+                    </p>
+                    {% endif %}
+                {% if url %}
+                </a>
+                {% endif %}
+            </div>
+            <div class="grade">
+                <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
+            </div>
         </div>
-        <div class="grade">
-            <span class="{{ urgency.marks(currentFeedback.normalisedMark) }}">{{ currentFeedback.humanReadableMark }}</span>
-        </div>
-    </div>
-    {% set deleteRoute = routeLookupIfAuthorized(
-        'learningDueWorkFeedback.deleteAssessmentFeedback',
-        {
-            assessmentId: participant.assessable.id,
-            assessment: participant.assessable,
-            feedbackId: currentFeedback.id,
-            feedback: currentFeedback,
-        }
-    ) %}
-    {% if deleteRoute %}
-    <nav>
-        <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
-    </nav>
-    {% endif %}
+        {% set deleteRoute = routeLookupIfAuthorized(
+            'learningDueWorkFeedback.deleteAssessmentFeedback',
+            {
+                assessmentId: participant.assessable.id,
+                assessment: participant.assessable,
+                feedbackId: currentFeedback.id,
+                feedback: currentFeedback,
+            }
+        ) %}
+        {% if deleteRoute %}
+        <nav>
+            <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
+        </nav>
+        {% endif %}
 
-    {% if currentFeedback.comment|length %}
-        <article>
-            {{ currentFeedback.comment|nl2br }}
-        </article>
-    {% endif %}
+        {% if currentFeedback.comment|length %}
+            <article>
+                {{ currentFeedback.comment|nl2br }}
+            </article>
+        {% endif %}
 
-    {% if currentFeedback.allFiles | length %}
-        <ul class="information-list">
-            {% for currentFile in currentFeedback.allFiles %}
-            {# Only show published feedback and therefore also
-             # only list files that are involved with a Published Feedback
-             #}
-            <li class="actions-small-1">
-                <div class="list-item">
-                    <div class="card attachment small-12">
-                        {# Crocodoc annotations have their own special url.
-                         # responseId comes from the twig that includes this fragment
-                         #}
-                        {% if currentFile.crocodocId|length %}
-                            {% set crocodocRoute = routeLookupIfAuthorized('learningDueWorkResponse.getCrocodocView', {
-                                assessmentId: currentFeedback.assessable.id,
-                                assessment:   assessment,
-                                responseId:   responseId,
-                                feedbackId:   currentFeedback.id,
-                                feedback:     currentFeedback,
-                                crocodocId:   currentFile.crocodocId,
-                                participant:  participant
-                            }) %}
+        {% if currentFeedback.allFiles | length %}
+            <ul class="information-list">
+                {% for currentFile in currentFeedback.allFiles %}
+                {# Only show published feedback and therefore also
+                 # only list files that are involved with a Published Feedback
+                 #}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="card attachment small-12">
+                            {# Crocodoc annotations have their own special url.
+                             # responseId comes from the twig that includes this fragment
+                             #}
+                            {% if currentFile.crocodocId|length %}
+                                {% set crocodocRoute = routeLookupIfAuthorized('learningDueWorkResponse.getCrocodocView', {
+                                    assessmentId: currentFeedback.assessable.id,
+                                    assessment:   assessment,
+                                    responseId:   responseId,
+                                    feedbackId:   currentFeedback.id,
+                                    feedback:     currentFeedback,
+                                    crocodocId:   currentFile.crocodocId,
+                                    participant:  participant
+                                }) %}
 
-                            {% if crocodocRoute %}
-                                <a href="{{ crocodocRoute }}">
-                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
-                                    <p>{{ currentFile.filename }}</p>
+                                {% if crocodocRoute %}
+                                    <a href="{{ crocodocRoute }}">
+                                        <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
+                                        <p>{{ currentFile.filename }}</p>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
+                                    <p>{{ currentFile.filename }} </p>
                                 </a>
                             {% endif %}
-                        {% else %}
-                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
-                                <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" />
-                                <p>{{ currentFile.filename }} </p>
-                            </a>
-                        {% endif %}
+                        </div>
                     </div>
-                </div>
-                <nav>
-                    {% if currentFile.crocodocId|length %}
-                        {% include '@learningDueWorkResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
-                    {% else %}
-                        <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
-                    {% endif %}
-                </nav>
-            </li>
-            {% endfor %}
-    {% endif %}
-</li>
+                    <nav>
+                        {% if currentFile.crocodocId|length %}
+                            {% include '@learningDueWorkResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
+                        {% else %}
+                            <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
+                        {% endif %}
+                    </nav>
+                </li>
+                {% endfor %}
+        {% endif %}
+    </li>
+</ul>
