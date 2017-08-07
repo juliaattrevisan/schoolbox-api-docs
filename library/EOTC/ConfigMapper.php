@@ -10,6 +10,7 @@
 
 namespace EOTC;
 
+use Calendar_Api_Config_Mapper;
 
 class ConfigMapper extends \Schoolbox\Mapper {
     const EOTC_SUBSCRIPTION_EVENT_TYPE ='Custom';
@@ -38,6 +39,18 @@ class ConfigMapper extends \Schoolbox\Mapper {
 			'type' => self::TYPE_STRING,
 		));
 	}
+
+    /**
+     * Determine if EOTC module enabled and subscription enabled
+     * This grants you access to EOTC event data
+     */
+	public function isSubscriptionEnabled()
+    {
+        $moduleEnabled = \Config::get('eotc_enabled');
+        $subscriptionEnabled = Calendar_Api_Config_Mapper::getInstance()->isSourceEnabled(self::EOTC_SUBSCRIPTION_EVENT_TYPE, self::EOTC_SUBSCRIPTION_CONNECTOR_CLASS);
+
+        return $moduleEnabled && $subscriptionEnabled;
+    }
 
 	/**
 	 * Get urgent threshold
