@@ -149,8 +149,18 @@ try {
         /* All EOTC Events
          */
         case 'eotc_all':
-            $api = new Calendar_Api_EventType_Custom_EOTC_Default($user, []);
-            $filename = 'eotc_all';
+
+            /* Normally you wouldn't get here because the ui option is hidden when
+             * eotc isn't available - the only way you'd get here is direct url access
+             */
+            if (Config::get('eotc_enabled')) {
+                $api = new Calendar_Api_EventType_Custom_EOTC_Default($user, []);
+                $filename = 'eotc_all';
+            }
+            else {
+                throw new SchoolboxException('EOTC module not enabled', 400);
+            }
+
             break;
 
         case 'all':
@@ -162,7 +172,11 @@ try {
                 // Resource bookings too for now, as there's no other place for them
                 $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, array()));
                 $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($user, array()));
-                $api->add(new Calendar_Api_EventType_Custom_EOTC_Default($user, []));
+
+                if (Config::get('eotc_enabled')) {
+                    $api->add(new Calendar_Api_EventType_Custom_EOTC_Default($user, []));
+                }
+
             } catch(DomainException $e){
                 // Do nothing. This is expected if Resource Booking is disabled
             }
