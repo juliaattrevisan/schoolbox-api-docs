@@ -146,6 +146,13 @@ try {
             $filename =  'external';
             break;
 
+        /* All EOTC Events
+         */
+        case 'eotc':
+            $api = new Calendar_Api_EventType_Custom_EOTC_Default($user, []);
+            $filename = 'eotc';
+            break;
+
         case 'all':
 
             // All day events, but exclude other sources
