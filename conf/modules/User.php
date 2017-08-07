@@ -10,7 +10,8 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Schoolbox\User\Module;
+use Schoolbox\User\Module as UserModule;
+use Schoolbox\User\Profile\DocumentManagement\Module as UserProfileDocumentManagementModule;
 
 class User implements ModuleConfigInterface
 {
@@ -23,7 +24,14 @@ class User implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $module = new Module($kernel->getDependencyInjector());
+        $di = $kernel->getDependencyInjector();
+
+        $module = new UserModule($kernel->getDependencyInjector());
         $module->init('/user');
+
+        if ($di->get('config')->get('external_docman_enabled')) {
+            $module = new UserProfileDocumentManagementModule($kernel->getDependencyInjector());
+            $module->init('/user/profile/documents');
+        }
     }
 }
