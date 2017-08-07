@@ -15,6 +15,9 @@ use Alaress\Database\Factory;
 use Database;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @requires extension ibm_db2
+ */
 class TestConnector extends PHPUnit_Framework_TestCase
 {
     /**

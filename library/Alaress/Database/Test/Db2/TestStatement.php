@@ -14,6 +14,9 @@ use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @requires extension ibm_db2
+ */
 class TestStatement extends PHPUnit_Framework_TestCase
 {
     use TestConnectorTrait;
@@ -37,6 +40,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test with long-winded preparation and binding
+     *
+     * @requires extension ibm_db2
      */
     public function testStatementWithPreparationAndBinding()
     {
@@ -62,6 +67,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test fetch() method
+     *
+     * @requires extension ibm_db2
      */
     public function testFetch()
     {
@@ -95,6 +102,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test executeIterator() method
+     *
+     * @requires extension ibm_db2
      */
     public function testExecuteIterator()
     {
@@ -133,6 +142,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test fetchColumn() method
+     *
+     * @requires extension ibm_db2
      */
     public function testFetchColumn()
     {
@@ -148,6 +159,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test columnArray() method
+     *
+     * @requires extension ibm_db2
      */
     public function testColumnArray()
     {
@@ -167,6 +180,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test rowArray() method
+     *
+     * @requires extension ibm_db2
      */
     public function testRowArray()
     {
