@@ -10,25 +10,9 @@
 
 namespace Alaress\Database\Test\Mssql\Sqlsrv;
 
-use Alaress\Database\Predicate\Builder as PredicateBuilder;
-use Alaress\Database\Test\TestConnectorTrait;
-use PHPUnit_Framework_TestCase;
+use Alaress\Database\Test\Mssql\AbstractTestPredicateBuilder;
 
-class TestPredicateBuilder extends PHPUnit_Framework_TestCase
+class TestPredicateBuilder extends AbstractTestPredicateBuilder
 {
-    use TestConnectorTrait;
-
-    /**
-     * Test predicate builder quoting
-     */
-    public function testPredicateBuilder()
-    {
-        $this->connectSynergetic68();
-
-        $predicateBuilder = new PredicateBuilder($this->synergetic68, 'Community');
-        $predicateBuilder->equals('Surname', 'rhodes');
-
-        $this->assertSame('[Community].[Surname] = :Surname_0', $predicateBuilder->getWhere()[0]);
-        $this->assertSame('rhodes', $predicateBuilder->getParams()['Surname_0']);
-    }
+    use SetupTestTrait;
 }
