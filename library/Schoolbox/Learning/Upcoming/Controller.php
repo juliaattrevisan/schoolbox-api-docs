@@ -198,7 +198,7 @@ class Controller extends Base
         // TODO Populate $_SESSION[children] properly
         $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
 
-        $returnUrl = "?returnUrl=".base64_encode("/learning/due/".$student->getId());
+        $returnUrl = "?returnUrl=".base64_encode($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent',["id" => $student->getId()]));
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
