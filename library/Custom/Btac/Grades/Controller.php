@@ -105,6 +105,13 @@ class Controller extends \Schoolbox\Learning\Grades\Controller
                     ->getStudentStatistics()[$viewee->getId()];
         }
 
+        //If we are looking at the year, no term is specified.
+        //Specify term 1 of that year in this case
+        if (!$term) {
+            $dateString = $year."-01-01";
+            $term = $this->getTermMapper()->findForDate(new \Alaress_Date_Format($dateString, "Y-m-d"));
+        }
+
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/grades.twig', [
