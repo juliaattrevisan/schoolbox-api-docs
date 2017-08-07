@@ -148,9 +148,9 @@ try {
 
         /* All EOTC Events
          */
-        case 'eotc':
+        case 'eotc_all':
             $api = new Calendar_Api_EventType_Custom_EOTC_Default($user, []);
-            $filename = 'eotc';
+            $filename = 'eotc_all';
             break;
 
         case 'all':
