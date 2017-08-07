@@ -254,7 +254,7 @@ class AjaxFlot
             ));
         }
 
-        echo $page->template->_varVals['file_block'];
+        return $page->template->_varVals['file_block'];
     }
 
     /* Getters/Setters
