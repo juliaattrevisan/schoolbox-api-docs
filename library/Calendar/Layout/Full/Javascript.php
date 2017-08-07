@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Calendar_Layout_Full_Javascript
  *
@@ -14,6 +13,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use EOTC\ConfigMapper as EOTCConfigMapper;
+
 class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 {
     /**
@@ -82,7 +84,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 
         /* If EOTC is enabled, show these options
          */
-        if (Config::get('eotc_enabled')) {
+        if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
             $this->getPage()->parse('has_eotc_events_all_block', 'has_eotc_events_all');
         }
         else {

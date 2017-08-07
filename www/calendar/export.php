@@ -16,6 +16,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
+use EOTC\ConfigMapper as EOTCConfigMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
@@ -153,7 +154,7 @@ try {
             /* Normally you wouldn't get here because the ui option is hidden when
              * eotc isn't available - the only way you'd get here is direct url access
              */
-            if (Config::get('eotc_enabled')) {
+            if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
                 $api = new Calendar_Api_EventType_Custom_EOTC_Default($user, []);
                 $filename = 'eotc_all';
             }
@@ -173,7 +174,7 @@ try {
                 $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, array()));
                 $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($user, array()));
 
-                if (Config::get('eotc_enabled')) {
+                if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
                     $api->add(new Calendar_Api_EventType_Custom_EOTC_Default($user, []));
                 }
 
