@@ -1,9 +1,3 @@
-{#<ul class="breadcrumb">#}
-    {#<li><a href="/submission/listSubmission">Submissions</a></li>#}
-    {#<li><a href="/submission/listSubmission/{{ box.duedate.getYear }}/{{ box.duedate.getMonth // 6 + 1 }}/{{ box.category.id }}">{{ box.category.name }}</a></li>#}
-    {#<li><a href="/submission/viewSubmission/{{ box.id }}">{{ box.name }}</a></li>#}
-    {#<li class="active"><a href="#">Overview</a></li>#}
-{#</ul>#}
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
