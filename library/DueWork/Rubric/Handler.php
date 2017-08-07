@@ -249,6 +249,7 @@ class DueWork_Rubric_Handler
                     AND rm.student_id = :student_id
                     AND sb.category = :category_id
                     AND sb.deleted IS FALSE
+                    AND rm.published_at IS NOT NULL
                 ORDER BY
                     ru.submission_box_id ASC,
                     rd.criterion_id ASC,
