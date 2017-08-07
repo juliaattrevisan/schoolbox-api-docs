@@ -10,6 +10,7 @@
 
 namespace Alaress\Database\Test\Sqlsrv;
 
+use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
 use Database;
@@ -17,6 +18,16 @@ use PHPUnit_Framework_TestCase;
 
 class TestConnector extends PHPUnit_Framework_TestCase
 {
+    /**
+     * Skip if SQLSrv driver is not available
+     */
+    public function setUp()
+    {
+        if (!SqlsrvBroker::isAvailable()) {
+            $this->markTestSkipped();
+        }
+    }
+
     /**
      * Ensure we can establish a connection to Synergetic V68 database on AWS
      */
@@ -42,7 +53,7 @@ class TestConnector extends PHPUnit_Framework_TestCase
 //
 //        $this->assertTrue($result, "Failed to connect to Synergetic V67 database");
 
-        $synergetic68 = $factory->createMssql();
+        $synergetic68 = $factory->createSqlsrv();
         $result = $synergetic68->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',
@@ -68,7 +79,7 @@ class TestConnector extends PHPUnit_Framework_TestCase
 
         $factory = new Factory();
 
-        $connectorOriginal = $factory->createMssql();
+        $connectorOriginal = $factory->createSqlsrv();
         $connectorOriginal->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',
