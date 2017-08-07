@@ -17,6 +17,7 @@ use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
+use PDOException;
 
 interface IConnector extends IQuoter
 {
@@ -158,6 +159,40 @@ interface IConnector extends IQuoter
      * @return string
      */
     public function lastInsertId($name = null);
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Database transaction functions
+    // ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Initiates a transaction
+     *
+     * @return bool Returns TRUE on success or FALSE on failure
+     * @throws PDOException if there is already a transaction started or the driver does not support transactions
+     */
+    public function beginTransaction();
+
+    /**
+     * Check if we are in a database transaction
+     *
+     * @return bool Returns TRUE if a transaction is currently active, and FALSE if not
+     */
+    public function inTransaction();
+
+    /**
+     * Commit current transaction to database
+     *
+     * @return bool Returns TRUE on success or FALSE on failure
+     */
+    public function commit();
+
+    /**
+     * Rollback current transaction
+     *
+     * @return bool Returns TRUE on success or FALSE on failure
+     * @throws PDOException if there is no active transaction
+     */
+    public function rollBack();
 
     // ----------------------------------------------------------------------------------------------------------------
     // Getters for immutable properties

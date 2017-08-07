@@ -56,25 +56,70 @@ class Healthcheck
      */
     public function run()
     {
-        // Make sure databases connected correctly
+        // To prevent doing anything unintended to the clients external SIS DB we need to wrap the healthcheck
+        // in a transaction which we will rollback- thus we should only proceed if transaction support is
+        // available on all external connections
+
+        /** @var bool $transactionsSupported */
+        $transactionsSupported = true;
+
+        // Make sure all databases connected correctly
 
         if ($this->connector == null) {
             $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
+        }
+
+        // Attempt to being transactions on all connections
+
+        if (!$this->connector->beginTransaction()) {
+            // Transactions not supported
+
+            $this->log .= 'ERROR: Database ({$connector->getDatabase()}) does not support transactions';
+            $transactionsSupported = false;
         }
 
         /** @var IConnector $connector */
         foreach ($this->secondaryConnectors as $connector) {
             if ($connector == null) {
                 $this->log .= "ERROR: Unable to connect to database '{$connector->getDatabase()}' (Hostname: {$connector->getHostname()})\n";
+            } else {
+                if (!$connector->beginTransaction()) {
+                    // Transactions not supported
+
+                    $this->log .= 'ERROR: Database ({$connector->getDatabase()}) does not support transactions';
+                    $transactionsSupported = false;
+                }
+            }
+        }
+
+        // Only proceed if database transactions could be successfully started on all connectors
+
+        if ($transactionsSupported) {
+
+            $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
+            $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
+
+            $testFunctionName = "{$this->externalType}Test";
+
+            $this->$testFunctionName();
+        }
+
+        // Rollback any transactions we were able to start so we don't end up inserting anything into the SIS
+
+        if ($this->connector->inTransaction()) {
+            $this->connector->rollback();
+        }
+
+        /** @var IConnector $connector */
+        foreach ($this->secondaryConnectors as $connector) {
+            if ($connector != null) {
+                if ($connector->inTransaction()) {
+                    $connector->rollBack();
+                }
             }
         };
 
-        $this->log .= str_pad(str_pad("METHOD", 15) . "DATABASE OBJECT", 50) . "TEST RESULT\n";
-        $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
-
-        $testFunctionName = "{$this->externalType}Test";
-
-        $this->$testFunctionName();
+        // Return the results
 
         return [
             'log' => trim($this->log) . "\n",
@@ -176,7 +221,6 @@ class Healthcheck
                 $statement->execute();
                 $this->log .= "OK\n";
             } catch (\Alaress\Database\Exception $e) {
-                $this->log .= "FAILED\n";
 
                 $error = "EXECUTE {$object['name']}\n{$e->getMessage()}\n";
 
@@ -208,7 +252,16 @@ class Healthcheck
                     }
                 }
 
-                $this->errors[] = $error;
+                // Unfortunately we can't test some procedures without generating an error (because we don't
+                // have the correct data to pass it)- so if 'ignoreError' is set, and the error message
+                // contains this text we will let it slide...
+
+                if (!isset($object['ignoreError']) || stripos($error, $object['ignoreError']) === false) {
+                    $this->errors[] = $error;
+                    $this->log .= "FAILED\n";
+                } else {
+                    $this->log .= "OK\n";
+                }
             }
         }
 
@@ -485,13 +538,14 @@ class Healthcheck
             ],
             [
                 'name' => 'sptwkAttendances',
+                'ignoreError' => 'No matching class found',
                 'inputParameters' => [
-                    'wkAttendanceMasterSeq' => 1,
+                    'wkAttendanceMasterSeq' => null,
                     'AttendanceSeq' => null,
-                    'HoldFlag' => 0,
-                    'ClassCancelledFlag' => 0,
-                    'SystemProcessNumber' => 0,
-                    'AllowMultiPeriodFlag' => 0,
+                    'HoldFlag' => null,
+                    'ClassCancelledFlag' => null,
+                    'SystemProcessNumber' => null,
+                    'AllowMultiPeriodFlag' => null,
                     'DebugPrintFlag' => 0,
                 ],
                 'outputParameters' => [
@@ -503,6 +557,45 @@ class Healthcheck
                         'type' => PDO::PARAM_INT,
                         'length' => 11
                     ]
+                ]
+            ],
+
+            // The procedures below actually mutate data in the DB- so it is imperative
+            // that they get rolled back after excution
+
+            [
+                'name' => 'spiExcursions',
+                'inputParameters' => [
+                    'EventCode' => 0,
+                    'Description' => null
+                ]
+            ],
+            [
+                'name' => 'spuExcursionDetails',
+                'inputParameters' => [
+                    'EventSeq' => 0,
+                    'Description' => null,
+                    'Objective' => null,
+                    'Attire' => null,
+                    'Type' => null,
+                    'Status' => null,
+                    'MaxAttendance' => null,
+                    'MaxTickets' => null,
+                    'EventFrom' => null,
+                    'EventTo' => null,
+                    'InviteDate' => null,
+                    'RSVPDueBy' => null,
+                    'Comments' => null
+                ]
+            ],
+            [
+                'name' => 'spiCommunityEventsCurrent',
+                'inputParameters' => [
+                    'ID' => 0,
+                    'EventCode' => null,
+                    'VerifyOnlyFlag' => 1,
+                    'NewEventCurrentSeq' => null,
+                    'Message' => null
                 ]
             ]
         ];
