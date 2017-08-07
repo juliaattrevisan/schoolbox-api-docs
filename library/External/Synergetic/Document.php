@@ -12,6 +12,9 @@ class External_Synergetic_Document implements External_DocumentInterface
     use External_MssqlConnector;
     use External_Synergetic_ValidateExternalIdTrait;
 
+    /** @var string $schema String indicating the Synergetic DB schema (varies between DB versions) */
+    private $schema;
+
     /**
      * Constructor
      */
@@ -20,6 +23,16 @@ class External_Synergetic_Document implements External_DocumentInterface
         // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
 
         $this->setupDatabase();
+
+        $externalPing = new External_Ping();
+
+        // The upload location varies depending on the version of Synergetic
+
+        if ($externalPing->getVersion() == "68") {
+            $this->schema = "media";
+        } else {
+            $this->schema = "SynergyOneMedia.dbo";
+        }
     }
 
     /**
@@ -44,8 +57,8 @@ class External_Synergetic_Document implements External_DocumentInterface
                             sral.FileYear, 
                             sral.FileSemester, 
                             Description
-            FROM            SynergyOneMedia.dbo.StudentReportsArchive sra
-            JOIN            SynergyOneMedia.dbo.StudentReportsArchiveLink sral ON 
+            FROM            {$this->schema}.StudentReportsArchive sra
+            JOIN            {$this->schema}.StudentReportsArchiveLink sral ON 
                             sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
             INNER JOIN      dbo.studentyears sy ON 
                             sy.id = sral.ID AND 
