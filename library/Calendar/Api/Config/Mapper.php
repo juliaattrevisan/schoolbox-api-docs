@@ -1,5 +1,8 @@
 <?php
-use \Schoolbox\Mapper as BaseMapper;
+
+use Schoolbox\Collection;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Calendar_Api_Config_Mapper
@@ -34,7 +37,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      * Un-uniqueified because this was ramming all vCal sources into the same
      * connector, and they should be unique (for filtering by source).
      *
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
     public function getAllConfigRecords()
     {
@@ -48,7 +51,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      * @param $eventType
      * @param $connectorClass
      * @return bool
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function isSourceEnabled($eventType, $connectorClass)
     {
@@ -116,7 +119,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      * @param $currentEventType
      * @param $currentConnector
      * @return Calendar_Api_Config_Connector_Interface[]
-     * @throws BaseMapper\Exception
+     * @throws MapperException
      */
     public function getAllConfigs($currentEventType, $currentConnector)
     {
@@ -146,6 +149,8 @@ class Calendar_Api_Config_Mapper extends BaseMapper
 
     /**
      * Deactivate all configs (used when updating)
+     *
+     * @return $this
      */
     public function deactivateAll()
     {
@@ -191,7 +196,6 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      */
     public function generateApiHierarchy()
     {
-
         /* Figure out which Event Sources are around, and which Connectors
          * are available for each Event Sources.
          */
@@ -233,6 +237,9 @@ class Calendar_Api_Config_Mapper extends BaseMapper
     /**
      * Some generic test values used to populate the calendar_connector table
      * while developing the admin ui
+     *
+     * @return void
+     * @throws PDOException
      */
     public function setupDefaults()
     {
