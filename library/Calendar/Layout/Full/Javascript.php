@@ -11,7 +11,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 use EOTC\ConfigMapper as EOTCConfigMapper;
@@ -40,7 +39,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 
         $this->getPage()->setVar([
             'USER_CALENDAR_ID' => $this->getUser()->getId(),
-            'USER_FULLNAME'    => $this->getUser()->getFullname(),
+            'USER_FULLNAME' => $this->getUser()->getFullname(),
         ]);
 
         $this->setupSelectedDayMonthYear();
@@ -66,10 +65,10 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         $selectedYear = date("Y", $selectedDate);
 
         $this->getPage()->setVar([
-            'SELECTED_DAY'   => $selectedDay,
+            'SELECTED_DAY' => $selectedDay,
             'SELECTED_MONTH' => $selectedMonth - 1,
-            'SELECTED_YEAR'  => $selectedYear,
-            'SELECTED_DATE'  => date('Y-m-d', $selectedDate),
+            'SELECTED_YEAR' => $selectedYear,
+            'SELECTED_DATE' => date('Y-m-d', $selectedDate),
         ]);
     }
 
@@ -84,8 +83,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
          */
         if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
             $this->getPage()->parse('has_eotc_events_all_block', 'has_eotc_events_all');
-        }
-        else {
+        } else {
             $this->getPage()->setVar([
                 'has_eotc_events_all_block' => ''
             ]);
@@ -100,11 +98,11 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         }
 
         $this->getPage()->setVar([
-            'CALENDAR_USER_ID'         => $this->getUser()->getId(),
-            'CALENDAR_VIEW'            => $calendarView,
+            'CALENDAR_USER_ID' => $this->getUser()->getId(),
+            'CALENDAR_VIEW' => $calendarView,
             'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
-            'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
-            'USER_TOKEN'               => $this->getUser()->getKey(),
+            'CALENDAR_START_DAY' => Config::get('calendar_start_day') ? : 0,
+            'USER_TOKEN' => $this->getUser()->getKey(),
         ]);
 
         /* Render event types to choose from
@@ -120,7 +118,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
                     ]);
                 } else {
                     $this->getPage()->setVar([
-                        'EVENT_TYPE_ID'   => $currentType->getId(),
+                        'EVENT_TYPE_ID' => $currentType->getId(),
                         'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
                     ]);
 
