@@ -276,16 +276,9 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test iteration of a stored procedure with output parameters and a return value.
-     *
-     * This doesn't work under the DBLib driver, but does under the SqlSrv driver.
      */
     public function testStoredProcedureIteratorWithOutputParameters()
     {
-        // This fails under DBLib
-        if (!SqlsrvBroker::isAvailable()) {
-            $this->setExpectedException(\DomainException::class);
-        }
-
         $result   = null;
         $returns  = ['value' => &$result, 'type' => PDO::PARAM_INT, 'length' => 4];
         $outputs  = [];
