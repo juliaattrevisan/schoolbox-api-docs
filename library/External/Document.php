@@ -5,7 +5,9 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Alaress\Redis;
 use Schoolbox\User;
+use Schoolbox\Config\ConfigMapper;
 
 class External_Document implements External_DocumentInterface
 {
@@ -17,6 +19,9 @@ class External_Document implements External_DocumentInterface
     /** @var External_Offline_Document */
     private $offline;
 
+    /** @var ConfigMapper $configMapper */
+    private $configMapper;
+
     /**
      * Constructor
      *
@@ -26,8 +31,11 @@ class External_Document implements External_DocumentInterface
     public function __construct($databaseName = '')
     {
         $factory = new External_DatabaseFactory();
+        $this->setConfigMapper(ConfigMapper::getInstance());
         $this->setDatabase($factory->buildDocumentConnector($databaseName));
         $this->setOffline(new External_Offline_Document());
+        $this->setCache(Redis::getInstance());
+        $this->setTimeout($this->configMapper->get('external_cache_timeout'));
     }
 
     /**
@@ -40,6 +48,8 @@ class External_Document implements External_DocumentInterface
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
+
+    // Getters & Setters
 
     /**
      * @return External_DocumentInterface
@@ -75,5 +85,21 @@ class External_Document implements External_DocumentInterface
     {
         $this->offline = $offline;
         return $this;
+    }
+
+    /**
+     * @return ConfigMapper
+     */
+    public function getConfigMapper()
+    {
+        return $this->configMapper;
+    }
+
+    /**
+     * @param ConfigMapper $configMapper
+     */
+    public function setConfigMapper($configMapper)
+    {
+        $this->configMapper = $configMapper;
     }
 }
