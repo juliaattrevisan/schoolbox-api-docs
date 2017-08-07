@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Calendar\Event;
+
 /* Use $_POST['action'] to separate screens
  */
 if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
@@ -127,6 +129,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
          */
         foreach ($_POST['cleanupEventId'] as $currentEventId) {
             try {
+                /** @var Event $event */
                 $event = $eventMapper->findById($currentEventId);
                 /* Purge existing sids
                  */
