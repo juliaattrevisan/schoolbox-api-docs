@@ -32,6 +32,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     {
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
         $this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'has_eotc_events_all', 'has_eotc_events_all_block');
 
         $this->getPage()->setVar(
             array(
@@ -78,6 +79,17 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     public function render()
     {
         $this->setupMovementButtons();
+
+        /* If EOTC is enabled, show these options
+         */
+        if (Config::get('eotc_enabled')) {
+            $this->getPage()->parse('has_eotc_events_all_block', 'has_eotc_events_all');
+        }
+        else {
+            $this->getPage()->setVar([
+                'has_eotc_events_all_block' => ''
+            ]);
+        }
 
         $calendarView = $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month';
 
