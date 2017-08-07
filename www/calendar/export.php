@@ -20,7 +20,7 @@ use EOTC\ConfigMapper as EOTCConfigMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
-
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 
 try {
     $token = $_GET['token'];
@@ -97,7 +97,10 @@ try {
 
             $page = new SitePage(false);
             $page->setDi($kernel->getDependencyInjector());
-            $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, [], $page->getDi()->get('assessmentDataSource'));
+
+            /** @var MapperProxy $assessmentDataSource */
+            $assessmentDataSource = $page->getDi()->get('assessmentDataSource');
+            $api = new Calendar_Api_EventType_Submission_Schoolbox_Default($user, [], $assessmentDataSource);
             $filename = 'duework';
             break;
 
