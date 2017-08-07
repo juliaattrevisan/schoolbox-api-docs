@@ -221,7 +221,7 @@ class DueWork_Rubric_Handler
         // most recent submissions first
         // highest marks first
         $stmt = Database::getInstance()->prepare(
-            "
+            '
                 SELECT
                     ru.submission_box_id AS box_id,
                     rd.criterion_id,
@@ -241,16 +241,10 @@ class DueWork_Rubric_Handler
                     ) AS rmax_mark,
                     rm.created_at
                 FROM rubric_mark rm
-                JOIN rubric_descriptor rd
-                    ON rm.descriptor_id = rd.id
-                JOIN rubric_criterion rc
-                    ON rd.criterion_id = rc.id
-                JOIN
-                    rubric_usage ru
-                    ON rd.criterion_id = ru.criterion_id
-                JOIN
-                    submission_box sb
-                    ON ru.submission_box_id = sb.id
+                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
+                JOIN rubric_criterion rc ON rd.criterion_id = rc.id
+                JOIN rubric_usage ru ON rd.criterion_id = ru.criterion_id
+                JOIN submission_box sb ON ru.submission_box_id = sb.id
                 WHERE rm.valid = 1
                     AND rm.student_id = :student_id
                     AND sb.category = :category_id
@@ -260,7 +254,7 @@ class DueWork_Rubric_Handler
                     rd.criterion_id ASC,
                     rm.created_at DESC,
                     rm.mark DESC
-            "
+            '
         );
         $stmt->execute(
             array(
@@ -272,6 +266,7 @@ class DueWork_Rubric_Handler
         $crits = array();
         $names = array();
 
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $names[$row['criterion_id']] = $row['name'];
 
