@@ -1,4 +1,5 @@
 <?php
+use \Schoolbox\Mapper as BaseMapper;
 
 /**
  * Calendar_Api_Config_Mapper
@@ -9,9 +10,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
+class Calendar_Api_Config_Mapper extends BaseMapper
 {
 
     /**
@@ -151,8 +151,8 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      *
      * @param $currentEventType
      * @param $currentConnector
-     *
      * @return Calendar_Api_Config_Connector_Interface[]
+     * @throws BaseMapper\Exception
      */
     public function getAllConfigs($currentEventType, $currentConnector)
     {
