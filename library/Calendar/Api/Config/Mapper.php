@@ -13,57 +13,19 @@ use \Schoolbox\Mapper as BaseMapper;
  */
 class Calendar_Api_Config_Mapper extends BaseMapper
 {
-
     /**
      * Mapping rules
-     *
-     * @return Bool|void
      */
     protected function mapping()
     {
         $this->hasTable('calendar_connector');
         $this->hasModel(Calendar_Api_Config_Record::class);
 
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'event_type',
-                'property' => 'eventType',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'connector_class',
-                'property' => 'connectorClass',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'config',
-                'property' => 'config',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'status',
-                'property' => 'status',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('event_type', self::TYPE_STRING, null, 'eventType');
+        $this->uses('connector_class', self::TYPE_STRING, null, 'connectorClass');
+        $this->uses('config', self::TYPE_STRING, null, 'config');
+        $this->uses('status', self::TYPE_INTEGER, null, 'status');
     }
 
     /**
@@ -134,7 +96,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
                 $carry[$name]['id'][] = $id;
                 return $carry;
             },
-            array()
+            []
         );
 
         // Join the IDs for each source together.
