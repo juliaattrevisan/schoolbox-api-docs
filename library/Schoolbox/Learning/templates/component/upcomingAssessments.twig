@@ -10,7 +10,7 @@ Usage:
         <li>
             <div class="card small-12" data-equalizer>
 
-                <h3><a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) }}">{{ assessment.title }}</a></h3>
+                <h3><a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: USER.id}) ~ returnUrl }}">{{ assessment.title }}</a></h3>
 
                 <p class="meta">
                     <a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}

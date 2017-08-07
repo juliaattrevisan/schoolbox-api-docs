@@ -105,6 +105,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
             [
                 'assessments' => $this->upcomingAssessments,
                 'limit'       => $this->limit,
+                'returnUrl'   => "?returnUrl=".base64_encode("/")
             ]
         );
     }

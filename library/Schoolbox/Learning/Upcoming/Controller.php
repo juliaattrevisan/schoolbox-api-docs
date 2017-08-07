@@ -198,6 +198,8 @@ class Controller extends Base
         // TODO Populate $_SESSION[children] properly
         $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
 
+        $returnUrl = "?returnUrl=".base64_encode("/learning/due/".$student->getId());
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningUpcoming/upcoming.twig',
@@ -209,6 +211,7 @@ class Controller extends Base
                     'currentTerm'  => $term,
                     'children'     => $children,
                     'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
+                    'returnUrl'    => $returnUrl
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯

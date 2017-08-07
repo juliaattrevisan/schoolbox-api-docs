@@ -289,6 +289,10 @@ else {
     ]);
 }
 
+/** @var Schoolbox\User $user */
+$user = $_SESSION['user'];
+$this->setVar('RETURN_URL', "?returnUrl=".base64_encode("/assess/attempts/".$assess['assess_id']."/".$user->getId()));
+
 $trail = new Breadcrumbs();
 
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
