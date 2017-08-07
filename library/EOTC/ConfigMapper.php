@@ -39,7 +39,10 @@ class ConfigMapper extends BaseMapper
     public function isSubscriptionEnabled()
     {
         $moduleEnabled = \Config::get('eotc_enabled');
-        $subscriptionEnabled = Calendar_Api_Config_Mapper::getInstance()->isSourceEnabled(self::EOTC_SUBSCRIPTION_EVENT_TYPE, self::EOTC_SUBSCRIPTION_CONNECTOR_CLASS);
+
+        $subscriptionEnabled = Calendar_Api_Config_Mapper::getInstance()->isSourceEnabled(
+            self::EOTC_SUBSCRIPTION_EVENT_TYPE, self::EOTC_SUBSCRIPTION_CONNECTOR_CLASS
+        );
 
         return $moduleEnabled && $subscriptionEnabled;
     }
