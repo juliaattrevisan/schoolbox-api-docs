@@ -50,8 +50,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         /* Output student grades link to students of this class */
         if ($this->getContentPermission() == UserAccess::ACCESS_READ
-            && $this->getAccess()->getFolderAccess($this->getUser(), $this->getContext()->getId())
-                == UserAccess::ACCESS_READ
+            && $this->getAccess()->isLearner($this->getUser(), $this->getContext()) == UserAccess::ACCESS_READ
         ) {
             $this->parse('student_grades_block', 'student_grades');
         } else {
