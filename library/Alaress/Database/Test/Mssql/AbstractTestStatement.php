@@ -75,6 +75,47 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test running the same statement as a prepare, then as an execute.
+     */
+    public function testPrepareThenExecuteStatement()
+    {
+        // prepare once
+        $statement = $this->mssqlTest->prepareQuery('SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname');
+        $statement->bindInputs([
+            'Surname' => [
+                'value' => 'rhodes',
+                'type' => PDO::PARAM_STR,
+                'length' => 50
+            ]
+        ]);
+        $statement->execute();
+
+        $count = 0;
+
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame(strtolower($row['Surname']), 'rhodes');
+        }
+
+        $this->assertGreaterThan(1, $count);
+
+
+        // and now fetch
+        $statement = $this->mssqlTest->executeQuery(
+            'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
+            ['Surname' => 'rhodes']
+        );
+        $count = 0;
+
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame(strtolower($row['Surname']), 'rhodes');
+        }
+
+        $this->assertGreaterThan(1, $count);
+    }
+
+    /**
      * Test with long-winded preparation and binding (with type and length specified)
      */
     public function testStatementWithPreparationAndFullBinding()
