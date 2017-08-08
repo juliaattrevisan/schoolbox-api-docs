@@ -380,8 +380,8 @@ class Mapper extends BaseMapper
     /**
      * Is the user a moderator of the item this booking is for?
      *
-     * @param  int $bookingId
-     * @param  int $userId
+     * @param  int $bookingId The ID of the booking that is being checked (not the item's ID)
+     * @param  int $userId    The ID of the user that is being checked
      * @return bool
      */
     public function isUserModeratorOfBookingItem($bookingId, $userId)
