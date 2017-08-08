@@ -49,4 +49,26 @@ class Controller extends Base
             )
         );
     }
+
+    /**
+     * Download the requested file from external document archive
+     *
+     * @param $student
+     * @param $documentId
+     */
+    public function getDownload($student, $documentId)
+    {
+        $report = $this->externalDocument->downloadAcademicReport($student, $documentId);
+
+        $headers  = $this->getResponse()->headers;
+        $headers->set("Pragma", " ");
+        $headers->set("Cache-Control", " ");
+        $headers->set("Content-Type", "application/pdf");
+        $headers->set("Content-Length", $report["filesize"]);
+        $headers->set("Content-Disposition", "attachment; filename=\"{$report["filename"]}\"");
+
+        $this->getResponse()->content->set(
+            $this->buildFileOutputFromString($report['blob'])
+        );
+    }
 }

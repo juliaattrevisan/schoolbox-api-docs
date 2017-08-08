@@ -39,6 +39,7 @@ class Module extends BaseModule
         $this->registerRoutesArray([
             'GET' => [
                 '/{studentId}'                              => ['getIndex' => $permissionStaff],
+                '/{studentId}/download/{documentId}'        => ['getDownload' => $permissionStaff],
             ],
             'POST' => [
             ]
@@ -78,6 +79,8 @@ class Module extends BaseModule
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                 }
             }
+
+            $injectedValues = array_merge($injectedValues, $params);
 
             return $injectedValues;
         });

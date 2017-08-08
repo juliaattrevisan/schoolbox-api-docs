@@ -18,4 +18,13 @@ interface External_DocumentInterface
      * @return array
      */
     public function getAcademicReportsForStudent(User $student);
+
+    /**
+     * Returns an array containing the academic reports binary contents, length, and filename
+     *
+     * @param User $student
+     * @param string $documentId
+     * @return array
+     */
+    public function downloadAcademicReport(User $student, $documentId);
 }

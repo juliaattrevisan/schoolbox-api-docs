@@ -5,6 +5,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
 
 class External_Offline_Document implements External_DocumentInterface
@@ -18,5 +20,18 @@ class External_Offline_Document implements External_DocumentInterface
     public function getAcademicReportsForStudent(User $student)
     {
         return [];
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param User $student
+     * @param string $documentId
+     * @return array
+     * @throws SchoolboxException
+     */
+    public function downloadAcademicReport(User $student, $documentId)
+    {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
     }
 }

@@ -49,6 +49,18 @@ class External_Document implements External_DocumentInterface
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
+    /**
+     * @inheritdoc
+     *
+     * @param User $student
+     * @param string $documentId
+     * @return array
+     */
+    public function downloadAcademicReport(User $student, $documentId)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
     // Getters & Setters
 
     /**

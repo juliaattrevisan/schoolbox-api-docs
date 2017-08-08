@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
 
 class External_Synergetic_Document implements External_DocumentInterface
@@ -58,7 +59,8 @@ class External_Synergetic_Document implements External_DocumentInterface
                         sral.FileSemester,
                         sral.Description
             FROM	    {$this->schema}.StudentReportsArchiveLink sral
-            JOIN        {$this->schema}.StudentReportsArchive sra ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
+            JOIN        {$this->schema}.StudentReportsArchive sra ON 
+                        sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
             WHERE       ID = :id
             ORDER BY    sral.FileYear DESC, 
                         sral.FileSemester DESC, 
@@ -81,5 +83,54 @@ class External_Synergetic_Document implements External_DocumentInterface
         }
 
         return $reports;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param User $student
+     * @param string $documentId
+     * @return array
+     */
+    public function downloadAcademicReport(User $student, $documentId)
+    {
+        // If the user does not have a valid external ID, or is not a student- return an empty collection
+
+        if (!$this->isExternalIdValid($student->getExternalId()) || !$student->getRole()->isStudent()) {
+            return [];
+        }
+
+        // Retrieve the document from the database
+
+        $query =
+        "
+            SELECT    Document, 
+                      Description
+            FROM      {$this->schema}.StudentReportsArchive sra
+            JOIN      {$this->schema}.StudentReportsArchiveLink sral ON 
+                      sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
+            WHERE     ID = :id
+            AND       sra.StudentReportsArchiveSeq = :documentId
+        ";
+
+        $result = $this->getConnector()->executeQuery($query, [
+            'id' => $student->getExternalId(),
+            'documentId' => $documentId
+        ]);
+
+        if ($row = $result->fetch()) {
+
+            // If we found a database record, return an array with the details necessary for downloading
+
+            return [
+                'filename' => "{$row["Description"]}.pdf",
+                'filesize' => strlen($row["Document"]),
+                'blob' => $row["Document"],
+            ];
+        }
+
+        // If we got here the document could not be located in the database
+
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
     }
 }
