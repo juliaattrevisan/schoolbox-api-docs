@@ -61,22 +61,36 @@
                                                 <h3>{{ assessment.title }}</h3>
                                             </a>
                                             <p class="meta">
-                                                <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a> {{ assessment.typeName }}
+                                                {{ assessment.typeName }}
                                             </p>
                                         </div>
 
-                                        <div class="small-12 large-4 columns grade">
+                                        <div class="small-12 large-4 columns">
                                             {% if assessment.isFeedbackVisibleToUser(USER) %}
-                                                <div class="{{ urgency.marks(assessment.normalisedMark(participant, true)) }}"><span>{{ assessment.humanReadableMark(participant, true) }}</span></div>
+
+                                                {% if assessment is task %}
+                                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                                    assessment: assessable,
+                                                    participant: participant
+                                                    } only %}
+                                                {% else %}
+                                                    <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}">
+                                                        <span>{{ assessment.humanReadableMark(participant, true) }}</span>
+                                                    </div>
+                                                {% endif %}
                                                 {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
                                                 {% if feedback %}
                                                     <p class="comment">{{ feedback.comment | nl2br  }}</p>
                                                 {% endif %}
                                             {% endif %}
+
                                         </div>
 
                                         <div class="small-12 large-3 columns">
-                                            {{ dueDate.dueDate(assessment, student) }}
+
+                                            {{ dueDate.dueDate(assessment, student) }} <br />
+                                            {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
+
                                         </div>
                                     </div>
                                 </div>
