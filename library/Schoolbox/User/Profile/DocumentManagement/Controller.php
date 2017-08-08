@@ -25,7 +25,8 @@ class Controller extends Base
      *
      * @param UserMapper $userMapper
      */
-    public function __construct(UserMapper $userMapper) {
+    public function __construct(UserMapper $userMapper)
+    {
         $this->userMapper = $userMapper;
         $this->externalDocument = new External_Document();
     }
@@ -60,7 +61,7 @@ class Controller extends Base
     {
         $report = $this->externalDocument->downloadAcademicReportForStudent($student, $documentId);
 
-        $headers  = $this->getResponse()->headers;
+        $headers = $this->getResponse()->headers;
         $headers->set("Pragma", " ");
         $headers->set("Cache-Control", " ");
         $headers->set("Content-Type", "application/pdf");
