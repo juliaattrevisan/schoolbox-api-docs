@@ -89,7 +89,7 @@
                                         <div class="small-12 large-3 columns">
 
                                             {{ dueDate.dueDate(assessment, student) }} <br />
-                                            {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment  } %}
+                                            {% include '@learningAssessment/fragments/statusLine.twig' with { assessable: assessment, student: student} only %}
 
                                         </div>
                                     </div>
