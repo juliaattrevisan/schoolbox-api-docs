@@ -86,6 +86,33 @@ class Module extends BaseModule
         });
     }
 
+
+    /**
+     * These pages may be accessed by:
+     *
+     * * superusers
+     * * staff
+     * * the child themselves
+     * * the child's parents
+     *
+     * {@inheritdoc}
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $ruleRegexp = '(?:getIndex|getDownload)';
+        $this
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                $ruleRegexp,
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                )
+            );
+    }
+
     /**
      * @return ErrorMapper
      * @throws InvalidArgumentException If cannot find mapper class
@@ -96,5 +123,20 @@ class Module extends BaseModule
         $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
 
         return $errorMapper;
+    }
+
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+
+        return $userMapper;
     }
 }

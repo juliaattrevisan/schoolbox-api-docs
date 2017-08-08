@@ -316,10 +316,12 @@
                         {% if showButtons %}
                             {% block buttons_documents %}
                                 {% if isStaff and config.external_document_report_enabled %}
-                                    <li>
-                                        <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) }}"
-                                           class="icon-document">Academic Reports</a>
-                                    </li>
+                                    {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
+                                    {% if routeAcademicReports %}
+                                        <li>
+                                            <a href="{{ routeAcademicReports }}" class="icon-document">Academic Reports</a>
+                                        </li>
+                                    {% endif %}
                                 {% endif %}
                             {% endblock buttons_documents %}
                         {% endif %}
