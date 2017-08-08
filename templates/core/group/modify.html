@@ -61,8 +61,10 @@
             var label       = $('#save-label');
             if ($(this).is('[data-interaction="reject"]')) {
                 label.toastActivate({text: 'Rejecting', css: 'alert'});
+                $(this).closest('li').slideUp();
             } else {
                 label.toastActivate({text: 'Accepting'});
+                $(this).closest('li').slideUp();
             }
             // loading dialog
             $.get(this.href)
