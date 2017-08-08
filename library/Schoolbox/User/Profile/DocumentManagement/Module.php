@@ -38,8 +38,8 @@ class Module extends BaseModule
 
         $this->registerRoutesArray([
             'GET' => [
-                '/{studentId}'                              => ['getIndex' => $permissionStaff],
-                '/{studentId}/download/{documentId}'        => ['getDownload' => $permissionStaff],
+                '/{studentId}' => ['getIndex' => $permissionStaff],
+                '/{studentId}/download/{documentId}' => ['getDownload' => $permissionStaff],
             ],
             'POST' => [
             ]
@@ -49,8 +49,9 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector) {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class, [
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
             'userMapper' => UserMapper::getInstance(),
         ]));
     }
@@ -58,7 +59,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
