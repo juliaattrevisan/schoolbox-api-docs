@@ -315,7 +315,7 @@
 
                         {% if showButtons %}
                             {% block buttons_documents %}
-                                {% if isStaff and config.external_document_report_enabled %}
+                                {% if config.external_document_report_enabled %}
                                     {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
                                     {% if routeAcademicReports %}
                                         <li>
