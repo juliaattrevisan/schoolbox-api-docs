@@ -26,7 +26,7 @@ class External_Synergetic_Document implements External_DocumentInterface
 
         $externalPing = new External_Ping();
 
-        // The upload location varies depending on the version of Synergetic
+        // The location of documents varies depending on the version of the Synergetic database schema
 
         if ($externalPing->getVersion() == "68") {
             $this->schema = "media";
@@ -52,31 +52,21 @@ class External_Synergetic_Document implements External_DocumentInterface
         // Otherwise attempt to find the documents for this user
 
         $query =
-            "
-            SELECT          StudentReportsArchiveLinkSeq, 
-                            sral.FileYear, 
-                            sral.FileSemester, 
-                            Description
-            FROM            {$this->schema}.StudentReportsArchive sra
-            JOIN            {$this->schema}.StudentReportsArchiveLink sral ON 
-                            sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
-            INNER JOIN      dbo.studentyears sy ON 
-                            sy.id = sral.ID AND 
-                            sy.fileyear = sral.FileYear
-            LEFT OUTER JOIN dbo.uluStudentReports ulusr ON 
-                            sral.fileyear = ulusr.fileyear AND 
-                            sral.FileSemester = ulusr.FileSemester AND 
-                            sy.YearLevel = ulusr.YearLevel AND 
-                            sy.StudentCampus = ulusr.Campus
-            WHERE           sral.ID = :externalId AND
-                            ulusr.ShowOnOLE = 1
-            ORDER BY        sral.FileYear DESC, 
-                            sral.FileSemester DESC, 
-                            sra.CreatedDate DESC
+        "
+            SELECT	    sral.StudentReportsArchiveLinkSeq,
+                        sral.FileYear,
+                        sral.FileSemester,
+                        sral.Description
+            FROM	    {$this->schema}.StudentReportsArchiveLink sral
+            JOIN        {$this->schema}.StudentReportsArchive sra ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
+            WHERE       ID = :id
+            ORDER BY    sral.FileYear DESC, 
+                        sral.FileSemester DESC, 
+                        sra.CreatedDate DESC
         ";
 
         $iterator = $this->getConnector()->executeQueryIterator($query, [
-            'externalId' => $student->getExternalId()
+            'id' => $student->getExternalId()
         ]);
 
         $reports = [];
