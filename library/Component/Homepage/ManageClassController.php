@@ -49,9 +49,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setVar('WORK_TERM', Schoolbox\Assessment\Term\Mapper::getInstance()->findForToday()->getCode());
 
         /* Output student grades link to students of this class */
-        if ($this->getContentPermission() == UserAccess::ACCESS_READ
-            && $this->getAccess()->isLearner($this->getUser(), $this->getContext())
-        ) {
+        if ($this->getAccess()->isLearner($this->getUser(), $this->getContext())) {
             $this->parse('student_grades_block', 'student_grades');
         } else {
             $this->setVar('student_grades_block', '');
