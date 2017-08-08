@@ -40,3 +40,13 @@ INSERT INTO `config` (
   'false'
 );
 
+UPDATE    `config`
+SET       `value` = '1' 
+WHERE     `name` = 'external_document_report_enabled' AND
+          (SELECT COUNT(*) FROM `config` WHERE `name` = 'site_location' and `value` = 'stk') > 0;
+
+UPDATE    `config`
+SET       `value` = '2013-10-01'
+WHERE     `name` = 'external_document_report_minimum_date' AND
+          (SELECT COUNT(*) FROM `config` WHERE `name` = 'site_location' and `value` = 'stk') > 0;
+
