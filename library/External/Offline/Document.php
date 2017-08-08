@@ -30,7 +30,7 @@ class External_Offline_Document implements External_DocumentInterface
      * @return array
      * @throws SchoolboxException
      */
-    public function downloadAcademicReport(User $student, $documentId)
+    public function downloadAcademicReportForStudent(User $student, $documentId)
     {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
     }

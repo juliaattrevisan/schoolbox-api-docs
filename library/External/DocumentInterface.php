@@ -26,5 +26,5 @@ interface External_DocumentInterface
      * @param string $documentId
      * @return array
      */
-    public function downloadAcademicReport(User $student, $documentId);
+    public function downloadAcademicReportForStudent(User $student, $documentId);
 }

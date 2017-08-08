@@ -92,7 +92,7 @@ class External_Synergetic_Document implements External_DocumentInterface
      * @param string $documentId
      * @return array
      */
-    public function downloadAcademicReport(User $student, $documentId)
+    public function downloadAcademicReportForStudent(User $student, $documentId)
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 

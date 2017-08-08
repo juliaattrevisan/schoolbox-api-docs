@@ -58,7 +58,7 @@ class Controller extends Base
      */
     public function getDownload($student, $documentId)
     {
-        $report = $this->externalDocument->downloadAcademicReport($student, $documentId);
+        $report = $this->externalDocument->downloadAcademicReportForStudent($student, $documentId);
 
         $headers  = $this->getResponse()->headers;
         $headers->set("Pragma", " ");
