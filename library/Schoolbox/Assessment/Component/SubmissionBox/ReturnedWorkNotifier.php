@@ -163,7 +163,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $catName = $cat->getName();
 
         $icon = "/portrait?userId=$teacherExtId&size={$this->iconSize}";
-        $href = "/submission/submissionHistory/$boxId/$studentId";
+        $href = "/learning/assessments/{$box->getAssessmentId()}/$studentId";
 
         // if student, 2nd-person language
         if ($target === Role::STUDENT && $box->getMarkVisibility() >= IAssessable::MARK_VISIBILITY_STUDENT) {
@@ -175,7 +175,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
                 ->setTitle(":teacher has marked your work for :boxname in :catname")
                 ->setHref($href)
                 ->setParam('teacher', new UserParam($teacher))
-                ->setParam('boxname', new Param($boxName, "/submission/submissionHistory/$boxId"))
+                ->setParam('boxname', new Param($boxName, "/learning/assessments/{$box->getAssessmentId()}/$studentId"))
                 ->setParam('catname', new CategoryParam($cat))
                 ->addFilter('roletype', [Role::STUDENT]);
             $envelope->targetToUser($studentId, $bob->build());
@@ -184,7 +184,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             // If parent can't view results for this grade:
             // target to student's grades page
             if (!$box->isMarkShownToParents()) {
-                $href = "/submission/allWork/$studentId";
+                $href = "/learning/grades/$studentId";
             }
             $term = $this->termMapper->findForDate($box->getDueDate());
             $bob = new Builder();
@@ -196,8 +196,8 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
                 ->setHref($href)
                 ->setParam('teacher', new UserParam($teacher))
                 ->setParam('student', new UserParam($student))
-                ->setParam('boxname', new Param($boxName, "/submission/submissionHistory/$boxId/$studentId"))
-                ->setParam('catname', new Param($catName, "/submission/allWork/$studentId/{$term->getCode()}/$catId"))
+                ->setParam('boxname', new Param($boxName, "/learning/assessments/{$box->getAssessmentId()}/$studentId"))
+                ->setParam('catname', new Param($catName, "/learning/grades/$studentId/{$term->getCode()}/$catId"))
                 ->addFilter('roletype', [Role::PARENT]);
             $envelope->targetToParent($studentId, $bob->build());
         }

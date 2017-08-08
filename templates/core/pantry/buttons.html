@@ -221,7 +221,7 @@
         <section class="content" style="overflow: auto;">
             <div class="context-switch">
                 <nav>
-                    <a data-interaction="previous" href="/submission/listSubmission/2015/1"></a>
+                    <a data-interaction="previous" href="/learning/pending"></a>
                 </nav>
                 <div class="semester">
                     <select id="context-selector-semester">
@@ -232,7 +232,7 @@
                     </select>
                 </div>
                 <nav>
-                    <a data-interaction="next" href="/submission/listSubmission/2016/1"></a>
+                    <a data-interaction="next" href="/learning/pending"></a>
                 </nav>
             </div>
 
@@ -260,7 +260,7 @@
 
                     var tgt = $('select[name=student-select]'), ize,
                             skipUnsubmitted = $('#skipUnsubmitted'),
-                            students = [{"text":"Admin, Alaress","value":"\/submission\/inlineGrading\/view\/22\/19","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"card\">\n            <img src=\"\/portrait.php?userId=485&size=square64\" alt=\"View Profile\" \/>\n            <p>Admin, Alaress<\/p>\n            <span class=\"label status unsubmitted\">Not Submitted<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":true},{"text":"Agius, Byron","value":"\/submission\/inlineGrading\/view\/22\/239","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"card small-12\">\n            <img src=\"\/portrait.php?userId=287&size=square64\" alt=\"View Profile\" \/>\n            <p>Agius, Byron<\/p>\n            <span class=\"label status submitted\">Submitted on Time<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":false}],
+                            students = [{"text":"Admin, Alaress","value":"\/learning\/assessments\/314\/230\/responses","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"card\">\n            <img src=\"\/portrait.php?userId=485&size=square64\" alt=\"View Profile\" \/>\n            <p>Admin, Alaress<\/p>\n            <span class=\"label status unsubmitted\">Not Submitted<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":true},{"text":"Agius, Byron","value":"\/submission\/inlineGrading\/view\/22\/239","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"card small-12\">\n            <img src=\"\/portrait.php?userId=287&size=square64\" alt=\"View Profile\" \/>\n            <p>Agius, Byron<\/p>\n            <span class=\"label status submitted\">Submitted on Time<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":false}],
                             selectizeOptions = {
                                 preload: true,
                                 closeAfterSelect: false,
@@ -289,8 +289,6 @@
                     ize.on('change', function (e) {
                         window.location.href = e.target.value;
                     });
-
-                    $('#returnWorkForm').marksheet();
 
                     $('[data-combobox]').combobox(["Absent","Not Assessed","Not Submitted","Submitted","Pending"]);
 

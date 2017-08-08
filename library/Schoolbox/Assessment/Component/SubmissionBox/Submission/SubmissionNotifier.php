@@ -228,12 +228,12 @@ class SubmissionNotifier extends AbstractModuleNotifier
             ->setParams(
                 array(
                     'student' => new UserParam($user),
-                    'boxname' => new Param($box->getName(), "/submission/viewSubmission/$boxId"),
+                    'boxname' => new Param($box->getName(), "/learning/assessments/{$box->getAssessmentId()}/{$user->getId()}"),
                     'catname' => new CategoryParam($folder)
                 )
             )
             ->setIcon("/portrait?userId=$studentExtId&size={$this->iconSize}")
-            ->setHref("/submission/viewSubmission/$boxId")
+            ->setHref("/learning/assessments/{$box->getAssessmentId()}/{$user->getId()}")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic("duework.$boxId.$type")
@@ -307,12 +307,12 @@ class SubmissionNotifier extends AbstractModuleNotifier
             ->setParams(
                 array(
                     'owner'   => new UserParam($user),
-                    'boxname' => new Param($box->getName(), "/submission/submissionHistory/$boxId/$studentId"),
+                    'boxname' => new Param($box->getName(), "/learning/assessments/{$box->getAssessmentId()}/$studentId"),
                     'catname' => new CategoryParam($folder)
                 )
             )
             ->setIcon("/portrait?userId=$studentExtId&size={$this->iconSize}")
-            ->setHref("/submission/viewSubmission/$boxId")
+            ->setHref("/learning/assessments/{$box->getAssessmentId()}/$studentId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic("duework.$boxId.deleted")
