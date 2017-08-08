@@ -163,7 +163,6 @@ class External_Synergetic_Document implements External_DocumentInterface
         $result = $this->getConnector()->executeQuery($query, $params);
 
         if ($row = $result->fetch()) {
-
             // If we found a database record, return an array with the details necessary for downloading
             // using the historical code
 
