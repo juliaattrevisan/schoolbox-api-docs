@@ -38,8 +38,8 @@ class Module extends BaseModule
 
         $this->registerRoutesArray([
             'GET' => [
-                '/report/{studentId}'                              => ['getIndex' => $permissionStaff],
-                '/report/{studentId}/download/{documentId}'        => ['getDownload' => $permissionStaff],
+                '/{studentId}'                              => ['getIndex' => $permissionStaff],
+                '/{studentId}/download/{documentId}'        => ['getDownload' => $permissionStaff],
             ],
             'POST' => [
             ]

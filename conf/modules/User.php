@@ -10,6 +10,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
+use Aura\Di\ContainerInterface as DependencyInjector;
 use Schoolbox\User\Module as UserModule;
 use Schoolbox\User\Profile\DocumentManagement\Module as UserProfileDocumentManagementModule;
 
@@ -24,14 +25,17 @@ class User implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
+        /** @var DependencyInjector $di */
         $di = $kernel->getDependencyInjector();
 
-        $module = new UserModule($kernel->getDependencyInjector());
-        $module->init('/user');
+        $userModule = new UserModule($di);
+        $userModule->init('/user');
+
+        // Only load the external SIS academic report module if it is enabled in config
 
         if ($di->get('config')->get('external_document_report_enabled')) {
-            $module = new UserProfileDocumentManagementModule($kernel->getDependencyInjector());
-            $module->init('/user/profile/documents');
+            $documentReportModule = new UserProfileDocumentManagementModule($di);
+            $documentReportModule->init('/user/profile/documents/reports');
         }
     }
 }
