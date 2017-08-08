@@ -26,7 +26,7 @@ REFERENCES `submission_grade_group` (`id`)
 
 UPDATE project
   LEFT JOIN `submission_mark_type` ON project.`mark_type_id` = `submission_mark_type`.mark_type_id
-SET project.`mark_type_id` =  (SELECT `id` FROM `submission_mark_type` WHERE slug LIKE 'none')
+SET project.`mark_type_id` =  (SELECT `mark_type_id` FROM `submission_mark_type` WHERE slug LIKE 'none')
 WHERE `submission_mark_type`.mark_type_id is null;
 
 ALTER TABLE `project`
