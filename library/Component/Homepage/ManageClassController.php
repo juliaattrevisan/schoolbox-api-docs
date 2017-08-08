@@ -6,17 +6,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-use Schoolbox\Permission\Access\UserAccessMapper;
 use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var UserAccessMapper
-     */
-    var $access;
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -30,7 +23,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             return $this->hasContextWriteAccess();
         }
 
-        $this->access = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
         return true;
     }
 
@@ -41,9 +33,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function renderTemplate($templateHandle)
     {
-        if (!parent::loadTemplate($templateHandle, 'manageClass')) {
-            return false;
-        }
 
         if ($this->getContext()->getCodeString() == '') {
             return false;
@@ -61,8 +50,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         /* Output student grades link to students of this class */
         if ($this->getContentPermission() == UserAccess::ACCESS_READ && (
-            $this->access->involvedInGroup($this->getUser(), $this->getContext()->getId()) ||
-                $this->access->involvedInSubject($this->getUser(), $this->getContext()->getCodeString()))
+            $this->getAccess()->involvedInGroup($this->getUser(), $this->getContext()->getId()) ||
+                $this->getAccess()->involvedInSubject($this->getUser(), $this->getContext()->getCodeString()))
         ) {
             $this->parse('student_grades_block', 'student_grades');
         } else {
