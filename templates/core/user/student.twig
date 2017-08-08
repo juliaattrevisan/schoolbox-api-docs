@@ -315,7 +315,7 @@
 
                         {% if showButtons %}
                             {% block buttons_documents %}
-                                {% if isStaff and config.external_docman_enabled %}
+                                {% if isStaff and config.external_document_report_enabled %}
                                     <li>
                                         <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) }}"
                                            class="icon-document">Academic Reports</a>

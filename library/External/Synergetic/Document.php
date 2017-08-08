@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
 
@@ -62,14 +63,38 @@ class External_Synergetic_Document implements External_DocumentInterface
             JOIN        {$this->schema}.StudentReportsArchive sra ON 
                         sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
             WHERE       ID = :id
+        ";
+
+        $params = [
+            'id' => $student->getExternalId()
+        ];
+
+        // Add date filter (if we find a parseable date in the config)
+
+        $minimumDateString = ConfigMapper::getInstance()->get('external_document_report_minimum_date');
+
+        $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+
+        if ($date !== false) {
+
+            $query .= ' AND sra.CreatedDate >= :createdDate';
+
+            $params = array_merge($params, [
+                'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+            ]);
+        }
+
+        $query .= "
             ORDER BY    sral.FileYear DESC, 
                         sral.FileSemester DESC, 
                         sra.CreatedDate DESC
         ";
 
-        $iterator = $this->getConnector()->executeQueryIterator($query, [
-            'id' => $student->getExternalId()
-        ]);
+        // Get all documents for the student
+
+        $iterator = $this->getConnector()->executeQueryIterator($query, $params);
+
+        // Return the results in an array in the format that is required by the historical code we are using
 
         $reports = [];
 
@@ -100,7 +125,7 @@ class External_Synergetic_Document implements External_DocumentInterface
             return [];
         }
 
-        // Retrieve the document from the database
+        // Create query to get the document from the database
 
         $query =
         "
@@ -113,14 +138,34 @@ class External_Synergetic_Document implements External_DocumentInterface
             AND       sra.StudentReportsArchiveSeq = :documentId
         ";
 
-        $result = $this->getConnector()->executeQuery($query, [
+        $params = [
             'id' => $student->getExternalId(),
             'documentId' => $documentId
-        ]);
+        ];
+
+        // Add date filter (if we find a parseable date in the config)
+
+        $minimumDateString = ConfigMapper::getInstance()->get('external_document_report_minimum_date');
+
+        $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+
+        if ($date !== false) {
+
+            $query .= ' AND sra.CreatedDate >= :createdDate';
+
+            $params = array_merge($params, [
+                'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+            ]);
+        }
+
+        // Get the document from the database
+
+        $result = $this->getConnector()->executeQuery($query, $params);
 
         if ($row = $result->fetch()) {
 
             // If we found a database record, return an array with the details necessary for downloading
+            // using the historical code
 
             return [
                 'filename' => "{$row["Description"]}.pdf",

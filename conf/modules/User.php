@@ -29,7 +29,7 @@ class User implements ModuleConfigInterface
         $module = new UserModule($kernel->getDependencyInjector());
         $module->init('/user');
 
-        if ($di->get('config')->get('external_docman_enabled')) {
+        if ($di->get('config')->get('external_document_report_enabled')) {
             $module = new UserProfileDocumentManagementModule($kernel->getDependencyInjector());
             $module->init('/user/profile/documents');
         }
