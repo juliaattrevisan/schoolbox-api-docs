@@ -300,7 +300,8 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
             'DefinitionDay' => ['value' => &$definitionDay, 'type' => PDO::PARAM_INT, 'length' => 4]
         ];
 
-        $statement = $this->mssqlTest->executeStoredProcedure('spgTimetableDay',
+        $statement = $this->mssqlTest->executeStoredProcedure(
+            'spgTimetableDay',
             [
                 'TimetableGroup' => 'SEN',
                 'Date' => '2010-10-03'
