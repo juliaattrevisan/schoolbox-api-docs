@@ -21,16 +21,6 @@ class Synchronise_Synergetic_Peninsula_Strategy_Student extends Synchronise_Base
     }
 
     /**
-     * Alt email (if not set) is based off of the student's username.
-     *
-     * @param  array  $currentUser
-     * @return string
-     */
-    public function getAltEmailFromUser($currentUser) {
-        return $this->getUsernameFromUser($currentUser).'@tps.vic.edu.au';
-    }
-
-    /**
      * Gets campus according to the following map:
      *
      * * E      => Early Childhood (4)
