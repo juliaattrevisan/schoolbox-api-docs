@@ -11,7 +11,6 @@ use Aura\Router\Router;
 use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
 use Schoolbox\Preview\Registry\Decoder\LinkRedir;
-use Schoolbox\Preview\Registry\Decoder\TaskRedir;
 use Schoolbox\User;
 
 class Factory
@@ -48,7 +47,6 @@ class Factory
          */
         $decoderRegistry = new Registry\Registry($encodedUrl);
         $decoderRegistry->add(new LinkRedir());
-        $decoderRegistry->add(new TaskRedir($this->router));
 
         $testUrl = $decoderRegistry->findUrl();
 
