@@ -334,7 +334,70 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getRoomTimetable($roomCodes)
     {
-        return [];
+        // Sort out room codes
+        if (!is_array($roomCodes)) {
+            $roomCodes = [$roomCodes];
+        }
+        if (empty($roomCodes)) {
+            return [];
+        }
+
+        $extraWhereParts = [];
+        foreach ($roomCodes as $roomCode) {
+            $extraWhereParts[] = "room_base.Code = {$this->database->smartQuote($roomCode)}";
+            $extraWhereParts[] = "room_replacement.Code = {$this->database->smartQuote($roomCode)}";
+        }
+        $extraWhere = implode(' OR ', $extraWhereParts);
+
+        // Campus may/must be null, as this method doesn't support campi
+        // Also doesn't support user IDs
+        // Also doesn't have a date.
+        // How'd this ever work?
+
+        // SubjectClasses.Description,
+        // Timetable.Room AS RoomCode,
+        // Timetable.DayNumber,
+        // Timetable.PeriodNumber,
+        // Timetable.TimetableGroup,
+        // Timetable.ClassCampus,
+        // Timetable.ClassCode,
+        // Timetable.StaffID,
+        // vStaff.StaffTitle,
+        // vStaff.StaffPreferredName,
+        // vStaff.StaffSurname
+
+        // Need to keep query between a reasonable timeframe?
+        $query = "
+            SELECT
+                ts.Name                     AS Description,
+                $this->baseRoomSelect,
+                $this->replacementRoomSelect,
+                td.SortOrder                AS DayNumber,
+                tp.Code                     AS PeriodNumber,
+                t.Name                      AS TimetableGroup,
+                ts.Code                     AS ClassCode,
+                ts.Name                     AS ClassName,
+                $this->baseStaffSelect,
+                $this->replacementStaffSelect
+
+            FROM       fc.TimetableSubject       ts
+            -- Join onto staff
+            INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+            -- Expand period
+            INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
+            INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
+            INNER JOIN fc.TimetableDay           td   ON tp.TimetableDayID            = td.ID
+            $this->baseStaffJoin
+            $this->replacementStaffJoin
+            $this->baseRoomJoin
+            $this->replacementRoomJoin
+            $this->timetableJoin
+
+            WHERE t.Enabled = 1
+            AND {$extraWhere}
+        ";
+        return $this->database->getAll($query);
     }
 
 
