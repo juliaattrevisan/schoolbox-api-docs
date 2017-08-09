@@ -221,7 +221,7 @@ class AjaxFlot
             } elseif ($currentData['groupName'] == 'Return') {
                 $page->setVar(array(
                     'FILE_LOCATION' => 'return',
-                    'FILE_DELETE_URL' => '/submission/returnWorkForm.php?delete='.$currentData['id'].'&hash='.$currentData['hash'],
+                    'FILE_DELETE_URL' => "/learning/feedback/file/{$currentData['id']}/delete",
                 ));
                 $page->parse('file_return_block', 'file_return');
                 $page->parse('has_category_block', 'has_category');
@@ -254,7 +254,7 @@ class AjaxFlot
             ));
         }
 
-        echo $page->template->_varVals['file_block'];
+        return $page->template->_varVals['file_block'];
     }
 
     /* Getters/Setters
