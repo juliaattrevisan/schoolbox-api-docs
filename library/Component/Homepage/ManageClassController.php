@@ -18,7 +18,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     private $userAccessMapper;
 
     /**
-     * @var  Term\Mapper
+     * @var Term\Mapper
      */
     private $termMapper;
 
@@ -69,12 +69,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setVar('WORK_TERM', $this->termMapper->findForToday()->getCode());
 
         $involvedInGroup = $isGroupPage && $this->userAccessMapper->involvedInGroup(
-                $this->getUser(),
-                $this->getContext()->getId());
+            $this->getUser(),
+            $this->getContext()->getId()
+        );
 
         $involvedInClass = $isClassPage && $this->userAccessMapper->involvedInSubject(
-                $this->getUser(),
-                $this->getContext()->getCodeString());
+            $this->getUser(),
+            $this->getContext()->getCodeString()
+        );
 
         /* Output student grades link to students (other users with READ access may be able to see this page) */
         if (($involvedInGroup || $involvedInClass) && UserAccess::ACCESS_READ === $this->getContentPermission()) {
