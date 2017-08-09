@@ -173,9 +173,12 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             'periodCount' => count($periods),
             'dayCount'    => $dayCount,
         ];
+
+        // Those trailing microseconds are really annoying, so strip them
+        $search = '/\\.\\d+$/';
         foreach ($periods as $period) {
-            $startTime = new Alaress_Date_Format($period['StartTime'], 'H:i:s.u');
-            $endTime   = new Alaress_Date_Format($period['EndTime'], 'H:i:s.u');
+            $startTime = new Alaress_Date_Format(preg_replace($search, '', $period['StartTime']), 'H:i:s');
+            $endTime   = new Alaress_Date_Format(preg_replace($search, '', $period['EndTime']), 'H:i:s');
             $definition['desc'][]     = $period['Name'];
             $definition['start'][]    = $startTime->getUsingFormat('H:i');
             $definition['end'][]      = $endTime->getUsingFormat('H:i');
