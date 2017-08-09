@@ -154,13 +154,14 @@ try {
          */
         case 'eotc_all':
 
-            /* Normally you wouldn't get here because the ui option is hidden when
-             * eotc isn't available - the only way you'd get here is direct url access
-             */
             if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
                 $api = new Calendar_Api_EventType_Custom_EOTC_Default($user, []);
                 $filename = 'eotc_all';
             } else {
+
+                /* Normally you wouldn't get here because the ui option is hidden when
+                 * eotc isn't available - the only way you'd get here is direct url access
+                 */
                 throw new SchoolboxException('EOTC module not enabled', 400);
             }
 
