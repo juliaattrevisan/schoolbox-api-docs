@@ -345,6 +345,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             return [];
         }
 
+        // Build query parts for them
         $extraWhereParts = [];
         foreach ($roomCodes as $roomCode) {
             $extraWhereParts[] = "room_base.Code = {$this->database->smartQuote($roomCode)}";
@@ -352,24 +353,10 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         }
         $extraWhere = implode(' OR ', $extraWhereParts);
 
-        // Campus may/must be null, as this method doesn't support campi
-        // Also doesn't support user IDs
-        // Also doesn't have a date.
-        // How'd this ever work?
-
-        // SubjectClasses.Description,
-        // Timetable.Room AS RoomCode,
-        // Timetable.DayNumber,
-        // Timetable.PeriodNumber,
-        // Timetable.TimetableGroup,
-        // Timetable.ClassCampus,
-        // Timetable.ClassCode,
-        // Timetable.StaffID,
-        // vStaff.StaffTitle,
-        // vStaff.StaffPreferredName,
-        // vStaff.StaffSurname
-
-        // Need to keep query between a reasonable timeframe?
+        // The room timetable query.
+        // Note it has no dates, only timetable day and period;
+        // therefore it doesn't join onto CROSS APPLY fc.PeriodExpand() like
+        // the other timetable queries.
         $query = "
             SELECT
                 ts.Name                     AS Description,
@@ -378,6 +365,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 td.SortOrder                AS DayNumber,
                 tp.Code                     AS PeriodNumber,
                 t.Name                      AS TimetableGroup,
+                t.Name                      AS ClassCampus,
                 ts.Code                     AS ClassCode,
                 ts.Name                     AS ClassName,
                 $this->baseStaffSelect,
@@ -387,7 +375,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             -- Join onto staff
             INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
             INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
-            -- Expand period
+            -- Join onto period
             INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
             INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
             INNER JOIN fc.TimetableDay           td   ON tp.TimetableDayID            = td.ID
@@ -399,8 +387,41 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
             WHERE t.Enabled = 1
             AND {$extraWhere}
+
+            ORDER BY td.SortOrder ASC, tp.Code ASC
         ";
-        return $this->database->getAll($query);
+
+        // Finagle result into room code format
+        $result = $this->database->getAll($query);
+        foreach ($result as &$row) {
+            $newRow = [
+                'Description'    => $row['Description'],
+                'DayNumber'      => $row['DayNumber'],
+                'PeriodNumber'   => $row['PeriodNumber'],
+                'TimetableGroup' => $row['TimetableGroup'],
+                'ClassCampus'    => $row['ClassCampus'],
+                'ClassCode'      => $row['ClassCode'],
+                'ClassName'      => $row['ClassName'],
+            ];
+            $newRow['RoomCode'] = $row['UseBaseRoom']
+                ? $row['BaseRoom']
+                : $row['ReplacementRoom'];
+            if ($row['UseBaseStaff']) {
+                $newRow['StaffID']            = $row['BaseStaffID'];
+                $newRow['StaffTitle']         = $row['BaseStaffTitle'];
+                $newRow['StaffPreferredName'] = $row['BaseStaffPreferredName'];
+                $newRow['StaffSurname']       = $row['BaseStaffSurname'];
+            } else {
+                $newRow['StaffID']            = $row['ReplacementStaffID'];
+                $newRow['StaffTitle']         = $row['ReplacementStaffTitle'];
+                $newRow['StaffPreferredName'] = $row['ReplacementStaffPreferredName'];
+                $newRow['StaffSurname']       = $row['ReplacementStaffSurname'];
+            }
+            $row = $newRow;
+        }
+        unset($row);
+
+        return $result;
     }
 
 
