@@ -14,7 +14,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Group;
 use Schoolbox\Test\TestCase;
 
-class CategoryTest extends TestCase
+class FolderTest extends TestCase
 {
 
     /**
