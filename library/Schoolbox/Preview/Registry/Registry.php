@@ -4,7 +4,7 @@
  *
  * A list of preprocessing Observer classes which help determine
  * the actual url from some encoded/encapsulated context, like a
- * link imprisoned in redir.php?id=39, or in task/start/143
+ * link imprisoned in redir.php?id=39
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -28,7 +28,7 @@ class Registry
     private $decoders;
 
     /**
-     * The original url to distill e.g. /task/start/143
+     * The original url to distill e.g. 'redir.php?id=39'
      *
      * @var string
      */
