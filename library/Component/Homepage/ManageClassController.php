@@ -38,9 +38,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             return false;
         }
 
-        $this->setBlock($templateHandle, "class_list", "class_list_block");
-        $this->setBlock($templateHandle, "class_mark", "class_mark_block");
-        $this->setBlock($templateHandle, "student_grades", "student_grades_block");
+        $this->setBlock($templateHandle, 'class_list', 'class_list_block');
+        $this->setBlock($templateHandle, 'class_mark', 'class_mark_block');
+        $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
 
 
         // Determine the term for the grades link
