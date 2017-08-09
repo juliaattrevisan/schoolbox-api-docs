@@ -132,6 +132,9 @@ switch ($this->arg[0]) {
             $article = \Schoolbox\News\ArticleMapper::getInstance()->findById($article->getId());
 
             try {
+                if (!$article->getImage()) {
+                    throw new \Schoolbox\Mapper\Exception("No image");
+                }
                 $hash = $article->getImage()->getHash();
                 if (!$hash) {
                     throw new \Schoolbox\Mapper\Exception("No hash");
