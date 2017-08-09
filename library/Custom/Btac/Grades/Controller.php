@@ -48,7 +48,12 @@ class Controller extends \Schoolbox\Learning\Grades\Controller
         $to          = new \Alaress_Date_Format("{$year}-12-31 23:59:59", \Alaress_Date_Format::DATABASE_FORMAT);
         $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, $from, $to);
 
-        $term = null;
+        //If we are looking at the year, no term is specified.
+        //Specify term 1 of that year in this case
+        $dateString = "{$year}-01-01";
+        $term = $this->getTermMapper()->findForDate(
+            new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_DATE_FORMAT)
+        );
         $this->getCustomGrades($viewee, $assessments, $year, $term);
     }
 
@@ -57,11 +62,11 @@ class Controller extends \Schoolbox\Learning\Grades\Controller
      *
      * @param User                     $viewee
      * @param Collection|IAssessable[] $assessments
-     * @param int                      $year
+     * @param null|int                 $year         Null if looking at a term, instead of a full-year
      * @param Term\Model               $term
      * @throws ServiceNotFound If unable to find mail handler service
      */
-    protected function getCustomGrades(User $viewee, Collection $assessments, $year = null, Term\Model $term = null)
+    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term)
     {
         // Storage for each folders markbook
         $markbooks        = [];
