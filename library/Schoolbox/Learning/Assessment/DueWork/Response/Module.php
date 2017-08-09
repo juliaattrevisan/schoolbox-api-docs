@@ -300,6 +300,8 @@ class Module extends BaseModule
     {
         try {
             $plagscanDocument = PlagscanMapper::getInstance()->findOneByColumn('plagscan_id', $params['plagscanId']);
+            // Need to cache HTML value as the cache will clear it if this model is used in a different context
+            $html = $plagscanDocument->getHtml();
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
@@ -331,7 +333,7 @@ class Module extends BaseModule
         return [
             'assessment' => $assessment,
             'response' => $response,
-            'plagscan' => $plagscanDocument,
+            'plagscan' => $plagscanDocument->setHtml($html), /* restore cached HTML value */
             'participant' => $participant
         ];
     }
