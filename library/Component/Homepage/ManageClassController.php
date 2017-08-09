@@ -33,12 +33,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function renderTemplate($templateHandle)
     {
-
-        if ($this->getContext()->getCodeString() == '') {
+        // If context is not a group or class, render nothing
+        if (!$this->getContext()->getGroup() && empty($this->getContext()->getCodeString())) {
             return false;
         }
-
-//        $this->parseConfig();
 
         $this->setBlock($templateHandle, "class_list", "class_list_block");
         $this->setBlock($templateHandle, "class_mark", "class_mark_block");
