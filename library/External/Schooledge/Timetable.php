@@ -69,14 +69,14 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
     ";
     private $baseRoomJoin = "
-        LEFT  JOIN fc.TimetableClassRoom tcr       ON tc.ID      = tcr.TimetableClassId
-        LEFT  JOIN fc.Room               tcrr      ON tcr.RoomID = tcrr.ID
-        LEFT  JOIN dbo.Room              room_base ON tcrr.ID    = room_base.ID
+        LEFT  JOIN fc.TimetableClassRoom tcr       ON tc.ID            = tcr.TimetableClassId
+        LEFT  JOIN fc.Room               tcrr      ON tcr.RoomID       = tcrr.ID
+        LEFT  JOIN dbo.Room              room_base ON tcrr.AdminRoomID = room_base.ID
     ";
     private $replacementRoomJoin = "
-        LEFT  JOIN fc.TimetableClassInstanceRoom tcir             ON tci.ID      = tcir.TimetableClassInstanceId AND tcir.RoomSpecified = 1
-        LEFT  JOIN fc.Room                       tcirr            ON tcir.RoomID = tcirr.ID
-        LEFT  JOIN dbo.Room                      room_replacement ON tcirr.ID    = room_replacement.ID
+        LEFT  JOIN fc.TimetableClassInstanceRoom tcir             ON tci.ID            = tcir.TimetableClassInstanceId AND tcir.RoomSpecified = 1
+        LEFT  JOIN fc.Room                       tcirr            ON tcir.RoomID       = tcirr.ID
+        LEFT  JOIN dbo.Room                      room_replacement ON tcirr.AdminRoomID = room_replacement.ID
     ";
 
     /**
