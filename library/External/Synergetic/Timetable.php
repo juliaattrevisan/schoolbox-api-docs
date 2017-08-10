@@ -484,8 +484,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @throws InvalidArgumentException
      * @return array
      */
-    public function fetchTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date) {
-
+    public function fetchTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    {
         $dayNumber = $this->getDayNumber($campus, $date->getUnixTimeStamp());
 
         if (!$this->isExternalIdValid($externalUserId)) {
