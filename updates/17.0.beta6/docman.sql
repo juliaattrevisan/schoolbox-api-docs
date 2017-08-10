@@ -40,13 +40,14 @@ INSERT INTO `config` (
   'false'
 );
 
+-- Update defaults for STK only
+SELECT @isStk := COUNT(*) FROM `config` WHERE `name` = 'site_location' and `value` = 'stk';
+SELECT @isStk;
+
 UPDATE    `config`
 SET       `value` = '1' 
-WHERE     `name` = 'external_document_report_enabled' AND
-          (SELECT COUNT(*) FROM `config` WHERE `name` = 'site_location' and `value` = 'stk') > 0;
+WHERE     `name` = 'external_document_report_enabled' AND @isStk IS TRUE;
 
 UPDATE    `config`
 SET       `value` = '2013-10-01'
-WHERE     `name` = 'external_document_report_minimum_date' AND
-          (SELECT COUNT(*) FROM `config` WHERE `name` = 'site_location' and `value` = 'stk') > 0;
-
+WHERE     `name` = 'external_document_report_minimum_date' AND @isStk IS TRUE;
