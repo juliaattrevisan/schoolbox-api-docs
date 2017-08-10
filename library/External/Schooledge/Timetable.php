@@ -138,11 +138,13 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             WHERE t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
             AND   t.Enabled = 1
         ");
-        $result   = $this->database->getAll("
+
+        // Filter out anything other than HH:MM in query
+        $result = $this->database->getAll("
             SELECT
                 tp.Name                    AS Name,
-                CAST(tp.StartTime AS TIME) AS StartTime,
-                CAST(tp.EndTime   AS TIME) AS EndTime,
+                SUBSTRING(CONVERT(CHAR(8), tp.StartTime, 108), 1, 5) AS StartTime,
+                SUBSTRING(CONVERT(CHAR(8), tp.EndTime, 108), 1, 5)   AS EndTime,
                 td.SortOrder               AS DayNumber,
                 tp.Code                    AS PeriodNumber
 
@@ -174,14 +176,10 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             'dayCount'    => $dayCount,
         ];
 
-        // Those trailing microseconds are really annoying, so strip them
-        $search = '/\\.\\d+$/';
         foreach ($periods as $period) {
-            $startTime = new Alaress_Date_Format(preg_replace($search, '', $period['StartTime']), 'H:i:s');
-            $endTime   = new Alaress_Date_Format(preg_replace($search, '', $period['EndTime']), 'H:i:s');
             $definition['desc'][]     = $period['Name'];
-            $definition['start'][]    = $startTime->getUsingFormat('H:i');
-            $definition['end'][]      = $endTime->getUsingFormat('H:i');
+            $definition['start'][]    = $period['StartTime'];
+            $definition['end'][]      = $period['EndTime'];
             $definition['number'][]   = $period['PeriodNumber'];
             $definition['sequence'][] = 1;
         }
