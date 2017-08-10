@@ -1257,9 +1257,10 @@ class External_Synergetic_User implements External_UserInterface
     // TODO: These functions seem to be used prolifically to fill in SQL clauses- in these cases should be using appropriate SQL joins.
 
     /**
-     * Retrieve current Synergetic file year and file semester
-     * @param int|null $externalUserId If supplied, will returns the users current year/semester
-     * @return array
+     * Return the FileYear and FileSemester for a user, if given; otherwise, the global value.
+     *
+     * @param int $externalUserId
+     * @return array [ year, semester ]
      */
     protected function findFileYearAndSemester($externalUserId = null)
     {
@@ -1322,7 +1323,10 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
+     * @param int $externalUserId
+     * @return int
      */
     public function getCurrentSemester($externalUserId = null)
     {
@@ -1336,7 +1340,10 @@ class External_Synergetic_User implements External_UserInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
+     * @param int $externalUserId
+     * @return int
      */
     public function getCurrentYear($externalUserId = null)
     {
