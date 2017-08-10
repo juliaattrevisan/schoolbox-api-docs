@@ -8,73 +8,73 @@
 {% endif %}
 
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', {assessment: currentInteraction.assessable, assessmentId: currentInteraction.assessable.id, participant: participant, studentId: participant.user.id, responseId: currentInteraction.id, response: currentInteraction}) %}
-
-<li class="actions-small-1" {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
-    <ul class="action-list">
-        <li class="actions-small-1">
-            <div class="list-item">
-                <div class="card small-12">
-                    {% if url %}
-                    <a href="{{ url }}" title="{{ tooltip }}">
-                    {% endif %}
-                        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}">
-                        <p>
-                            {% if currentInteraction.isSubmitted %}
-                                Submission
-                            {% else %}
-                                Draft Submission
-                            {% endif %}
-                            by {{ participant.user.fullname }}
-                        {% if currentInteraction.isSubmitted %}
-                            <p class="meta">{{ currentInteraction.submittedAt.short }}</p>
-                        {% else %}
-                            <p class="meta">{{ currentInteraction.updatedAt.short }}</p>
+<ul class="information-list threaded" {% if isOlderInteraction %}style="display:none"{% endif %} data-history-row>
+    <li class="actions-small-1">
+        <ul class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="card small-12">
+                        {% if url %}
+                        <a href="{{ url }}" title="{{ tooltip }}">
                         {% endif %}
-                        </p>
+                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}">
+                            <p>
+                                {% if currentInteraction.isSubmitted %}
+                                    Submission
+                                {% else %}
+                                    Draft Submission
+                                {% endif %}
+                                by {{ participant.user.fullname }}
+                            {% if currentInteraction.isSubmitted %}
+                                <p class="meta">{{ currentInteraction.submittedAt.short }}</p>
+                            {% else %}
+                                <p class="meta">{{ currentInteraction.updatedAt.short }}</p>
+                            {% endif %}
+                            </p>
 
-                    {% if url %}
-                    </a>
-                    {%  endif %}
+                        {% if url %}
+                        </a>
+                        {%  endif %}
+                    </div>
                 </div>
-            </div>
-            {% if deleteRoute %}
-            <nav>
-                <a class="icon-more" title="" data-dropdown="response-options-{{ currentInteraction.id }}"></a>
-            </nav>
-            <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
-                <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete Submission" data-delete="{{ deleteRoute }}">Delete</a></li>
-            </ul>
-            {% endif %}
-        </li>
-    </ul>
-    {% if currentInteraction.allFiles %}
-    <ul class="information-list">
-    {% for currentFile in currentInteraction.allFiles %}
-            {% include '@learning/dueWork/interaction/response/files.twig' with {
-                assessment: currentInteraction.assessable,
-                assessmentId: currentInteraction.assessable.id,
-                response: currentInteraction,
-                plagscanId: currentFile.plagscan.plagscanId
-            } %}
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-    {% if currentInteraction.allFeedback|length %}
-        <ul class="information-list reply">
-            {% for currentFeedback in currentInteraction.allFeedback %}
-
-                {# We pass the responseId as well, so that people can download annotated crocodocs
-                 #}
-                {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {
-                    currentFeedback: currentFeedback,
+                {% if deleteRoute %}
+                <nav>
+                    <a class="icon-more" title="" data-dropdown="response-options-{{ currentInteraction.id }}"></a>
+                </nav>
+                <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
+                    <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete Submission" data-delete="{{ deleteRoute }}">Delete</a></li>
+                </ul>
+                {% endif %}
+            </li>
+        </ul>
+        {% if currentInteraction.allFiles %}
+        <ul class="information-list">
+        {% for currentFile in currentInteraction.allFiles %}
+                {% include '@learning/dueWork/interaction/response/files.twig' with {
                     assessment: currentInteraction.assessable,
                     assessmentId: currentInteraction.assessable.id,
-                    responseId: currentInteraction.id,
-                    participant: participant
-                } only %}
+                    response: currentInteraction,
+                    plagscanId: currentFile.plagscan.plagscanId
+                } %}
             {% endfor %}
         </ul>
-    {% endif %}
-</li>
+        {% endif %}
 
+        {% if currentInteraction.allFeedback|length %}
+
+                {% for currentFeedback in currentInteraction.allFeedback %}
+
+                    {# We pass the responseId as well, so that people can download annotated crocodocs
+                     #}
+                    {% include '@learningAssessment/fragments/dueWork/summary/interaction/feedback.twig' with {
+                        currentFeedback: currentFeedback,
+                        assessment: currentInteraction.assessable,
+                        assessmentId: currentInteraction.assessable.id,
+                        responseId: currentInteraction.id,
+                        participant: participant
+                    } only %}
+                {% endfor %}
+
+        {% endif %}
+    </li>
+</ul>
