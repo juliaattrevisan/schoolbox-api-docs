@@ -7,6 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Alaress\Cache;
 use Schoolbox\Campus;
 
 class External_Synergetic_Timetable implements External_TimetableInterface
@@ -22,6 +23,18 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /** @var array */
     protected $synergeticDay = [];
 
+    /** @var Cache */
+    private $timetableDefinitionCache;
+
+    /** @var Cache */
+    private $dayNumberCache;
+
+    /** @var Cache */
+    private $timetableForDateCache;
+
+    /** @var Cache */
+    private $dayTimetableCache;
+
     /** @var Group */
     private $groupHandler;
 
@@ -36,6 +49,22 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $this->setDatabase(MSSQL::getInstance());
         $this->externalUser = new External_User('synergetic');
         $this->groupHandler = new Group();
+
+        $this->timetableDefinitionCache = new Cache(function ($externalUserId, $campusId, $day = 0, $date = null) {
+            return $this->fetchTimetableDefinition($externalUserId, $campusId, $day, $date);
+        });
+
+        $this->timetableForDateCache = new Cache(function ($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date) {
+            return $this->fetchTimetableForDate($externalUserId, $userId, $campus, $date);
+        });
+
+        $this->dayTimetableCache = new Cache(function ($externalUserId, $userId, Campus $campus, $dayNumber, $date = null) {
+            return $this->fetchDayTimetable($externalUserId, $userId, $campus, $dayNumber, $date);
+        });
+
+        $this->dayNumberCache = new Cache(function (Campus $campus, $date = 0) {
+            return $this->fetchDayNumber($campus, $date);
+        });
     }
 
 
@@ -48,6 +77,24 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @return array
      */
     public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
+    {
+        $args = [ $externalUserId, $campus, $day, $date ];
+        $key  = implode('-', $args);
+
+        return $this->timetableDefinitionCache->get($key, $args);
+    }
+
+
+    /**
+     * @param int    $externalUserId
+     * @param Campus $campus
+     * @param int    $day
+     * @param string $date
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws MssqlQueryException
+     */
+    public function fetchTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
     {
         // check if there is a calendar event remapping the day number for this specific date
 
@@ -109,6 +156,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @return bool|int|string
      */
     public function getDayNumber(Campus $campus, $date = 0)
+    {
+        $key = sprintf('%s-%s', $campus->getExtTimetableCode(), date('Y-m-d', $date));
+
+        return $this->dayNumberCache->get($key, func_get_args());
+    }
+
+
+    /**
+     * @param Campus $campus
+     * @param int    $date
+     * @return bool|int|string
+     */
+    public function fetchDayNumber(Campus $campus, $date = 0)
     {
         $days = $this->getTotalDays($campus);
 
@@ -410,6 +470,21 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
     {
+        $key = sprintf('%d-%d-%d-%s', $externalUserId, $userId, $campus->getId(), $date->getDatabaseDate());
+
+        return $this->timetableForDateCache->get($key, func_get_args());
+    }
+
+
+    /**
+     * @param int                 $externalUserId
+     * @param int                 $userId
+     * @param Campus              $campus
+     * @param Alaress_Date_Format $date
+     * @throws InvalidArgumentException
+     * @return array
+     */
+    public function fetchTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date) {
 
         $dayNumber = $this->getDayNumber($campus, $date->getUnixTimeStamp());
 
@@ -531,6 +606,24 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @throws InvalidArgumentException
      */
     public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber, $date = null)
+    {
+        $key = sprintf('%d-%d-%d-%d-%s', $externalUserId, $userId, $campus->getId(), $dayNumber, $date);
+
+        return $this->dayTimetableCache->get($key, func_get_args());
+    }
+
+
+    /**
+     * @param int    $externalUserId
+     * @param int    $userId
+     * @param Campus $campus
+     * @param int    $dayNumber
+     * @param string $date
+     * @throws InvalidArgumentException
+     * @throws MssqlQueryException
+     * @return array
+     */
+    public function fetchDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber, $date = null)
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
