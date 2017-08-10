@@ -8,27 +8,22 @@
 namespace Schoolbox\User\Profile\DocumentManagement;
 
 use Alaress\Web\Controller\Base;
-use External_Document;
+use Schoolbox\External\Connector\IDocument;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-    /** @var UserMapper $userMapper */
-    private $userMapper;
-
-    /** @var External_Document $externalDocument */
+    /** @var IDocument $externalDocument */
     private $externalDocument;
 
     /**
      * Constructor
      *
-     * @param UserMapper $userMapper
+     * @param IDocument $externalDocument
      */
-    public function __construct(UserMapper $userMapper)
+    public function __construct(IDocument $externalDocument)
     {
-        $this->userMapper = $userMapper;
-        $this->externalDocument = new External_Document();
+        $this->externalDocument = $externalDocument;
     }
 
     /**
