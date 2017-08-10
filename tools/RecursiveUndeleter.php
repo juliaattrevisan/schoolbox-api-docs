@@ -94,6 +94,20 @@ class RecursiveUndeleter
      */
     private $perform;
 
+    /**
+     * Command-line specified date to pretend the indicated root objects were deleted at.
+     *
+     * This allows us to specify a center of window restoration for:
+     * * objects that do not have a date-format soft-delete field, or
+     * * objects that are not soft-deleted at all,
+     *
+     * If a root object has a soft-delete date value, and this date was specified, then this
+     * date will override the database's soft-delete date value.
+     *
+     * @var null|Alaress_Date_Format
+     */
+    private $explicitDeletionDate;
+
     /** @var string */
     private $rootTable;
 
@@ -340,10 +354,11 @@ class RecursiveUndeleter
      */
     private function parseCommandLineArgs()
     {
-        $opts   = getopt('t:i:w:vp', ['table:', 'id:', 'window:', 'verbose', 'perform']);
+        $opts   = getopt('t:i:o:w:vp', ['table:', 'id:', 'override:', 'window:', 'verbose', 'perform']);
         $errors = [];
         $this->getCommandLinePerform($opts);
         $this->getCommandLineThreshold($opts);
+        $errors = $this->getCommandLineExplicitDeletionDate($errors, $opts);
         $errors = $this->getCommandLineTable($errors, $opts);
         $errors = $this->getCommandLineIds($errors, $opts);
         $errors = $this->getCommandLineTimestampWindow($errors, $opts);
@@ -352,6 +367,8 @@ class RecursiveUndeleter
         $green  = self::COLOUR_GREEN;
         $white  = self::COLOUR_WHITE;
         $yellow = self::COLOUR_YELLOW;
+
+        $dateFormat = Alaress_Date_Format::DATABASE_FORMAT;
 
         if(count($errors)) {
             echo "\n{$red}Invalid syntax. You must: \n";
@@ -385,15 +402,26 @@ DESCRIPTION
        {$yellow}-p, --perform{$white}
               *without* this flag, un-delete will only perform a dry-run
 
+       {$yellow}-o, --override=OVERRIDE_DATE{$white}
+              Format: {$yellow}'{$dateFormat}'{$white}
+              If specified, treat specified root objects as having been deleted at this date, regardless of when they
+              were really deleted, or whether they are deleted at all.
+              Note, this does NOT mean restore root objects deleted around this time!
+
        {$yellow}-w, --window=WINDOW{$white}
               duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
 
        {$yellow}-v, --verbose{$white}
               verbosity:   whether to print verbose output or not.
 
-EXAMPLE
-       Example to undelete folder with ID = 123:
+EXAMPLES:
+       1. To undelete a soft-deleted folder with ID = 123:
             {$green}$file {$yellow}-t '$table' -i 123 -p{$white}
+
+       2. To undelete children of a non-soft-deleted folder with ID = 123. Restore children deleted within
+          one hour before or after '2000-01-01 00:00:00':
+            {$green}$file {$yellow}-t '$table' -i 123 -o '2000-01-01 00:00:00' -w 7200 -p{$white}
+
 ";
             echo $helpMsg;
             exit(1);
@@ -547,6 +575,43 @@ EXAMPLE
 
 
     /**
+     * Did caller specify to
+     *
+     * @param string[] $errors
+     * @param array    $opts
+     * @return string[]
+     */
+    private function getCommandLineExplicitDeletionDate(array $errors, array $opts)
+    {
+        $red    = self::COLOUR_RED;
+        $yellow = self::COLOUR_YELLOW;
+
+        // Did user provide both short and long options?
+        if (isset($opts['o'], $opts['override'])) {
+            $errors[] = "{$red}specify override deletion date using either the short '{$yellow}-o{$red}' or long '{$yellow}--override{$red}' option syntax, but not both";
+            return $errors;
+        }
+
+        // Did user specify neither?
+        if (!isset($opts['o']) && !isset($opts['override'])) {
+            return $errors;
+        }
+
+        $dateString = isset($opts['o']) ? $opts['o'] : $opts['override'];
+
+        try {
+            $this->explicitDeletionDate = new Alaress_Date_Format($dateString, Alaress_Date_Format::DATABASE_FORMAT);
+        } catch (Exception $e) {
+            echo self::COLOUR_RED."Could not generate a date from string: {$dateString}\n";
+            echo "{$e->getMessage()}\n".self::COLOUR_WHITE;
+            exit(1);
+        }
+
+        return $errors;
+    }
+
+
+    /**
      * Ensure the soft-delete registry contains the specified mapper
      *
      * @param string $mapperClass
@@ -669,8 +734,9 @@ EXAMPLE
         $rootModels = $mapper->findByColumn($mapper->getIdentifierColumn(), $ids, ['deleted' => true]);
 
         $firstModel = $rootModels->first();
-        if($firstModel && !$firstModel instanceof ISoftDeletable) {
-            $this->logger->error("Mapper '%s' does not appear to be soft-deletable. Unable to restore", get_class($mapper));
+        if($firstModel && !$firstModel instanceof ISoftDeletable && !$this->explicitDeletionDate) {
+            $this->logger->error("Mapper '%s' does not appear to be soft-deletable, and no override deletion"
+            . ' date specified. Unable to restore', get_class($mapper));
             error(1);
         }
 
@@ -683,13 +749,20 @@ EXAMPLE
         // Add these to our 'found' set
         $this->registerDeletedModels($mapper, $deletedRootModels);
 
+        /**
+         * If an override deletion date was specified, traverse all root models, else only deleted root models
+         *
+         * @var object[] $rootModelsToTraverse
+         */
+        $rootModelsToTraverse = $this->explicitDeletionDate ? $rootModels : $deletedRootModels;
+
         // For each root model, recursively search for deleted children (matching the root's timestamp)
-        foreach($deletedRootModels as $deletedRootModel){
+        foreach($rootModelsToTraverse as $rootModel){
             // Try to get deletedAt timespan
-            list($deletedAfter, $deletedBefore) = $this->getDeletedBetweenDates($deletedRootModel);
+            list($deletedAfter, $deletedBefore) = $this->getDeletedBetweenDates($rootModel);
 
             // Enter recursive rabbit hole
-            $this->recursiveFindDeletedModels($mapper, $mapper->getModelAsCollection($deletedRootModel), $deletedAfter, $deletedBefore);
+            $this->recursiveFindDeletedModels($mapper, $mapper->getModelAsCollection($rootModel), $deletedAfter, $deletedBefore);
         }
     }
 
@@ -706,9 +779,15 @@ EXAMPLE
     private function getDeletedBetweenDates($model)
     {
         $deletedAfter = $deletedBefore = null;
-        if(method_exists($model, 'getDeletedAt')){
+        if($this->explicitDeletionDate || method_exists($model, 'getDeletedAt')){
             /** @var Mapper\Traits\Model\DeletedAtDate $model */
-            $deletedAt = $model->getDeletedAt();
+            $deletedAt = $this->explicitDeletionDate ?: $model->getDeletedAt();
+            $this->logger->info(
+                sprintf("Restoring soft-deleted models deleted within %d seconds before and after '%s'...",
+                    $this->deletedAtWindow / 2,
+                    $deletedAt->getDatabase()
+                )
+            );
             if($deletedAt instanceof Alaress_Date_Format && !$deletedAt instanceof Alaress_Date_NullDate){
                 $deletedAfter  = clone $deletedAt;
                 $deletedAfter->addSeconds(-1 * $this->deletedAtWindow / 2);
@@ -756,13 +835,15 @@ EXAMPLE
      */
     private function printResults(array $softDeletedModels)
     {
+        $maxIdFieldWidth = 100; // with two space chars adjacent
+
         $deDuplicatedResults = $this->buildDeDuplicatedResults($softDeletedModels);
 
         // How wide do columns need to be?
         $maxCountLength       = strlen('COUNT');
         $maxTableLength       = strlen('TABLE');
         $maxMapperClassLength = strlen('MAPPER');
-        $maxIdsStringLength   = strlen('IDS');
+        $maxIdsStringLength   = min($maxIdFieldWidth, strlen('IDS'));
 
         // Need to iterate first to find widest value in each column
         /** @var IMapper $mapperClass */
@@ -775,7 +856,7 @@ EXAMPLE
             $maxCountLength       = max($maxCountLength, strlen($count));
             $maxTableLength       = max($maxTableLength, strlen($table));
             $maxMapperClassLength = max($maxMapperClassLength, strlen($rTrimMapperClass));
-            $maxIdsStringLength   = max($maxIdsStringLength, strlen($ids));
+            $maxIdsStringLength   = max($maxIdsStringLength, min($maxIdFieldWidth, strlen($ids)));
         }
 
         $reportWidth = 5 + $maxCountLength + $maxTableLength + $maxMapperClassLength + $maxIdsStringLength;
@@ -800,11 +881,37 @@ EXAMPLE
             $table            = $mapperClass::getInstance()
                                             ->getTable();
             $rTrimMapperClass = preg_replace('/(\\\)?Mapper$/i', '', $mapperClass);
-            $ids              = $this->getIdString($models->keys());
 
-            $report .= sprintf("| %{$maxCountLength}s | %-{$maxTableLength}s | %-{$maxMapperClassLength}s | %-{$maxIdsStringLength}s |\n",
-                $count, $table, $rTrimMapperClass, $ids);
+            // Print the first 3 non-wrapping columns
+            $report .= sprintf("| %{$maxCountLength}s | %-{$maxTableLength}s | %-{$maxMapperClassLength}s | [",
+                $count, $table, $rTrimMapperClass);
+
+            $countLineCharsAvailable = $maxIdsStringLength - 1;
+
+            $countKeys = count($models->keys());
+            foreach($models->keys() as $idx => $id){
+                $isLast = $countKeys === ($idx + 1);
+
+                $idString = $isLast ? "{$id}" : "{$id},";
+
+                // Do we have room to print this id on this line?
+                $idLength = strlen($idString);
+                if($countLineCharsAvailable - $idLength < 0){
+                    // No room. Terminate this line.
+                    $report .= str_pad(" |\n", $countLineCharsAvailable + 3, ' ', STR_PAD_LEFT);
+                    // print blank first 3 columns
+                    $report .= sprintf("| %{$maxCountLength}s | %-{$maxTableLength}s | %-{$maxMapperClassLength}s |  ", '', '', '');
+                    // Indicate how many chars are left
+                    $countLineCharsAvailable = $maxIdsStringLength - $idLength - 1;
+                } else {
+                    $countLineCharsAvailable -= $idLength;
+                }
+                $report .= $idString;
+            }
+            $report .= ']' . str_pad("|\n", $countLineCharsAvailable + 2, ' ', STR_PAD_LEFT);
         }
+
+        $report .= str_pad('', $maxCountLength + $maxTableLength + $maxMapperClassLength + $maxIdsStringLength + 13, '-');
 
         $this->logger->info($report);
     }
