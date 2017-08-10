@@ -22,11 +22,11 @@ class External_DatabaseFactory
      *                             whatever the configured external DB is, or
      *                             "offline" if it isn't enabled.
      *
-     * @return mixed    External_ClassInterface|External_AttendanceInterface|
-     *                  External_PingInterface|External_TimetableInterface|
-     *                  External_UserInterface|External_UserDetentionInterface|
-     *                  External_MarkbookInterface|External_DocumentInterface
-     *                  (depends on value of $databaseType)
+     * @return External_ClassInterface|External_AttendanceInterface|
+     *         External_PingInterface|External_TimetableInterface|
+     *         External_UserInterface|External_UserDetentionInterface|
+     *         External_MarkbookInterface
+     *         (depends on value of $databaseType)
      * @throws LogicException if even the offline class could be created.
      *                        (This probably means you passed an invalid value
      *                         for $databaseType.)
@@ -121,17 +121,6 @@ class External_DatabaseFactory
     {
         return $this->buildConnector('User', $databaseName);
     }
-
-    /**
-     * Builds a document connector.
-     *
-     * @param  string $databaseName
-     * @return External_DocumentInterface
-     */
-    public function buildDocumentConnector($databaseName = '')
-    {
-        return $this->buildConnector('Document', $databaseName);
-    }    
 
     /**
      * Builds a user detention connector.
