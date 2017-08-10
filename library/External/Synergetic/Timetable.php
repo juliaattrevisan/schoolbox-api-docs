@@ -7,6 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Campus;
+
 class External_Synergetic_Timetable implements External_TimetableInterface
 {
     use External_Synergetic_ValidateExternalIdTrait;
@@ -26,6 +28,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /** @var array */
     private $days;
 
+    /**
+     * @throws \Exception
+     */
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
@@ -33,7 +38,16 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $this->groupHandler = new Group();
     }
 
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
+
+    /**
+     * @param string $externalUserId
+     * @param Campus $campus
+     * @param int    $day
+     * @param string $date
+     * @throws InvalidArgumentException
+     * @return array
+     */
+    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
     {
         // check if there is a calendar event remapping the day number for this specific date
 
@@ -88,8 +102,13 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         return $timetableDef;
     }
 
-    //gets current day number
-    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
+
+    /**
+     * @param Campus $campus
+     * @param int    $date
+     * @return bool|int|string
+     */
+    public function getDayNumber(Campus $campus, $date = 0)
     {
         $days = $this->getTotalDays($campus);
 
@@ -233,7 +252,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
 
-    public function getLastSynergeticDay($date, \Schoolbox\Campus $campus)
+    public function getLastSynergeticDay($date, Campus $campus)
     {
         //This function gets all start of term days entered into synergetic from the date provided backwards.
         //It caches this info so you can get it later again.
@@ -311,12 +330,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      *       Either that, or a timetable group code, as all other external DB
      *       calls use the key in the external DB, instead of the Schoolbox key.
      *
-     * @param \Schoolbox\Campus $campus A campus object (internal, not Synergetic)
-     * @param int $now Optional override of time
+     * @param Campus $campus A campus object (internal, not Synergetic)
+     * @param int    $now    Optional override of time
      *
      * @return array
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
     {
         $now = $now ?: time();
 
@@ -380,9 +399,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         );
     }
 
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date) {
 
-        $dayNumber = $this->getDayNumber($campus,$date->getUnixTimeStamp());
+    /**
+     * @param int                 $externalUserId
+     * @param int                 $userId
+     * @param Campus              $campus
+     * @param Alaress_Date_Format $date
+     * @throws InvalidArgumentException
+     * @return array
+     */
+    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    {
+
+        $dayNumber = $this->getDayNumber($campus, $date->getUnixTimeStamp());
 
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
@@ -491,7 +520,17 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
 
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber, $date = null)
+
+    /**
+     * @param int    $externalUserId
+     * @param int    $userId
+     * @param Campus $campus
+     * @param int    $dayNumber
+     * @param string $date
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber, $date = null)
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
@@ -594,7 +633,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     }
 
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, Campus $campus)
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
@@ -726,10 +765,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * Returns the number of days in a particular timetable groups cycle
      * Note that this means you do not need to set the days in the campus table for synergetic, we fetch it directly
      *
-     * @param \Schoolbox\Campus $campus
+     * @param Campus $campus
      * @return int
      */
-    public function getTotalDays(\Schoolbox\Campus $campus) {
+    public function getTotalDays(Campus $campus) {
 
         if(! isset($this->days[$campus->getExtTimetableCode()])) {
 
@@ -742,11 +781,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         return $this->days[$campus->getExtTimetableCode()];
     }
 
+
     /**
      * Gets the timetable for the given room.
      *
      * @param string $roomCodes
-     *
+     * @throws InvalidArgumentException
      * @return array
      */
     public function getRoomTimetable($roomCodes)
@@ -816,7 +856,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
 
             // Load the timetable def for this campus and code if I haven't tried already
-            if ($campusList[$timetableCode] instanceof \Schoolbox\Campus) {
+            if ($campusList[$timetableCode] instanceof Campus) {
                 if (!isset($campusTimetableList[$timetableCode][$timetableDay])) {
                     $campusTimetableList[$timetableCode][$timetableDay] = $this->getTimetableDefinition(
                         null,
