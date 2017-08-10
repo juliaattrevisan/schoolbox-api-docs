@@ -24,16 +24,16 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     protected $synergeticDay = [];
 
     /** @var Cache */
-    private $timetableDefinitionCache;
+    private static $timetableDefinitionCache;
 
     /** @var Cache */
-    private $dayNumberCache;
+    private static $dayNumberCache;
 
     /** @var Cache */
-    private $timetableForDateCache;
+    private static $timetableForDateCache;
 
     /** @var Cache */
-    private $dayTimetableCache;
+    private static $dayTimetableCache;
 
     /** @var Group */
     private $groupHandler;
@@ -50,19 +50,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $this->externalUser = new External_User('synergetic');
         $this->groupHandler = new Group();
 
-        $this->timetableDefinitionCache = new Cache(function ($externalUserId, $campusId, $day = 0, $date = null) {
+        self::$timetableDefinitionCache = new Cache(function ($externalUserId, $campusId, $day = 0, $date = null) {
             return $this->fetchTimetableDefinition($externalUserId, $campusId, $day, $date);
         });
 
-        $this->timetableForDateCache = new Cache(function ($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date) {
+        self::$timetableForDateCache = new Cache(function ($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date) {
             return $this->fetchTimetableForDate($externalUserId, $userId, $campus, $date);
         });
 
-        $this->dayTimetableCache = new Cache(function ($externalUserId, $userId, Campus $campus, $dayNumber, $date = null) {
+        self::$dayTimetableCache = new Cache(function ($externalUserId, $userId, Campus $campus, $dayNumber, $date = null) {
             return $this->fetchDayTimetable($externalUserId, $userId, $campus, $dayNumber, $date);
         });
 
-        $this->dayNumberCache = new Cache(function (Campus $campus, $date = 0) {
+        self::$dayNumberCache = new Cache(function (Campus $campus, $date = 0) {
             return $this->fetchDayNumber($campus, $date);
         });
     }
@@ -81,7 +81,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $args = [ $externalUserId, $campus, $day, $date ];
         $key  = implode('-', $args);
 
-        return $this->timetableDefinitionCache->get($key, $args);
+        return self::$timetableDefinitionCache->get($key, $args);
     }
 
 
@@ -159,7 +159,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     {
         $key = sprintf('%s-%s', $campus->getExtTimetableCode(), date('Y-m-d', $date));
 
-        return $this->dayNumberCache->get($key, func_get_args());
+        return self::$dayNumberCache->get($key, func_get_args());
     }
 
 
@@ -472,7 +472,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     {
         $key = sprintf('%d-%d-%d-%s', $externalUserId, $userId, $campus->getId(), $date->getDatabaseDate());
 
-        return $this->timetableForDateCache->get($key, func_get_args());
+        return self::$timetableForDateCache->get($key, func_get_args());
     }
 
 
@@ -609,7 +609,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     {
         $key = sprintf('%d-%d-%d-%d-%s', $externalUserId, $userId, $campus->getId(), $dayNumber, $date);
 
-        return $this->dayTimetableCache->get($key, func_get_args());
+        return self::$dayTimetableCache->get($key, func_get_args());
     }
 
 
