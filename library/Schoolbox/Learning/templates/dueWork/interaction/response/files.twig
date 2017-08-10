@@ -4,7 +4,7 @@
             <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                 <p>{{ currentFile.filename }}</p>
-
+            </a>
                 {% include '@learning/dueWork/plagscan/status.twig' with {
                     currentFile: currentFile,
                     plagscanEnabled: plagscanEnabled,
@@ -14,7 +14,6 @@
                     response: response,
                     plagscanId: plagscanId
                 } only %}
-            </a>
         </div>
     </div>
     <nav>
