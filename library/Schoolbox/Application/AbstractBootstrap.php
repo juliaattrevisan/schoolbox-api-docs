@@ -562,6 +562,23 @@ abstract class AbstractBootstrap implements BootstrapInterface
             return $communityPortal;
         }));
 
+        // Document Manager
+        $di->set('externalDocumentManager', $di->lazy(function() use ($di) {
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
+
+            /** @var array|IConnector $databaseExternal */
+            $databaseExternal = $di->get('databaseExternal');
+
+            // Create the external connection to docman
+            $factory = new ExternalConnectorFactory();
+            return $factory->build(
+                $config,
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_DOCUMENT
+            );
+        }));
+
         // Register external NDS object services
 
         $di->set('externalNDSUser', $di->lazy(function () use ($di) {
