@@ -7,12 +7,13 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
 use DateTime;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 
 class Document extends Base implements IDocument
@@ -24,22 +25,34 @@ class Document extends Base implements IDocument
 
     /**
      * Constructor
+     *
+     * Performs normal setup stuff, and also determines which schema to use
+     * based on database version.
+     *
+     * @param IConfigLoader    $config
+     * @param IConnector|array $databaseExternal
      */
-    public function __construct()
+    public function __construct(IConfigLoader $config, $databaseExternal)
     {
-        // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
+        parent::__construct($config, $databaseExternal);
 
-        $this->setupDatabase();
+        $this->schema = $this->retrieveDocumentSchema();
+    }
 
-        $externalPing = new External_Ping();
-
-        // The location of documents varies depending on the version of the Synergetic database schema
+    /**
+     * What schema does the document integration use?
+     *
+     * @return string
+     */
+    private function retrieveDocumentSchema()
+    {
+        // TODO inject ping/diagnostic object
+        $externalPing = new \External_Ping();
 
         if ($externalPing->getVersion() == "68") {
-            $this->schema = "media";
-        } else {
-            $this->schema = "SynergyOneMedia.dbo";
+            return "media";
         }
+        return "SynergyOneMedia.dbo";
     }
 
     /**
@@ -76,7 +89,7 @@ class Document extends Base implements IDocument
 
         // Add date filter (if we find a parseable date in the config)
 
-        $minimumDateString = ConfigMapper::getInstance()->get('external_document_report_minimum_date');
+        $minimumDateString = $this->config->get('external_document_report_minimum_date');
 
         $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
@@ -97,7 +110,7 @@ class Document extends Base implements IDocument
 
         // Get all documents for the student
 
-        $iterator = $this->getConnector()->executeQueryIterator($query, $params);
+        $iterator = $this->databaseExternal->executeQueryIterator($query, $params);
 
         // Return the results in an array in the format that is required by the historical code we are using
 
@@ -150,7 +163,7 @@ class Document extends Base implements IDocument
 
         // Add date filter (if we find a parseable date in the config)
 
-        $minimumDateString = ConfigMapper::getInstance()->get('external_document_report_minimum_date');
+        $minimumDateString = $this->config->get('external_document_report_minimum_date');
 
         $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
@@ -165,7 +178,7 @@ class Document extends Base implements IDocument
 
         // Get the document from the database
 
-        $result = $this->getConnector()->executeQuery($query, $params);
+        $result = $this->databaseExternal->executeQuery($query, $params);
 
         if ($row = $result->fetch()) {
             // If we found a database record, return an array with the details necessary for downloading
