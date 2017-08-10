@@ -34,16 +34,32 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $permissionStaff = new Rule\HasRole(Role::STAFF);
+        $preloader = function ($params) {
+            $injectedValues = [];
 
-        $this->registerRoutesArray([
-            'GET' => [
-                '/{studentId}' => ['getIndex' => $permissionStaff],
-                '/{studentId}/download/{documentId}' => ['getDownload' => $permissionStaff],
-            ],
-            'POST' => [
-            ]
-        ]);
+            if (array_key_exists('studentId', $params)) {
+                try {
+                    /** @var UserMapper $userMapper */
+                    $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+                    $injectedValues['student'] = $userMapper->findById($params['studentId']);
+                } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                }
+            }
+
+            $injectedValues = array_merge($injectedValues, $params);
+
+            return $injectedValues;
+        };
+
+        $permission = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+        );
+
+        $this->register('GET', '/{studentId}', 'getIndex', $permission, $preloader);
+        $this->register('GET', '/{studentId}/download/{documentId}', 'getDownload', $permission, $preloader);
     }
 
     /**
@@ -62,57 +78,6 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $this->addRoutePreload($matcher, '.*', function ($params) {
-            $injectedValues = [];
-
-            if (array_key_exists('studentId', $params)) {
-                try {
-                    /** @var UserMapper $userMapper */
-                    $userMapper = $this->getMapperFactory()->get(UserMapper::class);
-                    $injectedValues['student'] = $userMapper->findById($params['studentId']);
-                } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-                }
-            }
-
-            $injectedValues = array_merge($injectedValues, $params);
-
-            return $injectedValues;
-        });
-    }
-
-
-    /**
-     * These pages may be accessed by:
-     *
-     * * superusers
-     * * staff
-     * * the child themselves
-     * * the child's parents
-     *
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        $ruleRegexp = '(?:getIndex|getDownload)';
-        $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission(
-                $authorizer,
-                $ruleRegexp,
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
-                )
-            );
     }
 
     /**
