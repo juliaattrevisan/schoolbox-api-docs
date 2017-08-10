@@ -36,7 +36,6 @@ class External_Isams_User implements External_UserInterface
     /** Constructor */
     public function __construct()
     {
-        $this->setConfigMapper(ConfigMapper::getInstance());
         $this->setupDatabase();
         $this->setGroup(new Group());
     }
