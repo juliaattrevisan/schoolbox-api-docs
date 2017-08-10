@@ -226,7 +226,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
             return $day;
         } else {
-            // unknown day number
+            // ¯\_(ツ)_/¯ unknown day number
             return 0;
         }
     }
