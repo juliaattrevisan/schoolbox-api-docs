@@ -41,7 +41,7 @@ class ContextSelector
 	protected $usePlugin = true;
 
 	/**
-	 * @param string $basePath  The path to the page this selector is being used on (eg. "submission/allWork")
+	 * @param string $basePath  The path to the page this selector is being used on
 	 */
 	public function __construct($basePath) {
 		$this->basePath = $basePath;
