@@ -22,6 +22,7 @@ class Factory
     const EXTERNAL_SYNC = 'Sync';
     const EXTERNAL_EVENTS = 'ExternalEvents';
     const EXTERNAL_COMMUNITY_PORTAL = 'CommunityPortal';
+    const EXTERNAL_DOCUMENT = 'Document';
 
     /**
      * Return the correct version of the requested external object
