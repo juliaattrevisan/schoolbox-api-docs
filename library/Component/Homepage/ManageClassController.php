@@ -7,22 +7,41 @@
  * @version     SVN: $Id$
  */
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Assessment\Term;
 
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
     /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * @var Term\Mapper
+     */
+    private $termMapper;
+
+    /**
+     * Is the external DB enabled in the admin config?
+     *
+     * @var bool
+     */
+    private $externalDbEnabled;
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
+     * @throws InvalidArgumentException If unable to find a specified mapper class
      */
     public function execute()
     {
-        // If current user can't view component's source, only display the
-        // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
-            return $this->hasContextWriteAccess();
-        }
+        $this->userAccessMapper  = $this->getMapperFactory()->get(UserAccessMapper::class);
+        $this->termMapper        = $this->getMapperFactory()->get(Term\Mapper::class);
+        $this->externalDbEnabled = (bool)Cfg::get('external_enable');
 
+        // This component is always present on homepages (embedded in page tot menu)
         return true;
     }
 
@@ -33,35 +52,47 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function renderTemplate($templateHandle)
     {
+        $isGroupPage = $this->getContext()->isGroup();
+        $isClassPage = $this->getContext()->isClass();
 
-        if ($this->getContext()->getCodeString() == '') {
+        // If context is not a group or class, render nothing
+        if (!$isGroupPage && !$isClassPage) {
             return false;
         }
 
-//        $this->parseConfig();
-
-        $this->setBlock($templateHandle, "class_list", "class_list_block");
-        $this->setBlock($templateHandle, "class_mark", "class_mark_block");
-        $this->setBlock($templateHandle, "student_grades", "student_grades_block");
+        $this->setBlock($templateHandle, 'class_list', 'class_list_block');
+        $this->setBlock($templateHandle, 'class_mark', 'class_mark_block');
+        $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
 
 
         // Determine the term for the grades link
-        $this->setVar('WORK_TERM', Schoolbox\Assessment\Term\Mapper::getInstance()->findForToday()->getCode());
+        $this->setVar('WORK_TERM', $this->termMapper->findForToday()->getCode());
 
-        /* Output student grades link to students of this class */
-        if ($this->getAccess()->isLearner($this->getUser(), $this->getContext())) {
+        $involvedInGroup = $isGroupPage && $this->userAccessMapper->involvedInGroup(
+            $this->getUser(),
+            $this->getContext()->getId()
+        );
+
+        $involvedInClass = $isClassPage && $this->userAccessMapper->involvedInSubject(
+            $this->getUser(),
+            $this->getContext()->getCodeString()
+        );
+
+        /* Output student grades link to students (other users with READ access may be able to see this page) */
+        if (($involvedInGroup || $involvedInClass) && UserAccess::ACCESS_READ === $this->getContentPermission()) {
             $this->parse('student_grades_block', 'student_grades');
         } else {
             $this->setVar('student_grades_block', '');
         }
 
-
-        if (Cfg::get('external_enable') == false || $this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getCodeString() == '') {
+        // Not a class, or externalDB disabled, or no write access?
+        if (!$isClassPage || !$this->externalDbEnabled || $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             $this->setVar('class_list_block', '');
         } else {
             $this->parse('class_list_block', 'class_list');
         }
-        
+
+        // Render link to markbook if user is staff and has WRITE+ perm
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getUser()->getRole()->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
         } else {

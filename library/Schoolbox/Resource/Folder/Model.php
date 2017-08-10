@@ -187,6 +187,23 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return '';
     }
 
+
+    /**
+     * Returns whether this folder is a class by checking for non-deleted folder codes
+     *
+     * @return bool
+     */
+    public function isClass()
+    {
+        foreach ($this->codes as $code) {
+            if (!$code->isDeleted()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     /**
      * Get a truncated version of the Folder Code string
      * by getting the first $maxCodes codes and appending
