@@ -36,12 +36,9 @@ class FolderTest extends TestCase
     }
 
 
-    public function testCodes()
-    {
-        $this->markTestIncomplete();
-    }
-
-
+    /**
+     * Test whether we can positively identify a folder as being a group
+     */
     public function testIsGroup()
     {
         $folder = new Folder\Model();
@@ -50,6 +47,9 @@ class FolderTest extends TestCase
     }
 
 
+    /**
+     * Test whether we can positively identify a folder as not being a group
+     */
     public function testIsNotGroup()
     {
         $folder = new Folder\Model();
@@ -58,6 +58,9 @@ class FolderTest extends TestCase
     }
 
 
+    /**
+     * Test whether we can positively identify a folder as being a class
+     */
     public function testIsClass()
     {
         $folder = new Folder\Model();
@@ -66,6 +69,9 @@ class FolderTest extends TestCase
     }
 
 
+    /**
+     * Test whether we can positively identify a folder as not being a class
+     */
     public function testIsNotClass()
     {
         $folder = new Folder\Model();
@@ -74,6 +80,10 @@ class FolderTest extends TestCase
     }
 
 
+    /**
+     * Test whether we can positively identify a folder as not being a class,
+     * because the class codes it has have been soft-deleted
+     */
     public function testIsNotClassDeletedCodes()
     {
         // Not a class because all folder codes are deleted
