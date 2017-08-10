@@ -178,10 +178,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $startDate = $this->getLastSynergeticDay($date, $campus);
 
             //find number of days between both dates
-            $difference = intval(($date - $startDate) / 86400);
+            $difference = (int)(($date - $startDate) / 86400);
 
             //find number of weekends between 2 dates
-            $weekends = intval(($difference + date("w", $startDate)) / 7);
+            $weekends = (int)(($difference + date("w", $startDate)) / 7);
 
             $currentDay = ($this->synergeticDay[$startDate] + $difference - 2 * $weekends - 1) % 7 + 1;
 
@@ -208,7 +208,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             //find number of days between both dates
             $difference = floor(($date - $startDate) / 86400);
             //find number of weeks between 2 dates
-            $weeks = intval(($difference) / 7);
+            $weeks = (int)($difference / 7);
 
             if (($weeks % 2) == 0) {
                 $day = date('w', $date);
