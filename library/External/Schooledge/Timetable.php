@@ -195,7 +195,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     {
         $timetableDate = $this->getTimetableDate($campus, $this->getDateObjectFromTimestamp($date));
         if (isset($timetableDate)) {
-            return $timetableDate['SortOrder'];
+            return $timetableDate['TimetableDay']['SortOrder'];
         }
         return 0;
     }
