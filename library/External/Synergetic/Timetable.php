@@ -11,24 +11,26 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 {
     use External_Synergetic_ValidateExternalIdTrait;
 
-    /**
-     * @var MSSQL $database
-     */
+    /** @var MSSQL $database */
     private $database;
 
-    /**
-     * @var External_UserInterface
-     */
+    /** @var External_UserInterface */
     private $externalUser;
 
-    protected $synergeticDay = array();
+    /** @var array */
+    protected $synergeticDay = [];
+
+    /** @var Group */
+    private $groupHandler;
+
+    /** @var array */
+    private $days;
 
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
         $this->externalUser = new External_User('synergetic');
         $this->groupHandler = new Group();
-        $this->campusMapper = new \Schoolbox\CampusMapper();
     }
 
     public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
