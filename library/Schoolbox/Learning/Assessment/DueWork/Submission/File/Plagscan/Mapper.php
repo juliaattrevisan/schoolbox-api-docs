@@ -18,6 +18,9 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFil
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
+/**
+ * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /* TODO WARNING!!!
