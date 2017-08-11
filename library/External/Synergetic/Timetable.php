@@ -92,7 +92,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @param string $date
      * @return array
      * @throws InvalidArgumentException
-     * @throws MssqlQueryException
      */
     public function fetchTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
     {
