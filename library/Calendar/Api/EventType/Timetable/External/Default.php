@@ -80,85 +80,83 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
                 // Load events for this campus
-                if (isset($dayTimetable)) {
-                    foreach ($dayTimetable as $period) {
-                        // Has this exact class code for this time been added?
-                        // Don't add it again, but do add that it belongs to this campus.
-                        if (isset($period['description'])) {
-                            $startTime = strtotime($period['periodStart'], $currentTimestamp);
-                            $endTime   = strtotime($period['periodEnd'], $currentTimestamp);
-                            $code      = $period['code'];
-                            $key       = sprintf('%d-%d-%s', $startTime, $endTime, $code);
-                            if (array_key_exists($key, $addedEvents)) {
-                                $addedEvents[$key]->setCampusList(
-                                    $addedEvents[$key]->getCampusList().','.$campusId
-                                );
-                                continue;
-                            }
-
-
-                            $event = new Event();
-                            $event->setEventId(md5($key));
-
-                            if ($startTime && $endTime) {
-                                // Set the start and end time
-                                $event->setStartTime(new Alaress_Date_Format($startTime, Alaress_Date_Format::TIMESTAMP));
-                                $event->setEndTime(new Alaress_Date_Format($endTime, Alaress_Date_Format::TIMESTAMP));
-                                $event->setAllday(false);
-                            } else {
-                                // No start and end time - show this as an all day event
-                                $event->setStartTime(clone $date);
-                                $event->setEndTime(clone $date);
-                                $event->setAllday(true);
-                            }
-
-                            $event->setLocation($period['room']);
-                            $event->setPublishDate(null);
-                            $event->setTitle(sprintf('%s (%s)', $period['description'], $code));
-                            $event->setCampusList($campusId);
-                            $event->setTimetableCode($campus->getExtTimetableCode());
-                            if ($period['staff'] instanceof Schoolbox\User) {
-                                $event->setAuthorId($period['staff']->getId());
-                                $event->setAuthorName($period['staff']->formatName());
-                            }
-                            if ($period['category'] instanceof Folder) {
-                                // Put this into a category
-                                $event->setCategoryId($period['category']->getId());
-                                $event->setCategoryName($period['category']->getName());
-
-                                // Finagle a category collection for this event
-                                $eventCategory = new \Schoolbox\Calendar\Relation\Category();
-                                $eventCategory->setCategoryId($period['category']->getId());
-                                $event->setCategoryCollection(
-                                    new Schoolbox\Collection(array($eventCategory))
-                                );
-                                $event->setAccess(Event::GROUP_ACCESS);
-                            } else {
-                                // Make this up as a campus event if it has no category
-                                $event->setAccess(Event::CAMPUS_ACCESS);
-                            }
-                            $event->setType($eventType);
-
-                            /* Setup attendance button */
-                            $event->setCode($period['code']);
-                            $event->setCampus($period['campus']);
-                            $event->setPeriod($period['periodNumber']);
-                            $event->setPeriodName($period['periodName']);
-
-                            // Load the color for this timetabled class
-                            if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
-                                // not enough colors: loop around to index 0.
-                                if (!$colorList->offsetExists($colorIndex)) {
-                                    $colorIndex = 0;
-                                }
-                                $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
-                                $colorIndex++;
-                            }
-                            $event->setColour($colorMap[$period['code']]);
-
-                            $event->setConnectorId($this->getConnectorId());
-                            $addedEvents[$key] = $event;
+                foreach ($dayTimetable as $period) {
+                    // Has this exact class code for this time been added?
+                    // Don't add it again, but do add that it belongs to this campus.
+                    if (isset($period['description'])) {
+                        $startTime = strtotime($period['periodStart'], $currentTimestamp);
+                        $endTime   = strtotime($period['periodEnd'], $currentTimestamp);
+                        $code      = $period['code'];
+                        $key       = sprintf('%d-%d-%s', $startTime, $endTime, $code);
+                        if (array_key_exists($key, $addedEvents)) {
+                            $addedEvents[$key]->setCampusList(
+                                $addedEvents[$key]->getCampusList().','.$campusId
+                            );
+                            continue;
                         }
+
+
+                        $event = new Event();
+                        $event->setEventId(md5($key));
+
+                        if ($startTime && $endTime) {
+                            // Set the start and end time
+                            $event->setStartTime(new Alaress_Date_Format($startTime, Alaress_Date_Format::TIMESTAMP));
+                            $event->setEndTime(new Alaress_Date_Format($endTime, Alaress_Date_Format::TIMESTAMP));
+                            $event->setAllday(false);
+                        } else {
+                            // No start and end time - show this as an all day event
+                            $event->setStartTime(clone $date);
+                            $event->setEndTime(clone $date);
+                            $event->setAllday(true);
+                        }
+
+                        $event->setLocation($period['room']);
+                        $event->setPublishDate(null);
+                        $event->setTitle(sprintf('%s (%s)', $period['description'], $code));
+                        $event->setCampusList($campusId);
+                        $event->setTimetableCode($campus->getExtTimetableCode());
+                        if ($period['staff'] instanceof Schoolbox\User) {
+                            $event->setAuthorId($period['staff']->getId());
+                            $event->setAuthorName($period['staff']->formatName());
+                        }
+                        if ($period['category'] instanceof Folder) {
+                            // Put this into a category
+                            $event->setCategoryId($period['category']->getId());
+                            $event->setCategoryName($period['category']->getName());
+
+                            // Finagle a category collection for this event
+                            $eventCategory = new \Schoolbox\Calendar\Relation\Category();
+                            $eventCategory->setCategoryId($period['category']->getId());
+                            $event->setCategoryCollection(
+                                new Schoolbox\Collection(array($eventCategory))
+                            );
+                            $event->setAccess(Event::GROUP_ACCESS);
+                        } else {
+                            // Make this up as a campus event if it has no category
+                            $event->setAccess(Event::CAMPUS_ACCESS);
+                        }
+                        $event->setType($eventType);
+
+                        /* Setup attendance button */
+                        $event->setCode($period['code']);
+                        $event->setCampus($period['campus']);
+                        $event->setPeriod($period['periodNumber']);
+                        $event->setPeriodName($period['periodName']);
+
+                        // Load the color for this timetabled class
+                        if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {
+                            // not enough colors: loop around to index 0.
+                            if (!$colorList->offsetExists($colorIndex)) {
+                                $colorIndex = 0;
+                            }
+                            $colorMap[$period['code']] = $colorList->offsetGet($colorIndex)->getHexColour();
+                            $colorIndex++;
+                        }
+                        $event->setColour($colorMap[$period['code']]);
+
+                        $event->setConnectorId($this->getConnectorId());
+                        $addedEvents[$key] = $event;
                     }
                 }
             }
