@@ -72,12 +72,12 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
                 if (class_exists($className)) {
                     /** @var Calendar_Api_Config_Connector_Abstract $config */
                     $config = new $className();
-                    $config->setEventType(Scrub::text($bits[0]));
-                    $config->setConnectorClass(Scrub::text($bits[1]));
+                    $config->setEventType($bits[0]);
+                    $config->setConnectorClass($bits[1]);
                     $config->setLabel($config->getDefaultLabel());
                     $configRecord = new Calendar_Api_Config_Record();
-                    $configRecord->setEventType(Scrub::text($bits[0]));
-                    $configRecord->setConnectorClass(Scrub::text($bits[1]));
+                    $configRecord->setEventType($bits[0]);
+                    $configRecord->setConnectorClass($bits[1]);
                     $configRecord->updateConfig($config);
                     /* This is active
                      */

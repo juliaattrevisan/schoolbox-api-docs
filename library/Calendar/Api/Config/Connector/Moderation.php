@@ -54,7 +54,7 @@ class Calendar_Api_Config_Connector_Moderation extends Calendar_Api_Config_Conne
             array(
                 'CONNECTOR_ID'    => $this->getId(),
                 'CONNECTOR_LABEL' => Scrub::text($this->getLabel()),
-                'CONNECTOR_CLASS' => $this->getConnectorClass(),
+                'CONNECTOR_CLASS' => Scrub::text($this->getConnectorClass()),
             )
         );
         $page->setVar('has_multiple_options_block', '');
