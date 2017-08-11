@@ -11,3 +11,20 @@ ALTER TABLE pastoral
   REFERENCES user(`id`)
   ON DELETE RESTRICT
   ON UPDATE RESTRICT;
+
+
+-- Make pastoral.type_id relationship mandatory
+ALTER TABLE pastoral
+  DROP FOREIGN KEY fk_pastoral_type;
+
+ALTER TABLE pastoral
+  CHANGE COLUMN type_id type_id INT(11) NOT NULL;
+
+ALTER TABLE pastoral
+  ADD CONSTRAINT fk_pastoral_type
+FOREIGN KEY (`type_id`)
+REFERENCES lu_pastoral_type(`id`)
+  ON DELETE RESTRICT
+  ON UPDATE RESTRICT;
+
+
