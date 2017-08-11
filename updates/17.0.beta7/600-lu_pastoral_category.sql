@@ -15,5 +15,11 @@ ALTER TABLE lu_pastoral_category
     ON DELETE RESTRICT
     ON UPDATE RESTRICT;
 
+-- This field is deprecated and not mapped
+ALTER TABLE lu_pastoral_category
+    CHANGE external_id _external_id INT(11) NULL COMMENT 'deprecate in 17.0';
+
+
+
 
 
