@@ -1,4 +1,6 @@
 <?php
+
+use Schoolbox\Campus;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
@@ -75,7 +77,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                $dayTimetable = $this->buildTimetable($campus, $date);
+                $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
                 // Load events for this campus
                 if (isset($dayTimetable)) {
@@ -167,30 +169,72 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         return $stack;
     }
 
+
     /**
-     * Builds the timetable for a given campus for a given day.
+     * The expensive implementation of buildTimetable()
+     * Use when greater precision of timetable customisations are required (at the expense of performance)
      *
-     * @param \Schoolbox\Campus $campus
+     * @param Schoolbox\User      $user
+     * @param Campus              $campus
      * @param Alaress_Date_Format $date
-     *
      * @return array
      */
-    protected function buildTimetable($campus, Alaress_Date_Format $date)
+    private function buildTimetableExpensively(Schoolbox\User $user, Campus $campus, Alaress_Date_Format $date)
     {
         try {
             $timetable = $this->getExternalTimetable()->getTimetableForDate(
-                $this->getUser()->getExternalId(),
-                $this->getUser()->getId(),
+                $user->getExternalId(),
+                $user->getId(),
                 $campus,
                 $date
             );
         } catch (Schoolbox\External\Exception $e) {
             // Can't fetch timetable? assume it's empty
-        }
-        if (empty($timetable)) {
-            $timetable = array();
+            $timetable = [];
         }
 
+        return $this->buildTimetable($timetable ?: []);
+    }
+
+
+    /**
+     * The cheap implementation of buildTimetable()
+     * Use when timetable precision is less necessary (eg. more than a couple of days in the future)
+     *
+     * @param Schoolbox\User $user
+     * @param Campus         $campus
+     * @param int            $dayNumber
+     * @return array
+     */
+    private function buildTimetableCheaply(Schoolbox\User $user, Campus $campus, $dayNumber)
+    {
+        try {
+            // we are aware of the deprecation of this method, but must use it regardless
+            /** @noinspection PhpDeprecationInspection */
+            $timetable = $this->getExternalTimetable()->getDayTimetable(
+                $user->getExternalId(),
+                $user->getId(),
+                $campus,
+                $dayNumber
+            );
+        } catch (Schoolbox\External\Exception $e) {
+            // Can't fetch timetable? assume it's empty
+            $timetable = [];
+        }
+
+        return $this->buildTimetable($timetable ?: []);
+    }
+
+
+    /**
+     * Builds the timetable for a given data source. This method should not be called directly,
+     * but through either the Cheaply or Expensively variant.
+     *
+     * @param array $timetable
+     * @return array
+     */
+    private function buildTimetable(array $timetable)
+    {
         $dayTimetable        = array();
         $timetableStaff      = array();
         $timetableCategories = array();
