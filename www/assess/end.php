@@ -223,7 +223,6 @@ if ($assessment->isFeedbackVisibleToUser($currentUser)) {
     );
 }
 
-
 $folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
 $folder    = $folderMap->findById($assess['category_id']);
 

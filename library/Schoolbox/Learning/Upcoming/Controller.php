@@ -13,12 +13,14 @@ use External_ClassInterface;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -198,7 +200,7 @@ class Controller extends Base
         // TODO Populate $_SESSION[children] properly
         $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
 
-        $returnUrl = "?returnUrl=".base64_encode($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent',["id" => $student->getId()]));
+        $returnUrl = Redirect::queryString($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent',["id" => $student->getId()]));
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(

@@ -254,7 +254,7 @@
                         <h3>
                             {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, student: student, studentId: student.id, assessment: upcoming}) %}
                             {% if route %}
-                                <a class="title" href="{{ route ~ returnUrl }}">{{ upcoming.title }}</a>
+                                <a class="title" href="{{ route }}{{ returnUrl }}">{{ upcoming.title }}</a>
                             {% else %}
                                 {{ upcoming.title }}
                             {% endif %}
