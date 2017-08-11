@@ -80,23 +80,18 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        // Base management rule:
-        // Any superuser or user with moderate access to resource booking
-        // Resource management rule:
-        // Base management rule, or has moderate perms on the item.
-        // Create booking rule:
-        // is staff member, and has booking rights on the item.
-
-
-        // Approve/reject booking:
-        // only moderators can do this.
+        // Base rules:
+        // a superuser or RB moderator can do anything in this module
         $baseManageRule = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
         );
+
+        // Approve/reject booking:
+        // a moderator of a booked item can do this.
         $isItemModeratorRule = new Auth\CanModerateBooking();
         $isItemModeratorRule->setMapper($this->getMapper());
-        $baseManageRule->addRule($isItemModeratorRule);
+        $manageBookingRule = new Rule\Any($baseManageRule, $isItemModeratorRule);
 
         // Create booking:
         // This depends on the the item - managed items can only be booked by
@@ -113,9 +108,9 @@ class Module extends BaseModule
 
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermission($authorizer, '(?:book|createBooking)', $bookingCreateRule)
-            ->addRoutePermission($authorizer, '(?:approve|reject|setPending)', $baseManageRule)
-            ->addRoutePermission($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule);
+            ->addRoutePermission($authorizer, ['book', 'createBooking'], $bookingCreateRule)
+            ->addRoutePermission($authorizer, ['approve', 'reject', 'setPending'], $manageBookingRule)
+            ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditRule);
     }
 
     /**
