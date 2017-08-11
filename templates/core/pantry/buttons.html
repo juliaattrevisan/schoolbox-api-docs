@@ -132,19 +132,19 @@
             <ul class="inline-list no-margin">
                 <li><a href="#" class="progress-tick"></a></li>
                 <li><a href="#" class="progress-tick pending"></a></li>
-                <li><a href="#" class="progress-tick complete"></a></li>
+                <li><a href="#" class="progress-tick reviewed"></a></li>
             </ul>
             <div class="content"></div>
             <ul class="inline-list no-margin">
                 <li><a href="#" class="progress-tick small"></a></li>
                 <li><a href="#" class="progress-tick pending small"></a></li>
-                <li><a href="#" class="progress-tick complete small"></a></li>
+                <li><a href="#" class="progress-tick reviewed small"></a></li>
             </ul>
             <div class="content"></div>
             <ul class="inline-list no-margin">
                 <li><a href="#" class="progress-tick tiny"></a></li>
                 <li><a href="#" class="progress-tick pending tiny"></a></li>
-                <li><a href="#" class="progress-tick complete tiny"></a></li>
+                <li><a href="#" class="progress-tick reviewed tiny"></a></li>
             </ul>
         </section>
         <script type="text/javascript">
@@ -155,9 +155,9 @@
                     var $a = $(this);
 
                     if ($a.hasClass('pending')) {
-                        $a.removeClass('pending').addClass('complete');
-                    } else if ($a.hasClass('complete')) {
-                        $a.removeClass('complete');
+                        $a.removeClass('pending').addClass('reviewed');
+                    } else if ($a.hasClass('reviewed')) {
+                        $a.removeClass('reviewed');
                     } else {
                         $a.addClass('pending');
                     }
@@ -174,19 +174,19 @@
             <li>
                 <input type="checkbox" id="filter-incom" checked="checked" />
                 <label for="filter-incom">
-                    <span class="progress-tick tiny"></span> Incomplete
+                    <span class="progress-tick tiny"></span> Response Required
                 </label>
             </li>
             <li>
                 <input type="checkbox" id="filter-act" checked="checked" />
                 <label for="filter-act">
-                    <span class="progress-tick tiny pending"></span> Action Required
+                    <span class="progress-tick tiny pending"></span> Feedback Required
                 </label>
             </li>
             <li>
                 <input type="checkbox" id="filter-comp" />
                 <label for="filter-comp">
-                    <span class="progress-tick tiny complete"></span> Done
+                    <span class="progress-tick tiny reviewed"></span> Review Complete
                 </label>
             </li>
         </ul>
@@ -237,7 +237,6 @@
             </div>
 
             <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
-            <script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
             <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
             <script src="/javascript/shared/submissions/jquery.marksheet.js" type="text/javascript"></script>
             <script type="text/javascript">
@@ -283,7 +282,7 @@
                     $('.selectize-input input').prop('disabled', true).hide();
 
                     // manually set the value, because selectize
-                    ize[0].selectize.setValue("/submission/inlineGrading/view/22/19", true);
+                    ize[0].selectize.setValue("/learning/assessments/22/19", true);
 
                     // add the listener AFTER we've set the value
                     ize.on('change', function (e) {
