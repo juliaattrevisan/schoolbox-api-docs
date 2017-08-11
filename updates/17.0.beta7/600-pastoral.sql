@@ -31,3 +31,13 @@ REFERENCES lu_pastoral_type(`id`)
 ALTER TABLE pastoral
   CHANGE COLUMN private _private TINYINT(4) DEFAULT 0 NULL COMMENT 'deprecated in 17.0';
 
+-- Logically should not permit nulls (preserve old default in case it had some semantics)
+UPDATE pastoral
+  SET created_at = '0000-00-00 00:00:00'
+  WHERE created_at IS NULL;
+ALTER TABLE pastoral
+  CHANGE COLUMN created_at created_at DATETIME NOT NULL;
+
+
+
+
