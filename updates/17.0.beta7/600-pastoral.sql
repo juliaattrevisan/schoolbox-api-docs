@@ -27,4 +27,7 @@ REFERENCES lu_pastoral_type(`id`)
   ON DELETE RESTRICT
   ON UPDATE RESTRICT;
 
+-- This field is no longer mapped in 17.0
+ALTER TABLE pastoral
+  CHANGE COLUMN private _private TINYINT(4) DEFAULT 0 NULL COMMENT 'deprecated in 17.0';
 
