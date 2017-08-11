@@ -53,7 +53,7 @@ class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connecto
         $page->setVar(
             array(
                 'CONNECTOR_ID'    => $this->getId(),
-                'CONNECTOR_LABEL' => $this->getLabel(),
+                'CONNECTOR_LABEL' => Scrub::text($this->getLabel()),
                 'CONNECTOR_CLASS' => $this->getConnectorClass(),
             )
         );
