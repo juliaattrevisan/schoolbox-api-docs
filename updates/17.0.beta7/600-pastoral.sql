@@ -38,6 +38,12 @@ UPDATE pastoral
 ALTER TABLE pastoral
   CHANGE COLUMN created_at created_at DATETIME NOT NULL;
 
+-- Logically should not permit nulls (preserve old default in case it had some semantics)
+UPDATE pastoral
+  SET updated_at = '0000-00-00 00:00:00'
+  WHERE updated_at IS NULL;
+ALTER TABLE pastoral
+  CHANGE COLUMN updated_at updated_at DATETIME NOT NULL;
 
 
 
