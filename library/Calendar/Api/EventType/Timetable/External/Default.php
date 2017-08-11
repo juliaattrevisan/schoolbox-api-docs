@@ -315,9 +315,8 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      */
     public function getEvent($eventId)
     {
-        // Blah
-        $stack = new Collection();
-        return $stack;
+        // No events in this strat, just return empty.
+        return new Collection();
     }
 
     /**
