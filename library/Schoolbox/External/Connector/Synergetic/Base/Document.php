@@ -76,7 +76,8 @@ class Document extends Base implements IDocument
             SELECT      sral.StudentReportsArchiveLinkSeq,
                         sral.FileYear,
                         sral.FileSemester,
-                        sral.Description
+                        sral.Description,
+                        sra.CreatedDate
             FROM        {$this->schema}.StudentReportsArchiveLink sral
             JOIN        {$this->schema}.StudentReportsArchive sra ON 
                         sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
@@ -122,7 +123,10 @@ class Document extends Base implements IDocument
             $semester = $row['FileSemester'];
             $description = $row['Description'];
 
-            $reports[$year][$semester][$reportId] = ['description' => $description];
+            $reports[$year][$semester][$reportId] = [
+                'description' => $description,
+                'date'        => Alaress_Date_Format::newDatabaseDate($row['CreatedDate']),
+            ];
         }
 
         return $reports;

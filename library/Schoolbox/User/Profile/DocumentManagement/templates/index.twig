@@ -25,6 +25,12 @@
                                                 <img src="/images/mime/application-pdf.svg" class="mime">
                                                 <h3>{{ report.description }}</h3>
                                             </a>
+                                            <p class="meta">
+                                                Created
+                                                <time datetime="{{ report.date.database }}" title="{{ report.date.local }}">
+                                                    {{ report.date.relativeTime }}
+                                                </time>
+                                            </p>
                                         </div>
                                     </div>
                                 </li>
