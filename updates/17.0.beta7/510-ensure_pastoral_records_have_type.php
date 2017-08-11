@@ -44,7 +44,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $selectRecordsWithoutType->fetch(PDO::FETCH_ASSOC)) {
-            $log->debug('Pastoral (id: %s), Type (id: %s)', $row['p.id'], $row['p.type_id']);
+            $log->debug('Pastoral (id: %d), Type (id: %s)', $row['p.id'], $row['p.type_id'] ?: "'null'");
         }
 
         // Create a new PastoralType
@@ -57,7 +57,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         try {
             $insertTypeQuery->execute(['name' => 'Unknown Type']);
             $unknownTypeId = $db->lastInsertId();
-            $log->info(sprintf("'Unknown Type' successfully inserted (id: %s)", $unknownTypeId));
+            $log->info(sprintf("'Unknown Type' successfully inserted (id: %d)", $unknownTypeId));
         } catch (PDOException $e) {
             $log->error("Unable to insert 'Unknown Type'", [$e]);
             $log->error($e->getMessage());

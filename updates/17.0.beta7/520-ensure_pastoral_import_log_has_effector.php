@@ -44,7 +44,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $selectLogsWithoutUser->fetch(PDO::FETCH_ASSOC)) {
-            $log->debug('PastoralImportLog (id: %d), User (id: %d)', $row['l.id'], $row['l.user_id']);
+            $log->debug('PastoralImportLog (id: %d), User (id: %s)', $row['l.id'], $row['l.user_id'] ?: "'null'");
         }
 
         // Select the Alaress User

@@ -47,7 +47,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $selectRecordsWithoutOwners->fetch(PDO::FETCH_ASSOC)) {
-            $log->debug('Pastoral (id: %s), Owner (id: %s)', $row['p.id'], $row['p.owner_id']);
+            $log->debug('Pastoral (id: %d), Owner (id: %s)', $row['p.id'], $row['p.owner_id'] ?: "'null'");
         }
 
         // Select the Alaress User
@@ -68,7 +68,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             $errorsOccurred = true;
         } else {
             $row = $selectAlaressUser->fetch(PDO::FETCH_ASSOC);
-            $log->info(sprintf("'alaress' user found. (id: '%s', username: '%s', first: '%s', last: '%s')",
+            $log->info(sprintf("'alaress' user found. (id: '%d', username: '%s', first: '%s', last: '%s')",
                 $row['id'], $row['username'], $row['firstname'], $row['lastname']
             ));
             $alaressUserId = $row['id'];
@@ -86,10 +86,10 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
             try {
                 $updatePastoralOwnerQuery->execute(['user_id' => $alaressUserId]);
-                $log->info(sprintf("%d pastoral record owners set to 'alaress' (id: %s)", $updatePastoralOwnerQuery->rowCount(), $alaressUserId));
+                $log->info(sprintf("%d pastoral record owners set to 'alaress' (id: %d)", $updatePastoralOwnerQuery->rowCount(), $alaressUserId));
                 $successCount = $updatePastoralOwnerQuery->rowCount();
             } catch (PDOException $e) {
-                $log->error(sprintf("Unable to set record owners to 'alaress' (id: %s)", $alaressUserId), [$e]);
+                $log->error(sprintf("Unable to set record owners to 'alaress' (id: %d)", $alaressUserId), [$e]);
                 $log->error($e->getMessage());
                 $errorsOccurred = true;
             }

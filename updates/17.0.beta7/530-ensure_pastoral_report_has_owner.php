@@ -44,7 +44,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $selectReportsWithoutOwner->fetch(PDO::FETCH_ASSOC)) {
-            $log->debug('PastoralReport (id: %d), User (id: %d)', $row['r.id'], $row['r.owner_id']);
+            $log->debug('PastoralReport (id: %d), User (id: %s)', $row['r.id'], $row['r.owner_id'] ?: "'null'");
         }
 
         // Select the Alaress User
