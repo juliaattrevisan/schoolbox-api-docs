@@ -14,6 +14,7 @@ ALTER TABLE pastoral
 
 
 -- Make pastoral.type_id relationship mandatory
+-- (at this point we have run a script to ensure all are linked correctly)
 ALTER TABLE pastoral
   DROP FOREIGN KEY fk_pastoral_type;
 
@@ -36,14 +37,22 @@ UPDATE pastoral
   SET created_at = '0000-00-00 00:00:00'
   WHERE created_at IS NULL;
 ALTER TABLE pastoral
-  CHANGE COLUMN created_at created_at DATETIME NOT NULL;
+  CHANGE COLUMN created_at created_at DATETIME NOT NULL AFTER modified_by_user_id;;
 
 -- Logically should not permit nulls (preserve old default in case it had some semantics)
 UPDATE pastoral
   SET updated_at = '0000-00-00 00:00:00'
   WHERE updated_at IS NULL;
 ALTER TABLE pastoral
-  CHANGE COLUMN updated_at updated_at DATETIME NOT NULL;
+  CHANGE COLUMN updated_at updated_at DATETIME NOT NULL AFTER created_at;
+
+-- Move to end to conform to conventions
+ALTER TABLE pastoral
+  CHANGE COLUMN deleted_at deleted_at DATETIME NULL AFTER updated_at;
+
+-- Code indicates this can be NULL
+ALTER TABLE pastoral
+  CHANGE COLUMN points points FLOAT NULL AFTER body;
 
 
 
