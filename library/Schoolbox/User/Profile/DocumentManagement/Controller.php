@@ -31,17 +31,18 @@ class Controller extends Base
      *
      * @param User $student
      */
-    public function getIndex($student)
+    public function getIndex(User $student)
     {
         // And render this thing out
 
         $this->getResponse()->content->set(
-            array(
-                'template' => '@profileDocumentManagement/index.twig',
-                'data' => array(
+            $this->buildHtmlOutput(
+                '@profileDocumentManagement/index.twig',
+                [
                     'student' => $student,
                     'reports' => $this->externalDocument->getAcademicReportsForStudent($student)
-                ),
+                ],
+                'Academic Reports for '.$student->formatName()
             )
         );
     }
@@ -49,10 +50,10 @@ class Controller extends Base
     /**
      * Download the requested file from external document archive
      *
-     * @param $student
-     * @param $documentId
+     * @param User $student
+     * @param int  $documentId
      */
-    public function getDownload($student, $documentId)
+    public function getDownload(User $student, $documentId)
     {
         $report = $this->externalDocument->downloadAcademicReportForStudent($student, $documentId);
 
