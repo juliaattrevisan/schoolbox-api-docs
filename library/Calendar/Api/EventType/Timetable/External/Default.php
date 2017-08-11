@@ -21,6 +21,10 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      */
     protected $externalTimetable = null;
 
+    /** @var int */
+    private $expensiveWindow;
+
+
     /**
      * Constructor
      *
@@ -31,6 +35,9 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
     {
         $this->setUser($user);
         $this->externalTimetable = new External_Timetable();
+
+        // this can be made configurable if people feel strongly, for now it's just set to 2 days
+        $this->expensiveWindow = 172800;
     }
 
     /**
@@ -43,6 +50,9 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
+        // we're going to use this as a window for not building *too* much expensive timetable at once
+        $now = time();
+
         // If the user is not allowed to view timetables return an empty collection
         if ($this->getUser()->getHideTimetable()) {
             $stack = new Collection();
@@ -72,12 +82,26 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
+            $ttl = $currentTimestamp - $now;
+
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
+                if ($ttl >= 0 && $ttl < $this->expensiveWindow) {
+                    // if the current day is in the future AND within 2 days of now, get the expensive timetable
+                    $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
+
+                } else {
+                    $dayNumber = $this->getExternalTimetable()->getDayNumber($campus, $currentTimestamp);
+
+                    if ($dayNumber <= 0) {
+                        continue;
+                    }
+
+                    $dayTimetable = $this->buildTimetableCheaply($this->getUser(), $campus, $dayNumber);
+                }
 
                 // Load events for this campus
                 foreach ($dayTimetable as $period) {
