@@ -563,7 +563,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         }));
 
         // Document Manager
-        $di->set('externalDocumentManager', $di->lazy(function() use ($di) {
+        $di->set('externalDocumentManager', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $config */
             $config = $di->get('config');
 

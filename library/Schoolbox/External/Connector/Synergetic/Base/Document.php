@@ -95,7 +95,6 @@ class Document extends Base implements IDocument
         $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
         if ($date !== false) {
-
             $query .= ' AND sra.CreatedDate >= :createdDate';
 
             $params = array_merge($params, [
@@ -172,7 +171,6 @@ class Document extends Base implements IDocument
         $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
         if ($date !== false) {
-
             $query .= ' AND sra.CreatedDate >= :createdDate';
 
             $params = array_merge($params, [

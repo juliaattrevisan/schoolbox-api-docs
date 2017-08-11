@@ -50,8 +50,8 @@ class Controller extends Base
     /**
      * Download the requested file from external document archive
      *
-     * @param User $student
-     * @param int  $documentId
+     * @param User   $student
+     * @param string $documentId
      */
     public function getDownload(User $student, $documentId)
     {
