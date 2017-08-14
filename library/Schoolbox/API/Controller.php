@@ -55,10 +55,6 @@ class Controller extends Base {
      */
     public function register($provider)
     {
-        $sessionUser     = $this->getUser();
-        $sessionUserId   = $sessionUser->getId();
-        $sessionUserKey  = $sessionUser->getKey();
-
         $data      = (array)$this->getRequest()->post;
         $response  = $this->getResponse()->content;
         $providers = array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE);
@@ -92,6 +88,11 @@ class Controller extends Base {
         // verify username|password combination
         try {
             $this->auth->authenticate($data['username'], $data['password'], true);
+
+            // only obtain these *after* you've run authentication
+            $sessionUser     = $this->getUser();
+            $sessionUserId   = $sessionUser->getId();
+            $sessionUserKey  = $sessionUser->getKey();
         }
         catch (SchoolboxAccessDeniedException $e) {
             $this->getResponse()->status->setCode(401);
