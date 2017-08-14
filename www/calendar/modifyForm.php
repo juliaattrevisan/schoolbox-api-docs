@@ -61,11 +61,12 @@ switch ($_REQUEST['action']) {
             $owner = $userMapper->findById($_POST['userId']);
         }
 
+        // Check if author still exists
+        // If not - pass author to the editor
         try {
-            // Author might've been deleted, so don't die if they don't exist
             $author = $userMapper->findById($_POST['authorId']);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
+            $author = $_SESSION['user'];
         }
 
         /* Check user has permission to write the event with posted settings
