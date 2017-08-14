@@ -8,18 +8,18 @@
  */
 
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
 // this is a script and not to be SitePage'd
-if(isset($this)) {
+if (isset($this)) {
     error(4);
 }
 
-if(!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
+if (!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
     error(4);
 }
 
@@ -31,20 +31,20 @@ $page = new SitePage();
 
 // "security to the foyer!"
 $groupHandler = new Group();
-if(!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
+if (!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
     die('You to not have write permission to this category.');
 }
 
-$data = array();
+$data = [];
 
-foreach($criteria as $group) {
-    if(count($group['items'])) {
-        foreach($group['items'] as $critID => $crit) {
+foreach ($criteria as $group) {
+    if (count($group['items'])) {
+        foreach ($group['items'] as $critID => $crit) {
             $critID = substr($critID, 1);
-            $data[$critID] = array(
+            $data[$critID] = [
                 'group' => $group['name'],
                 'name'  => $crit,
-            );
+            ];
         }
     }
 }
@@ -53,19 +53,18 @@ foreach($criteria as $group) {
 $criterionMapper = CriterionMapper::getInstance();
 
 
-
 //work out the diff and delete unnecessary criteria
 $found = array_keys($data);
 
 $criterionCollection = $criterionMapper->findByColumnList(
-                                       array(
-                                           'parent_id'   => $catID,
-                                           'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                                       )
+    [
+        'parent_id'   => $catID,
+        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+    ]
 );
 
-foreach($criterionCollection as $crit) {
-    if(!in_array($crit->getID(), $found)) {
+foreach ($criterionCollection as $crit) {
+    if (!in_array($crit->getID(), $found)) {
         try {
             $criterionMapper->delete($crit);
         } catch (Exception $e) {
@@ -76,24 +75,23 @@ foreach($criterionCollection as $crit) {
 
 
 // iterate through list of provided criteria changes
-foreach($data as $critID => $critData) {
+foreach ($data as $critID => $critData) {
     try {
         $criteria = $criterionMapper->findOneByColumnList(
-            array(
+            [
                 'id'        => $critID,
                 'parent_id' => $catID,
-            )
+            ]
         );
         $criteria->setGrouping($critData['group']);
         $criteria->setName($critData['name']);
 
         //Do not edit criteria that are in use
-        $usage = UsageMapper::getInstance()->findByColumnList(array('criterion_id' => $critID));
-        if(count($usage)) {
+        $usage = UsageMapper::getInstance()->findByColumnList(['criterion_id' => $critID]);
+        if (count($usage)) {
             continue; // possibly throw an error of some kind
         }
-    }
-    catch(Exception $e) {
+    } catch (Exception $e) {
         $criteria = new Criterion();
         $criteria->setParentId($catID);
         $criteria->setGrouping($critData['group']);
