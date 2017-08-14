@@ -32,7 +32,8 @@ $clientSecret = $conf->get('office365_secret');
 $clientName   = $conf->get('office365_tenant');
 /* /CONF */
 
-$url = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].'/'.$_SERVER['SCRIPT_NAME'];
+$urlArray = parse_url($_SERVER['SCRIPT_URI']);
+$url = $urlArray['scheme'].'://'.$urlArray['host'].$urlArray['path'];
 
 $provider = new Alaress\OAuth2\Client\Provider\Office365([
     'clientId'      => $clientId,
