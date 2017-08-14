@@ -69,14 +69,14 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
     ";
     private $baseRoomJoin = "
-        LEFT  JOIN fc.TimetableClassRoom tcr       ON tc.ID      = tcr.TimetableClassId
-        LEFT  JOIN fc.Room               tcrr      ON tcr.RoomID = tcrr.ID
-        LEFT  JOIN dbo.Room              room_base ON tcrr.ID    = room_base.ID
+        LEFT  JOIN fc.TimetableClassRoom tcr       ON tc.ID            = tcr.TimetableClassId
+        LEFT  JOIN fc.Room               tcrr      ON tcr.RoomID       = tcrr.ID
+        LEFT  JOIN dbo.Room              room_base ON tcrr.AdminRoomID = room_base.ID
     ";
     private $replacementRoomJoin = "
-        LEFT  JOIN fc.TimetableClassInstanceRoom tcir             ON tci.ID      = tcir.TimetableClassInstanceId AND tcir.RoomSpecified = 1
-        LEFT  JOIN fc.Room                       tcirr            ON tcir.RoomID = tcirr.ID
-        LEFT  JOIN dbo.Room                      room_replacement ON tcirr.ID    = room_replacement.ID
+        LEFT  JOIN fc.TimetableClassInstanceRoom tcir             ON tci.ID            = tcir.TimetableClassInstanceId AND tcir.RoomSpecified = 1
+        LEFT  JOIN fc.Room                       tcirr            ON tcir.RoomID       = tcirr.ID
+        LEFT  JOIN dbo.Room                      room_replacement ON tcirr.AdminRoomID = room_replacement.ID
     ";
 
     /**
@@ -138,11 +138,13 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             WHERE t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
             AND   t.Enabled = 1
         ");
-        $result   = $this->database->getAll("
+
+        // Filter out anything other than HH:MM in query
+        $result = $this->database->getAll("
             SELECT
                 tp.Name                    AS Name,
-                CAST(tp.StartTime AS TIME) AS StartTime,
-                CAST(tp.EndTime   AS TIME) AS EndTime,
+                SUBSTRING(CONVERT(CHAR(8), tp.StartTime, 108), 1, 5) AS StartTime,
+                SUBSTRING(CONVERT(CHAR(8), tp.EndTime, 108), 1, 5)   AS EndTime,
                 td.SortOrder               AS DayNumber,
                 tp.Code                    AS PeriodNumber
 
@@ -173,12 +175,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             'periodCount' => count($periods),
             'dayCount'    => $dayCount,
         ];
+
         foreach ($periods as $period) {
-            $startTime = new Alaress_Date_Format($period['StartTime'], 'H:i:s.u');
-            $endTime   = new Alaress_Date_Format($period['EndTime'], 'H:i:s.u');
             $definition['desc'][]     = $period['Name'];
-            $definition['start'][]    = $startTime->getUsingFormat('H:i');
-            $definition['end'][]      = $endTime->getUsingFormat('H:i');
+            $definition['start'][]    = $period['StartTime'];
+            $definition['end'][]      = $period['EndTime'];
             $definition['number'][]   = $period['PeriodNumber'];
             $definition['sequence'][] = 1;
         }
@@ -192,7 +193,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     {
         $timetableDate = $this->getTimetableDate($campus, $this->getDateObjectFromTimestamp($date));
         if (isset($timetableDate)) {
-            return $timetableDate['SortOrder'];
+            return $timetableDate['TimetableDay']['SortOrder'];
         }
         return 0;
     }
@@ -334,7 +335,97 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      */
     public function getRoomTimetable($roomCodes)
     {
-        return [];
+        // Sort out room codes
+        if (!is_array($roomCodes)) {
+            $roomCodes = [$roomCodes];
+        }
+        if (empty($roomCodes)) {
+            return [];
+        }
+
+        // Build query parts for them
+        $extraWhereParts = [];
+        foreach ($roomCodes as $roomCode) {
+            $extraWhereParts[] = "room_base.Code = {$this->database->smartQuote($roomCode)}";
+            $extraWhereParts[] = "room_replacement.Code = {$this->database->smartQuote($roomCode)}";
+        }
+        $extraWhere = implode(' OR ', $extraWhereParts);
+
+        // The room timetable query.
+        // Note it has no dates, only timetable day and period;
+        // therefore it doesn't join onto CROSS APPLY fc.PeriodExpand() like
+        // the other timetable queries.
+        $query = "
+            SELECT
+                ts.Name                     AS Description,
+                $this->baseRoomSelect,
+                $this->replacementRoomSelect,
+                td.SortOrder                AS DayNumber,
+                tp.Code                     AS PeriodNumber,
+                SUBSTRING(CONVERT(CHAR(8), tp.StartTime, 108), 1, 5) AS PeriodStart,
+                SUBSTRING(CONVERT(CHAR(8), tp.EndTime, 108), 1, 5)   AS PeriodEnd,
+                tp.Name                     AS PeriodName,
+                t.Name                      AS TimetableGroup,
+                t.Name                      AS ClassCampus,
+                ts.Code                     AS ClassCode,
+                ts.Name                     AS ClassName,
+                $this->baseStaffSelect,
+                $this->replacementStaffSelect
+
+            FROM       fc.TimetableSubject       ts
+            -- Join onto staff
+            INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
+            -- Join onto period
+            INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
+            INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
+            INNER JOIN fc.TimetableDay           td   ON tp.TimetableDayID            = td.ID
+            $this->baseStaffJoin
+            $this->replacementStaffJoin
+            $this->baseRoomJoin
+            $this->replacementRoomJoin
+            $this->timetableJoin
+
+            WHERE t.Enabled = 1
+            AND {$extraWhere}
+
+            ORDER BY td.SortOrder ASC, tp.Code ASC
+        ";
+
+        // Finagle result into room code format
+        $result = $this->database->getAll($query);
+        foreach ($result as &$row) {
+            $newRow = [
+                'Description'    => $row['Description'],
+                'DayNumber'      => $row['DayNumber'],
+                'PeriodNumber'   => $row['PeriodNumber'],
+                'PeriodStart'    => $row['PeriodStart'],
+                'PeriodEnd'      => $row['PeriodEnd'],
+                'PeriodName'     => $row['PeriodName'],
+                'TimetableGroup' => $row['TimetableGroup'],
+                'ClassCampus'    => $row['ClassCampus'],
+                'ClassCode'      => $row['ClassCode'],
+                'ClassName'      => $row['ClassName'],
+            ];
+            $newRow['RoomCode'] = $row['UseBaseRoom']
+                ? $row['BaseRoom']
+                : $row['ReplacementRoom'];
+            if ($row['UseBaseStaff']) {
+                $newRow['StaffID']            = $row['BaseStaffID'];
+                $newRow['StaffTitle']         = $row['BaseStaffTitle'];
+                $newRow['StaffPreferredName'] = $row['BaseStaffPreferredName'];
+                $newRow['StaffSurname']       = $row['BaseStaffSurname'];
+            } else {
+                $newRow['StaffID']            = $row['ReplacementStaffID'];
+                $newRow['StaffTitle']         = $row['ReplacementStaffTitle'];
+                $newRow['StaffPreferredName'] = $row['ReplacementStaffPreferredName'];
+                $newRow['StaffSurname']       = $row['ReplacementStaffSurname'];
+            }
+            $row = $newRow;
+        }
+        unset($row);
+
+        return $result;
     }
 
 

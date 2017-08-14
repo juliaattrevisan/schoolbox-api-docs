@@ -83,10 +83,10 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                             $timetableCode
                         );
                     } catch (Schoolbox\Mapper\Exception $e) {
-                        trigger_error(
-                            sprintf('Campus code "%s" does not exist - no timetabled classes will be displayed', $timetableCode),
-                            E_USER_WARNING
-                        );
+//                        trigger_error(
+//                            sprintf('Campus code "%s" does not exist - no timetabled classes will be displayed', $timetableCode),
+//                            E_USER_WARNING
+//                        );
                         $campusList[$timetableCode] = null;
                     }
                 }

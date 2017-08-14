@@ -142,7 +142,7 @@
 <ul class="breadcrumb">
     <li><a href="/resource-booking/item">Resources</a></li>
     {% if item.id %}
-    <li><a href="#">{{ item.name }}</a></li>
+    <li><a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">{{ item.name }}</a></li>
     <li class="active"><a href="#">Edit</a></li>
     {% else %}
     <li class="active"><a href="#">Add New</a></li>
@@ -180,7 +180,6 @@
 
             <section>
                 <fieldset class="content">
-                    <legend>Resource Information</legend>
                     <div class="small-12 columns">
                         <label>
                             Name
@@ -224,7 +223,7 @@
                 </fieldset>
 
                 <fieldset class="content">
-                    <legend>Roles And Moderation</legend>
+                    <legend>Permissions</legend>
                     <div class="small-12 columns">
                         <label>
                             Allowed Roles

@@ -19,7 +19,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Storage;
 
 class Controller extends Base
 {
@@ -127,10 +126,10 @@ class Controller extends Base
         $excludedId = $this->getRequest()->query['thisId'];
         $search     = trim($this->getRequest()->query['query']);
         $data       = $this->getMapper()->search($search)
-            ->filter(function($item) use ($excludedId) {
+            ->filter(function(Model $item) use ($excludedId) {
                 return $item->getId() != $excludedId;
             })
-            ->map(function($item) {
+            ->map(function(Model $item) {
                 return array(
                     'id'   => $item->getId(),
                     'name' => $item->getName(),
@@ -241,8 +240,7 @@ class Controller extends Base
         $model = new Model();
         $this->updateItemWithFormValues(
             $model,
-            $this->getRequest()->post,
-            $this->getRequest()->files
+            $this->getRequest()->post
         );
         $this->getMapper()->save($model);
         // Return something.
@@ -369,7 +367,7 @@ class Controller extends Base
     protected function getDateIntervalFromForm($formPart)
     {
         return new \DateInterval(
-            sprintf('PT%dH%dM', ($formPart['day'] * 24 + $formPart['hour']), $formPart['minute'])
+            sprintf('PT%dH%dM', ((int)$formPart['day'] * 24 + (int)$formPart['hour']), (int)$formPart['minute'])
         );
     }
 
