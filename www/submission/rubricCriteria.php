@@ -42,6 +42,7 @@ $this->setBlock(TEMPLATE_content, 'allow_cascade', 'allow_cascade_block');
 $this->setBlock(TEMPLATE_content, 'criterion_group', 'criterion_group_block');
 $this->setBlock('criterion_group', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'criterion_disabled', 'criterion_disabled_block');
+$this->setBlock('criterion_disabled', 'criterion_assessment', 'criterion_assessment_block');
 $this->setBlock('criterion', 'criterion_enabled', 'criterion_enabled_block');
 
 
@@ -105,7 +106,13 @@ if(count($criterionCollection)) {
                 $this->setVar('criterion_enabled_block', '');
                 $this->parse('criterion_disabled_block', 'criterion_disabled');
 
-
+                // PHPLib the assessments
+                $this->setVar('criterion_assessment_block', '');
+                foreach ($usage as $assessment) {
+                    $this->setVar('CRITERION_ASSESSMENT_ID', $assessment['id']);
+                    $this->setVar('CRITERION_ASSESSMENT_TITLE', $assessment['title']);
+                    $this->parse('criterion_assessment_block', 'criterion_assessment', true);
+                }
             }
             else {
                 $this->setVar('criterion_disabled_block', '');

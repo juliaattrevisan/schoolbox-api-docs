@@ -111,7 +111,7 @@ class UsageMapper extends Schoolbox\Mapper {
      * This does not include deleted assessments.
      *
      * @param  int $criterionId
-     * @return array[] id: the assessment's ID, name: the assessment's name
+     * @return array[] id: the assessment's ID, title: the assessment's title
      */
     public function findUsage($criterionId)
     {
