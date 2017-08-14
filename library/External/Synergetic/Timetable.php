@@ -79,7 +79,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
     {
         $args = [ $externalUserId, $campus, $day, $date ];
-        $key  = implode('-', $args);
+        $key  = sprintf('%d-%s-%d-%s', $externalUserId, $campus->getExtTimetableCode(), $day, $date);
 
         return self::$timetableDefinitionCache->get($key, $args);
     }
@@ -469,7 +469,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
     {
-        $key = sprintf('%d-%d-%d-%s', $externalUserId, $userId, $campus->getId(), $date->getDatabaseDate());
+        $key = sprintf('%d-%d-%s-%s', $externalUserId, $userId, $campus->getExtTimetableCode(), $date->getDatabaseDate());
 
         return self::$timetableForDateCache->get($key, func_get_args());
     }
@@ -606,7 +606,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber, $date = null)
     {
-        $key = sprintf('%d-%d-%d-%d-%s', $externalUserId, $userId, $campus->getId(), $dayNumber, $date);
+        $key = sprintf('%d-%d-%s-%d-%s', $externalUserId, $userId, $campus->getExtTimetableCode(), $dayNumber, $date);
 
         return self::$dayTimetableCache->get($key, func_get_args());
     }
