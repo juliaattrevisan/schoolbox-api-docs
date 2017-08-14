@@ -131,9 +131,11 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      */
     public function renderAssessContents($assess_id, $page)
     {
+
         $page->setBlock('assessContentsFragment', 'section', 'section_block');
         $page->setBlock('section', 'question', 'question_block');
         $page->setBlock('section', 'has_section_description', 'has_section_description_block');
+        $page->setBlock('section', 'empty_description', 'empty_description_block');
         $page->setBlock('question', 'has_mark', 'has_mark_block');
 
         $allQuestions = $this->getContents($assess_id);
@@ -193,9 +195,13 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                     );
                     if (empty(trim($currentQuestion['description']))) {
                         $page->setVar('has_section_description_block', '');
+                        $page->parse('empty_description_block', 'empty_description');
+
                     } else {
+                        $page->setVar('empty_description_block', '');
                         $page->parse('has_section_description_block', 'has_section_description');
                     }
+
                     $page->parse('section_block', 'section', true);
                     $page->setVar('question_block', '');
                 }
