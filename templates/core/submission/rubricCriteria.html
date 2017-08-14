@@ -212,7 +212,7 @@ $(function() {
                                     <ul>
                                         <!-- BEGIN criterion_assessment -->
                                         <li>
-                                            <a href="/learning/assessments/{CRITERION_ASSESSMENT_ID}">{CRITERION_ASSESSMENT_TITLE}</a>
+                                            <a href="/learning/assessments/{CRITERION_ASSESSMENT_ID}/{USER_ID}">{CRITERION_ASSESSMENT_TITLE}</a>
                                         </li>
                                         <!-- END criterion_assessment -->
                                     </ul>
@@ -309,26 +309,28 @@ $(function() {
                         <label>
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Factorisation" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Algebraic simplification using index laws" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Fraction operations" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Determining an unknown by substitution" />
-                            </div>
-                        </div>
+                        <ul class="information-list">
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Factorisation" />
+                                </div>
+                            </li>
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Algebraic simplification using index laws" />
+                                </div>
+                            </li>
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Fraction operations" />
+                                </div>
+                            </li>
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Determining an unknown by substitution" />
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </fieldset>
 
@@ -343,21 +345,24 @@ $(function() {
                         <label>
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Solving linear equations" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Solving simultaneous equations" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Solving simple quadratic equations" />
-                            </div>
-                        </div>
+
+                        <ul class="information-list">
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving linear equations" />
+                                </div>
+                            </li>
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving simultaneous equations" />
+                                </div>
+                            </li>
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving simple quadratic equations" />
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </fieldset>
             </section>
