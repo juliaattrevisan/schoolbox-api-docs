@@ -51,7 +51,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
     public function getEvents($startTimestamp, $endTimestamp)
     {
         // we're going to use this as a window for not building *too* much expensive timetable at once
-        $now = time();
+        $midnight = mktime(0, 0, 0);
 
         // If the user is not allowed to view timetables return an empty collection
         if ($this->getUser()->getHideTimetable()) {
@@ -82,7 +82,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
-            $ttl = $currentTimestamp - $now;
+            $ttl = $currentTimestamp - $midnight;
 
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
@@ -90,7 +90,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
                 if ($ttl >= 0 && $ttl < $this->expensiveWindow) {
-                    // if the current day is in the future AND within 2 days of now, get the expensive timetable
+                    // if the current day is in the future AND within 2 days of midnight, get the expensive timetable
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
                 } else {
