@@ -167,6 +167,79 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         return [];
     }
 
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param                  $externalUserId
+     * @param                  $userId
+     * @param Schoolbox\Campus $campus
+     * @param                  $dayNumber
+     * @throws \Alaress\Database\Exception
+     * @return array
+     */
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    {
+        // I need to know if $userId is a teacher or student
+        try {
+            $user = $this->userMapper->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
+        }
+
+        $studentExternalId = '';
+        $teacherExternalId = '';
+        $timePeriod        = $campus->getExtTimetableCode();
+        if ($user->getRole()->isStudent()) {
+            $studentExternalId = $user->getExternalId();
+        } elseif ($user->getRole()->isStaff()) {
+            $teacherExternalId = $user->getExternalId();
+        }
+
+        $statement = $this->getDatabase()->prepareProcedure('spSelTimetable');
+        $statement->bindInputs([
+            ['name' => 'DATE', 'value' => date('Ymd')],
+            ['name' => 'TIMEPERIOD', 'value' => $timePeriod],
+            ['name' => 'STUDKEY', 'value' => $studentExternalId],
+            ['name' => 'TEACHERCODE', 'value' => $teacherExternalId]
+        ]);
+
+        $statement->execute();
+        $row = $statement->fetch();
+        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $row;
+
+        // The $homeClasses definition is mostly included within dayPeriods
+        $timetable = [];
+        foreach ($dayPeriods as $period) {
+            // Order the list by sortOrder
+            $order = $period['SORT_ORDER'];
+            $timetable[$order]['periodName']     = $period['HEADING'];
+            $timetable[$order]['periodStart']    = $period['TIME_START'];
+            $timetable[$order]['periodEnd']      = $period['TIME_END'];
+            $timetable[$order]['periodNumber']   = $order;
+            $timetable[$order]['periodSequence'] = 1;
+            $timetable[$order]['class']          = [];
+        }
+        ksort($timetable);
+
+        // Add classes for each day into it
+        foreach ($dayClasses as $dayClass) {
+            $period = $dayClass['PERIOD'];
+            $code   = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
+            if ($dayNumber == $dayClass['DAY']) {
+                $timetable[$period]['class'][$code] = array(
+                    'description'        => $dayClass['DESC'],
+                    'code'               => $code,
+                    'campus'             => $timePeriod,
+                    'room'               => $dayClass['ROOM'],
+                    'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                );
+            }
+        }
+        return $timetable;
+    }
+
+
     /**
      * Return a user's timetable for a specific date
      * This was developed as synergetic has substitutions and attendance data available in a stored proc which
