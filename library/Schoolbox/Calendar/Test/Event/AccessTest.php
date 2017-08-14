@@ -175,7 +175,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function dataCheckAccess()
+    public function dataCheckExisting()
     {
         // Set access on users
         $this->configureUserAccess('campusModerate');
@@ -295,18 +295,45 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         return $tests;
     }
 
+
     /**
-     * @dataProvider dataCheckAccess
+     * @return array
+     */
+    public function dataCheckDestination()
+    {
+        $tests = [];
+
+        return $tests;
+    }
+
+    /**
+     * @dataProvider dataCheckExisting
      * @param $expected
      * @param User $effector
      * @param Event $event
+     */
+    public function testCheckExisting($expected, User $effector, Event $event)
+    {
+        $access = new EventAccess();
+        $actual = $access->checkExisting($effector, $event);
+        $this->assertEquals($expected, $actual);
+    }
+
+
+    /**
+     * @dataProvider dataCheckDestination
+     * @param $expected
+     * @param User $effector
+     * @param $accessLevel
+     * @param User $author
+     * @param User $owner
      * @param array $groups
      * @param array $campuses
      */
-    public function testCheckAccess($expected, User $effector, Event $event, $groups = [], $campuses = [])
+    public function testCheckDestination($expected, User $effector, $accessLevel, User $author, User $owner, array $groups = [], array $campuses = [])
     {
         $access = new EventAccess();
-        $actual = $access->checkAccess($effector, $event, $groups, $campuses);
+        $actual = $access->checkDestination($effector, $accessLevel, $author, $owner, $groups, $campuses);
         $this->assertEquals($expected, $actual);
     }
 }

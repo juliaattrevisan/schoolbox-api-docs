@@ -58,7 +58,7 @@ if ($_POST['allDay']) {
 /* Check user has permission to create this event
  */
 $eventAccess = new Access();
-if ($eventAccess->checkAccess($user, $event) == false) {
+if ($eventAccess->checkDestination($user, Event::ACCESS_PERSONAL, $user, $owner) == false) {
     error(35);
 }
 

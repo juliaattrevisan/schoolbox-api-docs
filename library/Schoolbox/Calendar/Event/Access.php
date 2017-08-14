@@ -21,29 +21,65 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Access
 {
+
+    /**
+     * Takes an existing event object, and uses checkDestination below to check access for a given user
+     *
+     * @param User $effector
+     * @param Event $event
+     * @return bool
+     */
+    public function checkExisting(User $effector, Event $event)
+    {
+        // Split groups into an array of ints, if there are any
+        if ($event->getCategoryCollection()) {
+            $groups = $event->getCategoryCollection()->getColumnValues('categoryId');
+        } else {
+            $groups = [];
+        }
+
+        // Split campuses into an array of ints, if there are any
+        if ($event->getCampusCollection()) {
+            $campus = $event->getCampusCollection()->getColumnValues('campusId');
+        } else {
+            $campus = [];
+        }
+
+        return $this->checkDestination(
+            $effector,
+            $event->getAccess(),
+            $event->getAuthor(),
+            $event->getOwner(),
+            $groups,
+            $campus
+        );
+    }
+
+
     /**
      * Checks if a given user has permission to write or modify an event
      *
-     * @param User $user
-     * @param Event $event
-     * @param RelationCategory[] $groups
-     * @param Campus[] $campuses
-     *
+     * @param User $effector
+     * @param int $accessLevel
+     * @param User $author
+     * @param User $owner
+     * @param int[] $groups
+     * @param int[] $campuses
      * @return bool
      */
-    public function checkAccess(User $user, Event $event, $groups = [], $campuses = [])
+    public function checkDestination(User $effector, $accessLevel, User $author, User $owner, array $groups = [], array $campuses = [])
     {
         /* Check superuser
          */
-        if ($user->isSuperuser()) {
+        if ($effector->isSuperuser()) {
             return true;
         }
 
 
-        /* If event is on a personal level, check user is the owner or the author
+        /* If event is on a personal level, check effector is the owner or the author
          */
-        if ($event->isPersonalLevel()) {
-            if ($user->getId() == $event->getOwner()->getId() || $user->getId() == $event->getAuthor()->getId()) {
+        if ($accessLevel == Event::ACCESS_PERSONAL) {
+            if ($effector->getId() == $owner->getId() || $effector->getId() == $author->getId()) {
                 return true;
             }
         }
@@ -52,11 +88,11 @@ class Access
         /* If the event is on a campus level, check if this user
          * is a calendar moderator for one of the campuses selected
          */
-        if ($event->isCampusLevel()) {
+        if ($accessLevel == Event::ACCESS_CAMPUS) {
 
-            /* Get list of calendar permissions this user has
+            /* Get list of calendar permissions the effector has
              */
-            $accessList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
+            $accessList = $effector->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
 
             foreach ($accessList as $currentAccess) {
                 /** @var UserAccess $currentAccess */
@@ -92,7 +128,7 @@ class Access
 
         /* If the event is on a group level, check if the user is a group manager
          */
-        if ($event->isGroupLevel()) {
+        if ($accessLevel == Event::ACCESS_GROUP) {
 
             /* Loop through the groups selected for this event
              */
@@ -107,7 +143,7 @@ class Access
                 $groupIds[] = $groupId;
             }
 
-            if (FolderAccess::getInstance()->getMinFolderAccess($user, $groupIds) >= UserAccess::ACCESS_WRITE) {
+            if (FolderAccess::getInstance()->getMinFolderAccess($effector, $groupIds) >= UserAccess::ACCESS_WRITE) {
                 return true;
             }
         }

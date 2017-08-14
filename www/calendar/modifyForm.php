@@ -43,7 +43,7 @@ switch ($_REQUEST['action']) {
 
             /* Check user has permission to modify this event
              */
-            if ($eventAccess->checkAccess($_SESSION['user'], $event, $event->getCategoryCollection(), $event->getCampusCollection()) == false) {
+            if ($eventAccess->checkExisting($_SESSION['user'], $event) == false) {
                 error(34);
             }
 
@@ -59,6 +59,29 @@ switch ($_REQUEST['action']) {
         } else {
             $event = new Event();
             $owner = $userMapper->findById($_POST['userId']);
+        }
+
+        try {
+            // Author might've been deleted, so don't die if they don't exist
+            $author = $userMapper->findById($_POST['authorId']);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
+        }
+
+        /* Check user has permission to write the event with posted settings
+         */
+        $groups = isset($_POST['group']) ? $_POST['group'] : [];
+        $campuses = isset($_POST['campus']) ? $_POST['campus'] : [];
+
+        if ($eventAccess->checkDestination(
+                $_SESSION['user'],
+                $_POST['level'],
+                $author,
+                $owner,
+                $groups,
+                $campuses
+            ) == false) {
+            error(34);
         }
 
         /* Events aren't visible until this date
@@ -104,15 +127,9 @@ switch ($_REQUEST['action']) {
         /* NO RETREAT
          * NO SURRENDER
          */
-        try {
-            // Author might've been deleted, so don't die if they don't exist
-            $event->setAuthor($userMapper->findById($_POST['authorId']));
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
-        }
 
-        /* spawned further up
-         */
+        // spawned further up
+        $event->setAuthor($author);
         $event->setOwner($owner);
         $event->setAccess($_POST['level']);
         $event->setType(EventTypeMapper::getInstance()->createModel()->setId($_POST['type']));
@@ -153,12 +170,6 @@ switch ($_REQUEST['action']) {
                 error(2);
                 exit;
             }
-        }
-
-        /* Check user has permission to write the event with the new settings
-         */
-        if ($eventAccess->checkAccess($_SESSION['user'], $event, $_POST['group'], $_POST['campus']) == false) {
-            error(34);
         }
 
         /* Set up individual relations for each event in the series
@@ -213,7 +224,7 @@ switch ($_REQUEST['action']) {
         /**
          * Check user has permission to delete this event
          */
-        if ($eventAccess->checkAccess($_SESSION['user'], $event, $event->getCategoryCollection(), $event->getCampusCollection()) == false) {
+        if ($eventAccess->checkExisting($_SESSION['user'], $event) == false) {
             error(34);
         }
 
