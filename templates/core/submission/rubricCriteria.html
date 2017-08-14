@@ -248,21 +248,23 @@ $(function() {
                         <label>
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
-                        <div class="row" data-rubric-criterion-row="{MAX_CRIT_ID}">
-                            <div class="small-9 columns">
-                                <input type="text"
-                                       value=""
-                                       data-rubric-criterion
-                                       data-rubric-criterion-new="1"
-                                       placeholder="Add Criterion..." />
-                            </div>
-                            <div class="small-3 columns no-pad">
-                                <a title="Delete criterion"
-                                   class="button icon-delete hide"
-                                   data-role="remove-criterion"
-                                   href="#"></a>
-                            </div>
-                        </div>
+                        <ul class="information-list">
+                            <li class="actions-small-1" data-rubric-criterion-row="{MAX_CRIT_ID}">
+                                <div class="list-item">
+                                    <input type="text"
+                                           value=""
+                                           data-rubric-criterion
+                                           data-rubric-criterion-new="1"
+                                           placeholder="Add Criterion..." />
+                                </div>
+                                <nav>
+                                    <a title="Delete criterion"
+                                       class="icon-delete hide"
+                                       data-role="remove-criterion"
+                                       href="#"></a>
+                                </nav>
+                            </li>
+                        </ul>
                     </div>
                 </fieldset>
             </section>
