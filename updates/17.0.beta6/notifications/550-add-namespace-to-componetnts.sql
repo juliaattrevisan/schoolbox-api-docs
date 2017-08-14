@@ -1,5 +1,5 @@
 ALTER TABLE `component_definition`
-  ADD COLUMN `msg_namespace_slug` VARCHAR(32) NULL AFTER `multiple`,
+  ADD COLUMN `msg_namespace_slug` VARCHAR(32) CHARSET utf8mb4 COLLATE utf8mb4_general_ci NULL AFTER `multiple`,
   ADD FOREIGN KEY (`msg_namespace_slug`) REFERENCES `msg_namespace`(`slug`)
     ON UPDATE NO ACTION
     ON DELETE SET NULL;
