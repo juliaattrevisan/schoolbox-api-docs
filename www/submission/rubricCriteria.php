@@ -102,9 +102,9 @@ if(count($criterionCollection)) {
             $usage      = UsageMapper::getInstance()->findUsage($crit->getId());
             $usageCount = count($usage);
             if($usageCount > 0) {
-                $this->setVar('CRITERION_USAGE', $usageCount);
                 $this->setVar('criterion_enabled_block', '');
                 $this->parse('criterion_disabled_block', 'criterion_disabled');
+                $this->setVar('CRITERION_USAGE', $usageCount);
 
                 // PHPLib the assessments
                 $this->setVar('criterion_assessment_block', '');
