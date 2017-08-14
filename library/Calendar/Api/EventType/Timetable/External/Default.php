@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Campus;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
@@ -36,8 +37,10 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         $this->setUser($user);
         $this->externalTimetable = new External_Timetable();
 
-        // this can be made configurable if people feel strongly, for now it's just set to 2 days
-        $this->expensiveWindow = 172800;
+        // ensure this value is a non-negative integer
+        $days = max(0, (int)ConfigMapper::getInstance()->get('external_synergetic_timetable_accurate_days'));
+
+        $this->expensiveWindow = $days * 86400;
     }
 
     /**
