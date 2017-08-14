@@ -869,7 +869,7 @@ class Controller extends Base
                             }
                         }
                     }
-                    
+
                     if (!$found) {
                         try {
                             $user = $this->userMapper->findById($user_id);
