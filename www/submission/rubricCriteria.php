@@ -15,7 +15,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 // not in SitePage context, redirect to equivalent
 if (!isset($this)) {
-    require_once('../../library/Bootstrap.php');
+    require_once __DIR__ . '../../library/Bootstrap.php';
     $this->localRedir('/submission/rubricCriteria');
     die();
 }
@@ -32,7 +32,6 @@ $groupHandler = new Group();
 if (!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
     error(6);
 }
-
 
 $this->setFile(TEMPLATE_content, 'submission/rubricCriteria.html');
 $this->setTab('submission');
@@ -68,11 +67,12 @@ $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
 );
 
 
-// for now, we're not supporting inheritence
+// for now, we're not supporting inheritance
 $this->setVar('allow_cascade_block', '');
 
 $this->setVar('criterion_group_block', '');
 $topID = 0;
+$groupCount = 0;
 if (count($criterionCollection)) {
 
     /* Create group structure */
@@ -81,7 +81,6 @@ if (count($criterionCollection)) {
         $criteriaList[$crit->getGrouping()][] = $crit;
     }
 
-    $groupCount = 0;
     foreach ($criteriaList as $grouping => $crits) {
         $this->setVar([
             'criterion_block'    => '',
@@ -116,7 +115,6 @@ if (count($criterionCollection)) {
                 $this->parse('criterion_enabled_block', 'criterion_enabled');
             }
 
-
             $this->parse('criterion_block', 'criterion', true);
         }
         $this->parse('criterion_group_block', 'criterion_group', true);
@@ -125,7 +123,7 @@ if (count($criterionCollection)) {
 $this->setVar('MAX_CRITGROUP_ID', $groupCount);
 $this->setVar('MAX_CRIT_ID', $topID + 1);
 
-$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail = new \Schoolbox\Breadcrumbs();
 $trail->renderIntoSitePage(
     $this,
     'BREADCRUMB',
