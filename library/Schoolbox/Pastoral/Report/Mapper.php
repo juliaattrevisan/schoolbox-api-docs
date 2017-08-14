@@ -22,6 +22,9 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ */
 class Mapper extends BaseMapper
 {
     /**

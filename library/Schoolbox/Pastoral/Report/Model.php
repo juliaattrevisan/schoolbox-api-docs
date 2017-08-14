@@ -85,8 +85,12 @@ class Model implements ISoftDeletable
     /** @var Collection $types */
     protected $types;
 
-    /** @var PastoralSeverity $severity */
-    protected $severity;
+    /**
+     * Will be null if severity is turned off in admin config
+     *
+     * @var null|PastoralSeverity $severity
+     */
+    private $severity;
 
     /** @var Collection $groups */
     protected $groups;
@@ -110,13 +114,13 @@ class Model implements ISoftDeletable
      * @param PastoralSeverity $value
      * @return $this
      */
-    public function setSeverity($value) {
+    public function setSeverity(PastoralSeverity $value = null) {
         $this->severity = $value;
         return $this;
     }
 
     /**
-     * @return PastoralSeverity
+     * @return null|PastoralSeverity
      */
     public function getSeverity() {
         return $this->severity;
