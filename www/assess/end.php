@@ -16,6 +16,7 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
@@ -231,16 +232,11 @@ $term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate(
     new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT)
 );
 
-if (isset($_GET["returnUrl"])) {
-    $folderUrl = \Schoolbox\Learning\Assessment\Redirect::decode($_GET["returnUrl"]);
-
-    // If for whatever reason the URL failed to decode- just set it to the
-
-    if (empty($folderUrl)) {
-        $folderUrl = "/homepage/{$folder->getId()}";
-    }
-} else {
-    $folderUrl = "/homepage/{$folder->getId()}";
+if (!empty($_GET[Redirect::RETURN_URL])) {
+    $folderUrl = Redirect::decode($_GET[Redirect::RETURN_URL]);
+}
+else {
+    $folderUrl = '/homepage/'.$folder->getId();
 }
 
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
@@ -251,7 +247,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text'  => $folder->getName(),
-        'href'  => $folderUrl,
+        'href'  => '/homepage/'.$folder->getId(),
         'class' => ''
     ],
     [
