@@ -92,13 +92,14 @@ if(count($criterionCollection)) {
         ));
         foreach($crits as $crit) {
             /* @var $crit Criterion */
-            $topID = max($topID, $crit->getID());
+            $topID = max($topID, $crit->getId());
             $this->setVar(array(
-                'CRITERION_ID'   => $crit->getID(),
+                'CRITERION_ID'   => $crit->getId(),
                 'CRITERION_NAME' => $crit->getName(),
             ));
 
-            $usageCount = UsageMapper::getInstance()->countUsage($crit->getID());
+            $usage      = UsageMapper::getInstance()->findUsage($crit->getId());
+            $usageCount = count($usage);
             if($usageCount > 0) {
                 $this->setVar('CRITERION_USAGE', $usageCount);
                 $this->setVar('criterion_enabled_block', '');

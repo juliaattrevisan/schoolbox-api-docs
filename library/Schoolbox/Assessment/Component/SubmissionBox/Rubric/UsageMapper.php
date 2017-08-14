@@ -106,17 +106,19 @@ class UsageMapper extends Schoolbox\Mapper {
     }
 
     /**
-     * Retrieves the number of submission boxes in which this criterion is used.
+     * Retrieves a list of assessment IDs and names in which this criterion is used.
      *
-     * This count does not include deleted submission boxes.
+     * This does not include deleted assessments.
      *
      * @param  int $criterionId
-     * @return int
+     * @return array[] id: the assessment's ID, name: the assessment's name
      */
-    public function countUsage($criterionId)
+    public function findUsage($criterionId)
     {
         $query = "
-            SELECT COUNT(DISTINCT a.id)
+            SELECT DISTINCT
+                a.id,
+                a.title
             FROM {$this->getTable()} ru
             INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
             INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
@@ -124,6 +126,6 @@ class UsageMapper extends Schoolbox\Mapper {
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([$criterionId]);
-        return intval($statement->fetchColumn());
+        return $statement->fetchAll();
     }
 }
