@@ -11,6 +11,9 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as DocumentClassificationMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**

@@ -7,7 +7,7 @@
 use \Schoolbox\Pastoral\Model as PastoralModel;
 use \Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
-use \Schoolbox\User;
+use Schoolbox\User;
 
 class External_Pastoral implements External_PastoralInterface
 {

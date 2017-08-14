@@ -25,20 +25,36 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var int */
-    protected $externalId;
+    /**
+     * Identifier of corresponding SIS record. NULL if none.
+     *
+     * @var null|int
+     */
+    private $externalId;
 
-    /** @var Model */
-    protected $parent;
+    /**
+     * Null if does not have a parent.
+     *
+     * @var null|Model
+     */
+    private $parent;
 
-    /** @var PastoralType */
+    /**@var PastoralType */
     protected $type;
 
-    /** @var PastoralCategory */
-    protected $category;
+    /**
+     * AKA 'sub-type'. Optional.
+     *
+     * @var null|PastoralCategory
+     */
+    private $category;
 
-    /** @var PastoralSeverity */
-    protected $severity;
+    /**
+     * Optional. Will be NULL if admin has configured 'pastoral_severity' to off.
+     *
+     * @var null|PastoralSeverity
+     */
+    private $severity;
 
     /** @var User */
     protected $student;
@@ -49,45 +65,49 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $body;
 
-    /** @var float */
+    /** @var null|float */
     protected $points;
 
     /** @var User */
     protected $owner;
 
-    /** @var User */
-    protected $modifiedBy;
+    /**
+     * Null if imported from SIS
+     *
+     * @var null|User
+     */
+    private $modifiedBy;
 
-    /** @var Collection */
-    protected $access;
+    /** @var Collection|Access\Model[] */
+    private $access;
 
-    /** @var Collection */
-    protected $comments;
+    /** @var Collection|Comment\Model[] */
+    private $comments;
 
-    /** @var Collection */
-    protected $attachments;
+    /** @var Collection|Attachment\Model[] */
+    private $attachments;
 
-    /** @var Collection */
-    protected $tags;
+    /** @var Collection|Tag\Model[] */
+    private $tags;
 
-    /** @var Collection */
-    protected $relatedRecords;
+    /** @var Collection|Model[] */
+    private $relatedRecords;
 
-    /** @var Collection */
-    protected $revisions;
+    /** @var Collection|Revision\Model[] */
+    private $revisions;
 
     /**
-     * @param  Collection $access
+     * @param  Collection|Access\Model[] $access
      * @return $this
      */
-    public function setAccess($access)
+    public function setAccess(Collection $access)
     {
         $this->access = $access;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Collection|Access\Model[]
      */
     public function getAccess()
     {
@@ -95,17 +115,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param  Collection $tags
+     * @param  Collection|Tag\Model[] $tags
      * @return $this
      */
-    public function setTags($tags)
+    public function setTags(Collection $tags)
     {
         $this->tags = $tags;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Collection|Tag\Model[]
      */
     public function getTags()
     {
@@ -167,17 +187,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $comments
-     * @return self
+     * @param Collection|Comment\Model[] $comments
+     * @return $this
      */
-    public function setComments($comments)
+    public function setComments(Collection $comments)
     {
         $this->comments = $comments;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Collection|Comment\Model[]
      */
     public function getComments()
     {
@@ -185,7 +205,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection
+     * @return Collection|Attachment\Model[]
      */
     public function getAttachments()
     {
@@ -193,17 +213,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $attachments
-     * @return self
+     * @param Collection|Attachment\Model[] $attachments
+     * @return $this
      */
-    public function setAttachments($attachments)
+    public function setAttachments(Collection $attachments)
     {
         $this->attachments = $attachments;
         return $this;
     }
 
     /**
-     * @param int $externalId
+     * @param null|int $externalId
      * @return self
      */
     public function setExternalId($externalId)
@@ -213,7 +233,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return null|int
      */
     public function getExternalId()
     {
@@ -224,7 +244,7 @@ class Model implements ISoftDeletable
      * @param PastoralType $type
      * @return self
      */
-    public function setType($type)
+    public function setType(PastoralType $type)
     {
         $this->type = $type;
         return $this;
@@ -239,17 +259,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param PastoralCategory $category
-     * @return self
+     * @param null|PastoralCategory $category
+     * @return $this
      */
-    public function setCategory($category)
+    public function setCategory(PastoralCategory $category = null)
     {
         $this->category = $category;
         return $this;
     }
 
     /**
-     * @return PastoralCategory
+     * @return null|PastoralCategory
      */
     public function getCategory()
     {
@@ -257,17 +277,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Model $parent
+     * @param null|Model $parent
      * @return self
      */
-    public function setParent($parent)
+    public function setParent(Model $parent = null)
     {
         $this->parent = $parent;
         return $this;
     }
 
     /**
-     * @return Model
+     * @return null|Model
      */
     public function getParent()
     {
@@ -275,17 +295,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param PastoralSeverity $severity
+     * @param null|PastoralSeverity $severity
      * @return self
      */
-    public function setSeverity($severity)
+    public function setSeverity(PastoralSeverity $severity = null)
     {
         $this->severity = $severity;
         return $this;
     }
 
     /**
-     * @return PastoralSeverity
+     * @return null|PastoralSeverity
      */
     public function getSeverity()
     {
@@ -296,7 +316,7 @@ class Model implements ISoftDeletable
      * @param User $student
      * @return self
      */
-    public function setStudent($student)
+    public function setStudent(User $student)
     {
         $this->student = $student;
         return $this;
@@ -314,7 +334,7 @@ class Model implements ISoftDeletable
      * @param User $owner
      * @return self
      */
-    public function setOwner($owner)
+    public function setOwner(User $owner)
     {
         $this->owner = $owner;
         return $this;
@@ -329,17 +349,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param User $modifiedBy
-     * @return self
+     * @param null|User $modifiedBy
+     * @return $this
      */
-    public function setModifiedBy($modifiedBy)
+    public function setModifiedBy(User $modifiedBy = null)
     {
         $this->modifiedBy = $modifiedBy;
         return $this;
     }
 
     /**
-     * @return User
+     * @return null|User
      */
     public function getModifiedBy()
     {
@@ -347,15 +367,17 @@ class Model implements ISoftDeletable
     }    
 
     /**
-     * @param Collection|Model
+     * @param Collection|Model[] $relatedRecords
+     * @return $this
      */
-    public function setRelatedRecords($relatedRecords)
+    public function setRelatedRecords(Collection $relatedRecords)
     {
         $this->relatedRecords = $relatedRecords;
+        return $this;
     }
 
     /**
-     * @return Collection|Model
+     * @return Collection|Model[]
      */
     public function getRelatedRecords()
     {
@@ -370,10 +392,11 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $revisions
-     * @return self
+     * @param Collection|Revision\Model[] $revisions
+     * @return $this
      */
-    public function setRevisions($revisions) {
+    public function setRevisions(Collection $revisions)
+    {
         $this->revisions = $revisions;
         return $this;
     }
