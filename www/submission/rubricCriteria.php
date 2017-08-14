@@ -8,13 +8,13 @@
  */
 
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 // not in SitePage context, redirect to equivalent
-if(!isset($this)) {
+if (!isset($this)) {
     require_once('../../library/Bootstrap.php');
     $this->localRedir('/submission/rubricCriteria');
     die();
@@ -22,18 +22,16 @@ if(!isset($this)) {
 
 // retrieve the categoryID or die
 $catID = 0;
-if(isset($this->arg[0]) && is_numeric($this->arg[0])) {
+if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
     $catID = $this->arg[0];
-}
-else {
+} else {
     error(2);
 }
 
 $groupHandler = new Group();
-if(!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
+if (!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
     error(6);
 }
-
 
 
 $this->setFile(TEMPLATE_content, 'submission/rubricCriteria.html');
@@ -49,24 +47,24 @@ $this->setBlock('criterion', 'criterion_enabled', 'criterion_enabled_block');
 // get category details
 $category = FolderMapper::getInstance()->findById($catID);
 
-$this->setVar(array(
-    'CATEGORY_ID' => $category->getId(),
+$this->setVar([
+    'CATEGORY_ID'   => $category->getId(),
     'CATEGORY_NAME' => Scrub::text($category->getName()),
-));
+]);
 
 $criteriaName = $this->getDi()->get('l10n')->translate('rubricCriterion', true, true);
 
-$title = 'Manage '.$criteriaName.' for '.Scrub::text($category->getName());
+$title = 'Manage ' . $criteriaName . ' for ' . Scrub::text($category->getName());
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 
 // get rubric details
 $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
-                                               array(
-                                                     'parent_id'   => $catID,
-                                                     'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                                               ),
-                                               array('order' => array('grouping'=>'ASC', 'name'=>'ASC'))
+    [
+        'parent_id'   => $catID,
+        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+    ],
+    ['order' => ['grouping' => 'ASC', 'name' => 'ASC']]
 );
 
 
@@ -75,33 +73,33 @@ $this->setVar('allow_cascade_block', '');
 
 $this->setVar('criterion_group_block', '');
 $topID = 0;
-if(count($criterionCollection)) {
+if (count($criterionCollection)) {
 
     /* Create group structure */
     $criteriaList = [];
-    foreach($criterionCollection as $crit) {
+    foreach ($criterionCollection as $crit) {
         $criteriaList[$crit->getGrouping()][] = $crit;
     }
 
     $groupCount = 0;
     foreach ($criteriaList as $grouping => $crits) {
-        $this->setVar(array(
-            'criterion_block' => '',
-            'CRITGROUP_COUNT' => $groupCount++,
-            'CRITGROUP_NAME'  => $grouping,
-            'CRITGROUP_DISABLED' => ''
-        ));
-        foreach($crits as $crit) {
+        $this->setVar([
+            'criterion_block'    => '',
+            'CRITGROUP_COUNT'    => $groupCount++,
+            'CRITGROUP_NAME'     => $grouping,
+            'CRITGROUP_DISABLED' => '',
+        ]);
+        foreach ($crits as $crit) {
             /* @var $crit Criterion */
             $topID = max($topID, $crit->getId());
-            $this->setVar(array(
+            $this->setVar([
                 'CRITERION_ID'   => $crit->getId(),
                 'CRITERION_NAME' => $crit->getName(),
-            ));
+            ]);
 
-            $usage      = UsageMapper::getInstance()->findUsage($crit->getId());
+            $usage = UsageMapper::getInstance()->findUsage($crit->getId());
             $usageCount = count($usage);
-            if($usageCount > 0) {
+            if ($usageCount > 0) {
                 $this->setVar('criterion_enabled_block', '');
                 $this->parse('criterion_disabled_block', 'criterion_disabled');
                 $this->setVar('CRITERION_USAGE', $usageCount);
@@ -113,12 +111,10 @@ if(count($criterionCollection)) {
                     $this->setVar('CRITERION_ASSESSMENT_TITLE', $assessment['title']);
                     $this->parse('criterion_assessment_block', 'criterion_assessment', true);
                 }
-            }
-            else {
+            } else {
                 $this->setVar('criterion_disabled_block', '');
                 $this->parse('criterion_enabled_block', 'criterion_enabled');
             }
-
 
 
             $this->parse('criterion_block', 'criterion', true);
@@ -140,9 +136,9 @@ $trail->renderIntoSitePage(
             'class' => '',
         ],
         [
-            'text'  => 'Manage '.$criteriaName,
+            'text'  => 'Manage ' . $criteriaName,
             'href'  => '',
             'class' => 'active',
-        ]
+        ],
     ]
 );
