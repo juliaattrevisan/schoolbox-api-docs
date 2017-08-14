@@ -93,7 +93,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @return array
      * @throws InvalidArgumentException
      */
-    public function fetchTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
+    private function fetchTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
     {
         // check if there is a calendar event remapping the day number for this specific date
 
@@ -167,7 +167,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @param int    $date
      * @return bool|int|string
      */
-    public function fetchDayNumber(Campus $campus, $date = 0)
+    private function fetchDayNumber(Campus $campus, $date = 0)
     {
         $days = $this->getTotalDays($campus);
 
@@ -483,7 +483,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @throws InvalidArgumentException
      * @return array
      */
-    public function fetchTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    private function fetchTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
     {
         $dayNumber = $this->getDayNumber($campus, $date->getUnixTimeStamp());
 
@@ -622,7 +622,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @throws MssqlQueryException
      * @return array
      */
-    public function fetchDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber, $date = null)
+    private function fetchDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber, $date = null)
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
