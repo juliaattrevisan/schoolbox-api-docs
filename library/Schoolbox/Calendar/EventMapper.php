@@ -152,8 +152,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         return "
             FROM `{$this->table}` 
-			LEFT JOIN {$this->getJoinSql('owner', '', 'o')}
-			LEFT JOIN {$this->getJoinSql('author', '', 'a')}
+			LEFT JOIN {$this->getJoinSql('owner', '', 'o', true)}
+			LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
 			LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
 			LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
 			LEFT JOIN {$this->getJoinSql('category', '', 'c')}

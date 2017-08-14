@@ -9,6 +9,8 @@
 
 namespace Calendar\Event\Type\Day\Renderer;
 
+use Schoolbox\UserMapper;
+
 class Html extends Base {
 
 
@@ -45,6 +47,7 @@ class Html extends Base {
                 array(  'event' => $this->getEvent(),
                         'renderer' => $this,
                         'returnStr' => $returnStr,
+                        'author' => UserMapper::getInstance()->findByIdWithFallback($this->getEvent()->getAuthorId())
                 )
             );
         } else {
