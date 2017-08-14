@@ -166,13 +166,20 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICGROUP_PC}
-                            <input type="text"
-                                   name="crits[{CRITGROUP_COUNT}][name]"
-                                   value="{CRITGROUP_NAME}"
-                                   {CRITGROUP_DISABLED}
-                                   readonly
-                                   data-rubric-group />
                         </label>
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input type="text"
+                                           name="crits[{CRITGROUP_COUNT}][name]"
+                                           value="{CRITGROUP_NAME}"
+                                           {CRITGROUP_DISABLED}
+                                           readonly
+                                           data-rubric-group />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
@@ -249,12 +256,19 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICGROUP_PC}
-                            <input type="text"
-                                   value=""
-                                   data-rubric-group
-                                   data-rubric-group-new="1"
-                                   placeholder="Add Group..." />
                         </label>
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input type="text"
+                                           value=""
+                                           data-rubric-group
+                                           data-rubric-group-new="1"
+                                           placeholder="Add Group..." />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
@@ -303,33 +317,40 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICGROUP_PC}
-                            <input readonly type="text" value="Algebra" />
                         </label>
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Algebra" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
                         <ul class="information-list">
-                            <li class="action-small-0">
+                            <li class="actions-small-0">
                                 <div class="list-item">
                                     <input readonly type="text" value="Factorisation" />
                                 </div>
                                 <nav></nav>
                             </li>
-                            <li class="action-small-0">
+                            <li class="actions-small-0">
                                 <div class="list-item">
                                     <input readonly type="text" value="Algebraic simplification using index laws" />
                                 </div>
                                 <nav></nav>
                             </li>
-                            <li class="action-small-0">
+                            <li class="actions-small-0">
                                 <div class="list-item">
                                     <input readonly type="text" value="Fraction operations" />
                                 </div>
                                 <nav></nav>
                             </li>
-                            <li class="action-small-0">
+                            <li class="actions-small-0">
                                 <div class="list-item">
                                     <input readonly type="text" value="Determining an unknown by substitution" />
                                 </div>
@@ -343,8 +364,15 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICGROUP_PC}
-                            <input readonly type="text" value="Linear and non-linear relations" />
                         </label>
+                        <ul class="information-list">
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Linear and non-linear relations" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
@@ -352,19 +380,19 @@ $(function() {
                         </label>
 
                         <ul class="information-list">
-                            <li class="action-small-0">
+                            <li class="actions-small-0">
                                 <div class="list-item">
                                     <input readonly type="text" value="Solving linear equations" />
                                 </div>
                                 <nav></nav>
                             </li>
-                            <li class="action-small-0">
+                            <li class="actions-small-0">
                                 <div class="list-item">
                                     <input readonly type="text" value="Solving simultaneous equations" />
                                 </div>
                                 <nav></nav>
                             </li>
-                            <li class="action-small-0">
+                            <li class="actions-small-0">
                                 <div class="list-item">
                                     <input readonly type="text" value="Solving simple quadratic equations" />
                                 </div>
