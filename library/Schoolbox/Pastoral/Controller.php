@@ -836,65 +836,40 @@ class Controller extends Base
         $this->assignTagsToRecord($record, $post["tags"]);
 
         // Delete user permissions
-
         $accessRecords = $record->getAccess();
 
-        /* Delete all the individual access instances for this pastoral record
-         */
-        $deleteIds = trim($post['deleteIds']);
-        $individualAccessIds = [];
-
-        if (strlen($deleteIds)) {
-            $individualAccessIds = array_unique(explode(',', $deleteIds));
-        }
-
-        foreach ($individualAccessIds as $currentAccessId) {
-            $this->pastoralAccessMapper->deleteByColumnList([
-                'pastoral_id' => $record->getId(),
-                'user_id' => $currentAccessId
-            ]);
-        }
-
         // Update the authorised users
+        $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
 
+        //Remove users no longer in the list
+        $deleteIds = array_diff($existingAccess->map(function(PastoralAccessModel $access){
+            return $access->getUser()->getId();
+        })->getAll(), $post["user_id"]);
+
+        foreach ($deleteIds as $deleteId){
+            $access = $this->pastoralAccessMapper->findByColumnList(["pastoral_id" => $record->getId(), "user_id" => $deleteId]);
+            $this->pastoralAccessMapper->delete($access);
+        }
+
+        //Add users with de-dupe
         if (isset($post["user_id"])) {
             if (is_array($post["user_id"])) {
                 foreach ($post["user_id"] as $user_id) {
 
                     $found = false;
 
-                    // Don't re-add deleted users
+                    // Check not already have access
 
-                    if (count($individualAccessIds)) {
-
-                        /** @var PastoralAccessModel $access */
-                        foreach ($accessRecords as $access) {
-                            if ($access->getUser()->getId() == $user_id) {
-                                if (in_array($user_id, $individualAccessIds)) {
-                                    $found = true;
-                                    break;
-                                }
+                    /** @var PastoralAccessModel $accessCurrent */
+                    foreach ($existingAccess as $accessCurrent) {
+                        if ($accessCurrent->getUser() instanceof User) {
+                            if ($accessCurrent->getUser()->getId() == $user_id) {
+                                $found = true;
+                                break;
                             }
                         }
                     }
-
-                    $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
-
-                    if (!$found) {
-
-                        // Check not already have access
-
-                        /** @var PastoralAccessModel $accessCurrent */
-                        foreach ($existingAccess as $accessCurrent) {
-                            if ($accessCurrent->getUser() instanceof User) {
-                                if ($accessCurrent->getUser()->getId() == $user_id) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
+                    
                     if (!$found) {
                         try {
                             $user = $this->userMapper->findById($user_id);
