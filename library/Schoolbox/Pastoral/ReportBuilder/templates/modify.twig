@@ -264,10 +264,12 @@
                         <input id="type-all" type="checkbox" data-check-all-type>
                         <label for="type-all">Select All</label>
                         {% for type in types %}
-                            <input data-check-type id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
-                                    {% for typeSelected in report.types %}
-                                        {% if typeSelected.id == type.id %}checked{% endif %}
-                                    {% endfor %}
+                            <input id="type-{{ type.id }}"
+                                   name="types[]"
+                                   value="{{ type.id }}"
+                                   type="checkbox"
+                                   {% for typeSelected in report.types if typeSelected.id == type.id %}checked{% endfor %}
+                                   data-check-type
                             >
                             <label for="type-{{ type.id }}">
                                 {{ type.name }}
@@ -311,12 +313,12 @@
                         <input id="year-all" type="checkbox" data-check-all-year>
                         <label for="year-all">Select All</label>
                         {% for year in years %}
-                            <input data-check-year id="year-{{ year }}" name="years[]" value="{{ year }}" type="checkbox"
-                                    {% for yearSelected in report.years %}
-                                        {% if yearSelected == year %}
-                                            checked
-                                        {% endif %}
-                                    {% endfor %}
+                            <input id="year-{{ year }}"
+                                   name="years[]"
+                                   value="{{ year }}"
+                                   type="checkbox"
+                                   {% for yearSelected in report.years if yearSelected == year %}checked{% endfor %}
+                                   data-check-year
                             >
                             <label for="year-{{ year }}">{{ year }}</label>
                         {% endfor %}
@@ -375,7 +377,13 @@
                                     <div class="card small-12 wrap-down">
                                         <p>
                                             Record Type
-                                            <span class="meta"> ({% for type in types %}{{ type.name }}{% if not loop.last %}, {% endif %}{% endfor %})</span>
+                                            <span class="meta">
+                                                (
+                                                {%- for type in types -%}
+                                                {{ type.name }}{% if not loop.last %}, {% endif %}
+                                                {%- endfor -%}
+                                                )
+                                            </span>
                                         </p>
                                     </div>
                                 </div>
