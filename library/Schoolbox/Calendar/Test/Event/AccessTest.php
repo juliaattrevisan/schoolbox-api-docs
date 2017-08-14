@@ -13,11 +13,7 @@ use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access as EventAccess;
-use Schoolbox\Calendar\Relation\Campus as CampusRelation;
-use Schoolbox\Calendar\Relation\Category as CategoryRelation;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Group;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 
 class AccessTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,9 +63,10 @@ class AccessTest extends \PHPUnit_Framework_TestCase
                 'campusModerate' => (new User)->setId(6),
                 'campusWrite' => (new User)->setId(7),
                 'campusRead' => (new User)->setId(8),
+                'campusNone' => (new User)->setId(9),
 
-                'groupWrite' => (new User)->setId(9),
-                'groupRead' => (new User)->setId(10),
+                'groupWrite' => (new User)->setId(10),
+                'groupRead' => (new User)->setId(11),
             ];
 
             // Create a mock user object, who is a child of $this->users['parent']
@@ -110,7 +107,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             $this->userAccess = [
                 'campusModerate' => (new UserAccess())
                     ->setService(UserAccess::SERVICE_CALENDAR)
-                    ->setAccessLevel(UserAccess::ACCESS_READ)
+                    ->setAccessLevel(UserAccess::ACCESS_FULL)
                     ->setServiceIdentifier(1),
 
                 'campusWrite' => (new UserAccess())
@@ -152,8 +149,35 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         $access->setUser($user);
     }
 
+
     /**
-     * Generate an array for running a test
+     * Generate an array for running a test on checkDestination
+     *
+     * @param $result
+     * @param string $effectorKey
+     * @param int $accessLevel
+     * @param string $authorKey
+     * @param string $ownerKey
+     * @param int[] $groups
+     * @param int[] $campuses
+     * @return array
+     */
+    private function generateTest($result, $effectorKey, $accessLevel, $authorKey, $ownerKey, $groups = [], $campuses = [])
+    {
+        return [
+            $result,
+            $this->getUser($effectorKey),
+            $accessLevel,
+            $this->getUser($authorKey),
+            $this->getUser($ownerKey),
+            $groups,
+            $campuses
+        ];
+    }
+
+
+    /**
+     * Generate an array for running a test on checkExisting
      *
      * @param $result
      * @param $effectorKey
@@ -162,7 +186,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      * @param $ownerKey
      * @return array
      */
-    private function generateTest($result, $effectorKey, $eventKey, $authorKey, $ownerKey)
+    private function generateTestExisting($result, $effectorKey, $eventKey, $authorKey, $ownerKey)
     {
         $event = (clone $this->getEvent($eventKey))
             ->setOwner($this->getUser($ownerKey))
@@ -173,36 +197,17 @@ class AccessTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Tests for checkDestination()
+     * This makes up most of the permission check tests
+     *
      * @return array
      */
-    public function dataCheckExisting()
+    public function dataCheckDestination()
     {
         // Set access on users
         $this->configureUserAccess('campusModerate');
         $this->configureUserAccess('campusWrite');
         $this->configureUserAccess('campusRead');
-
-//        $groups = [
-//            (new Group)->setCategory(1)
-//        ];
-//
-//        $folders = [
-//            (new FolderModel())->setId(1)->setGroup($groups[0])
-//        ];
-//
-//        $categoryCollection = new Collection([
-//            (new CategoryRelation())->setCategoryId(1)->setEventId(2)
-//        ]);
-//
-//        $this->events['group']->setCategoryCollection($categoryCollection);
-//
-//
-//        $campusCollection = new Collection([
-//            (new CampusRelation())->setEventId(1)->setCampusId(1),
-//        ]);
-//
-//        $this->getEvent('campus')->setCampusCollection($campusCollection);
-
 
         $tests = [];
 
@@ -211,51 +216,51 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         // --------------------------------------------------------------------------
 
         // Staff can create an event for themselves
-        $tests['StaffPersonal'] = $this->generateTest(true, 'staff', 'personal', 'staff', 'staff');
+        $tests['StaffPersonal'] = $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staff');
 
         // Parent can create an event for themselves
-        $tests['ParentPersonal'] = $this->generateTest(true, 'parent', 'personal', 'parent', 'parent');
+        $tests['ParentPersonal'] = $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent');
 
         // Student can create an event for themselves
-        $tests['StudentPersonal'] = $this->generateTest(true, 'student', 'personal', 'student', 'student');
+        $tests['StudentPersonal'] = $this->generateTest(true, 'student', Event::ACCESS_PERSONAL, 'student', 'student');
 
         // Super can create an event for staff member
-        $tests['SuperForStaff'] = $this->generateTest(true, 'super', 'personal', 'super', 'staff');
+        $tests['SuperForStaff'] = $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'staff');
 
         // Super can create an event for a parent
-        $tests['SuperForParent'] = $this->generateTest(true, 'super', 'personal', 'super', 'parent');
+        $tests['SuperForParent'] = $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'parent');
 
         // Super can create an event for a student
-        $tests['SuperForStudent'] = $this->generateTest(true, 'super', 'personal', 'super', 'student');
+        $tests['SuperForStudent'] = $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'student');
 
         // Staff can create an event for another staff member
-        $tests['StaffForStaff'] = $this->generateTest(true, 'staff', 'personal', 'staff', 'staffAlt');
+        $tests['StaffForStaff'] = $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staffAlt');
 
         // Staff can create event for any parent
-        $tests['StaffForParent'] = $this->generateTest(true, 'staff', 'personal', 'staff', 'parent');
+        $tests['StaffForParent'] = $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'parent');
 
         // Staff can create event for any student
-        $tests['StaffForStudent'] = $this->generateTest(true, 'staff', 'personal', 'staff', 'student');
+        $tests['StaffForStudent'] = $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student');
 
         // Parent can create event for their child
-        $tests['ParentForChild'] = $this->generateTest(true, 'parent', 'personal', 'parent', 'parentChild');
+        $tests['ParentForChild'] = $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parentChild');
 
-        // Parent can not create an event for a staff member
+        // Parent cannot create an event for a staff member
         // TODO: currently possible, add test with SA-4032 fix
 
-        // Parent can not create an event for another parent
+        // Parent cannot create an event for another parent
         // TODO: currently possible, add test with SA-4032 fix
 
-        // Parent can not create an event for a student that isn't theirs
+        // Parent cannot create an event for a student that isn't theirs
         // TODO: currently possible, add test with SA-4032 fix
 
-        // Student can not create event for a staff member
+        // Student cannot create event for a staff member
         // TODO: currently possible, add test with SA-4032 fix
 
-        // Student can not create event for a parent
+        // Student cannot create event for a parent
         // TODO: currently possible, add test with SA-4032 fix
 
-        // Student can not create event for another student
+        // Student cannot create event for another student
         // TODO: currently possible, add test with SA-4032 fix
 
 
@@ -264,14 +269,19 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         // --------------------------------------------------------------------------
 
         // Super with no campus permission can create
-        // $tests['SuperCampus'] = $this->generateTest(true, 'super', 'campus', 'super', 'super');
+        $tests['SuperCampus'] = $this->generateTest(true, 'super', Event::ACCESS_CAMPUS, 'super', 'super', [], [1]);
 
         // User with moderate access can create
-        // $tests['ModerateCampus'] = $this->generateTest(true, 'campusModerate', 'campus', 'campusModerate', 'campusModerate');
+        $tests['ModerateCampus'] = $this->generateTest(true, 'campusModerate', Event::ACCESS_CAMPUS, 'campusModerate', 'campusModerate', [], [1]);
 
         // User with write access can create
+        $tests['WriteCampus'] = $this->generateTest(true, 'campusWrite', Event::ACCESS_CAMPUS, 'campusWrite', 'campusWrite', [], [1]);
 
         // User with read access cannot create
+        $tests['ReadCampus'] = $this->generateTest(false, 'campusRead', Event::ACCESS_CAMPUS, 'campusRead', 'campusRead', [], [1]);
+
+        // User with no access cannot create
+        $tests['NoCampus'] = $this->generateTest(false, 'campusNone', Event::ACCESS_CAMPUS, 'campusNone', 'campusNone', [], [1]);
 
 
         // --------------------------------------------------------------------------
@@ -279,13 +289,10 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         // --------------------------------------------------------------------------
 
         // Super with no permissions to group can create
-        // $tests['SuperGroup'] = $this->generateTest(true, 'super', 'group', 'super', 'super');
 
         // Super with read access to group can create
-        // $tests['SuperGroupRead'] = $this->generateTest(true, 'superRead', 'group', 'superRead', 'superRead');
 
         // User with write access to group can create
-        // $tests['GroupWrite'] = $this->generateTest(true, 'write', 'group', 'write', 'write');
 
         // User with read access to group cannot create
 
@@ -297,14 +304,19 @@ class AccessTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Tests for checkExisting()
+     * Because checkExisting is a shim on checkDestination - these tests will not repeat the checks above, they will
+     * just make sure that permission checks run fine with this (working with an event object)
+     *
      * @return array
      */
-    public function dataCheckDestination()
+    public function dataCheckExisting()
     {
         $tests = [];
 
         return $tests;
     }
+
 
     /**
      * @dataProvider dataCheckExisting
