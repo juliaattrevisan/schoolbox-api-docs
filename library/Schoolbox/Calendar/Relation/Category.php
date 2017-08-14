@@ -61,10 +61,12 @@ class Category
      * Set category id
      *
      * @param int $categoryId
+     * @return $this
      */
     public function setCategoryId($categoryId)
     {
         $this->categoryId = $categoryId;
+        return $this;
     }
 
     /**
