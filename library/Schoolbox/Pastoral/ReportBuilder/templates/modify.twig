@@ -146,37 +146,32 @@
             messages: {
                 'types[]': 'You must select at least one record type to show in the report',
                 'years[]': 'You must select at least one year level to show in the report'
-            }
-        });
+            },
+            submitHandler: function(form) {
+                {# Prior to submitting the form we need to set the hidden `order` #}
+                var order = '';
 
-        {# Prior to submitting the form we need to set the hidden `order` #}
+                {# Iterate each item in the sort order drag-drop sortable #}
+                $('#sort-order').children('li').each(function () {
 
-        $('[data-submit]').click(function () {
+                    {# Add the current column to a CSV string #}
 
-            var order = '';
+                    if (order !== '') {
+                        order += ',';
+                    }
 
-            {# Iterate each item in the sort order drag-drop sortable #}
+                    order += $(this).data('order');
+                });
 
-            $('#sort-order').children('li').each(function () {
-
-                {# Add the current column to a CSV string #}
-
-                if (order !== '') {
-                    order += ',';
+                {# Just in case something has gone wrong and there was no order- we set the default #}
+                if (order === '') {
+                    order = 'student,date,category,author,points,year,severity';
                 }
 
-                order += $(this).data('order');
-            });
-
-            {# Just in case something has gone wrong and there was no order- we set the default #}
-
-            if (order === '') {
-                order = 'student,date,category,author,points,year,severity';
+                $('#order').val(order);
+                form.submit();
             }
-
-            $('#order').val(order);
         });
-
     });
 
 </script>
