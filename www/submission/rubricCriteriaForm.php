@@ -12,7 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 
-require_once('../../library/Bootstrap.php');
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 // this is a script and not to be SitePage'd
 if(isset($this)) {
@@ -49,6 +49,7 @@ foreach($criteria as $group) {
     }
 }
 
+/* @var $criterionMapper CriterionMapper */
 $criterionMapper = CriterionMapper::getInstance();
 
 
@@ -73,8 +74,6 @@ foreach($criterionCollection as $crit) {
     }
 }
 
-
-/* @var $criterionMapper CriteriaMapper */
 
 // iterate through list of provided criteria changes
 foreach($data as $critID => $critData) {
@@ -105,8 +104,7 @@ foreach($data as $critID => $critData) {
 }
 
 
-if ($page->detectAjax()) {
+if ($page::detectAjax()) {
     die('Criteria updated.');
-} else {
-    $page->backToTheFuture(2);
 }
+$page::localRedir('/homepage/' . $catID);
