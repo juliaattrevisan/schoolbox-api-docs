@@ -693,6 +693,10 @@ class Mapper extends BaseMapper
             }
         }
 
+        if ($orderSql != '') {
+            $orderSql = ' ORDER BY ' . $orderSql;
+        }
+
         // If filtering on involvement, only show records the logged in user is involved with via audience/role/ownership
 
         if ($involved || !$this->getSessionUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0)
@@ -726,7 +730,7 @@ class Mapper extends BaseMapper
 
         // Execute SQL
 
-        $statement = $this->getDatabase()->prepare($this->getSelectString() . "{$criteriaSql} ORDER BY {$orderSql}");
+        $statement = $this->getDatabase()->prepare($this->getSelectString() . "{$criteriaSql} {$orderSql}");
         $statement->execute($this->bindings);
 
         // Hydrate records for return
