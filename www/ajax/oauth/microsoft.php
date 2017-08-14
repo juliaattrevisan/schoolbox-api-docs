@@ -32,11 +32,13 @@ $clientSecret = $conf->get('office365_secret');
 $clientName   = $conf->get('office365_tenant');
 /* /CONF */
 
+$urlArray = parse_url($_SERVER['SCRIPT_URI']);
+$url = $urlArray['scheme'].'://'.$urlArray['host'].$urlArray['path'];
 
 $provider = new Alaress\OAuth2\Client\Provider\Office365([
     'clientId'      => $clientId,
     'clientSecret'  => $clientSecret,
-    'redirectUri'   => $_SERVER['SCRIPT_URI'], // TODO check this will be reliable
+    'redirectUri'   => $url,
     'scopes'        => [ 'MyFiles.Read' ],
 ]);
 
