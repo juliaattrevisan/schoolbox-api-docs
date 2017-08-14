@@ -195,7 +195,7 @@
                     <div class="small-12 columns">
                         <label for="name">
                             Report Name
-                            <input id="name" name="name" value="{{ report.name }}"/>
+                            <input id="name" type="text" name="name" value="{{ report.name }}"/>
                         </label>
                         <div class="checklist">
                             <input id="dashboard" name="dashboard" value="1" type="checkbox" {% if report.dashboard %}checked{% endif %}>
@@ -213,13 +213,11 @@
                     <div class="small-12 columns">
                         <label>
                             Filter By Student
-                            <!--suppress HtmlUnknownAttribute -->
-                            <select id="filterStudents" name="students[]" multiple placeholder="Select Students"></select>
+                            <select id="filterStudents" name="students[]" multiple data-placeholder="Select Students"></select>
                         </label>
                         <label>
                             Filter By Author
-                            <!--suppress HtmlUnknownAttribute -->
-                            <select id="filterAuthors" name="authors[]" multiple placeholder="Select Authors"></select>
+                            <select id="filterAuthors" name="authors[]" multiple data-placeholder="Select Authors"></select>
                         </label>
                         {% if severities | length %}
                             <label>
@@ -238,22 +236,21 @@
                     <div class="small-12 large-6 columns">
                         <label for="datetime_after">
                             Published On Or After
-                            <input name="after" id="datetime_after" maxlength="50" value="{{ report.afterDate.usingFormat('d/m/Y') }}"
+                            <input type="text" name="after" id="datetime_after" maxlength="50" value="{{ report.afterDate.usingFormat('d/m/Y') }}"
                                    data-datepicker data-datesync-enddate="#datetime_before"/>
                         </label>
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="item_datetime_published">
                             Published On Or Before
-                            <input name="before" id="datetime_before" maxlength="50" value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
+                            <input type="text" name="before" id="datetime_before" maxlength="50" value="{{ report.beforeDate.usingFormat('d/m/Y') }}"
                                    data-datepicker data-datesync-startdate="#datetime_after"/>
                         </label>
                     </div>
                     <div class="small-12 columns">
                         <label for="item_datetime_published">
                             Filter By Tags
-                            <!--suppress HtmlUnknownAttribute -->
-                            <select id="filterTags" name="tags[]" multiple placeholder="Select Tags"></select>
+                            <select id="filterTags" name="tags[]" multiple data-placeholder="Select Tags"></select>
                         </label>
                     </div>
                 </fieldset>
