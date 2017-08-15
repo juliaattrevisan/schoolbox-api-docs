@@ -119,7 +119,7 @@
          * Set up actions to occur when Publishing Feedback, or Continuing without Publishing
          */
         function setupActions() {
-            $(config.assessmentList).on('click', '[data-draft="publish"], [data-draft="continue"]', function (e) {
+            $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
                 var $thisButton  = $(this),
