@@ -7,4 +7,4 @@ COMMENT='Table is ascii on purpose, route data is always ascii.';
 ALTER TABLE `msg_redirect`
   ADD INDEX (`from`),
   ADD INDEX (`to`),
-  ADD INDEX (`from`, `to`);
+  ADD UNIQUE INDEX (`from`, `to`);
