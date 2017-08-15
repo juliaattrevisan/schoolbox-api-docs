@@ -248,7 +248,7 @@ class Mapper extends BaseMapper
 
         // If the user is not in the audience- and is not the owner, they can't see the record
 
-        $inAudience = $this->isUserInPastoralService();
+        $inAudience = $this->isUserInPastoralService($this->getSessionUser());
 
         if (!$inAudience) {
             /** @var Access $access */
@@ -710,7 +710,7 @@ class Mapper extends BaseMapper
 
         // If filtering on involvement, only show records the logged in user is involved with via audience/role/ownership
 
-        if ($involved || !$this->isUserInPastoralService()) {
+        if ($involved || !$this->isUserInPastoralService($this->getSessionUser())) {
             $this->filters[] = "
                 (
                     (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = {$user->getRole()->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
@@ -785,15 +785,13 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Does the current user have access to the pastoral service?
+     * Does the given user have access to the pastoral service?
      *
+     * @param User $user
      * @return bool
      */
-    private function isUserInPastoralService()
+    private function isUserInPastoralService(User $user)
     {
-        return $this->getSessionUser()->getAccessList()->filterBy(
-            'service',
-            UserAccess::SERVICE_PASTORAL
-        )->count() > 0;
+        return $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
     }
 }
