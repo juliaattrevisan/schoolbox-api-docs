@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Component\Dashboard;
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use \Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -30,6 +31,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
      * @var IAssessable[]|Collection
      */
     private $upcomingAssessments;
+
 
     /**
      * The maximum number of items to show
@@ -105,6 +107,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
             [
                 'assessments' => $this->upcomingAssessments,
                 'limit'       => $this->limit,
+                'returnUrl'   => Redirect::queryString('/')
             ]
         );
     }

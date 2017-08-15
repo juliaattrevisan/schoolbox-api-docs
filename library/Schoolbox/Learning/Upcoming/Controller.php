@@ -13,6 +13,7 @@ use External_ClassInterface;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Permission\Access\Access;
@@ -198,6 +199,8 @@ class Controller extends Base
         // TODO Populate $_SESSION[children] properly
         $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
 
+        $returnUrl = Redirect::queryString($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', ['id' => $student->getId()]));
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningUpcoming/upcoming.twig',
@@ -209,6 +212,7 @@ class Controller extends Base
                     'currentTerm'  => $term,
                     'children'     => $children,
                     'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
+                    'returnUrl'    => $returnUrl
                 ]
             )->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯
