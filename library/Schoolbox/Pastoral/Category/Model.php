@@ -26,7 +26,7 @@ class Model implements ISoftDeletable, JsonSerializable
     private $name;
 
     /**
-     * Optional. Can be null.
+     * Optional. Null if not linked to SIS
      *
      * @var null|string
      */
@@ -77,7 +77,7 @@ class Model implements ISoftDeletable, JsonSerializable
      * @param null|string $externalCode
      * @return $this
      */
-    public function setExternalCode($externalCode)
+    public function setExternalCode($externalCode = null)
     {
         $this->externalCode = $externalCode;
         return $this;
@@ -85,7 +85,7 @@ class Model implements ISoftDeletable, JsonSerializable
 
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getExternalCode()
     {

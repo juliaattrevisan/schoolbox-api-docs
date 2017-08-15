@@ -48,9 +48,8 @@ class Mapper extends BaseMapper
 
         $countRecords = $pastoralRecordMapper->countByPredicates($pb);
         if ($countRecords) {
-            throw new \UnexpectedValueException(
-                sprintf('Cannot delete PastoralCategory Model. %d non-deleted pastoral records still linked', $countRecords)
-            );
+            $message = 'Cannot delete PastoralCategory Model. %d non-deleted pastoral records still linked';
+            throw new \UnexpectedValueException(sprintf($message, $countRecords));
         }
         return true;
     }
