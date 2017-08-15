@@ -149,26 +149,17 @@
             },
             submitHandler: function(form) {
                 {# Prior to submitting the form we need to set the hidden `order` #}
-                var order = '';
-
-                {# Iterate each item in the sort order drag-drop sortable #}
-                $('#sort-order').children('li').each(function () {
-
-                    {# Add the current column to a CSV string #}
-
-                    if (order !== '') {
-                        order += ',';
-                    }
-
-                    order += $(this).data('order');
-                });
+                var order = $.makeArray(
+                    $('#sort-order').children('li')
+                        .map(function () { return $(this).data('order'); })
+                );
 
                 {# Just in case something has gone wrong and there was no order- we set the default #}
-                if (order === '') {
-                    order = 'student,date,category,author,points,year,severity';
+                if (order.length === 0) {
+                    order = ['student', 'date', 'category', 'author', 'points', 'year', 'severity'];
                 }
 
-                $('#order').val(order);
+                $('#order').val(order.join(','));
                 form.submit();
             }
         });
