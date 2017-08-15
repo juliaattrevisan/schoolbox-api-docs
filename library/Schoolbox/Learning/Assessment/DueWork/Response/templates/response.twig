@@ -40,7 +40,11 @@ Usage:
 
 <script type="text/javascript">
     $(function() {
-        var nextUrl = findNext(tgt);
+        var nextHref = findNext(tgt);
+        var nextUrl  = nextHref.data('value') !== undefined
+            ? nextHref.data('value')
+            : '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}';
+        $('a[data-draft="continue"]').attr('href', nextUrl);
 
         {% if not readonly %}
         $.fn.dynamicFeedback({
@@ -51,12 +55,7 @@ Usage:
             publishText: 'Publish And Continue',
 
             onPublishCallback: function() {
-                {# Go to next available person in the carousel
-                 # If there is nobody, just visit Status screen
-                 #}
-                window.location.href = nextUrl.data('value') !== undefined
-                    ? nextUrl.data('value')
-                    : '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}';
+                window.location.href = nextUrl;
             }
         });
         {% endif %}
@@ -99,12 +98,7 @@ Usage:
                          #}
                         var destination;
                         if ($('#response-selector').find('option').length < 2) {
-                            if (nextUrl.data('value') !== undefined) {
-                                destination = nextUrl.data('value');
-                            }
-                            else {
-                                destination = '{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) }}'
-                            }
+                            destination = nextUrl;
                         }
                         else {
                             {# Reload summary screen to find what is now the most
@@ -338,7 +332,7 @@ Usage:
                         {% set buttons %}
                             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
                             {% if not readonly %}
-                                <a class="button" data-draft="continue" >Continue</a>
+                                <a class="button" data-draft="continue">Continue</a>
                                 <a class="button"
                                    data-draft="publish"
                                    {% if isPublishedFeedback %}style="display:none;"{% endif %}
