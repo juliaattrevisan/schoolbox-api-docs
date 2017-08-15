@@ -11,6 +11,7 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\Event\Access;
 use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\Access as FolderAccess;
 
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
@@ -19,7 +20,7 @@ $calendarHandler = new Calendar();
 $page            = new SitePage();
 $userMapper      = new UserMapper();
 $eventMapper     = new EventMapper();
-$eventAccess     = new Access();
+$eventAccess     = new Access(new FolderAccess());
 
 switch ($_REQUEST['action']) {
     case 'Add':

@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access as EventAccess;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\Access as FolderAccess;
 
 class AccessTest extends \PHPUnit_Framework_TestCase
 {
@@ -349,7 +350,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckExisting($expected, User $effector, Event $event)
     {
-        $access = new EventAccess();
+        $access = new EventAccess(new FolderAccess());
         $actual = $access->checkExisting($effector, $event);
         $this->assertEquals($expected, $actual);
     }
@@ -367,7 +368,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckDestination($expected, User $effector, $accessLevel, User $author, User $owner, array $groups = [], array $campuses = [])
     {
-        $access = new EventAccess();
+        $access = new EventAccess(new FolderAccess());
         $actual = $access->checkDestination($effector, $accessLevel, $author, $owner, $groups, $campuses);
         $this->assertEquals($expected, $actual);
     }

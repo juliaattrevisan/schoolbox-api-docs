@@ -6,6 +6,8 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;
 use Calendar\Event\Type\Day\Renderer\Javascript;
+use Schoolbox\Permission\Access\Access as FolderAccess;
+
 /**
  * ${NAME}
  *
@@ -57,7 +59,7 @@ if ($_POST['allDay']) {
 
 /* Check user has permission to create this event
  */
-$eventAccess = new Access();
+$eventAccess = new Access(new FolderAccess());
 if ($eventAccess->checkDestination($user, Event::ACCESS_PERSONAL, $user, $owner) == false) {
     error(35);
 }

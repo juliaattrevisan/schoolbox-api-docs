@@ -51,7 +51,7 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Check user has permission to modify this event
      */
-    $eventAccess = new Access();
+    $eventAccess = new Access(new FolderAccess());
 
     if ($eventAccess->checkExisting($selectedUser, $event) == false) {
         error(34);

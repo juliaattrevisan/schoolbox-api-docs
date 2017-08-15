@@ -18,6 +18,17 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Access
 {
+    /** @var FolderAccess $folderAccess */
+    private $folderAccess;
+
+    /**
+     * Access constructor.
+     * @param FolderAccess $folderAccess
+     */
+    public function __construct(FolderAccess $folderAccess)
+    {
+        $this->setFolderAccess($folderAccess);
+    }
 
     /**
      * Takes an existing event object, and uses checkDestination below to check access for a given user
@@ -52,7 +63,6 @@ class Access
         );
     }
 
-
     /**
      * Checks if a given user has permission to write or modify an event
      *
@@ -64,8 +74,14 @@ class Access
      * @param int[] $campuses
      * @return bool
      */
-    public function checkDestination(User $effector, $accessLevel, User $author, User $owner, array $groups = [], array $campuses = [])
-    {
+    public function checkDestination(
+        User $effector,
+        $accessLevel,
+        User $author,
+        User $owner,
+        array $groups = [],
+        array $campuses = []
+    ) {
         // Superuser passes immediately
         if ($effector->isSuperuser()) {
             return true;
@@ -108,13 +124,31 @@ class Access
                 $groupIds[] = $groupId;
             }
 
-            if (FolderAccess::getInstance()->getMinFolderAccess($effector, $groupIds) >= UserAccess::ACCESS_WRITE) {
+            if ($this->getFolderAccess()->getMinFolderAccess($effector, $groupIds) >= UserAccess::ACCESS_WRITE) {
                 return true;
             }
         }
 
         // User didn't pass any of the checks, deny!
         return false;
+    }
+
+    /**
+     * @return FolderAccess
+     */
+    private function getFolderAccess()
+    {
+        return $this->folderAccess;
+    }
+
+    /**
+     * @param $folderAccess
+     * @return $this
+     */
+    private function setFolderAccess($folderAccess)
+    {
+        $this->folderAccess = $folderAccess;
+        return $this;
     }
 
 }
