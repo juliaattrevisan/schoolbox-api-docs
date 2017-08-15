@@ -15,32 +15,48 @@ class Model {
     use Id;
     use CreatedAtDate;
 
-    /** @var int */
-    protected $importId;
-
-    /** @var int */
-    protected $pastoralId;
-
-    /** @var int */
-    protected $userId;
-
-    /** @var string */
-    protected $studentName;
-
-    /** @var string */
-    protected $creatorName;
-
-    /** @var string */
-    protected $heading;
-
-    /** @var string */
-    protected $result;
+    /**
+     * Intentionally allows null to represent import failures, eg result = 'ERROR'
+     *
+     * @var null|int
+     * @todo Consider normalising table into 'pastoral_import' + 'pastoral_import_log'
+     */
+    private $importId;
 
     /**
-     * @param string $heading
+     * Intentionally allows null for items not associated with a pastoral record, eg 'start of import'
+     *
+     * @var null|int
+     * @todo Consider normalising table into 'pastoral_import' + 'pastoral_import_log' so this isn't required.
+     */
+    private $pastoralId;
+
+    /**
+     * Intentionally permits nulls, eg when an import fails
+     *
+     * @var null|int
+     */
+    private $userId;
+
+    /**
+     * @var null|string
+     */
+    private $studentName;
+
+    /** @var null|string */
+    private $creatorName;
+
+    /** @var null|string */
+    private $heading;
+
+    /** @var string */
+    private $result;
+
+    /**
+     * @param null|string $heading
      * @return self
      */
-    public function setHeading($heading) {
+    public function setHeading($heading = null) {
         $this->heading = $heading;
         return $this;
     }
@@ -123,10 +139,11 @@ class Model {
     }
 
     /**
-     * @param int $pastoralId
-     * @return self
+     * @param null|int $pastoralId
+     * @return $this
      */
-    public function setPastoralId($pastoralId) {
+    public function setPastoralId($pastoralId = null)
+    {
         $this->pastoralId = $pastoralId;
         return $this;
     }

@@ -12,6 +12,9 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
