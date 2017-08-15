@@ -8,7 +8,6 @@
 namespace Schoolbox\Pastoral\Attachment;
 
 use PDOStatement;
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
@@ -17,6 +16,10 @@ use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -31,8 +34,7 @@ class Mapper extends BaseMapper
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -42,18 +44,16 @@ class Mapper extends BaseMapper
     {
         $storageMapper = $this->getJoinMapper('storage');
 
-        $sql = "
+        return "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('pastoral', 'p')},
                         {$this->getJoinColumnString('storage', 's')},
-				        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
+                        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
             FROM        {$this->getTable()} 
-            LEFT JOIN   {$this->getJoinSql('storage', '', 's')}
-            LEFT JOIN   {$this->getJoinSql('pastoral', '', 'p')}
-			LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime', true)}
+            INNER JOIN  {$this->getJoinSql('pastoral', '', 'p', true)}
+            INNER JOIN  {$this->getJoinSql('storage', '', 's', true)}
+            LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime')}
         ";
-
-        return $sql;
     }
 
     /**
@@ -63,14 +63,13 @@ class Mapper extends BaseMapper
     {
         // Return attachments fully hydrated by default
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         /** @var MimetypeMapper $mimeMapper */
         $mimeMapper = $this->getJoinMapper('storage')->getJoinMapper('allowedFileExtension');
 
         foreach ($statement as $row) {
 
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var Pastoral $pastoral */
@@ -78,8 +77,6 @@ class Mapper extends BaseMapper
             $model->setPastoral($pastoral);
 
             // Hydrate storage object
-
-            if (!empty($row['hash'])) {
 
                 /** @var Storage $storage */
                 $storage = $this->hydrateJoin($row, 'storage', 's');
@@ -94,7 +91,6 @@ class Mapper extends BaseMapper
                 }
 
                 $model->setStorage($storage);
-            }
 
             $collection->add($model);
         }
