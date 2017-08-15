@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Pastoral;
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
@@ -15,27 +16,25 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
 use Schoolbox\Pastoral\Access\Model as Access;
+use Schoolbox\Pastoral\Attachment\Mapper as AttachmentMapper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
+use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
+use Schoolbox\Pastoral\Category\Model as Category;
+use Schoolbox\Pastoral\Comment\Mapper as CommentMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
+use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
+use Schoolbox\Pastoral\Severity\Model as Severity;
+use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
+use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
+use Schoolbox\Pastoral\Type\Model as Type;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
-use Schoolbox\Pastoral\Type\Model as Type;
-use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
-use Schoolbox\Pastoral\Category\Model as Category;
-use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
-use Schoolbox\Pastoral\Severity\Model as Severity;
-use Schoolbox\Pastoral\Comment\Mapper as CommentMapper;
-use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
-use Schoolbox\Pastoral\Attachment\Mapper as AttachmentMapper;
-use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
 
 class Mapper extends BaseMapper
 {
@@ -73,32 +72,32 @@ class Mapper extends BaseMapper
 
         $this->hasJoin(
             'access',
-            array(
-                'mapper' => AccessMapper::class,
+            [
+                'mapper'    => AccessMapper::class,
                 'other_key' => 'pastoral_id',
-                'this_key' => 'id',
-                'multiple' => true,
-            )
+                'this_key'  => 'id',
+                'multiple'  => true,
+            ]
         );
 
         $this->hasJoin(
             'comments',
-            array(
-                'mapper' => CommentMapper::class,
+            [
+                'mapper'    => CommentMapper::class,
                 'other_key' => 'pastoral_id',
-                'this_key' => 'id',
-                'multiple' => true,
-            )
+                'this_key'  => 'id',
+                'multiple'  => true,
+            ]
         );
 
         $this->hasJoin(
             'attachments',
-            array(
-                'mapper' => AttachmentMapper::class,
+            [
+                'mapper'    => AttachmentMapper::class,
                 'other_key' => 'pastoral_id',
-                'this_key' => 'id',
-                'multiple' => true,
-            )
+                'this_key'  => 'id',
+                'multiple'  => true,
+            ]
         );
 
 
@@ -111,7 +110,8 @@ class Mapper extends BaseMapper
      *
      * @param Model $model
      */
-    public function deleteReferences(Model $model) {
+    public function deleteReferences(Model $model)
+    {
 
         // Delete comments from record
 
@@ -151,7 +151,7 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return
-        "
+            "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('student', 's')},
                         {$this->getJoinColumnString('severity', 'sv')},
@@ -181,7 +181,7 @@ class Mapper extends BaseMapper
      * Hydrate the record. This exists to prevent recursion when hydrating related records.
      *
      * @param PDOStatement $statement
-     * @param bool $hydrateRelatedRecords
+     * @param bool         $hydrateRelatedRecords
      * @return Collection
      */
     protected function hydrateSelectInternal(PDOStatement $statement, $hydrateRelatedRecords = true)
@@ -208,7 +208,8 @@ class Mapper extends BaseMapper
      * @param $hydrateRelatedRecords
      * @return Model|bool
      */
-    protected function hydrateRow($row, $hydrateRelatedRecords) {
+    protected function hydrateRow($row, $hydrateRelatedRecords)
+    {
 
         // This method gets called before checking authorization- so if the session timed out this might be blank
 
@@ -247,7 +248,8 @@ class Mapper extends BaseMapper
 
         // If the user is not in the audience- and is not the owner, they can't see the record
 
-        $inAudience = $this->getSessionUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
+        $inAudience = $this->getSessionUser()->getAccessList()->filterBy('service',
+                UserAccess::SERVICE_PASTORAL)->count() > 0;
 
         if (!$inAudience) {
             /** @var Access $access */
@@ -381,7 +383,7 @@ class Mapper extends BaseMapper
             ':student_id_1' => $student->getId(),
             ':student_id_2' => $student->getId(),
             ':student_id_3' => $student->getId(),
-            ':student_id_4' => $student->getId()
+            ':student_id_4' => $student->getId(),
         ]);
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -396,15 +398,15 @@ class Mapper extends BaseMapper
     public function findRecentDashboard($count = 5)
     {
         $records = $this->findByColumnList([
-            'sv.dashboard' => 1
+            'sv.dashboard' => 1,
         ], [
             'limit' => $count,
-            ['order' => ['created_at' => 'DESC']]
+            ['order' => ['created_at' => 'DESC']],
         ]);
 
         $displayed = new Collection();
 
-        /** @var Model$record */
+        /** @var Model $record */
         foreach ($records as $record) {
             if ($record->getOwner()->getId() == $this->getSessionUser()->getId()) {
                 $displayed->add($record);;
@@ -454,8 +456,8 @@ class Mapper extends BaseMapper
     /**
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
-     * @param User $student
-     * @param User $linkedStudent
+     * @param User     $student
+     * @param User     $linkedStudent
      * @param int|null $typeId
      * @return Collection
      */
@@ -507,7 +509,7 @@ class Mapper extends BaseMapper
 
         // Keep an audit trail of searches
         $pastoralAuditMapper = PastoralAuditMapper::getInstance();
-        $auditRecord         = $pastoralAuditMapper->createModel();
+        $auditRecord = $pastoralAuditMapper->createModel();
         $auditRecord->setUser($this->getSessionUser());
         $auditRecord->setSearch($search);
 
@@ -538,9 +540,9 @@ class Mapper extends BaseMapper
             $commentBodyClause = implode(' OR ', $pbCommentSearch->getWhere());
 
             // Ensure comment is not deleted
-            $commentDeleteClause  = $this->getPredicateBuilder()
-                                         ->isNull('pastoral_comment.deleted_at')
-                                         ->getWhere()[0];
+            $commentDeleteClause = $this->getPredicateBuilder()
+                                        ->isNull('pastoral_comment.deleted_at')
+                                        ->getWhere()[0];
 
 
             $sql = $this->getSelectString() . "
@@ -584,7 +586,8 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @var int $placeholderIndex This is a static placeholder used to make sure parameters in report filters are given unique names
+     * @var int $placeholderIndex This is a static placeholder used to make sure parameters in report filters are given
+     *      unique names
      */
     private static $placeholderIndex = 0;
 
@@ -592,7 +595,7 @@ class Mapper extends BaseMapper
      * Ugly helper function to create report SQL condition
      *
      * @param Collection $collection
-     * @param string $field
+     * @param string     $field
      */
     private function addFilter(Collection $collection, $field)
     {
@@ -606,8 +609,7 @@ class Mapper extends BaseMapper
             }
         }
 
-        if (count($ids) > 0)
-        {
+        if (count($ids) > 0) {
             $pbArray = PredicateBuilder::getArrayBindings(
                 $ids,
                 str_replace(".", "", str_replace("`", "", str_replace("_", "", $field))) . self::$placeholderIndex
@@ -623,17 +625,17 @@ class Mapper extends BaseMapper
     /**
      * This is the function that gets the report results out of the database
      *
-     * @param User $user
+     * @param User                $user
      * @param Alaress_Date_Format $before_date
      * @param Alaress_Date_Format $after_date
-     * @param Severity $severity
-     * @param Collection $types
-     * @param Collection $authors
-     * @param Collection $students
-     * @param Collection $tags
-     * @param Collection $order
-     * @param bool $involved
-     * @param Collection $years
+     * @param Severity            $severity
+     * @param Collection          $types
+     * @param Collection          $authors
+     * @param Collection          $students
+     * @param Collection          $tags
+     * @param Collection          $order
+     * @param bool                $involved
+     * @param Collection          $years
      *
      * @return Collection
      */
@@ -677,16 +679,29 @@ class Mapper extends BaseMapper
         $this->addFilter($authors, '`owner_id`');
 
         $orderParts = [];
-        foreach ($order as $orderCurrent)
-        {
+        foreach ($order as $orderCurrent) {
             switch ($orderCurrent) {
-                case 'student':     $orderParts[] = "`s`.lastname, `s`.firstname"; break;
-                case 'severity':    $orderParts[] = "`sv`.order"; break;
-                case 'date':        $orderParts[] = "`pastoral`.created_at"; break;
-                case 'category':    $orderParts[] = "`c`.name"; break;
-                case 'points':      $orderParts[] = "`pastoral`.points"; break;
-                case 'year':        $orderParts[] = "`s`.year"; break;
-                case 'author':      $orderParts[] = "`o`.lastname, `o`.firstname"; break;
+                case 'student':
+                    $orderParts[] = "`s`.lastname, `s`.firstname";
+                    break;
+                case 'severity':
+                    $orderParts[] = "`sv`.order";
+                    break;
+                case 'date':
+                    $orderParts[] = "`pastoral`.created_at";
+                    break;
+                case 'category':
+                    $orderParts[] = "`c`.name";
+                    break;
+                case 'points':
+                    $orderParts[] = "`pastoral`.points";
+                    break;
+                case 'year':
+                    $orderParts[] = "`s`.year";
+                    break;
+                case 'author':
+                    $orderParts[] = "`o`.lastname, `o`.firstname";
+                    break;
             }
         }
 
@@ -696,8 +711,8 @@ class Mapper extends BaseMapper
 
         // If filtering on involvement, only show records the logged in user is involved with via audience/role/ownership
 
-        if ($involved || !$this->getSessionUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0)
-        {
+        if ($involved || !$this->getSessionUser()->getAccessList()->filterBy('service',
+                UserAccess::SERVICE_PASTORAL)->count() > 0) {
             $this->filters[] = "
                 (
                     (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = {$user->getRole()->getId()} AND `pastoral_id` = `pastoral`.`id`) > 0 OR
