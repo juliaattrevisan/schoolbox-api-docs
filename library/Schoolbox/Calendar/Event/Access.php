@@ -97,7 +97,6 @@ class Access
         // If the event is on a campus level, check if this user is a calendar moderator for one of the campuses
         // selected
         if ($accessLevel == Event::ACCESS_CAMPUS) {
-
             // Get list of calendar permissions the effector has
             $accessList = $effector->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
 

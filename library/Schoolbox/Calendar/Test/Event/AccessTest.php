@@ -93,7 +93,6 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     private function getEvent($key)
     {
         if (empty($this->events)) {
-
             $categoryCollection = new Collection([
                 (new CategoryRelation())->setCategoryId(1)->setEventId(2)
             ]);
@@ -103,9 +102,19 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             ]);
 
             $this->events = [
-                'personal' => (new Event)->setId(1)->setAccess(Event::ACCESS_PERSONAL),
-                'group' => (new Event)->setId(2)->setAccess(Event::ACCESS_GROUP)->setCategoryCollection($categoryCollection),
-                'campus' => (new Event)->setId(3)->setAccess(Event::ACCESS_CAMPUS)->setCampusCollection($campusCollection),
+                'personal' => (new Event)
+                    ->setId(1)
+                    ->setAccess(Event::ACCESS_PERSONAL),
+
+                'group' => (new Event)
+                    ->setId(2)
+                    ->setAccess(Event::ACCESS_GROUP)
+                    ->setCategoryCollection($categoryCollection),
+
+                'campus' => (new Event)
+                    ->setId(3)
+                    ->setAccess(Event::ACCESS_CAMPUS)
+                    ->setCampusCollection($campusCollection),
             ];
         }
 
@@ -214,8 +223,15 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      * @param int[] $campuses
      * @return array
      */
-    private function generateTest($result, $effectorKey, $accessLevel, $authorKey, $ownerKey, $groups = [], $campuses = [])
-    {
+    private function generateTest(
+        $result,
+        $effectorKey,
+        $accessLevel,
+        $authorKey,
+        $ownerKey,
+        $groups = [],
+        $campuses = []
+    ) {
         return [
             $result,
             $this->getUser($effectorKey),
@@ -328,16 +344,48 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             'SuperCampus' => $this->generateTest(true, 'super', Event::ACCESS_CAMPUS, 'super', 'super', [], [1]),
 
             // User with moderate access can create
-            'ModerateCampus' => $this->generateTest(true, 'campusModerate', Event::ACCESS_CAMPUS, 'campusModerate', 'campusModerate', [], [1]),
+            'ModerateCampus' => $this->generateTest(
+                true,
+                'campusModerate',
+                Event::ACCESS_CAMPUS,
+                'campusModerate',
+                'campusModerate',
+                [],
+                [1]
+            ),
 
             // User with write access can create
-            'WriteCampus' => $this->generateTest(true, 'campusWrite', Event::ACCESS_CAMPUS, 'campusWrite', 'campusWrite', [], [1]),
+            'WriteCampus' => $this->generateTest(
+                true,
+                'campusWrite',
+                Event::ACCESS_CAMPUS,
+                'campusWrite',
+                'campusWrite',
+                [],
+                [1]
+            ),
 
             // User with read access cannot create
-            'ReadCampus' => $this->generateTest(false, 'campusRead', Event::ACCESS_CAMPUS, 'campusRead', 'campusRead', [], [1]),
+            'ReadCampus' => $this->generateTest(
+                false,
+                'campusRead',
+                Event::ACCESS_CAMPUS,
+                'campusRead',
+                'campusRead',
+                [],
+                [1]
+            ),
 
             // User with no access cannot create
-            'NoCampus' => $this->generateTest(false, 'campusNone', Event::ACCESS_CAMPUS, 'campusNone', 'campusNone', [], [1]),
+            'NoCampus' => $this->generateTest(
+                false,
+                'campusNone',
+                Event::ACCESS_CAMPUS,
+                'campusNone',
+                'campusNone',
+                [],
+                [1]
+            ),
 
 
             // --------------------------------------------------------------------------
@@ -348,13 +396,34 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             'SuperGroup' => $this->generateTest(true, 'super', Event::ACCESS_GROUP, 'super', 'super', [1]),
 
             // Super with read access to group can create
-            'SuperReadGroup' => $this->generateTest(true, 'groupReadSuper', Event::ACCESS_GROUP, 'groupReadSuper', 'groupReadSuper', [1]),
+            'SuperReadGroup' => $this->generateTest(
+                true,
+                'groupReadSuper',
+                Event::ACCESS_GROUP,
+                'groupReadSuper',
+                'groupReadSuper',
+                [1]
+            ),
 
             // User with admin access to group can create
-            'AdminGroup' => $this->generateTest(true, 'groupAdmin', Event::ACCESS_GROUP, 'groupAdmin', 'groupAdmin', [1]),
+            'AdminGroup' => $this->generateTest(
+                true,
+                'groupAdmin',
+                Event::ACCESS_GROUP,
+                'groupAdmin',
+                'groupAdmin',
+                [1]
+            ),
 
             // User with write access to group can create
-            'WriteGroup' => $this->generateTest(true, 'groupWrite', Event::ACCESS_GROUP, 'groupWrite', 'groupWrite', [1]),
+            'WriteGroup' => $this->generateTest(
+                true,
+                'groupWrite',
+                Event::ACCESS_GROUP,
+                'groupWrite',
+                'groupWrite',
+                [1]
+            ),
 
             // User with read access to group cannot create
             'ReadGroup' => $this->generateTest(false, 'groupRead', Event::ACCESS_GROUP, 'groupRead', 'groupRead', [1]),
@@ -395,7 +464,13 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             'ExistingCampus' => $this->generateTestExisting(true, 'campusModerate', 'campus', 'staff', 'staff'),
 
             // Campus level event, read access cannot modify campus level event, even if they authored & own
-            'ExistingCampusRead' => $this->generateTestExisting(false, 'campusRead', 'campus', 'campusRead', 'campusRead'),
+            'ExistingCampusRead' => $this->generateTestExisting(
+                false,
+                'campusRead',
+                'campus',
+                'campusRead',
+                'campusRead'
+            ),
 
             // Group level event, write access can modify event not authored or owned by themselves
             'ExistingGroup' => $this->generateTestExisting(true, 'groupWrite', 'group', 'staff', 'staff'),
@@ -414,7 +489,9 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckExisting($expected, User $effector, Event $event)
     {
-        $access = new EventAccess($this->getMockFolderAccess($effector, $event->getCategoryCollection()->getColumnValues('categoryId')));
+        $access = new EventAccess(
+            $this->getMockFolderAccess($effector, $event->getCategoryCollection()->getColumnValues('categoryId'))
+        );
         $actual = $access->checkExisting($effector, $event);
         $this->assertEquals($expected, $actual);
     }
@@ -429,8 +506,15 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      * @param array $groups
      * @param array $campuses
      */
-    public function testCheckDestination($expected, User $effector, $accessLevel, User $author, User $owner, array $groups = [], array $campuses = [])
-    {
+    public function testCheckDestination(
+        $expected,
+        User $effector,
+        $accessLevel,
+        User $author,
+        User $owner,
+        array $groups = [],
+        array $campuses = []
+    ) {
         $access = new EventAccess($this->getMockFolderAccess($effector, $groups));
         $actual = $access->checkDestination($effector, $accessLevel, $author, $owner, $groups, $campuses);
         $this->assertEquals($expected, $actual);
