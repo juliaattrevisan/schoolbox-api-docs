@@ -58,8 +58,8 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
         $page->setVar(
             array(
                 'CONNECTOR_ID'    => $this->getId(),
-                'CONNECTOR_LABEL' => $this->getLabel(),
-                'CONNECTOR_CLASS' => $this->getConnectorClass(),
+                'CONNECTOR_LABEL' => Scrub::text($this->getLabel()),
+                'CONNECTOR_CLASS' => Scrub::text($this->getConnectorClass()),
                 'URL'             => $this->getUrl()
             )
         );
