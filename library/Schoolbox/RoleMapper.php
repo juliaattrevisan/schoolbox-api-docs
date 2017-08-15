@@ -9,7 +9,9 @@
 
 namespace Schoolbox;
 
-
+/**
+ * @method Role hydrate(array $row, $alias = '', $callback = null)
+ */
 class RoleMapper extends Mapper
 {
 
