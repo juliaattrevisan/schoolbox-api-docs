@@ -87,8 +87,6 @@ class External_Schoolpro_User implements External_UserInterface
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
-        new \Alaress_Probe($result);
-
         if ($result['success']) {
         } else {
         }
