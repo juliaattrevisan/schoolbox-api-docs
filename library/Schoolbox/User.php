@@ -1000,6 +1000,7 @@ class User implements JsonSerializable, ISoftDeletable
 
     /**
      * Load teachers into object from external db
+     * @return $this
      */
     public function loadTeachers()
     {
@@ -1043,10 +1044,12 @@ class User implements JsonSerializable, ISoftDeletable
         }
 
         $this->setTeacherCollection($teacherCollection);
+        return $this;
     }
 
     /**
      * Load parents into object from external db
+     * @return User
      */
     public function loadParents()
     {
