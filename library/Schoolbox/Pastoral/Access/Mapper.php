@@ -19,6 +19,9 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -34,8 +37,7 @@ class Mapper extends BaseMapper
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -46,6 +48,10 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
+        /* Intentionally does not join onto soft-deleted strong entities.
+         * eg, If an access is for a User, and user is soft-deleted, the no access model
+         * should be fetched.
+         */
         return "
 			SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('role', 'r')},
@@ -76,7 +82,6 @@ class Mapper extends BaseMapper
                 continue;
             }
 
-            /** @var Model $access */
             $access = $this->hydrate($row);
 
             if (!empty($row['u.id'])) {
