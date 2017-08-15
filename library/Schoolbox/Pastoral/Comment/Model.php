@@ -42,7 +42,8 @@ class Model implements ISoftDeletable {
      * @param Pastoral $pastoral
      * @return self
      */
-    public function setPastoral(Pastoral $pastoral) {
+    public function setPastoral(Pastoral $pastoral)
+    {
         $this->pastoral = $pastoral;
         return $this;
     }
@@ -58,7 +59,8 @@ class Model implements ISoftDeletable {
      * @param null|string $externalCode
      * @return $this
      */
-    public function setExternalCode($externalCode = null) {
+    public function setExternalCode($externalCode = null)
+    {
         $this->externalCode = $externalCode;
         return $this;
     }
@@ -66,9 +68,10 @@ class Model implements ISoftDeletable {
     /**
      * @return null|string
      */
-    public function getExternalCode() {
+    public function getExternalCode()
+    {
         return $this->externalCode;
-    }    
+    }
 
     /**
      * @param string $body

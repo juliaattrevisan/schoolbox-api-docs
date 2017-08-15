@@ -56,7 +56,8 @@ class Model {
      * @param null|string $heading
      * @return self
      */
-    public function setHeading($heading = null) {
+    public function setHeading($heading = null)
+    {
         $this->heading = $heading;
         return $this;
     }
