@@ -18,11 +18,10 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Alt Source Linkup', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'errors'  => E_ALL,
     'fields'  => array_keys($opts),
-    'flags'   => $flags,
 ]);
 
 /** @var IConnector $db */
-$db = $kernel->get('database');
+$db = $kernel->get('databaseInternal');
 
 $accessLevels = [
     UserAccess::ACCESS_READ,
