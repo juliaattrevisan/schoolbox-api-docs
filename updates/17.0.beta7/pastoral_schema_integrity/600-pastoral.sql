@@ -32,12 +32,28 @@ REFERENCES lu_pastoral_type(`id`)
 ALTER TABLE pastoral
   CHANGE COLUMN private _private TINYINT(4) DEFAULT 0 NULL COMMENT 'deprecated in 17.0';
 
+-- Should never be NULL
+UPDATE pastoral
+SET heading = ''
+WHERE heading IS NULL;
+
+ALTER TABLE pastoral
+    CHANGE COLUMN heading heading VARCHAR(255) NOT NULL;
+
+-- Should never be NULL
+UPDATE pastoral
+SET body = ''
+WHERE body IS NULL;
+
+ALTER TABLE pastoral
+  CHANGE COLUMN body body TEXT NOT NULL;
+
 -- Logically should not permit nulls (preserve old default in case it had some semantics)
 UPDATE pastoral
   SET created_at = '0000-00-00 00:00:00'
   WHERE created_at IS NULL;
 ALTER TABLE pastoral
-  CHANGE COLUMN created_at created_at DATETIME NOT NULL AFTER modified_by_user_id;;
+  CHANGE COLUMN created_at created_at DATETIME NOT NULL AFTER modified_by_user_id;
 
 -- Logically should not permit nulls (preserve old default in case it had some semantics)
 UPDATE pastoral
@@ -50,9 +66,22 @@ ALTER TABLE pastoral
 ALTER TABLE pastoral
   CHANGE COLUMN deleted_at deleted_at DATETIME NULL AFTER updated_at;
 
--- Code indicates this can be NULL
+-- Code usages indicates this should permit NULL
 ALTER TABLE pastoral
-  CHANGE COLUMN points points FLOAT NULL AFTER body;
+  CHANGE COLUMN points points FLOAT DEFAULT 0 NULL AFTER body;
+
+-- Must run after the corresponding PHP script to ensure this field is valid
+ALTER TABLE pastoral
+  CHANGE COLUMN modified_by_user_id modified_by_user_id INT(11) UNSIGNED NULL;
+
+ALTER TABLE pastoral
+  ADD CONSTRAINT fk_pastoral_modified_by_user_id
+  FOREIGN KEY (`modified_by_user_id`)
+  REFERENCES user(`id`)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT;
+
+
 
 
 

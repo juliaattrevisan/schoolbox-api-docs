@@ -13,13 +13,16 @@
 use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 
-require_once __DIR__ . '/../../conf/core/require.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Ensure `lu_pastoral_category.pastoral_type_id` referential integrity', [
-    'verbose' => [false, false, false],
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel(
+    'Ensure `lu_pastoral_category`.`pastoral_type_id` referential integrity',
+    [
+        'verbose' => [false, false, false],
+        'errors'  => E_ALL,
+    ]
+);
 
 
 /** @noinspection PhpUnusedParameterInspection */

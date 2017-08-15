@@ -17,7 +17,7 @@ ALTER TABLE lu_pastoral_category
 
 -- This field is deprecated and not mapped
 ALTER TABLE lu_pastoral_category
-    CHANGE external_id _external_id INT(11) NULL COMMENT 'deprecate in 17.0';
+    CHANGE external_id _external_id INT(11) NULL COMMENT 'deprecated in 17.0';
 
 
 

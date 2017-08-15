@@ -12,10 +12,10 @@
 use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 
-require_once __DIR__ . '/../../conf/core/require.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Ensure Pastoral Type referential integrity', [
+$kernel = new Schoolbox\Application\Daemon\Kernel('Ensure `pastoral`.`type` referential integrity', [
     'verbose' => [false, false, false],
     'errors'  => E_ALL,
 ]);
@@ -44,7 +44,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $selectRecordsWithoutType->fetch(PDO::FETCH_ASSOC)) {
-            $log->debug('Pastoral (id: %d), Type (id: %s)', $row['p.id'], $row['p.type_id'] ?: "'null'");
+            $log->debug(sprintf('Pastoral (id: %d), Type (id: %s)', $row['p.id'], $row['p.type_id'] ?: "'null'"));
         }
 
         // Create a new PastoralType

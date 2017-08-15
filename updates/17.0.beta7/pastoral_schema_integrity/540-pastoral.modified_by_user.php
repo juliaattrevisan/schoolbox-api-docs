@@ -6,19 +6,18 @@
  */
 
 /**
- * The pastoral.modified_by_user_id relationship is currently nullable to account for hard-deleted users.
- * This causes problems in the code as it assumes the modifiedBy user always exists.
+ * The pastoral.modified_by_user_id relationship currently lacks referential integrity.
+ * It is optional, where 'null' represents 'imported from SIS'.
  *
- * This script searches for any records linked to missing users, or with no modifiedBy
- * specified at all and [re]assigns modifiedBy to the 'alaress' user.
+ * This script searches for any records linked to missing users and [re]assigns modifiedBy to the 'alaress' user.
  */
 use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 
-require_once __DIR__ . '/../../conf/core/require.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Ensure Pastoral ModifiedBy relationship integrity', [
+$kernel = new Schoolbox\Application\Daemon\Kernel('Ensure `pastoral`.`modified_by_user_id` relationship integrity', [
     'verbose' => [false, false, false],
     'errors'  => E_ALL,
 ]);
@@ -31,23 +30,26 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $errorsOccurred = false;
     $successCount   = 0;
 
-    $log->info('Searching for pastoral records without a valid modifiedBy user');
+    $log->info('Searching for pastoral records with an invalid modifiedBy user');
     $selectRecordsWithoutModifier = $db->prepare("
         SELECT p.id AS 'p.id', p.modified_by_user_id AS 'p.modified_by_user_id'
         FROM pastoral p
         LEFT JOIN user u ON p.modified_by_user_id = u.id
-        WHERE u.id IS NULL;
+        WHERE p.modified_by_user_id IS NOT NULL
+        AND u.id IS NULL;
     ");
     $selectRecordsWithoutModifier->execute();
 
     if (!$selectRecordsWithoutModifier->rowCount()) {
-        $log->info('No pastoral records found without a valid modifier. OK.');
+        $log->info('No pastoral records found with an invalid modifier. OK.');
     } else {
-        $log->info(sprintf('%d pastoral records found without a valid modifier.', $selectRecordsWithoutModifier->rowCount()));
+        $log->info(sprintf('%d pastoral records found with an invalid modifier.',
+            $selectRecordsWithoutModifier->rowCount()));
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $selectRecordsWithoutModifier->fetch(PDO::FETCH_ASSOC)) {
-            $log->debug('Pastoral (id: %d), ModifiedBy User (id: %s)', $row['p.id'], $row['p.modified_by_user_id'] ?: "'null'");
+            $log->debug(sprintf('Pastoral (id: %d), ModifiedBy User (id: %s)',
+                $row['p.id'], $row['p.modified_by_user_id']));
         }
 
         // Select the Alaress User

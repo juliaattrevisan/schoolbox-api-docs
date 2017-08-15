@@ -15,10 +15,10 @@
 use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 
-require_once __DIR__ . '/../../conf/core/require.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Ensure Pastoral Owner relationship integrity', [
+$kernel = new Schoolbox\Application\Daemon\Kernel('Ensure `pastoral`.`owner` relationship integrity', [
     'verbose' => [false, false, false],
     'errors'  => E_ALL,
 ]);
@@ -47,7 +47,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $selectRecordsWithoutOwners->fetch(PDO::FETCH_ASSOC)) {
-            $log->debug('Pastoral (id: %d), Owner (id: %s)', $row['p.id'], $row['p.owner_id'] ?: "'null'");
+            $log->debug(sprintf('Pastoral (id: %d), Owner (id: %s)', $row['p.id'], $row['p.owner_id'] ?: "'null'"));
         }
 
         // Select the Alaress User
