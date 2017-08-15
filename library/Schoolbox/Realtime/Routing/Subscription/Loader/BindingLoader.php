@@ -82,7 +82,7 @@ class BindingLoader implements ILoader
 
         while (list($from, $to) = $stmt->fetch(\PDO::FETCH_NUM)) {
             $this->log->info("Adding redirect `$from` -> `$to`");
-            $router->add($from, $to);
+            $router->add($from, $to, true);
         }
 
         return $this;
