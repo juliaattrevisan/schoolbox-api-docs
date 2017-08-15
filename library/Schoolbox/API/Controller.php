@@ -161,6 +161,7 @@ class Controller extends Base {
             'data'   => array(
                 'id'  => $sessionUserId,
                 'key' => $sessionUserKey,
+                'role'=> $sessionUser->getRole()->getType(),
             )
         ));
     }
