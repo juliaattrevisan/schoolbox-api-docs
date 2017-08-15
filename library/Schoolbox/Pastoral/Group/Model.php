@@ -25,10 +25,14 @@ class Model implements ISoftDeletable
     /** @var string $name */
     protected $name;
 
-    /** @var User $user */
+    /**
+     * Group creator
+     *
+     * @var User $user
+     */
     protected $user;
     
-    /** @var Collection $members */
+    /** @var Collection|Member\Model[] $members */
     protected $members;
 
     /**
@@ -53,7 +57,7 @@ class Model implements ISoftDeletable
      * @param User $user
      * @return self
      */
-    public function setUser($user)
+    public function setUser(User $user)
     {
         $this->user = $user;
         return $this;
@@ -71,7 +75,7 @@ class Model implements ISoftDeletable
      * @param Collection $members
      * @return self
      */
-    public function setMembers($members)
+    public function setMembers(Collection $members)
     {
         $this->members = $members;
         return $this;

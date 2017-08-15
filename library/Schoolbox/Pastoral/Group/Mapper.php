@@ -8,12 +8,14 @@
 namespace Schoolbox\Pastoral\Group;
 
 use PDOStatement;
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Pastoral\Group\Member\Mapper as GroupMemberMapper;
+use Schoolbox\Pastoral\Group\Member as GroupMember;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -28,20 +30,9 @@ class Mapper extends BaseMapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        // Anyone got a shorthand version of these?
-
-        $this->hasJoin(
-            'members',
-            array(
-                'mapper' => GroupMemberMapper::class,
-                'other_key' => 'group_id',
-                'this_key' => 'id',
-                'multiple' => true,
-            )
-        );
+        $this->joinsReverseMulti('group_id', GroupMember\Mapper::class, 'members', 'members');
 
         $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteGroupMembers']);
     }
@@ -68,7 +59,7 @@ class Mapper extends BaseMapper
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('user', 'u')}
             FROM        {$this->getTable()} 
-            LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
+            INNER JOIN  {$this->getJoinSql('user', '', 'u', true)}
         ";
     }
 
@@ -79,11 +70,10 @@ class Mapper extends BaseMapper
     {
         // Return pastoral records fully hydrated by default
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
 
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var User $user */
