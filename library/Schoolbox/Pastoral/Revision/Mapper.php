@@ -54,10 +54,10 @@ class Mapper extends PastoralMapper
                         {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('category', 'c')}
             FROM        {$this->getTable()}
-            LEFT JOIN   {$this->getJoinSql('student', '', 's')}
+            INNER JOIN  {$this->getJoinSql('student', '', 's', true)}
             LEFT JOIN   {$this->getJoinSql('severity', '', 'sv')}
-            LEFT JOIN   {$this->getJoinSql('owner', '', 'o')}
-            LEFT JOIN   {$this->getJoinSql('type', '', 't')}
+            INNER JOIN  {$this->getJoinSql('owner', '', 'o', true)}
+            INNER JOIN  {$this->getJoinSql('type', '', 't')}
             LEFT JOIN   {$this->getJoinSql('category', '', 'c')}
         ";
     }
@@ -67,13 +67,13 @@ class Mapper extends PastoralMapper
      *
      * @param PDOStatement $statement
      * @param bool $hydrateRelatedRecords
-     * @return Collection
+     * @return Collection|Model[]
      */
     protected function hydrateSelectInternal(PDOStatement $statement, $hydrateRelatedRecords = true)
     {
         // Return pastoral records fully hydrated by default
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
 
@@ -99,17 +99,23 @@ class Mapper extends PastoralMapper
 
         // Super-laziness follows
 
+        // We need to re-fetch the pastoral record from the database to get the correct timestamps
+        $pastoralMapper = PastoralMapper::getInstance();
+        $pastoral = $pastoralMapper->findOneByColumn(
+            $pastoralMapper->getIdentifierColumn(),
+            $pastoral->getId(),
+            [],
+            ['cache' => false]
+        );
+
         /** @var Model $revision */
         $revision = $this->createModel();
 
-        $methods = get_class_methods(Pastoral::class);
-
-        foreach ($methods as $method) {
-            if (substr($method,0, 3) == 'set') {
-
+        foreach (get_class_methods(Pastoral::class) as $method) {
+            if (0 === strpos($method, 'set')) {
                 // We need to put the pastoral `id` into the revisions `root_id` field, everything else just get copied as-is
 
-                if ($method != 'setId') {
+                if ($method !== 'setId') {
                     $getter = $method;
                     $getter[0] = 'g';
                     if (is_callable([$pastoral, $getter]) && is_callable([$revision, $method])) {
