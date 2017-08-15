@@ -39,11 +39,7 @@
                 {% block eventBubbleMeta %}
                 {% if event.authorName %}
                 <li class="icon-staff-students" title="Author">Posted by
-                    {% if author.deleted %}
-                    {{ event.authorName }}
-                    {% else %}
                     <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
-                    {% endif %}
                 </li>
                 {% endif %}
 
