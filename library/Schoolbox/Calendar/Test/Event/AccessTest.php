@@ -163,15 +163,17 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     /**
      * Takes a user/user access key and sets the relationship on both objects
      *
-     * @param $key
+     * @param string[] $keys
      */
-    private function configureUserAccess($key)
+    private function configureUserAccess($keys)
     {
-        $user = $this->getUser($key);
-        $access = $this->getUserAccess($key);
+        foreach ($keys as $key) {
+            $user = $this->getUser($key);
+            $access = $this->getUserAccess($key);
 
-        $user->setAccessList(new Collection([$access]));
-        $access->setUser($user);
+            $user->setAccessList(new Collection([$access]));
+            $access->setUser($user);
+        }
     }
 
     /**
@@ -253,112 +255,114 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     public function dataCheckDestination()
     {
         // Set access on users
-        $this->configureUserAccess('campusModerate');
-        $this->configureUserAccess('campusWrite');
-        $this->configureUserAccess('campusRead');
-        $this->configureUserAccess('groupReadSuper');
-        $this->configureUserAccess('groupAdmin');
-        $this->configureUserAccess('groupWrite');
-        $this->configureUserAccess('groupRead');
+        $this->configureUserAccess([
+            'campusModerate',
+            'campusWrite',
+            'campusRead',
+            'groupReadSuper',
+            'groupAdmin',
+            'groupWrite',
+            'groupRead',
+        ]);
 
-        $tests = [];
+        return [
 
-        // --------------------------------------------------------------------------
-        // Personal level events
-        // --------------------------------------------------------------------------
+            // --------------------------------------------------------------------------
+            // Personal level events
+            // --------------------------------------------------------------------------
 
-        // Staff can create an event for themselves
-        $tests['StaffPersonal'] = $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staff');
+            // Staff can create an event for themselves
+            'StaffPersonal' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staff'),
 
-        // Parent can create an event for themselves
-        $tests['ParentPersonal'] = $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent');
+            // Parent can create an event for themselves
+            'ParentPersonal' => $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent'),
 
-        // Student can create an event for themselves
-        $tests['StudentPersonal'] = $this->generateTest(true, 'student', Event::ACCESS_PERSONAL, 'student', 'student');
+            // Student can create an event for themselves
+            'StudentPersonal' => $this->generateTest(true, 'student', Event::ACCESS_PERSONAL, 'student', 'student'),
 
-        // Super can create an event for staff member
-        $tests['SuperForStaff'] = $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'staff');
+            // Super can create an event for staff member
+            'SuperForStaff' => $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'staff'),
 
-        // Super can create an event for a parent
-        $tests['SuperForParent'] = $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'parent');
+            // Super can create an event for a parent
+            'SuperForParent' => $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'parent'),
 
-        // Super can create an event for a student
-        $tests['SuperForStudent'] = $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'student');
+            // Super can create an event for a student
+            'SuperForStudent' => $this->generateTest(true, 'super', Event::ACCESS_PERSONAL, 'super', 'student'),
 
-        // Staff can create an event for another staff member
-        $tests['StaffForStaff'] = $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staffAlt');
+            // Staff can create an event for another staff member
+            'StaffForStaff' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'staffAlt'),
 
-        // Staff can create event for any parent
-        $tests['StaffForParent'] = $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'parent');
+            // Staff can create event for any parent
+            'StaffForParent' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'parent'),
 
-        // Staff can create event for any student
-        $tests['StaffForStudent'] = $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student');
+            // Staff can create event for any student
+            'StaffForStudent' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
-        // Parent can create event for their child
-        $tests['ParentForChild'] = $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parentChild');
+            // Parent can create event for their child
+            'ParentForChild' => $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parentChild'),
 
-        // Parent cannot create an event for a staff member
-        // TODO: currently possible, add test with SA-4032 fix
+            // Parent cannot create an event for a staff member
+            // TODO: currently possible, add test with SA-4032 fix
 
-        // Parent cannot create an event for another parent
-        // TODO: currently possible, add test with SA-4032 fix
+            // Parent cannot create an event for another parent
+            // TODO: currently possible, add test with SA-4032 fix
 
-        // Parent cannot create an event for a student that isn't theirs
-        // TODO: currently possible, add test with SA-4032 fix
+            // Parent cannot create an event for a student that isn't theirs
+            // TODO: currently possible, add test with SA-4032 fix
 
-        // Student cannot create event for a staff member
-        // TODO: currently possible, add test with SA-4032 fix
+            // Student cannot create event for a staff member
+            // TODO: currently possible, add test with SA-4032 fix
 
-        // Student cannot create event for a parent
-        // TODO: currently possible, add test with SA-4032 fix
+            // Student cannot create event for a parent
+            // TODO: currently possible, add test with SA-4032 fix
 
-        // Student cannot create event for another student
-        // TODO: currently possible, add test with SA-4032 fix
-
-
-        // --------------------------------------------------------------------------
-        // Campus level events
-        // --------------------------------------------------------------------------
-
-        // Super with no campus permission can create
-        $tests['SuperCampus'] = $this->generateTest(true, 'super', Event::ACCESS_CAMPUS, 'super', 'super', [], [1]);
-
-        // User with moderate access can create
-        $tests['ModerateCampus'] = $this->generateTest(true, 'campusModerate', Event::ACCESS_CAMPUS, 'campusModerate', 'campusModerate', [], [1]);
-
-        // User with write access can create
-        $tests['WriteCampus'] = $this->generateTest(true, 'campusWrite', Event::ACCESS_CAMPUS, 'campusWrite', 'campusWrite', [], [1]);
-
-        // User with read access cannot create
-        $tests['ReadCampus'] = $this->generateTest(false, 'campusRead', Event::ACCESS_CAMPUS, 'campusRead', 'campusRead', [], [1]);
-
-        // User with no access cannot create
-        $tests['NoCampus'] = $this->generateTest(false, 'campusNone', Event::ACCESS_CAMPUS, 'campusNone', 'campusNone', [], [1]);
+            // Student cannot create event for another student
+            // TODO: currently possible, add test with SA-4032 fix
 
 
-        // --------------------------------------------------------------------------
-        // Group level events
-        // --------------------------------------------------------------------------
+            // --------------------------------------------------------------------------
+            // Campus level events
+            // --------------------------------------------------------------------------
 
-        // Super with no permissions to group can create
-        $tests['SuperGroup'] = $this->generateTest(true, 'super', Event::ACCESS_GROUP, 'super', 'super', [1]);
+            // Super with no campus permission can create
+            'SuperCampus' => $this->generateTest(true, 'super', Event::ACCESS_CAMPUS, 'super', 'super', [], [1]),
 
-        // Super with read access to group can create
-        $tests['SuperReadGroup'] = $this->generateTest(true, 'groupReadSuper', Event::ACCESS_GROUP, 'groupReadSuper', 'groupReadSuper', [1]);
+            // User with moderate access can create
+            'ModerateCampus' => $this->generateTest(true, 'campusModerate', Event::ACCESS_CAMPUS, 'campusModerate', 'campusModerate', [], [1]),
 
-        // User with admin access to group can create
-        $tests['AdminGroup'] = $this->generateTest(true, 'groupAdmin', Event::ACCESS_GROUP, 'groupAdmin', 'groupAdmin', [1]);
+            // User with write access can create
+            'WriteCampus' => $this->generateTest(true, 'campusWrite', Event::ACCESS_CAMPUS, 'campusWrite', 'campusWrite', [], [1]),
 
-        // User with write access to group can create
-        $tests['WriteGroup'] = $this->generateTest(true, 'groupWrite', Event::ACCESS_GROUP, 'groupWrite', 'groupWrite', [1]);
+            // User with read access cannot create
+            'ReadCampus' => $this->generateTest(false, 'campusRead', Event::ACCESS_CAMPUS, 'campusRead', 'campusRead', [], [1]),
 
-        // User with read access to group cannot create
-        $tests['ReadGroup'] = $this->generateTest(false, 'groupRead', Event::ACCESS_GROUP, 'groupRead', 'groupRead', [1]);
+            // User with no access cannot create
+            'NoCampus' => $this->generateTest(false, 'campusNone', Event::ACCESS_CAMPUS, 'campusNone', 'campusNone', [], [1]),
 
-        // User with no access to group cannot create
-        $tests['NoGroup'] = $this->generateTest(false, 'groupNone', Event::ACCESS_GROUP, 'groupNone', 'groupNone', [1]);
 
-        return $tests;
+            // --------------------------------------------------------------------------
+            // Group level events
+            // --------------------------------------------------------------------------
+
+            // Super with no permissions to group can create
+            'SuperGroup' => $this->generateTest(true, 'super', Event::ACCESS_GROUP, 'super', 'super', [1]),
+
+            // Super with read access to group can create
+            'SuperReadGroup' => $this->generateTest(true, 'groupReadSuper', Event::ACCESS_GROUP, 'groupReadSuper', 'groupReadSuper', [1]),
+
+            // User with admin access to group can create
+            'AdminGroup' => $this->generateTest(true, 'groupAdmin', Event::ACCESS_GROUP, 'groupAdmin', 'groupAdmin', [1]),
+
+            // User with write access to group can create
+            'WriteGroup' => $this->generateTest(true, 'groupWrite', Event::ACCESS_GROUP, 'groupWrite', 'groupWrite', [1]),
+
+            // User with read access to group cannot create
+            'ReadGroup' => $this->generateTest(false, 'groupRead', Event::ACCESS_GROUP, 'groupRead', 'groupRead', [1]),
+
+            // User with no access to group cannot create
+            'NoGroup' => $this->generateTest(false, 'groupNone', Event::ACCESS_GROUP, 'groupNone', 'groupNone', [1]),
+
+        ];
     }
 
 
@@ -372,10 +376,12 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     public function dataCheckExisting()
     {
         // Set access on users
-        $this->configureUserAccess('campusModerate');
-        $this->configureUserAccess('campusRead');
-        $this->configureUserAccess('groupWrite');
-        $this->configureUserAccess('groupRead');
+        $this->configureUserAccess([
+            'campusModerate',
+            'campusRead',
+            'groupWrite',
+            'groupRead',
+        ]);
 
         return [
 
