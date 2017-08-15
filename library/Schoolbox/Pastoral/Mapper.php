@@ -676,25 +676,22 @@ class Mapper extends BaseMapper
         $this->addFilter($types, '`type_id`');
         $this->addFilter($authors, '`owner_id`');
 
+        $orderParts = [];
         foreach ($order as $orderCurrent)
         {
-            if ($orderSql != "") {
-                $orderSql .= ",";
-            }
-
             switch ($orderCurrent) {
-                case 'student':     $orderSql .= "`s`.lastname, `s`.firstname"; break;
-                case 'severity':    $orderSql .= "`sv`.order"; break;
-                case 'date':        $orderSql .= "`pastoral`.created_at"; break;
-                case 'category':    $orderSql .= "`c`.name"; break;
-                case 'points':      $orderSql .= "`pastoral`.points"; break;
-                case 'year':        $orderSql .= "`s`.year"; break;
-                case 'author':      $orderSql .= "`o`.lastname, `o`.firstname"; break;
+                case 'student':     $orderParts[] = "`s`.lastname, `s`.firstname"; break;
+                case 'severity':    $orderParts[] = "`sv`.order"; break;
+                case 'date':        $orderParts[] = "`pastoral`.created_at"; break;
+                case 'category':    $orderParts[] = "`c`.name"; break;
+                case 'points':      $orderParts[] = "`pastoral`.points"; break;
+                case 'year':        $orderParts[] = "`s`.year"; break;
+                case 'author':      $orderParts[] = "`o`.lastname, `o`.firstname"; break;
             }
         }
 
-        if ($orderSql != '') {
-            $orderSql = ' ORDER BY ' . $orderSql;
+        if (!empty($orderParts)) {
+            $orderSql = ' ORDER BY ' . implode(',', $orderParts);
         }
 
         // If filtering on involvement, only show records the logged in user is involved with via audience/role/ownership
@@ -717,15 +714,13 @@ class Mapper extends BaseMapper
             ";
         }
 
+        $criteriaParts = [];
         foreach ($this->filters as $filter) {
-            if ($criteriaSql != '') {
-                $criteriaSql .= ' AND ';
-            }
-            $criteriaSql .= $filter;
+            $criteriaParts[] = $filter;
         }
 
-        if ($criteriaSql != '') {
-            $criteriaSql = ' WHERE ' . $criteriaSql;
+        if (!empty($criteriaParts)) {
+            $criteriaSql = ' WHERE ' . implode(' AND ', $criteriaParts);
         }
 
         // Execute SQL
