@@ -154,7 +154,6 @@ $(function() {
                                            name="crits[{CRITGROUP_COUNT}][name]"
                                            value="{CRITGROUP_NAME}"
                                            {CRITGROUP_DISABLED}
-                                           readonly
                                            data-rubric-group />
                                 </div>
                                 <nav></nav>
@@ -168,7 +167,7 @@ $(function() {
                         <ul class="information-list">
                             <!-- BEGIN criterion -->
                             <!-- BEGIN criterion_enabled -->
-                            <li class="actions-small-1" data-rubric-criterion-row="{CRITGROUP_COUNT}">
+                            <li class="actions-small-2" data-rubric-criterion-row="{CRITGROUP_COUNT}">
                                 <div class="list-item">
                                     <input type="text"
                                            name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
@@ -177,6 +176,9 @@ $(function() {
                                            data-rubric-criterion />
                                 </div>
                                 <nav>
+                                    <!-- BEGIN criterion_in_use -->
+                                    <a class="icon-info" data-reveal-id="criterion-{CRITERION_ID}" href="#"></a>
+                                    <!-- END criterion_in_use -->
                                     <a title="Delete criterion"
                                        class="icon-delete"
                                        data-role="remove-criterion"
@@ -185,7 +187,7 @@ $(function() {
                             </li>
                             <!-- END criterion_enabled -->
                             <!-- BEGIN criterion_disabled -->
-                            <li class="actions-small-1" data-rubric-criterion-row="{CRITGROUP_COUNT}">
+                            <li class="actions-small-2" data-rubric-criterion-row="{CRITGROUP_COUNT}">
                                 <div class="list-item">
                                     <input type="text"
                                            name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
@@ -194,25 +196,29 @@ $(function() {
                                            readonly
                                            data-rubric-criterion />
                                 </div>
-                                <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="criterion-{CRITERION_ID}">
-                                    This criterion is in use on {CRITERION_USAGE} assessments;
-                                    it can be deleted from future use but may not be modified.
-                                    <ul class="information-list">
+                                <nav>
+                                    <a class="icon-info" data-reveal-id="criterion-{CRITERION_ID}" href="#"></a>
+                                </nav>
+                            </li>
+                            <!-- END criterion_disabled -->
+                            <div data-reveal id="criterion-{CRITERION_ID}" class="reveal-modal">
+                                <article>
+                                    <h2>{CRITERION_NAME}</h2>
+                                    <p>{TPL_LOCAL_RUBRICCRITERION_PC} is in use on {CRITERION_USAGE} assessments;</p>
+                                    <ul>
                                         <!-- BEGIN criterion_assessment -->
                                         <li>
                                             <a href="/learning/assessments/{CRITERION_ASSESSMENT_ID}/{USER_ID}">{CRITERION_ASSESSMENT_TITLE}</a>
                                         </li>
                                         <!-- END criterion_assessment -->
                                     </ul>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-down-arrow" data-collapser="criterion-{CRITERION_ID}"></a>
-                                </nav>
-                            </li>
-                            <!-- END criterion_disabled -->
+
+                                </article>
+                                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                            </div>
                             <!-- END criterion -->
                             <!-- New criterion within group -->
-                            <li class="actions-small-1" data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <li class="actions-small-2" data-rubric-criterion-row="{MAX_CRIT_ID}">
                                 <div class="list-item">
                                     <input type="text"
                                            value=""
@@ -255,7 +261,7 @@ $(function() {
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
                         <ul class="information-list">
-                            <li class="actions-small-1" data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <li class="actions-small-2" data-rubric-criterion-row="{MAX_CRIT_ID}">
                                 <div class="list-item">
                                     <input type="text"
                                            value=""

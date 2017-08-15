@@ -12,6 +12,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 // not in SitePage context, redirect to equivalent
 if (!isset($this)) {
@@ -21,15 +23,15 @@ if (!isset($this)) {
 }
 
 // retrieve the categoryID or die
-$catID = 0;
+$folderId = 0;
 if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
-    $catID = $this->arg[0];
+    $folderId = $this->arg[0];
 } else {
     error(2);
 }
 
-$groupHandler = new Group();
-if (!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
+$userAccess = new Access();
+if (!($_SESSION['user']->isSuperuser() || $userAccess->getFolderAccess($_SESSION['user'], $folderId) >= UserAccess::ACCESS_WRITE)) {
     error(6);
 }
 
@@ -39,28 +41,31 @@ $this->setBlock(TEMPLATE_content, 'allow_cascade', 'allow_cascade_block');
 $this->setBlock(TEMPLATE_content, 'criterion_group', 'criterion_group_block');
 $this->setBlock('criterion_group', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'criterion_disabled', 'criterion_disabled_block');
-$this->setBlock('criterion_disabled', 'criterion_assessment', 'criterion_assessment_block');
+$this->setBlock('criterion', 'criterion_assessment', 'criterion_assessment_block');
 $this->setBlock('criterion', 'criterion_enabled', 'criterion_enabled_block');
+$this->setBlock('criterion_enabled', 'criterion_in_use', 'criterion_in_use_block');
+
 
 
 // get category details
-$category = FolderMapper::getInstance()->findById($catID);
+$folder = FolderMapper::getInstance()->findById($folderId);
+
 
 $this->setVar([
-    'CATEGORY_ID'   => $category->getId(),
-    'CATEGORY_NAME' => Scrub::text($category->getName()),
+    'CATEGORY_ID'   => $folder->getId(),
+    'CATEGORY_NAME' => Scrub::text($folder->getName()),
 ]);
 
 $criteriaName = $this->getDi()->get('l10n')->translate('rubricCriterion', true, true);
 
-$title = 'Manage ' . $criteriaName . ' for ' . Scrub::text($category->getName());
+$title = 'Manage ' . $criteriaName . ' for ' . Scrub::text($folder->getName());
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 
 // get rubric details
 $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
     [
-        'parent_id'   => $catID,
+        'parent_id'   => $folderId,
         'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
     ],
     ['order' => ['grouping' => 'ASC', 'name' => 'ASC']]
@@ -88,6 +93,9 @@ if (count($criterionCollection)) {
             'CRITGROUP_NAME'     => $grouping,
             'CRITGROUP_DISABLED' => '',
         ]);
+
+        $usageTotal = 0;
+
         foreach ($crits as $crit) {
             /* @var $crit Criterion */
             $topID = max($topID, $crit->getId());
@@ -98,10 +106,19 @@ if (count($criterionCollection)) {
 
             $usage = UsageMapper::getInstance()->findUsage($crit->getId());
             $usageCount = count($usage);
+            $usageTotal += $usageCount;
             if ($usageCount > 0) {
-                $this->setVar('criterion_enabled_block', '');
-                $this->parse('criterion_disabled_block', 'criterion_disabled');
                 $this->setVar('CRITERION_USAGE', $usageCount);
+
+                if (!($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
+                    $this->setVar('criterion_enabled_block', '');
+                    $this->parse('criterion_disabled_block', 'criterion_disabled');
+                }
+                else {
+                    $this->setVar('criterion_disabled_block', '');
+                    $this->parse('criterion_in_use_block', 'criterion_in_use');
+                    $this->parse('criterion_enabled_block', 'criterion_enabled');
+                }
 
                 // PHPLib the assessments
                 $this->setVar('criterion_assessment_block', '');
@@ -111,11 +128,16 @@ if (count($criterionCollection)) {
                     $this->parse('criterion_assessment_block', 'criterion_assessment', true);
                 }
             } else {
+                $this->setVar('criterion_assessment_block', '');
                 $this->setVar('criterion_disabled_block', '');
+                $this->setVar('criterion_in_use_block', '');
                 $this->parse('criterion_enabled_block', 'criterion_enabled');
             }
 
             $this->parse('criterion_block', 'criterion', true);
+            if($usageTotal > 0 ) {
+                $this->setVar('CRITGROUP_DISABLED', 'readonly');
+            }
         }
         $this->parse('criterion_group_block', 'criterion_group', true);
     }
@@ -129,8 +151,8 @@ $trail->renderIntoSitePage(
     'BREADCRUMB',
     [
         [
-            'text'  => $category->getName(),
-            'href'  => "/homepage/{$category->getId()}",
+            'text'  => $folder->getName(),
+            'href'  => "/homepage/{$folder->getId()}",
             'class' => '',
         ],
         [
