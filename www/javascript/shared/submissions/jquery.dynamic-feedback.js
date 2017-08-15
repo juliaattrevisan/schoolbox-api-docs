@@ -35,7 +35,7 @@
 
         setupPreValues();
         setupListeners();
-        setupActions();
+        setupPublishAction();
 
         /**
          * Init
@@ -70,10 +70,6 @@
                  */
                 publishText: 'Publish',
 
-                /* The text to display on the continue button
-                 */
-                continueText: 'Continue',
-
                 // Callbacks to execute upon successful completion of Draft and Publish actions
                 onDraftCallback: $.noop,
                 onPublishCallback: $.noop
@@ -96,10 +92,9 @@
                 $(this).data('preval', $(this).val());
             });
 
-            /* Set initial state of the Publish and Continue buttons
+            /* Set initial state of the Publish button
              */
             $(config.assessmentList).find('[data-draft="publish"]').text(config.publishText);
-            $(config.assessmentList).find('[data-draft="continue"]').text(config.continueText);
         }
 
         /**
@@ -116,35 +111,27 @@
         }
 
         /**
-         * Set up actions to occur when Publishing Feedback, or Continuing without Publishing
+         * Set up actions to occur when Publishing Feedback
          */
-        function setupActions() {
+        function setupPublishAction() {
             $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                var $thisButton  = $(this),
-                    $thisText    = $thisButton.text(),
-                    $participant = $thisButton.closest('[data-participant]'),
+                var $participant = $(this).closest('[data-participant]'),
                     $form        = $participant.find('[data-feedback-form]'),
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                    $btnPublish  = $actionBar.find('[data-draft=publish]'),
-                    $btnContinue = $actionBar.find('[data-draft=continue]'),
-                    $buttons     = $btnPublish.add($btnContinue);
+                    $btnPublish  = $actionBar.find('[data-draft=publish]');
 
-                $buttons.attr('disabled', 'disabled');
-                $thisButton.text('Publishing...');
+                $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
                 $(config.formSaveLabel).toastActivate({
                     text: 'Publishing...'
                 });
 
                 // Publish submits everything
-                // Continue submits everything but doesn't publish
                 var formData = $form.serializeArray();
-                if ($thisButton.is($btnPublish)) {
-                    formData.push({name: 'publish', value: 1});
-                }
+                formData.push({name: 'publish', value: 1});
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
                     data:  formData,
@@ -153,11 +140,11 @@
 
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
-                        $thisButton.text($thisText).addClass('hide');
+                        $btnPublish.text(config.publishText).addClass('hide');
                         $btnDrafted.text('');
                     } else {
                         $actionBar.slideUp(function () {
-                            $thisButton.text($thisText);
+                            $btnPublish.text(config.publishText);
                             $btnDrafted.text('');
                         });
                     }
@@ -185,8 +172,7 @@
 
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
-                    $buttons.removeAttr('disabled');
-                    $thisButton.text($thisText);
+                    $btnPublish.removeAttr('disabled').text(config.publishText);
                 });
             });
         }
@@ -229,9 +215,7 @@
                 $form        = $participant.find('[data-feedback-form]'),
                 $actionBar   = $participant.find('[data-action-bar]'),
                 $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                $btnPublish  = $actionBar.find('[data-draft=publish]'),
-                $btnContinue = $actionBar.find('[data-draft=continue]'),
-                $buttons     = $btnPublish.add($btnContinue);
+                $btnPublish  = $actionBar.find('[data-draft=publish]');
 
             var data = {
                 type: $form.attr('method'),
@@ -253,7 +237,7 @@
                     // Show the action bar and buttons
                     $actionBar.show();
                     $btnDrafted.show().text('Saved as Draft');
-                    $buttons.show();
+                    $btnPublish.show();
 
                     // If published feedback already existed, and this is the first change afterwards,
                     // remove any info about being linked to a response & having attachments
@@ -268,7 +252,7 @@
                     toast.call($participant, xhr.responseText, false, false);
                 })
                 .always(function () {
-                    $buttons.removeAttr("disabled");
+                    $btnPublish.removeAttr("disabled");
                 });
         }
 
