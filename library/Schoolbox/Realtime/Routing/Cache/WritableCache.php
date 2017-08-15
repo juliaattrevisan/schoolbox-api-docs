@@ -24,4 +24,9 @@ interface WritableCache
      */
     public function cacheAllUsers($instanceId);
 
+    /**
+     * @param string $instanceId
+     * @return void
+     */
+    public function cacheRedirects($instanceId);
 }

@@ -77,6 +77,54 @@ class WriteCache extends ReadCache implements WritableCache
 
     /**
      * @param string $instanceId
+     * @return void
+     */
+    public function cacheRedirects($instanceId)
+    {
+        $this->log->info('Calculating redirect bindings');
+
+        // retrieve all routes from the cache
+        $cachedRoutes = $this->fetchCache($this->getCacheKey($instanceId));
+
+        // remove all redirects from the cache
+        foreach ($cachedRoutes as $path => $pathData) {
+            foreach ($pathData as $key => $value) {
+                if (!is_int($key)) {
+                    // if it's not an integer, remove it
+                    unset ($cachedRoutes[$path][$key]);
+                }
+            }
+        }
+
+        // remove any now-empty keys
+        $cachedRoutes = array_filter($cachedRoutes);
+
+        // obtain a list of all redirects in the db
+        $redirects = \Database::getInstance()->query('SELECT `from`, `to` FROM msg_redirect')->fetchAll(\PDO::FETCH_NUM);
+
+        foreach ($redirects as list($from, $to)) {
+            // put these redirects into the cache
+            $cachedRoutes[$from][$to] = true;
+        }
+
+        // load up a router with the new dataset
+        $router = new FlatRouter();
+
+        // reinsert all remaining routes
+        foreach ($cachedRoutes as $path => $pathData) {
+            foreach ($pathData as $key => $value) {
+                $router->add($path, $key, $value);
+            }
+        }
+
+        $this->writeCache($router, $this->getCacheKey($instanceId));
+
+        $this->broadcastReload($instanceId);
+    }
+
+
+    /**
+     * @param string $instanceId
      */
     private function broadcastReload($instanceId)
     {
