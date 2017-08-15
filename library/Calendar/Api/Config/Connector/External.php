@@ -78,7 +78,7 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
      * @param int $duration
      * @return $this
      */
-    private function setDuration($duration)
+    public function setDuration($duration)
     {
         $this->duration = $duration;
         return $this;
