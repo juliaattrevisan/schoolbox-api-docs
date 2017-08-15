@@ -18,7 +18,7 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Access
 {
-    /** @var FolderAccess $folderAccess */
+    /** @var FolderAccess */
     private $folderAccess;
 
     /**
@@ -41,7 +41,7 @@ class Access
     {
         // Split groups into an array of ints, if there are any
         if ($event->getCategoryCollection()) {
-            $groups = $event->getCategoryCollection()->getColumnValues('id');
+            $groups = $event->getCategoryCollection()->getColumnValues('categoryId');
         } else {
             $groups = [];
         }
@@ -117,14 +117,8 @@ class Access
 
         // If the event is on a group level, check if the user is a group manager
         if ($accessLevel == Event::ACCESS_GROUP) {
-
-            // Loop through the groups selected for this event
-            $groupIds = [];
-            foreach ($groups as $groupId) {
-                $groupIds[] = $groupId;
-            }
-
-            if ($this->getFolderAccess()->getMinFolderAccess($effector, $groupIds) >= UserAccess::ACCESS_WRITE) {
+            $minFolderAccess = $this->getFolderAccess()->getMinFolderAccess($effector, $groups);
+            if ($minFolderAccess >= UserAccess::ACCESS_WRITE) {
                 return true;
             }
         }

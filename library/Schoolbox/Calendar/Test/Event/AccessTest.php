@@ -16,6 +16,7 @@ use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access as EventAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access as FolderAccess;
+use Schoolbox\Calendar\Relation\Category as CategoryRelation;
 
 class AccessTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +31,6 @@ class AccessTest extends \PHPUnit_Framework_TestCase
 
     /** @var UserAccess[] */
     private $userAccess;
-
 
     /**
      * @param $key
@@ -57,19 +57,22 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     {
         if (empty($this->users)) {
             $this->users = [
-                'super' => (new User)->setSuperuser(true)->setId(1),
-                'staff' => (new User)->setRole($this->getRole('staff'))->setId(2),
-                'staffAlt' => (new User)->setRole($this->getRole('staff'))->setId(3),
-                'parent' => (new User)->setRole($this->getRole('parent'))->setId(4),
-                'student' => (new User)->setRole($this->getRole('student'))->setId(5),
+                'super' => (new User)->setId(1)->setSuperuser(true),
+                'staff' => (new User)->setId(2)->setRole($this->getRole('staff')),
+                'staffAlt' => (new User)->setId(3)->setRole($this->getRole('staff')),
+                'parent' => (new User)->setId(4)->setRole($this->getRole('parent')),
+                'student' => (new User)->setId(5)->setRole($this->getRole('student')),
 
                 'campusModerate' => (new User)->setId(6),
                 'campusWrite' => (new User)->setId(7),
                 'campusRead' => (new User)->setId(8),
                 'campusNone' => (new User)->setId(9),
 
-                'groupWrite' => (new User)->setId(10),
-                'groupRead' => (new User)->setId(11),
+                'groupReadSuper' => (new User)->setId(10)->setSuperuser(true),
+                'groupAdmin' => (new User)->setId(11),
+                'groupWrite' => (new User)->setId(12),
+                'groupRead' => (new User)->setId(13),
+                'groupNone' => (new User)->setId(14),
             ];
 
             // Create a mock user object, who is a child of $this->users['parent']
@@ -91,13 +94,17 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     {
         if (empty($this->events)) {
 
+            $categoryCollection = new Collection([
+                (new CategoryRelation())->setCategoryId(1)->setEventId(2)
+            ]);
+
             $campusCollection = new Collection([
                 (new Campus())->setId(1)
             ]);
 
             $this->events = [
                 'personal' => (new Event)->setId(1)->setAccess(Event::ACCESS_PERSONAL),
-                'group' => (new Event)->setId(2)->setAccess(Event::ACCESS_GROUP),
+                'group' => (new Event)->setId(2)->setAccess(Event::ACCESS_GROUP)->setCategoryCollection($categoryCollection),
                 'campus' => (new Event)->setId(3)->setAccess(Event::ACCESS_CAMPUS)->setCampusCollection($campusCollection),
             ];
         }
@@ -133,9 +140,19 @@ class AccessTest extends \PHPUnit_Framework_TestCase
                     ->setAccessLevel(UserAccess::ACCESS_READ)
                     ->setServiceIdentifier(1),
 
+                'groupAdmin' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setAccessLevel(UserAccess::ACCESS_FULL)
+                    ->setServiceIdentifier(1),
+
                 'groupWrite' => (new UserAccess())
                     ->setService(UserAccess::SERVICE_HOMEPAGE)
                     ->setAccessLevel(UserAccess::ACCESS_WRITE)
+                    ->setServiceIdentifier(1),
+
+                'groupRead' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setAccessLevel(UserAccess::ACCESS_READ)
                     ->setServiceIdentifier(1),
             ];
         }
@@ -156,7 +173,6 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         $user->setAccessList(new Collection([$access]));
         $access->setUser($user);
     }
-
 
     /**
      * Generate an array for running a test on checkDestination
@@ -183,7 +199,6 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
     /**
      * Generate an array for running a test on checkExisting
      *
@@ -203,7 +218,6 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         return [$result, $this->getUser($effectorKey), $event];
     }
 
-
     /**
      * Tests for checkDestination()
      * This makes up most of the permission check tests
@@ -216,6 +230,10 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         $this->configureUserAccess('campusModerate');
         $this->configureUserAccess('campusWrite');
         $this->configureUserAccess('campusRead');
+        $this->configureUserAccess('groupReadSuper');
+        $this->configureUserAccess('groupAdmin');
+        $this->configureUserAccess('groupWrite');
+        $this->configureUserAccess('groupRead');
 
         $tests = [];
 
@@ -297,15 +315,22 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         // --------------------------------------------------------------------------
 
         // Super with no permissions to group can create
+        $tests['SuperGroup'] = $this->generateTest(true, 'super', Event::ACCESS_GROUP, 'super', 'super', [1]);
 
         // Super with read access to group can create
+        $tests['SuperReadGroup'] = $this->generateTest(true, 'groupReadSuper', Event::ACCESS_GROUP, 'groupReadSuper', 'groupReadSuper', [1]);
+
+        // User with admin access to group can create
+        $tests['AdminGroup'] = $this->generateTest(true, 'groupAdmin', Event::ACCESS_GROUP, 'groupAdmin', 'groupAdmin', [1]);
 
         // User with write access to group can create
+        $tests['WriteGroup'] = $this->generateTest(true, 'groupWrite', Event::ACCESS_GROUP, 'groupWrite', 'groupWrite', [1]);
 
         // User with read access to group cannot create
+        $tests['ReadGroup'] = $this->generateTest(false, 'groupRead', Event::ACCESS_GROUP, 'groupRead', 'groupRead', [1]);
 
         // User with no access to group cannot create
-
+        $tests['NoGroup'] = $this->generateTest(false, 'groupNone', Event::ACCESS_GROUP, 'groupNone', 'groupNone', [1]);
 
         return $tests;
     }
@@ -341,7 +366,6 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
     /**
      * @dataProvider dataCheckExisting
      * @param $expected
@@ -355,7 +379,6 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-
     /**
      * @dataProvider dataCheckDestination
      * @param $expected
@@ -368,7 +391,24 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckDestination($expected, User $effector, $accessLevel, User $author, User $owner, array $groups = [], array $campuses = [])
     {
-        $access = new EventAccess(new FolderAccess());
+        // Create mock folder access object and mock getMinFolderAccess() to bypass DB
+        $mockFolderAccess = $this->getMockBuilder(FolderAccess::class)->getMock();
+        $mockFolderAccess->method('getMinFolderAccess')->willReturnCallback(function () use ($effector, $groups) {
+            $relatedAccessList = $effector->getAccessList()->filter(function (UserAccess $access) use ($groups) {
+                return in_array($access->getServiceIdentifier(), $groups);
+            });
+
+            $relatedAccessLevels = $relatedAccessList->getColumnValues('accessLevel');
+
+            if (empty($relatedAccessLevels)) {
+                return 0;
+            }
+
+            return min($relatedAccessLevels);
+        });
+
+
+        $access = new EventAccess($mockFolderAccess);
         $actual = $access->checkDestination($effector, $accessLevel, $author, $owner, $groups, $campuses);
         $this->assertEquals($expected, $actual);
     }
