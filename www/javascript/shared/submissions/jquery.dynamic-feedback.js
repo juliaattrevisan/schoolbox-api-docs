@@ -229,7 +229,9 @@
                 $form        = $participant.find('[data-feedback-form]'),
                 $actionBar   = $participant.find('[data-action-bar]'),
                 $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                $btnPublish  = $actionBar.find('[data-draft=publish]');
+                $btnPublish  = $actionBar.find('[data-draft=publish]'),
+                $btnContinue = $actionBar.find('[data-draft=continue]'),
+                $buttons     = $btnPublish.add($btnContinue);
 
             var data = {
                 type: $form.attr('method'),
@@ -251,7 +253,7 @@
                     // Show the action bar and buttons
                     $actionBar.show();
                     $btnDrafted.show().text('Saved as Draft');
-                    $btnPublish.show();
+                    $buttons.show();
 
                     // If published feedback already existed, and this is the first change afterwards,
                     // remove any info about being linked to a response & having attachments
@@ -266,7 +268,7 @@
                     toast.call($participant, xhr.responseText, false, false);
                 })
                 .always(function () {
-                    $btnPublish.removeAttr("disabled");
+                    $buttons.removeAttr("disabled");
                 });
         }
 
