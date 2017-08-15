@@ -8,14 +8,15 @@
 namespace Schoolbox\Pastoral\Report\Dashboard;
 
 use PDOStatement;
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Pastoral\Report\Mapper as ReportMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -29,8 +30,7 @@ class Mapper extends BaseMapper
         $this->joins('report_id', ReportMapper::class, 'id', null, null, 'report', 'report');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -39,13 +39,12 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('report', 'r')},
                         {$this->getJoinColumnString('user', 'u')}
             FROM        {$this->getTable()}
-            LEFT JOIN   {$this->getJoinSql('report', '', 'r')}
-            LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
+            INNER JOIN  {$this->getJoinSql('report', '', 'r', true)}
+            INNER JOIN  {$this->getJoinSql('user', '', 'u', true)}
         ";
     }
 
@@ -54,10 +53,9 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var User $user */
