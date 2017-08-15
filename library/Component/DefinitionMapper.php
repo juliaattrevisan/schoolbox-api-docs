@@ -9,7 +9,7 @@
  * @
  */
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\PredicateBuilder;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Realtime\Message\NSMapper;
 
 /**
