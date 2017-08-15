@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Calendar\Test\Event;
 
+use Schoolbox\Campus;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -60,6 +61,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
                 'staffAlt' => (new User)->setRole($this->getRole('staff'))->setId(3),
                 'parent' => (new User)->setRole($this->getRole('parent'))->setId(4),
                 'student' => (new User)->setRole($this->getRole('student'))->setId(5),
+
                 'campusModerate' => (new User)->setId(6),
                 'campusWrite' => (new User)->setId(7),
                 'campusRead' => (new User)->setId(8),
@@ -87,10 +89,15 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     private function getEvent($key)
     {
         if (empty($this->events)) {
+
+            $campusCollection = new Collection([
+                (new Campus())->setId(1)
+            ]);
+
             $this->events = [
                 'personal' => (new Event)->setId(1)->setAccess(Event::ACCESS_PERSONAL),
                 'group' => (new Event)->setId(2)->setAccess(Event::ACCESS_GROUP),
-                'campus' => (new Event)->setId(3)->setAccess(Event::ACCESS_CAMPUS),
+                'campus' => (new Event)->setId(3)->setAccess(Event::ACCESS_CAMPUS)->setCampusCollection($campusCollection),
             ];
         }
 
@@ -305,16 +312,32 @@ class AccessTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests for checkExisting()
-     * Because checkExisting is a shim on checkDestination - these tests will not repeat the checks above, they will
-     * just make sure that permission checks run fine with this (working with an event object)
+     * Because checkExisting is just a shim on checkDestination - these tests will not repeat the checks above, they
+     * will just make sure that permission checks run fine when working with an event object
      *
      * @return array
      */
     public function dataCheckExisting()
     {
-        $tests = [];
+        // Set access on users
+        $this->configureUserAccess('campusModerate');
+        $this->configureUserAccess('campusRead');
 
-        return $tests;
+        return [
+
+            // Personal level event, staff can modify event for themselves
+            'ExistingPersonal' => $this->generateTestExisting(true, 'staff', 'personal', 'staff', 'staff'),
+
+            // Personal level event, student cannot create event for a staff member
+            // TODO: currently possible, add test with SA-4032 fix
+
+            // Campus level event, moderators can modify campus level event not authored or owned by themselves
+            'ExistingCampus' => $this->generateTestExisting(true, 'campusModerate', 'campus', 'staff', 'staff'),
+
+            // Campus level event, read access cannot modify campus level event, even if they authored & own
+            'ExistingCampusRead' => $this->generateTestExisting(false, 'campusRead', 'campus', 'campusRead', 'campusRead'),
+
+        ];
     }
 
 
