@@ -18,6 +18,13 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
     protected $connectorClass = 'External';
 
     /**
+     * Maximum number of days to obtain, or something like that?
+     *
+     * @var int
+     */
+    protected $duration = 2;
+
+    /**
      * {@inheritdoc}
      */
     public function getDefaultLabel()
@@ -34,13 +41,12 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
      */
     public function render($page)
     {
-        $page->setVar(
-            array(
-                'CONNECTOR_ID'    => $this->getId(),
-                'CONNECTOR_LABEL' => Scrub::text($this->getLabel()),
-                'CONNECTOR_CLASS' => Scrub::text($this->getConnectorClass()),
-            )
-        );
+        $page->setVar([
+            'CONNECTOR_ID'    => $this->getId(),
+            'CONNECTOR_LABEL' => Scrub::text($this->getLabel()),
+            'CONNECTOR_CLASS' => Scrub::text($this->getConnectorClass()),
+            'DURATION' => $this->getDuration(),
+        ]);
         $page->setVar('has_multiple_options_block', '');
         $this->renderEventType($page, $this->getLuEventType());
     }
@@ -55,5 +61,26 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
     public function hasPermissions($userCampus, $userGroup)
     {
         return true;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return int
+     */
+    private function getDuration()
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param int $duration
+     * @return $this
+     */
+    private function setDuration($duration)
+    {
+        $this->duration = $duration;
+        return $this;
     }
 }
