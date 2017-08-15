@@ -1843,8 +1843,8 @@ abstract class Mapper implements IMapper, Serializable
      * @throws Exception if no instance of model is found
      * @throws Exception\Deleted if the model was found but has been deleted
      *
-     * @param  String $columnName
-     * @param  String $columnValue
+     * @param  string     $columnName
+     * @param  int|string $columnValue
      * @param  array  $order Fields to order by (@see findByColumnList() $options param)
      * @param  array $options
      *
