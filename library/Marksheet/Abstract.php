@@ -186,27 +186,6 @@ abstract class Marksheet_Abstract
     /* Abstract functions for extending classes to implement */
 
     /**
-    * Take a UI-formatted mark, normalise it, and insert it into the database
-    *
-    * @abstract
-    * @param $mark
-    * @return mixed
-    */
-    abstract public function normaliseMark($mark);
-
-    /**
-     * Extract a normalised mark from the database, and format it for the UI
-     *
-     * @abstract
-     *
-     * @param $user_id
-     * @param bool $asText
-     * @param bool $blankZero
-     * @return mixed
-     */
-    abstract public function retrieveMark($user_id, $asText = false, $blankZero = true);
-
-    /**
      * Format a pre-extracted value for the UI
      *
      * @abstract

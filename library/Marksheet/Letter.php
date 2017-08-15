@@ -9,27 +9,7 @@
 class Marksheet_Letter extends Marksheet_Abstract
 {
 
-    public function normaliseMark($mark)
-    {
-        $grade = $this->getSubmissionHandler()->getLetterGradeByID($mark);
-        return array(
-            'norm_mark' => $grade['raw_grade'],
-            'mark'      => $grade['caption']
-        );
-    }
 
-    public function retrieveMark($user_id, $asText = false, $blankZero = true)
-    {
-        $box_id = $this->getSubmissionBox()->getId();
-        $return = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
-        $grade = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
-
-        return array(
-            'grade_selected' => $grade['grade_id'],
-            'norm_mark' => $return['norm_mark'],
-            'comment' => $return['comment']
-        );
-    }
 
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true)
     {
