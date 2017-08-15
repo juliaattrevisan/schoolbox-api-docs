@@ -25,8 +25,12 @@ class Model implements ISoftDeletable {
     /** @var Pastoral */
     protected $pastoral;
 
-    /** @var int */
-    protected $externalId;
+    /**
+     * Optional. Null if not inserted into external SIS
+     *
+     * @var null|string
+     */
+    private $externalCode;
 
     /** @var string */
     protected $body;
@@ -38,7 +42,7 @@ class Model implements ISoftDeletable {
      * @param Pastoral $pastoral
      * @return self
      */
-    public function setPastoral($pastoral) {
+    public function setPastoral(Pastoral $pastoral) {
         $this->pastoral = $pastoral;
         return $this;
     }
@@ -51,19 +55,19 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param string $externalId
-     * @return self
+     * @param null|string $externalCode
+     * @return $this
      */
-    public function setExternalId($externalId) {
-        $this->externalId = $externalId;
+    public function setExternalCode($externalCode = null) {
+        $this->externalCode = $externalCode;
         return $this;
     }
 
     /**
-     * @return int
+     * @return null|string
      */
-    public function getExternalId() {
-        return $this->externalId;
+    public function getExternalCode() {
+        return $this->externalCode;
     }    
 
     /**
