@@ -99,10 +99,7 @@ class WriteCache extends ReadCache implements WritableCache
         // remove any now-empty keys
         $cachedRoutes = array_filter($cachedRoutes);
 
-        // obtain a list of all redirects in the db
-        $redirects = \Database::getInstance()->query('SELECT `from`, `to` FROM msg_redirect')->fetchAll(\PDO::FETCH_NUM);
-
-        foreach ($redirects as list($from, $to)) {
+        foreach ($this->loaderFactory->getNoCache()->getRedirects() as $from => $to) {
             // put these redirects into the cache
             $cachedRoutes[$from][$to] = true;
         }
