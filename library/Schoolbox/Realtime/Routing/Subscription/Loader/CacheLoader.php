@@ -9,9 +9,11 @@
 namespace Schoolbox\Realtime\Routing\Subscription\Loader;
 
 use Alaress\Routing\IRouter;
+use ArrayIterator;
 use InvalidArgumentException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
+use Traversable;
 
 
 /**
@@ -84,13 +86,24 @@ class CacheLoader implements ILoader
      */
     public function getUserSubscriptions($userId)
     {
+        return $this->getRoutes(function ($key) use ($userId) { return $key == $userId; });
+    }
+
+
+    /**
+     * @param callable $filter
+     * @return string[]
+     */
+    private function getRoutes(callable $filter)
+    {
         $routes = [];
 
+        /** @var string[][] $routeTree */
         $routeTree = json_decode(gzuncompress($this->data), true);
 
         foreach ($routeTree as $path => $pathData) {
             foreach ($pathData as $key => $value) {
-                if ($key == $userId) {
+                if ($filter($key)) {
                     $routes[] = $path;
                 }
             }
