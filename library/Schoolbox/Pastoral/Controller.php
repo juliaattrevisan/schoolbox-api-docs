@@ -231,7 +231,6 @@ class Controller extends Base
 
         // Create an audit record of anyone viewing a student record
 
-        /** @var PastoralAudit $auditRecord */
         $auditRecord = $this->pastoralAuditMapper->createModel();
         $auditRecord->setStudent($student);
         $auditRecord->setUser($this->getUser());
@@ -306,13 +305,11 @@ class Controller extends Base
 
         // Create an audit record of anyone viewing a student record
 
-        /** @var PastoralAudit $auditRecord */
         $auditRecord = $this->pastoralAuditMapper->createModel();
         $auditRecord->setStudent($student);
         $auditRecord->setUser($this->getUser());
         $this->pastoralAuditMapper->save($auditRecord);
 
-        /** @var PastoralAudit $auditRecord */
         $auditRecord = $this->pastoralAuditMapper->createModel();
         $auditRecord->setStudent($linkedStudent);
         $auditRecord->setUser($this->getUser());
@@ -369,7 +366,6 @@ class Controller extends Base
 
         // Create an audit record
 
-        /** @var PastoralAudit $auditRecord */
         $auditRecord = $this->pastoralAuditMapper->createModel();
         $auditRecord->setStudent($student);
         $auditRecord->setPastoral($record);
@@ -593,8 +589,6 @@ class Controller extends Base
         // Go through every kid
 
         foreach ($students as $student_id => $value) {
-
-            /** @var Model $record */
             $record = $this->pastoralMapper->createModel();
 
             // If this is not the first record, set the parent ID
