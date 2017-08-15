@@ -20,7 +20,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -200,7 +199,7 @@ class Controller extends Base
         // TODO Populate $_SESSION[children] properly
         $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
 
-        $returnUrl = Redirect::queryString($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent',["id" => $student->getId()]));
+        $returnUrl = Redirect::queryString($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', ['id' => $student->getId()]));
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(

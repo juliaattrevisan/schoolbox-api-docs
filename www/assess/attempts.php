@@ -214,7 +214,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
             }
         }
 
-        $returnUrlSuffix = isset($_GET["returnUrl"]) ? "?returnUrl=" . $_GET["returnUrl"] : "";
+        $returnUrlSuffix = !empty($_GET[Redirect::RETURN_URL]) ? Redirect::queryString($_GET[Redirect::RETURN_URL]) : '';
 
         $this->setVar(array(
             'RETURN_URL_SUFFIX' => $returnUrlSuffix,
@@ -291,7 +291,7 @@ else {
 
 /** @var Schoolbox\User $user */
 $user = $_SESSION['user'];
-$this->setVar('RETURN_URL', Redirect::queryString("/assess/attempts/".$assess['assess_id']."/".$user->getId()));
+$this->setVar('RETURN_URL', Redirect::queryString('/assess/attempts/'.$assess['assess_id'].'/'.$user->getId()));
 
 $trail = new Breadcrumbs();
 

@@ -32,6 +32,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
      */
     private $upcomingAssessments;
 
+
     /**
      * The maximum number of items to show
      *
@@ -106,7 +107,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
             [
                 'assessments' => $this->upcomingAssessments,
                 'limit'       => $this->limit,
-                'returnUrl'   => Redirect::queryString("/")
+                'returnUrl'   => Redirect::queryString('/')
             ]
         );
     }
