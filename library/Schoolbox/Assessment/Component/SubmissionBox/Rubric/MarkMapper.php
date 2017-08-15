@@ -47,7 +47,7 @@ class MarkMapper extends Mapper
         $this->uses('published_at', self::TYPE_DATETIME);
 
         // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
-        // hence marks already given are invalid.
+        // hence marks already given are invalid because they take their value from the rubric descriptor.
         $this->uses('valid', self::TYPE_BOOLEAN);
     }
 
