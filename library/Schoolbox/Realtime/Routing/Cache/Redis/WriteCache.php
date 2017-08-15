@@ -114,13 +114,8 @@ class WriteCache extends ReadCache implements WritableCache
     private function bindIndividual($userId, $routeStorageKey)
     {
         $this->log->info("Calculating bindings for user $userId");
-        $router = new FlatRouter();
+        $allRoutes = $this->fetchCache($routeStorageKey);
 
-        // start by loading from cache
-        $this->loaderFactory->get($routeStorageKey)->loadSubscriptions($router);
-
-        // extract the list and reset the router
-        $allRoutes = $router->getAll();
         $router = new FlatRouter();
 
         // compile user routes
@@ -192,4 +187,19 @@ class WriteCache extends ReadCache implements WritableCache
         return $this->loaderFactory->getNoCache()->getUserSubscriptions($userId);
     }
 
+
+    /**
+     * @param string $routeStorageKey
+     * @return string[][]
+     */
+    private function fetchCache($routeStorageKey)
+    {
+        $router = new FlatRouter();
+
+        // start by loading from cache
+        $this->loaderFactory->get($routeStorageKey)->loadSubscriptions($router);
+
+        // extract the list and reset the router
+        return $router->getAll();
+    }
 }
