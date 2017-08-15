@@ -6,9 +6,11 @@
  * @link        http://www.alaress.com.au/
  */
 
-
+use Psr\Log\NullLogger;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
+use Schoolbox\Realtime\Routing\Subscription\Loader;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
@@ -171,6 +173,15 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
 
             $this->doQuery($query, $from, $to);
         }
+
+        // TODO desingleton these
+        $redis = Alaress\Redis::getClientInstance();
+        $log = new NullLogger();
+
+        // update the cache
+        $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log));
+
+        $cache->cacheRedirects(INSTANCE_ID);
     }
 
     /**
