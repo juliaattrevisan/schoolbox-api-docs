@@ -14,6 +14,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use MSSQL;
+use Alaress_Probe as Probe;
 
 abstract class Base {
 
