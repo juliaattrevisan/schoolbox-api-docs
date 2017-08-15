@@ -70,6 +70,10 @@
                  */
                 publishText: 'Publish',
 
+                /* The text to display on the continue button
+                 */
+                continueText: 'Continue',
+
                 // Callbacks to execute upon successful completion of Draft and Publish actions
                 onDraftCallback: $.noop,
                 onPublishCallback: $.noop
@@ -92,9 +96,10 @@
                 $(this).data('preval', $(this).val());
             });
 
-            /* Set initial state of the Publish button
+            /* Set initial state of the Publish and Continue buttons
              */
             $(config.assessmentList).find('[data-draft="publish"]').text(config.publishText);
+            $(config.assessmentList).find('[data-draft="continue"]').text(config.continueText);
         }
 
         /**
@@ -121,7 +126,8 @@
                     $form        = $participant.find('[data-feedback-form]'),
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                    $btnPublish  = $actionBar.find('[data-draft=publish]');
+                    $btnPublish  = $actionBar.find('[data-draft=publish]'),
+                    $btnContinue = $actionBar.find('[data-draft=continue]');
 
                 $btnPublish.attr('disabled', 'disabled').text('Publishing...');
 
