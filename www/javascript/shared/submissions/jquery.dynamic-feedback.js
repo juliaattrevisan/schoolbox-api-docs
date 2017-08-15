@@ -35,7 +35,7 @@
 
         setupPreValues();
         setupListeners();
-        setupPublishAction();
+        setupActions();
 
         /**
          * Init
@@ -116,28 +116,35 @@
         }
 
         /**
-         * Set up actions to occur when Publishing Feedback
+         * Set up actions to occur when Publishing Feedback, or Continuing without Publishing
          */
-        function setupPublishAction() {
-            $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
+        function setupActions() {
+            $(config.assessmentList).on('click', '[data-draft="publish"], [data-draft="continue"]', function (e) {
                 e.preventDefault();
 
-                var $participant = $(this).closest('[data-participant]'),
+                var $thisButton  = $(this),
+                    $thisText    = $thisButton.text(),
+                    $participant = $thisButton.closest('[data-participant]'),
                     $form        = $participant.find('[data-feedback-form]'),
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
                     $btnPublish  = $actionBar.find('[data-draft=publish]'),
-                    $btnContinue = $actionBar.find('[data-draft=continue]');
+                    $btnContinue = $actionBar.find('[data-draft=continue]'),
+                    $buttons     = $btnPublish.add($btnContinue);
 
-                $btnPublish.attr('disabled', 'disabled').text('Publishing...');
+                $buttons.attr('disabled', 'disabled');
+                $thisButton.text('Publishing...');
 
                 $(config.formSaveLabel).toastActivate({
                     text: 'Publishing...'
                 });
 
                 // Publish submits everything
+                // Continue submits everything but doesn't publish
                 var formData = $form.serializeArray();
-                formData.push({name: 'publish', value: 1});
+                if ($thisButton.is($btnPublish)) {
+                    formData.push({name: 'publish', value: 1});
+                }
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
                     data:  formData,
@@ -146,11 +153,11 @@
 
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
-                        $btnPublish.text(config.publishText).addClass('hide');
+                        $thisButton.text($thisText).addClass('hide');
                         $btnDrafted.text('');
                     } else {
                         $actionBar.slideUp(function () {
-                            $btnPublish.text(config.publishText);
+                            $thisButton.text($thisText);
                             $btnDrafted.text('');
                         });
                     }
@@ -178,7 +185,8 @@
 
                 }).fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
-                    $btnPublish.removeAttr('disabled').text(config.publishText);
+                    $buttons.removeAttr('disabled');
+                    $thisButton.text($thisText);
                 });
             });
         }
