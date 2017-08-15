@@ -12,6 +12,8 @@ use Alaress\Routing\IRouter;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
 use Schoolbox\UserMapper;
+use Traversable;
+
 
 class BindingLoader implements ILoader
 {
@@ -77,10 +79,7 @@ class BindingLoader implements ILoader
 
         $this->log->debug(sprintf("%d subscriptions loaded for %d users in %0.3f seconds", $totalRoutes, $userCount, ($b - $a)));
 
-        // load in the redirects
-        $stmt = $this->userMapper->getDatabase()->query('SELECT `from`, `to` FROM msg_redirect');
-
-        while (list($from, $to) = $stmt->fetch(\PDO::FETCH_NUM)) {
+        foreach ($this->getRedirects() as $from => $to) {
             $this->log->info("Adding redirect `$from` -> `$to`");
             $router->add($from, $to, true);
         }
@@ -109,5 +108,17 @@ class BindingLoader implements ILoader
         return $userRoutes;
     }
 
+
+    /**
+     * @return Traversable
+     */
+    public function getRedirects()
+    {
+        $stmt = $this->userMapper->getDatabase()->query('SELECT `from`, `to` FROM msg_redirect');
+
+        while (list ($from, $to) = $stmt->fetch(\PDO::FETCH_NUM)) {
+            yield $from => $to;
+        }
+    }
 
 }

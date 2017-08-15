@@ -91,6 +91,15 @@ class CacheLoader implements ILoader
 
 
     /**
+     * @return Traversable|string[]
+     */
+    public function getRedirects()
+    {
+        return new ArrayIterator($this->getRoutes(function ($key) { return !is_int($key); }));
+    }
+
+
+    /**
      * @param callable $filter
      * @return string[]
      */
