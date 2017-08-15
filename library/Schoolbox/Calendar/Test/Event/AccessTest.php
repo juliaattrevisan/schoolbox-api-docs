@@ -175,6 +175,32 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param User $effector
+     * @param int[] $groups
+     * @return FolderAccess
+     */
+    private function getMockFolderAccess(User $effector, array $groups)
+    {
+        // Create mock folder access object and mock getMinFolderAccess() to bypass DB
+        $mockFolderAccess = $this->getMockBuilder(FolderAccess::class)->getMock();
+        $mockFolderAccess->method('getMinFolderAccess')->willReturnCallback(function () use ($effector, $groups) {
+            $relatedAccessList = $effector->getAccessList()->filter(function (UserAccess $access) use ($groups) {
+                return in_array($access->getServiceIdentifier(), $groups);
+            });
+
+            $relatedAccessLevels = $relatedAccessList->getColumnValues('accessLevel');
+
+            if (empty($relatedAccessLevels)) {
+                return 0;
+            }
+
+            return min($relatedAccessLevels);
+        });
+
+        return $mockFolderAccess;
+    }
+
+    /**
      * Generate an array for running a test on checkDestination
      *
      * @param $result
@@ -348,13 +374,15 @@ class AccessTest extends \PHPUnit_Framework_TestCase
         // Set access on users
         $this->configureUserAccess('campusModerate');
         $this->configureUserAccess('campusRead');
+        $this->configureUserAccess('groupWrite');
+        $this->configureUserAccess('groupRead');
 
         return [
 
             // Personal level event, staff can modify event for themselves
             'ExistingPersonal' => $this->generateTestExisting(true, 'staff', 'personal', 'staff', 'staff'),
 
-            // Personal level event, student cannot create event for a staff member
+            // Personal level event, student cannot modify event for a staff member
             // TODO: currently possible, add test with SA-4032 fix
 
             // Campus level event, moderators can modify campus level event not authored or owned by themselves
@@ -362,6 +390,12 @@ class AccessTest extends \PHPUnit_Framework_TestCase
 
             // Campus level event, read access cannot modify campus level event, even if they authored & own
             'ExistingCampusRead' => $this->generateTestExisting(false, 'campusRead', 'campus', 'campusRead', 'campusRead'),
+
+            // Group level event, write access can modify event not authored or owned by themselves
+            'ExistingGroup' => $this->generateTestExisting(true, 'groupWrite', 'group', 'staff', 'staff'),
+
+            // Group level event, read access cannot modify group level event, even if they authored & own
+            'ExistingGroupRead' => $this->generateTestExisting(false, 'groupRead', 'group', 'groupRead', 'groupRead'),
 
         ];
     }
@@ -374,7 +408,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckExisting($expected, User $effector, Event $event)
     {
-        $access = new EventAccess(new FolderAccess());
+        $access = new EventAccess($this->getMockFolderAccess($effector, $event->getCategoryCollection()->getColumnValues('categoryId')));
         $actual = $access->checkExisting($effector, $event);
         $this->assertEquals($expected, $actual);
     }
@@ -391,24 +425,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckDestination($expected, User $effector, $accessLevel, User $author, User $owner, array $groups = [], array $campuses = [])
     {
-        // Create mock folder access object and mock getMinFolderAccess() to bypass DB
-        $mockFolderAccess = $this->getMockBuilder(FolderAccess::class)->getMock();
-        $mockFolderAccess->method('getMinFolderAccess')->willReturnCallback(function () use ($effector, $groups) {
-            $relatedAccessList = $effector->getAccessList()->filter(function (UserAccess $access) use ($groups) {
-                return in_array($access->getServiceIdentifier(), $groups);
-            });
-
-            $relatedAccessLevels = $relatedAccessList->getColumnValues('accessLevel');
-
-            if (empty($relatedAccessLevels)) {
-                return 0;
-            }
-
-            return min($relatedAccessLevels);
-        });
-
-
-        $access = new EventAccess($mockFolderAccess);
+        $access = new EventAccess($this->getMockFolderAccess($effector, $groups));
         $actual = $access->checkDestination($effector, $accessLevel, $author, $owner, $groups, $campuses);
         $this->assertEquals($expected, $actual);
     }
