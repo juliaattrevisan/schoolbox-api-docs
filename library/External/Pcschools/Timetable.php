@@ -248,15 +248,14 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         ksort($timetable);
 
         // What's the current day number?
-        $dayNumber    = 0;
-        $databaseDate = $date->getDatabaseDate();
+        $dayNumber = 0;
         foreach ($weekDays as $weekDay) {
             try {
-                $adf = new Alaress_Date_Format($weekDay['DATE'], 'M d Y+|');
+                $adf = new Alaress_Date_Format($weekDay['DATE'], Alaress_Date_Format::DATABASE_FORMAT);
             } catch (Exception $e) {
                 continue;
             }
-            if ($adf->getDatabaseDate() == $databaseDate) {
+            if ($adf->isSameDay($date)) {
                 $dayNumber = $weekDay['TIMETABLE_DAY'];
                 break;
             }
