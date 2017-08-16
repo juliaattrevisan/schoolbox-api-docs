@@ -48,7 +48,7 @@ class Attendance_Synergetic_AttendanceRecord
             foreach ($data as $key => $value) {
                 $paramCount++;
                 $query .= " $key = :param{$paramCount},";
-                $params[$paramCount] = $value;
+                $params['param'.$paramCount] = $value;
             }
 
             $query = substr($query, 0, -1);
@@ -57,7 +57,7 @@ class Attendance_Synergetic_AttendanceRecord
 
             $query .= "
                 WHERE wkAttendanceMasterSeq = :attendanceMasterSeq
-                AND	ID = :id
+                AND ID = :id
             ";
 
             $params['attendanceMasterSeq'] = $AttendanceMasterSeq;
