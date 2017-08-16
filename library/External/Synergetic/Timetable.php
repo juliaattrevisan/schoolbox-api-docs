@@ -389,7 +389,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $periodList = [];
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
-        if (!is_array($timetabledef)) {
+        if (!is_array($timetabledef['desc'])) {
             return [];
         }
 
