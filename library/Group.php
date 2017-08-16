@@ -456,7 +456,7 @@ class Group extends DeprecatedModel
             try {
                 $this->cacheUser[$userID] = $user = UserMapper::getInstance()->findById($userID);
             } catch (MapperException $e) {
-                return 0;
+                return DENY_ACCESS;
             }
         } else {
             $user = $this->cacheUser[$userID];
