@@ -28,8 +28,8 @@ class ConfigMapper extends BaseMapper
         $this->hasTable('eotc_config');
         $this->hasModel(Config::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->uses('name', self::TYPE_STRING, self::COLUMN_IDENTIFIER, 'name');
-        $this->uses('value', self::TYPE_STRING, self::COLUMN_IDENTIFIER, 'value');
+        $this->uses('name', self::TYPE_STRING, null, 'name');
+        $this->uses('value', self::TYPE_STRING, null, 'value');
     }
 
     /**
