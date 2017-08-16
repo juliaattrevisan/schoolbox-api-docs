@@ -8,7 +8,9 @@
 
 namespace Schoolbox\Fixtures\Team;
 
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\Web\Controller\Exception;
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
@@ -25,6 +27,7 @@ use \Schoolbox\Fixtures\Division\Helper\Collector;
 use \Schoolbox\Fixtures\Division\Helper\Translator;
 use Schoolbox\UserMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+use Schoolbox\Application\Exception as ApplicationException;
 
 /**
  * @method TeamMapper getMapper()
@@ -119,80 +122,22 @@ class Controller extends AbstractController
     }
 
     /**
-     * List of Teams and the Division they are in
-     * @param Division $context
+     * Generate a list of Teams and the Division they are in
+     *
+     * @param null|Division $context
+     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws ApplicationException\Exception If no sport found in DB
      */
     public function getList($context = null)
     {
-        /* ajax a list of Teams for a particular Division
-         */
+        // ajax a list of Teams for a particular Division
         if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
-            $query = $this->getRequest()->query->get('query');
-
-            if ($context == null) {
-                $pb = $this->getMapper()->getPredicateBuilder();
-                $pb->like('name', "%{$this->getMapper()->getDatabase()->escapeForLike($query)}%");
-                $allTeams = $this->getMapper()->findByPredicates($pb);
-            } else {
-                $allTeams = $this->getMapper()->findByName($context->getId(), $query);
-            }
-
-            $teams = [];
-
-            /** @var Team $currentTeam */
-            foreach ($allTeams as $currentTeam) {
-                $teams[] = array_combine(['id', 'name'], $currentTeam->findValueLabelPair());
-            }
-
-            // If the 'schools' parameter is set we also want to add schools from the tag cloud
-
-            if ($this->getRequest()->query->get('schools') == 1) {
-                // Add schools from the tag cloud
-                $schools = $this->getSchoolTagCloudMapper()->findForTag($this->getUser(), $query);
-
-                foreach ($schools as $school) {
-                    // Prefix their ID with the external school token, we will parse it later when saving a match
-                    $school['id'] = TagCloudMapper::SCHOOL_PREFIX . $school['id'];
-                    $teams[] = $school;
-                }
-
-                // Sort return array by name
-                usort($teams, function ($a, $b) {
-                    return strcmp($a['name'], $b['name']);
-                });
-            }
-
-            $this->getResponse()->content->set($this->buildJsonOutput($teams));
-        }
-        else {
-            try {
-                $sport = $this->getSportMapper()->findById($context->getSport()->getId());
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-            }
-
-            $allTeams = $this->getMapper()->findByColumn(
-                'division_id',
-                $context->getId(),
-                [
-                    'order' => [
-                        'name' => 'asc'
-                    ]
-                ]
-            );
-
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput(
-                    '@sportsfixturesTeam/list.twig',
-                    [
-                        'sport'    => $sport,
-                        'division' => $context,
-                        'allTeams' => $allTeams
-                    ]
-                )
-            );
+            $this->getJsonList($context);
+        } else {
+            $this->getHtmlList($context);
         }
     }
+
 
     /**
      * Create a Team in a particular Division id
@@ -387,6 +332,92 @@ class Controller extends AbstractController
                 )
             );
         }
+    }
+
+
+    /**
+     * Return a JSON formatted list of teams
+     *
+     * @param null|Division $context
+     */
+    private function getJsonList(Division $context = null)
+    {
+        $query = $this->getRequest()->query->get('query');
+
+        if ($context === null) {
+            /** @var IQuoter $database */
+            $database = $this->getMapper()->getDatabase();
+            $pb       = $this->getMapper()->getPredicateBuilder();
+            $pb->like('name', "%{$database->escapeForLike($query)}%");
+            $allTeams = $this->getMapper()->findByPredicates($pb);
+        } else {
+            $allTeams = $this->getMapper()->findByName($context->getId(), $query);
+        }
+
+        $teams = [];
+
+        /** @var Team $currentTeam */
+        foreach ($allTeams as $currentTeam) {
+            $teams[] = array_combine(['id', 'name'], $currentTeam->findValueLabelPair());
+        }
+
+        // If the 'schools' parameter is set we also want to add schools from the tag cloud
+
+        if ((int)$this->getRequest()->query->get('schools') === 1) {
+            // Add schools from the tag cloud
+            $schools = $this->getSchoolTagCloudMapper()->findForTag($this->getUser(), $query);
+
+            foreach ($schools as $school) {
+                // Prefix their ID with the external school token, we will parse it later when saving a match
+                $school['id'] = TagCloudMapper::SCHOOL_PREFIX . $school['id'];
+                $teams[]      = $school;
+            }
+
+            // Sort return array by name
+            usort($teams, function ($a, $b) {
+                return strcmp($a['name'], $b['name']);
+            });
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($teams));
+    }
+
+
+    /**
+     * Renders a HTML list of teams
+     *
+     * @param Division $context Intentionally does not permit null
+     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws ApplicationException\Exception If no sport found in DB
+     */
+    private function getHtmlList(Division $context)
+    {
+        try {
+            $sport = $this->getSportMapper()->findById($context->getSport()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        }
+
+        $allTeams = $this->getMapper()->findByColumn(
+            'division_id',
+            $context->getId(),
+            [
+                'order' => [
+                    'name' => 'asc',
+                ],
+            ]
+        );
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@sportsfixturesTeam/list.twig',
+                [
+                    'sport'    => $sport,
+                    'division' => $context,
+                    'allTeams' => $allTeams,
+                ]
+            )
+        );
     }
 
     /* Getters/Setters

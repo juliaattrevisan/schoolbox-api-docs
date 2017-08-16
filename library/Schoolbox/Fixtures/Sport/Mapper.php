@@ -21,9 +21,10 @@ use \Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 
 /**
  * Class Mapper
+ *
  * @package Schoolbox\Fixtures\Sport
  *
- * @method Sport createModel()
+ * @method Sport createModel($idValue = null)
  * @method Sport findById($id)
  */
 class Mapper extends BaseMapper

@@ -1,3 +1,11 @@
+{#
+  Renders a list of teams.
+
+  Data:
+    sport:    Sport\Model
+    division: Division\Model
+    allTeams: Collection|Team\Model[]
+#}
 <script type="text/javascript">
     $(function() {
         $('#allTeams').on('click', '[data-delete]', function(event) {
@@ -12,8 +20,8 @@
                     $.post(element.attr('href'), {teamId: element.attr('data-delete')}, function() {
 
                         // Is this the last team in the division ?
-                        if( 1 == $('[data-team]').length){
-                            window.location.href = window.location.href;
+                        if( 1 === $('[data-team]').length){
+                            location.reload();
                         } else {
                             $team.fadeOut({ done: $team.remove });
                         }
@@ -44,9 +52,13 @@
                     <h2 class="subheader">{{ division.name }}</h2>
                 </div>
             </div>
-            {% if not division.season.isArchived %}
+            {% set routeCreateTeam = routeLookupIfAuthorized('sportsfixturesTeam.getCreateForm', {
+                contextId: division.id,
+                context:   division
+            }) %}
+            {% if routeCreateTeam %}
             <nav>
-                <a href='{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}' class="icon-add" title="Add Team to {{ division.name }}"></a>
+                <a href='{{ routeCreateTeam }}' class="icon-add" title="Add Team to {{ division.name }}"></a>
             </nav>
             {% endif %}
         </div>
@@ -62,16 +74,33 @@
                             <p class="meta"><a href="{{ currentTeam.url }}">{{ currentTeam.url }}</a>
                         </div>
                     </div>
-                    <nav>
-                        {% if not division.season.isArchived %}
-                            <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: currentTeam.id}) }}" class="icon-modify" title="Modify"></a>
-                        {% endif %}
 
-                        <a href="#" class="icon-more" data-dropdown="sportsfixtures-team-{{ currentTeam.getId() }}-actions"></a>
-                    </nav>
-                    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-team-{{ currentTeam.getId() }}-actions">
-                        <li><a href="{{ routeLookup('sportsfixturesTeam.deleteEntity', {entityId: currentTeam.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentTeam.id }}">Delete</a></li>
-                    </ul>
+                    {% set routeModifyTeam = routeLookupIfAuthorized('sportsfixturesTeam.getModifyForm', {
+                        entityId: currentTeam.id,
+                        entity:   currentTeam
+                    }) %}
+
+                    {% set routeDeleteTeam = routeLookupIfAuthorized('sportsfixturesTeam.deleteEntity', {
+                        entityId: currentTeam.id,
+                        entity:   currentTeam
+                    }) %}
+
+                    {% if routeModifyTeam or routeDeleteTeam %}
+                        <nav>
+                            {% if routeModifyTeam %}
+                                <a href="{{ routeModifyTeam }}" class="icon-modify" title="Modify"></a>
+                            {% endif %}
+
+                            {% if routeDeleteTeam %}
+                                <a href="#" class="icon-more" data-dropdown="sportsfixtures-team-{{ currentTeam.getId() }}-actions"></a>
+                            {% endif %}
+                        </nav>
+                        {% if routeDeleteTeam %}
+                            <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-team-{{ currentTeam.getId() }}-actions">
+                                <li><a href="{{ routeDeleteTeam }}" class="icon-delete" title="Delete" data-delete="{{ currentTeam.id }}">Delete</a></li>
+                            </ul>
+                        {% endif %}
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
@@ -80,7 +109,9 @@
         <div class="empty-state">
             <i class="icon-team"></i>
             <p>There are no Teams in {{ division.name }}.</p>
-            <p><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" title="Add a Team">Add a Team</a></p>
+            {% if routeCreateTeam %}
+            <p><a href="{{ routeCreateTeam }}" title="Add a Team">Add a Team</a></p>
+            {% endif %}
         </div>
         {% endif %}
     </div>

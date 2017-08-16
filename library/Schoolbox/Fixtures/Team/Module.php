@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Fixtures\Authorizer\Rule\IsSeasonNotArchived;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use \Schoolbox\Permission\Access\UserAccess;
@@ -67,22 +68,27 @@ class Module extends RestfulModule
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException If any sub-rules to composite do not implement IAuthorizationRule
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
-
-        /* Permissions requirements for being a Sports Administrator
-         */
-        $isSportsAdministrator = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE)
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        // SU can do mutate whatever, whenever. Sports Admin can mutate if not archived.
+        $canMutateTeams = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\HasServicePermission(
+                    UserAccess::SERVICE_SPORTS_ADMINISTRATOR,
+                    UserAccess::ACCESS_WRITE
+                ),
+                new IsSeasonNotArchived()
             )
         );
 
-        /* Apply route permissions here as you add them to initRoutes()
-         * Note that if the perms change you need to log out/log in to refresh
-         */
-        $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
+        // Match all routes except for 'getList' and 'getEntity'
+        $this->addRoutePermission($authorizer, '(?!(getList|getEntity)$).*', $canMutateTeams);
+
+        // Any logged in user can see a list of teams (whether AJAX JSON or HTML page), or team details
+        $this->addRoutePermission($authorizer, 'getList|getEntity', new Rule\IsLoggedIn());
     }
 }
