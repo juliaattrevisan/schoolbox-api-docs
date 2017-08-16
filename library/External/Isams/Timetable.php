@@ -25,9 +25,6 @@ class External_Isams_Timetable implements External_TimetableInterface
 {
     use External_MssqlConnector;
 
-    /** @var MSSQL $database */
-    private $database;
-
     /**
      * External_Doublefirst_Timetable constructor.
      */
@@ -110,7 +107,7 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         $queryDayCount = "
            SELECT     COUNT(*) AS DayCount
-           FROM       (SELECT DISTINCT DayID from V_TimetableStructure WHERE CampusCode = :campus_code as d
+           FROM       (SELECT DISTINCT DayID from V_TimetableStructure WHERE CampusCode = :campus_code) AS d
         ";
 
         $days = $this->getConnector()->executeQuery($queryDayCount, [
@@ -382,7 +379,7 @@ class External_Isams_Timetable implements External_TimetableInterface
                             V_Class.Tutor2ID = :external_user_id OR
                             V_Class.StudentID = :external_user_id
                         )
-                        AND CampusCode = :campus_code{}
+                        AND CampusCode = :campus_code
             ORDER BY V_Days.intOrder, V_Periods.intOrder
         ";
 
