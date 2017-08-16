@@ -275,7 +275,7 @@ ALTER TABLE resource_category MODIFY name varchar(250) CHARACTER SET utf8mb4 COL
 ALTER TABLE rubric_criterion MODIFY grouping varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE rubric_criterion MODIFY name varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE rubric_criterion MODIFY parent_type enum('submission','category','curriculum') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-ALTER TABLE rubric_descriptor MODIFY description varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE rubric_descriptor MODIFY description varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE rubric_level MODIFY name varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE rubric_result MODIFY label varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ALTER TABLE socialstream_post MODIFY type varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
