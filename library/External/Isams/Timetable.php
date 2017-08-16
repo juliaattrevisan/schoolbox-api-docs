@@ -166,7 +166,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             return $day['DayID'];
         } else {
             // If that falls in a heap, use the default one specified in the config
-            return intval(Config::get('external_isams_default_day_id'));
+            return (int)$this->config->get('external_isams_default_day_id');
         }
     }
 
