@@ -131,16 +131,28 @@
                     <form id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                         <input type="hidden" name="studentId" value="{{ student.id }}"/>
                         <input type="hidden" name="categoryId" value="{{ subject.id }}"/>
-                        <textarea title="TODO" name="comment" rows="3"></textarea>
+                        <textarea name="comment" rows="3"></textarea>
                         <div class="row">
-                            <div class="small-6 medium-offset-6 medium-3 column">
-                                <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
-                                <label for="vis-student" class="checkbox-label">Visible To Student</label>
-                            </div>
-                            <div class="small-6 medium-3 column">
-                                <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
-                                <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
-                            </div>
+                            {% if USER.role.isStaff %}
+                                <div class="small-offset-6 small-3 medium-offset-6 medium-3 column">
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
+                                    <label for="vis-student" class="checkbox-label">Visible To Student</label>
+                                </div>
+                                <div class="small-3 medium-3 column">
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
+                                    <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
+                                </div>
+                            {% elseif USER.role.isStudent %}
+                                <div class="small-offset-9 small-3 medium-offset-9 medium-3 column">
+                                    <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" checked />
+                                    <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
+                                </div>
+                            {% elseif USER.role.isParent %}
+                                <div class="small-offset-9 small-3 medium-offset-9 medium-3 column">
+                                    <input id="vis-student" type="checkbox" name="visibility[student]" value="1" />
+                                    <label for="vis-student" class="checkbox-label">Visible To Student</label>
+                                </div>
+                            {% endif %}
                         </div>
                         <a class="button expand submit" data-comment-post="new">Post</a>
                     </form>
