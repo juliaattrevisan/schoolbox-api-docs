@@ -34,8 +34,9 @@ if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
 }
 
 $userAccess = new Access();
-if (!($_SESSION['user']->isSuperuser() || $userAccess->getFolderAccess($_SESSION['user'],
-        $folderId) >= UserAccess::ACCESS_WRITE)) {
+if (!($_SESSION['user']->isSuperuser()
+    || $userAccess->getFolderAccess($_SESSION['user'], $folderId) >= UserAccess::ACCESS_WRITE
+)) {
     error(6);
 }
 
