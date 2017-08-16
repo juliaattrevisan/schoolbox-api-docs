@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Calendar_Layout_Full_Javascript
  *
@@ -12,8 +11,12 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+use EOTC\ConfigMapper as EOTCConfigMapper;
+use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Collection;
+
 class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 {
     /**
@@ -32,13 +35,12 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     {
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
         $this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'has_eotc_events_all', 'has_eotc_events_all_block');
 
-        $this->getPage()->setVar(
-            array(
-                'USER_CALENDAR_ID' => $this->getUser()->getId(),
-                'USER_FULLNAME'    => $this->getUser()->getFullname(),
-            )
-        );
+        $this->getPage()->setVar([
+            'USER_CALENDAR_ID' => $this->getUser()->getId(),
+            'USER_FULLNAME' => $this->getUser()->getFullname(),
+        ]);
 
         $this->setupSelectedDayMonthYear();
     }
@@ -62,14 +64,12 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         $selectedMonth = date("n", $selectedDate);
         $selectedYear = date("Y", $selectedDate);
 
-        $this->getPage()->setVar(
-            array(
-                'SELECTED_DAY'   => $selectedDay,
-                'SELECTED_MONTH' => $selectedMonth - 1,
-                'SELECTED_YEAR'  => $selectedYear,
-                'SELECTED_DATE'  => date('Y-m-d', $selectedDate),
-            )
-        );
+        $this->getPage()->setVar([
+            'SELECTED_DAY' => $selectedDay,
+            'SELECTED_MONTH' => $selectedMonth - 1,
+            'SELECTED_YEAR' => $selectedYear,
+            'SELECTED_DATE' => date('Y-m-d', $selectedDate),
+        ]);
     }
 
     /**
@@ -79,44 +79,49 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     {
         $this->setupMovementButtons();
 
+        /* If EOTC is enabled, show these options
+         */
+        if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
+            $this->getPage()->parse('has_eotc_events_all_block', 'has_eotc_events_all');
+        } else {
+            $this->getPage()->setVar([
+                'has_eotc_events_all_block' => ''
+            ]);
+        }
+
         $calendarView = $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month';
 
         // The list view is not part of fullcalendar and will cause a JS error, default back to the month view
 
-        if ($calendarView == 'list')
+        if ($calendarView == 'list') {
             $calendarView = 'month';
+        }
 
-        $this->getPage()->setVar(
-            array(
-                'CALENDAR_USER_ID'         => $this->getUser()->getId(),
-                'CALENDAR_VIEW'            => $calendarView,
-                'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
-                'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
-                'USER_TOKEN'               => $this->getUser()->getKey(),
-            )
-        );
+        $this->getPage()->setVar([
+            'CALENDAR_USER_ID' => $this->getUser()->getId(),
+            'CALENDAR_VIEW' => $calendarView,
+            'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
+            'CALENDAR_START_DAY' => Config::get('calendar_start_day') ? : 0,
+            'USER_TOKEN' => $this->getUser()->getKey(),
+        ]);
 
         /* Render event types to choose from
          */
-        /** @var \Schoolbox\Calendar\EventType[] $allTypes */
-        $allTypes = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
+        /** @var Collection $allTypes */
+        $allTypes = EventTypeMapper::getInstance()->findAll();
+
         if ($allTypes->count()) {
             foreach ($allTypes as $currentType) {
-                /* Event Task id
-                 */
                 if ($currentType->isTaskType()) {
-                    $this->getPage()->setVar(
-                        array(
-                            'TASK_TYPE_ID' => $currentType->getId(),
-                        )
-                    );
+                    $this->getPage()->setVar([
+                        'TASK_TYPE_ID' => $currentType->getId(),
+                    ]);
                 } else {
-                    $this->getPage()->setVar(
-                        array(
-                            'EVENT_TYPE_ID'   => $currentType->getId(),
-                            'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
-                        )
-                    );
+                    $this->getPage()->setVar([
+                        'EVENT_TYPE_ID' => $currentType->getId(),
+                        'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
+                    ]);
+
                     $this->getPage()->parse('event_type_block', 'event_type', true);
                 }
             }

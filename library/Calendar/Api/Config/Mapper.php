@@ -1,5 +1,9 @@
 <?php
 
+use Schoolbox\Collection;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+
 /**
  * Calendar_Api_Config_Mapper
  *
@@ -9,61 +13,22 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
+class Calendar_Api_Config_Mapper extends BaseMapper
 {
-
     /**
      * Mapping rules
-     *
-     * @return Bool|void
      */
     protected function mapping()
     {
         $this->hasTable('calendar_connector');
         $this->hasModel(Calendar_Api_Config_Record::class);
 
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'event_type',
-                'property' => 'eventType',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'connector_class',
-                'property' => 'connectorClass',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'config',
-                'property' => 'config',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'status',
-                'property' => 'status',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('event_type', self::TYPE_STRING, null, 'eventType');
+        $this->uses('connector_class', self::TYPE_STRING, null, 'connectorClass');
+        $this->uses('config', self::TYPE_STRING, null, 'config');
+        $this->uses('status', self::TYPE_INTEGER, null, 'status');
     }
 
     /**
@@ -72,11 +37,29 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      * Un-uniqueified because this was ramming all vCal sources into the same
      * connector, and they should be unique (for filtering by source).
      *
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
     public function getAllConfigRecords()
     {
         return $this->findByColumn('status', 1);
+    }
+
+    /**
+     * The provided eventType and connectorClass combination is an active source
+     * in Calendar subscription
+     *
+     * @param $eventType
+     * @param $connectorClass
+     * @return bool
+     * @throws MapperException
+     */
+    public function isSourceEnabled($eventType, $connectorClass)
+    {
+        return Calendar_Api_Config_Mapper::getInstance()->countByColumnList([
+            'event_type'      => $eventType,
+            'connector_class' => $connectorClass,
+            'status'          => 1
+        ]) > 0;
     }
 
     /**
@@ -89,13 +72,15 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     public function getSourceListForCalendar()
     {
         $configs = $this->getAllConfigRecords();
+        $sourceList = [];
+
         foreach ($configs as $record) {
             /** @var Calendar_Api_Config_Record $record */
             try {
-                $sourceList[] = array(
+                $sourceList[] = [
                     'id'   => $record->getId(),
                     'name' => $record->decodeConfig()->getLabel()
-                );
+                ];
             } catch (DomainException $e) {
                 //config does not exist or is disabled
             }
@@ -109,12 +94,12 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
                 $name = $item['name'];
                 if (!array_key_exists($name, $carry)) {
                     $carry[$name]       = $item;
-                    $carry[$name]['id'] = array();
+                    $carry[$name]['id'] = [];
                 }
                 $carry[$name]['id'][] = $id;
                 return $carry;
             },
-            array()
+            []
         );
 
         // Join the IDs for each source together.
@@ -133,8 +118,8 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      *
      * @param $currentEventType
      * @param $currentConnector
-     *
      * @return Calendar_Api_Config_Connector_Interface[]
+     * @throws MapperException
      */
     public function getAllConfigs($currentEventType, $currentConnector)
     {
@@ -164,15 +149,15 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
 
     /**
      * Deactivate all configs (used when updating)
+     *
+     * @return $this
      */
     public function deactivateAll()
     {
-        $statement = $this->database->prepare(
-            "
+        $statement = $this->database->prepare("
             UPDATE `{$this->table}`
             SET status = 0
-        "
-        );
+        ");
 
         $statement->execute();
 
@@ -189,19 +174,17 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      */
     public function activate($eventType, $connectorClass)
     {
-        $statement = $this->database->prepare(
-            "
+        $statement = $this->database->prepare("
             UPDATE `{$this->table}`
             SET status = 1
             WHERE event_type = :eventType
             AND connector_class = :connectorClass
-        "
-        );
+        ");
 
-        $statement->bindParam(':eventType', $eventType);
-        $statement->bindParam(':connectorClass', $connectorClass);
-
-        $statement->execute();
+        $statement->execute([
+            'eventType' => $eventType,
+            'connectorClass' => $connectorClass
+        ]);
 
         return $this;
     }
@@ -213,13 +196,12 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      */
     public function generateApiHierarchy()
     {
-
         /* Figure out which Event Sources are around, and which Connectors
          * are available for each Event Sources.
          */
         $path = '../library/Calendar/Api/EventType';
 
-        $allApi = array();
+        $allApi = [];
 
         /* Just get the dir names (these correspond to event types)
          */
@@ -250,52 +232,5 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
         }
 
         return $allApi;
-    }
-
-    /**
-     * Some generic test values used to populate the calendar_connector table
-     * while developing the admin ui
-     */
-    public function setupDefaults()
-    {
-        $start = 85;
-
-        $config = new Calendar_Api_Config_Connector_Vcal();
-        $config->setId($start);
-        $config->setEventType('Event');
-        $config->setConnectorClass('Vcal');
-        $config->setUrl('http://www.google.com');
-
-        $configRecord = new Calendar_Api_Config_Record();
-        $configRecord->setEventType('Event');
-        $configRecord->setConnectorClass('Vcal');
-        $configRecord->updateConfig($config);
-
-        $this->save(array($configRecord));
-
-        $config = new Calendar_Api_Config_Connector_Vcal();
-        $config->setId($start++);
-        $config->setEventType('Event');
-        $config->setConnectorClass('Vcal');
-        $config->setUrl('http://www.gruber.org');
-
-        $configRecord = new Calendar_Api_Config_Record();
-        $configRecord->setEventType('Event');
-        $configRecord->setConnectorClass('Vcal');
-        $configRecord->updateConfig($config);
-
-        $this->save(array($configRecord));
-
-        $config = new Calendar_Api_Config_Connector_Schoolbox();
-        $config->setId($start++);
-        $config->setEventType('Submission');
-        $config->setConnectorClass('Schoolbox');
-
-        $configRecord = new Calendar_Api_Config_Record();
-        $configRecord->setEventType('Submission');
-        $configRecord->setConnectorClass('Schoolbox');
-        $configRecord->updateConfig($config);
-
-        $this->save(array($configRecord));
     }
 }

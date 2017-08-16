@@ -1,17 +1,21 @@
 <?php
 
+use Schoolbox\Calendar\Event;
+use Schoolbox\Collection;
+
 /* Use $_POST['action'] to separate screens
  */
 if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
-/* Subscription settings
+    /* Subscription settings
      */
     if (is_array($_POST['record']) && count($_POST['record'])) {
-/* Update the options for each connector
+        /* Update the options for each connector
          */
         foreach ($_POST['record'] as $id => $attribs) {
             /** @var Calendar_Api_Config_Record $configRecord */
             $configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($id);
             $config = $configRecord->decodeConfig();
+
             /* Process multiple Vcals
              */
             if (isset($attribs['luEventType'])) {
@@ -25,26 +29,29 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
                 /* Add urls
                  */
                 $config->setUrl($attribs['url']);
+
                 /* Add permissions for campus (or use the default empty array if not chosen)
                  */
                 if (is_array($attribs['campus'])) {
                     $config->setCampus($attribs['campus']);
                 } else {
-                    $config->setCampus(array());
+                    $config->setCampus([]);
                 }
+
                 /* Add permission for groups (or use the default empty array if not chosen)
                  */
                 if (is_array($attribs['groupCheck'])) {
                     $config->setGroups($attribs['groupCheck']);
                 } else {
-                    $config->setGroups(array());
+                    $config->setGroups([]);
                 }
             }
+
             /* Update and save config
              */
             $config->setLabel($attribs['label']);
             $configRecord->updateConfig($config);
-            Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
+            Calendar_Api_Config_Mapper::getInstance()->save([$configRecord]);
         }
     }
 
@@ -56,15 +63,15 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
     if (is_array($_POST['active']) && count($_POST['active'])) {
         foreach ($_POST['active'] as $currentActive) {
             $bits = explode('_', $currentActive);
+
             /* Ensure that each connector has at least one config
              * If it doesn't have one, add one
              */
-            $allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(
-                array(
-                    'event_type' => $bits[0],
-                    'connector_class' => $bits[1],
-                )
-            );
+            $allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList([
+                'event_type' => $bits[0],
+                'connector_class' => $bits[1],
+            ]);
+
             /* Add it
              */
             if (!$allConfigs->count()) {
@@ -79,12 +86,14 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
                     $configRecord->setEventType($bits[0]);
                     $configRecord->setConnectorClass($bits[1]);
                     $configRecord->updateConfig($config);
+
                     /* This is active
                      */
                     $configRecord->activate();
+
                     /* Ram in this new record
                      */
-                    $allConfigs = new Schoolbox\Collection(array($configRecord));
+                    $allConfigs = new Collection([$configRecord]);
                 }
             }
 
@@ -93,17 +102,17 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
              */
             foreach ($allConfigs as $currentConfig) {
                 $currentConfig->activate();
-                Calendar_Api_Config_Mapper::getInstance()->save(array($currentConfig));
+                Calendar_Api_Config_Mapper::getInstance()->save([$currentConfig]);
             }
         }
     }
 } elseif (isset($_POST['action']) && $_POST['action'] == 'cleanup') {
-/* Mass Cleanup
+    /* Mass Cleanup
      */
     if (isset($_POST['cleanupFrom']) && isset($_POST['cleanupTo'])) {
         /* Change selected date range for mass cleanup
+         * noop
          */
-        // noop
     } elseif (is_array($_POST['cleanupEventId']) && count($_POST['cleanupEventId'])) {
         /* Mass cleanup of selected events
          */
@@ -121,6 +130,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
          */
         foreach ($_POST['cleanupEventId'] as $currentEventId) {
             try {
+                /** @var Event $event */
                 $event = $eventMapper->findById($currentEventId);
                 /* Purge existing sids
                  */
