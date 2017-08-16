@@ -85,16 +85,11 @@ class External_Synergetic_Class implements External_ClassInterface
         }
 
         $classQuery   = $this->getClassCodeQuery($subCode);
-        //TODO: Inject $_SESSION['user'], short term to get this working without arch changes
-        if (isset($_SESSION['user']) && $_SESSION['user'] instanceof \Schoolbox\User) {
-            /** @var \Schoolbox\User $user */
-            $user = $_SESSION['user'];
-            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($user->getExternalId()));
-            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($user->getExternalId()));
-        } else {
-            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-        }
+
+        // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
+        $userExternalId = $_SESSION['user'] ? $_SESSION['user']->getExternalId() : null;
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($userExternalId));
+        $fileYear = $this->database->quote($this->externalUser->getCurrentYear($userExternalId));
 
         $query = "
         SELECT DISTINCT StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
@@ -123,10 +118,13 @@ class External_Synergetic_Class implements External_ClassInterface
     public function getTeacherName($subCode)
     {
         $teachers = array();
-
         $classQuery   = $this->getClassCodeQuery($subCode);
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+
+        // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
+        $userExternalId = $_SESSION['user'] ? $_SESSION['user']->getExternalId() : null;
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($userExternalId));
+        $fileYear = $this->database->quote($this->externalUser->getCurrentYear($userExternalId));
+
         $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
                     WHERE $classQuery
                     AND FileYear='{$fileYear}'
