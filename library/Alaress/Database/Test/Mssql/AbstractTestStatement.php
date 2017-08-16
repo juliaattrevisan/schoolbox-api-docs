@@ -100,6 +100,13 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
         $this->assertGreaterThan(1, $count);
 
 
+        // Because of some object reference voodoo which I can't figure out;
+        // running the statement again fails under DBLib
+        // (presumably because the object reference isn't cleaned up)
+        // All I can do for now is to unset the statement object.
+        unset($statement);
+
+
         // and now fetch
         $statement = $this->mssqlTest->executeQuery(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
