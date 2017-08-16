@@ -606,22 +606,4 @@ class External_Isams_User implements External_UserInterface
     {
         return $this->groupHandler;
     }
-
-    /**
-     * @param ConfigMapper $configMapper
-     * @return $this
-     */
-    public function setConfigMapper($configMapper)
-    {
-        $this->configMapper = $configMapper;
-        return $this;
-    }
-
-    /**
-     * @return ConfigMapper
-     */
-    public function getConfigMapper()
-    {
-        return $this->configMapper;
-    }
 }

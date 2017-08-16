@@ -306,8 +306,8 @@ class External_Isams_Timetable implements External_TimetableInterface
         ";
 
         $iterator = $this->getConnector()->executeQueryIterator($queryTimetable, [
-            'day_id'            => $this->database->smartQuote($dayNumber),
-            'campus_code'       => $this->database->quote($campus->getExtTimetableCode()),
+            'day_id'            => $dayNumber,
+            'campus_code'       => $campus->getExtTimetableCode(),
             'external_user_id'  => $externalUserId
         ]);
 
@@ -388,7 +388,7 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         $iterator = $this->getConnector()->executeQueryIterator($queryTimetable, [
             'external_user_id'  => $externalUserId,
-            'campus_code'       => $this->database->quote($campus->getExtTimetableCode())
+            'campus_code'       => $campus->getExtTimetableCode()
         ]);
 
         
