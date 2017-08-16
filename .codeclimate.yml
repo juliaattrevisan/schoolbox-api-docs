@@ -33,7 +33,7 @@ engines:
       ignore_undeclared: true
       ignore-undeclared: true
   phpmd:
-    enabled: true
+    enabled: false
     config:
       file_extensions: "php"
       rulesets: "cleancode"
