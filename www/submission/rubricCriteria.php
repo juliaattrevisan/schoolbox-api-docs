@@ -12,9 +12,9 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 // not in SitePage context, redirect to equivalent
 if (!isset($this)) {
@@ -34,7 +34,8 @@ if (isset($this->arg[0]) && is_numeric($this->arg[0])) {
 }
 
 $userAccess = new Access();
-if (!($_SESSION['user']->isSuperuser() || $userAccess->getFolderAccess($_SESSION['user'], $folderId) >= UserAccess::ACCESS_WRITE)) {
+if (!($_SESSION['user']->isSuperuser() || $userAccess->getFolderAccess($_SESSION['user'],
+        $folderId) >= UserAccess::ACCESS_WRITE)) {
     error(6);
 }
 
@@ -50,7 +51,6 @@ $this->setBlock('criterion', 'criterion_disabled', 'criterion_disabled_block');
 $this->setBlock('criterion', 'criterion_assessment', 'criterion_assessment_block');
 $this->setBlock('criterion', 'criterion_enabled', 'criterion_enabled_block');
 $this->setBlock('criterion_enabled', 'criterion_in_use', 'criterion_in_use_block');
-
 
 
 // get category details
@@ -115,15 +115,14 @@ if (count($criterionCollection)) {
             $usageTotal += $usageCount;
             if ($usageCount > 0) {
                 $this->setVar([
-                    'CRITERION_USAGE' => $usageCount,
-                    'CRITERION_ASSESSMENT_COUNT_LABEL' => $l10n->translate('assessment', $usageCount > 1)
+                    'CRITERION_USAGE'                  => $usageCount,
+                    'CRITERION_ASSESSMENT_COUNT_LABEL' => $l10n->translate('assessment', $usageCount > 1),
                 ]);
 
                 if (!($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
                     $this->setVar('criterion_enabled_block', '');
                     $this->parse('criterion_disabled_block', 'criterion_disabled');
-                }
-                else {
+                } else {
                     $this->setVar('criterion_disabled_block', '');
                     $this->parse('criterion_in_use_block', 'criterion_in_use');
                     $this->parse('criterion_enabled_block', 'criterion_enabled');
@@ -144,7 +143,7 @@ if (count($criterionCollection)) {
             }
 
             $this->parse('criterion_block', 'criterion', true);
-            if($usageTotal > 0 ) {
+            if ($usageTotal > 0) {
                 $this->setVar('CRITGROUP_DISABLED', 'readonly');
             }
         }
