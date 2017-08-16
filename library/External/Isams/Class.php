@@ -21,6 +21,8 @@
 
 class External_Isams_Class implements External_ClassInterface
 {
+    use External_MssqlConnector;
+
     /**
      * @var MSSQL $database
      */
@@ -34,9 +36,9 @@ class External_Isams_Class implements External_ClassInterface
     /**
      * External_Doublefirst_Class constructor.
      */
-    function __construct()
+    public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->setupDatabase();
         $this->externalUser = new External_User('isams');
     }
 
@@ -67,7 +69,7 @@ class External_Isams_Class implements External_ClassInterface
             WHERE     $classQuery
         ";
 
-        $rows = $this->getDatabase()->getAll($query);
+        $rows = $this->getConnector()->executeQuery($query)->fetchAll();
 
         if ($rows) {
             return $rows;
@@ -119,7 +121,7 @@ class External_Isams_Class implements External_ClassInterface
                               $classQuery
         ";
 
-        $rows = $this->getDatabase()->getAll($query);
+        $rows = $this->getConnector()->executeQuery($query)->fetchAll();
 
         if (!$rows) {
             return [];
@@ -132,22 +134,6 @@ class External_Isams_Class implements External_ClassInterface
         }
 
         return $teachers;
-    }
-
-    /**
-     * @param $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    private function getDatabase()
-    {
-        return $this->database;
     }
 }
 

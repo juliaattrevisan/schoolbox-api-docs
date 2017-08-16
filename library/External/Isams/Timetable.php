@@ -23,15 +23,14 @@ use Schoolbox\Campus as CampusModel;
 
 class External_Isams_Timetable implements External_TimetableInterface
 {
-    /** @var MSSQL $database */
-    private $database;
+    use External_MssqlConnector;
 
     /**
      * External_Doublefirst_Timetable constructor.
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->setupDatabase();
     }
 
     /**
@@ -71,10 +70,13 @@ class External_Isams_Timetable implements External_TimetableInterface
             FROM V_TimetableStructure
             JOIN V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
             JOIN V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID 
-            WHERE CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}' AND DayID = {$this->database->smartQuote($day)}
+            WHERE CampusCode = :campus_code AND DayID = :day_id
             ORDER BY DayID, CAST(StartTime AS TIME)
 	    ";
-        $periods = $this->getDatabase()->getAll($query);
+        $periods = $this->getConnector()->executeQueryIterator($query, [
+            'campus_code'   => $campus->getExtTimetableCode(),
+            'day_id'        => $day
+        ]);
 
         $definitionArray = [];
 
@@ -94,18 +96,24 @@ class External_Isams_Timetable implements External_TimetableInterface
         $queryPeriodCount = "
             SELECT      COUNT(*) As PeriodCount 
             FROM        V_TimetableStructure 
-            WHERE       DayID = {$this->database->smartQuote($day)}
+            WHERE       DayID = :day_id
         ";
 
-        $periods = $this->getDatabase()->getRow($queryPeriodCount);
+        $periods = $this->getConnector()->executeQuery($queryPeriodCount,[
+            'day_id' => $day
+        ])->fetch();
+
         $definitionArray['periodCount'] = $periods['PeriodCount'];
 
         $queryDayCount = "
            SELECT     COUNT(*) AS DayCount
-           FROM       (SELECT DISTINCT DayID from V_TimetableStructure WHERE CampusCode = '{$campus->getExtTimetableCode()}') as d
+           FROM       (SELECT DISTINCT DayID from V_TimetableStructure WHERE CampusCode = :campus_code) AS d
         ";
 
-        $days = $this->getDatabase()->getRow($queryDayCount);
+        $days = $this->getConnector()->executeQuery($queryDayCount, [
+            'campus_code' => $campus->getExtTimetableCode()
+        ])->fetch();
+
         $definitionArray['dayCount'] = $days['DayCount'];
 
         return $definitionArray;
@@ -140,19 +148,22 @@ class External_Isams_Timetable implements External_TimetableInterface
            WHERE    intWeek = (
               SELECT  TOP 1 MAX(TblTimetableManagerWeeksID) 
               FROM    V_Weeks 
-              WHERE   txtShortName = '{$this->getDatabase()->quote($campus->getExtTimetableCode())}' AND 
+              WHERE   txtShortName = :txt_short_name AND 
                       intActive = 1
            ) AND 
-           intDay = {$dayOfWeek}
+           intDay = :day_of_week
         ";
 
-        $day = $this->getDatabase()->getRow($queryDay);
+        $day = $this->getConnector()->executeQuery($queryDay, [
+            'txt_short_name'    => $campus->getExtTimetableCode(),
+            'day_of_week'       => $dayOfWeek
+        ])->fetch();
 
         if ($day['DayID']) {
             return $day['DayID'];
         } else {
             // If that falls in a heap, use the default one specified in the config
-            return intval(Config::get('external_isams_default_day_id'));
+            return (int)$this->config->get('external_isams_default_day_id');
         }
     }
 
@@ -193,11 +204,14 @@ class External_Isams_Timetable implements External_TimetableInterface
                       PeriodID AS PeriodNumber,
                       1 AS PeriodNumberSeq
            FROM       V_TimetableStructure
-           WHERE      CAST('{$time}' AS TIME) BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME) AND  
-                      DayID = {$this->getDayNumber($campus, $time)}
+           WHERE      CAST(:time_val AS TIME) BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME) AND  
+                      DayID = :day_id
         ";
 
-        $period = $this->getDatabase()->getRow($queryPeriod);
+        $period = $this->getConnector()->executeQuery($queryPeriod, [
+            'time_val'  => $time,
+            'day_id'    => $this->getDayNumber($campus, $time)
+        ])->fetch();
 
         if ($period) {
             return ([
@@ -279,18 +293,22 @@ class External_Isams_Timetable implements External_TimetableInterface
             JOIN    V_Class ON V_Class.ClassCode = V_TimetableSchedule.ClassCode
             JOIN    V_Periods ON V_Periods.TblTimetableManagerPeriodsID = V_TimetableStructure.PeriodID
             JOIN    V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
-            WHERE   V_TimetableStructure.PeriodID IN (SELECT PeriodID FROM V_TimetableStructure WHERE DayID = {$this->database->smartQuote($dayNumber)}) AND   
-                    CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}' AND
+            WHERE   V_TimetableStructure.PeriodID IN (SELECT PeriodID FROM V_TimetableStructure WHERE DayID = :day_id) AND   
+                    CampusCode = :campus_code AND
                     (
-                        V_Class.Tutor1ID = '{$this->database->quote($externalUserId)}' OR
-                        V_Class.Tutor2ID = '{$this->database->quote($externalUserId)}' OR
-                        V_Class.StudentID = '{$this->database->quote($externalUserId)}'
+                        V_Class.Tutor1ID = :external_user_id OR
+                        V_Class.Tutor2ID = :external_user_id OR
+                        V_Class.StudentID = :external_user_id
                     )
         ";
 
-        $result = $this->getDatabase()->query($queryTimetable);
+        $iterator = $this->getConnector()->executeQueryIterator($queryTimetable, [
+            'day_id'            => $dayNumber,
+            'campus_code'       => $campus->getExtTimetableCode(),
+            'external_user_id'  => $externalUserId
+        ]);
 
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        foreach($iterator as $desc) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber'] && !isset($timetable[$x]['class'][$desc['ClassCode']])) {
                     $timetable[$x]['class'][$desc['ClassCode']] = array(
@@ -357,15 +375,19 @@ class External_Isams_Timetable implements External_TimetableInterface
             JOIN        V_Days ON V_Days.TblTimetableManagerDaysID = V_TimetableStructure.DayID
             LEFT JOIN   V_Staff ON V_Staff.StaffID = V_Class.Tutor1ID 
             WHERE       (
-                            V_Class.Tutor1ID = '{$externalUserId}' OR
-                            V_Class.Tutor2ID = '{$externalUserId}' OR
-                            V_Class.StudentID = '{$externalUserId}'
+                            V_Class.Tutor1ID = :external_user_id OR
+                            V_Class.Tutor2ID = :external_user_id OR
+                            V_Class.StudentID = :external_user_id
                         )
-                        AND CampusCode = '{$this->database->quote($campus->getExtTimetableCode())}'
+                        AND CampusCode = :campus_code
             ORDER BY V_Days.intOrder, V_Periods.intOrder
         ";
 
-        $result = $this->getDatabase()->query($queryTimetable);
+        $iterator = $this->getConnector()->executeQueryIterator($queryTimetable, [
+            'external_user_id'  => $externalUserId,
+            'campus_code'       => $campus->getExtTimetableCode()
+        ]);
+
         
 	// Create the timetable framework
 
@@ -384,8 +406,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         }
 
         // Add classes for each day into it
-
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
+        foreach ($iterator as $desc) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber'] && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])) {
 
@@ -441,21 +462,5 @@ class External_Isams_Timetable implements External_TimetableInterface
     public function getRoomTimetable($roomCodes)
     {
         return [];
-    }
-
-    /**
-     * @var MSSQL $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    private function getDatabase()
-    {
-        return $this->database;
     }
 }

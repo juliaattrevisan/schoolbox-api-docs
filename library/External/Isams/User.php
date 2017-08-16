@@ -19,25 +19,19 @@
  *    '{_}`
  */
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 
 class External_Isams_User implements External_UserInterface
 {
-    /** @var MSSQL */
-    private $database;
+    use External_MssqlConnector;
 
     /** @var Group $groupHandler */
     private $groupHandler;
 
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
-
     /** Constructor */
     public function __construct()
     {
-        $this->setConfigMapper(ConfigMapper::getInstance());
-        $this->setDatabase(MSSQL::getInstance());
+        $this->setupDatabase();
         $this->setGroup(new Group());
     }
 
@@ -49,9 +43,9 @@ class External_Isams_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
-        $photoPath = realpath($this->getConfigMapper()->get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+        $photoPath = realpath($this->config->get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
-        if ($this->getConfigMapper()->get('photo_sis_import') == 0) {
+        if ($this->config->get('photo_sis_import') == 0) {
             if (file_exists($photoPath)) {
                 return $photoPath;
             }
@@ -90,11 +84,11 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS SpouseMobilePhone,
                         1                             AS SpouseDirectoryIncludeFlag
             FROM        V_Student
-            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = '{$this->database->quote($externalUserId)}'
-            WHERE       V_Student.StudentID = '{$this->database->quote($externalUserId)}'
+            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = :external_user_id
+            WHERE       V_Student.StudentID = :external_user_id
         ";
 
-        $parent = $this->getDatabase()->getRow($query);
+        $parent = $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch();
 
         return $parent;
     }
@@ -117,25 +111,22 @@ class External_Isams_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = [];
-        $id_list = implode(',', array_map([$this->database, 'smartQuote'], $synergyIds));
-
-        if (empty($id_list)) {
-            return [];
-        }
+        $pb = $this->getConnector()->buildPredicateBuilder("V_Parent")->equals("StudentID", $synergyIds);
+        $pb->notEquals("CISEmail", "");
+        $whereString = implode(" AND " , $pb->getWhere());
 
         $query =
         "
             SELECT V_Parent.ParentID, V_Parent.CISEmail 
             FROM V_Parent
-            WHERE V_Parent.StudentID IN ({$id_list})
-            AND V_Parent.CISEmail <> ''
+            WHERE $whereString
         ";
 
-        $this->getDatabase()->query($query);
+        $iterator = $this->getConnector()->executeQueryIterator($query, $pb->getParams());
 
-        while ($row = $this->getDatabase()->getNextArray()) {
-            if (!isset($emailList[$row['ParentID']])) {
-                $emailList[$row['ParentID']] = $row['CISEmail'];
+        foreach ($iterator as $currentRow) {
+            if (!isset($emailList[$currentRow['ParentID']])) {
+                $emailList[$currentRow['ParentID']] = $currentRow['CISEmail'];
             }
         }
 
@@ -178,10 +169,10 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentBoarder,
                         0 AS countIndividualEducationPlans
             FROM        V_Student
-            WHERE       StudentID = '{$this->database->quote($externalUserId)}'
+            WHERE       StudentID = :external_user_id
         ";
 
-        return $this->getDatabase()->getRow($query);
+        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch();
     }
 
     /**
@@ -203,10 +194,10 @@ class External_Isams_User implements External_UserInterface
                             ''                  AS StaffDepartment,
                             ''                  AS StaffVoiceMail
             FROM            V_Staff
-            WHERE           StaffID = '{$this->database->quote($externalUserId)}'
+            WHERE           StaffID = :external_user_id
         ";
 
-        return $this->getDatabase()->getRow($staff);
+        return $this->getConnector()->executeQuery($staff, ['external_user_id' => $externalUserId])->fetch();
     }
 
     /**
@@ -275,12 +266,12 @@ class External_Isams_User implements External_UserInterface
         ";
 
         if (!empty($yearlevel)) {
-            $query .= "WHERE V_Student.Grade = '{$this->getDatabase()->quote($yearlevel)}'";
+            $query .= "WHERE V_Student.Grade = :year_level";
         }
 
         $query .= " ORDER BY StudentSurname, StudentGiven1, StudentID";
 
-        return $this->getDatabase()->getAll($query) ?: [];
+        return $this->getConnector()->executeQuery($query, ['year_level' => $yearlevel])->fetchAll();
     }
 
     /**
@@ -318,10 +309,10 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentContactSpouseDefaultEmail
             FROM        V_Student
             JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID 
-            WHERE       V_Student.StudentID = '{$this->database->quote($externalUserId)}'
+            WHERE       V_Student.StudentID = :external_user_id
         ";
 
-        return $this->getDatabase()->getAll($query) ?: [];
+        return $this->getConnector()->executeQuery($query , ['external_user_id' => $externalUserId])->fetchAll();
     }
 
     /**
@@ -354,24 +345,23 @@ class External_Isams_User implements External_UserInterface
      */
     public function getSubjectList(User $user)
     {
-        $externalId =  $this->getDatabase()->smartQuote($user->getExternalId());
+        $externalUserId = $user->getExternalId();
 
-        $sql =
-            "
+        $sql = '
           SELECT DISTINCT   V_Class.ClassCode AS code
           FROM              V_Class
-          WHERE             V_Class.StudentID = $externalId OR
-                            V_Class.Tutor1ID = $externalId OR
-                            V_Class.Tutor2ID = $externalId
-        ";
+          WHERE             V_Class.StudentID = :external_user_id OR
+                            V_Class.Tutor1ID = :external_user_id OR
+                            V_Class.Tutor2ID = :external_user_id
+        ';
 
-        $this->getDatabase()->query($sql);
+        $iterator = $this->getConnector()->executeQueryIterator($sql, ['external_user_id' => $externalUserId]);
         $subjectList = [];
 
-        while ($subject = $this->getDatabase()->getNextArray()) {
+        foreach ($iterator as $currentRow) {
             $subjectList[] = array(
-                'code' => $subject['code'],
-                'name' => $subject['code'],
+                'code' => $currentRow['code'],
+                'name' => $currentRow['code'],
                 'classType' => ''
             );
         }
@@ -390,10 +380,10 @@ class External_Isams_User implements External_UserInterface
         $query = "
             SELECT    StudentID AS RelatedID
             FROM      V_Parent   
-            WHERE     V_Parent.ParentID = '{$this->database->quote($externalUserId)}'
+            WHERE     V_Parent.ParentID = :external_user_id
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetchAll();
     }
 
     /**
@@ -407,10 +397,10 @@ class External_Isams_User implements External_UserInterface
             "
           SELECT  V_Parent.CISEmail 
           FROM    V_Parent 
-          WHERE   V_Parent.ParentID = '{$this->database->quote($id)}'
+          WHERE   V_Parent.ParentID = :id
         ";
 
-        return $this->getDatabase()->getOne($query);
+        return $this->getConnector()->executeQuery($query, ['id' => $id])->fetch();
     }
 
     /**
@@ -437,7 +427,7 @@ class External_Isams_User implements External_UserInterface
             FROM        V_Student
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
@@ -468,7 +458,7 @@ class External_Isams_User implements External_UserInterface
             LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = V_Student.StudentID
         ";
 
-        return $this->getDatabase()->getAll($query) ?: [];
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
 
@@ -497,7 +487,7 @@ class External_Isams_User implements External_UserInterface
             ORDER BY    teacherlastname, PreferredName
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->getConnector()->executeQuery($query)->fetchAll();
 
     }
 
@@ -542,7 +532,7 @@ class External_Isams_User implements External_UserInterface
             ORDER BY    teacherlastname, PreferredName
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
     /**
@@ -597,22 +587,6 @@ class External_Isams_User implements External_UserInterface
       */
 
     /**
-     * @param $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    private function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
      * @param Group $groupHandler
      */
     public function setGroup($groupHandler)
@@ -626,23 +600,5 @@ class External_Isams_User implements External_UserInterface
     public function getGroup()
     {
         return $this->groupHandler;
-    }
-
-    /**
-     * @param ConfigMapper $configMapper
-     * @return $this
-     */
-    public function setConfigMapper($configMapper)
-    {
-        $this->configMapper = $configMapper;
-        return $this;
-    }
-
-    /**
-     * @return ConfigMapper
-     */
-    public function getConfigMapper()
-    {
-        return $this->configMapper;
     }
 }
