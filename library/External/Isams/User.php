@@ -19,8 +19,6 @@
  *    '{_}`
  */
 
-use Alaress\Database\Connector\IConnector;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 
 class External_Isams_User implements External_UserInterface
@@ -29,9 +27,6 @@ class External_Isams_User implements External_UserInterface
 
     /** @var Group $groupHandler */
     private $groupHandler;
-
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
 
     /** Constructor */
     public function __construct()
