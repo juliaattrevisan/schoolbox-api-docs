@@ -55,11 +55,11 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      */
     public function isSourceEnabled($eventType, $connectorClass)
     {
-        return Calendar_Api_Config_Mapper::getInstance()->findByColumnList([
+        return Calendar_Api_Config_Mapper::getInstance()->countByColumnList([
             'event_type'      => $eventType,
             'connector_class' => $connectorClass,
             'status'          => 1
-        ])->count() > 0;
+        ]) > 0;
     }
 
     /**
