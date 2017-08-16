@@ -111,8 +111,8 @@ $(function() {
         <div class="alert-box">
             <p>
                 {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC} are used as rows in a rubric.  These may be added while creating your rubric or initially setup via this screen.
-                If you want to delete any {TPL_LOCAL_RUBRICCRITERION} that has already been used on an assessment, you need to first
-                remove it from the assessment, then you can delete it.
+                If you want to delete any {TPL_LOCAL_RUBRICCRITERION} that has already been used on an {TPL_LOCAL_ASSESSMENT},
+                you need to first remove it from the {TPL_LOCAL_ASSESSMENT}, then you can delete it.
                 If you remove all the {TPL_LOCAL_RUBRICCRITERION_PLURAL} from any {TPL_LOCAL_RUBRICGROUP}, the {TPL_LOCAL_RUBRICGROUP} will automatically be deleted.
                 <a href="#" data-interaction="show-example-criteria">See example {TPL_LOCAL_RUBRICCRITERION_PLURAL}</a>
             </p>
@@ -204,7 +204,7 @@ $(function() {
                             <div data-reveal id="criterion-{CRITERION_ID}" class="reveal-modal">
                                 <article>
                                     <h2>{CRITERION_NAME}</h2>
-                                    <p>{TPL_LOCAL_RUBRICCRITERION_PC} is in use on {CRITERION_USAGE} assessments;</p>
+                                    <p>{TPL_LOCAL_RUBRICCRITERION_PC} is in use on {CRITERION_USAGE} {TPL_LOCAL_ASSESSMENT_PLURAL};</p>
                                     <ul>
                                         <!-- BEGIN criterion_assessment -->
                                         <li>
