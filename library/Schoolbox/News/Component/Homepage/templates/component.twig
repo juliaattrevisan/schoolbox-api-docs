@@ -72,7 +72,7 @@
                                 <a href="/search/user/{{ item.owner.id }}">
                                     <img src="/portrait.php?userId={{ owner.externalId }}&size=square64" alt="View Profile" />
                                 </a>
-                                <h3>{{ item.heading }}</h3>
+                                <h3><a href="/homepage/news/{{ item.category.id }}/{{ item.id }}">{{ item.heading }}</a></h3>
                                 <p class="meta">Posted by
                                     {% if owner.deleted %}
                                         {{ owner.firstname }} {{ owner.lastname }}

@@ -16,9 +16,15 @@
                         <div class="small-12 card">
                             <a href="/search/user/{AUTHOR_ID}" title="View Profile">
                                 <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="" />
-                                <p>{NEWS_HEADING}</p>
                             </a>
-                            <p class="meta">{AUTHOR}</p>
+                            <a href="/homepage/news/{ID}/{NEWS_ID}" title="View News">
+                                <h3>{NEWS_HEADING}</h3>
+                            </a>
+                                <p class="meta">
+                                    <a href="/search/user/{AUTHOR_ID}" title="View Profile">
+                                    {AUTHOR}
+                                    </a>
+                                </p>
                             <p class="meta">Posted {POSTED_DATE}</p>
                         </div>
                     </div>
