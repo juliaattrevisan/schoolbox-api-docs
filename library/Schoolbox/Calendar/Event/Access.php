@@ -11,76 +11,101 @@
 
 namespace Schoolbox\Calendar\Event;
 
-use Schoolbox\Campus;
 use Schoolbox\User;
 use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\Relation\Campus as RelationCampus;
-use Schoolbox\Calendar\Relation\Category as RelationCategory;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Access
 {
+    /** @var FolderAccess */
+    private $folderAccess;
+
+    /**
+     * Access constructor.
+     * @param FolderAccess $folderAccess
+     */
+    public function __construct(FolderAccess $folderAccess)
+    {
+        $this->setFolderAccess($folderAccess);
+    }
+
+    /**
+     * Takes an existing event object, and uses checkDestination below to check access for a given user
+     *
+     * @param User $effector
+     * @param Event $event
+     * @return bool
+     */
+    public function checkExisting(User $effector, Event $event)
+    {
+        // Split groups into an array of ints, if there are any
+        if ($event->getCategoryCollection()) {
+            $groups = $event->getCategoryCollection()->getColumnValues('categoryId');
+        } else {
+            $groups = [];
+        }
+
+        // Split campuses into an array of ints, if there are any
+        if ($event->getCampusCollection()) {
+            $campus = $event->getCampusCollection()->getColumnValues('id');
+        } else {
+            $campus = [];
+        }
+
+        return $this->checkDestination(
+            $effector,
+            $event->getAccess(),
+            $event->getAuthor(),
+            $event->getOwner(),
+            $groups,
+            $campus
+        );
+    }
+
     /**
      * Checks if a given user has permission to write or modify an event
      *
-     * @param User $user
-     * @param Event $event
-     * @param RelationCategory[] $groups
-     * @param Campus[] $campuses
-     *
+     * @param User $effector
+     * @param int $accessLevel
+     * @param User $author
+     * @param User $owner
+     * @param int[] $groups
+     * @param int[] $campuses
      * @return bool
      */
-    public function checkAccess(User $user, Event $event, $groups = [], $campuses = [])
-    {
-        /* Check superuser
-         */
-        if ($user->isSuperuser()) {
+    public function checkDestination(
+        User $effector,
+        $accessLevel,
+        User $author,
+        User $owner,
+        array $groups = [],
+        array $campuses = []
+    ) {
+        // Superuser passes immediately
+        if ($effector->isSuperuser()) {
             return true;
         }
 
-
-        /* If event is on a personal level, check user is the owner or the author
-         */
-        if ($event->isPersonalLevel()) {
-            if ($user->getId() == $event->getOwner()->getId() || $user->getId() == $event->getAuthor()->getId()) {
+        // If event is on a personal level, check effector is the owner or the author
+        if ($accessLevel == Event::ACCESS_PERSONAL) {
+            if ($effector->getId() == $owner->getId() || $effector->getId() == $author->getId()) {
                 return true;
             }
         }
 
-
-        /* If the event is on a campus level, check if this user
-         * is a calendar moderator for one of the campuses selected
-         */
-        if ($event->isCampusLevel()) {
-
-            /* Get list of calendar permissions this user has
-             */
-            $accessList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
+        // If the event is on a campus level, check if this user is a calendar moderator for one of the campuses
+        // selected
+        if ($accessLevel == Event::ACCESS_CAMPUS) {
+            // Get list of calendar permissions the effector has
+            $accessList = $effector->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
 
             foreach ($accessList as $currentAccess) {
                 /** @var UserAccess $currentAccess */
 
                 if ($currentAccess->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
-                    /* Loop through campuses for the event and check if one
-                     * matches with this access
-                     */
-                    foreach ($campuses as $campus) {
-
-                        if ($campus instanceof Campus) {
-                            // CampusCollection is a collection of Schoolbox\Campus instances
-                            // when importing events from csv or vcal
-                            $campusId = $campus->getId();
-                        } elseif ($campus instanceof RelationCampus) {
-                            // CampusCollection is a collection of Calendar\Relation\Campus instances
-                            // when modifying a series of events
-                            $campusId = $campus->getCampusId();
-                        } else {
-                            // CampusCollection is a collection of campus ID's
-                            // when editing a single event
-                            $campusId = $campus;
-                        }
-
+                    // Loop through campuses for the event and check if one matches with this access
+                    foreach ($campuses as $campusId) {
                         if ($campusId == $currentAccess->getServiceIdentifier()) {
                             return true;
                         }
@@ -89,33 +114,34 @@ class Access
             }
         }
 
-
-        /* If the event is on a group level, check if the user is a group manager
-         */
-        if ($event->isGroupLevel()) {
-
-            /* Loop through the groups selected for this event
-             */
-            $groupIds = [];
-            foreach ($groups as $group) {
-
-                if ($group instanceof RelationCategory) {
-                    $groupId = $group->getCategoryId();
-                } else {
-                    $groupId = $group;
-                }
-                $groupIds[] = $groupId;
-            }
-
-            if (FolderAccess::getInstance()->getMinFolderAccess($user, $groupIds) >= UserAccess::ACCESS_WRITE) {
+        // If the event is on a group level, check if the user is a group manager
+        if ($accessLevel == Event::ACCESS_GROUP) {
+            $minFolderAccess = $this->getFolderAccess()->getMinFolderAccess($effector, $groups);
+            if ($minFolderAccess >= UserAccess::ACCESS_WRITE) {
                 return true;
             }
         }
 
-
-        /* User didn't pass any of the checks, deny!
-         */
+        // User didn't pass any of the checks, deny!
         return false;
+    }
+
+    /**
+     * @return FolderAccess
+     */
+    private function getFolderAccess()
+    {
+        return $this->folderAccess;
+    }
+
+    /**
+     * @param $folderAccess
+     * @return $this
+     */
+    private function setFolderAccess($folderAccess)
+    {
+        $this->folderAccess = $folderAccess;
+        return $this;
     }
 
 }

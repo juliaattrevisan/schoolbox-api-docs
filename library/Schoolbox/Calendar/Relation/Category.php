@@ -41,10 +41,12 @@ class Category
      * Set event id
      *
      * @param int $eventId
+     * @return $this
      */
     public function setEventId($eventId)
     {
         $this->eventId = $eventId;
+        return $this;
     }
 
     /**
@@ -61,10 +63,12 @@ class Category
      * Set category id
      *
      * @param int $categoryId
+     * @return $this
      */
     public function setCategoryId($categoryId)
     {
         $this->categoryId = $categoryId;
+        return $this;
     }
 
     /**

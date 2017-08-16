@@ -42,10 +42,12 @@ class Campus
      * Set event id
      *
      * @param null $eventId
+     * @return $this
      */
     public function setEventId($eventId)
     {
         $this->eventId = $eventId;
+        return $this;
     }
 
     /**
@@ -62,10 +64,12 @@ class Campus
      * Set campus id
      *
      * @param null $campusId
+     * @return $this
      */
     public function setCampusId($campusId)
     {
         $this->campusId = $campusId;
+        return $this;
     }
 
     /**

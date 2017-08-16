@@ -875,10 +875,12 @@ class Event implements ISoftDeletable
      * Set category collection
      *
      * @param Collection|Relation\Category[] $categoryCollection
+     * @return $this
      */
     public function setCategoryCollection($categoryCollection)
     {
         $this->categoryCollection = $categoryCollection;
+        return $this;
     }
 
     /**
