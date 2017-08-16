@@ -453,11 +453,7 @@ class Group extends DeprecatedModel
         // Cache users as well
 
         if (!isset($this->cacheUser[$userID]) || !$cache) {
-            try {
-                $this->cacheUser[$userID] = $user = UserMapper::getInstance()->findById($userID);
-            } catch (MapperException $e) {
-                return DENY_ACCESS;
-            }
+            $this->cacheUser[$userID] = $user = UserMapper::getInstance()->findById($userID);
         } else {
             $user = $this->cacheUser[$userID];
         }
@@ -684,12 +680,7 @@ class Group extends DeprecatedModel
         $allFolders = array();
 
         $userMapper = new UserMapper();
-        try {
-            $user = $userMapper->findById($userID);
-        } catch (MapperException $e)  {
-            /* Just return an empty set if the user does not exist */
-            return $allFolders;
-        }
+        $user = $userMapper->findById($userID);
 
         $folderMapper = new FolderMapper();
 
