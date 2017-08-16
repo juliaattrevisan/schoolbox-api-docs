@@ -56,23 +56,29 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     private function getUser($key)
     {
         if (empty($this->users)) {
+            $newUser = function ($id) {
+                // Set an empty access list by default on every user, this is to avoid hitting the database on
+                // User::getAccessList() when access list is not set
+                return (new User)->setId($id)->setAccessList(new Collection());
+            };
+
             $this->users = [
-                'super' => (new User)->setId(1)->setSuperuser(true),
-                'staff' => (new User)->setId(2)->setRole($this->getRole('staff')),
-                'staffAlt' => (new User)->setId(3)->setRole($this->getRole('staff')),
-                'parent' => (new User)->setId(4)->setRole($this->getRole('parent')),
-                'student' => (new User)->setId(5)->setRole($this->getRole('student')),
+                'super' => $newUser(1)->setSuperuser(true),
+                'staff' => $newUser(2)->setRole($this->getRole('staff')),
+                'staffAlt' => $newUser(3)->setRole($this->getRole('staff')),
+                'parent' => $newUser(4)->setRole($this->getRole('parent')),
+                'student' => $newUser(5)->setRole($this->getRole('student')),
 
-                'campusModerate' => (new User)->setId(6),
-                'campusWrite' => (new User)->setId(7),
-                'campusRead' => (new User)->setId(8),
-                'campusNone' => (new User)->setId(9),
+                'campusModerate' => $newUser(6),
+                'campusWrite' => $newUser(7),
+                'campusRead' => $newUser(8),
+                'campusNone' => $newUser(9),
 
-                'groupReadSuper' => (new User)->setId(10)->setSuperuser(true),
-                'groupAdmin' => (new User)->setId(11),
-                'groupWrite' => (new User)->setId(12),
-                'groupRead' => (new User)->setId(13),
-                'groupNone' => (new User)->setId(14),
+                'groupReadSuper' => $newUser(10)->setSuperuser(true),
+                'groupAdmin' => $newUser(11),
+                'groupWrite' => $newUser(12),
+                'groupRead' => $newUser(13),
+                'groupNone' => $newUser(14),
             ];
 
             // Create a mock user object, who is a child of $this->users['parent']
