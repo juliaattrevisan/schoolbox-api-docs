@@ -83,7 +83,10 @@ class Authenticator {
         // start by creating a desktop session, then we will add the mobile elements into it
         if (session_start()) {
             $session = new Session();
-            $session->create($username, $remember);
+            if(!$session->create($username, $remember)) {
+                throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
+            }
+
             return true;
         } else {
             return false;
