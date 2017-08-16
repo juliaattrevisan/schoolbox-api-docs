@@ -55,16 +55,15 @@
         // On accept/reject: ajax new group list in
         var waitingList = $('#waitingList');
         var memberList  = $('#members');
+        var waitingUser;
         waitingList.on('click', '[data-interaction="accept"], [data-interaction="reject"]', function(e) {
             e.preventDefault();
-            var waitingUser = $(this).closest('[data-relation="waiting-user"]');
+            waitingUser = $(this).closest('[data-relation="waiting-user"]');
             var label       = $('#save-label');
             if ($(this).is('[data-interaction="reject"]')) {
                 label.toastActivate({text: 'Rejecting', css: 'alert'});
-                $(this).closest('li').slideUp();
             } else {
                 label.toastActivate({text: 'Accepting'});
-                $(this).closest('li').slideUp();
             }
             // loading dialog
             $.get(this.href)
@@ -79,6 +78,7 @@
                             $('[data-toggle-all]').off('change').change(deleteAllToggled);
                             $('input[name="delete[]"]').off('change').change(deleteToggled);
                         });
+                        waitingUser.slideUp();
                     })
                     .fail(function() {
                         // failure stuff
