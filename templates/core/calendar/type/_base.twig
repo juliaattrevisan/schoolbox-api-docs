@@ -38,7 +38,9 @@
 
                 {% block eventBubbleMeta %}
                 {% if event.authorName %}
-                <li class="icon-staff-students" title="Author">Posted by <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a></li>
+                <li class="icon-staff-students" title="Author">Posted by
+                    <a href="/search/user/{{ event.authorId }}">{{ event.authorName }}</a>
+                </li>
                 {% endif %}
 
                 {% if event.categoryId and event.categoryName %}
