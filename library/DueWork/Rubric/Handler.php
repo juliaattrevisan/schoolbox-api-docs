@@ -13,23 +13,27 @@ use Schoolbox\Assessment\Term;
 
 /**
  * Class DueWork_Rubric_Handler
+ *
  * @deprecated
  * @see RubricMapper
  */
 class DueWork_Rubric_Handler
 {
+
     /** @var Database */
     private $db;
 
 
     /**
      * DueWork_Rubric_Handler constructor.
+     *
      * @deprecated
      */
     public function __construct()
     {
         $this->db = Database::getInstance();
     }
+
 
     /**
      * Returns normalised marks for all student rubric marks in specified folders
@@ -44,11 +48,11 @@ class DueWork_Rubric_Handler
      * @param int[]      $folderIds
      * @param Term\Model $term
      * @return array
-     * @var string $data[sb.id][rc.id]['grouping'] criterion.grouping
-     * @var string $data[sb.id][rc.id]['name'] criterion.name
-     * @var string $data[sb.id][rc.id]['max_mark'] max mark
-     * @var array $data[sb.id][rc.id]['marks']
-     * @var float $data[sb.id][rc.id]['marks'][student.id]
+     * @var string       $data [sb.id][rc.id]['grouping'] criterion.grouping
+     * @var string       $data [sb.id][rc.id]['name'] criterion.name
+     * @var string       $data [sb.id][rc.id]['max_mark'] max mark
+     * @var array        $data [sb.id][rc.id]['marks']
+     * @var float        $data [sb.id][rc.id]['marks'][student.id]
      */
     public function getStudentMarksByCriteriaInFolder(array $folderIds, Term\Model $term)
     {
@@ -72,7 +76,7 @@ class DueWork_Rubric_Handler
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase());
 
         $finish = $term->getActualFinish();
-        if(null !== $finish && !$finish->isNull()){
+        if (null !== $finish && !$finish->isNull()) {
             $pb->lessThan('a.due_date', $finish->getDatabase());
         }
 
@@ -90,7 +94,11 @@ class DueWork_Rubric_Handler
             JOIN assessment a         ON  a.id = sb.assessment_id
             LEFT JOIN (
                 -- Get the latest published marks
-                SELECT MAX(rm.published_at) AS 'max_published_at', rm.student_id AS 'student_id', rl.box_id AS 'sb_id', rc.id AS 'rc_id'
+                SELECT
+                  MAX(rm.published_at) AS 'max_published_at',
+                  rm.student_id AS 'student_id',
+                  rl.box_id AS 'sb_id',
+                  rc.id AS 'rc_id'
                 FROM rubric_mark rm
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
                 JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
@@ -101,7 +109,8 @@ class DueWork_Rubric_Handler
                 AND rm.valid
                 AND rm.published_at IS NOT NULL
                 GROUP BY rm.student_id, rl.box_id, rc.id
-            ) t ON t.max_published_at = rm.published_at AND t.student_id = rm.student_id AND rl.box_id = t.sb_id AND rc.id = t.rc_id
+            ) t ON t.max_published_at = rm.published_at AND t.student_id = rm.student_id
+                AND rl.box_id = t.sb_id AND rc.id = t.rc_id
             WHERE {$whereClauseOuter}
             AND rm.valid
             AND rm.published_at IS NOT NULL;
@@ -114,7 +123,7 @@ class DueWork_Rubric_Handler
         $pb->equals('rc.parent_id', $folderIds)
            ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY);
         $whereClause = implode(' AND ', $pb->getWhere());
-        $stmt = Database::getInstance()->prepare("
+        $stmt        = Database::getInstance()->prepare("
             SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rc.grouping, rc.name, MAX(rd.value) AS 'max_mark'
             FROM rubric_descriptor rd
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
@@ -144,14 +153,15 @@ class DueWork_Rubric_Handler
             ];
         }
 
-        foreach($studentMarks as $row){
+        foreach ($studentMarks as $row) {
             $mark = $row['mark'];
-            if(null === $mark){
+            if (null === $mark) {
                 continue;
             }
             $boxId       = $row['sb.id'];
             $criterionId = $row['rc.id'];
             $maxMark     = $results[$boxId][$criterionId]['maxMark'];
+
             $results[$boxId][$criterionId]['marks'][$row['student_id']] = 100.0 * $mark / $maxMark;
         }
         return $results;
@@ -160,15 +170,16 @@ class DueWork_Rubric_Handler
 
     public function populateResultSet(DueWork_Rubric_ResultSet $resultSet, $resultSetID)
     {
-        $stmt = $this->db->prepare("SELECT `value`, `label` FROM `rubric_result` WHERE `resultset_id` = :rsid");
+        $stmt = $this->db->prepare('SELECT `value`, `label` FROM `rubric_result` WHERE `resultset_id` = :rsid');
 
-        $stmt->execute(array('rsid' => $resultSetID));
+        $stmt->execute(['rsid' => $resultSetID]);
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $resultSet->addResult(new DueWork_Rubric_Result($row['label'], $row['value']));
         }
     }
+
 
     /**
      * Get all criteria available on the specified parent
@@ -177,8 +188,8 @@ class DueWork_Rubric_Handler
      * @param string $parentType
      *
      * @return array
-     * @var string   $criteria[rc.id]['grouping']
-     * @var string   $criteria[rc.id]['name']
+     * @var string   $criteria [rc.id]['grouping']
+     * @var string   $criteria [rc.id]['name']
      */
     public function getAvailableCriteria(array $parentIds, $parentType = Criterion::PARENT_TYPE_CATEGORY)
     {

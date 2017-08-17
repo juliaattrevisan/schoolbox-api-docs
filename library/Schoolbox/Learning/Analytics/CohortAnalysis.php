@@ -630,11 +630,11 @@ class CohortAnalysis
      *
      * (Cuts the same data as getCohortGradesByAssessment() but by indicators instead of assessment.)
      *
-     * @param GenericCollection|UnitImplementation[] $unitImplementations
-     * @param Term\Model                             $term
+     * @param Collection|UnitImplementation[] $unitImplementations
+     * @param Term\Model                      $term
      * @return array
      */
-    public function getCohortGradesByIndicator(GenericCollection $unitImplementations, Term\Model $term)
+    public function getCohortGradesByIndicator(Collection $unitImplementations, Term\Model $term)
     {
         // exploit old class
         return (new AllRubrics($unitImplementations, $term))->getRubricData();
