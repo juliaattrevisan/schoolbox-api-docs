@@ -1,7 +1,6 @@
 <?php
 
 use Schoolbox\Campus;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
@@ -22,10 +21,6 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      */
     protected $externalTimetable = null;
 
-    /** @var int */
-    private $expensiveWindow;
-
-
     /**
      * Constructor
      *
@@ -36,11 +31,6 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
     {
         $this->setUser($user);
         $this->externalTimetable = new External_Timetable();
-
-        // ensure this value is a non-negative integer
-        $days = max(0, (int)ConfigMapper::getInstance()->get('external_synergetic_timetable_accurate_days'));
-
-        $this->expensiveWindow = $days * 86400;
     }
 
     /**
@@ -70,15 +60,22 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
         $colorMap   = array();
         $colorIndex = 0;
 
-        // Figure out event type
+        // Figure out event type and days to fetch calendar for
+        $days = 0;
         try {
             /** @var Calendar_Api_Config_Record $config */
             $config        = $this->loadConnectorConfiguration();
             $decodedConfig = $config->decodeConfig();
             $eventType     = $decodedConfig->getLuEventType();
+            // it should always be one of these, but test
+            if ($decodedConfig instanceof Calendar_Api_Config_Connector_External) {
+                // ensure this value is a non-negative integer
+                $days = max(0, $decodedConfig->getDuration());
+            }
         } catch (\Schoolbox\Mapper\Exception $e) {
             $eventType = 1;
         }
+        $expensiveWindow = $days * 86400;
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
@@ -92,7 +89,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
 
-                if ($ttl >= 0 && $ttl < $this->expensiveWindow) {
+                if ($ttl >= 0 && $ttl < $expensiveWindow) {
                     // if the current day is in the future AND within 2 days of midnight, get the expensive timetable
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
 
