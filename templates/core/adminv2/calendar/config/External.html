@@ -1,7 +1,7 @@
 <li class="row">
 <input type="hidden" name="record[{CONNECTOR_ID}][eventType]" value="{EVENTTYPE_NAME}" />
 <input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value="{CONNECTOR_CLASS}" />
-<div class="columns medium-4">
+<div class="columns medium-6">
     <div class="content">
         <label>Label
             <input type='text' name="record[{CONNECTOR_ID}][label]" value="{CONNECTOR_LABEL}" />
@@ -9,7 +9,7 @@
     </div>
 </div>
 <!-- BEGIN event_type_list -->
-<div class="columns medium-4">
+<div class="columns medium-6">
     <div class="content">
         <label>Event Type
             <select name="record[{CONNECTOR_ID}][luEventType]">
@@ -20,17 +20,7 @@
         </label>
     </div>
 </div>
-    <div class="columns medium-4">
-        <div class="content">
-            <label>Accurate Days Window
-                <span data-tooltip
-                      class="has-tip tip-top hint"
-                      title="The number of days in advance to retrieve date-specific timetable information for users, which is a more expensive operation than retrieving just by day number"
-                >?</span>
-                <input type='text' name="record[{CONNECTOR_ID}][duration]" value="{CONNECTOR_DURATION}" />
-            </label>
-        </div>
-    </div>
+
 </li>
 <!-- END event_type_list -->
 <!-- BEGIN campus_list -->

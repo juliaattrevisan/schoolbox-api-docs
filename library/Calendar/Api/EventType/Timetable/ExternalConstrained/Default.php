@@ -13,7 +13,7 @@ use Calendar\Event\Type\Timetable\Event;
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_EventType_Abstract
+class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calendar_Api_EventType_Abstract
 {
 
     /**

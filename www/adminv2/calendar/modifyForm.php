@@ -28,7 +28,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
 
             /* Process Duration for External DB connectors
              */
-            if ($config instanceof Calendar_Api_Config_Connector_External) {
+            if ($config instanceof Calendar_Api_Config_Connector_ExternalConstrained) {
                 $config->setDuration($attribs['duration']);
             }
             elseif ($config instanceof Calendar_Api_Config_Connector_Vcal) {
