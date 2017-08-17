@@ -2,7 +2,8 @@
     Renders a rubric box plot for the learning analytics page
 
     Data:
-        studentMarksPerCriterion: float[][]  Indexed by criteria name, then student ID
+        studentMarksPerCriterion: float[][]         Indexed by criteria name, then student ID
+        students:                 Collection|User[] Indexed by user.id
 #}
 <script type="text/javascript">
     $(function () {
@@ -43,8 +44,8 @@
 
                         {% for studentId, studentMark in studentMarks %}
                         {
-                            info: "{{ studentId }}",
-                            uid: '{{ studentId }}',
+                            uid: {{ studentId }},
+                            info: "{{ students[studentId].fullName }}",
                             value: {{ studentMark }}
 
                         }{% if not loop.last %},{% endif %}

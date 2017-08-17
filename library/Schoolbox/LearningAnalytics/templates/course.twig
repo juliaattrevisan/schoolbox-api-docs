@@ -311,7 +311,7 @@
     <div class="small-12 island">
         <h2 class="subheader">{{ locale.translate('rubricCriterion', true) }}</h2>
         <section class="content">
-            {% include '@learningAnalytics/fragments/rubric_box_plot.twig' with {studentMarksPerCriterion: rubrics} only %}
+            {% include '@learningAnalytics/fragments/rubric_box_plot.twig' with {studentMarksPerCriterion: rubrics, students: students} only %}
         </section>
     </div>
 </div>
