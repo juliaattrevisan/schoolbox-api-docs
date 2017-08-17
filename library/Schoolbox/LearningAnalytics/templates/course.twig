@@ -93,71 +93,6 @@
             ]
         });
 
-{% if rubrics.allRubrics | length > 0 %}
-        /**
-         *  Boxplots for Rubrics
-         */
-        $.fn.boxPlotRender({
-            element: '[data-graph=rubrics]',
-
-            /* Title of the graph
-             */
-            title: '',
-
-            /* Orientation of the box plots
-             */
-            orientation: 'horizontal',
-
-            /* A list of all the assessment names that are being graphed
-             * These correspond to a series of data and their respective
-             * five-point summaries
-             */
-            allAssessments: [
-{% for group, currentCriterion in rubrics.allRubrics %}
-{% for criterionId,criterionData in currentCriterion %}
-"{{ group }}: {{ criterionData.name }}"{% if not loop.last %},
-{% endif %}
-{% endfor %}{% if not loop.last %},
-{% endif %}
-{% endfor %}
-
-            ],
-
-            /* All the raw data
-             */
-            allData: $.fn.boxPlotCalculateAllSeriesData([
-{% for group, allCriteria in rubrics.allRubrics %}
-{% for currentCriterion in allCriteria %}
-[
-{# Highcharts won't render without at least one data point #}
-{% if currentCriterion.allValues | length == 0 %}
-    {
-        info: null,
-        uid: null,
-        value: -100
-    }
-{% endif %}
-{% for currentValue in currentCriterion.allValues %}
-    {
-        info: "{{ currentValue.user }}",
-        uid: '{{ currentValue.user }}',
-        value: {% if currentValue.value %}{{ currentValue.value }}{% else %}null{% endif %}
-
-    }{% if not loop.last %},
-{% endif %}
-{% endfor %}
-
-]{% if not loop.last %},
-{% endif %}
-
-{% endfor %}{% if not loop.last %},
-{% endif %}
-{% endfor %}
-            ])
-        });
-{% endif %}
-
-
         /**
          *  Scatter for Effort
          */
@@ -371,12 +306,12 @@
     </div>
 </div>
 
-{% if rubrics.allRubrics | length > 0 %}
+{% if rubrics | length > 0 %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">{{ locale.translate('rubricCriterion', true) }}</h2>
         <section class="content">
-            <div data-graph="rubrics" style="height:{{ ((rubrics.allRubrics | length)*150)+75 }}px"></div>
+            {% include '@learningAnalytics/fragments/rubric_box_plot.twig' with {studentMarksPerCriterion: rubrics} only %}
         </section>
     </div>
 </div>

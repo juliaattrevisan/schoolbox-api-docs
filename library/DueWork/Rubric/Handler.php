@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 
 /**
@@ -30,97 +31,109 @@ class DueWork_Rubric_Handler
     }
 
     /**
-     * This function should be renamed to something sensible
-     * It retrieves a student's marks in a category, broken down by criteria and averaged
+     * Returns normalised marks for all student rubric marks in specified folders
      *
-     * @param $studentID
-     * @param $categoryID
+     * Does not respect assessment.weight, ie all assessments are weighted at 1.
      *
-     * @return array Indexed by criterion.id
-     * @var string $return[rc.id]['name']     Criterion.name
-     * @var int    $return[rc.id]['value']    Normalised mark (0 - 100)
+     * If a student mark has a NULL value, it is ignored for aggregation.
+     *
+     * Normalised mark: (0.0 - 100.0)
+     *
+     * @param int[] $folderIds
+     * @return array
+     * @var string $data[sb.id][rc.id]['grouping'] criterion.grouping
+     * @var string $data[sb.id][rc.id]['name'] criterion.name
+     * @var string $data[sb.id][rc.id]['max_mark'] max mark
+     * @var array $data[sb.id][rc.id]['marks']
+     * @var float $data[sb.id][rc.id]['marks'][student.id]
      */
-    public function getStudentMarksByCriteriaInCategory($studentID, $categoryID)
+    public function getStudentMarksByCriteriaInFolder(array $folderIds)
     {
-        // Ordering:
-        // box and criterion
-        // most recent submissions first
-        // highest marks first
-        $stmt = Database::getInstance()->prepare(
-            '
-                SELECT
-                    ru.submission_box_id AS box_id,
-                    rd.criterion_id,
-                    rd.value mark,
-                    rc.name,
-                    (
-                        SELECT MAX(rdt.value)
-                        FROM rubric_descriptor rdt
-                        WHERE rd.criterion_id = rdt.criterion_id
-                        AND sb.rubric_result_set = 0
-                    ) AS dmax_mark,
-                    (
-                        SELECT MAX(rr.value)
-                        FROM rubric_result rr
-                        WHERE sb.rubric_result_set = rr.resultset_id
-                        AND sb.rubric_result_set > 0
-                    ) AS rmax_mark,
-                    rm.created_at
+        /* 1. Get latest student published marks per criterion and dueWork
+         * 2. Find the max descriptor value per criterion and dueWork.
+         * 3. Convert each student mark into a normalised value
+         *
+         * We could perform steps 1+2 in a single query using a correlated subquery, but
+         * that would mean the subquery is executed for every row fetched by the outer query.
+         * In our case it is much faster to just fetch the max descriptors in a subsequent light-weight query.
+         * (eg, consider there is no point executing the subquery for different students)
+         * @see http://www.sqlservice.se/sql-server-performance-death-by-correlated-subqueries/
+         */
+        $pb = new Alaress\Database\Predicate\Builder($this->db, '');
+        $pb->equals('rc.parent_id', $folderIds)
+           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY);
+
+        $whereClauseInner = implode(' AND ', $pb->getWhere());
+        $whereClauseOuter = implode(' AND ', $pb->getWhere());
+
+        // 1. Get latest published student marks
+        $stmt = Database::getInstance()->prepare("
+            SELECT rm.student_id, rl.box_id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
+            FROM rubric_mark rm
+            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+            JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_level rl      ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+            LEFT JOIN (
+                -- Get the latest published marks
+                SELECT MAX(rm.published_at) AS 'max_published_at', rm.student_id AS 'student_id', rl.box_id AS 'sb_id', rc.id AS 'rc_id'
                 FROM rubric_mark rm
-                JOIN rubric_descriptor rd ON rm.descriptor_id = rd.id
-                JOIN rubric_criterion rc ON rd.criterion_id = rc.id
-                JOIN rubric_usage ru ON rd.criterion_id = ru.criterion_id
-                JOIN submission_box sb ON ru.submission_box_id = sb.id
-                WHERE rm.valid = 1
-                    AND rm.student_id = :student_id
-                    AND sb.category = :category_id
-                    AND sb.deleted IS FALSE
-                    AND rm.published_at IS NOT NULL
-                ORDER BY
-                    ru.submission_box_id ASC,
-                    rd.criterion_id ASC,
-                    rm.created_at DESC,
-                    rm.mark DESC
-            '
-        );
-        $stmt->execute(
-            array(
-                'student_id'  => $studentID,
-                'category_id' => $categoryID
-            )
-        );
-        // create a normalised value for each criterion
-        $crits = array();
-        $names = array();
+                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+                JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+                JOIN rubric_level rl      ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+                WHERE {$whereClauseInner}
+                AND rm.valid
+                AND rm.published_at IS NOT NULL
+                GROUP BY rm.student_id, rl.box_id, rc.id
+            ) t ON t.max_published_at = rm.published_at AND t.student_id = rm.student_id AND rl.box_id = t.sb_id AND rc.id = t.rc_id
+            WHERE {$whereClauseOuter}
+            AND rm.valid
+            AND rm.published_at IS NOT NULL;
+        ");
+        $stmt->execute($pb->getParams());
+        $studentMarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 2. Get max mark per criterion and dueWork
+        $stmt = Database::getInstance()->prepare("
+            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rc.grouping, rc.name, MAX(rd.value) AS 'max_mark'
+            FROM rubric_descriptor rd
+            JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_level rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+            WHERE {$whereClauseInner}
+            GROUP BY rl.box_id, rc.id
+            ORDER BY rl.box_id, rc.id
+        ");
+        $stmt->execute($pb->getParams());
+
+        // 3. Convert each student mark into a normalised value
+        $results = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $names[$row['criterion_id']] = $row['name'];
+            $boxId       = $row['sb.id'];
+            $criterionId = $row['rc.id'];
 
-            // only use the most recent mark for each submission/criterion
-            if (isset($crits[$row['criterion_id']][$row['box_id']])) {
-                continue;
+            if (!is_array($results[$boxId])) {
+                $results[$boxId] = [];
             }
-
-            if ($row['dmax_mark']) {
-                $localAvg = 0 == $row['dmax_mark'] ? null : $row['mark'] / $row['dmax_mark'];
-            } elseif ($row['rmax_mark']) {
-                $localAvg = $row['mark'] / $row['rmax_mark'];
-            } else {
-                continue;
-            }
-
-            $crits[$row['criterion_id']][$row['box_id']] = $localAvg;
+            $results[$boxId][$criterionId] = [
+                'grouping' => $row['grouping'],
+                'name'     => $row['name'],
+                'maxMark'  => $row['max_mark'],
+                'marks'    => [],
+            ];
         }
 
-        $return = array();
-
-        foreach ($crits as $critID => $marks) {
-            $return[$critID]['name'] = $names[$critID];
-            $return[$critID]['value'] = (array_sum($marks) / count($marks)) * 100;
+        foreach($studentMarks as $row){
+            $mark = $row['mark'];
+            if(null === $mark){
+                continue;
+            }
+            $boxId       = $row['sb.id'];
+            $criterionId = $row['rc.id'];
+            $maxMark     = $results[$boxId][$criterionId]['maxMark'];
+            $results[$boxId][$criterionId]['marks'][$row['student_id']] = 100.0 * $mark / $maxMark;
         }
-
-        return $return;
+        return $results;
     }
 
 
@@ -137,53 +150,39 @@ class DueWork_Rubric_Handler
     }
 
     /**
-     * @param        $parentID
+     * Get all criteria available on the specified parent
+     *
+     * @param int[] $parentID
      * @param string $parentType
      *
      * @return array
+     * @var string $criteria[rc.id]['grouping']
+     * @var string $criteria[rc.id]['name']
      */
-    public function getAvailableCriteria($parentID, $parentType = 'category', $withUsageCount = false)
+    public function getAvailableCriteria(array $parentID, $parentType = Criterion::PARENT_TYPE_CATEGORY)
     {
-        if ($withUsageCount) {
-            $sql = '
-                SELECT c.grouping, c.id, c.name, COUNT(u.submission_box_id) usecount
-                FROM rubric_criterion c
-                LEFT JOIN rubric_usage u ON c.id = u.`criterion_id`
-                WHERE c.parent_id = :pid
-                AND c.parent_type = :ptype
-                GROUP BY c.id
-                ORDER BY `grouping` ASC, `name` ASC
-            ';
-        } else {
-            $sql = '
-                SELECT `grouping`, `id`, `name`
-                FROM `rubric_criterion`
-                WHERE `parent_id` = :pid
-                AND `parent_type` = :ptype
-                ORDER BY `grouping` ASC, `name` ASC
-            ';
-        }
+        $pb = new Alaress\Database\Predicate\Builder($this->db, '');
+        $pb->equals('parent_id', $parentID)
+           ->equals('parent_type', $parentType);
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(
-            array(
-                'pid'   => $parentID,
-                'ptype' => $parentType
-            )
-        );
+        $whereClause = implode(' AND ', $pb->getWhere());
 
-        $crits = array();
+        $stmt = $this->db->prepare("
+            SELECT `grouping`, `id`, `name`
+            FROM `rubric_criterion`
+            WHERE {$whereClause}
+            ORDER BY `grouping` ASC, `name` ASC
+        ");
+        $stmt->execute($pb->getParams());
+
+        $criteria = [];
         /** @noinspection PhpAssignmentInConditionInspection */
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $val = array(
-                'id'   => $row[1],
-                'name' => $row[2]
-            );
-            if ($withUsageCount) {
-                $val['count'] = $row[3];
-            }
-            $crits[$row[0]][$row[1]] = $val;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $criteria[$row['id']] = [
+                'grouping' => $row['grouping'],
+                'name'     => $row['name'],
+            ];
         }
-        return $crits;
+        return $criteria;
     }
 }

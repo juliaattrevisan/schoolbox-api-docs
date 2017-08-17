@@ -368,9 +368,9 @@ class Controller extends Base
             'progress'            => [
                 'allUnits' => $analysis->getProgressByUnit(),
             ],
-            'rubrics'             => [
-                'allRubrics' => $analysis->getCohortGradesByIndicator($unitImplsInTerm, $registry->getStudents()),
-            ],
+            'rubrics'             =>
+                $analysis->getCohortGradesByIndicator($unitImplsInTerm, $registry->getStudents())
+            ,
             'effort'              => [
                 'allEffort' => $analysis->getEffort(),
             ],
