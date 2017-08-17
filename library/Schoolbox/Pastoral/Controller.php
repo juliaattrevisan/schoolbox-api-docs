@@ -841,25 +841,22 @@ class Controller extends Base
         // Load access for current report
         $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
 
+        //Filter for individual access
+        $existingAccessIndividual = $existingAccess->filter(function () {
+            return $this->getUser() !== null;
+        });
+
         //Remove individual access users no longer in the Individual Users list
         if (empty($post["user_id"])) {
             $post["user_id"] = [];
         }
-        $deleteIds = array_diff($existingAccess->map(function(PastoralAccessModel $access){
-            if ($access->getUser() === null){
-                //Not an individual access item - skip
-                return false;
-            }
-            else{
-                return $access->getUser()->getId();
-            }
+        $deleteIds = array_diff($existingAccessIndividual->map(function(PastoralAccessModel $access){
+            return $access->getUser()->getId();
         })->getAll(), $post["user_id"]);
 
+        $access = $this->pastoralAccessMapper->findByColumnList(["pastoral_id" => $record->getId(), "user_id" => $deleteIds]);
+        $this->pastoralAccessMapper->deleteByColumnList($access);
 
-        foreach ($deleteIds as $deleteId){
-            $access = $this->pastoralAccessMapper->findByColumnList(["pastoral_id" => $record->getId(), "user_id" => $deleteId]);
-            $this->pastoralAccessMapper->delete($access);
-        }
 
         //Add users with de-dupe
         if (isset($post["user_id"])) {
