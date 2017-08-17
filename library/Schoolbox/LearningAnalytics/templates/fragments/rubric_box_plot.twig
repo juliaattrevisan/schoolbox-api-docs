@@ -5,6 +5,7 @@
         studentMarksPerCriterion: float[][]         Indexed by criteria name, then student ID
         students:                 Collection|User[] Indexed by user.id
 #}
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
         /**
@@ -45,10 +46,10 @@
 
                         {% for studentId, studentMark in studentMarks %}
                         {
-                            uid: {{ studentId }},
+                            uid: Number("{{ studentId }}"),
                             externalId: "{{ students[studentId].externalId }}",
                             info: "{{ students[studentId].fullName }}",
-                            value: {{ studentMark }}
+                            value: Number("{{ studentMark }}")
 
                         }{% if not loop.last %},{% endif %}
                         {% endfor %}
@@ -59,6 +60,7 @@
         });
     });
 </script>
+{% endautoescape %}
 
 
 <div data-graph="rubrics" style="height:{{ ((studentMarksPerCriterion | length)*40)+75 }}px"></div>
