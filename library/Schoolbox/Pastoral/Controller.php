@@ -838,13 +838,23 @@ class Controller extends Base
         // Delete user permissions
         $accessRecords = $record->getAccess();
 
-        // Update the authorised users
+        // Load access for current report
         $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
 
-        //Remove users no longer in the list
+        //Remove individual access users no longer in the Individual Users list
+        if (empty($post["user_id"])) {
+            $post["user_id"] = [];
+        }
         $deleteIds = array_diff($existingAccess->map(function(PastoralAccessModel $access){
-            return $access->getUser()->getId();
+            if ($access->getUser() === null){
+                //Not an individual access item - skip
+                return false;
+            }
+            else{
+                return $access->getUser()->getId();
+            }
         })->getAll(), $post["user_id"]);
+
 
         foreach ($deleteIds as $deleteId){
             $access = $this->pastoralAccessMapper->findByColumnList(["pastoral_id" => $record->getId(), "user_id" => $deleteId]);
