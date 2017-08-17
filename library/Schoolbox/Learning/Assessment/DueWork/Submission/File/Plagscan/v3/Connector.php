@@ -196,6 +196,7 @@ class Connector
      *
      * @param int $plagscanId
      * @return bool
+     * @throws \RuntimeException if Plagscan is unavailable
      * @throws \DomainException if some unexpected thing went wrong
      */
     public function analyse($plagscanId)
@@ -372,6 +373,7 @@ class Connector
      * @param int $plagscanId
      * @param int $mode
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \RuntimeException if Plagscan is unavailable
      */
     private function retrieve($plagscanId, $mode)
     {
@@ -405,6 +407,7 @@ class Connector
      *
      * @param $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \RuntimeException if Plagscan is unavailable
      */
     public function delete($plagscanId)
     {
@@ -437,6 +440,7 @@ class Connector
      *
      * @param $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \RuntimeException if Plagscan is unavailable
      */
     public function privatise($plagscanId)
     {
