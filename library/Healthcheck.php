@@ -449,8 +449,21 @@ class Healthcheck
             'tAttendances',
             'IndividualPlans',
             'StudentYears',
+
         ];
 
+        if ($this->configMapper->get('external_document_report_enabled')) {
+            $externalPing = new \External_Ping();
+
+            if ($externalPing->getVersion() == "68") {
+                $tables[] = 'media.StudentReportsArchiveLink';
+                $tables[] = 'media.StudentReportsArchive';
+            } else {
+                $tables[] = 'SynergyOneMedia.StudentReportsArchiveLink';
+                $tables[] = 'SynergyOneMedia.StudentReportsArchive';
+            }
+        }
+        
         // Pastoral Care Tables (Only If Module Enabled)
 
         if ($this->configMapper->get('pastoral_enabled')) {
