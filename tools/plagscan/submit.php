@@ -122,14 +122,17 @@ foreach ($allDocuments as $currentDocument) {
     catch (\DomainException $e) {
 
         /* Could not transmit this file to plagscan for some reason
+         * Continue
          */
         $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()} (domain exception)");
     }
     catch (\RuntimeException $e) {
 
         /* Could not transmit this file to plagscan for some reason
+         * RuntimeException = Plagscan is unusable = immediate exit
          */
-        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()} (runtime exception)");
+        $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()} (runtime exception); exiting immediately");
+        exit(1);
     }
 }
 
