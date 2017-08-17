@@ -49,6 +49,10 @@ class DueWork_Rubric_Handler
      */
     public function getStudentMarksByCriteriaInFolder(array $folderIds)
     {
+        if (!count($folderIds)) {
+            return [];
+        }
+
         /* 1. Get latest student published marks per criterion and dueWork
          * 2. Find the max descriptor value per criterion and dueWork.
          * 3. Convert each student mark into a normalised value
@@ -152,17 +156,21 @@ class DueWork_Rubric_Handler
     /**
      * Get all criteria available on the specified parent
      *
-     * @param int[] $parentID
+     * @param int[]  $parentIds
      * @param string $parentType
      *
      * @return array
-     * @var string $criteria[rc.id]['grouping']
-     * @var string $criteria[rc.id]['name']
+     * @var string   $criteria[rc.id]['grouping']
+     * @var string   $criteria[rc.id]['name']
      */
-    public function getAvailableCriteria(array $parentID, $parentType = Criterion::PARENT_TYPE_CATEGORY)
+    public function getAvailableCriteria(array $parentIds, $parentType = Criterion::PARENT_TYPE_CATEGORY)
     {
+        if (!count($parentIds)) {
+            return [];
+        }
+
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
-        $pb->equals('parent_id', $parentID)
+        $pb->equals('parent_id', $parentIds)
            ->equals('parent_type', $parentType);
 
         $whereClause = implode(' AND ', $pb->getWhere());
