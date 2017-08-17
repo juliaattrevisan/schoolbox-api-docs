@@ -87,7 +87,9 @@ class External_Synergetic_Class implements External_ClassInterface
         $classQuery   = $this->getClassCodeQuery($subCode);
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
-        $userExternalId = $_SESSION['user'] ? $_SESSION['user']->getExternalId() : null;
+        /** @var Schoolbox\User $sessionUser */
+        $sessionUser = $_SESSION['user'];
+        $userExternalId = $sessionUser ? $sessionUser->getExternalId() : null;
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($userExternalId));
         $fileYear = $this->database->quote($this->externalUser->getCurrentYear($userExternalId));
 
@@ -121,7 +123,9 @@ class External_Synergetic_Class implements External_ClassInterface
         $classQuery   = $this->getClassCodeQuery($subCode);
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
-        $userExternalId = $_SESSION['user'] ? $_SESSION['user']->getExternalId() : null;
+        /** @var Schoolbox\User $sessionUser */
+        $sessionUser = $_SESSION['user'];
+        $userExternalId = $sessionUser ? $sessionUser->getExternalId() : null;
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($userExternalId));
         $fileYear = $this->database->quote($this->externalUser->getCurrentYear($userExternalId));
 
