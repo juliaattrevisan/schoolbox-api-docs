@@ -196,7 +196,7 @@ class Connector
      *
      * @param int $plagscanId
      * @return bool
-     * @throws DomainException
+     * @throws \DomainException if some unexpected thing went wrong
      */
     public function analyse($plagscanId)
     {
@@ -225,7 +225,7 @@ class Connector
 
         /* What was the outcome?
          */
-        $content = json_decode($response->getBody());
+        $content = json_decode($response->getBody(), true);
 
         /* As far as I know, the only success state is statusCode 204
          */
@@ -241,7 +241,7 @@ class Connector
              * Get the latest version of the report and cache it locally
              * Sadly must check error strings, because plagscan
              */
-            if ($content->error->message == 'The document is already checked') {
+            if ($content['error']['message'] == 'The document is already checked') {
                 return true;
             }
 
@@ -257,7 +257,7 @@ class Connector
         /* If you ended up here, the document can't be analysed for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
