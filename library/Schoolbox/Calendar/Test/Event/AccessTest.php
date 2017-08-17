@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Calendar\Test\Event;
 
+use Aura\Web\Response\Redirect;
 use Schoolbox\Campus;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -63,29 +64,48 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             };
 
             $this->users = [
-                'super' => $newUser(1)->setSuperuser(true),
-                'staff' => $newUser(2)->setRole($this->getRole('staff')),
-                'staffAlt' => $newUser(3)->setRole($this->getRole('staff')),
-                'parent' => $newUser(4)->setRole($this->getRole('parent')),
-                'student' => $newUser(5)->setRole($this->getRole('student')),
+                'super'             => $newUser(1)->setSuperuser(true),
+                'staff'             => $newUser(2)->setRole($this->getRole('staff')),
+                'staffAlt'          => $newUser(3)->setRole($this->getRole('staff')),
+                'parent'            => $newUser(4)->setRole($this->getRole('parent')),
+                'student'           => $newUser(5)->setRole($this->getRole('student')),
 
-                'campusModerate' => $newUser(6),
-                'campusWrite' => $newUser(7),
-                'campusRead' => $newUser(8),
-                'campusNone' => $newUser(9),
+                'campusModerate'    => $newUser(6),
+                'campusWrite'       => $newUser(7),
+                'campusRead'        => $newUser(8),
+                'campusNone'        => $newUser(9),
 
-                'groupReadSuper' => $newUser(10)->setSuperuser(true),
-                'groupAdmin' => $newUser(11),
-                'groupWrite' => $newUser(12),
-                'groupRead' => $newUser(13),
-                'groupNone' => $newUser(14),
+                'groupReadSuper'    => $newUser(10)->setSuperuser(true),
+                'groupAdmin'        => $newUser(11),
+                'groupWrite'        => $newUser(12),
+                'groupRead'         => $newUser(13),
+                'groupNone'         => $newUser(14),
+
+                'parent2'           => $newUser(15)->setRole($this->getRole('parent')),
+                'student2'          => $newUser(16)->setRole($this->getRole('student')),
             ];
 
-            // Create a mock user object, who is a child of $this->users['parent']
+            // Create a mock user object, who is a child of $this->users['childParent'] (below)
             /** @var User|\PHPUnit_Framework_MockObject_MockObject $parentChild */
             $this->users['parentChild'] = $this->getMockBuilder(User::class)->getMock();
             $this->users['parentChild']->method('getParents')->willReturnCallback(function () {
                 return new Collection([$this->users['parent']]);
+            });
+            $this->users['parentChild']->method('getRole')->willReturnCallback(function () {
+                return $this->getRole('student');
+            });
+
+            // Create a mock user object, who is a parent of $this->users['parentChild']
+            /** @var User|\PHPUnit_Framework_MockObject_MockObject $parentChild */
+            $this->users['childParent'] = $this->getMockBuilder(User::class)->getMock();
+            $this->users['childParent']->method('isParentOf')->willReturnCallback(function () {
+                return true;
+            });
+            $this->users['childParent']->method('getRole')->willReturnCallback(function () {
+                return $this->getRole('parent');
+            });
+            $this->users['childParent']->method('isStaff')->willReturnCallback(function () {
+                return false;
             });
         }
 
@@ -321,25 +341,26 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             'StaffForStudent' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
             // Parent can create event for their child
-            'ParentForChild' => $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parentChild'),
+            'ParentForChild' => $this->generateTest(true, 'childParent', Event::ACCESS_PERSONAL, 'childParent', 'parentChild'),
 
             // Parent cannot create an event for a staff member
-            // TODO: currently possible, add test with SA-4032 fix
+            'ParentForStaff' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'staff'),
 
             // Parent cannot create an event for another parent
-            // TODO: currently possible, add test with SA-4032 fix
+            'ParentForParent' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent2'),
 
             // Parent cannot create an event for a student that isn't theirs
-            // TODO: currently possible, add test with SA-4032 fix
+            'ParentForOtherChild' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'student'),
 
             // Student cannot create event for a staff member
-            // TODO: currently possible, add test with SA-4032 fix
+            'StudentForStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'staff'),
 
             // Student cannot create event for a parent
-            // TODO: currently possible, add test with SA-4032 fix
+            'StudentForParent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'parent'),
 
             // Student cannot create event for another student
-            // TODO: currently possible, add test with SA-4032 fix
+            'StudentForStudent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'student2'),
+
 
 
             // --------------------------------------------------------------------------

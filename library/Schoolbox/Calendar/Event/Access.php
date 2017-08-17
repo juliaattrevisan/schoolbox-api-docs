@@ -89,7 +89,16 @@ class Access
 
         // If event is on a personal level, check effector is the owner or the author
         if ($accessLevel == Event::ACCESS_PERSONAL) {
-            if ($effector->getId() == $owner->getId() || $effector->getId() == $author->getId()) {
+            if ($owner->getRole()->isStudent()) {
+                $isParentOfOwner = $effector->isParentOf($owner->loadParents());
+            }
+            else {
+                $isParentOfOwner = false;
+            }
+            $isStaff = $effector->getRole()->isStaff();
+
+            if ($effector->getId() == $owner->getId() ||
+                ($effector->getId() == $author->getId() && ( $isStaff || $isParentOfOwner ))) {
                 return true;
             }
         }
