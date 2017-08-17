@@ -485,7 +485,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             'ExistingPersonal' => $this->generateTestExisting(true, 'staff', 'personal', 'staff', 'staff'),
 
             // Personal level event, student cannot modify event for a staff member
-            // TODO: currently possible, add test with SA-4032 fix
+            'ExistingPersonalStudentToStaff' => $this->generateTestExisting(false, 'student', 'personal', 'staff', 'staff'),
 
             // Campus level event, moderators can modify campus level event not authored or owned by themselves
             'ExistingCampus' => $this->generateTestExisting(true, 'campusModerate', 'campus', 'staff', 'staff'),
