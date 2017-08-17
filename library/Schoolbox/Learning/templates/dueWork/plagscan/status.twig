@@ -8,12 +8,20 @@
 {% if plagscanEnabled and currentFile.plagscan %}
     <p class="meta">
         {% if currentFile.plagscan.isComplete %}
-            <a href="{{ routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport', {assessmentId: assessment.id, assessment: assessment, participant: participant, responseId: response.id, plagscanId: currentFile.plagscan.plagscanId }) }}">
+            {% set plagscanReport = routeLookupIfAuthorized('learningDueWorkResponse.getPlagscanReport',{
+            assessmentId: assessment.id, assessment: assessment, participant: participant,responseId: response.id,
+            plagscanId: currentFile.plagscan.plagscanId}) %}
+            {% if plagscanReport %}
+                <a href="{{ plagscanReport }}">
+                    <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
+                    <span title="Plagiarism check completed.">plagiarised</span>
+                </a>
+            {% else %}
                 <span class="{{ urgency.plagscan(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
                 <span title="Plagiarism check completed.">plagiarised</span>
-            </a>
+            {%  endif %}
         {% elseif currentFile.plagscan.isProcessing %}
-            <span title="Plagiarism check is currently processing - check back again soon.">Calculating plagiarism..</span>
+            <span title="Plagiarism check is currently processing - check back again soon.">Calculating plagiarism...</span>
         {% elseif currentFile.plagscan.isPending %}
             <span title="Plagiarism check has been queued for processing and is pending being sent">Plagiarism check pending</span>
         {% elseif currentFile.plagscan.isUnscannable %}

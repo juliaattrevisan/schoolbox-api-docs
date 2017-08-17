@@ -193,8 +193,8 @@ Usage:
                             <a href="{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
                                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" class="mime" />
                                 <p>{{ currentFile.filename }}</p>
-                                {% include '@learning/dueWork/plagscan/status.twig' %}
                             </a>
+                            {% include '@learning/dueWork/plagscan/status.twig' %}
                         </div>
                     </div>
                     <nav>
