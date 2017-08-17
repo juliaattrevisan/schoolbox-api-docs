@@ -113,7 +113,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
                 {$this->getColumnString('post')},
                 {$this->getJoinColumnString('owner', 'owner')}
             FROM {$this->getTable()} AS post
-            LEFT JOIN {$this->getJoinSql('owner', 'post', 'owner')}
+            LEFT JOIN {$this->getJoinSql('owner', 'post', 'owner', true)}
 			WHERE post.postID=? ";
 
         $statement = $this->database->prepare($query);
