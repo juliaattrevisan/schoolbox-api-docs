@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use External_Pastoral;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -838,30 +839,28 @@ class Controller extends Base
         // Delete user permissions
         $accessRecords = $record->getAccess();
 
-        // Load access for current report
+        // Load Access
         $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
 
         //Filter for individual access
-        $existingAccessIndividual = $existingAccess->filter(function () {
-            return $this->getUser() !== null;
+        $existingAccessIndividual = $existingAccess->filter(function (PastoralAccessModel $access) {
+            return $access->getUser() !== null;
         });
 
-        //Remove individual access users no longer in the Individual Users list
-        if (empty($post["user_id"])) {
-            $post["user_id"] = [];
+        //Remove users no longer in the list
+        if (empty($post['user_id'])) {
+            $post['user_id'] = [];
         }
         $deleteIds = array_diff($existingAccessIndividual->map(function(PastoralAccessModel $access){
             return $access->getUser()->getId();
-        })->getAll(), $post["user_id"]);
+        })->getAll(), $post['user_id']);
 
-        $access = $this->pastoralAccessMapper->findByColumnList(["pastoral_id" => $record->getId(), "user_id" => $deleteIds]);
-        $this->pastoralAccessMapper->deleteByColumnList($access);
-
+        $this->pastoralAccessMapper->deleteByColumnList(['pastoral_id' => $record->getId(), 'user_id' => $deleteIds]);
 
         //Add users with de-dupe
-        if (isset($post["user_id"])) {
-            if (is_array($post["user_id"])) {
-                foreach ($post["user_id"] as $user_id) {
+        if (isset($post['user_id'])) {
+            if (is_array($post['user_id'])) {
+                foreach ($post['user_id'] as $user_id) {
 
                     $found = false;
 
