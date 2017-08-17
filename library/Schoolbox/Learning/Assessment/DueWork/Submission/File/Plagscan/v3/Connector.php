@@ -268,7 +268,7 @@ class Connector
         /* Save the report url
          */
         if ($response->getStatusCode() == 200) {
-            return json_decode($response->getBody())->data->reportlink;
+            return json_decode($response->getBody())->data->reportLink;
         }
 
         $content = json_decode($response->getBody());
@@ -323,7 +323,7 @@ class Connector
 
             /* ...really - is a shame it's not synonymous with fetchReport()
              */
-            return $content->data->level;
+            return $content->data->plagLevel;
         }
 
         /* If you ended up here, the document can't be reported for various reasons
