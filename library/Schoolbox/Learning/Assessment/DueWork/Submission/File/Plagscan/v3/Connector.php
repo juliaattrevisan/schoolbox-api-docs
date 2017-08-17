@@ -148,7 +148,7 @@ class Connector
         if ($response->getStatusCode() == 201) {
             if (!(array_key_exists('data', $content) && array_key_exists('docID', $content['data']))) {
                 throw new \InvalidArgumentException(
-                    "response->data->docID does not exist: PlagScan has changed their API again"
+                    "response[data][docID] does not exist: PlagScan has changed their API again"
                 );
             }
             return $content['data']['docID'];
@@ -280,7 +280,7 @@ class Connector
         if ($response->getStatusCode() == 200) {
             if (!(array_key_exists('data', $content) && array_key_exists('reportLink', $content['data']))) {
                 throw new \InvalidArgumentException(
-                    "response->data->reportLink does not exist: PlagScan has changed their API again"
+                    "response[data][reportLink] does not exist: PlagScan has changed their API again"
                 );
             }
             return $content['data']['reportLink'];
@@ -336,7 +336,7 @@ class Connector
         if ($response->getStatusCode() == 200) {
             if (!(array_key_exists('data', $content) && array_key_exists('plagLevel', $content['data']))) {
                 throw new \InvalidArgumentException(
-                    "response->data->plagLevel does not exist: PlagScan has changed their API again"
+                    "response[data][plagLevel] does not exist: PlagScan has changed their API again"
                 );
             }
             /* ...really - is a shame it's not synonymous with fetchReport()
