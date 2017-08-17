@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Assessment\Term;
 
 /**
  * Class CohortAnalysis
@@ -630,13 +631,13 @@ class CohortAnalysis
      * (Cuts the same data as getCohortGradesByAssessment() but by indicators instead of assessment.)
      *
      * @param GenericCollection|UnitImplementation[] $unitImplementations
-     * @param Collection|User[][]                    $unitImplStudents Grouped by unitImpl.id,
+     * @param Term\Model                             $term
      * @return array
      */
-    public function getCohortGradesByIndicator(GenericCollection $unitImplementations, Collection $unitImplStudents)
+    public function getCohortGradesByIndicator(GenericCollection $unitImplementations, Term\Model $term)
     {
         // exploit old class
-        return (new AllRubrics($unitImplementations, $unitImplStudents))->getRubricData();
+        return (new AllRubrics($unitImplementations, $term))->getRubricData();
     }
 
 

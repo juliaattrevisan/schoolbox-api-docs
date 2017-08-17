@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\User;
+use Schoolbox\Assessment\Term;
 
 class AllRubrics
 {
@@ -42,9 +43,9 @@ class AllRubrics
 
     /**
      * @param GenericCollection|UnitImplementation\Model[] $unitImplementations
-     * @param Collection|User[][]                          $unitImplStudents Grouped by unitImpl.id,
+     * @param Term\Model                                   $term
      */
-    public function __construct(GenericCollection $unitImplementations, Collection $unitImplStudents)
+    public function __construct(GenericCollection $unitImplementations, Term\Model $term)
     {
         $rubricHandler = new DueWork_Rubric_Handler();
 
@@ -53,7 +54,7 @@ class AllRubrics
         })->getAll();
         $folderIds = array_unique($folderIds);
 
-        $studentRubricMarks = $rubricHandler->getStudentMarksByCriteriaInFolder($folderIds);
+        $studentRubricMarks = $rubricHandler->getStudentMarksByCriteriaInFolder($folderIds, $term);
         $allCriteria        = $rubricHandler->getAvailableCriteria($folderIds);
 
         // Aggregate criteria by grouping+name

@@ -9,6 +9,7 @@
  */
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Term;
 
 /**
  * Class DueWork_Rubric_Handler
@@ -32,6 +33,7 @@ class DueWork_Rubric_Handler
 
     /**
      * Returns normalised marks for all student rubric marks in specified folders
+     * on assessments due in the specified term.
      *
      * Does not respect assessment.weight, ie all assessments are weighted at 1.
      *
@@ -39,7 +41,8 @@ class DueWork_Rubric_Handler
      *
      * Normalised mark: (0.0 - 100.0)
      *
-     * @param int[] $folderIds
+     * @param int[]      $folderIds
+     * @param Term\Model $term
      * @return array
      * @var string $data[sb.id][rc.id]['grouping'] criterion.grouping
      * @var string $data[sb.id][rc.id]['name'] criterion.name
@@ -47,7 +50,7 @@ class DueWork_Rubric_Handler
      * @var array $data[sb.id][rc.id]['marks']
      * @var float $data[sb.id][rc.id]['marks'][student.id]
      */
-    public function getStudentMarksByCriteriaInFolder(array $folderIds)
+    public function getStudentMarksByCriteriaInFolder(array $folderIds, Term\Model $term)
     {
         if (!count($folderIds)) {
             return [];
@@ -65,7 +68,13 @@ class DueWork_Rubric_Handler
          */
         $pb = new Alaress\Database\Predicate\Builder($this->db, '');
         $pb->equals('rc.parent_id', $folderIds)
-           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY);
+           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY)
+           ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase());
+
+        $finish = $term->getActualFinish();
+        if(null !== $finish && !$finish->isNull()){
+            $pb->lessThan('a.due_date', $finish->getDatabase());
+        }
 
         $whereClauseInner = implode(' AND ', $pb->getWhere());
         $whereClauseOuter = implode(' AND ', $pb->getWhere());
@@ -77,6 +86,8 @@ class DueWork_Rubric_Handler
             JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
             JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN rubric_level rl      ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+            JOIN submission_box sb    ON sb.id = rl.box_id
+            JOIN assessment a         ON  a.id = sb.assessment_id
             LEFT JOIN (
                 -- Get the latest published marks
                 SELECT MAX(rm.published_at) AS 'max_published_at', rm.student_id AS 'student_id', rl.box_id AS 'sb_id', rc.id AS 'rc_id'
@@ -84,6 +95,8 @@ class DueWork_Rubric_Handler
                 JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
                 JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
                 JOIN rubric_level rl      ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+                JOIN submission_box sb    ON sb.id = rl.box_id
+                JOIN assessment a         ON  a.id = sb.assessment_id
                 WHERE {$whereClauseInner}
                 AND rm.valid
                 AND rm.published_at IS NOT NULL
@@ -97,12 +110,16 @@ class DueWork_Rubric_Handler
         $studentMarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // 2. Get max mark per criterion and dueWork
+        $pb = new Alaress\Database\Predicate\Builder($this->db, '');
+        $pb->equals('rc.parent_id', $folderIds)
+           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY);
+        $whereClause = implode(' AND ', $pb->getWhere());
         $stmt = Database::getInstance()->prepare("
             SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rc.grouping, rc.name, MAX(rd.value) AS 'max_mark'
             FROM rubric_descriptor rd
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN rubric_level rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
-            WHERE {$whereClauseInner}
+            WHERE {$whereClause}
             GROUP BY rl.box_id, rc.id
             ORDER BY rl.box_id, rc.id
         ");
