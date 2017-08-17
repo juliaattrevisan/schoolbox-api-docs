@@ -10,17 +10,15 @@
  */
 
 
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
-
-use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
-use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
-
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', ['level' => 200]);
 $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();
@@ -36,8 +34,8 @@ if (!$mapper->getConnector()) {
 /** @var Plagscan $currentDocument */
 $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE, [
     'order' => [
-        'student_submission_file_id' => 'ASC'
-    ]
+        'student_submission_file_id' => 'ASC',
+    ],
 ]);
 
 $log->info("Plagscan now re-processing {$allDocuments->count()} documents");
@@ -75,7 +73,7 @@ foreach ($allDocuments as $currentDocument) {
             $previousPlagscans = $mapper->findPreviousIncarnationsOf($submissionFile->getId());
 
             /** @var Plagscan $currentPlagscan */
-            foreach($previousPlagscans as $currentPlagscan) {
+            foreach ($previousPlagscans as $currentPlagscan) {
                 $log->info("{$prefix}: privatising {$currentPlagscan->getPlagscanId()} - superseded by student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
                 $mapper->privatise($currentPlagscan);
             }
@@ -99,34 +97,29 @@ foreach ($allDocuments as $currentDocument) {
             } else {
                 $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
             }
-        }
-        else {
+        } else {
             $log->warning("{$prefix}: unknown join criteria for file/assessment/user");
         }
-    }
-    catch (Schoolbox\Mapper\Exception $e) {
+    } catch (Schoolbox\Mapper\Exception $e) {
         $log->warning("{$prefix}: unable to find student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
         /* Couldn't find the file or any of its pieces
          * So we continue instead, ignoring this plagscan doc
          */
         continue;
-    }
-    catch (\InvalidArgumentException $e) {
+    } catch (\InvalidArgumentException $e) {
         /* The PlagScan API needs to be updated
          * Immediately exit
          */
         $log->error("{$prefix}: PlagScan API needs to be updated. {$e->getMessage()}; exiting immediately");
         exit(1);
-    }
-    catch (\DomainException $e) {
+    } catch (\DomainException $e) {
 
         /* Could not transmit this file to plagscan for some reason
          * Continue
          */
         $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()} (domain exception)");
-    }
-    catch (\RuntimeException $e) {
+    } catch (\RuntimeException $e) {
 
         /* Could not transmit this file to plagscan for some reason
          * RuntimeException = Plagscan is unusable = immediate exit

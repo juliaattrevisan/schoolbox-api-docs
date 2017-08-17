@@ -10,16 +10,17 @@
  * @link             http://www.alaress.com.au/
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', ['level' => 200]);
 $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();
@@ -42,8 +43,7 @@ $reRetrieveMode = isset($opts['re-retrieve']);
 if ($reRetrieveMode) {
     $log->info("Scanner running in re-retrieve mode");
     $allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_COMPLETE);
-}
-/* Scan currently-pending plagscan records
+} /* Scan currently-pending plagscan records
  */
 else {
     $log->info("Scanner running in scan mode");
@@ -102,29 +102,24 @@ foreach ($allDocuments as $currentDocument) {
                     $mapper->save($currentDocument);
 
                     $numUpdated++;
-                }
-                else {
+                } else {
                     $log->warning("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");
                 }
-            }
-            else {
+            } else {
                 $log->warning("{$prefix}: report not yet analysed");
             }
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             /* The PlagScan API needs to be updated
              * Immediately exit
              */
             $log->error("{$prefix}: PlagScan API needs to be updated. {$e->getMessage()}; exiting immediately");
             exit(1);
-        }
-        catch (\DomainException $e) {
+        } catch (\DomainException $e) {
             $currentDocument->setStatus(Plagscan::STATUS_UNSCANNABLE);
             $mapper->save($currentDocument);
 
             $log->error("{$prefix} unscannable - {$e->getMessage()} (domain exception)");
-        }
-        catch (\RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $log->error("{$prefix} unscannable - {$e->getMessage()} (runtime exception); exiting immediately");
             exit(1);
         }
