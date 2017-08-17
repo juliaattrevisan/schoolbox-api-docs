@@ -125,7 +125,6 @@ foreach ($allDocuments as $currentDocument) {
             $log->error("{$prefix} unscannable - {$e->getMessage()} (domain exception)");
         }
         catch (\RuntimeException $e) {
-            $mapper->save($currentDocument);
             $log->error("{$prefix} unscannable - {$e->getMessage()} (runtime exception); exiting immediately");
             exit(1);
         }
