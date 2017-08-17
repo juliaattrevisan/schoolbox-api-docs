@@ -157,7 +157,7 @@ class Connector
         /* If you ended up here, the document can't be transmitted for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
@@ -267,24 +267,30 @@ class Connector
      *
      * @param int $plagscanId
      * @return string
-     * @throws DomainException
+     * @throws \InvalidArgumentException if Plagscan changed their API on us
+     * @throws \DomainException if some other unexpected thing went wrong
      */
     public function fetchInteractiveReportUrl($plagscanId)
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_INTERACTIVE);
 
+        $content = json_decode($response->getBody(), true);
+
         /* Save the report url
          */
         if ($response->getStatusCode() == 200) {
-            return json_decode($response->getBody())->data->reportLink;
+            if (!(array_key_exists('data', $content) && array_key_exists('reportLink', $content['data']))) {
+                throw new \InvalidArgumentException(
+                    "response->data->reportLink does not exist: PlagScan has changed their API again"
+                );
+            }
+            return $content['data']['reportLink'];
         }
-
-        $content = json_decode($response->getBody());
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
@@ -294,7 +300,7 @@ class Connector
      *
      * @param int $plagscanId
      * @return string
-     * @throws DomainException
+     * @throws \DomainException if some unexpected thing went wrong
      */
     public function fetchReport($plagscanId)
     {
@@ -306,12 +312,12 @@ class Connector
             return $response->getBody();
         }
 
-        $content = json_decode($response->getBody());
+        $content = json_decode($response->getBody(), true);
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
@@ -319,25 +325,30 @@ class Connector
      *
      * @param $plagscanId
      * @return string
-     * @throws DomainException
+     * @throws \InvalidArgumentException if Plagscan changed their API on us
+     * @throws \DomainException if some other unexpected thing went wrong
      */
     public function fetchScore($plagscanId)
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_SCORE);
 
-        $content = json_decode($response->getBody());
+        $content = json_decode($response->getBody(), true);
 
         if ($response->getStatusCode() == 200) {
-
+            if (!(array_key_exists('data', $content) && array_key_exists('plagLevel', $content['data']))) {
+                throw new \InvalidArgumentException(
+                    "response->data->plagLevel does not exist: PlagScan has changed their API again"
+                );
+            }
             /* ...really - is a shame it's not synonymous with fetchReport()
              */
-            return $content->data->plagLevel;
+            return $content['data']['plagLevel'];
         }
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
