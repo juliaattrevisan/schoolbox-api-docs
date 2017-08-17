@@ -7,21 +7,26 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Term;
 
 /**
  * Class DueWork_Rubric_Handler
+ *
  * @deprecated
  * @see RubricMapper
  */
 class DueWork_Rubric_Handler
 {
 
+    /** @var Database */
     private $db;
 
 
     /**
      * DueWork_Rubric_Handler constructor.
+     *
      * @deprecated
      */
     public function __construct()
@@ -31,717 +36,189 @@ class DueWork_Rubric_Handler
 
 
     /**
-     * @param $boxID
+     * Returns normalised marks for all student rubric marks in specified folders
+     * on assessments due in the specified term.
      *
-     * @return DueWork_Rubric_Abstract
-     */
-    public function getRubric($boxID)
-    {
-
-        // setup
-        $criteria     = array();
-        $results      = array();
-        $resultCounts = array();
-
-        // <SQL>
-        $sql = "
-            SELECT
-                c.id c_id, c.grouping c_grouping, c.name c_name,
-                sb.`rubric_result_set` sb_resultset,
-                r.value r_value, r.label r_label,
-                d.value d_value, d.`description` d_description
-            FROM rubric_usage u
-                LEFT JOIN `submission_box` sb
-                    ON u.`submission_box_id` = sb.id
-                LEFT JOIN rubric_criterion c
-                    ON u.`criterion_id` = c.id
-                LEFT JOIN rubric_result r
-                    ON r.`resultset_id` = sb.`rubric_result_set`
-                    AND sb.`rubric_result_set` > 0
-                LEFT JOIN rubric_descriptor d
-                    ON d.`criterion_id` = u.`criterion_id`
-                    AND d.`submission_box_id` = u.`submission_box_id`
-                    AND sb.`rubric_result_set` = 0
-            WHERE u.submission_box_id = :sbid
-            AND (d.`valid` = 1 OR sb.rubric_result_set > 0)
-            ORDER BY c.grouping ASC, c.name ASC, r.value ASC, d.value ASC";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(array('sbid' => $boxID));
-        // </SQL>
-
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // if criterion doesn't yet exist, create it
-            if (!isset($criteria[$row['c_id']])) {
-                $criteria[$row['c_id']] = new DueWork_Rubric_Criterion(
-                    $row['c_id'],
-                    $row['c_grouping'],
-                    $row['c_name']
-                );
-            }
-
-            ++$resultCounts[$row['c_id']];
-
-            if ($row['sb_resultset']) {
-                // use resultset
-                $results[$row['c_id']][$row['r_value']] = new DueWork_Rubric_Result(
-                    $row['r_label'],
-                    $row['r_value']
-                );
-            } else {
-                // use descriptors
-                $results[$row['c_id']][$row['d_value']] = new DueWork_Rubric_Descriptor(
-                    $row['d_description'],
-                    $row['d_value']
-                );
-            }
-        }
-
-        // the 2nd dimension of $results must all be the same size: get the min size and truncate if required
-        $size = count($resultCounts) ? min($resultCounts) : 0;
-
-        foreach ($results as $cID => $foo) {
-            $results[$cID] = array_slice($results[$cID], 0, $size);
-        }
-
-        // create factory
-        $rubricFactory = new DueWork_Rubric_Factory($criteria);
-
-        return $rubricFactory->buildRubric($results, $boxID);
-
-    }
-
-    /**
-     * Gets an array representing the marks given by the rubric marking in question
+     * Does not respect assessment.weight, ie all assessments are weighted at 1.
      *
-     * @param     $studentID
-     * @param     $boxID
-     * @param int $set
+     * If a student mark has a NULL value, it is ignored for aggregation.
      *
+     * Normalised mark: (0.0 - 100.0)
+     *
+     * @param int[]      $folderIds
+     * @param Term\Model $term
      * @return array
+     * @var string       $data [sb.id][rc.id]['grouping'] criterion.grouping
+     * @var string       $data [sb.id][rc.id]['name'] criterion.name
+     * @var string       $data [sb.id][rc.id]['max_mark'] max mark
+     * @var array        $data [sb.id][rc.id]['marks']
+     * @var float        $data [sb.id][rc.id]['marks'][student.id]
      */
-    public function getStudentMarks($studentID, $boxID, $set = 0)
+    public function getStudentMarksByCriteriaInFolder(array $folderIds, Term\Model $term)
     {
-        $stmt = Database::getInstance()->prepare(
-            "
-                        SELECT criterion_id, mark, UNIX_TIMESTAMP(created_at) AS created_at
-                        FROM rubric_mark
-                        WHERE student_id = :sid
-                        AND submission_box_id = :sbid
-                        AND valid = 1
-                        ORDER BY created_at DESC, criterion_id ASC
-                    "
-        );
-
-        $stmt->execute(
-            array(
-                'sid'  => $studentID,
-                'sbid' => $boxID
-            )
-        );
-
-        $marks = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $marks[$row['created_at']][$row['criterion_id']] = $row['mark'];
+        if (!count($folderIds)) {
+            return [];
         }
 
-        // remove timetstamps and replace with indices
-        $marks = array_values($marks);
-        if (isset($marks[$set])) {
-            return $marks[$set];
-        }
-        return array();
-    }
+        /* 1. Get latest student published marks per criterion and dueWork
+         * 2. Find the max descriptor value per criterion and dueWork.
+         * 3. Convert each student mark into a normalised value
+         *
+         * We could perform steps 1+2 in a single query using a correlated subquery, but
+         * that would mean the subquery is executed for every row fetched by the outer query.
+         * In our case it is much faster to just fetch the max descriptors in a subsequent light-weight query.
+         * (eg, consider there is no point executing the subquery for different students)
+         * @see http://www.sqlservice.se/sql-server-performance-death-by-correlated-subqueries/
+         */
+        $pb = new Alaress\Database\Predicate\Builder($this->db, '');
+        $pb->equals('rc.parent_id', $folderIds)
+           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY)
+           ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase());
 
-    /**
-     * Gets an array representing the marks given by the rubric marking in question
-     * Includes description
-     *
-     * @param int $studentID
-     * @param int $boxID
-     *
-     * @return array
-     */
-    public function getStudentMarksWithDescription($studentID, $boxID)
-    {
-        // Search both rubric_descriptor and rubric_result for description
+        $finish = $term->getActualFinish();
+        if (null !== $finish && !$finish->isNull()) {
+            $pb->lessThan('a.due_date', $finish->getDatabase());
+        }
+
+        $whereClauseInner = implode(' AND ', $pb->getWhere());
+        $whereClauseOuter = implode(' AND ', $pb->getWhere());
+
+        // 1. Get latest published student marks
         $stmt = Database::getInstance()->prepare("
-            SELECT
-              m.criterion_id,
-              COALESCE(d.value, m.mark) mark,
-              d.description,
-              UNIX_TIMESTAMP(m.created_at) created_at
-            FROM rubric_mark m
-            LEFT JOIN rubric_descriptor d ON m.`descriptor_id` = d.id
-            WHERE m.submission_box_id = :sbid
-            AND m.student_id = :sid
-            AND m.valid IS TRUE
-            AND d.valid IS TRUE
-            ORDER BY created_at DESC, m.criterion_id ASC
-        ");
-
-        $stmt->execute(
-            array(
-                'sid'  => $studentID,
-                'sbid' => $boxID
-            )
-        );
-
-        $marks = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $marks[$row['created_at']][$row['criterion_id']]['mark'] = $row['mark'];
-            $marks[$row['created_at']][$row['criterion_id']]['description'] = $row['description'];
-        }
-
-        // Use the youngest rubric mark set.
-        if (count($marks)) {
-            ksort($marks);
-            $marks = array_pop(array_values($marks));
-        }
-
-        return $marks;
-    }
-
-    /**
-     * This function should be renamed to something sensible
-     * It retrieves a student's marks in a category, broken down by criteria and averaged
-     *
-     * @param $studentID
-     * @param $categoryID
-     *
-     * @return array
-     */
-    public function getStudentMarksByCriteriaInCategory($studentID, $categoryID)
-    {
-        // Ordering:
-        // box and criterion
-        // most recent submissions first
-        // highest marks first
-        $stmt = Database::getInstance()->prepare(
-            "
+            SELECT rm.student_id, rl.box_id AS 'sb.id', rc.id AS 'rc.id', rd.value AS 'mark'
+            FROM rubric_mark rm
+            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+            JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_level rl      ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+            JOIN submission_box sb    ON sb.id = rl.box_id
+            JOIN assessment a         ON  a.id = sb.assessment_id
+            LEFT JOIN (
+                -- Get the latest published marks
                 SELECT
-                    sb.id AS box_id,
-                    rm.criterion_id,
-                    rd.value mark,
-                    rc.name,
-                    (
-                        SELECT MAX(rd.value)
-                        FROM rubric_descriptor rd
-                        WHERE rm.criterion_id = rd.criterion_id
-                        AND sb.rubric_result_set = 0
-                    ) AS dmax_mark,
-                    (
-                        SELECT MAX(rr.value)
-                        FROM rubric_result rr
-                        WHERE sb.rubric_result_set = rr.resultset_id
-                        AND sb.rubric_result_set > 0
-                    ) AS rmax_mark,
-                    rm.created_at
+                  MAX(rm.published_at) AS 'max_published_at',
+                  rm.student_id AS 'student_id',
+                  rl.box_id AS 'sb_id',
+                  rc.id AS 'rc_id'
                 FROM rubric_mark rm
-                LEFT JOIN rubric_descriptor rd
-                    ON rm.descriptor_id = rd.id
-                LEFT JOIN rubric_criterion rc
-                    ON rm.criterion_id = rc.id
-                LEFT JOIN
-                    submission_box sb
-                    ON rm.submission_box_id = sb.id
-                WHERE rm.valid = 1
-                    AND rm.student_id = :student_id
-                    AND sb.category = :category_id
-                    AND sb.deleted IS FALSE
-                ORDER BY
-                    sb.id ASC,
-                    rm.criterion_id ASC,
-                    rm.created_at DESC,
-                    rm.mark DESC
-            "
-        );
-        $stmt->execute(
-            array(
-                'student_id'  => $studentID,
-                'category_id' => $categoryID
-            )
-        );
-        // create a normalised value for each criterion
-        $crits = array();
-        $names = array();
+                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+                JOIN rubric_criterion rc  ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+                JOIN rubric_level rl      ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+                JOIN submission_box sb    ON sb.id = rl.box_id
+                JOIN assessment a         ON  a.id = sb.assessment_id
+                WHERE {$whereClauseInner}
+                AND rm.valid
+                AND rm.published_at IS NOT NULL
+                GROUP BY rm.student_id, rl.box_id, rc.id
+            ) t ON t.max_published_at = rm.published_at AND t.student_id = rm.student_id
+                AND rl.box_id = t.sb_id AND rc.id = t.rc_id
+            WHERE {$whereClauseOuter}
+            AND rm.valid
+            AND rm.published_at IS NOT NULL;
+        ");
+        $stmt->execute($pb->getParams());
+        $studentMarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // 2. Get max mark per criterion and dueWork
+        $pb = new Alaress\Database\Predicate\Builder($this->db, '');
+        $pb->equals('rc.parent_id', $folderIds)
+           ->equals('rc.parent_type', Criterion::PARENT_TYPE_CATEGORY);
+        $whereClause = implode(' AND ', $pb->getWhere());
+        $stmt        = Database::getInstance()->prepare("
+            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rc.grouping, rc.name, MAX(rd.value) AS 'max_mark'
+            FROM rubric_descriptor rd
+            JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_level rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+            WHERE {$whereClause}
+            GROUP BY rl.box_id, rc.id
+            ORDER BY rl.box_id, rc.id
+        ");
+        $stmt->execute($pb->getParams());
+
+        // 3. Convert each student mark into a normalised value
+        $results = [];
+
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $names[$row['criterion_id']] = $row['name'];
+            $boxId       = $row['sb.id'];
+            $criterionId = $row['rc.id'];
 
-            // only use the most recent mark for each submission/criterion
-            if (isset($crits[$row['criterion_id']][$row['box_id']])) {
+            if (!is_array($results[$boxId])) {
+                $results[$boxId] = [];
+            }
+            $results[$boxId][$criterionId] = [
+                'grouping' => $row['grouping'],
+                'name'     => $row['name'],
+                'maxMark'  => $row['max_mark'],
+                'marks'    => [],
+            ];
+        }
+
+        foreach ($studentMarks as $row) {
+            $mark = $row['mark'];
+            if (null === $mark) {
                 continue;
             }
+            $boxId       = $row['sb.id'];
+            $criterionId = $row['rc.id'];
+            $maxMark     = $results[$boxId][$criterionId]['maxMark'];
 
-            if ($row['dmax_mark']) {
-                $localAvg = 0 == $row['dmax_mark'] ? null : $row['mark'] / $row['dmax_mark'];
-            } elseif ($row['rmax_mark']) {
-                $localAvg = $row['mark'] / $row['rmax_mark'];
-            } else {
-                continue;
-            }
-
-            $crits[$row['criterion_id']][$row['box_id']] = $localAvg;
+            $results[$boxId][$criterionId]['marks'][$row['student_id']] = 100.0 * $mark / $maxMark;
         }
-
-        $return = array();
-
-        foreach ($crits as $critID => $marks) {
-            $return[$critID]['name'] = $names[$critID];
-            $return[$critID]['value'] = (array_sum($marks) / count($marks)) * 100;
-        }
-
-        return $return;
+        return $results;
     }
 
-    /**
-     * Gets the total mark for the rubric marking in question
-     *
-     * @param     $studentID
-     * @param     $boxID
-     * @param int $set
-     *
-     * @return array
-     */
-    public function getStudentMarksTotal($studentID, $boxID, $set = 0)
-    {
-
-        // test for a rubric mark
-        $marks = $this->getStudentMarks($studentID, $boxID, $set);
-
-        if (count($marks)) {
-            $result = array(
-                'mark' => array_sum($marks),
-                'max'  => $this->getRubricMaxScore($boxID)
-            );
-        } else {
-            $result = array(
-                'mark' => -1,
-                'max'  => -1
-            );
-        }
-
-        // make sure there's not an error code on the submissionreturn table
-        $dem  = DueWork_ErrorMapper::getInstance();
-        $errs = $dem->listDisplayValues();
-
-        $returnHandler = new SubmissionReturn();
-        $rtn           = $returnHandler->getOneByUser($studentID, $boxID);
-        if (in_array($rtn['mark'], $errs)) {
-            $result['err'] = $rtn['mark'];
-        }
-
-        return $result;
-    }
 
     public function populateResultSet(DueWork_Rubric_ResultSet $resultSet, $resultSetID)
     {
-        $stmt = $this->db->prepare("SELECT `value`, `label` FROM `rubric_result` WHERE `resultset_id` = :rsid");
+        $stmt = $this->db->prepare('SELECT `value`, `label` FROM `rubric_result` WHERE `resultset_id` = :rsid');
 
-        $stmt->execute(array('rsid' => $resultSetID));
+        $stmt->execute(['rsid' => $resultSetID]);
 
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $resultSet->addResult(new DueWork_Rubric_Result($row['label'], $row['value']));
         }
     }
 
-    public function populateCriteria($criterionList)
-    {
-
-        $returnList = array();
-
-        // prepare statement for retrieving criteria if it turns out to be required
-        $stmt = Database::getInstance()->prepare(
-            "SELECT `id`, `grouping`, `name` FROM `rubric_criterion` WHERE `id` = :cid"
-        );
-
-        // insert criteria into rubric
-        foreach ($criterionList as $id => $checked) {
-            if ($checked instanceof DueWork_Rubric_Criterion) {
-                $returnList[$id] = $checked;
-            } // if the criterion is just an index, retrieve it from the db and replace
-            elseif ($checked && is_numeric($checked)) {
-                $stmt->execute(array('cid' => $id));
-                $row             = $stmt->fetch(PDO::FETCH_ASSOC);
-                $returnList[$id] = new DueWork_Rubric_Criterion($row['id'], $row['grouping'], $row['name']);
-            }
-        }
-        return $returnList;
-    }
 
     /**
-     * @param $boxID
+     * Get all criteria available on the specified parent
      *
-     * @return bool
-     */
-    public function marksAlreadyGiven($boxID)
-    {
-        $stmt = $this->db->prepare(
-            "SELECT COUNT(DISTINCT student_id) FROM `rubric_mark` WHERE `submission_box_id` = :sbid"
-        );
-        $stmt->execute(array('sbid' => $boxID));
-        return $stmt->fetchColumn() ? true : false;
-    }
-
-    /**
-     * @param        $parentID
+     * @param int[]  $parentIds
      * @param string $parentType
      *
      * @return array
+     * @var string   $criteria [rc.id]['grouping']
+     * @var string   $criteria [rc.id]['name']
      */
-    public function getAvailableCriteria($parentID, $parentType = 'category', $withUsageCount = false)
+    public function getAvailableCriteria(array $parentIds, $parentType = Criterion::PARENT_TYPE_CATEGORY)
     {
-        if ($withUsageCount) {
-            $sql = "
-                SELECT c.grouping, c.id, c.name, COUNT(u.submission_box_id) usecount
-                FROM rubric_criterion c
-                LEFT JOIN rubric_usage u ON c.id = u.`criterion_id`
-                WHERE c.parent_id = :pid
-                AND c.parent_type = :ptype
-                GROUP BY c.id
-                ORDER BY `grouping` ASC, `name` ASC
-            ";
-        } else {
-            $sql = "
-                SELECT `grouping`, `id`, `name`
-                FROM `rubric_criterion`
-                WHERE `parent_id` = :pid
-                AND `parent_type` = :ptype
-                ORDER BY `grouping` ASC, `name` ASC
-            ";
+        if (!count($parentIds)) {
+            return [];
         }
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(
-            array(
-                'pid'   => $parentID,
-                'ptype' => $parentType
-            )
-        );
+        $pb = new Alaress\Database\Predicate\Builder($this->db, '');
+        $pb->equals('parent_id', $parentIds)
+           ->equals('parent_type', $parentType);
 
-        $crits = array();
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $val = array(
-                'id'   => $row[1],
-                'name' => $row[2]
-            );
-            if ($withUsageCount) {
-                $val['count'] = $row[3];
-            }
-            $crits[$row[0]][$row[1]] = $val;
+        $whereClause = implode(' AND ', $pb->getWhere());
+
+        $stmt = $this->db->prepare("
+            SELECT `grouping`, `id`, `name`
+            FROM `rubric_criterion`
+            WHERE {$whereClause}
+            ORDER BY `grouping` ASC, `name` ASC
+        ");
+        $stmt->execute($pb->getParams());
+
+        $criteria = [];
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $criteria[$row['id']] = [
+                'grouping' => $row['grouping'],
+                'name'     => $row['name'],
+            ];
         }
-        return $crits;
-    }
-
-    /**
-     * @return array
-     */
-    public function getResultSets()
-    {
-        $sql = "
-            SELECT `resultset_id`, `value`, `label`
-            FROM `rubric_result`
-            ORDER BY `resultset_id` ASC, `value` ASC
-        ";
-
-        $rs = array();
-
-        $result = $this->db->query($sql);
-        while ($row = $result->fetch(PDO::FETCH_NUM)) {
-            $rs[$row[0]][$row[1]] = $row[2];
-        }
-
-        return $rs;
-    }
-
-    public function saveMarks($marks, $studentID, $boxID, $stamp = 0)
-    {
-        if ($stamp) {
-            return $this->updateMarks($marks, $studentID, $boxID, $stamp);
-        } else {
-            return $this->createMarks($marks, $studentID, $boxID);
-        }
-    }
-
-    public function createMarks($marks, $studentID, $boxID)
-    {
-        $stmt = $this->db->prepare(
-            "
-                INSERT INTO rubric_mark (`student_id`,`submission_box_id`, `criterion_id`, `mark`)
-                VALUES (:sid, :sbid, :cid, :mark)
-                ON DUPLICATE KEY UPDATE mark = :mark
-            "
-        );
-
-        foreach ($marks as $cID => $mark) {
-            $stmt->execute(
-                array(
-                    'sid'  => $studentID,
-                    'sbid' => $boxID,
-                    'cid'  => $cID,
-                    'mark' => $mark
-                )
-            );
-        }
-        return true;
-    }
-
-    public function updateMarks($marks, $studentID, $boxID, $createdAt)
-    {
-
-        // the ON DUPLICATE clause is equivalent to the nonexistent ON DUPLICATE KEY IGNORE
-        $insertStmt = $this->db->prepare(
-            "
-                INSERT INTO rubric_mark (`student_id`,`submission_box_id`, `criterion_id`, `created_at`, `mark`)
-                VALUES (:sid, :sbid, :cid, :created_at, :mark)
-                ON DUPLICATE KEY UPDATE valid = valid
-            "
-        );
-
-        $updateStmt = $this->db->prepare(
-            "
-                UPDATE rubric_mark
-                SET `mark` = :mark
-                WHERE student_id = :sid
-                AND submission_box_id = :sbid
-                AND criterion_id = :cid
-                AND created_at = :created_at
-                AND valid = 1
-            "
-        );
-
-        foreach ($marks as $cID => $mark) {
-            // attempt an update of a record
-            $updateStmt->execute(
-                array(
-                    'mark'       => $mark,
-                    'sid'        => $studentID,
-                    'sbid'       => $boxID,
-                    'cid'        => $cID,
-                    'created_at' => $createdAt
-                )
-            );
-
-            // if nothing happened, we need to insert a record that matches the timestamp in question
-            if (!$updateStmt->rowCount()) {
-                $insertStmt->execute(
-                    array(
-                        'sid'        => $studentID,
-                        'sbid'       => $boxID,
-                        'cid'        => $cID,
-                        'created_at' => $createdAt,
-                        'mark'       => $mark
-                    )
-                );
-            }
-        }
-        return true;
-    }
-
-//	/**
-//	 * Bin this
-//	 * @deprecated
-//	 * @param $studentID
-//	 * @param $boxID
-//	 * @return string
-//	 */
-//	public function getLatestMarkTimestamp($studentID, $boxID) {
-//        $db = Database::getInstance();
-//        $stmt = $db->prepare("
-//            SELECT MAX(created_at) FROM rubric_mark
-//            WHERE student_id = :sid
-//            AND submission_box_id = :sbid
-//            AND valid = 1
-//        ");
-//
-//        $stmt->execute(array(
-//            'sid'  => $studentID,
-//            'sbid' => $boxID,
-//        ));
-//
-//        return $stmt->fetchColumn();
-//    }
-
-    /**
-     * @param $rubric                  DueWork_Rubric_Abstract
-     * @param $invalidateExistingMarks bool
-     * @param $submissionBoxID         int
-     */
-    public function persistRubric($rubric, $invalidateExistingMarks, $submissionBoxID)
-    {
-
-        // 0) invalidate existing marks if required
-        if (isset($invalidateExistingMarks) && $invalidateExistingMarks === true) {
-            $stmt = $this->db->prepare(
-                "
-                                UPDATE rubric_mark
-                                SET valid = 0
-                                WHERE submission_box_id = :sbid
-                            "
-            );
-            $stmt->execute(array('sbid' => $submissionBoxID));
-        }
-
-        // 1) remove existing rubric_usage entries for this submissionbox for data integrity
-        $stmt = $this->db->prepare(
-            "
-                        DELETE FROM rubric_usage
-                        WHERE submission_box_id = :sbid
-                    "
-        );
-        $stmt->execute(array('sbid' => $submissionBoxID));
-
-        // 2) add the rubric usages for this submission box
-        $stmt = $this->db->prepare(
-            "
-                        INSERT INTO rubric_usage
-                        VALUES (:cid, :sbid)
-                    "
-        );
-        if ($rubric->getCriteriaCount()) {
-            foreach ($rubric->getCriteriaIndices() as $i) {
-                $stmt->execute(
-                    array(
-                        'cid'  => $i,
-                        'sbid' => $submissionBoxID
-                    )
-                );
-            }
-        }
-
-        // 3) add the descriptors into into the database, if necessary
-        // the ResultSetRubric doesn't need any additional data stored
-        if ($rubric instanceof DueWork_Rubric_DescriptorRubric) {
-            // invalidate any existing descriptors for this submission box,
-            // and we will revalidate the ones we plan to use
-            $stmt = $this->db->prepare(
-                "
-                    UPDATE rubric_descriptor
-                    SET valid = 0
-                    WHERE submission_box_id = :sbid
-                "
-            );
-            $stmt->execute(array('sbid' => $submissionBoxID));
-
-            // insert nonexistent descriptors,
-            // or replace existing ones with their new descriptions if they already exist
-            $stmt = $this->db->prepare(
-                "
-                    INSERT INTO rubric_descriptor (`criterion_id`,`submission_box_id`,`value`,`description`)
-                    VALUES (:cid, :sbid, :val, :descr)
-                    ON DUPLICATE KEY UPDATE `description` = :descr, `valid` = 1
-                "
-            );
-
-            if ($rubric->getCriteriaCount() && $rubric->getResultCount()) {
-                foreach ($rubric->getCriteriaIndices() as $i) {
-                    foreach ($rubric->getResultIndices($i) as $j) {
-                        $subst = array(
-                            'cid'   => $i,
-                            'sbid'  => $submissionBoxID,
-                            'val'   => $j,
-                            'descr' => $rubric->getResult($i, $j)->getDescription()
-                        );
-                        $stmt->execute($subst);
-                    }
-                }
-            }
-        }
-
-        // 4) if marks have been given, the most recent needs to be updated on the submission_return table
-        // note that the display mark isn't being altered, just the normalised one
-
-        // determine the scalefactor based on how the rubric has changed
-        $max = $this->getRubricMaxScore($submissionBoxID);
-
-        // get a list of students to update
-        $stmt = $this->db->prepare(
-            "SELECT DISTINCT `owner` FROM submission_return WHERE box_id = :sbid"
-        );
-        $stmt->execute(array('sbid' => $submissionBoxID));
-        $studentList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (count($studentList)) {
-            // prepare statement to retrieve updated marks
-            $stmt = $this->db->prepare(
-                "
-                    UPDATE submission_return
-                    SET norm_mark = (
-                        SELECT SUM(mark) AS newmark FROM (
-                            SELECT * FROM (
-                                SELECT *
-                                FROM rubric_mark
-                                WHERE submission_box_id = :sbid
-                                AND student_id = :sid
-                                AND valid = 1
-                                ORDER BY created_at DESC
-                            ) t
-                            GROUP BY criterion_id
-                        ) u
-                    ) / :max * 100
-                    WHERE box_id = :sbid
-                    AND `owner` = :sid
-                    ORDER BY returned DESC
-                    LIMIT 1
-                "
-            );
-
-            foreach ($studentList as $row) {
-                $stmt->execute(
-                    array(
-                        'sbid' => $submissionBoxID,
-                        'sid'  => $row['owner'],
-                        'max'  => $max
-                    )
-                );
-            }
-        }
-    }
-
-
-    public function getRubricMaxScore($submissionBoxID)
-    {
-
-        $max = 0;
-
-        /* if descriptor */
-        $stmt = $this->db->prepare(
-            "SELECT MAX(d.value)
-                        FROM submission_box sb
-                        LEFT JOIN `rubric_usage` u ON sb.id = u.`submission_box_id`
-                        LEFT JOIN rubric_criterion c ON c.id = u.`criterion_id`
-                        LEFT JOIN rubric_descriptor d ON d.`submission_box_id` = sb.id
-                            AND d.`criterion_id` = c.id AND sb.`rubric_result_set` = 0
-                        WHERE d.valid = 1 AND sb.id = :sbid
-                        GROUP BY (c.id)"
-        );
-        $stmt->execute(array('sbid' => $submissionBoxID));
-        foreach ($stmt as $result) {
-            $max += $result[0];
-        }
-
-        if ($max > 0) {
-            return $max;
-        } else {
-            /* attempt result set max */
-            $stmt = $this->db->prepare(
-                "
-                    SELECT r.value r_value
-                    FROM submission_box sb
-                    LEFT JOIN `rubric_usage` u ON sb.id = u.`submission_box_id`
-                    LEFT JOIN rubric_result r ON r.`resultset_id` = sb.`rubric_result_set`
-                        AND sb.`rubric_result_set` > 0
-                    WHERE sb.rubric_result_set > 0 AND r.value > 0 AND sb.id = :sbid
-                    ORDER BY r.value DESC
-                "
-            );
-
-            $stmt->execute(array('sbid' => $submissionBoxID));
-            return $stmt->rowCount();
-        }
+        return $criteria;
     }
 }

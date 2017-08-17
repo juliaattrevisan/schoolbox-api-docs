@@ -20,68 +20,6 @@ class Marksheet_Rubric extends Marksheet_Abstract
     }
 
     /**
-    * Take a UI-formatted mark and normalise it
-    *
-    * @param $rubric
-    * @return array|mixed
-    */
-    public function normaliseMark($rubric)
-    {
-        $mark = 0;
-        foreach ($rubric as $i) {
-            $mark += $i;
-        }
-
-        $max = $this->getRubricHandler()->getRubricMaxScore($this->getSubmissionBox()->getId());
-
-        $normalised = (($mark / $max) * 100);
-
-        // validation: must be inside bounds
-        if ($normalised < 0) {
-            $normalised = 0;
-            $mark = 0;
-        } elseif ($normalised > 100) {
-            $normalised = 100;
-            $mark = $max;
-        }
-
-        return array(
-            'norm_mark' => $normalised,
-            'mark'      => $this->cleanNumber($mark, 4, false) . " / " . $max
-        );
-    }
-
-    /**
-     * Extract a normalised mark from the database, and format it for the UI
-     *
-     * @param $user_id
-     * @param bool $asText
-     * @param bool $blankZero
-     * @return mixed
-     */
-    public function retrieveMark($user_id, $asText = false, $blankZero = true)
-    {
-        $box_id = $this->getSubmissionBox()->getId();
-        // we can't trust the submission_box table, because it may have been set to null, so retrieve rubric data
-        $marks = $this->getRubricHandler()->getStudentMarksTotal($user_id, $box_id);
-        $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
-
-/*
-        $subbox = $this->getSubmissionHandler()->getByID($box_id);
-        $mark = $this->cleanNumber(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
-*/
-
-        return array(
-            'mark'      => $asText ? sprintf('%d / %d', $marks['mark'], $marks['max']) : $marks['mark'],
-            'max_mark'  => $marks['max'],
-//            'norm_mark' => $marks['max'] <= 0 ? 0 : ($marks['mark'] / $marks['max']) * 100,
-            'norm_mark' => $subReturn['norm_mark'],
-            'err'       => isset($marks['err']) ? $marks['err'] : -1,
-            'comment'   => $subReturn['comment']
-        );
-    }
-
-    /**
      * Format a pre-extracted value for the UI
      *
      * @param $rawMark

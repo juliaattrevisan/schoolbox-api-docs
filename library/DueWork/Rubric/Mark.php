@@ -42,24 +42,6 @@ class DueWork_Rubric_Mark {
         }
     }
 
-    /**
-     * Populate self with student marks, based on a timestamp set
-     * @param $studentID
-     * @param int $set
-     * @return bool
-     */
-    public function populateMarks($studentID, $set = 0) {
-        $rubricHandler = new DueWork_Rubric_Handler();
-        $marks = $rubricHandler->getStudentMarks($studentID, $this->rubric->getSubmissionBoxID(), $set);
-        if(count($marks)) {
-            foreach($marks as $cID => $mark) {
-                $this->setMark($cID, $mark);
-            }
-            return true;
-        }
-        return false;
-    }
-
 
     public function unsetMark($criterionID) {
         if($this->isValidCriterionID($criterionID)) {

@@ -333,13 +333,6 @@ class Controller extends Base
         $codeMapper = FolderCodeMapper::getInstance();
         $codeMapper->applyCodesToCategories($courseImplementationFolders);
 
-
-        /* Get a list of all the students involved in each unit
-         * and a list of units involved. This gets reused everywhere
-         * so just hit the external db once
-         */
-        $registry = new Registry($unitImplsInTerm);
-
         /** @var Term[]|GenericCollection $navigableTerms */
         $navigableTerms = $this->getNavigableTerms($courseSpecification, $classFolder);
 
@@ -368,9 +361,9 @@ class Controller extends Base
             'progress'            => [
                 'allUnits' => $analysis->getProgressByUnit(),
             ],
-            'rubrics'             => [
-                'allRubrics' => $analysis->getCohortGradesByIndicator($unitImplsInTerm, $registry->getStudents()),
-            ],
+            'rubrics'             =>
+                $analysis->getCohortGradesByIndicator($unitImplsInTerm, $term)
+            ,
             'effort'              => [
                 'allEffort' => $analysis->getEffort(),
             ],

@@ -1,0 +1,66 @@
+{#
+    Renders a rubric box plot for the learning analytics page
+
+    Data:
+        studentMarksPerCriterion: float[][]         Indexed by criteria name, then student ID
+        students:                 Collection|User[] Indexed by user.id
+#}
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function () {
+        /**
+         *  Boxplots for Rubrics
+         */
+        $.fn.boxPlotRender({
+            element: '[data-graph=rubrics]',
+
+            // Title of the graph
+            title: '',
+
+            // Orientation of the box plots
+            orientation: 'horizontal',
+
+            /* A list of all the criteria that are being graphed
+             * These correspond to a series of data and their respective
+             * five-point summaries
+             */
+            allAssessments: [
+                {% for criterionName, studentMarks in studentMarksPerCriterion %}
+                    "{{ criterionName }}"{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+
+            // All the raw data
+            allData: $.fn.boxPlotCalculateAllSeriesData([
+                {% for criterionName, studentMarks in studentMarksPerCriterion %}
+                    [
+                        {# Highcharts won't render without at least one data point #}
+                        {% if 0 == studentMarks | length %}
+                        {
+                            info: null,
+                            externalId: null,
+                            uid: null,
+                            value: -100
+                        }{% if false %},{% endif %} {# Just a hack to placate storm #}
+                        {% endif %}
+
+                        {% for studentId, studentMark in studentMarks %}
+                        {
+                            uid: Number("{{ studentId }}"),
+                            externalId: "{{ students[studentId].externalId }}",
+                            info: "{{ students[studentId].fullName }}",
+                            value: Number("{{ studentMark }}")
+
+                        }{% if not loop.last %},{% endif %}
+                        {% endfor %}
+
+                    ]{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ])
+        });
+    });
+</script>
+{% endautoescape %}
+
+
+<div data-graph="rubrics" style="height:{{ ((studentMarksPerCriterion | length)*40)+75 }}px"></div>

@@ -187,57 +187,6 @@ class Factory
         return $errors;
     }
 
-    /**
-     * Start processing the Returned Work
-     */
-    public function start()
-    {
-        $allowUpdate      = true;
-        $collectorFactory = new CollectorFactory();
-        $attachments      = $collectorFactory->build($this->getAttachments())->getAll();
-        $returnedItems    = new Collection();
-        if (count($attachments) === 0) {
-            // Update a single returned work item
-            // (Figure out which returned work record to use - assign marks,
-            //  normalized marks, ownerships, etc.)
-            $returnedItems->add($this->processReturnedWork($allowUpdate));
-        } else {
-            foreach ($attachments as $attachment) {
-                $returnedItem = $this->processReturnedWork($allowUpdate);
-                // Does this item already have a storage item?
-                // Don't override it if it did - create a new item.
-                if ($allowUpdate && $returnedItem->getStorage()->getHash()) {
-                    $returnedItem = $this->processReturnedWork(false);
-                }
-                $returnedItem->setStorage($attachment);
-                $returnedItem->setFilename($attachment->getFilename());
-                $returnedItems->add($returnedItem);
-
-                // Only allow update of one return.
-                // Any subsequent attachments are created as new records.
-                $allowUpdate = false;
-            }
-        }
-
-        /* Ram them home
-         */
-        foreach ($returnedItems as $returnedWork) {
-            /** @var ReturnedWork $returnedWork */
-            try {
-                $this->getReturnedWorkMapper()->save($returnedWork);
-
-                // save the rubric if there is one
-                if ($this->getSubmissionBox()->isRubric() && $this->getRubric()) {
-                    $marks = $this->getRubric()->getORMMarks($this->getUser(), Alaress_Date_Format::now());
-                    SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
-                }
-            } catch (Mapper\Exception $e) {
-                // noop
-                die($e);
-            }
-        }
-        return $returnedItems;
-    }
 
     /**
      * Get the returned work record to deal with
@@ -321,58 +270,6 @@ class Factory
         return $returnedWork;
     }
 
-    /**
-     * Apply updates to the returned work record
-     *
-     * @param  bool         $allowUpdate If false, always create new record
-     * @return ReturnedWork
-     */
-    private function processReturnedWork($allowUpdate)
-    {
-        $returnedWork = $this->retrieveReturnedWorkRecord($allowUpdate);
-        $errors = $this->getErrors();
-
-        if (isset($errors[$this->getMark()])) {
-            /* A string mark was submitted (Absent, Not Submitted, etc)
-             */
-            $returnedWork->setHumanReadableMark($errors[$this->getMark()]->getDisplayAs());
-            $returnedWork->setNormalizedMark($errors[$this->getMark()]->getNormaliseAs());
-        } elseif ($this->getSubmissionBox()->isRubric()) {
-            /* If it's a rubric, it normalises in a special way
-             * However: if I submitted a mark override, I still want to give that precedence
-             */
-            if ($this->getRubric() && !$this->getMark()) {
-
-                $normalisedMark = $this->getRubric()->getPercentage() * 100;
-                $returnedWork->setHumanReadableMark($this->getMarksheet()->convertRawMark($normalisedMark, $this->getRubric()->getTotal(), true));
-                $returnedWork->setNormalizedMark($normalisedMark);
-            }
-            else {
-                $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark());
-                $returnedWork->setHumanReadableMark($normalisedMarkArray['mark']);
-                $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
-            }
-        } elseif ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
-            /* Empty mark (not zero) - treat as null
-             */
-            $returnedWork->setHumanReadableMark(null);
-            $returnedWork->setNormalizedMark(null);
-        } else {
-            /* Just do it in the normal way
-             */
-            $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark());
-            $returnedWork->setHumanReadableMark($normalisedMarkArray['mark']);
-            $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
-        }
-
-        /* Update the existing Returned Work record with new data
-         */
-        $returnedWork->setComment($this->getComment());
-        $returnedWork->setMarker($_SESSION['user']);
-        $returnedWork->getFiles()->first()->setUuid($this->getUuid());
-
-        return $returnedWork;
-    }
 
     /* Getters/Setters
      */
@@ -387,15 +284,6 @@ class Factory
         $this->comment = $comment;
     }
 
-    /**
-     * Get comment
-     *
-     * @return string
-     */
-    private function getComment()
-    {
-        return $this->comment;
-    }
 
     /**
      * Set mark
