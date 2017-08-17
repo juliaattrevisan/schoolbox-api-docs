@@ -98,6 +98,9 @@ class Connector
      * @param SubmissionFile $submissionFile
      * @param string $filename
      * @return int
+     * @throws \RuntimeException if Plagscan is unavailable
+     * @throws \InvalidArgumentException if Plagscan changed their API on us
+     * @throws \DomainException if some other unexpected thing went wrong
      */
     public function transmit(SubmissionFile $submissionFile, $filename)
     {
@@ -140,10 +143,15 @@ class Connector
 
         /* What was the outcome?
          */
-        $content = json_decode($response->getBody());
+        $content = json_decode($response->getBody(), true);
 
         if ($response->getStatusCode() == 201) {
-            return $content->data->docID;
+            if (!(array_key_exists('data', $content) && array_key_exists('docID', $content['data']))) {
+                throw new \InvalidArgumentException(
+                    "response->data->docID does not exist: PlagScan has changed their API again"
+                );
+            }
+            return $content['data']['docID'];
         }
 
         /* If you ended up here, the document can't be transmitted for various reasons
