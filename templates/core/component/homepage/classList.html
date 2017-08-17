@@ -45,13 +45,14 @@
                     <li>
                         <div class="card small-12">
                             <a href="/search/user/{PERSON_UID}" title="View Profile">
-                                <!-- BEGIN has_thumbnail -->
-                                <img src="/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64" alt="View Profile" />
-                                <!-- END has_thumbnail -->
-                                <!-- BEGIN has_icon -->
-                                <img src="/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64" alt="View Profile" />
-                                <!-- END has_icon -->
-
+                                <!-- BEGIN student_photo_visible -->
+                                    <!-- BEGIN has_thumbnail -->
+                                    <img src="/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                    <!-- END has_thumbnail -->
+                                    <!-- BEGIN has_icon -->
+                                    <img src="/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                    <!-- END has_icon -->
+                                <!-- END student_photo_visible -->
                                 <p>{PERSON_NAME}</p>
                             </a>
                             <p class="meta">{PERSON_GROUP}</p>
