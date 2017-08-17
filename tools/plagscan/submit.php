@@ -112,6 +112,13 @@ foreach ($allDocuments as $currentDocument) {
          */
         continue;
     }
+    catch (\InvalidArgumentException $e) {
+        /* The PlagScan API needs to be updated
+         * Immediately exit
+         */
+        $log->error("{$prefix}: PlagScan API needs to be updated. {$e->getMessage()}; exiting immediately");
+        exit(1);
+    }
     catch (\DomainException $e) {
 
         /* Could not transmit this file to plagscan for some reason

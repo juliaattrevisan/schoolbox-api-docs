@@ -111,6 +111,13 @@ foreach ($allDocuments as $currentDocument) {
                 $log->warning("{$prefix}: report not yet analysed");
             }
         }
+        catch (\InvalidArgumentException $e) {
+            /* The PlagScan API needs to be updated
+             * Immediately exit
+             */
+            $log->error("{$prefix}: PlagScan API needs to be updated. {$e->getMessage()}; exiting immediately");
+            exit(1);
+        }
         catch (\DomainException $e) {
             $currentDocument->setStatus(Plagscan::STATUS_UNSCANNABLE);
             $mapper->save($currentDocument);
