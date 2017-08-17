@@ -37,6 +37,7 @@
                         {% if 0 == studentMarks | length %}
                         {
                             info: null,
+                            externalId: null,
                             uid: null,
                             value: -100
                         }{% if false %},{% endif %} {# Just a hack to placate storm #}
@@ -45,6 +46,7 @@
                         {% for studentId, studentMark in studentMarks %}
                         {
                             uid: {{ studentId }},
+                            externalId: "{{ students[studentId].externalId }}",
                             info: "{{ students[studentId].fullName }}",
                             value: {{ studentMark }}
 

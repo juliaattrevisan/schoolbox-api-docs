@@ -84,7 +84,7 @@
                             var template =
                                 '<tr>' +
                                     '<td>' +
-                                        '<span style="display:block;width:32px;height:32px;background-image:url(/portrait.php?userId={UID}&size=square32);"></span>' +
+                                        '<span style="display:block;width:32px;height:32px;background-image:url(/portrait.php?userId={EXTERNAL_ID}&size=square32);"></span>' +
                                     '</td>' +
                                     '<td>' +
                                         '<em>{NAME}</em><br />{VALUE}' +
@@ -99,6 +99,7 @@
                                 if (options.allData.input[this.x][i].value == this.y) {
                                     var tooltipContent = template;
 
+                                    tooltipContent = tooltipContent.replace(/{EXTERNAL_ID}/, options.allData.input[this.x][i].externalId);
                                     tooltipContent = tooltipContent.replace(/{UID}/, options.allData.input[this.x][i].uid);
                                     tooltipContent = tooltipContent.replace(/{NAME}/, options.allData.input[this.x][i].info);
                                     tooltipContent = tooltipContent.replace(/{VALUE}/, this.y);
