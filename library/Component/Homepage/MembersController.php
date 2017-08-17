@@ -92,6 +92,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
             $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('person', 'has_icon', 'has_icon_block');
+            $this->setBlock('person', 'student_photo_visible', 'student_photo_visible_block');
 
             $this->setVar([
                 'empty_state_block' => '',
@@ -188,6 +189,19 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                             $this->setVar('has_thumbnail_block', '');
                             $this->parse('has_icon_block', 'has_icon');
+                        }
+
+                        if($_SESSION['user']->getRole()->isStudent()) {
+                            //Don't display images for students if config hides student photo
+                            $hideStudentPhoto = \Schoolbox\Config\ConfigMapper::getInstance()->get('protect_student_photo');
+                        } else {
+                            $hideStudentPhoto = false;
+                        }
+                        if ($hideStudentPhoto && $user->getRole()->isStudent()) {
+                            $this->setVar('student_photo_visible_block', '');
+                            //$this->parse('student_photo_visible_block', 'student_photo_visible');
+                        } else {
+                            $this->parse('student_photo_visible_block', 'student_photo_visible');
                         }
 
                         $this->parse('person_block', 'person', true);

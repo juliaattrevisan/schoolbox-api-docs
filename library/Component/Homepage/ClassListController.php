@@ -186,7 +186,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                         } else {
                             $hideStudentPhoto = false;
                         }
-                        if ($hideStudentPhoto) {
+                        if ($hideStudentPhoto && $user->getRole()->isStudent()) {
                             $this->setVar('student_photo_visible_block', '');
                             //$this->parse('student_photo_visible_block', 'student_photo_visible');
                         } else {
