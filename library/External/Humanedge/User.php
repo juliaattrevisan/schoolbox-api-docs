@@ -406,7 +406,6 @@ class External_Humanedge_User implements External_UserInterface
             return [];
         }
 
-        $quotedId = $this->getDatabase()->smartQuote($externalId);
         if ($user->getRole()->isStudent()) {
             // Statement 1: core subjects
             // Statement 2: electives
