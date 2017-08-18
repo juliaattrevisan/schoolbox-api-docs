@@ -16,20 +16,23 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
      * Quotes class codes for direct injection into a SQL query.
      *
      * @param string $classCode
-     * @return string
+     * @return array query: the query part, params: the parameters
      */
     protected function quoteClassCodes($classCode)
     {
         // Split on ,
         // quote each segment
         // join back together with ,
-        return implode(
-            ',',
-            array_map(
-                [$this->loadAPlusDatabase(), 'smartQuote'],
-                explode(',', $classCode)
-            )
-        );
+        $query  = [];
+        $params = [];
+        foreach (explode(',', $classCode) as $i => $code) {
+            $query[]           = ":code{$i}";
+            $params['code'.$i] = $code;
+        }
+        return [
+            'query'  => implode(',', $query),
+            'params' => $params,
+        ];
     }
 
 
@@ -60,7 +63,7 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
             INNER JOIN tblPeriod p ON a.PeriodID = p.ID
             INNER JOIN tblStudent st on a.FormID = st.FormID
             WHERE st.deleted = 0
-            AND   (s.Code + '_' + RIGHT(f.Code,1)) IN ($classQuery)
+            AND   (s.Code + '_' + RIGHT(f.Code,1)) IN ({$classQuery['query']})
 
             UNION
 
@@ -78,9 +81,9 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
             INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
             INNER JOIN tblStudent st ON sc.StudentID = st.ID
             WHERE st.deleted = 0
-            AND   (s.Code + ISNULL(b.Suffix, '')) IN ($classQuery)
+            AND   (s.Code + ISNULL(b.Suffix, '')) IN ({$classQuery['query']})
         ";
-        return $db->getAll($query);
+        return $db->executeQuery($query, $classQuery['params'])->fetchAll();
     }
 
     /**
@@ -101,7 +104,7 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
             INNER JOIN tblTeacher t on a.TeacherID = t.ID
             $coreRoomJoin
             WHERE t.deleted = 0
-            AND   (s.Code + '_' + RIGHT(f.Code,1)) IN ($classQuery)
+            AND   (s.Code + '_' + RIGHT(f.Code,1)) IN ({$classQuery['query']})
 
             UNION
 
@@ -112,14 +115,8 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
             INNER JOIN tblTeacher t on b.TeacherID = t.ID
             $electRoomJoin
             WHERE t.deleted = 0
-            AND   (s.Code + ISNULL(b.Suffix, '')) IN ($classQuery)
+            AND   (s.Code + ISNULL(b.Suffix, '')) IN ({$classQuery['query']})
         ";
-        $result = [];
-        if($statement = $db->query($query)) {
-            while ($row = $statement->fetch()) {
-                $result[] = $row['Code'];
-            }
-        }
-        return $result;
+        return $db->executeQuery($query, ['classCode' => $classCode])->fetchColumnArray('Code');
     }
 }
