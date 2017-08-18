@@ -40,9 +40,7 @@
                 placeholder="Descriptor"
                 rows="2"
                 name="{{ descInput }}[{{ levelIndex }}][text]"
-                maxlength="1024" >
-            {{ descriptor.text }}
-        </textarea>
+                maxlength="1024" >{{ descriptor.text }}</textarea>
         <input {% if not checkChecked %} disabled="disabled"{% endif %}
                 data-descriptor-value
                 data-descriptor-value-original="{{ descriptor.value }}"
