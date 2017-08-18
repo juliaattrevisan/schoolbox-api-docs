@@ -129,4 +129,16 @@ class Router implements IRouter
         $this->root->lock();
     }
 
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return $this
+     */
+    public function dropAll()
+    {
+        unset ($this->cache);
+        $this->root->reset();
+        return $this;
+    }
 }
