@@ -31,7 +31,7 @@ class Attendance_Synergetic_AttendanceRecord
      */
     public function update($data)
     {
-        if (isset($data['ID']) && isset($data['AttendanceMasterSeq'])) {
+        if (isset($data['ID'], $data['AttendanceMasterSeq'])) {
 
             $userID = $data['ID'];
             $AttendanceMasterSeq = $data['AttendanceMasterSeq'];
@@ -48,7 +48,7 @@ class Attendance_Synergetic_AttendanceRecord
             foreach ($data as $key => $value) {
                 $paramCount++;
                 $query .= " $key = :param{$paramCount},";
-                $params[$paramCount] = $value;
+                $params['param' . $paramCount] = $value;
             }
 
             $query = substr($query, 0, -1);
@@ -57,7 +57,7 @@ class Attendance_Synergetic_AttendanceRecord
 
             $query .= "
                 WHERE wkAttendanceMasterSeq = :attendanceMasterSeq
-                AND	ID = :id
+                AND ID = :id
             ";
 
             $params['attendanceMasterSeq'] = $AttendanceMasterSeq;
@@ -65,9 +65,8 @@ class Attendance_Synergetic_AttendanceRecord
 
             return $this->connector->executeQuery($query, $params);
 
-        } else {
-
-            return false;
         }
+
+        return false;
     }
 }
