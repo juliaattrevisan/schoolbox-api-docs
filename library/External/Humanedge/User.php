@@ -422,7 +422,7 @@ class External_Humanedge_User implements External_UserInterface
                 INNER JOIN tblPeriod p ON a.PeriodID = p.ID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
+                AND st.code = :externalId
 
                 UNION
 
@@ -436,7 +436,7 @@ class External_Humanedge_User implements External_UserInterface
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
+                AND st.code = :externalId
 
                 ORDER BY code ASC
             ";
@@ -456,7 +456,7 @@ class External_Humanedge_User implements External_UserInterface
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 $roomJoin
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
+                AND t.code = :externalId
 
                 UNION
 
@@ -470,14 +470,16 @@ class External_Humanedge_User implements External_UserInterface
                 INNER JOIN tblTeacher t on b.TeacherID = t.ID
                 $roomJoin
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
+                AND t.code = :externalId
 
                 ORDER BY code ASC
             ";
         } else {
             return [];
         }
-        return $this->loadAPlusDatabase()->getAll($query);
+        return $this->loadAPlusDatabase()
+                    ->executeQuery($query, ['externalId' => $externalId])
+                    ->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
