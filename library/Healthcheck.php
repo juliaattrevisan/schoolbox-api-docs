@@ -188,7 +188,12 @@ class Healthcheck
     }
 
     /**
-     * Test procedure execution against each database object in the supplied array
+     * Test procedure execution against each database object in the supplied array.
+     *
+     * This now uses HAS_PERMS_BY_NAME instead of actually running the proc;
+     * this will be more efficient and less destructive.
+     *
+     * TODO this works only against MSSQL; may need a method for testing other DB procs
      *
      * @param array $objects
      */
@@ -202,25 +207,7 @@ class Healthcheck
 
         foreach ($objects as $object) {
 
-            // If MSSQL: can run HAS_PERMS_BY_NAME(proc, "OBJECT", "EXECUTE")
-//            var_dump($db->getOne('SELECT HAS_PERMS_BY_NAME(\'CommunityLoginsPage\', \'OBJECT\', \'INSERT\')'));
-
             $this->log .= str_pad(str_pad('EXECUTE', 15). $object["name"], 50);
-
-//            $statement = $this->connector->prepareStoredProcedure($object['name']);
-//
-//            if (is_array($object['inputParameters'])) {
-//                $statement->bindInputs($object['inputParameters']);
-//            }
-//
-//            if (is_array($object['outputParameters'])) {
-//                foreach ($object['outputParameters'] as $name => $parameter) {
-//                    $this->outputParameters[$name] = null;
-//                    $parameter['value'] = &$this->outputParameters[$name];
-//                }
-//
-//                $statement->bindOutputs($object['outputParameters']);
-//            }
 
             try {
                 $statement->execute(['proc' => $object['name']]);
@@ -240,42 +227,8 @@ class Healthcheck
 
                 $error .= "\n{$statement->getSql()}\n";
 
-                foreach ($object['inputParameters'] as $key => $value) {
-
-                    if ($value == null) {
-                        $result = 'NULL';
-                    } else {
-                        $result = "'{$value}'";
-                    }
-
-                    $error .= "\n" . str_pad(str_pad("INPUT", 15) . "" . $key, 50) . str_pad(BaseStatement::getDataTypeName($value), 15) . $result;
-                }
-
-                if (is_array($object['outputParameters'])) {
-                    foreach ($object['outputParameters'] as $parameterName => $optionArray) {
-                        $error .= "\n" . str_pad(str_pad("OUTPUT", 15) . $parameterName, 50);
-
-                        if ($outputValues[$object['name']][$parameterName] == null) {
-                            $result = 'NULL';
-                        } else {
-                            $result = "'{$outputValues[$object['name']][$parameterName]}'";
-                        }
-
-                        $error .= str_pad(BaseStatement::getDataTypeName($optionArray['type']) . "(" . $optionArray['length'] . ")", 15) . $result;
-
-                    }
-                }
-
-                // Unfortunately we can't test some procedures without generating an error (because we don't
-                // have the correct data to pass it)- so if 'ignoreError' is set, and the error message
-                // contains this text we will let it slide...
-
-//                if (!isset($object['ignoreError']) || stripos($error, $object['ignoreError']) === false) {
-                    $this->errors[] = $error;
-                    $this->log .= "FAILED\n";
-//                } else {
-//                    $this->log .= "OK\n";
-//                }
+                $this->errors[] = $error;
+                $this->log .= "FAILED\n";
             }
         }
 
