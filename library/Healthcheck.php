@@ -557,15 +557,13 @@ class Healthcheck
                     'NewEventCurrentSeq' => null,
                     'Message' => null
                 ]
-            ]
+            ],
         ];
 
         $this->procedureTest($procedures);
 
         $functions = [
-            'dbo.fnTimeStr' => [
-                'ADateTime' => date('Y-m-d')
-            ]
+            ['name' => 'dbo.fnTimeStr',],
         ];
 
         $this->functionTest($functions);
