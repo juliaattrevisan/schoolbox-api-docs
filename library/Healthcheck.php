@@ -198,28 +198,40 @@ class Healthcheck
 
         $outputValues = [];
 
+        $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:proc, 'OBJECT', 'EXECUTE')");
+
         foreach ($objects as $object) {
+
+            // If MSSQL: can run HAS_PERMS_BY_NAME(proc, "OBJECT", "EXECUTE")
+//            var_dump($db->getOne('SELECT HAS_PERMS_BY_NAME(\'CommunityLoginsPage\', \'OBJECT\', \'INSERT\')'));
 
             $this->log .= str_pad(str_pad('EXECUTE', 15). $object["name"], 50);
 
-            $statement = $this->connector->prepareStoredProcedure($object['name']);
-
-            if (is_array($object['inputParameters'])) {
-                $statement->bindInputs($object['inputParameters']);
-            }
-
-            if (is_array($object['outputParameters'])) {
-                foreach ($object['outputParameters'] as $name => $parameter) {
-                    $this->outputParameters[$name] = null;
-                    $parameter['value'] = &$this->outputParameters[$name];
-                }
-
-                $statement->bindOutputs($object['outputParameters']);
-            }
+//            $statement = $this->connector->prepareStoredProcedure($object['name']);
+//
+//            if (is_array($object['inputParameters'])) {
+//                $statement->bindInputs($object['inputParameters']);
+//            }
+//
+//            if (is_array($object['outputParameters'])) {
+//                foreach ($object['outputParameters'] as $name => $parameter) {
+//                    $this->outputParameters[$name] = null;
+//                    $parameter['value'] = &$this->outputParameters[$name];
+//                }
+//
+//                $statement->bindOutputs($object['outputParameters']);
+//            }
 
             try {
-                $statement->execute();
-                $this->log .= "OK\n";
+                $statement->execute(['proc' => $object['name']]);
+                $result = $statement->fetchColumn();
+                if (!isset($result)) {
+                    $this->log .= "FAILED - object does not exist\n";
+                } elseif (empty($result)) {
+                    $this->log .= "FAILED - user does not have permission on object\n";
+                } else {
+                    $this->log .= "OK\n";
+                }
             } catch (\Alaress\Database\Exception $e) {
 
                 $error = "EXECUTE {$object['name']}\n{$e->getMessage()}\n";
@@ -256,12 +268,12 @@ class Healthcheck
                 // have the correct data to pass it)- so if 'ignoreError' is set, and the error message
                 // contains this text we will let it slide...
 
-                if (!isset($object['ignoreError']) || stripos($error, $object['ignoreError']) === false) {
+//                if (!isset($object['ignoreError']) || stripos($error, $object['ignoreError']) === false) {
                     $this->errors[] = $error;
                     $this->log .= "FAILED\n";
-                } else {
-                    $this->log .= "OK\n";
-                }
+//                } else {
+//                    $this->log .= "OK\n";
+//                }
             }
         }
 
