@@ -29,9 +29,14 @@ function attachAlaressDatePicker() {
             // find the submit button and use that to stall (and init if not already)
             staller = $dateinput.closest('[data-mage]').find('[data-mage-next]').stallSubmit({ event:'click' });
 
+        } else if ($dateinput.closest('#resource-booking-form').length) {
+            // Temporarily detach the staller form the resource booking form.
+            staller = null;
+
         } else if ($dateinput.closest('form').length) {
             // use the form itself as the stall target
             staller = $dateinput.closest('form');
+
         }
 
         $dateinput.alaressDateTimePicker({
