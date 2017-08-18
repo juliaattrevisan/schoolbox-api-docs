@@ -45,7 +45,7 @@ class External_Humanedge_Ngsl_User extends External_Humanedge_User implements Ex
                 INNER JOIN tblPeriod p ON a.PeriodID = p.ID
                 INNER JOIN tblForm f ON a.FormId = f.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
+                AND st.code = :externalId
 
                 UNION
 
@@ -59,7 +59,7 @@ class External_Humanedge_Ngsl_User extends External_Humanedge_User implements Ex
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
+                AND st.code = :externalId
 
                 ORDER BY code ASC
             ";
@@ -80,7 +80,7 @@ class External_Humanedge_Ngsl_User extends External_Humanedge_User implements Ex
                 INNER JOIN tblForm f ON a.FormId = f.ID
                 $coreRoomJoin
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
+                AND t.code = :externalId
 
                 UNION
 
@@ -94,13 +94,15 @@ class External_Humanedge_Ngsl_User extends External_Humanedge_User implements Ex
                 INNER JOIN tblTeacher t on b.TeacherID = t.ID
                 $electRoomJoin
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
+                AND t.code = :externalId
 
                 ORDER BY code ASC
             ";
         } else {
             return [];
         }
-        return $this->loadAPlusDatabase()->getAll($query);
+        return $this->loadAPlusDatabase()
+                    ->executeQuery($query, ['externalId' => $externalId])
+                    ->fetchAll(PDO::FETCH_ASSOC);
     }
 }
