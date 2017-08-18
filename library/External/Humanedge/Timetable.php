@@ -403,7 +403,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE st.deleted = 0
-                AND st.code = :externalUserId
+                AND st.code = :externalId
 
                 UNION
 
@@ -424,7 +424,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
-                AND st.code = :externalUserId
+                AND st.code = :externalId
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -447,7 +447,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE t.deleted = 0
-                AND t.code = :externalUserId
+                AND t.code = :externalId
 
                 UNION
 
@@ -466,7 +466,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 $periodJoin
                 $electRoomJoin
                 WHERE t.deleted = 0
-                AND t.code = :externalUserId
+                AND t.code = :externalId
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
