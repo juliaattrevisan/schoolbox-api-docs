@@ -225,10 +225,12 @@ class Healthcheck
             try {
                 $statement->execute(['proc' => $object['name']]);
                 $result = $statement->fetchColumn();
-                if (!isset($result)) {
-                    $this->log .= "FAILED - object does not exist\n";
-                } elseif (empty($result)) {
-                    $this->log .= "FAILED - user does not have permission on object\n";
+                $statement->close();
+
+                // I want to be able to query if the object exists or not;
+                // however, all attempts at doing so have failed.
+                if (empty($result)) {
+                    $this->log .= "FAILED - object does not exist, or user does not have EXECUTE permission on it\n";
                 } else {
                     $this->log .= "OK\n";
                 }
