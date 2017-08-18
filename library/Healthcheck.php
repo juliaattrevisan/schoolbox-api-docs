@@ -199,10 +199,10 @@ class Healthcheck
 
         foreach ($objects as $object) {
 
-            $this->log .= str_pad(str_pad($objectType, 15). $object["name"], 50);
+            $this->log .= str_pad(str_pad($objectType, 15). $object, 50);
 
             try {
-                $statement->execute(['proc' => $object['name']]);
+                $statement->execute(['proc' => $object]);
                 $result = $statement->fetchColumn();
                 $statement->close();
 
@@ -215,7 +215,7 @@ class Healthcheck
                 }
             } catch (\Alaress\Database\Exception $e) {
 
-                $error = "EXECUTE {$object['name']}\n{$e->getMessage()}\n";
+                $error = "EXECUTE {$object}\n{$e->getMessage()}\n";
 
                 $error .= "\n{$statement->getSql()}\n";
 
@@ -344,15 +344,7 @@ class Healthcheck
         $this->selectTest($tables);
 
         $procedures = [
-            [
-                'name' => 'spSelTimetable',
-                'inputParameters' => [
-                    'DATE' => date('Ymd'),
-                    'TIMEPERIOD' => '',
-                    'STUDKEY' => '',
-                    'TEACHERCODE' => ''
-                ]
-            ]
+             'spSelTimetable',
         ];
 
         $this->procedureTest($procedures);
@@ -431,140 +423,20 @@ class Healthcheck
 
         // Stored Procedures
 
-        $procedures = [
-            [
-                'name' => 'spgTimetableDay',
-                'inputParameters' => [
-                    'TimetableGroup' => 'SEN',
-                    'Date' => Alaress_Date_Format::now()->getDatabase()
-                ],
-                'outputParameters' => [
-                    'CurrentDay' => [
-                        'type' => PDO::PARAM_INT,
-                        'length' => 11
-                    ]
-                ]
-            ],
-            [
-                'name' => 'spsConfigUserDefaultYearSemester',
-                'inputParameters' => [
-                    'ID' => 1
-                ]
-            ],
-            [
-                'name' => 'spsTimetable',
-                'inputParameters' => [
-                    'FileYear' => Alaress_Date_Format::now()->getYear(),
-                    'FileSemester' => Alaress_Date_Format::now()->getYearHalf(),
-                    'ID' => 1,
-                    'Date' => Alaress_Date_Format::now()->getDatabase(),
-                    'IncludeStaffScheduleFlag' => 1,
-                    'CheckAttendancesExistFlag' => 1,
-                    'IncludeSparesFlag' => 0,
-                    'IncludeRecessFlag' => 0
-                ]
-            ],
-            [
-                'name' => 'spiwkAttendances',
-                'inputParameters' => [
-                    'FileType' => 'A',
-                    'FileYear' => 2010,
-                    'FileSemester' => 1,
-                    'ClassCampus' => 'S',
-                    'ClassCode' => 'FREA1',
-                    'AttendanceDate' => '2010-04-07',
-                    'AttendancePeriod' => 1,
-                    'AttendanceDayNumber' => 1,
-                    'StaffID' => 1,
-                    'AttendedFlag' => 1,
-                    'TimeTableGroup' => 'SEN',
-                    'SynWebFlag' => 1
-                ],
-                'outputParameters' => [
-                    'wkAttendanceMasterSeq' => [
-                        'type' => PDO::PARAM_INT,
-                        'length' => 11
-                    ]
-                ]
-            ],
-            [
-                'name' => 'spswkAttendances',
-                'inputParameters' => [
-                    'wkAttendanceMasterSeq' => 1,
-                    'FillActualAbsenceColumnsFlag' => 1,
-                    'CheckPossibleNonAttendFlag' => 1,
-                    'CalculateTodaysAttendanceStringFlag' => 1
-                ]
-            ],
-            [
-                'name' => 'sptwkAttendances',
-                'ignoreError' => 'No matching class found',
-                'inputParameters' => [
-                    'wkAttendanceMasterSeq' => null,
-                    'AttendanceSeq' => null,
-                    'HoldFlag' => null,
-                    'ClassCancelledFlag' => null,
-                    'SystemProcessNumber' => null,
-                    'AllowMultiPeriodFlag' => null,
-                    'DebugPrintFlag' => 0,
-                ],
-                'outputParameters' => [
-                    'AttendanceMasterSeq' => [
-                        'type' => PDO::PARAM_INT,
-                        'length' => 11
-                    ],
-                    'GroupCount' => [
-                        'type' => PDO::PARAM_INT,
-                        'length' => 11
-                    ]
-                ]
-            ],
-
-            // The procedures below actually mutate data in the DB- so it is imperative
-            // that they get rolled back after excution
-
-            [
-                'name' => 'spiExcursions',
-                'inputParameters' => [
-                    'EventCode' => 0,
-                    'Description' => null
-                ]
-            ],
-            [
-                'name' => 'spuExcursionDetails',
-                'inputParameters' => [
-                    'EventSeq' => 0,
-                    'Description' => null,
-                    'Objective' => null,
-                    'Attire' => null,
-                    'Type' => null,
-                    'Status' => null,
-                    'MaxAttendance' => null,
-                    'MaxTickets' => null,
-                    'EventFrom' => null,
-                    'EventTo' => null,
-                    'InviteDate' => null,
-                    'RSVPDueBy' => null,
-                    'Comments' => null
-                ]
-            ],
-            [
-                'name' => 'spiCommunityEventsCurrent',
-                'inputParameters' => [
-                    'ID' => 0,
-                    'EventCode' => null,
-                    'VerifyOnlyFlag' => 1,
-                    'NewEventCurrentSeq' => null,
-                    'Message' => null
-                ]
-            ],
+        $procedures = ['spgTimetableDay',
+                       'spsConfigUserDefaultYearSemester',
+                       'spsTimetable',
+                       'spiwkAttendances',
+                       'spswkAttendances',
+                       'sptwkAttendances',
+                       'spiExcursions',
+                       'spuExcursionDetails',
+                        'spiCommunityEventsCurrent',
         ];
 
         $this->procedureTest($procedures);
 
-        $functions = [
-            ['name' => 'dbo.fnTimeStr',],
-        ];
+        $functions = [ 'dbo.fnTimeStr' ];
 
         $this->functionTest($functions);
     }
