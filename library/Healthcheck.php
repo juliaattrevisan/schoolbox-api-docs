@@ -338,7 +338,7 @@ class Healthcheck
             'TEACHER',
             'FAMILY',
             'SYSFILE',
-            'IDENTITY'
+            '"IDENTITY"'
         ];
 
         $this->selectTest($tables);
