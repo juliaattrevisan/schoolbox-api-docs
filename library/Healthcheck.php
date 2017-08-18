@@ -159,45 +159,37 @@ class Healthcheck
     }
 
     /**
-     * Test a list of database functions
+     * Test a list of database functions.
      *
      * @param array $objects
      */
     private function functionTest($objects)
     {
-        foreach ($objects as $name => $parameters) {
-
-            $this->log .= str_pad(str_pad('FUNCTION', 15). $name, 50);
-
-            $statement = $this->connector->prepareFunctionCall($name);
-
-            if (is_array($parameters)) {
-                $statement->bindInputs($parameters);
-            }
-
-            try {
-                $statement->execute();
-                $this->log .= "OK\n";
-            } catch (\Alaress\Database\Exception $e) {
-                $this->log .= "FAILED\n";
-                $this->errors[] = "EXEC {$name}\n{$e->getMessage()}";
-            }
-
-            unset($outputValues);
-        }
+        $this->executeTest($objects, 'FUNCTION');
     }
 
     /**
-     * Test procedure execution against each database object in the supplied array.
+     * Test a list of stored procedures.
+     *
+     * @param array $objects
+     */
+    private function procedureTest($objects)
+    {
+        $this->executeTest($objects, 'EXECUTE');
+    }
+
+    /**
+     * Test object execution against each database object in the supplied array.
      *
      * This now uses HAS_PERMS_BY_NAME instead of actually running the proc;
      * this will be more efficient and less destructive.
      *
      * TODO this works only against MSSQL; may need a method for testing other DB procs
      *
-     * @param array $objects
+     * @param array  $objects
+     * @param string $objectType The type of object to test; this only affects logs.
      */
-    private function procedureTest($objects)
+    private function executeTest($objects, $objectType)
     {
         sort($objects);
 
@@ -207,7 +199,7 @@ class Healthcheck
 
         foreach ($objects as $object) {
 
-            $this->log .= str_pad(str_pad('EXECUTE', 15). $object["name"], 50);
+            $this->log .= str_pad(str_pad($objectType, 15). $object["name"], 50);
 
             try {
                 $statement->execute(['proc' => $object['name']]);
