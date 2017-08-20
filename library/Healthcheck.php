@@ -144,14 +144,18 @@ class Healthcheck
 
         foreach ($objects as $object) {
 
-            $objectName = $object;
+            // Build reporting and escaped object name
             if (isset($schema)) {
-                $objectName = "{$schema}.{$object}";
+                $objectName  = "{$schema}.{$object}";
+                $objectParam = "{$this->connector->quoteIdentifier($schema)}.{$this->connector->quoteIdentifier($object)}";
+            } else {
+                $objectName  = $object;
+                $objectParam = $this->connector->quoteIdentifier($object);
             }
 
             $this->log .= str_pad(str_pad($method, 15) . $objectName, 50);
 
-            $sql = str_replace(':object', $objectName, $query);
+            $sql = str_replace(':object', $objectParam, $query);
             $statement = $this->connector->prepareQuery($sql);
 
             try {
@@ -349,7 +353,7 @@ class Healthcheck
             'TEACHER',
             'FAMILY',
             'SYSFILE',
-            '"IDENTITY"'
+            'IDENTITY'
         ];
 
         $this->selectTest($tables);
