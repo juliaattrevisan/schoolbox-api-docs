@@ -9,6 +9,7 @@ namespace Schoolbox\Pastoral\Revision;
 
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 
@@ -101,12 +102,16 @@ class Mapper extends PastoralMapper
 
         // We need to re-fetch the pastoral record from the database to get the correct timestamps
         $pastoralMapper = PastoralMapper::getInstance();
-        $pastoral = $pastoralMapper->findOneByColumn(
-            $pastoralMapper->getIdentifierColumn(),
-            $pastoral->getId(),
-            [],
-            ['cache' => false]
-        );
+        try{
+            $pastoral = $pastoralMapper->findOneByColumn(
+                $pastoralMapper->getIdentifierColumn(),
+                $pastoral->getId(),
+                [],
+                ['cache' => false]
+            );
+        } catch (Deleted $e){
+            $pastoral = $e->getDeletedObject();
+        }
 
         /** @var Model $revision */
         $revision = $this->createModel();
