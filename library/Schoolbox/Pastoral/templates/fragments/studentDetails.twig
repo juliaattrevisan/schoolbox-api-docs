@@ -16,7 +16,11 @@
 
                             <dt class="small-12 medium-3">Student Name</dt>
                             <dd class="small-12 medium-9">
+                                {% if student.deleted %}
+                                {{ student.fullName }}
+                                {% else %}
                                 <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
+                                {% endif %}
                             </dd>
 
                             <dt class="small-12 medium-3">Year Level</dt>
