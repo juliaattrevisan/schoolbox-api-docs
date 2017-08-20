@@ -10,36 +10,36 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
-$options = getopt('u:r::U::p::', array('skip-duplicates', 'enable-eportfolio', 'dry-run'));
-$kernel  = new Schoolbox\Application\Daemon\Kernel('Routing', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'errors'  => E_ALL,
-    'userId'  => $options['u'],
-    'toUserId'  => $options['U'],
-    'roleId'  => $options['r'],
-    'importPageId'  => $options['p'],
-    'skipDuplicates'  => isset($options['skip-duplicates']),
-    'enableEportfolio'  => isset($options['enable-eportfolio']),
-    'dryRun'  => isset($options['dry-run']),
+$options = getopt('u:r::U::p::', ['skip-duplicates', 'enable-eportfolio', 'dry-run']);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
+    'verbose'          => isset($opts['v']) ? $opts['v'] : null,
+    'errors'           => E_ALL,
+    'userId'           => $options['u'],
+    'toUserId'         => $options['U'],
+    'roleId'           => $options['r'],
+    'importPageId'     => $options['p'],
+    'skipDuplicates'   => isset($options['skip-duplicates']),
+    'enableEportfolio' => isset($options['enable-eportfolio']),
+    'dryRun'           => isset($options['dry-run']),
 ]);
 
 // ROUTING APP
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
-    $userId           = $options['userId'];
-    $toUserId         = $options['toUserId'];
-    $roleId           = $options['roleId'];
-    $importPageId     = $options['importPageId'];
-    $skipDuplicates   = $options['skipDuplicates'];
+    $userId = $options['userId'];
+    $toUserId = $options['toUserId'];
+    $roleId = $options['roleId'];
+    $importPageId = $options['importPageId'];
+    $skipDuplicates = $options['skipDuplicates'];
     $enableEportfolio = $options['enableEportfolio'];
-    $dryRun           = $options['dryRun'];
+    $dryRun = $options['dryRun'];
     if (!(isset($userId) && (isset($roleId) || isset($toUserId)))) {
         echo <<<HELP
 Copies ePortfolios from a single user into either another user, or all users
@@ -71,7 +71,7 @@ HELP;
         print("ePortfolio Import Script:\n\n");
     }
 
-// Load source user
+    // Load source user
     try {
         /** @var User $user */
         $user = UserMapper::getInstance()->findById($userId);
@@ -80,7 +80,7 @@ HELP;
         exit(1);
     }
 
-// Load user list, either from toUserId or from roleId
+    // Load user list, either from toUserId or from roleId
     /** @var User[] $destUserList */
     if (isset($toUserId)) {
         $destUserList = UserMapper::getInstance()->findByColumn('id', $toUserId);
@@ -114,11 +114,11 @@ HELP;
     }
 
 
-// Pre-load the component list for each page
-    $sitepage       = new SitePage(false);
+    // Pre-load the component list for each page
+    $sitepage = new SitePage(false);
     $sitepage->setDi($di);
-    $factory        = new Component_Eportfolio_Factory($user, $sitepage);
-    $eportfolioList = array();
+    $factory = new Component_Eportfolio_Factory($user, $sitepage);
+    $eportfolioList = [];
     foreach (Eportfolio\PageMapper::getInstance()->findPagesWithPermissions($userId) as $page) {
         /** @var Eportfolio\Page $page */
         // Ignore deleted pages
@@ -130,7 +130,7 @@ HELP;
             printf("Not importing page #%d (%s)\n", $page->getPageId(), $page->getPageTitle());
             continue;
         }
-        $eportfolioList[] = array($page, $factory->buildComponentList($page->getPageId()));
+        $eportfolioList[] = [$page, $factory->buildComponentList($page->getPageId())];
     }
     if (empty($eportfolioList)) {
         printf(
@@ -141,7 +141,7 @@ HELP;
         exit;
     }
 
-// We have something to import, so proceed
+    // We have something to import, so proceed
     if ($roleId) {
         printf(
             "importing %d eportfolio pages from user #%d (%s) into %d users in role #%d (%s).\n",
@@ -191,10 +191,10 @@ HELP;
                     // Check this user doesn't already have this page.
                     $existingPageList = Eportfolio\PageMapper::getInstance()->
                     findByColumnList(
-                        array(
+                        [
                             'uid'        => $destUserId,
                             'page_title' => $page->getPageTitle(),
-                        )
+                        ]
                     );
                     if (count($existingPageList) > 0) {
                         printf("    skipping page \"%s\" as it already exists.\n", $page->getPageTitle());
@@ -260,21 +260,21 @@ HELP;
                 \Eportfolio\PermissionMapper::getInstance()->updatePermissions(
                     $newPage->getPageId(),
                     $parentPermission,
-                    array(),
-                    array()
+                    [],
+                    []
                 );
 
                 // Below code will copy all permissions, including perms for users
                 // and groups the destination user can't access.
-//            $newPermissions = new \Schoolbox\Collection();
-//            foreach ($page->getPermissions() as $permission) {
-//                /** @var Eportfolio\Permission $newPermission */
-//                $newPermission = clone $permission;
-//                $newPermission->setPageId($newPage->getPageId());
-//                $newPermissions->add($newPermission);
-//            }
-//            \Eportfolio\PermissionMapper::getInstance()->create($newPermissions);
-//            \Eportfolio\PermissionMapper::getInstance()->updatePermissions($newPermissions);
+//                $newPermissions = new \Schoolbox\Collection();
+//                foreach ($page->getPermissions() as $permission) {
+//                    /** @var Eportfolio\Permission $newPermission */
+//                    $newPermission = clone $permission;
+//                    $newPermission->setPageId($newPage->getPageId());
+//                    $newPermissions->add($newPermission);
+//                }
+//                \Eportfolio\PermissionMapper::getInstance()->create($newPermissions);
+//                \Eportfolio\PermissionMapper::getInstance()->updatePermissions($newPermissions);
             }
         }
     }
