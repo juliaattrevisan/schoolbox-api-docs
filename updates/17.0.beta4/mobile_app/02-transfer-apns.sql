@@ -2,6 +2,7 @@
  * Pull any existing data across from the config table
  */
 
+INSERT INTO mobile_app
 SELECT
     NULL,
     'apns_default',
