@@ -24,7 +24,7 @@ ALTER TABLE pastoral_comment
 -- This should not allow NULLs
 -- Preserve default in case there was some semantic purpose
 UPDATE pastoral_comment
-  SET updated_at = '1970-01-01 00:00:00'
+  SET updated_at = created_at
   WHERE updated_at IS NULL;
 
 ALTER TABLE pastoral_comment

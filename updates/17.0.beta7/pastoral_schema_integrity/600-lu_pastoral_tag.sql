@@ -17,7 +17,7 @@ ALTER TABLE lu_pastoral_tag
 
 -- This should not allow NULLs
 UPDATE lu_pastoral_tag
-SET updated_at = '1970-01-01 00:00:00'
+SET updated_at = created_at
 WHERE updated_at IS NULL;
 
 ALTER TABLE lu_pastoral_tag
