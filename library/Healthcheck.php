@@ -132,10 +132,10 @@ class Healthcheck
      * Test a query against each database object in the supplied array
      *
      * @param array $objects
-     * @param string $query If provided, run against this instead of default select first query
      * @param string $schema If provided, run against this instead of the default schema
+     * @param string $query If provided, run against this instead of default select first query
      */
-    private function selectTest($objects, $query = "SELECT TOP 1 * FROM :object", $schema = null)
+    private function selectTest($objects, $schema = null, $query = "SELECT TOP 1 * FROM :object")
     {
         sort($objects);
 
@@ -272,7 +272,7 @@ class Healthcheck
             'db2inst1.schoolbox_timetable_definition'
         ];
 
-        $this->selectTest($tables, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($tables, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -425,7 +425,7 @@ class Healthcheck
 
         // Community Portal Password Update
 
-        $this->selectTest(['CommunityLogins'], "UPDATE :object SET Password = '' WHERE 1 = 0");
+        $this->selectTest(['CommunityLogins'], null, "UPDATE :object SET Password = '' WHERE 1 = 0");
 
         // Stored Procedures
 
@@ -671,12 +671,12 @@ class Healthcheck
             "TimetableBlockInstance",
         ];
 
-        $this->selectTest($fcTables, 'SELECT TOP 1 * FROM :object', 'fc');
+        $this->selectTest($fcTables, 'fc');
 
         $this->selectTest(
             ['periodExpand'],
-            'SELECT TOP 1 * FROM fc.TimetableBlockInstance tbi CROSS APPLY :object(tbi.TimetablePeriodID, tbi.Consecutive) tpe',
-            'fc'
+            'fc',
+            'SELECT TOP 1 * FROM fc.TimetableBlockInstance tbi CROSS APPLY :object(tbi.TimetablePeriodID, tbi.Consecutive) tpe'
         );
     }
 
