@@ -266,7 +266,7 @@ class Healthcheck
             'db2inst1.schoolbox_timetable_definition'
         ];
 
-        $this->selectTest($tables, "SELECT * FROM :TABLE FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($tables, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
