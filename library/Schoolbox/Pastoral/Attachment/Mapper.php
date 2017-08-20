@@ -69,7 +69,6 @@ class Mapper extends BaseMapper
         $mimeMapper = $this->getJoinMapper('storage')->getJoinMapper('allowedFileExtension');
 
         foreach ($statement as $row) {
-
             $model = $this->hydrate($row);
 
             /** @var Pastoral $pastoral */
@@ -78,19 +77,19 @@ class Mapper extends BaseMapper
 
             // Hydrate storage object
 
-                /** @var Storage $storage */
-                $storage = $this->hydrateJoin($row, 'storage', 's');
+            /** @var Storage $storage */
+            $storage = $this->hydrateJoin($row, 'storage', 's');
 
-                // Hydrate a mime type if we can find one
+            // Hydrate a mime type if we can find one
 
-                /** @var Mimetype $mime */
-                $mime = $mimeMapper->hydrate($row, 'mime');
+            /** @var Mimetype $mime */
+            $mime = $mimeMapper->hydrate($row, 'mime');
 
-                if ($mime instanceof Mimetype) {
-                    $storage->setMimetype($mime);
-                }
+            if ($mime instanceof Mimetype) {
+                $storage->setMimetype($mime);
+            }
 
-                $model->setStorage($storage);
+            $model->setStorage($storage);
 
             $collection->add($model);
         }

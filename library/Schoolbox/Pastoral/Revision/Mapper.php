@@ -102,14 +102,14 @@ class Mapper extends PastoralMapper
 
         // We need to re-fetch the pastoral record from the database to get the correct timestamps
         $pastoralMapper = PastoralMapper::getInstance();
-        try{
+        try {
             $pastoral = $pastoralMapper->findOneByColumn(
                 $pastoralMapper->getIdentifierColumn(),
                 $pastoral->getId(),
                 [],
                 ['cache' => false]
             );
-        } catch (Deleted $e){
+        } catch (Deleted $e) {
             $pastoral = $e->getDeletedObject();
         }
 
