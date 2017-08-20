@@ -132,9 +132,10 @@ class Healthcheck
      * Test a query against each database object in the supplied array
      *
      * @param array $objects
-     * @param string $query
+     * @param string $query If provided, run against this instead of default select first query
+     * @param string $schema If provided, run against this instead of the default schema
      */
-    private function selectTest($objects, $query = "SELECT TOP 1 * FROM :object")
+    private function selectTest($objects, $query = "SELECT TOP 1 * FROM :object", $schema = null)
     {
         sort($objects);
 
@@ -143,9 +144,14 @@ class Healthcheck
 
         foreach ($objects as $object) {
 
-            $this->log .= str_pad(str_pad($method, 15) . $object, 50);
+            $objectName = $object;
+            if (isset($schema)) {
+                $objectName = "{$schema}.{$object}";
+            }
 
-            $sql = str_replace(':object', $object, $query);
+            $this->log .= str_pad(str_pad($method, 15) . $objectName, 50);
+
+            $sql = str_replace(':object', $objectName, $query);
             $statement = $this->connector->prepareQuery($sql);
 
             try {
@@ -641,26 +647,37 @@ class Healthcheck
             'Student',
             'StudentContact',
             'vw_Contact_Addresses',
-            "fc.TimetableSubject",
-            "fc.TimetableSubjectChoice",
-            "fc.Timetable",
-            "fc.TimetableClass",
-            "fc.YearLevelSub",
-            "fc.YearLevelSubStudent",
-            "fc.TimetableClassInstance",
-            "fc.TimetableClassStaff",
-            "fc.TimetableClassInstanceStaff",
-            "fc.TimetableClassRoom",
-            "fc.Room",
-            "fc.TimetableClassInstanceRoom",
-            "fc.TimetableDay",
-            "fc.TimetablePeriod",
-            "fc.TimetableDate",
-            "fc.TimetableBlockInstance",
-            "fc.TimetableBlockInstance tbi CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe"
         ];
 
         $this->selectTest($tables);
+
+
+        $fcTables = [
+            "TimetableSubject",
+            "TimetableSubjectChoice",
+            "Timetable",
+            "TimetableClass",
+            "YearLevelSub",
+            "YearLevelSubStudent",
+            "TimetableClassInstance",
+            "TimetableClassStaff",
+            "TimetableClassInstanceStaff",
+            "TimetableClassRoom",
+            "Room",
+            "TimetableClassInstanceRoom",
+            "TimetableDay",
+            "TimetablePeriod",
+            "TimetableDate",
+            "TimetableBlockInstance",
+        ];
+
+        $this->selectTest($fcTables, 'SELECT TOP 1 * FROM :object', 'fc');
+
+        $this->selectTest(
+            ['periodExpand'],
+            'SELECT TOP 1 * FROM fc.TimetableBlockInstance tbi CROSS APPLY :object(tbi.TimetablePeriodID, tbi.Consecutive) tpe',
+            'fc'
+        );
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
