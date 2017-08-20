@@ -29,7 +29,6 @@ class External_Humanedge_Ngsl_User extends External_Humanedge_User implements Ex
             return [];
         }
 
-        $quotedId = $this->loadAPlusDatabase()->smartQuote($externalId);
         if ($user->getRole()->isStudent()) {
             // Statement 1: core subjects
             // Statement 2: electives
