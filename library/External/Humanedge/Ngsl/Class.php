@@ -117,6 +117,6 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
             WHERE t.deleted = 0
             AND   (s.Code + ISNULL(b.Suffix, '')) IN ({$classQuery['query']})
         ";
-        return $db->executeQuery($query, ['classCode' => $classCode])->fetchColumnArray('Code');
+        return $db->executeQuery($query, $classQuery['params'])->fetchColumnArray('Code');
     }
 }
