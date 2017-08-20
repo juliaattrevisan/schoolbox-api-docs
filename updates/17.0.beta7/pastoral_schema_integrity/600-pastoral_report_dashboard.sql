@@ -1,6 +1,6 @@
 -- This should not allow NULLs
 UPDATE pastoral_report_dashboard
-SET created_at = '0000-00-00 00:00:00'
+SET created_at = '1970-01-01 00:00:00'
 WHERE created_at IS NULL;
 
 ALTER TABLE pastoral_report_dashboard
@@ -8,7 +8,7 @@ ALTER TABLE pastoral_report_dashboard
 
 -- This should not allow NULLs
 UPDATE pastoral_report_dashboard
-SET updated_at = '0000-00-00 00:00:00'
+SET updated_at = '1970-01-01 00:00:00'
 WHERE updated_at IS NULL;
 
 ALTER TABLE pastoral_report_dashboard
