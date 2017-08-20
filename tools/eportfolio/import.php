@@ -20,7 +20,7 @@ require_once __DIR__ . '/../../library/Bootstrap.php';
 
 $options = getopt('u:r::U::p::', ['skip-duplicates', 'enable-eportfolio', 'dry-run']);
 $kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
-    'verbose'          => isset($opts['v']) ? $opts['v'] : null,
+    'verbose'          => isset($options['v']) ? $options['v'] : null,
     'errors'           => E_ALL,
     'userId'           => $options['u'],
     'toUserId'         => $options['U'],
