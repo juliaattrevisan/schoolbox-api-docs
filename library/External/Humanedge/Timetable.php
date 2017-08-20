@@ -144,7 +144,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                         BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME)
                     AND deleted = 0
                 ",
-                ['time' => $time]
+                ['time' => $time->getDatabase()]
             )
             ->fetchColumn();
     }
