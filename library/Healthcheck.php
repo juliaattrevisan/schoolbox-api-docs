@@ -260,19 +260,24 @@ class Healthcheck
             'family',
             'persondefs',
             'studcommrules',
-            'db2inst1.schoolbox_classes',
-            'db2inst1.schoolbox_parents',
-            'db2inst1.schoolbox_report_periods',
-            'db2inst1.schoolbox_studentclass',
-            'db2inst1.schoolbox_students',
-            'db2inst1.schoolbox_teacherclass',
-            'db2inst1.schoolbox_parent_student',
-            'db2inst1.schoolbox_staff',
-            'db2inst1.schoolbox_timetable',
-            'db2inst1.schoolbox_timetable_definition'
         ];
 
         $this->selectTest($tables, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+
+        $db2inst1Tables = [
+            'schoolbox_classes',
+            'schoolbox_parents',
+            'schoolbox_report_periods',
+            'schoolbox_studentclass',
+            'schoolbox_students',
+            'schoolbox_teacherclass',
+            'schoolbox_parent_student',
+            'schoolbox_staff',
+            'schoolbox_timetable',
+            'schoolbox_timetable_definition'
+        ];
+
+        $this->selectTest($db2inst1Tables, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
