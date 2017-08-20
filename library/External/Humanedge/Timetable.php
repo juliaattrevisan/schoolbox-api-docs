@@ -106,7 +106,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 WHERE CAST(c.TimetableDate AS DATE) = CAST(:time AS DATE)
                 AND d.deleted = 0
             ",
-            ['time' => $time]
+            ['time' => $time->getDatabase()]
         )->fetchColumn();
         return intval($result);
     }
