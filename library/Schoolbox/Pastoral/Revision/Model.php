@@ -12,7 +12,7 @@ use Schoolbox\Pastoral\Model as Pastoral;
 class Model extends Pastoral
 {
     /** @var int $rootId */
-    protected $rootId;
+    private $rootId;
 
     /**
      * @param int $rootId

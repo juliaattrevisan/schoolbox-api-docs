@@ -30,9 +30,9 @@ class Model implements ISoftDeletable
 
     /**
      * @param User $user
-     * @return self
+     * @return $this
      */
-    public function setUser($user)
+    public function setUser(User $user)
     {
         $this->user = $user;
         return $this;
@@ -48,9 +48,9 @@ class Model implements ISoftDeletable
 
     /**
      * @param Report $report
-     * @return self
+     * @return $this
      */
-    public function setReport($report)
+    public function setReport(Report $report)
     {
         $this->report = $report;
         return $this;

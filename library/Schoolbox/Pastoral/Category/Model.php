@@ -10,80 +10,99 @@ namespace Schoolbox\Pastoral\Category;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Pastoral\Type\Model as PastoralType;
+use Schoolbox\Pastoral\Type as PastoralType;
 use JsonSerializable;
 
 class Model implements ISoftDeletable, JsonSerializable
 {
+
     use Id;
     use DeletedAtDate;
-    
-    /** @var PastoralType */
-    protected $pastoralType;
+
+    /** @var PastoralType\Model */
+    private $pastoralType;
 
     /** @var string */
-    protected $name;
+    private $name;
 
-    /** @var string */
-    protected $externalCode;
+    /**
+     * Optional. Null if not linked to SIS
+     *
+     * @var null|string
+     */
+    private $externalCode;
+
 
     /**
      * @param string $name
-     * @return self
+     * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
 
+
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
+
     /**
-     * @param PastoralType $pastoralType
-     * @return self
+     * @param PastoralType\Model $pastoralType
+     * @return $this
      */
-    public function setPastoralType($pastoralType) {
+    public function setPastoralType(PastoralType\Model $pastoralType)
+    {
         $this->pastoralType = $pastoralType;
         return $this;
     }
 
+
     /**
-     * @return PastoralType
+     * @return PastoralType\Model
      */
-    public function getPastoralType() {
+    public function getPastoralType()
+    {
         return $this->pastoralType;
     }
 
+
     /**
-     * @param string $externalCode
-     * @return self
+     * @param null|string $externalCode
+     * @return $this
      */
-    public function setExternalCode($externalCode) {
+    public function setExternalCode($externalCode = null)
+    {
         $this->externalCode = $externalCode;
         return $this;
     }
 
+
     /**
-     * @return string
+     * @return null|string
      */
-    public function getExternalCode() {
+    public function getExternalCode()
+    {
         return $this->externalCode;
     }
+
 
     /**
      * Specify data which should be serialized to JSON
      *
-     * @return array
+     * @return string[]
      */
-    public function jsonSerialize() {
-        return array(
-            'id'          => $this->getId(),
-            'name'        => $this->getName(),
-        );
+    public function jsonSerialize()
+    {
+        return [
+            'id'   => $this->getId(),
+            'name' => $this->getName(),
+        ];
     }
 }

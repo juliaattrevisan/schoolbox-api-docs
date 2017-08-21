@@ -8,13 +8,14 @@
 namespace Schoolbox\Pastoral\Group\Member;
 
 use PDOStatement;
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
-use Schoolbox\Pastoral\Group\Model as Group;
+use Schoolbox\Pastoral\Group;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -27,10 +28,9 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
+        $this->joins('group_id', Group\Mapper::class, 'id', null, null, 'group', 'group');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');            
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -45,9 +45,9 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('author', 'a')},
                         {$this->getJoinColumnString('group', 'g')}
             FROM        {$this->getTable()} 
-            LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
-            LEFT JOIN   {$this->getJoinSql('author', '', 'a')}
-            LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
+            INNER JOIN  {$this->getJoinSql('user', '', 'u', true)}
+            INNER JOIN  {$this->getJoinSql('author', '', 'a', true)}
+            INNER JOIN  {$this->getJoinSql('group', '', 'g', true)}
         ";
     }
 
@@ -58,11 +58,9 @@ class Mapper extends BaseMapper
     {
         // Return pastoral records fully hydrated by default
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
-
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var User $user */
@@ -73,7 +71,7 @@ class Mapper extends BaseMapper
             $author = $this->hydrateJoin($row, 'author', 'a');
             $model->setAuthor($author);
 
-            /** @var Group $group */
+            /** @var Group\Model $group */
             $group = $this->hydrateJoin($row, 'group', 'g');
             $model->setGroup($group);
 
@@ -81,5 +79,5 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
-    }    
+    }
 }

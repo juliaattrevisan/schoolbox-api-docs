@@ -30,20 +30,21 @@ class Model implements ISoftDeletable
     /** @var Pastoral */
     protected $pastoral;
 
-    /** @var Role */
+    /** @var null|Role */
     protected $role;
 
-    /** @var User */
+    /** @var null|User */
     protected $user;
     
-    /** @var Group */
+    /** @var null|Group */
     protected $group;
 
     /**
      * @param Pastoral $pastoral
      * @return self
      */
-    public function setPastoral($pastoral) {
+    public function setPastoral(Pastoral $pastoral)
+    {
         $this->pastoral = $pastoral;
         return $this;
     }
@@ -56,48 +57,51 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Role $role
-     * @return self
+     * @param null|Role $role
+     * @return $this
      */
-    public function setRole($role) {
+    public function setRole(Role $role = null)
+    {
         $this->role = $role;
         return $this;
     }
 
     /**
-     * @return Role
+     * @return null|Role
      */
     public function getRole() {
         return $this->role;
     }
 
     /**
-     * @param User $user
+     * @param null|User $user
      * @return self
      */
-    public function setUser($user) {
+    public function setUser(User $user = null)
+    {
         $this->user = $user;
         return $this;
     }
 
     /**
-     * @return User
+     * @return null|User
      */
     public function getUser() {
         return $this->user;
     }
 
     /**
-     * @param Group $group
+     * @param null|Group $group
      * @return self
      */
-    public function setGroup($group) {
+    public function setGroup(Group $group = null)
+    {
         $this->group = $group;
         return $this;
     }
 
     /**
-     * @return Group
+     * @return null|Group
      */
     public function getGroup() {
         return $this->group;

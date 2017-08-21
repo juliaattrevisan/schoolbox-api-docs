@@ -1843,8 +1843,8 @@ abstract class Mapper implements IMapper, Serializable
      * @throws Exception if no instance of model is found
      * @throws Exception\Deleted if the model was found but has been deleted
      *
-     * @param  String $columnName
-     * @param  String $columnValue
+     * @param  string     $columnName
+     * @param  int|string $columnValue
      * @param  array  $order Fields to order by (@see findByColumnList() $options param)
      * @param  array $options
      *
@@ -3400,6 +3400,15 @@ abstract class Mapper implements IMapper, Serializable
         return $this;
     }
 
+
+    /**
+     * If callback fails and you want it to be silent, return false.
+     * If caller should know why it failed, throw an UnexpectedValueException explaining failure.
+     *
+     * @param string $point  One of the self::CALLBACK_* constants
+     * @return bool
+     * @throws \UnexpectedValueException If callback failed and caller should know why
+     */
     public function triggerCallbacks($point)
     {
         $params = array_slice(func_get_args(), 1);

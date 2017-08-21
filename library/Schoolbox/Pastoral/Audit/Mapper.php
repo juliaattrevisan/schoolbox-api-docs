@@ -15,10 +15,14 @@ use Schoolbox\Collection;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -50,9 +54,9 @@ class Mapper extends BaseMapper
                           {$this->getJoinColumnString('student', 's')},
                           {$this->getJoinColumnString('pastoral', 'p')}
             FROM          {$this->database->quoteIdentifier($this->table)}
-            LEFT JOIN     {$this->getJoinSql('user', '', 'u')}
-            LEFT JOIN     {$this->getJoinSql('student', '', 's')}
-            LEFT JOIN     {$this->getJoinSql('pastoral', '', 'p')}
+            JOIN          {$this->getJoinSql('user', '', 'u', true)}
+            LEFT JOIN     {$this->getJoinSql('student', '', 's', true)}
+            LEFT JOIN     {$this->getJoinSql('pastoral', '', 'p', true)}
         ";
     }
 
@@ -63,22 +67,21 @@ class Mapper extends BaseMapper
     {
         // Return audit records fully hydrated by default
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
 
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var User $user */
             $user = $this->hydrateJoin($row, 'user', 'u');
             $model->setUser($user);
 
-            /** @var User $student */
+            /** @var null|User $student */
             $student = $this->hydrateJoin($row, 'student', 's');
             $model->setStudent($student);
 
-            /** @var Pastoral $pastoral */
+            /** @var null|Pastoral $pastoral */
             $pastoral = $this->hydrateJoin($row, 'pastoral', 'p');
             $model->setPastoral($pastoral);
 
@@ -93,11 +96,17 @@ class Mapper extends BaseMapper
      *
      * @param int $count Number of records to return
      * @param int $offset Offset from start of results
-     * @return Collection
+     * @return Collection|User[]
      */
     public function findRecentStudents($count = 5, $offset = 0)
     {
-        $records = new Collection();
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('student');
+
+        /** @var RoleMapper $roleMapper */
+        $roleMapper = $userMapper->getJoinMapper('role');
+
+        $students = $userMapper->createCollection();
 
         $statement = $this->getDatabase()->prepare("
             
@@ -123,21 +132,16 @@ class Mapper extends BaseMapper
 
             // Hydrate the student and their role for display purposes
 
-            /** @var Model $model */
-            $model = $this->hydrate($row);
-
-            /** @var User $student */
-            $student = $this->hydrateJoin($row, 'student', 's');
-
-            /** @var Role $role */
-            $role = $this->getJoinMapper('student')->hydrateJoin($row, 'role', 'r');
-            $student->setRole($role);
+            $model   = $this->hydrate($row);
+            $student = $userMapper->hydrate($row, 's');
+            $role    = $roleMapper->hydrate($row, 'r');
 
             $model->setStudent($student);
+            $student->setRole($role);
 
-            $records->add($this->hydrateJoin($row, 'student', 's'));
+            $students->add($student);
         }
 
-        return $records;
+        return $students;
     }
 }

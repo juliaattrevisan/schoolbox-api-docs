@@ -12,7 +12,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Pastoral\Group\Model as Group;
-use Schoolbox\User as User;
+use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
@@ -26,14 +26,18 @@ class Model implements ISoftDeletable
     /** @var User $user */
     protected $user;
 
-    /** @var User $author */
+    /**
+     * User who created this group member
+     *
+     * @var User $author
+     */
     protected $author;
 
     /**
      * @param Group $group
      * @return self
      */
-    public function setGroup($group)
+    public function setGroup(Group $group)
     {
         $this->group = $group;
         return $this;
@@ -51,7 +55,7 @@ class Model implements ISoftDeletable
      * @param User $user
      * @return self
      */
-    public function setUser($user)
+    public function setUser(User $user)
     {
         $this->user = $user;
         return $this;
@@ -69,7 +73,7 @@ class Model implements ISoftDeletable
      * @param User $author
      * @return self
      */
-    public function setAuthor($author)
+    public function setAuthor(User $author)
     {
         $this->author = $author;
         return $this;

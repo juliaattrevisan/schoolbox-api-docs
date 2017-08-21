@@ -638,7 +638,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             'modifiedOwnerId' => $comment->getOwner()->getExternalId()
         ]);
 
-        $comment->setExternalId($this->connector->lastInsertId());
+        $comment->setExternalCode($this->connector->lastInsertId());
         $this->getPastoralCommentMapper()->save($comment);
 
         return $result;
@@ -649,10 +649,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function deleteComment(PastoralComment $comment)
     {
-        if ($this->isExternalIdValid($comment->getExternalId())) {
+        if ($this->isExternalIdValid($comment->getExternalCode())) {
             return $this->connector->executeQuery(
-                "DELETE FROM PastoralCareComments WHERE PastoralCareCommentsSeq = :externalId",
-                ['externalId' => $comment->getExternalId()]
+                "DELETE FROM PastoralCareComments WHERE PastoralCareCommentsSeq = :external_code",
+                ['external_code' => $comment->getExternalCode()]
             );
         }
 

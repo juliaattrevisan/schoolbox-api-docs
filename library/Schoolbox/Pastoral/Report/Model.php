@@ -9,13 +9,19 @@ namespace Schoolbox\Pastoral\Report;
 
 use Alaress_Date_Format;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
+use Schoolbox\Pastoral\Tag as PastoralTag;
+use Schoolbox\Pastoral\Type as PastoralType;
+use Schoolbox\Pastoral\Category as PastoralCategory;
+use Schoolbox\Pastoral\Group as PastoralGroup;
 use Schoolbox\User;
+use Alaress_Date_NullDate;
 
 class Model implements ISoftDeletable
 {
@@ -28,95 +34,116 @@ class Model implements ISoftDeletable
     protected $dashboard;
     
     /** @var string $name */
-    protected $name;
+    private $name;
 
-    /** @var string $description */
-    protected $description;
+    /** @var null|string $description */
+    private $description;
 
     /** @var Collection $years */
-    protected $years;
+    private $years;
 
-    /** @var bool $involved */
-    protected $involved;
+    /**
+     * Only show records in which the user is the author or an audience member
+     *
+     * @var bool $involved
+     */
+    private $involved;
 
-    /** @var Alaress_Date_Format $afterDate */
-    protected $afterDate;
+    /**
+     * Optional. Can be Null.
+     *
+     * @var null|Alaress_Date_Format $afterDate
+     */
+    private $afterDate;
 
-    /** @var Alaress_Date_Format $beforeDate */
-    protected $beforeDate;
+    /**
+     * Optional. Can be Null.
+     *
+     * @var null|Alaress_Date_Format $beforeDate
+     */
+    private $beforeDate;
 
     /** @var User $owner */
-    protected $owner;
+    private $owner;
 
     // These are the filters stored as CSV strings
 
-    /** @var string $typesCsv */
-    protected $typesCsv;
+    /**
+     * Ids of Lookup list 'pastoral types'
+     *
+     * @var string $typesCsv
+     */
+    private $typesCsv;
 
     /** @var string $authorsCsv */
-    protected $authorsCsv;
+    private $authorsCsv;
 
     /** @var string $studentsCsv */
-    protected $studentsCsv;
+    private $studentsCsv;
 
     /** @var string $tagsCsv */
-    protected $tagsCsv;
+    private $tagsCsv;
 
     /** @var string $orderCsv */
-    protected $orderCsv;
+    private $orderCsv;
 
     /** @var string $yearsCsv */
-    protected $yearsCsv;
+    private $yearsCsv;
 
     // These are the collections that get hydrated from the CSV values above
 
     /** @var Collection $order */
-    protected $order;
+    private $order;
 
-    /** @var Collection $tags */
-    protected $tags;
+    /** @var Collection|PastoralTag\Model[] $tags */
+    private $tags;
 
-    /** @var Collection $students */
-    protected $students;
+    /** @var Collection|User[] $students */
+    private $students;
 
-    /** @var Collection $authors */
-    protected $authors;
+    /** @var Collection|User[] $authors */
+    private $authors;
 
-    /** @var Collection $types */
-    protected $types;
+    /** @var Collection|PastoralCategory\Model[] $types */
+    private $types;
 
-    /** @var PastoralSeverity $severity */
-    protected $severity;
+    /**
+     * Will be null if severity is turned off in admin config
+     *
+     * @var null|PastoralSeverity $severity
+     */
+    private $severity;
 
-    /** @var Collection $groups */
-    protected $groups;
+    /** @var Collection|PastoralGroup\Model[] $groups */
+    private $groups;
 
     /**
      * Model constructor
      */
     public function __construct()
     {
-        $this->students = new Collection();
-        $this->authors = new Collection();
-        $this->order = new Collection();
-        $this->tags = new Collection();
-        
+        $this->students = new GenericCollection(User::class);
+        $this->authors  = new GenericCollection(User::class);
+        $this->order    = new Collection();
+        $this->tags     = new GenericCollection(PastoralTag\Model::class);
+        $this->types    = new GenericCollection(PastoralType\Model::class);
+
         // This is a collection of groups that have access to this report
-        
-        $this->groups = new Collection();
+        $this->groups = new GenericCollection(PastoralGroup\Model::class);
     }
 
     /**
-     * @param PastoralSeverity $value
+     * @param null|PastoralSeverity $value
      * @return $this
      */
-    public function setSeverity($value) {
+    public function setSeverity(PastoralSeverity $value = null)
+    {
         $this->severity = $value;
         return $this;
     }
 
     /**
-     * @return PastoralSeverity
+     * @return null|PastoralSeverity
      */
     public function getSeverity() {
         return $this->severity;
@@ -273,17 +300,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Alaress_Date_Format $beforeDate
+     * @param null|Alaress_Date_Format $beforeDate
      * @return self
      */
-    public function setBeforeDate($beforeDate)
+    public function setBeforeDate(Alaress_Date_Format $beforeDate = null)
     {
         $this->beforeDate = $beforeDate;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     public function getBeforeDate()
     {
@@ -291,17 +318,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Alaress_Date_Format $afterDate
+     * @param null|Alaress_Date_Format $afterDate
      * @return self
      */
-    public function setAfterDate($afterDate)
+    public function setAfterDate(Alaress_Date_Format $afterDate = null)
     {
         $this->afterDate = $afterDate;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     public function getAfterDate()
     {
@@ -309,17 +336,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $types
+     * @param Collection|PastoralCategory\Model[] $types
      * @return self
      */
-    public function setTypes($types)
+    public function setTypes(Collection $types)
     {
         $this->types = $types;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Collection|PastoralCategory\Model[]
      */
     public function getTypes()
     {
@@ -327,17 +354,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $authors
+     * @param Collection|User[] $authors
      * @return self
      */
-    public function setAuthors($authors)
+    public function setAuthors(Collection $authors)
     {
         $this->authors = $authors;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Collection|User[]
      */
     public function getAuthors()
     {
@@ -345,17 +372,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $students
+     * @param Collection|User[] $students
      * @return self
      */
-    public function setStudents($students)
+    public function setStudents(Collection $students)
     {
         $this->students = $students;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Collection|User[]
      */
     public function getStudents()
     {
@@ -363,17 +390,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $tags
+     * @param Collection|PastoralTag\Model[] $tags
      * @return self
      */
-    public function setTags($tags)
+    public function setTags(Collection $tags)
     {
         $this->tags = $tags;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Collection|PastoralTag\Model[]
      */
     public function getTags()
     {
@@ -384,7 +411,7 @@ class Model implements ISoftDeletable
      * @param Collection $order
      * @return self
      */
-    public function setOrder($order)
+    public function setOrder(Collection $order)
     {
         $this->order = $order;
         return $this;
@@ -420,7 +447,7 @@ class Model implements ISoftDeletable
      * @param Collection $years
      * @return self
      */
-    public function setYears($years)
+    public function setYears(Collection $years)
     {
         $this->years = $years;
         return $this;
@@ -435,17 +462,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $groups
+     * @param Collection|PastoralGroup\Model[] $groups
      * @return self
      */
-    public function setGroups($groups)
+    public function setGroups(Collection $groups)
     {
         $this->groups = $groups;
         return $this;
     }
 
     /**
-     * @return Collection
+     * @return Collection|PastoralGroup\Model[]
      */
     public function getGroups()
     {

@@ -140,7 +140,6 @@ class Controller extends Base
      */
     public function getReportInsert()
     {
-        /** @var PastoralReport $report */
         $report = $this->pastoralReportMapper->createModel();
         $report->setOwner($this->getUser());
 
@@ -386,8 +385,8 @@ class Controller extends Base
 
         // Only save severity if it is enabled by policy
 
-        if ($this->getConfigLoader()->get('pastoral_severity')) {
-            $pastoralReport->setSeverity($post['severity']);
+        if ($post['severity'] && $this->getConfigLoader()->get('pastoral_severity')) {
+            $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
         if (!empty($post['before'])) {
@@ -469,7 +468,6 @@ class Controller extends Base
 
         // Create bare minimum report object
 
-        /** @var PastoralReport $report */
         $report = $this->pastoralReportMapper->createModel($post['reportId']);
 
         $result = $this->updatePastoralDashboard($report, $post['display']);

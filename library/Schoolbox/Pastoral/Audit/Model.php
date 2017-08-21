@@ -12,77 +12,88 @@ namespace Schoolbox\Pastoral\Audit;
 
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Pastoral;
 use Schoolbox\User;
 
 class Model
 {
+
     use Id;
     use CreatedAtDate;
 
-    /** @var User $user */
-    protected $user;
+    /**
+     * Schoolbox user whose actions we are tracking
+     *
+     * @var User $user
+     */
+    private $user;
 
-    /** @var Pastoral $pastoral */
-    protected $pastoral;
+    /** @var null|Pastoral\Model $pastoral */
+    private $pastoral;
 
-    /** @var User $student */
-    protected $student;
+    /** @var null|User $student */
+    private $student;
 
-    /** @var integer $reportId */
-    protected $reportId;
+    /** @var null|integer $reportId */
+    private $reportId;
 
-    /** @var string $search */
-    protected $search;
+    /** @var null|string $search */
+    private $search;
 
-    /** @var string $searchResult */
-    protected $searchResult;
+    /** @var null|string $searchResult */
+    private $searchResult;
+
 
     /**
      * @param User $student
-     * @return self
+     * @return $this
      */
-    public function setStudent($student)
+    public function setStudent(User $student = null)
     {
         $this->student = $student;
         return $this;
     }
 
+
     /**
-     * @return User
+     * @return null|User
      */
     public function getStudent()
     {
         return $this->student;
     }
 
+
     /**
-     * @param Pastoral $pastoral
-     * @return self
+     * @param null|Pastoral\Model $pastoral
+     * @return $this
      */
-    public function setPastoral($pastoral)
+    public function setPastoral(Pastoral\Model $pastoral = null)
     {
         $this->pastoral = $pastoral;
         return $this;
     }
 
+
     /**
-     * @return Pastoral
+     * @return null|Pastoral\Model
      */
     public function getPastoral()
     {
         return $this->pastoral;
     }
 
+
     /**
      * @param User $user
      * @return self
      */
-    public function setUser($user)
+    public function setUser(User $user)
     {
         $this->user = $user;
         return $this;
     }
+
 
     /**
      * @return User
@@ -92,54 +103,60 @@ class Model
         return $this->user;
     }
 
+
     /**
-     * @param integer $reportId
-     * @return self
+     * @param null|integer $reportId
+     * @return $this
      */
-    public function setReportId($reportId)
+    public function setReportId($reportId = null)
     {
         $this->reportId = $reportId;
         return $this;
     }
 
+
     /**
-     * @return integer
+     * @return null|integer
      */
     public function getReportId()
     {
         return $this->reportId;
-    }    
+    }
+
 
     /**
-     * @param string $search
-     * @return self
+     * @param null|string $search
+     * @return $this
      */
-    public function setSearch($search)
+    public function setSearch($search = null)
     {
         $this->search = $search;
         return $this;
     }
 
+
     /**
-     * @return string
+     * @return null|string
      */
     public function getSearch()
     {
         return $this->search;
     }
 
+
     /**
-     * @param string $searchResult
-     * @return self
+     * @param null|string $searchResult
+     * @return $this
      */
-    public function setSearchResult($searchResult)
+    public function setSearchResult($searchResult = null)
     {
         $this->searchResult = $searchResult;
         return $this;
     }
 
+
     /**
-     * @return string
+     * @return null|string
      */
     public function getSearchResult()
     {

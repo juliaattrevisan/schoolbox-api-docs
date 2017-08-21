@@ -22,6 +22,10 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -51,8 +55,7 @@ class Mapper extends BaseMapper
 
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(Mapper::CALLBACK_POSTSAVE, [$this, 'saveGroups']);
     }
@@ -137,7 +140,7 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
 
@@ -145,13 +148,16 @@ class Mapper extends BaseMapper
                 continue;
             }
 
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             if ($this->getConfigLoader()->get('pastoral_severity')) {
                 if (!empty($row['severity_id'])) {
-                    /** @var PastoralSeverity $severity */
-                    $severity = $this->getJoinMapper('severity')->findById($row['severity_id']);
+                    /** @var null|PastoralSeverity $severity */
+                    try {
+                        $severity = $this->getJoinMapper('severity')->findById($row['severity_id']);
+                    } catch (MapperException\Deleted $e) {
+                        $severity = null;
+                    }
                     $model->setSeverity($severity);
                 }
             }
@@ -323,7 +329,7 @@ class Mapper extends BaseMapper
      */
     private function getCollection($mapper, $ids)
     {
-        $collection = new Collection();
+        $collection = $mapper->createCollection();
 
         $ids = trim($ids);
 

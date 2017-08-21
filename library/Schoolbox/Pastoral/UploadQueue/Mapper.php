@@ -18,8 +18,10 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 
+/**
+ * @method Model createModel($idValue = null)
+ */
 class Mapper extends BaseMapper
 {
     const UPLOAD_STATUS_PENDING = 'Pending';
@@ -43,8 +45,7 @@ class Mapper extends BaseMapper
         $this->uses('message', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
