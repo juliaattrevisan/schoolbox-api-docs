@@ -593,7 +593,7 @@ class Mapper extends BaseMapper
      * @param User                $user
      * @param Alaress_Date_Format $before_date
      * @param Alaress_Date_Format $after_date
-     * @param Severity\Model $severity
+     * @param null|Severity\Model $severity
      * @param Collection $types
      * @param Collection $authors
      * @param Collection $students
@@ -608,7 +608,7 @@ class Mapper extends BaseMapper
         User $user,
         Alaress_Date_Format $before_date,
         Alaress_Date_Format $after_date,
-        Severity\Model $severity,
+        Severity\Model $severity = null,
         Collection $types,
         Collection $authors,
         Collection $students,
