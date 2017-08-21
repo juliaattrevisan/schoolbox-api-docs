@@ -68,7 +68,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
             $decodedConfig = $config->decodeConfig();
             $eventType     = $decodedConfig->getLuEventType();
             // it should always be one of these, but test
-            if ($decodedConfig instanceof Calendar_Api_Config_Connector_External) {
+            if ($decodedConfig instanceof Calendar_Api_Config_Connector_ExternalConstrained) {
                 // ensure this value is a non-negative integer
                 $days = max(0, $decodedConfig->getDuration());
             }
