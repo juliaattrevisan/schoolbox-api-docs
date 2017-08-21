@@ -132,7 +132,16 @@ if (count($criterionCollection)) {
                 // PHPLib the assessments
                 $this->setVar('criterion_assessment_block', '');
                 foreach ($usage as $assessment) {
-                    $this->setVar('CRITERION_ASSESSMENT_ID', $assessment['id']);
+                    $this->setVar(
+                        'CRITERION_ASSESSMENT_HREF',
+                        $this->routeLookup(
+                            'learningAssessment.getSummary',
+                            [
+                                'assessmentId' => $assessment['id'],
+                                'studentId' => $_SESSION['user']->getId(),
+                            ]
+                        )
+                    );
                     $this->setVar('CRITERION_ASSESSMENT_TITLE', $assessment['title']);
                     $this->parse('criterion_assessment_block', 'criterion_assessment', true);
                 }
