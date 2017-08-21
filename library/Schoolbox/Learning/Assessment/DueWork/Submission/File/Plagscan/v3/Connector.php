@@ -13,12 +13,11 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\ValidFiles;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use GuzzleHttp\Client;
-use Zend\Stdlib\Exception\DomainException;
+use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\ValidFiles;
 
 class Connector
 {
@@ -81,8 +80,8 @@ class Connector
      * Connector constructor.
      *
      * @param IConfigLoader $configLoader
-     * @param int $plagscanClientId
-     * @param string $plagscanApiKey
+     * @param int           $plagscanClientId
+     * @param string        $plagscanApiKey
      */
     public function __construct(IConfigLoader $configLoader, $plagscanClientId, $plagscanApiKey)
     {
@@ -96,8 +95,11 @@ class Connector
      * Transmit a document to Plagscan
      *
      * @param SubmissionFile $submissionFile
-     * @param string $filename
+     * @param string         $filename
      * @return int
+     * @throws \RuntimeException if Plagscan is unavailable
+     * @throws \InvalidArgumentException if Plagscan changed their API on us
+     * @throws \DomainException if some other unexpected thing went wrong
      */
     public function transmit(SubmissionFile $submissionFile, $filename)
     {
@@ -118,45 +120,51 @@ class Connector
          */
         $filepointer = fopen($filepath, 'r');
 
-        $postData = [[
-            "name" => "fileUpload",
-            "contents" => $filepointer
-        ]];
+        $postData = [
+            [
+                "name"     => "fileUpload",
+                "contents" => $filepointer,
+            ],
+        ];
 
         try {
             $client = new Client([
                 "base_uri"    => $this->getApiUrl(),
                 "timeout"     => 20.0,
-                "http_errors" => false
+                "http_errors" => false,
             ]);
-        }
-        catch (TransferException $e) {
+        } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
 
         $response = $client->post("documents?access_token={$this->getAccessTokenGenerator()->generate()}", [
-            "multipart" => $postData
+            "multipart" => $postData,
         ]);
 
         /* What was the outcome?
          */
-        $content = json_decode($response->getBody());
+        $content = json_decode($response->getBody(), true);
 
         if ($response->getStatusCode() == 201) {
-            return $content->data->docID;
+            if (!(array_key_exists('data', $content) && array_key_exists('docID', $content['data']))) {
+                throw new \InvalidArgumentException(
+                    "response[data][docID] does not exist: PlagScan has changed their API again"
+                );
+            }
+            return $content['data']['docID'];
         }
 
         /* If you ended up here, the document can't be transmitted for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
      * Move $submissionFile data to a temp location for upload
      *
      * @param SubmissionFile $submissionFile
-     * @param $filename
+     * @param                $filename
      * @return null|string
      */
     private function makeTempFile(SubmissionFile $submissionFile, $filename)
@@ -171,7 +179,7 @@ class Connector
         if ($submissionFile->getStorage()->exists() && $fp = fopen($destination, 'w')) {
             $input = $submissionFile->getStorage()->readStream();
 
-            while($chunk = fgets($input, 1024)) {
+            while ($chunk = fgets($input, 1024)) {
                 fwrite($fp, $chunk);
             }
 
@@ -188,7 +196,8 @@ class Connector
      *
      * @param int $plagscanId
      * @return bool
-     * @throws DomainException
+     * @throws \RuntimeException if Plagscan is unavailable
+     * @throws \DomainException if some unexpected thing went wrong
      */
     public function analyse($plagscanId)
     {
@@ -201,23 +210,22 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri" => $this->getApiUrl(),
-            "timeout" => 20.0,
-            "http_errors" => false
+            "base_uri"    => $this->getApiUrl(),
+            "timeout"     => 20.0,
+            "http_errors" => false,
         ]);
 
         try {
             $response = $client->put("documents/{$plagscanId}/check", [
-                'form_params' => $postData
+                'form_params' => $postData,
             ]);
-        }
-        catch (TransferException $e) {
+        } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not analyse file.');
         }
 
         /* What was the outcome?
          */
-        $content = json_decode($response->getBody());
+        $content = json_decode($response->getBody(), true);
 
         /* As far as I know, the only success state is statusCode 204
          */
@@ -226,14 +234,13 @@ class Connector
             /* noop: need to wait for plagscan to do its thing
              */
             return false;
-        }
-        elseif ($response->getStatusCode() == 400) {
+        } elseif ($response->getStatusCode() == 400) {
 
             /* This document has already been checked
              * Get the latest version of the report and cache it locally
              * Sadly must check error strings, because plagscan
              */
-            if ($content->error->message == 'The document is already checked') {
+            if ($content['error']['message'] == 'The document is already checked') {
                 return true;
             }
 
@@ -249,7 +256,7 @@ class Connector
         /* If you ended up here, the document can't be analysed for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
@@ -259,24 +266,30 @@ class Connector
      *
      * @param int $plagscanId
      * @return string
-     * @throws DomainException
+     * @throws \InvalidArgumentException if Plagscan changed their API on us
+     * @throws \DomainException if some other unexpected thing went wrong
      */
     public function fetchInteractiveReportUrl($plagscanId)
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_INTERACTIVE);
 
+        $content = json_decode($response->getBody(), true);
+
         /* Save the report url
          */
         if ($response->getStatusCode() == 200) {
-            return json_decode($response->getBody())->data->reportlink;
+            if (!(array_key_exists('data', $content) && array_key_exists('reportLink', $content['data']))) {
+                throw new \InvalidArgumentException(
+                    "response[data][reportLink] does not exist: PlagScan has changed their API again"
+                );
+            }
+            return $content['data']['reportLink'];
         }
-
-        $content = json_decode($response->getBody());
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
@@ -286,7 +299,7 @@ class Connector
      *
      * @param int $plagscanId
      * @return string
-     * @throws DomainException
+     * @throws \DomainException if some unexpected thing went wrong
      */
     public function fetchReport($plagscanId)
     {
@@ -298,12 +311,12 @@ class Connector
             return $response->getBody();
         }
 
-        $content = json_decode($response->getBody());
+        $content = json_decode($response->getBody(), true);
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
@@ -311,25 +324,30 @@ class Connector
      *
      * @param $plagscanId
      * @return string
-     * @throws DomainException
+     * @throws \InvalidArgumentException if Plagscan changed their API on us
+     * @throws \DomainException if some other unexpected thing went wrong
      */
     public function fetchScore($plagscanId)
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_SCORE);
 
-        $content = json_decode($response->getBody());
+        $content = json_decode($response->getBody(), true);
 
         if ($response->getStatusCode() == 200) {
-
+            if (!(array_key_exists('data', $content) && array_key_exists('plagLevel', $content['data']))) {
+                throw new \InvalidArgumentException(
+                    "response[data][plagLevel] does not exist: PlagScan has changed their API again"
+                );
+            }
             /* ...really - is a shame it's not synonymous with fetchReport()
              */
-            return $content->data->level;
+            return $content['data']['plagLevel'];
         }
 
         /* If you ended up here, the document can't be reported for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error {$content->error->code}: {$content->error->message}");
+        throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
     /**
@@ -337,40 +355,44 @@ class Connector
      *
      * $mode is one of the following:
      *
-     * 0 Retrieve statistics only, such as plagiarism level, number of words, wait etc. (n.b.: wait is in ms, the report timestamp - creation timestamp, so a negative value indicates that the analysis has not started at all or finished yet.)
-     * 1 Retrieve document's plain text and report links; to list of possible plagiarism sources and in-document view of possible plagiarism sources; e.g. https://www.plagscan.com/view?6055
+     * 0 Retrieve statistics only, such as plagiarism level, number of words, wait etc. (n.b.: wait is in ms, the
+     * report timestamp - creation timestamp, so a negative value indicates that the analysis has not started at all or
+     * finished yet.)
+     * 1 Retrieve document's plain text and report links; to list of possible plagiarism sources and in-document view
+     * of possible plagiarism sources; e.g. https://www.plagscan.com/view?6055
      * 2 Retrieve XML with data on all possible plagiarism sources
      * 3 Retrieve annotated Docx document (if available, depending on user configuration)
      * 4 Retrieve HTML document with annotations
      * 5 Retrieve HTML report of matches sorted by relevance
      * 6 Retrieve new style (interactive) HTML document with annotations
-     * 7 Retrieve latest report type (with formatting and images) - returns URL (link gives temporary access for one hour)
+     * 7 Retrieve latest report type (with formatting and images) - returns URL (link gives temporary access for one
+     * hour)
      * 8 PDF version of HTML document with annotations
      * 9 PDF version of HTML report of matches sorted by relevance
      *
      * @param int $plagscanId
      * @param int $mode
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \RuntimeException if Plagscan is unavailable
      */
     private function retrieve($plagscanId, $mode)
     {
         $postData = [
             'access_token' => $this->getAccessTokenGenerator()->generate(),
-            'mode' => $mode
+            'mode'         => $mode,
         ];
 
         $client = new Client([
-            "base_uri" => $this->getApiUrl(),
-            "timeout" => 20.0,
-            "http_errors" => false
+            "base_uri"    => $this->getApiUrl(),
+            "timeout"     => 20.0,
+            "http_errors" => false,
         ]);
 
         try {
             $response = $client->get("documents/{$plagscanId}/retrieve", [
-                'query' => $postData
+                'query' => $postData,
             ]);
-        }
-        catch (TransferException $e) {
+        } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not retrieve report.');
         }
 
@@ -385,6 +407,7 @@ class Connector
      *
      * @param $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \RuntimeException if Plagscan is unavailable
      */
     public function delete($plagscanId)
     {
@@ -393,17 +416,16 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri" => $this->getApiUrl(),
-            "timeout" => 20.0,
-            "http_errors" => false
+            "base_uri"    => $this->getApiUrl(),
+            "timeout"     => 20.0,
+            "http_errors" => false,
         ]);
 
         try {
             $response = $client->delete("documents/{$plagscanId}", [
-                'query' => $postData
+                'query' => $postData,
             ]);
-        }
-        catch (TransferException $e) {
+        } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not delete document.');
         }
 
@@ -418,6 +440,7 @@ class Connector
      *
      * @param $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \RuntimeException if Plagscan is unavailable
      */
     public function privatise($plagscanId)
     {
@@ -426,17 +449,16 @@ class Connector
         ];
 
         $client = new Client([
-            "base_uri" => $this->getApiUrl(),
-            "timeout" => 20.0,
-            "http_errors" => false
+            "base_uri"    => $this->getApiUrl(),
+            "timeout"     => 20.0,
+            "http_errors" => false,
         ]);
 
         try {
             $response = $client->put("documents/{$plagscanId}/private", [
-                'query' => $postData
+                'query' => $postData,
             ]);
-        }
-        catch (TransferException $e) {
+        } catch (TransferException $e) {
             throw new \RuntimeException('Error: Plagscan unavailable. Could not privatise document.');
         }
 
