@@ -10,6 +10,12 @@ ALTER TABLE `assessment`
     REFERENCES `lu_work_type` (`id`)
     ON UPDATE NO ACTION ON DELETE NO ACTION;
 
+-- Make sure submission boxes are not pointing at any non-existing types
+UPDATE `submission_box`
+  LEFT JOIN `lu_work_type` ON `type` = `lu_work_type`.id
+SET type = NULL
+WHERE `lu_work_type`.id is null;
+
 -- Copy DueWork workType values
 UPDATE assessment a
 JOIN submission_box sb ON sb.assessment_id = a.id
