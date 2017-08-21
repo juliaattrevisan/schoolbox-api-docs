@@ -174,9 +174,12 @@ $(function() {
                                 </div>
                                 <nav>
                                     <!-- BEGIN criterion_in_use -->
-                                    <a class="icon-info" data-reveal-id="criterion-{CRITERION_ID}" href="#"></a>
+                                    <a class="icon-info"
+                                       data-reveal-id="criterion-{CRITERION_ID}"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
                                     <!-- END criterion_in_use -->
-                                    <a title="Delete criterion"
+                                    <a title="Delete {TPL_LOCAL_RUBRICCRITERION_PC}"
                                        class="icon-delete"
                                        data-role="remove-criterion"
                                        href="#"></a>
@@ -194,7 +197,10 @@ $(function() {
                                            data-rubric-criterion />
                                 </div>
                                 <nav>
-                                    <a class="icon-info" data-reveal-id="criterion-{CRITERION_ID}" href="#"></a>
+                                    <a class="icon-info"
+                                       data-reveal-id="criterion-{CRITERION_ID}"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
                                 </nav>
                             </li>
                             <!-- END criterion_disabled -->
@@ -224,7 +230,7 @@ $(function() {
                                            placeholder="Add {TPL_LOCAL_RUBRICCRITERION_PC} to {CRITGROUP_NAME}..." />
                                 </div>
                                 <nav>
-                                    <a title="Delete criterion"
+                                    <a title="Delete {TPL_LOCAL_RUBRICCRITERION_PC}"
                                        class="icon-delete hide"
                                        data-role="remove-criterion"
                                        href="#"></a>
@@ -247,7 +253,7 @@ $(function() {
                                            value=""
                                            data-rubric-group
                                            data-rubric-group-new="1"
-                                           placeholder="Add Group..." />
+                                           placeholder="Add {TPL_LOCAL_RUBRICGROUP_PC}..." />
                                 </div>
                                 <nav></nav>
                             </li>
@@ -264,10 +270,10 @@ $(function() {
                                            value=""
                                            data-rubric-criterion
                                            data-rubric-criterion-new="1"
-                                           placeholder="Add Criterion..." />
+                                           placeholder="Add {TPL_LOCAL_RUBRICCRITERION_PC}..." />
                                 </div>
                                 <nav>
-                                    <a title="Delete criterion"
+                                    <a title="Delete {TPL_LOCAL_RUBRICCRITERION_PC}"
                                        class="icon-delete hide"
                                        data-role="remove-criterion"
                                        href="#"></a>
