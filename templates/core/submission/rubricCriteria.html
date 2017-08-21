@@ -44,29 +44,24 @@ $(function() {
                         .data('rubric-criterion-row', criterionId)
                     ;
 
-                    // Show and dropdown
+                    // Show and setup dropdown
                     var newDropdownId = 'dropdown-i' + String(criterionId);
-                    container.find('[data-dropdown]')
+                    container.find('[data-dropdown-dormant]')
+                        .removeAttr('data-dropdown-dormant')
                         .removeClass('hide disabled')
                         .removeAttr('aria-disabled')
                         .attr('data-dropdown', newDropdownId);
-                    container.find('[data-dropdown-content]').attr('id', newDropdownId);
+                    container.find('[data-dropdown-content-dormant]')
+                        .removeAttr('data-dropdown-content-dormant')
+                        .attr('data-dropdown-content', '')
+                        .attr('id', newDropdownId);
                     container.foundation('dropdown', 'reflow');
 
-//                    // Restore remove button
-//                    container.find('[data-role="remove-criterion"]')
-//                        .removeClass('hide disabled')
-//                        .removeAttr('aria-disabled')
-//                    ;
                     input
                         .attr('name', 'crits['+groupId+'][items][i'+criterionId+']')
                         .removeAttr('data-rubric-criterion-new')
                         .removeData('rubric-criterion-new')
                     ;
-//                    // Update dropdown
-//                    var newDropdownId = 'dropdown-i' + String(criterionId);
-//                    container.find('[data-dropdown]').attr('data-dropdown', newDropdownId);
-//                    container.find('[data-dropdown-content]').attr('id', newDropdownId);
                 }
                 if (addGroup) {
                     container.data('rubric-group-row', groupId);
@@ -246,9 +241,9 @@ $(function() {
                                            placeholder="Add {TPL_LOCAL_RUBRICCRITERION_PC} to {CRITGROUP_NAME}..." />
                                 </div>
                                 <nav>
-                                    <a href="#" class="icon-more hide" data-dropdown title="Actions"></a>
+                                    <a href="#" class="icon-more hide" data-dropdown-dormant title="Actions"></a>
                                 </nav>
-                                <ul class="f-dropdown" data-dropdown-content>
+                                <ul class="f-dropdown" data-dropdown-content-dormant>
                                     <li>
                                         <a class="icon-delete"
                                            data-role="remove-criterion"
@@ -293,9 +288,9 @@ $(function() {
                                            placeholder="Add {TPL_LOCAL_RUBRICCRITERION_PC}..." />
                                 </div>
                                 <nav>
-                                    <a href="#" class="icon-more hide" data-dropdown title="Actions"></a>
+                                    <a href="#" class="icon-more hide" data-dropdown-dormant title="Actions"></a>
                                 </nav>
-                                <ul class="f-dropdown" data-dropdown-content>
+                                <ul class="f-dropdown" data-dropdown-content-dormant>
                                     <li>
                                         <a class="icon-delete"
                                            data-role="remove-criterion"
