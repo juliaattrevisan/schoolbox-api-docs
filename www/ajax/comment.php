@@ -147,15 +147,18 @@ else if(isset($_REQUEST['commentId']) && is_numeric($_REQUEST['commentId'])) {
 			respond(400, 'Comment cannot be blank.');
 		}
 
+        $forceStudentVisible = $sessionUser->getRole()->getType() == Role::STUDENT;
+        $forceParentVisible  = $sessionUser->getRole()->getType() == Role::PARENT;
+        
 		if(isset($_POST['studentVisibility']) && is_numeric($_POST['studentVisibility'])) {
-			$comment->setStudentVisibility(!!$_POST['studentVisibility']);
+			$comment->setStudentVisibility(!!$_POST['studentVisibility'] || $forceStudentVisible );
 		}
 		else {
 			respond(400, 'Invalid student visibility.');
 		}
 
 		if(isset($_POST['parentVisibility']) && is_numeric($_POST['parentVisibility'])) {
-			$comment->setParentVisibility(!!$_POST['parentVisibility']);
+			$comment->setParentVisibility(!!$_POST['parentVisibility'] || $forceParentVisible);
 		}
 		else {
 			respond(400, 'Invalid parent visibility.');
