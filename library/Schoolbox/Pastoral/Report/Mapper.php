@@ -152,8 +152,12 @@ class Mapper extends BaseMapper
 
             if ($this->getConfigLoader()->get('pastoral_severity')) {
                 if (!empty($row['severity_id'])) {
-                    /** @var PastoralSeverity $severity */
-                    $severity = $this->getJoinMapper('severity')->findById($row['severity_id']);
+                    /** @var null|PastoralSeverity $severity */
+                    try {
+                        $severity = $this->getJoinMapper('severity')->findById($row['severity_id']);
+                    } catch (MapperException\Deleted $e) {
+                        $severity = null;
+                    }
                     $model->setSeverity($severity);
                 }
             }
