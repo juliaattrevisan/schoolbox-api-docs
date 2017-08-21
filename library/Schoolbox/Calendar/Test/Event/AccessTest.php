@@ -57,55 +57,48 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     private function getUser($key)
     {
         if (empty($this->users)) {
-            $newUser = function ($id) {
+            $newUser = function ($id, array $overload = null) {
                 // Set an empty access list by default on every user, this is to avoid hitting the database on
                 // User::getAccessList() when access list is not set
-                return (new User)->setId($id)->setAccessList(new Collection());
+
+                $mockUser = $this->getMockBuilder(User::class)->setMethods($overload)->getMock();
+                $mockUser->setId($id);
+                $mockUser->setAccessList(new Collection());
+
+                return $mockUser;
             };
 
             $this->users = [
-                'super'             => $newUser(1)->setSuperuser(true),
-                'staff'             => $newUser(2)->setRole($this->getRole('staff')),
-                'staffAlt'          => $newUser(3)->setRole($this->getRole('staff')),
-                'parent'            => $newUser(4)->setRole($this->getRole('parent')),
-                'student'           => $newUser(5)->setRole($this->getRole('student')),
+                'super'                 => $newUser(1)->setSuperuser(true),
+                'staff'                 => $newUser(2)->setRole($this->getRole('staff')),
+                'staffAlt'              => $newUser(3)->setRole($this->getRole('staff')),
+                'parent'                => $newUser(4)->setRole($this->getRole('parent')),
+                'student'               => $newUser(5)->setRole($this->getRole('student')),
 
-                'campusModerate'    => $newUser(6),
-                'campusWrite'       => $newUser(7),
-                'campusRead'        => $newUser(8),
-                'campusNone'        => $newUser(9),
+                'campusModerate'        => $newUser(6),
+                'campusWrite'           => $newUser(7),
+                'campusRead'            => $newUser(8),
+                'campusNone'            => $newUser(9),
 
-                'groupReadSuper'    => $newUser(10)->setSuperuser(true),
-                'groupAdmin'        => $newUser(11),
-                'groupWrite'        => $newUser(12),
-                'groupRead'         => $newUser(13),
-                'groupNone'         => $newUser(14),
+                'groupReadSuper'        => $newUser(10)->setSuperuser(true),
+                'groupAdmin'            => $newUser(11),
+                'groupWrite'            => $newUser(12),
+                'groupRead'             => $newUser(13),
+                'groupNone'             => $newUser(14),
 
-                'parent2'           => $newUser(15)->setRole($this->getRole('parent')),
-                'student2'          => $newUser(16)->setRole($this->getRole('student')),
+                'parent2'               => $newUser(15)->setRole($this->getRole('parent')),
+                'student2'              => $newUser(16)->setRole($this->getRole('student')),
+                'parentWithStudent'     => $newUser(17)->setRole($this->getRole('parent')),
+                'studentWithParent'     => $newUser(18, ["loadParents", "getParents"])->setRole($this->getRole('student')),
             ];
 
-            // Create a mock user object, who is a child of $this->users['childParent'] (below)
-            /** @var User|\PHPUnit_Framework_MockObject_MockObject $parentChild */
-            $this->users['parentChild'] = $this->getMockBuilder(User::class)->getMock();
-            $this->users['parentChild']->method('getParents')->willReturnCallback(function () {
-                return new Collection([$this->users['parent']]);
+            // Create a mock user object, who is a child of $this->users['parentWithStudent']
+            $this->users['studentWithParent']->method('loadParents')->willReturnCallback(function () {
+                return  $this->users['studentWithParent'];
             });
-            $this->users['parentChild']->method('getRole')->willReturnCallback(function () {
-                return $this->getRole('student');
-            });
-
-            // Create a mock user object, who is a parent of $this->users['parentChild']
-            /** @var User|\PHPUnit_Framework_MockObject_MockObject $parentChild */
-            $this->users['childParent'] = $this->getMockBuilder(User::class)->getMock();
-            $this->users['childParent']->method('isParentOf')->willReturnCallback(function () {
-                return true;
-            });
-            $this->users['childParent']->method('getRole')->willReturnCallback(function () {
-                return $this->getRole('parent');
-            });
-            $this->users['childParent']->method('isStaff')->willReturnCallback(function () {
-                return false;
+            $this->users['studentWithParent']->method('getParents')->willReturnCallback(function () {
+                $collection = new Collection();
+                return $collection->add($this->users['parentWithStudent']);
             });
         }
 
@@ -341,7 +334,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             'StaffForStudent' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
             // Parent can create event for their child
-            'ParentForChild' => $this->generateTest(true, 'childParent', Event::ACCESS_PERSONAL, 'childParent', 'parentChild'),
+            'ParentForChild' => $this->generateTest(true, 'parentWithStudent', Event::ACCESS_PERSONAL, 'parentWithStudent', 'studentWithParent'),
 
             // Parent cannot create an event for a staff member
             'ParentForStaff' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'staff'),
@@ -350,7 +343,7 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             'ParentForParent' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent2'),
 
             // Parent cannot create an event for a student that isn't theirs
-            'ParentForOtherChild' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'student'),
+            'ParentForOtherChild' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'studentWithParent'),
 
             // Student cannot create event for a staff member
             'StudentForStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'staff'),
