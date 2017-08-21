@@ -102,7 +102,7 @@ class Loader
             'P3' => $this->generateHash($epoch)
         ];
 
-        $remoteUrl = self::REMOTE_URL . http_build_query($urlArgs);
+        $remoteUrl = self::REMOTE_URL .'?'. http_build_query($urlArgs);
 
         return $remoteUrl;
     }
