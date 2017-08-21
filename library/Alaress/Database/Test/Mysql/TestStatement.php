@@ -19,16 +19,18 @@ class TestStatement extends PHPUnit_Framework_TestCase
     use TestConnectorTrait;
 
     /**
-     * Test plain old boring statements
+     * Set up Schoolbox DB
      */
-    public function testStatement()
+    public function setUp()
     {
         $this->connectSchoolbox();
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch with long-winded preparation and binding
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetch with concise preparation and binding
+     */
+    public function testStatementWithConciseBinding()
+    {
         $statement = $this->schoolbox->prepareQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname');
         $statement->bindInputs(['lastname' => 'rhodes']);
         $statement->execute();
@@ -41,11 +43,14 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch with long-winded preparation and binding (with type and length specified)
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetch with long-winded preparation and binding (with type and length specified)
+     *
+     */
+    public function testStatementWithVerboseBinding()
+    {
         $statement = $this->schoolbox->prepareQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname');
         $statement->bindInputs([
             'lastname' => [
@@ -64,11 +69,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetch with named parameters
+     */
+    public function testStatementWithNamedParameters()
+    {
         $statement = $this->schoolbox->executeQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'rhodes']
         );
@@ -81,11 +88,35 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // executeIterator
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Test fetch with positional parameters
+     */
+    public function testStatementWithPositionalParameters()
+    {
+        // Test a second positional parameter, to ensure they're positioned appropriately
+        $statement = $this->schoolbox->executeQuery(
+            'SELECT `firstname`, `lastname` FROM `user` WHERE `lastname` = ? AND `firstname` = ?',
+            ['rhodes', 'rachel']
+        );
 
+        $count = 0;
+
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame(strtolower($row['lastname']), 'rhodes');
+            $this->assertSame(strtolower($row['firstname']), 'rachel');
+        }
+
+        $this->assertEquals(1, $count);
+    }
+
+    /**
+     * Test iterator
+     */
+    public function testStatementIterator()
+    {
         $iterator = $this->schoolbox->executeQueryIterator(
             'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
@@ -107,11 +138,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         // Test both iterations returned same number of results
 
         $this->assertSame($count1, $count2);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchColumn
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetch column
+     */
+    public function testStatementFetchColumn()
+    {
         $statement = $this->schoolbox->executeQuery(
             'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
@@ -122,11 +155,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         while ($lastName = $statement->fetchColumn()) {
             $this->assertSame(strtolower($lastName), 'rhodes');
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchColumnArray
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetch of column as array
+     */
+    public function testStatementFetchColumnArray()
+    {
         $statement = $this->schoolbox->executeQuery(
             'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
@@ -139,11 +174,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
         foreach ($arrayLastName as $lastName) {
             $this->assertSame(strtolower($lastName), 'rhodes');
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchRowArray
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetch of row as array
+     */
+    public function testStatementFetchRowArray()
+    {
         $statement = $this->schoolbox->executeQuery(
             'SELECT `id`, `firstname`, `lastname` FROM `user` WHERE `lastname` = :lastname',
             ['lastname' => 'Rhodes']
@@ -170,11 +207,14 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $this->assertSame(strtolower($users[245]['firstname']), 'caleb');
         $this->assertSame(strtolower($users[245]['lastname']), 'rhodes');
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // Test function call
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test function call result
+     *
+     */
+    public function testFunctionCall()
+    {
         $function = $this->schoolbox->executeFunctionCall('testFunction', [
             'input' => 'Got Milk?'
         ]);
