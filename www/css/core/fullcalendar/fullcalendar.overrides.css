@@ -105,10 +105,6 @@
     margin-bottom: 0;
 }
 
-.fc-timeline-event {
-    height: 100%;
-}
-
 /* Overcome specificity
  */
 #content > .row > .small-12 table .fc-day-header.fc-widget-header,
