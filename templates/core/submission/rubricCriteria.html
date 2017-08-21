@@ -77,7 +77,7 @@ $(function() {
 
         if (self.is('[aria-disabled="true"]')) {
             self.confirmDialog({
-                text: 'You are about to remove a criterion that is currently in use. Removing this criterion will make it unavailable for future assessments. It will remain visible on the existing assessments.',
+                text: $('#criterion-in-use-text').text(),
                 confirmEvent: function() {
                     container.remove();
                 }
@@ -402,4 +402,11 @@ $(function() {
         <h5>Something went wrong while saving</h5>
         <p>You may try pressing the "Save Changes" button. If this persists, please contact your IT support.</p>
     </div>
+</div>
+
+<!-- Hidden text for remove criterion -->
+<div class="hide" id="criterion-in-use-text">
+    You are about to remove a {TPL_LOCAL_RUBRICCRITERION} that is currently in use.
+    Removing this {TPL_LOCAL_RUBRICCRITERION} will make it unavailable for future {TPL_LOCAL_ASSESSMENT_PLURAL}.
+    It will remain visible on the existing {TPL_LOCAL_ASSESSMENT_PLURAL}.
 </div>
