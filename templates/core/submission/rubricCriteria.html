@@ -84,7 +84,12 @@ $(function() {
             });
         } else {
             // Is this a new criterion?
-            container.remove();
+            self.confirmDialog({
+                text: $('#criterion-remove-text').text(),
+                confirmEvent: function() {
+                    container.remove();
+                }
+            });
         }
     });
 
@@ -403,6 +408,11 @@ $(function() {
 </div>
 
 <!-- Hidden text for remove criterion -->
+<div class="hide" id="criterion-remove-text">
+    Removing this {TPL_LOCAL_RUBRICCRITERION} will make it unavailable for future {TPL_LOCAL_ASSESSMENT_PLURAL}.
+    Are you sure you wish to do this?
+</div>
+
 <div class="hide" id="criterion-in-use-text">
     You are about to remove a {TPL_LOCAL_RUBRICCRITERION} that is currently in use.
     Removing this {TPL_LOCAL_RUBRICCRITERION} will make it unavailable for future {TPL_LOCAL_ASSESSMENT_PLURAL}.
