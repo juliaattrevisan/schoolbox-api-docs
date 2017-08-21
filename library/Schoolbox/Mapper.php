@@ -3719,9 +3719,9 @@ abstract class Mapper implements IMapper, Serializable
 
         // Does the mapper have 'created_at' or 'updated_at' timestamps?
         foreach ($this->map as $property => $map) {
-            if ($map['created_timestamp']) {
+            if (isset($map['created_timestamp'])) {
                 $createMap = $map;
-            } elseif ($map['updated_timestamp']) {
+            } elseif (isset($map['updated_timestamp'])) {
                 $updateMap = $map;
             }
         }
