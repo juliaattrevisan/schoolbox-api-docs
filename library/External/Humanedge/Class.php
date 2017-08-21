@@ -24,17 +24,21 @@ class External_Humanedge_Class implements External_ClassInterface
      * Gets the class code part of a query.
      *
      * @param  string $subCode
-     * @return string
+     * @return array query: the query part, params: the parameters
      */
     protected function getClassCodeQuery($subCode)
     {
-        $db    = $this->loadAPlusDatabase();
-        $classQuery = '(';
+        $classQuery   = '(';
+        $params       = [];
         $subCodeArray = explode(',', $subCode);
-        foreach ($subCodeArray as $code) {
-            $classQuery .= "s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($code)} OR ";
+        foreach ($subCodeArray as $i => $code) {
+            $classQuery .= "s.Code + ISNULL(b.Suffix, '') = :code{$i} OR ";
+            $params['code'.$i] = $code;
         }
-        return substr($classQuery, 0, -3) . ')';
+        return [
+            'query'  => substr($classQuery, 0, -3) . ')',
+            'params' => $params,
+        ];
     }
 
 
@@ -65,7 +69,7 @@ class External_Humanedge_Class implements External_ClassInterface
             INNER JOIN tblPeriod p ON a.PeriodID = p.ID
             INNER JOIN tblStudent st on a.FormID = st.FormID
             WHERE st.deleted = 0
-            AND   $classQuery
+            AND   {$classQuery['query']}
 
             UNION
 
@@ -83,9 +87,9 @@ class External_Humanedge_Class implements External_ClassInterface
             INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
             INNER JOIN tblStudent st ON sc.StudentID = st.ID
             WHERE st.deleted = 0
-            AND   $classQuery
+            AND   {$classQuery['query']}
         ";
-        return $db->getAll($query);
+        return $db->executeQuery($query, $classQuery['params'])->fetchAll();
     }
 
     /**
@@ -104,7 +108,7 @@ class External_Humanedge_Class implements External_ClassInterface
             INNER JOIN tblTeacher t on a.TeacherID = t.ID
             $roomJoin
             WHERE t.deleted = 0
-            AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
+            AND   s.Code + ISNULL(b.Suffix, '') = :classCode
 
             UNION
 
@@ -115,14 +119,8 @@ class External_Humanedge_Class implements External_ClassInterface
             INNER JOIN tblTeacher t on b.TeacherID = t.ID
             $roomJoin
             WHERE t.deleted = 0
-            AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
+            AND   s.Code + ISNULL(b.Suffix, '') = :classCode
         ";
-        $result = [];
-        if($statement = $db->query($query)) {
-            while ($row = $statement->fetch()) {
-                $result[] = $row['Code'];
-            }
-        }
-        return $result;
+        return $db->executeQuery($query, ['classCode' => $classCode])->fetchColumnArray('Code');
     }
 }

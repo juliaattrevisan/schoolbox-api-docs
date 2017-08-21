@@ -48,9 +48,11 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
             ''              AS StaffTitle
         ";
 
-        $db        = $this->loadAPlusDatabase();
-        $quotedId  = $db->smartQuote($externalUserId);
-        $quotedDay = $db->smartQuote($dayNumber);
+        $db     = $this->loadAPlusDatabase();
+        $params = [
+            'externalId' => $externalUserId,
+            'dayNumber'  => $dayNumber,
+        ];
         if ($user->getRole()->isStudent()) {
             // Statement 1: core subjects
             // Statement 2: electives
@@ -73,8 +75,8 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 INNER JOIN tblForm f ON a.FormId = f.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
-                AND d.SortOrder = $quotedDay
+                AND st.code = :externalId
+                AND d.SortOrder = :dayNumber
 
                 UNION
 
@@ -97,8 +99,8 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
-                AND d.SortOrder = $quotedDay
+                AND st.code = :externalId
+                AND d.SortOrder = :dayNumber
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -123,8 +125,8 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 INNER JOIN tblForm f ON a.FormId = f.ID
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
-                AND d.SortOrder = $quotedDay
+                AND t.code = :externalId
+                AND d.SortOrder = :dayNumber
 
                 UNION
 
@@ -145,8 +147,8 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
                 $periodJoin
                 $electRoomJoin
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
-                AND d.SortOrder = $quotedDay
+                AND t.code = :externalId
+                AND d.SortOrder = :dayNumber
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -165,7 +167,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['class']          = [];
         }
-        foreach ($db->getAll($query) as $timetabledClass) {
+        foreach ($db->executeQueryIterator($query, $params) as $timetabledClass) {
             // Account for classes which extend multiple periods
             $periodSpan = range(
                 $timetabledClass['PeriodNumber'],
@@ -230,8 +232,10 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
             ''              AS StaffTitle
         ";
 
-        $db = $this->loadAPlusDatabase();
-        $quotedId = $db->smartQuote($externalUserId);
+        $db     = $this->loadAPlusDatabase();
+        $params = [
+            'externalId' => $externalUserId,
+        ];
         if ($user->getRole()->isStudent()) {
             // Statement 1: core subjects
             // Statement 2: electives
@@ -252,7 +256,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 INNER JOIN tblForm f ON a.FormId = f.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
+                AND st.code = :externalId
 
                 UNION
 
@@ -273,7 +277,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
+                AND st.code = :externalId
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -296,7 +300,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 INNER JOIN tblForm f ON a.FormId = f.ID
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
+                AND t.code = :externalId
 
                 UNION
 
@@ -315,7 +319,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
                 $periodJoin
                 $electRoomJoin
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
+                AND t.code = :externalId
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -335,7 +339,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable imp
             // Fill in each day with blanks
             $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], []);
         }
-        foreach ($db->getAll($query) as $timetabledClass) {
+        foreach ($db->executeQueryIterator($query, $params) as $timetabledClass) {
             // Account for classes which extend multiple periods
             $periodSpan = range(
                 $timetabledClass['PeriodNumber'],

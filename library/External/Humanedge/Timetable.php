@@ -45,9 +45,9 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             $day = 1;
         }
         $db       = $this->loadAPlusDatabase();
-        $dayCount = $db->getOne("SELECT COUNT(*) FROM tblDay WHERE deleted = 0");
+        $dayCount = $db->executeQuery("SELECT COUNT(*) FROM tblDay WHERE deleted = 0")->fetchColumn();
         $periods  = [];
-        $result   = $db->getAll("
+        $result   = $db->executeQueryIterator("
             SELECT
                 p.Name,
                 CONVERT(varchar(15),CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME),100) as StartTime,
@@ -59,11 +59,11 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             LEFT JOIN tblDay d ON pd.DayID = d.ID
             WHERE p.deleted = 0
             AND   ISNULL(d.Deleted, 0) = 0
-            AND   ISNULL(d.SortOrder, 0) IN ({$db->smartQuote($day)}, 0)
+            AND   ISNULL(d.SortOrder, 0) IN (:day, 0)
             ORDER BY
                 d.SortOrder ASC,
                 p.SortOrder ASC
-        ");
+        ", ['day' => $day]);
         // Prefer an explicit day to one which is day 0
         foreach ($result as $period) {
             $periods[$period['PeriodNumber']] = $period;
@@ -98,23 +98,31 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             ? new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now()
         ;
-        $result = $db->getOne("
-            SELECT d.[SortOrder]
-            FROM tblDay d
-            INNER JOIN tblCalendarDay c ON d.ID = c.TimetableDayID
-            WHERE CAST(c.TimetableDate AS DATE) = CAST({$db->smartQuote($time->getDatabase())} AS DATE)
-            AND d.deleted = 0
-        ");
+        $result = $db->executeQuery(
+            "
+                SELECT d.[SortOrder]
+                FROM tblDay d
+                INNER JOIN tblCalendarDay c ON d.ID = c.TimetableDayID
+                WHERE CAST(c.TimetableDate AS DATE) = CAST(:time AS DATE)
+                AND d.deleted = 0
+            ",
+            ['time' => $time->getDatabase()]
+        )->fetchColumn();
         return intval($result);
     }
 
     /**
      * @inheritDoc
      */
-    function getDayName($dayNumber)
+    public function getDayName($dayNumber)
     {
         $db = $this->loadAPlusDatabase();
-        return $db->getOne("SELECT [Name] FROM tblDay WHERE SortOrder = {$db->smartQuote($dayNumber)} AND deleted = 0");
+        return $db
+            ->executeQuery(
+                "SELECT [Name] FROM tblDay WHERE SortOrder = :dayNumber AND deleted = 0",
+                ['dayNumber' => $dayNumber]
+            )
+            ->fetchColumn();
     }
 
     /**
@@ -127,13 +135,18 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             ? new Alaress_Date_Format($now, Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now()
         ;
-        return $db->getOne("
-            SELECT [SortOrder]
-            FROM tblPeriod
-            WHERE CAST({$db->smartQuote($time->getDatabase())} AS TIME)
-                BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME)
-            AND deleted = 0
-        ");
+        return $db
+            ->executeQuery(
+            "
+                    SELECT [SortOrder]
+                    FROM tblPeriod
+                    WHERE CAST(:time AS TIME)
+                        BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME)
+                    AND deleted = 0
+                ",
+                ['time' => $time->getDatabaseTime()]
+            )
+            ->fetchColumn();
     }
 
     /**
@@ -170,9 +183,11 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             ''              AS StaffTitle
         ";
 
-        $db        = $this->loadAPlusDatabase();
-        $quotedId  = $db->smartQuote($externalUserId);
-        $quotedDay = $db->smartQuote($dayNumber);
+        $db     = $this->loadAPlusDatabase();
+        $params = [
+            'externalId' => $externalUserId,
+            'dayNumber'  => $dayNumber,
+        ];
         if ($user->getRole()->isStudent()) {
             // Statement 1: core subjects
             // Statement 2: electives
@@ -195,8 +210,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
-                AND d.SortOrder = $quotedDay
+                AND st.code = :externalId
+                AND d.SortOrder = :dayNumber
 
                 UNION
 
@@ -219,8 +234,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
-                AND d.SortOrder = $quotedDay
+                AND st.code = :externalId
+                AND d.SortOrder = :dayNumber
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -245,8 +260,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
-                AND d.SortOrder = $quotedDay
+                AND t.code = :externalId
+                AND d.SortOrder = :dayNumber
 
                 UNION
 
@@ -267,8 +282,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 $periodJoin
                 $electRoomJoin
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
-                AND d.SortOrder = $quotedDay
+                AND t.code = :externalId
+                AND d.SortOrder = :dayNumber
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -287,7 +302,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['class']          = [];
         }
-        foreach ($db->getAll($query) as $timetabledClass) {
+        foreach ($db->executeQueryIterator($query, $params) as $timetabledClass) {
             // Account for classes which extend multiple periods
             $periodSpan = range(
                 $timetabledClass['PeriodNumber'],
@@ -364,8 +379,10 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             ''              AS StaffTitle
         ";
 
-        $db = $this->loadAPlusDatabase();
-        $quotedId = $db->smartQuote($externalUserId);
+        $db     = $this->loadAPlusDatabase();
+        $params = [
+            'externalId' => $externalUserId,
+        ];
         if ($user->getRole()->isStudent()) {
             // Statement 1: core subjects
             // Statement 2: electives
@@ -386,7 +403,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
+                AND st.code = :externalId
 
                 UNION
 
@@ -407,7 +424,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
-                AND st.code = $quotedId
+                AND st.code = :externalId
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -430,7 +447,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
+                AND t.code = :externalId
 
                 UNION
 
@@ -449,7 +466,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 $periodJoin
                 $electRoomJoin
                 WHERE t.deleted = 0
-                AND t.code = $quotedId
+                AND t.code = :externalId
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
@@ -469,7 +486,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             // Fill in each day with blanks
             $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], []);
         }
-        foreach ($db->getAll($query) as $timetabledClass) {
+        foreach ($db->executeQueryIterator($query, $params) as $timetabledClass) {
             // Account for classes which extend multiple periods
             $periodSpan = range(
                 $timetabledClass['PeriodNumber'],
