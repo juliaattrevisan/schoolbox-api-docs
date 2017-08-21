@@ -25,7 +25,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
      * @var Calendar
      */
     private $calendarHandler;
-    
+
     /** @var  Alaress_Date_Format $start */
     protected $start;
 

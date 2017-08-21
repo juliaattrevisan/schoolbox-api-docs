@@ -192,32 +192,6 @@
                     {% for access in record.access if access.user.id != '' %}
                         {% set found = 1 %}
                     {% endfor %}
-                    {% if found %}
-                        <fieldset class="content">
-                            <div class="small-12 columns">
-                                <label>
-                                    Existing Individual User Access
-                                </label>
-                                <ul class="information-list">
-                                    {% for access in record.access if access.user.id != '' %}
-                                        <li class="actions-small-1">
-                                            <div class="list-item">
-                                                <div class="card small-12">
-                                                    <a href="/search/user/{{ access.user.id }}" title="View Profile"><img src="/portrait.php?userId={{ access.user.externalId }}&size=square64" alt="View Profile"/></a>
-                                                    <p><a href="/search/user/{{ access.user.id }}" title="View Profile">{{ access.user.firstname }} {{ access.user.lastname }}</a></p>
-                                                    <p class="meta">{{ access.user.role.name }}</p>
-                                                </div>
-                                            </div>
-                                            <nav>
-                                                <a data-delete-permission="{{ access.user.id }}" class="icon-delete no-text" href="#"
-                                                   title="Remove User Permission"></a>
-                                            </nav>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </fieldset>
-                    {% endif %}
             {% endif %}
             {# Show linked pastoral records #}
             </section>

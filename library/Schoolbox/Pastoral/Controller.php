@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use External_Pastoral;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -836,61 +837,41 @@ class Controller extends Base
         $this->assignTagsToRecord($record, $post["tags"]);
 
         // Delete user permissions
-
         $accessRecords = $record->getAccess();
 
-        /* Delete all the individual access instances for this pastoral record
-         */
-        $deleteIds = trim($post['deleteIds']);
-        $individualAccessIds = [];
+        // Load Access
+        $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
 
-        if (strlen($deleteIds)) {
-            $individualAccessIds = array_unique(explode(',', $deleteIds));
+        //Filter for individual access
+        $existingAccessIndividual = $existingAccess->filter(function (PastoralAccessModel $access) {
+            return $access->getUser() !== null;
+        });
+
+        //Remove users no longer in the list
+        if (empty($post['user_id'])) {
+            $post['user_id'] = [];
         }
+        $deleteIds = array_diff($existingAccessIndividual->map(function(PastoralAccessModel $access){
+            return $access->getUser()->getId();
+        })->getAll(), $post['user_id']);
 
-        foreach ($individualAccessIds as $currentAccessId) {
-            $this->pastoralAccessMapper->deleteByColumnList([
-                'pastoral_id' => $record->getId(),
-                'user_id' => $currentAccessId
-            ]);
-        }
+        $this->pastoralAccessMapper->deleteByColumnList(['pastoral_id' => $record->getId(), 'user_id' => $deleteIds]);
 
-        // Update the authorised users
-
-        if (isset($post["user_id"])) {
-            if (is_array($post["user_id"])) {
-                foreach ($post["user_id"] as $user_id) {
+        //Add users with de-dupe
+        if (isset($post['user_id'])) {
+            if (is_array($post['user_id'])) {
+                foreach ($post['user_id'] as $user_id) {
 
                     $found = false;
 
-                    // Don't re-add deleted users
+                    // Check not already have access
 
-                    if (count($individualAccessIds)) {
-
-                        /** @var PastoralAccessModel $access */
-                        foreach ($accessRecords as $access) {
-                            if ($access->getUser()->getId() == $user_id) {
-                                if (in_array($user_id, $individualAccessIds)) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    $existingAccess = $this->pastoralAccessMapper->findByColumn('pastoral_id', $record->getId());
-
-                    if (!$found) {
-
-                        // Check not already have access
-
-                        /** @var PastoralAccessModel $accessCurrent */
-                        foreach ($existingAccess as $accessCurrent) {
-                            if ($accessCurrent->getUser() instanceof User) {
-                                if ($accessCurrent->getUser()->getId() == $user_id) {
-                                    $found = true;
-                                    break;
-                                }
+                    /** @var PastoralAccessModel $accessCurrent */
+                    foreach ($existingAccess as $accessCurrent) {
+                        if ($accessCurrent->getUser() instanceof User) {
+                            if ($accessCurrent->getUser()->getId() == $user_id) {
+                                $found = true;
+                                break;
                             }
                         }
                     }
