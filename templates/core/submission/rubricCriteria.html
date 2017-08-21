@@ -75,12 +75,17 @@ $(function() {
         var self      = $(this);
         var container = self.closest('[data-rubric-criterion-row]');
 
-        self.confirmDialog({
-            text: $('#criterion-remove-text').text(),
-            confirmEvent: function() {
-                container.remove();
-            }
-        });
+        // Is this new? if so no dialog
+        if (container.is('[data-rubric-criterion-new-row]')) {
+            container.remove();
+        } else {
+            self.confirmDialog({
+                text: $('#criterion-remove-text').text(),
+                confirmEvent: function() {
+                    container.remove();
+                }
+            });
+        }
     });
 
     $('[data-interaction="show-example-criteria"]').click(function(e) {
@@ -214,7 +219,7 @@ $(function() {
                             </div>
                             <!-- END criterion -->
                             <!-- New criterion within group -->
-                            <li class="actions-small-2" data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <li class="actions-small-2" data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
                                 <div class="list-item">
                                     <input type="text"
                                            value=""
@@ -257,7 +262,7 @@ $(function() {
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
                         <ul class="information-list">
-                            <li class="actions-small-2" data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <li class="actions-small-2" data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
                                 <div class="list-item">
                                     <input type="text"
                                            value=""
