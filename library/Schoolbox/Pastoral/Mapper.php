@@ -135,7 +135,7 @@ class Mapper extends BaseMapper
             INNER JOIN   {$this->getJoinSql('student', '', 's', true)}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv')}
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
-            INNER JOIN   {$this->getJoinSql('type', '', 't')}
+            INNER JOIN   {$this->getJoinSql('type', '', 't', true)}
             LEFT  JOIN   {$this->getJoinSql('category', '', 'c')}
         ";
     }
