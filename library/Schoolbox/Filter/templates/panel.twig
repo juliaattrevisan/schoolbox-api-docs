@@ -404,40 +404,59 @@ Usage:
 <div class="row">
     <div class="small-12 island" id="filter_panel">
         <section>
-            <fieldset class="row collapse">
-                <div id="panel-summary" data-collapser="panel-components" class="icon-down-arrow small-12 medium-9 columns">
-                    <span id="filter-loader" class="loader" title="Request sent ..."></span>Filters: <span id="applied_filters" data-applied-filters></span>
-                </div>
-                <div class="small-12 medium-3 columns">
-                    <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ...">
-                </div>
-            </fieldset>
 
-            <fieldset data-collapsable="panel-components" data-collapse-state="collapsed" style="display: none;">
-                <div class="content flex-container">
-                    {% set countComponents = 0 %}
-                    {% for component in panel.components %}
-                        {% set template = component.template %}
-                        {% set data     = component.toContext() %}
-                        {% if data.isUserConfigurable %}
-                            {% set countComponents = countComponents + 1 %}
-                        {% endif %}
-                        {% include component.template with data only %}
-                    {% endfor %}
 
-                    {% if not countComponents %}
-                        <div class="empty-state">
-                            <i class="icon-info"></i>
-                            <p>No filters are user-configurable on this page.</p>
+
+            <ul class="information-list expandable-card">
+                <li>
+                    <div class="filter-interaction">
+                        <div class="expander icon-down-arrow" data-collapser="collap-1"></div>
+
+                        {# ALWAYS-SHOW HEADER DISPLAY #}
+                        <div id="panel-summary" data-collapser="panel-components" class="small-12 medium-9 columns filter-summary">
+                            <span id="filter-loader" class="loader" title="Request sent ..."></span>Filters: <span id="applied_filters" data-applied-filters></span>
                         </div>
-                    {% endif %}
-                </div>
-                <ul class="flex-list buttons">
-                    {# This needs to be outside the collapsable panel so we can hit it after removing filters from summary div #}
-                    <li><a id="defaults_reset" title="Revert to default selections">Reset to Defaults</a></li>
-                    <li><a id="cancel_changes" title="Revert to your most recently applied filter">Cancel Changes</a></li>
-                </ul>
-            </fieldset>
+
+
+                        <div class="small-12 medium-3 columns">
+                            <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ...">
+                        </div>
+
+
+                    </div>
+                    <div class="small-12 column no-pad hide" data-collapse-state="collapsed" data-collapsable="collap-1">
+
+                        {# HIDABLE CONTENT #}
+                        <div class="content flex-container">
+                            {% set countComponents = 0 %}
+                            {% for component in panel.components %}
+                                {% set template = component.template %}
+                                {% set data     = component.toContext() %}
+                                {% if data.isUserConfigurable %}
+                                    {% set countComponents = countComponents + 1 %}
+                                {% endif %}
+                                {% include component.template with data only %}
+                            {% endfor %}
+
+                            {% if not countComponents %}
+                                <div class="empty-state">
+                                    <i class="icon-info"></i>
+                                    <p>No filters are user-configurable on this page.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="component-action">
+                            <section>
+                                <a class="button" id="defaults_reset" title="Revert to default selections">Reset to Defaults</a>
+                                <a class="button" id="cancel_changes" title="Revert to your most recently applied filter">Cancel Changes</a>
+                            </section>
+                        </div>
+
+                    </div>
+                </li>
+            </ul>
+
         </section>
 
         {# Will contain error message HTML, as defined in template below #}

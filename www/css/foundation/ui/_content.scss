@@ -780,6 +780,16 @@ $rotate-th-width: $square-grid-td-size;
     }
 }
 
+.filter-interaction {
+    padding: 1rem 0;
+    .filter-summary {
+        line-height: 2rem;
+    }
+    input[type="submit"] {
+        margin-bottom: 0;
+    }
+}
+
 nav {
     @extend .hide-for-print;
 }
