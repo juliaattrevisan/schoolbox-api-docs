@@ -378,7 +378,7 @@ Usage:
          */
         function hideFilterLoader() {
             $filterLoaderIcon.prop('disabled', true);
-            $filterLoaderIcon.css({'opacity': '0', 'width':'0', 'margin':'0'});
+            $filterLoaderIcon.css('opacity', 0);
         }
 
         /**
@@ -410,21 +410,16 @@ Usage:
             <ul class="information-list expandable-card">
                 <li>
                     <div class="filter-interaction">
-                        <div class="expander icon-down-arrow" data-collapser="collap-1"></div>
-
-                        {# ALWAYS-SHOW HEADER DISPLAY #}
-                        <div id="panel-summary" data-collapser="panel-components" class="small-12 medium-9 columns filter-summary">
+                        <div id="panel-summary" data-collapser="panel-components" class="icon-down-arrow small-12 medium-9 columns">
                             <span id="filter-loader" class="loader" title="Request sent ..."></span>Filters: <span id="applied_filters" data-applied-filters></span>
                         </div>
-
-
                         <div class="small-12 medium-3 columns">
                             <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ...">
                         </div>
 
 
                     </div>
-                    <div class="small-12 column no-pad hide" data-collapse-state="collapsed" data-collapsable="collap-1">
+                    <div class="small-12 column no-pad hide" data-collapse-state="collapsed" data-collapsable="panel-components">
 
                         {# HIDABLE CONTENT #}
                         <div class="content flex-container">
