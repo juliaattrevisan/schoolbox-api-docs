@@ -17,6 +17,8 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
      */
     protected $connectorClass = 'External';
 
+
+
     /**
      * {@inheritdoc}
      */
@@ -34,13 +36,11 @@ class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connect
      */
     public function render($page)
     {
-        $page->setVar(
-            array(
-                'CONNECTOR_ID'    => $this->getId(),
-                'CONNECTOR_LABEL' => Scrub::text($this->getLabel()),
-                'CONNECTOR_CLASS' => Scrub::text($this->getConnectorClass()),
-            )
-        );
+        $page->setVar([
+            'CONNECTOR_ID' => $this->getId(),
+            'CONNECTOR_LABEL' => Scrub::text($this->getLabel()),
+            'CONNECTOR_CLASS' => Scrub::text($this->getConnectorClass()),
+        ]);
         $page->setVar('has_multiple_options_block', '');
         $this->renderEventType($page, $this->getLuEventType());
     }

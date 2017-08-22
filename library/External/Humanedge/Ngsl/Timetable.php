@@ -9,7 +9,7 @@
  *
  * NGSL specific HumanEdge implementation of timetable.
  */
-class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable implements External_TimetableInterface
+class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable
 {
     use External_Humanedge_APlusDatabaseTrait;
 

@@ -188,6 +188,20 @@ class External_Timetable implements External_TimetableInterface
 
 
     /**
+     * {@inheritdoc}
+     *
+     * @param int               $externalUserId
+     * @param int               $userId
+     * @param \Schoolbox\Campus $campus
+     * @param int               $dayNumber
+     * @return array
+     */
+    function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
+
+    /**
      * Returns a user's timetable for a particular date
      *
      * The structure of this data is as follows
