@@ -7,7 +7,7 @@
         userSelections:     Filter\Selection\Model[] - A set of filter selections made by the current user, indexed by selection.key
 #}
 
-<div class="checklist filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
+<div class="item checklist filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
 
     {{ block('scripts') }}
 
@@ -26,7 +26,7 @@
             <div class="empty-state">
                 <i class="icon-info"></i>
                 <p>No options available. No results possible.<br>
-                Please contact your administrator if you think this is in error.
+                Please contact your administrator if you think this is an error.
                 </p>
             </div>
         {% endif %}
