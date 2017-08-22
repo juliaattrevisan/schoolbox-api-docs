@@ -60,7 +60,7 @@ class Base extends BaseStatement
             // but it requires 1-indexes, as each param is bound separately.
             // It's tempting to just ban non-named parameters,
             // but they are more concise than named ones if you just want to pass a single param.
-            if (filter_var($key, FILTER_VALIDATE_INT) !== false) {
+            if (is_int($key) === true) {
                 ++$key;
             }
 
