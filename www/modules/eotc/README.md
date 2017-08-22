@@ -168,7 +168,20 @@ The numbers in brackets *(5,2)* indicate the number of student attendees and sta
 
 The counts are to help with catering. You can still get these counts in the Modify screen.
 
-### 12.1 Exporting Events as Vcal
+### 12.1 Visibility
+EOTC Events become visible to certain parties based on the event's current status. The styling will depend on their status, however, in accordance with the following:
+
+- Events display as translucent when they are in any non-approved status except Cancelled.
+- Events display as opaque when they are approved.
+
+On the calendar and in the export, in accordance with the aforementioned styling convention:
+- EOTC Events are only visible when the module is available and when the calendar subscription is on. See *1. Schoolbox Installation* 
+- EOTC Events are always visible for Superusers and EOTC Administrators.
+- EOTC Events are always visible to Teachers In Charge (TIC).
+- EOTC Events are visible to any staff member in the same campus as the event itself.
+- EOTC Events are visible to any other attendee only when in Approved Status.
+
+### 12.2 Exporting Events as Vcal
 You can export EOTC Events like any other. What you see on the calendar is what you'll get in the export; the EOTC Connector doesn't have any idiosyncratic hard-coded logic. Therefore, if you want to export a list of particular EOTC Events, you need to set up a faux user who can see these events, and have this user Export to csv or url.
 
 ## 13. Other References
