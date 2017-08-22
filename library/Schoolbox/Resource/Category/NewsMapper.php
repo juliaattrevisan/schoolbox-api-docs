@@ -219,7 +219,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 			FROM
 				`{$this->getTable()}` `n`
 				INNER JOIN {$this->getJoinSql('folder', 'n', 'c')}
-				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u', true)}
+				INNER JOIN {$this->getJoinSql('owner', 'n', 'u', true)}
 			WHERE
 				`n`.`deleted` = FALSE
 				AND `n`.`datetime_published` < :time

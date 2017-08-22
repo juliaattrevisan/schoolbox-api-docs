@@ -142,9 +142,9 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
                 {$this->getJoinColumnString('user', 'u')}
             FROM
                 `{$this->getTable()}`
-                LEFT JOIN {$this->getJoinSql('wiki', '', 'w')}
+                INNER JOIN {$this->getJoinSql('wiki', '', 'w', true)}
                 LEFT JOIN {$this->getJoinMapper('wiki')->getJoinSql('category', 'w', 'c')}
-                LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+                INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
         ";
     }
 

@@ -14,6 +14,7 @@ use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class LogMapper extends Mapper {
 
@@ -191,13 +192,16 @@ class LogMapper extends Mapper {
 		$joinSql = $joins[$filter];
 		$whereSql = $wheres[$filter];
 
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('user');
+
 		$stmt = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('log')},
 				{$this->getJoinColumnString('user', 'u')},
 				$selectSql
 			FROM `{$this->getTable()}` `log`
-				LEFT JOIN {$this->getJoinSql('user', 'log', 'u')}
+				LEFT JOIN {$this->getJoinSql('user', 'log', 'u', true)}
 				$joinSql
 			WHERE log.time <= :time
 			AND $whereSql
@@ -215,9 +219,13 @@ class LogMapper extends Mapper {
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 		    $user = $this->hydrateJoin($r, 'user', 'u');
 
-		    if ($user instanceof User) {
-                $collection->add($this->hydrate($r, 'log')->setUser($user));
-            }
+            /* Special case for logs:
+             * For the moment, we do not enforce referential integrity.
+             * If the user no longer exists, create an empty user object
+             */
+            $user = $user ?: $userMapper->getUnknownUser();
+
+            $collection->add($this->hydrate($r, 'log')->setUser($user));
 		}
 
 		return $collection;
