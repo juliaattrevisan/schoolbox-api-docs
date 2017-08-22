@@ -60,7 +60,9 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementWithPreparationAndBinding()
     {
-        $statement = $this->mssqlTest->prepareQuery('SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname');
+        $statement = $this->mssqlTest->prepareQuery(
+            'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname'
+        );
         $statement->bindInputs(['Surname' => 'rhodes']);
         $statement->execute();
 
@@ -80,7 +82,9 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
     public function testPrepareThenExecuteStatement()
     {
         // prepare once
-        $statement = $this->mssqlTest->prepareQuery('SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname');
+        $statement = $this->mssqlTest->prepareQuery(
+            'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname'
+        );
         $statement->bindInputs([
             'Surname' => [
                 'value' => 'rhodes',
@@ -127,7 +131,9 @@ abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStatementWithPreparationAndFullBinding()
     {
-        $statement = $this->mssqlTest->prepareQuery('SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname');
+        $statement = $this->mssqlTest->prepareQuery(
+            'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname'
+        );
         $statement->bindInputs([
             'Surname' => [
                 'value' => 'rhodes',
