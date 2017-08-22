@@ -77,7 +77,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      * @param User             $effector
      * @throws Mapper\Exception
      */
-    public function notifySystemCreated(Component_Config $model, User $effector)
+    public function notifySystemCreated(Component_Config $model, User $effector = null)
     {
         if (!$this->definitionIsSource($model)) {
             return;
@@ -93,7 +93,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      * @param array            $diff
      * @throws Mapper\Exception
      */
-    public function notifySystemUpdated(Component_Config $model, User $effector, array $diff)
+    public function notifySystemUpdated(Component_Config $model, User $effector = null, array $diff = [])
     {
         if (!$this->definitionIsSource($model)) {
             return;
@@ -115,7 +115,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      * @param User             $effector
      * @throws Mapper\Exception
      */
-    public function notifySystemDeleted(Component_Config $model, User $effector)
+    public function notifySystemDeleted(Component_Config $model, User $effector = null)
     {
         if (!$this->definitionIsSource($model)) {
             return;
