@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Calendar\Test\Event;
 
-use Aura\Web\Response\Redirect;
 use Schoolbox\Campus;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -92,9 +91,11 @@ class AccessTest extends \PHPUnit_Framework_TestCase
                 'studentWithParent'     => $newUser(18, ["loadParents", "getParents"])->setRole($this->getRole('student')),
             ];
 
-            // Create a mock user object, who is a child of $this->users['parentWithStudent']
+            // Create a mock returns for users
+
+            //Mock returns for studentWithParent, who is a child of $this->users['parentWithStudent']
             $this->users['studentWithParent']->method('loadParents')->willReturnCallback(function () {
-                return  $this->users['studentWithParent'];
+                return  $this->users['studentWithParent']; //Makes function do nothing
             });
             $this->users['studentWithParent']->method('getParents')->willReturnCallback(function () {
                 $collection = new Collection();
@@ -354,8 +355,18 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             // Student cannot create event for another student
             'StudentForStudent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'student2'),
 
+            // Student can't edit own event made by staff
+            'StudentEditStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
+            // Student can't edit own event made py parent
+            'StudentEditParent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'parent', 'student'),
 
+            // Staff can edit own event made by super user
+            'StaffEditSuper' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'super', 'staff'),
+
+            //Staff can't edit other staff members event
+            'StaffEditStaff2' => $this->generateTest(false, 'staff', Event::ACCESS_PERSONAL, 'staffAlt', 'staffAlt'),
+            
             // --------------------------------------------------------------------------
             // Campus level events
             // --------------------------------------------------------------------------
