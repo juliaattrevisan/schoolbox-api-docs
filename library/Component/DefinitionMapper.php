@@ -16,7 +16,6 @@ use Schoolbox\Realtime\Message\NSMapper;
  * Class Component_DefinitionMapper
  *
  * @method Component_Definition findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
- * @method Component_Definition findById($identifierValue)
  * @method Component_Definition hydrate(array $row, $alias = '', $callback = null)
  */
 class Component_DefinitionMapper extends Schoolbox\Mapper {
@@ -224,4 +223,40 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 			}
 		}
 	}
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \Schoolbox\Mapper\Exception if no instance of model is found
+     * @throws \Schoolbox\Mapper\Exception\Deleted if the model was found but has been deleted
+     *
+     * @param  mixed $identifierValue
+     * @return Component_Definition
+     */
+    public function findById($identifierValue)
+    {
+        return $this->findOneByColumn($this->getIdentifierColumn(), $identifierValue, [], [ 'hidden' => true ]);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param Component_Definition $model             The model to get values from
+     * @param bool                 $includeTimestamps Whether or not to include timestamps in the dehydrated output
+     * @throws \Schoolbox\Mapper\Exception if the map is not valid
+     * @return array
+     */
+    public function dehydrate($model, $includeTimestamps = false)
+    {
+        $dehydration = parent::dehydrate($model, $includeTimestamps);
+
+        // override ns.id to ns.slug - this is to overcome a limitation of the Mapper system that can't handle the
+        // scenario where you join onto a non-primary key
+        $dehydration['msg_namespace_slug'] = $model->getNamespace() ? $model->getNamespace()->getSlug() : null;
+
+        return $dehydration;
+    }
+
 }
