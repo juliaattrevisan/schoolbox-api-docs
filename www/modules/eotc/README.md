@@ -131,8 +131,9 @@ There are six possible statuses for EOTC Events. An EOTC Event can only be in on
 5. *Approved.* EOTC Administrator is okay with the event and it can go ahead.
 6. *Cancelled.* Event will not take place. Any status can transition to Cancelled.
 
-Typical transitions when RAMS is required: 1 > 2 > 3 > 4 > 5
-Typical transitions when RAMS is not required: 1 > 2 > 4 > 5
+Transitions usually occur like this:
+* Typical transitions when RAMS is required: 1 > 2 > 3 > 4 > 5
+* Typical transitions when RAMS is not required: 1 > 2 > 4 > 5
 
 Note that the EOTC Administrator permissions are on a status *and* campus basis. An EOTC Administrator must have permissions on the status and the event's campus in order to transition its status.
 
