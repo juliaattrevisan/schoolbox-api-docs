@@ -32,30 +32,12 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         $this->hasModel(BlogCommentModel::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('blog_id', BlogMapper::class, 'id', null, null, 'blog');
-        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
+        $this->joins('blog_id', BlogMapper::class, 'id', null, null, 'blog', 'blog');
+        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->uses('body', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        $this->hasJoin(
-            'owner',
-            array(
-                'mapper' => UserMapper::class,
-                'this_key' => 'owner_id',
-                'other_key' => 'id'
-            )
-        );
-
-        $this->hasJoin(
-            'blog',
-            array(
-                'mapper' => BlogMapper::class,
-                'this_key' => 'blog_id',
-                'other_key' => 'id'
-            )
-        );
     }
 
     /**
@@ -79,7 +61,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
 				{$this->getJoinColumnString('owner', 'u')},
 				{$this->getJoinColumnString('blog', 'b')}
 			FROM `{$this->getTable()}` AS `bc`
-				LEFT JOIN {$this->getJoinSql('owner', 'bc', 'u', true)}
+				INNER JOIN {$this->getJoinSql('owner', 'bc', 'u', true)}
 				INNER JOIN {$this->getJoinSql('blog', 'bc', 'b')}
 			WHERE `bc`.`deleted_at` IS NULL
 				AND `b`.`folder_id` = :folder_id

@@ -111,8 +111,8 @@ class WikiMapper extends Mapper implements FeedableMapperInterface {
 			FROM
 				`{$this->getTable()}` `w`
 				LEFT JOIN {$this->getJoinSql('category', 'w', 'c')}
-				LEFT JOIN {$this->getJoinSql('revision', 'w', 'r')}
-				LEFT JOIN {$this->getJoinMapper('revision')->getJoinSql('user', 'r', 'u')}
+				LEFT JOIN {$this->getJoinSql('revision', 'w', 'r', true)}
+				LEFT JOIN {$this->getJoinMapper('revision')->getJoinSql('user', 'r', 'u', true)}
 			WHERE
 				`c`.`id` = :cat_id
 				AND `w`.`created` < :time

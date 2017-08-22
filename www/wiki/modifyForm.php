@@ -49,7 +49,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
         $url  = new Url($heading);
         $wiki = $wikiMapper->createModel()
             ->setCategory($folderMapper->createModel()->setId($_POST['categoryID']))
-            ->setLatestRevision($revisionMapper->createModel()->setId(0))
+            ->setLatestRevision(null)
             ->setCreated($now)
             // Never set slug from form
             ->setSlug($url->getSlug())
@@ -79,10 +79,11 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
         error(19);
     }
 
-    /* at this juncture, $revision has no ID; $wiki *may* have an ID */
-
-    // if the wiki already existed, no change; if not, it just got assigned its ID
-    $wikiMapper->save($wiki);
+    /* at this juncture, $revision has no ID; */
+    // If new Wiki, save it so we can link the revision back to it
+    if (!$wiki->getId()) {
+        $wikiMapper->save($wiki);
+    }
 
     // assign the wiki to the revision we just created
     $revision->setWiki($wiki);
@@ -91,7 +92,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     $revisionMapper->save($revision);
 
     // is there a previous revision that's snuck in and caused merge conflicts?
-    if ($_POST['revision'] < $wiki->getLatestRevision()->getId()) {
+    if ($wiki->getLatestRevision() && $_POST['revision'] < $wiki->getLatestRevision()->getId()) {
         SitePage::localRedir("/wiki/merge/" . $wiki->getId());
         exit;
     }

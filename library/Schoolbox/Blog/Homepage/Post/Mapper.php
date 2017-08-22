@@ -34,33 +34,13 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $this->hasTable('blog');
         $this->hasModel(BlogModel::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder');
-        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
+        $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
+        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
-
-        /** Joins */
-
-        $this->hasJoin(
-            'folder',
-            array(
-                'mapper' => FolderMapper::class,
-                'this_key' => 'folder_id',
-                'other_key' => 'id'
-            )
-        );
-
-        $this->hasJoin(
-            'owner',
-            array(
-                'mapper' => UserMapper::class,
-                'this_key' => 'owner_id',
-                'other_key' => 'id'
-            )
-        );
 
         $this->hasJoin(
             'perms',
@@ -177,7 +157,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
 				{$this->getJoinColumnString('owner', 'u')},
 				{$this->getJoinColumnString('folder', 'c')}
 			FROM `{$this->getTable()}` AS `b`
-				LEFT JOIN {$this->getJoinSql('owner', 'b', 'u', true)}
+				INNER JOIN {$this->getJoinSql('owner', 'b', 'u', true)}
 				INNER JOIN {$this->getJoinSql('folder', 'b', 'c')}
 			WHERE `b`.`deleted_at` IS NULL
 				AND `b`.`folder_id` = :folder_id

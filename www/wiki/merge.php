@@ -30,7 +30,7 @@ if (is_numeric($this->arg[0])) {
 	if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS)
 		error(19);
 
-    $previousRevision = $wikiHandler->getPreviousRevision($wiki['wikiID'], $wiki['latestRevision']);
+    $previousRevision = $wikiHandler->getLatestRevision($wiki['wikiID']);
 
 	$output = array('ACTION'      => 'Modify',
 					'WIKI_ID'     => $previousRevision['wikiID'],

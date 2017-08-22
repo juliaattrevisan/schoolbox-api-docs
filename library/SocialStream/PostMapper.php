@@ -465,16 +465,20 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
         $limit = (int)$limit;
         $offset = (int)$offset;
 
+        /** @var Schoolbox\UserMapper $ownerMapper */
+        $ownerMapper = $this->getJoinMapper('user');
+
         $stmt = $this->database->prepare("
 			SELECT
-				{$this->getColumnString()}
-			FROM
-				`{$this->getTable()}`
+				{$this->getColumnString('p')},
+ 				{$ownerMapper->getColumnString('u')}
+			FROM `{$this->getTable()}` p
+ 			INNER JOIN {$this->getJoinSql('user', 'p', 'u', true)}
 			WHERE
-				`deleted_at` IS NULL
-				AND `created_at` < :time
-				AND `homepage_id` = :cat_id
-			ORDER BY `created_at` DESC
+				p.deleted_at IS NULL
+ 				AND p.created_at < :time
+ 				AND p.homepage_id = :cat_id
+ 			ORDER BY p.created_at DESC
 			LIMIT $offset, $limit
 		");
 
@@ -487,7 +491,8 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var SocialStream_Post_Abstract $post */
-            $post = $this->hydrate($r);
+            $post = $this->hydrate($r, 'p');
+            $post->setOwner($ownerMapper->hydrate($r, 'u'));
             $c->add($post);
         }
         return $c;

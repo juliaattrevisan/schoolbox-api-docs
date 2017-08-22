@@ -335,12 +335,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $posts = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($posts as $post) {
-            try {
-                $owner = $this->userMapper->findById($post->getOwner()->getId());
-            } catch (Mapper\Exception $e) {
-                $owner = new User();
-                $owner->setFirstname('Unknown')->setLastname('User')->setId(0);
-            }
+            $owner= $post->getOwner();
             $c = $c->merge(new Collection($this->notifyPosted(Role::STUDENT, $post, $owner)->getAll($post->getCreatedAt()->getUnixTimestamp())));
         }
         return $c;

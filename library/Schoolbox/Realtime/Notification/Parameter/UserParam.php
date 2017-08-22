@@ -24,7 +24,8 @@ class UserParam extends Param {
 	 * @param string $format
 	 */
 	public function __construct($user, $stacking = self::STACKING_APPEND, $format = null) {
-		parent::__construct($user->formatName($format), "/search/user/{$user->getId()}", $stacking);
+		$href = $user->isDeleted() ? null : "/search/user/{$user->getId()}";
+		parent::__construct($user->formatName($format), $href, $stacking);
 	}
 
 

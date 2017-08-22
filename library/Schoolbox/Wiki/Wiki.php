@@ -20,7 +20,7 @@ class Wiki {
 	/** @var Folder */
 	protected $category;
 
-	/** @var Revision */
+	/** @var null|Revision */
 	protected $latestRevision;
 
 	/** @var string */
@@ -73,7 +73,7 @@ class Wiki {
 
 
 	/**
-	 * @param Revision $latestRevision
+	 * @param null|Revision $latestRevision
 	 * @return self
 	 */
 	public function setLatestRevision($latestRevision) {
@@ -83,7 +83,7 @@ class Wiki {
 
 
 	/**
-	 * @return Revision
+	 * @return null|Revision
 	 */
 	public function getLatestRevision() {
 		return $this->latestRevision;

@@ -851,7 +851,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			FROM
 				`{$this->getTable()}` `sb`
 				LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-				LEFT JOIN {$this->getJoinSql('owner', 'sb', 'u', true)}
+				INNER JOIN {$this->getJoinSql('owner', 'sb', 'u', true)}
 			WHERE
 				`sb`.`category` = :cat_id
 				AND ( `sb`.`open_date` < :time OR `sb`.`date` < :time )

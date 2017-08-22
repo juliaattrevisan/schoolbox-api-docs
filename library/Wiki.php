@@ -22,7 +22,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 	{
 		$query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '{$this->db->quote($wikiID)}'";
 
-		$latestRevisionID = $this->db->getRow($query);
+		$latestRevisionID = $this->db->getOne($query);
 
 		return $this->getByID($wikiID, $latestRevisionID);
 	}
