@@ -12,6 +12,8 @@ namespace Alaress\Routing\Test;
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
 use InvalidArgumentException;
+use OutOfBoundsException;
+use PHPUnit_Framework_AssertionFailedError;
 use PHPUnit_Framework_Exception;
 use PHPUnit_Framework_TestCase;
 
@@ -20,6 +22,21 @@ class RouterTest extends PHPUnit_Framework_TestCase
     /** @var Router */
     private static $testGet;
 
+    /**
+     * The order of these patterns is important: by inserting the more generic ones before their
+     * specific counterparts it ensures that the sorting works as expected.
+     * @var string[]
+     */
+    private static $patterns = [
+        '*:42:*'             => 'wordFortyTwoWord',
+        '*:42:42:foo:42:bar' => 'wordFortyTwoFortyTwoFooFortyTwoBar',
+        '*:42:baz'           => 'wordFortyTwoBaz',
+        'foo:#'              => 'fooHash',
+        'foo:42:#'           => 'fooFortyTwoHash',
+        'foo:42:bar'         => 'fooFortyTwoBar',
+        '*:foo:42:#'         => 'wordFooFortyTwoHash',
+        '*:foo:42:*:*'       => 'wordFooFortyTwoWordWord'
+    ];
 
     /**
      * @param string $delimiter
@@ -43,20 +60,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         // preload a router for use in pattern match tests
         self::$testGet = $r = self::newRouter(':', false);
 
-        // the order of these patterns is important: by inserting the more generic ones
-        // before their specific counterparts it ensures that the sorting works as expected
-        $patterns = [
-            '*:42:*'             => 'wordFortyTwoWord',
-            '*:42:42:foo:42:bar' => 'wordFortyTwoFortyTwoFooFortyTwoBar',
-            '*:42:baz'           => 'wordFortyTwoBaz',
-            'foo:#'              => 'fooHash',
-            'foo:42:#'           => 'fooFortyTwoHash',
-            'foo:42:bar'         => 'fooFortyTwoBar',
-            '*:foo:42:#'         => 'wordFooFortyTwoHash',
-            '*:foo:42:*:*'       => 'wordFooFortyTwoWordWord'
-        ];
-
-        foreach ($patterns as $ptn => $key) {
+        foreach (self::$patterns as $ptn => $key) {
             $r->add($ptn, $key, true);
         }
     }
@@ -107,4 +111,74 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedKey, $result[0]);
     }
 
+
+    /**
+     * @return array[]
+     */
+    public function dataDropAll()
+    {
+        return [
+            'recursive'     => [ true ],
+            'non-recursive' => [ false ]
+        ];
+    }
+
+
+    /**
+     * @dataProvider dataDropAll
+     * @param bool $recursive
+     * @throws InvalidArgumentException
+     * @throws OutOfBoundsException
+     * @throws PHPUnit_Framework_AssertionFailedError
+     */
+    public function testDropAll($recursive)
+    {
+        // don't use the global router, we need to mutate this one
+        $router = static::newRouter(':', $recursive);
+
+        // load up the router
+        foreach (self::$patterns as $ptn => $key) {
+            $router->add($ptn, $key, true);
+        }
+
+        // aaaaand now dump it all out!
+        $router->dropAll();
+
+        try {
+            $router->get('foo');
+            $this->fail('Did not throw ' . InvalidArgumentException::class);
+
+        } catch (InvalidArgumentException $e) {
+            // good, we got to here
+            $router->add('foo:#', 'fooHash', true);
+
+            // if this throws an IAE, that's our fail-case
+            $this->assertTrue($router->get('foo:something')['fooHash']);
+        }
+    }
+
+
+    /**
+     * @expectedException InvalidArgumentException
+     *
+     * @throws InvalidArgumentException
+     * @throws OutOfBoundsException
+     */
+    public function testLocking()
+    {
+        // don't use the global router, we need to mutate this one
+        $router = static::newRouter(':', true);
+
+        // load up the router
+        foreach (self::$patterns as $ptn => $key) {
+            $router->add($ptn, $key, true);
+        }
+
+        $router->lock();
+
+        $router->add('something:silly', 'oops', true);
+
+        // will throw IAE, because the add operation did not work
+        $router->get('something:silly');
+    }
 }

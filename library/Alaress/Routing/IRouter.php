@@ -41,4 +41,12 @@ interface IRouter
      * @return void
      */
     public function lock();
+
+
+    /**
+     * Removes all routes from this Router
+     *
+     * @return $this
+     */
+    public function dropAll();
 }

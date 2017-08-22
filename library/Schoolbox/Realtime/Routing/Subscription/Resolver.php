@@ -51,7 +51,7 @@ class Resolver
 
 
     /**
-     * Internal resursive function
+     * Internal recursive function
      *
      * @param string $topic
      * @param array  $seenPaths cache of paths seen so far in this traversal in order to protect against recursion

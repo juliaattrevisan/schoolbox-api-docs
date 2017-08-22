@@ -254,4 +254,26 @@ class Trie
     {
         return empty($this->writable);
     }
+
+
+    /**
+     * Remove the contents of this Trie
+     *
+     * @return $this
+     */
+    public function reset()
+    {
+        // unlock
+        $this->writable = true;
+
+        foreach ($this->tries as $trie) {
+            // recursively erase the content from leaf to trunk
+            $trie->reset();
+        }
+
+        // remove stubs
+        $this->tries = [];
+
+        return $this;
+    }
 }

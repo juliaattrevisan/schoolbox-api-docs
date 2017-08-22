@@ -77,6 +77,51 @@ class WriteCache extends ReadCache implements WritableCache
 
     /**
      * @param string $instanceId
+     * @return void
+     */
+    public function cacheRedirects($instanceId)
+    {
+        $this->log->info('Calculating redirect bindings');
+
+        // retrieve all routes from the cache
+        $cachedRoutes = $this->fetchCache($this->getCacheKey($instanceId));
+
+        // remove all redirects from the cache
+        foreach ($cachedRoutes as $path => $pathData) {
+            foreach ($pathData as $key => $value) {
+                if (!is_int($key)) {
+                    // if it's not an integer, remove it
+                    unset ($cachedRoutes[$path][$key]);
+                }
+            }
+        }
+
+        // remove any now-empty keys
+        $cachedRoutes = array_filter($cachedRoutes);
+
+        foreach ($this->loaderFactory->getNoCache()->getRedirects() as $from => $to) {
+            // put these redirects into the cache
+            $cachedRoutes[$from][$to] = true;
+        }
+
+        // load up a router with the new dataset
+        $router = new FlatRouter();
+
+        // reinsert all remaining routes
+        foreach ($cachedRoutes as $path => $pathData) {
+            foreach ($pathData as $key => $value) {
+                $router->add($path, $key, $value);
+            }
+        }
+
+        $this->writeCache($router, $this->getCacheKey($instanceId));
+
+        $this->broadcastReload($instanceId);
+    }
+
+
+    /**
+     * @param string $instanceId
      */
     private function broadcastReload($instanceId)
     {
@@ -114,13 +159,8 @@ class WriteCache extends ReadCache implements WritableCache
     private function bindIndividual($userId, $routeStorageKey)
     {
         $this->log->info("Calculating bindings for user $userId");
-        $router = new FlatRouter();
+        $allRoutes = $this->fetchCache($routeStorageKey);
 
-        // start by loading from cache
-        $this->loaderFactory->get($routeStorageKey)->loadSubscriptions($router);
-
-        // extract the list and reset the router
-        $allRoutes = $router->getAll();
         $router = new FlatRouter();
 
         // compile user routes
@@ -192,4 +232,19 @@ class WriteCache extends ReadCache implements WritableCache
         return $this->loaderFactory->getNoCache()->getUserSubscriptions($userId);
     }
 
+
+    /**
+     * @param string $routeStorageKey
+     * @return string[][]
+     */
+    private function fetchCache($routeStorageKey)
+    {
+        $router = new FlatRouter();
+
+        // start by loading from cache
+        $this->loaderFactory->get($routeStorageKey)->loadSubscriptions($router);
+
+        // extract the list and reset the router
+        return $router->getAll();
+    }
 }

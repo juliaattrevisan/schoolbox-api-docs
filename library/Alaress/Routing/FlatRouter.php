@@ -84,4 +84,17 @@ class FlatRouter implements IRouter
         $this->locked = true;
     }
 
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return $this
+     */
+    public function dropAll()
+    {
+        $this->locked = false;
+        $this->paths = [];
+        return $this;
+    }
+
 }

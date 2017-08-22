@@ -14,6 +14,18 @@
  */
 class Component_ConfigMapper extends \Schoolbox\Mapper
 {
+    /** @var Component_ConfigNotifier */
+    private $moduleNotifierObject;
+
+
+    /**
+     * Default setup for any other objects which compose the mapper.
+     */
+    protected function postSetup()
+    {
+        $this->moduleNotifierObject = new Component_ConfigNotifier($this->getConfigLoader());
+    }
+
 
     protected function mapping()
     {
@@ -23,11 +35,26 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
         $this->uses('component_config_definition_id', self::TYPE_INTEGER, null, 'configDefinitionId');
         $this->uses('component_instance_id', self::TYPE_INTEGER, null, 'instanceId');
         $this->uses('value', self::TYPE_STRING);
+
+        // these callbacks would typically be asynchronous, however due to component
+        // infrastructure limitations, they need to happen synchronously here
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, function (Component_Config $model, Component_Config $previous = null) {
+            if ($previous) {
+                $this->moduleNotifierObject->notifySystemUpdated($model, $this->getSessionUser(), $this->diff($model, $previous));
+            } else {
+                $this->moduleNotifierObject->notifySystemCreated($model, $this->getSessionUser());
+            }
+        });
+
+        $this->registerCallback(self::CALLBACK_POSTDELETE, function (Component_Config $model) {
+            $this->moduleNotifierObject->notifySystemDeleted($model, $this->getSessionUser());
+        });
     }
 
 
     /**
-     * This model does not have any notifications
+     * Due to the synchronous "notification" handling above, there is no need to raise notifications the normal way
      *
      * @param object $object
      * @param string $verb

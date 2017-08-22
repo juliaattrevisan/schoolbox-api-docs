@@ -73,6 +73,8 @@ class ReadCache implements ReadableCache
 
         $this->log->debug('Installing cached routes');
 
+        // drop existing routes from router
+        $router->dropAll();
         $count = 0;
 
         foreach ($routeTree as $path => $pathData) {
