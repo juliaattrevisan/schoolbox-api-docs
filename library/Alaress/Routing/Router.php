@@ -91,7 +91,9 @@ class Router implements IRouter
         }
 
         if (!preg_match("`$fullRegex`", $path, $matches)) {
+            // @codeCoverageIgnoreStart
             throw new OutOfBoundsException("How did this not match?? $fullRegex -> $path");
+            // @codeCoverageIgnoreEnd
         }
 
         array_shift($matches);
