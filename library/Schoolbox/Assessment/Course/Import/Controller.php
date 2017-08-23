@@ -44,6 +44,8 @@ use \Component_ConfigDefinition;
 use \Component_ConfigDefinitionMapper;
 use \Component_ConfigMapper;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 
 class Controller extends Base\Base
 {
@@ -596,6 +598,50 @@ class Controller extends Base\Base
                 $courseImpl->setSpecification($courseSpec);
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
+
+                //Create db entries for criteria attached to course and units
+
+                $criteriaMapper = CriterionMapper::getInstance();
+
+                $courseFolder = $courseSpec->getFolder()->getId();
+                /** @var GenericCollection | Criterion[] $courseCriteria */
+                $courseCriteria = $criteriaMapper->findByColumnList(
+                    array(
+                        'parent_id'   => $courseFolder,
+                        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                    )
+                );
+
+                //Collect unit criteria
+                $unitSpecs = [];
+                foreach($unitImplData as $unitImp) {
+                    $unitSpecs[] = $unitImp['unit_spec_id'];
+                }
+
+                $unitFolders = [];
+                foreach($courseSpec->getUnits() as $unitSpec) {
+                    if(in_array($unitSpec->getId(),$unitSpecs)) {
+                        $unitFolders[] = $unitSpec->getFolder()->getId();
+                    }
+                }
+
+                /** @var Criterion[] $unitCriteria */
+                $unitCriteria = $criteriaMapper->findByColumnList(
+                    array(
+                        'parent_id'   => $unitFolders,
+                        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                    )
+                );
+
+                /** @var GenericCollection $allCriteria */
+                $allCriteria = $courseCriteria->merge($unitCriteria);
+
+                //Save copy of criteria with class page as parent
+                foreach ($allCriteria as  $criteria){
+                    $criteria->setParentId($classFolderId);
+                }
+                CriterionMapper::getInstance()->save($allCriteria);
+
             }
         } // Else we are modifying an existing import
         else {
