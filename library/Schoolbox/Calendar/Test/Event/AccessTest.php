@@ -88,14 +88,15 @@ class AccessTest extends \PHPUnit_Framework_TestCase
                 'parent2'               => $newUser(15)->setRole($this->getRole('parent')),
                 'student2'              => $newUser(16)->setRole($this->getRole('student')),
                 'parentWithStudent'     => $newUser(17)->setRole($this->getRole('parent')),
-                'studentWithParent'     => $newUser(18, ["loadParents", "getParents"])->setRole($this->getRole('student')),
+                'studentWithParent'     => $newUser(18, ['loadParents', 'getParents'])
+                                                ->setRole($this->getRole('student')),
             ];
 
             // Create a mock returns for users
 
-            //Mock returns for studentWithParent, who is a child of $this->users['parentWithStudent']
+            // Mock returns for studentWithParent, who is a child of $this->users['parentWithStudent']
             $this->users['studentWithParent']->method('loadParents')->willReturnCallback(function () {
-                return  $this->users['studentWithParent']; //Makes function do nothing
+                return $this->users['studentWithParent']; //Makes function do nothing
             });
             $this->users['studentWithParent']->method('getParents')->willReturnCallback(function () {
                 $collection = new Collection();
@@ -334,8 +335,20 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             // Staff can create event for any student
             'StaffForStudent' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
+            // Staff can edit own event made by super user
+            'StaffEditSuper' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'super', 'staff'),
+
             // Parent can create event for their child
-            'ParentForChild' => $this->generateTest(true, 'parentWithStudent', Event::ACCESS_PERSONAL, 'parentWithStudent', 'studentWithParent'),
+            'ParentForChild' => $this->generateTest(
+                true,
+                'parentWithStudent',
+                Event::ACCESS_PERSONAL,
+                'parentWithStudent',
+                'studentWithParent'
+            ),
+
+            // Staff cannot edit other staff members event
+            'StaffEditStaff2' => $this->generateTest(false, 'staff', Event::ACCESS_PERSONAL, 'staffAlt', 'staffAlt'),
 
             // Parent cannot create an event for a staff member
             'ParentForStaff' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'staff'),
@@ -344,7 +357,13 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             'ParentForParent' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent2'),
 
             // Parent cannot create an event for a student that isn't theirs
-            'ParentForOtherChild' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'studentWithParent'),
+            'ParentForOtherChild' => $this->generateTest(
+                false,
+                'parent',
+                Event::ACCESS_PERSONAL,
+                'parent',
+                'studentWithParent'
+            ),
 
             // Student cannot create event for a staff member
             'StudentForStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'staff'),
@@ -355,18 +374,12 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             // Student cannot create event for another student
             'StudentForStudent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'student2'),
 
-            // Student can't edit own event made by staff
+            // Student cannot edit own event made by staff
             'StudentEditStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
-            // Student can't edit own event made py parent
+            // Student cannot edit own event made by parent
             'StudentEditParent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'parent', 'student'),
 
-            // Staff can edit own event made by super user
-            'StaffEditSuper' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'super', 'staff'),
-
-            //Staff can't edit other staff members event
-            'StaffEditStaff2' => $this->generateTest(false, 'staff', Event::ACCESS_PERSONAL, 'staffAlt', 'staffAlt'),
-            
             // --------------------------------------------------------------------------
             // Campus level events
             // --------------------------------------------------------------------------
@@ -485,16 +498,30 @@ class AccessTest extends \PHPUnit_Framework_TestCase
 
         return [
 
-            // Personal level event, staff can modify event for themselves
+            // --------------------------------------------------------------------------
+            // Personal level events
+            // --------------------------------------------------------------------------
+
+            // Staff can modify event for themselves
             'ExistingPersonal' => $this->generateTestExisting(true, 'staff', 'personal', 'staff', 'staff'),
 
-            // Personal level event, student cannot modify event for a staff member
-            'ExistingPersonalStudentToStaff' => $this->generateTestExisting(false, 'student', 'personal', 'staff', 'staff'),
+            // Student cannot modify event for a staff member
+            'ExistingPersonalStudentToStaff' => $this->generateTestExisting(
+                false,
+                'student',
+                'personal',
+                'staff',
+                'staff'
+            ),
 
-            // Campus level event, moderators can modify campus level event not authored or owned by themselves
+            // --------------------------------------------------------------------------
+            // Campus level events
+            // --------------------------------------------------------------------------
+
+            // Moderator can modify campus level event not authored or owned by themselves
             'ExistingCampus' => $this->generateTestExisting(true, 'campusModerate', 'campus', 'staff', 'staff'),
 
-            // Campus level event, read access cannot modify campus level event, even if they authored & own
+            // Read access cannot modify campus level event, even if they authored & own
             'ExistingCampusRead' => $this->generateTestExisting(
                 false,
                 'campusRead',
@@ -503,10 +530,14 @@ class AccessTest extends \PHPUnit_Framework_TestCase
                 'campusRead'
             ),
 
-            // Group level event, write access can modify event not authored or owned by themselves
+            // --------------------------------------------------------------------------
+            // Group level events
+            // --------------------------------------------------------------------------
+
+            // Write access can modify event not authored or owned by themselves
             'ExistingGroup' => $this->generateTestExisting(true, 'groupWrite', 'group', 'staff', 'staff'),
 
-            // Group level event, read access cannot modify group level event, even if they authored & own
+            // Read access cannot modify group level event, even if they authored & own
             'ExistingGroupRead' => $this->generateTestExisting(false, 'groupRead', 'group', 'groupRead', 'groupRead'),
 
         ];
