@@ -1,0 +1,51 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+[ student.formatName, "/search/user/" ~ student.id ],
+[ 'Academic Reports' ]
+) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Academic Reports</h1>
+    </div>
+
+    {% if reports|length %}
+        {% for year, semesters in reports %}
+            <div class="small-12 island">
+                <h2 class="subheader">{{ year }}</h2>
+                <section>
+                    <ul class="action-list">
+                        {% for semester, reports in semesters %}
+                            {% for reportId, report in reports %}
+                                <li class="actions-small-1">
+                                    <div class="list-item">
+                                        <div class="compact card small-12">
+                                            <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: reportId}) }}">
+                                                <img src="/images/mime/application-pdf.svg" class="mime">
+                                                <h3>{{ report.description }}</h3>
+                                            </a>
+                                            <p class="meta">
+                                                Created
+                                                <time datetime="{{ report.date.database }}" title="{{ report.date.local }}">
+                                                    {{ report.date.relativeTime }}
+                                                </time>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-document"></i>
+                <p>No academic reports found for this student</p>
+            </div>
+        </div>
+    {% endif %}
+</div>

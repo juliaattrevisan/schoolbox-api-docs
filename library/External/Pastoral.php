@@ -1,7 +1,8 @@
 <?php
 /**
- * @author      Damian Sloane <jdsloane@alaress.com.au>
+ * @author      Damian Sloane <dsloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 
 use \Schoolbox\Pastoral\Model as PastoralModel;
