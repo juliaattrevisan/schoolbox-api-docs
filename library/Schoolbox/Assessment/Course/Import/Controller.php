@@ -589,6 +589,8 @@ class Controller extends Base\Base
         // Therefore store in array and index by ClassFolderId
         /** @var CourseImplementation[] $courseImpls */
         $courseImpls = [];
+        $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
+        $criteriaMapper = CriterionMapper::getInstance();
 
         // Are we creating a new import?
         if ('import' === $action) {
@@ -596,13 +598,11 @@ class Controller extends Base\Base
             foreach ($classOwners as $classFolderId => $user) {
                 $courseImpl = $this->getCourseImplementationMapper()->createModel();
                 $courseImpl->setSpecification($courseSpec);
+                $classFolderId = explode(':', $ownership)[0];
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
 
                 //Create db entries for criteria attached to course and units
-
-                $criteriaMapper = CriterionMapper::getInstance();
-
                 $courseFolder = $courseSpec->getFolder()->getId();
                 /** @var GenericCollection | Criterion[] $courseCriteria */
                 $courseCriteria = $criteriaMapper->findByColumnList(
@@ -640,7 +640,7 @@ class Controller extends Base\Base
                 foreach ($allCriteria as  $criteria){
                     $criteria->setParentId($classFolderId);
                 }
-                CriterionMapper::getInstance()->save($allCriteria);
+                $criteriaMapper->save($allCriteria);
 
             }
         } // Else we are modifying an existing import
@@ -656,6 +656,34 @@ class Controller extends Base\Base
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 $unitImpl->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId()));
             }
+
+            //Collect unit criteria
+            $unitSpecs = [];
+            foreach($unitImplData as $unitImp) {
+                $unitSpecs[] = $unitImp['unit_spec_id'];
+            }
+
+            $unitFolders = [];
+            foreach($courseSpec->getUnits() as $unitSpec) {
+                if(in_array($unitSpec->getId(),$unitSpecs)) {
+                    $unitFolders[] = $unitSpec->getFolder()->getId();
+                }
+            }
+
+            /** @var Criterion[] $unitCriteria */
+            $unitCriteria = $criteriaMapper->findByColumnList(
+                array(
+                    'parent_id'   => $unitFolders,
+                    'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                )
+            );
+
+            //Save copy of criteria with class page as parent
+            $classFolderId = explode(':', $ownerships)[0];
+            foreach ($unitCriteria as  $criteria){
+                $criteria->setParentId($classFolderId);
+            }
+            $criteriaMapper->save($unitCriteria);
         }
 
         // Delete de-selected Units and Assessments
