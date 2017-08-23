@@ -39,6 +39,8 @@ $(function() {
 
                 // Update the new form input - make it no longer new
                 if (addCriterion) {
+                    // This is no longer a new row
+                    newContainer.removeAttr('data-rubric-criterion-new-row');
                     container
                         .attr('data-rubric-criterion-row', criterionId)
                         .data('rubric-criterion-row', criterionId)
@@ -64,6 +66,8 @@ $(function() {
                 }
                 if (addGroup) {
                     container.data('rubric-group-row', groupId);
+                    // Clear all non-empty rows
+                    newContainer.find('[data-rubric-criterion-row]').not('[data-rubric-criterion-new-row]').remove();
                     input
                         .attr('name', 'crits['+groupId+'][name]')
                         .removeAttr('data-rubric-group-new')
