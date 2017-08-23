@@ -173,7 +173,7 @@ class Connector
 
         /* Shank the file into a temp dir; the file extension must be included
          */
-        $destination = $this->getConfigLoader()->get('plagscan_upload_tmp_dir') . '/' . $filename . '_' . $documentName;
+        $destination = sys_get_temp_dir() . '/' . $filename . '_' . $documentName;
 
         // copy the file contents to the temp directory
         if ($submissionFile->getStorage()->exists() && $fp = fopen($destination, 'w')) {
