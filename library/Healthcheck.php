@@ -132,9 +132,10 @@ class Healthcheck
      * Test a query against each database object in the supplied array
      *
      * @param array $objects
-     * @param string $query
+     * @param string $schema If provided, run against this instead of the default schema
+     * @param string $query If provided, run against this instead of default select first query
      */
-    private function selectTest($objects, $query = "SELECT TOP 1 * FROM :object")
+    private function selectTest($objects, $schema = null, $query = "SELECT TOP 1 * FROM :object")
     {
         sort($objects);
 
@@ -143,9 +144,18 @@ class Healthcheck
 
         foreach ($objects as $object) {
 
-            $this->log .= str_pad(str_pad($method, 15) . $object, 50);
+            // Build reporting and escaped object name
+            if (isset($schema)) {
+                $objectName  = "{$schema}.{$object}";
+                $objectParam = "{$this->connector->quoteIdentifier($schema)}.{$this->connector->quoteIdentifier($object)}";
+            } else {
+                $objectName  = $object;
+                $objectParam = $this->connector->quoteIdentifier($object);
+            }
 
-            $sql = str_replace(':object', $object, $query);
+            $this->log .= str_pad(str_pad($method, 15) . $objectName, 50);
+
+            $sql = str_replace(':object', $objectParam, $query);
             $statement = $this->connector->prepareQuery($sql);
 
             try {
@@ -159,109 +169,68 @@ class Healthcheck
     }
 
     /**
-     * Test a list of database functions
+     * Test a list of database functions.
      *
      * @param array $objects
      */
     private function functionTest($objects)
     {
-        foreach ($objects as $name => $parameters) {
-
-            $this->log .= str_pad(str_pad('FUNCTION', 15). $name, 50);
-
-            $statement = $this->connector->prepareFunctionCall($name);
-
-            if (is_array($parameters)) {
-                $statement->bindInputs($parameters);
-            }
-
-            try {
-                $statement->execute();
-                $this->log .= "OK\n";
-            } catch (\Alaress\Database\Exception $e) {
-                $this->log .= "FAILED\n";
-                $this->errors[] = "EXEC {$name}\n{$e->getMessage()}";
-            }
-
-            unset($outputValues);
-        }
+        $this->executeTest($objects, 'FUNCTION');
     }
 
     /**
-     * Test procedure execution against each database object in the supplied array
+     * Test a list of stored procedures.
      *
      * @param array $objects
      */
     private function procedureTest($objects)
     {
+        $this->executeTest($objects, 'EXECUTE');
+    }
+
+    /**
+     * Test object execution against each database object in the supplied array.
+     *
+     * This now uses HAS_PERMS_BY_NAME instead of actually running the proc;
+     * this will be more efficient and less destructive.
+     *
+     * TODO this works only against MSSQL; may need a method for testing other DB procs
+     *
+     * @param array  $objects
+     * @param string $objectType The type of object to test; this only affects logs.
+     */
+    private function executeTest($objects, $objectType)
+    {
         sort($objects);
 
         $outputValues = [];
 
+        $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:proc, 'OBJECT', 'EXECUTE')");
+
         foreach ($objects as $object) {
 
-            $this->log .= str_pad(str_pad('EXECUTE', 15). $object["name"], 50);
-
-            $statement = $this->connector->prepareStoredProcedure($object['name']);
-
-            if (is_array($object['inputParameters'])) {
-                $statement->bindInputs($object['inputParameters']);
-            }
-
-            if (is_array($object['outputParameters'])) {
-                foreach ($object['outputParameters'] as $name => $parameter) {
-                    $this->outputParameters[$name] = null;
-                    $parameter['value'] = &$this->outputParameters[$name];
-                }
-
-                $statement->bindOutputs($object['outputParameters']);
-            }
+            $this->log .= str_pad(str_pad($objectType, 15). $object, 50);
 
             try {
-                $statement->execute();
-                $this->log .= "OK\n";
-            } catch (\Alaress\Database\Exception $e) {
+                $statement->execute(['proc' => $object]);
+                $result = $statement->fetchColumn();
+                $statement->close();
 
-                $error = "EXECUTE {$object['name']}\n{$e->getMessage()}\n";
-
-                $error .= "\n{$statement->getSql()}\n";
-
-                foreach ($object['inputParameters'] as $key => $value) {
-
-                    if ($value == null) {
-                        $result = 'NULL';
-                    } else {
-                        $result = "'{$value}'";
-                    }
-
-                    $error .= "\n" . str_pad(str_pad("INPUT", 15) . "" . $key, 50) . str_pad(BaseStatement::getDataTypeName($value), 15) . $result;
-                }
-
-                if (is_array($object['outputParameters'])) {
-                    foreach ($object['outputParameters'] as $parameterName => $optionArray) {
-                        $error .= "\n" . str_pad(str_pad("OUTPUT", 15) . $parameterName, 50);
-
-                        if ($outputValues[$object['name']][$parameterName] == null) {
-                            $result = 'NULL';
-                        } else {
-                            $result = "'{$outputValues[$object['name']][$parameterName]}'";
-                        }
-
-                        $error .= str_pad(BaseStatement::getDataTypeName($optionArray['type']) . "(" . $optionArray['length'] . ")", 15) . $result;
-
-                    }
-                }
-
-                // Unfortunately we can't test some procedures without generating an error (because we don't
-                // have the correct data to pass it)- so if 'ignoreError' is set, and the error message
-                // contains this text we will let it slide...
-
-                if (!isset($object['ignoreError']) || stripos($error, $object['ignoreError']) === false) {
-                    $this->errors[] = $error;
-                    $this->log .= "FAILED\n";
+                // I want to be able to query if the object exists or not;
+                // however, all attempts at doing so have failed.
+                if (empty($result)) {
+                    $this->log .= "FAILED - object does not exist, or user does not have EXECUTE permission on it\n";
                 } else {
                     $this->log .= "OK\n";
                 }
+            } catch (\Alaress\Database\Exception $e) {
+
+                $error = "EXECUTE {$object}\n{$e->getMessage()}\n";
+
+                $error .= "\n{$statement->getSql()}\n";
+
+                $this->errors[] = $error;
+                $this->log .= "FAILED\n";
             }
         }
 
@@ -295,19 +264,24 @@ class Healthcheck
             'family',
             'persondefs',
             'studcommrules',
-            'db2inst1.schoolbox_classes',
-            'db2inst1.schoolbox_parents',
-            'db2inst1.schoolbox_report_periods',
-            'db2inst1.schoolbox_studentclass',
-            'db2inst1.schoolbox_students',
-            'db2inst1.schoolbox_teacherclass',
-            'db2inst1.schoolbox_parent_student',
-            'db2inst1.schoolbox_staff',
-            'db2inst1.schoolbox_timetable',
-            'db2inst1.schoolbox_timetable_definition'
         ];
 
-        $this->selectTest($tables, "SELECT * FROM :TABLE FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($tables, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+
+        $db2inst1Tables = [
+            'schoolbox_classes',
+            'schoolbox_parents',
+            'schoolbox_report_periods',
+            'schoolbox_studentclass',
+            'schoolbox_students',
+            'schoolbox_teacherclass',
+            'schoolbox_parent_student',
+            'schoolbox_staff',
+            'schoolbox_timetable',
+            'schoolbox_timetable_definition'
+        ];
+
+        $this->selectTest($db2inst1Tables, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -385,15 +359,7 @@ class Healthcheck
         $this->selectTest($tables);
 
         $procedures = [
-            [
-                'name' => 'spSelTimetable',
-                'inputParameters' => [
-                    'DATE' => date('Ymd'),
-                    'TIMEPERIOD' => '',
-                    'STUDKEY' => '',
-                    'TEACHERCODE' => ''
-                ]
-            ]
+             'spSelTimetable',
         ];
 
         $this->procedureTest($procedures);
@@ -481,146 +447,24 @@ class Healthcheck
 
         // Community Portal Password Update
 
-        $this->selectTest(['CommunityLogins'], "UPDATE :object SET Password = '' WHERE 1 = 0");
+        $this->selectTest(['CommunityLogins'], null, "UPDATE :object SET Password = '' WHERE 1 = 0");
 
         // Stored Procedures
 
-        $procedures = [
-            [
-                'name' => 'spgTimetableDay',
-                'inputParameters' => [
-                    'TimetableGroup' => 'SEN',
-                    'Date' => Alaress_Date_Format::now()->getDatabase()
-                ],
-                'outputParameters' => [
-                    'CurrentDay' => [
-                        'type' => PDO::PARAM_INT,
-                        'length' => 11
-                    ]
-                ]
-            ],
-            [
-                'name' => 'spsConfigUserDefaultYearSemester',
-                'inputParameters' => [
-                    'ID' => 1
-                ]
-            ],
-            [
-                'name' => 'spsTimetable',
-                'inputParameters' => [
-                    'FileYear' => Alaress_Date_Format::now()->getYear(),
-                    'FileSemester' => Alaress_Date_Format::now()->getYearHalf(),
-                    'ID' => 1,
-                    'Date' => Alaress_Date_Format::now()->getDatabase(),
-                    'IncludeStaffScheduleFlag' => 1,
-                    'CheckAttendancesExistFlag' => 1,
-                    'IncludeSparesFlag' => 0,
-                    'IncludeRecessFlag' => 0
-                ]
-            ],
-            [
-                'name' => 'spiwkAttendances',
-                'inputParameters' => [
-                    'FileType' => 'A',
-                    'FileYear' => 2010,
-                    'FileSemester' => 1,
-                    'ClassCampus' => 'S',
-                    'ClassCode' => 'FREA1',
-                    'AttendanceDate' => '2010-04-07',
-                    'AttendancePeriod' => 1,
-                    'AttendanceDayNumber' => 1,
-                    'StaffID' => 1,
-                    'AttendedFlag' => 1,
-                    'TimeTableGroup' => 'SEN',
-                    'SynWebFlag' => 1
-                ],
-                'outputParameters' => [
-                    'wkAttendanceMasterSeq' => [
-                        'type' => PDO::PARAM_INT,
-                        'length' => 11
-                    ]
-                ]
-            ],
-            [
-                'name' => 'spswkAttendances',
-                'inputParameters' => [
-                    'wkAttendanceMasterSeq' => 1,
-                    'FillActualAbsenceColumnsFlag' => 1,
-                    'CheckPossibleNonAttendFlag' => 1,
-                    'CalculateTodaysAttendanceStringFlag' => 1
-                ]
-            ],
-            [
-                'name' => 'sptwkAttendances',
-                'ignoreError' => 'No matching class found',
-                'inputParameters' => [
-                    'wkAttendanceMasterSeq' => null,
-                    'AttendanceSeq' => null,
-                    'HoldFlag' => null,
-                    'ClassCancelledFlag' => null,
-                    'SystemProcessNumber' => null,
-                    'AllowMultiPeriodFlag' => null,
-                    'DebugPrintFlag' => 0,
-                ],
-                'outputParameters' => [
-                    'AttendanceMasterSeq' => [
-                        'type' => PDO::PARAM_INT,
-                        'length' => 11
-                    ],
-                    'GroupCount' => [
-                        'type' => PDO::PARAM_INT,
-                        'length' => 11
-                    ]
-                ]
-            ],
-
-            // The procedures below actually mutate data in the DB- so it is imperative
-            // that they get rolled back after excution
-
-            [
-                'name' => 'spiExcursions',
-                'inputParameters' => [
-                    'EventCode' => 0,
-                    'Description' => null
-                ]
-            ],
-            [
-                'name' => 'spuExcursionDetails',
-                'inputParameters' => [
-                    'EventSeq' => 0,
-                    'Description' => null,
-                    'Objective' => null,
-                    'Attire' => null,
-                    'Type' => null,
-                    'Status' => null,
-                    'MaxAttendance' => null,
-                    'MaxTickets' => null,
-                    'EventFrom' => null,
-                    'EventTo' => null,
-                    'InviteDate' => null,
-                    'RSVPDueBy' => null,
-                    'Comments' => null
-                ]
-            ],
-            [
-                'name' => 'spiCommunityEventsCurrent',
-                'inputParameters' => [
-                    'ID' => 0,
-                    'EventCode' => null,
-                    'VerifyOnlyFlag' => 1,
-                    'NewEventCurrentSeq' => null,
-                    'Message' => null
-                ]
-            ]
+        $procedures = ['spgTimetableDay',
+                       'spsConfigUserDefaultYearSemester',
+                       'spsTimetable',
+                       'spiwkAttendances',
+                       'spswkAttendances',
+                       'sptwkAttendances',
+                       'spiExcursions',
+                       'spuExcursionDetails',
+                        'spiCommunityEventsCurrent',
         ];
 
         $this->procedureTest($procedures);
 
-        $functions = [
-            'dbo.fnTimeStr' => [
-                'ADateTime' => date('Y-m-d')
-            ]
-        ];
+        $functions = [ 'dbo.fnTimeStr' ];
 
         $this->functionTest($functions);
     }
@@ -825,26 +669,37 @@ class Healthcheck
             'Student',
             'StudentContact',
             'vw_Contact_Addresses',
-            "fc.TimetableSubject",
-            "fc.TimetableSubjectChoice",
-            "fc.Timetable",
-            "fc.TimetableClass",
-            "fc.YearLevelSub",
-            "fc.YearLevelSubStudent",
-            "fc.TimetableClassInstance",
-            "fc.TimetableClassStaff",
-            "fc.TimetableClassInstanceStaff",
-            "fc.TimetableClassRoom",
-            "fc.Room",
-            "fc.TimetableClassInstanceRoom",
-            "fc.TimetableDay",
-            "fc.TimetablePeriod",
-            "fc.TimetableDate",
-            "fc.TimetableBlockInstance",
-            "fc.TimetableBlockInstance tbi CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe"
         ];
 
         $this->selectTest($tables);
+
+
+        $fcTables = [
+            "TimetableSubject",
+            "TimetableSubjectChoice",
+            "Timetable",
+            "TimetableClass",
+            "YearLevelSub",
+            "YearLevelSubStudent",
+            "TimetableClassInstance",
+            "TimetableClassStaff",
+            "TimetableClassInstanceStaff",
+            "TimetableClassRoom",
+            "Room",
+            "TimetableClassInstanceRoom",
+            "TimetableDay",
+            "TimetablePeriod",
+            "TimetableDate",
+            "TimetableBlockInstance",
+        ];
+
+        $this->selectTest($fcTables, 'fc');
+
+        $this->selectTest(
+            ['periodExpand'],
+            'fc',
+            'SELECT TOP 1 * FROM fc.TimetableBlockInstance tbi CROSS APPLY :object(tbi.TimetablePeriodID, tbi.Consecutive) tpe'
+        );
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
