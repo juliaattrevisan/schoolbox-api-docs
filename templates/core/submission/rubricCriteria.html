@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
 $(function() {
+
     var form           = $('form[data-role="rubric-criteria-form"]');
     var groupMaxId     = Number('{MAX_CRITGROUP_ID}');
     var criterionMaxId = Number('{MAX_CRIT_ID}');
@@ -38,15 +39,25 @@ $(function() {
 
                 // Update the new form input - make it no longer new
                 if (addCriterion) {
+                    // This is no longer a new row
+                    newContainer.removeAttr('data-rubric-criterion-new-row');
                     container
                         .attr('data-rubric-criterion-row', criterionId)
                         .data('rubric-criterion-row', criterionId)
                     ;
-                    // Restore remove button
-                    container.find('[data-role="remove-criterion"]')
+
+                    // Show and setup dropdown
+                    var newDropdownId = 'dropdown-i' + String(criterionId);
+                    container.find('[data-dropdown-dormant]')
+                        .removeAttr('data-dropdown-dormant')
                         .removeClass('hide disabled')
                         .removeAttr('aria-disabled')
-                    ;
+                        .attr('data-dropdown', newDropdownId);
+                    container.find('[data-dropdown-content-dormant]')
+                        .removeAttr('data-dropdown-content-dormant')
+                        .attr('data-dropdown-content', '')
+                        .attr('id', newDropdownId);
+
                     input
                         .attr('name', 'crits['+groupId+'][items][i'+criterionId+']')
                         .removeAttr('data-rubric-criterion-new')
@@ -55,6 +66,8 @@ $(function() {
                 }
                 if (addGroup) {
                     container.data('rubric-group-row', groupId);
+                    // Clear all non-empty rows
+                    newContainer.find('[data-rubric-criterion-row]').not('[data-rubric-criterion-new-row]').remove();
                     input
                         .attr('name', 'crits['+groupId+'][name]')
                         .removeAttr('data-rubric-group-new')
@@ -74,37 +87,17 @@ $(function() {
         var self      = $(this);
         var container = self.closest('[data-rubric-criterion-row]');
 
-        if (self.is('[aria-disabled="true"]')) {
+        // Is this new? if so no dialog
+        if (container.is('[data-rubric-criterion-new-row]')) {
+            container.remove();
+        } else {
             self.confirmDialog({
-                text: 'You are about to remove a criterion that is currently in use. Removing this criterion will make it unavailable for future assessments. It will remain visible on the existing assessments.',
+                text: $('#criterion-remove-text').text(),
                 confirmEvent: function() {
                     container.remove();
                 }
             });
-        } else {
-            // Is this a new criterion?
-            container.remove();
         }
-    });
-
-    // logic for handling the form submit
-    // Currently, just goes back in history - this is so whatever you entered
-    // in the submission you just created gets restored
-    form.submit(function(e) {
-        e.preventDefault();
-        var submit = form.find(':submit');
-        var value  = submit.val();
-        submit.prop('disabled', true).val('Saving Changes...');
-        $.post(form.attr('action'), form.serializeArray())
-            .done(function() {
-                history.back();
-            })
-            .fail(function() {
-                // Something went wrong.
-                // We have no global fail handler, so I'll add something here.
-                submit.prop('disabled', false).val(value);
-                $('[data-role="ajax-error"]').foundation('reveal', 'open');
-            });
     });
 
     $('[data-interaction="show-example-criteria"]').click(function(e) {
@@ -127,8 +120,8 @@ $(function() {
         <div class="alert-box">
             <p>
                 {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC} are used as rows in a rubric.  These may be added while creating your rubric or initially setup via this screen.
-                If you want to delete any {TPL_LOCAL_RUBRICCRITERION} that has already been used on an assessment, you need to first
-                remove it from the assessment, then you can delete it.
+                If you want to delete any {TPL_LOCAL_RUBRICCRITERION} that has already been used on an {TPL_LOCAL_ASSESSMENT},
+                you need to first remove it from the {TPL_LOCAL_ASSESSMENT}, then you can delete it.
                 If you remove all the {TPL_LOCAL_RUBRICCRITERION_PLURAL} from any {TPL_LOCAL_RUBRICGROUP}, the {TPL_LOCAL_RUBRICGROUP} will automatically be deleted.
                 <a href="#" data-interaction="show-example-criteria">See example {TPL_LOCAL_RUBRICCRITERION_PLURAL}</a>
             </p>
@@ -162,70 +155,106 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICGROUP_PC}
-                            <input type="text"
-                                   name="crits[{CRITGROUP_COUNT}][name]"
-                                   value="{CRITGROUP_NAME}"
-                                   {CRITGROUP_DISABLED}
-                                   readonly='readonly'
-                                   data-rubric-group />
                         </label>
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input type="text"
+                                           name="crits[{CRITGROUP_COUNT}][name]"
+                                           value="{CRITGROUP_NAME}"
+                                           {CRITGROUP_DISABLED}
+                                           data-rubric-group />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
-                        <!-- BEGIN criterion -->
-                        <!-- BEGIN criterion_enabled -->
-                        <div class="row" data-rubric-criterion-row="{CRITGROUP_COUNT}">
-                            <div class="small-9 columns">
-                                <input type="text"
-                                       name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
-                                       value="{CRITERION_NAME}"
-                                       id="i{CRITERION_ID}"
-                                       data-rubric-criterion />
+                        <ul class="information-list">
+                            <!-- BEGIN criterion -->
+                            <!-- BEGIN criterion_enabled -->
+                            <li class="actions-small-2" data-rubric-criterion-row="{CRITGROUP_COUNT}">
+                                <div class="list-item">
+                                    <input type="text"
+                                           name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
+                                           value="{CRITERION_NAME}"
+                                           id="i{CRITERION_ID}"
+                                           data-rubric-criterion />
+                                </div>
+                                <nav>
+                                    <!-- BEGIN criterion_in_use -->
+                                    <a class="icon-info"
+                                       data-reveal-id="criterion-{CRITERION_ID}"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                    <!-- END criterion_in_use -->
+                                    <a href="#" class="icon-more" data-dropdown="dropdown-i{CRITERION_ID}" title="Actions"></a>
+                                </nav>
+                                <ul id="dropdown-i{CRITERION_ID}" class="f-dropdown" data-dropdown-content="">
+                                    <li>
+                                        <a class="icon-delete"
+                                           data-role="remove-criterion"
+                                           href="#">Delete {TPL_LOCAL_RUBRICCRITERION_PC}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <!-- END criterion_enabled -->
+                            <!-- BEGIN criterion_disabled -->
+                            <li class="actions-small-2" data-rubric-criterion-row="{CRITGROUP_COUNT}">
+                                <div class="list-item">
+                                    <input type="text"
+                                           name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
+                                           value="{CRITERION_NAME}"
+                                           id="i{CRITERION_ID}"
+                                           readonly
+                                           data-rubric-criterion />
+                                </div>
+                                <nav>
+                                    <a class="icon-info"
+                                       data-reveal-id="criterion-{CRITERION_ID}"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                </nav>
+                            </li>
+                            <!-- END criterion_disabled -->
+                            <div data-reveal id="criterion-{CRITERION_ID}" class="reveal-modal">
+                                <article>
+                                    <h2>{CRITERION_NAME}</h2>
+                                    <p>{TPL_LOCAL_RUBRICCRITERION_PC} is in use on {CRITERION_USAGE} {CRITERION_ASSESSMENT_COUNT_LABEL};</p>
+                                    <ul>
+                                        <!-- BEGIN criterion_assessment -->
+                                        <li><a href="{CRITERION_ASSESSMENT_HREF}">{CRITERION_ASSESSMENT_TITLE}</a></li>
+                                        <!-- END criterion_assessment -->
+                                    </ul>
+
+                                </article>
+                                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                             </div>
-                            <div class="small-3 columns no-pad">
-                                <a title="Delete criterion"
-                                   class="button icon-delete"
-                                   data-role="remove-criterion"
-                                   href="#"></a>
-                            </div>
-                        </div>
-                        <!-- END criterion_enabled -->
-                        <!-- BEGIN criterion_disabled -->
-                        <div class="row" data-rubric-criterion-row="{CRITGROUP_COUNT}">
-                            <div class="small-9 columns">
-                                <input type="text"
-                                       name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
-                                       value="{CRITERION_NAME}"
-                                       id="i{CRITERION_ID}"
-                                       data-rubric-criterion
-                                       readonly />
-                            </div>
-                            <div class="small-3 columns no-pad">
-                                <div title="This criterion is in use on {CRITERION_USAGE} assessments. It can be deleted from future use but may not be modified"
-                                   class="button icon-delete disabled"
-                                   aria-disabled="true"></div>
-                            </div>
-                        </div>
-                        <!-- END criterion_disabled -->
-                        <!-- END criterion -->
-                        <!-- New criterion within group -->
-                        <div class="row" data-rubric-criterion-row="{MAX_CRIT_ID}">
-                            <div class="small-9 columns">
-                                <input type="text"
-                                       value=""
-                                       data-rubric-criterion
-                                       data-rubric-criterion-new="1"
-                                       placeholder="Add {TPL_LOCAL_RUBRICCRITERION_PC} to {CRITGROUP_NAME}..." />
-                            </div>
-                            <div class="small-3 columns no-pad">
-                                <a title="Delete criterion"
-                                   class="button icon-delete hide"
-                                   data-role="remove-criterion"
-                                   href="#"></a>
-                            </div>
-                        </div>
+                            <!-- END criterion -->
+                            <!-- New criterion within group -->
+                            <li class="actions-small-2" data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
+                                <div class="list-item">
+                                    <input type="text"
+                                           value=""
+                                           data-rubric-criterion
+                                           data-rubric-criterion-new="1"
+                                           placeholder="Add {TPL_LOCAL_RUBRICCRITERION_PC} to {CRITGROUP_NAME}..." />
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-more hide" data-dropdown-dormant title="Actions"></a>
+                                </nav>
+                                <ul class="f-dropdown" data-dropdown-content-dormant>
+                                    <li>
+                                        <a class="icon-delete"
+                                           data-role="remove-criterion"
+                                           href="#">Delete {TPL_LOCAL_RUBRICCRITERION_PC}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
                     </div>
                 </fieldset>
                 <!-- END criterion_group -->
@@ -234,32 +263,45 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICGROUP_PC}
-                            <input type="text"
-                                   value=""
-                                   data-rubric-group
-                                   data-rubric-group-new="1"
-                                   placeholder="Add Group..." />
                         </label>
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input type="text"
+                                           value=""
+                                           data-rubric-group
+                                           data-rubric-group-new="1"
+                                           placeholder="Add {TPL_LOCAL_RUBRICGROUP_PC}..." />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
-                        <div class="row" data-rubric-criterion-row="{MAX_CRIT_ID}">
-                            <div class="small-9 columns">
-                                <input type="text"
-                                       value=""
-                                       data-rubric-criterion
-                                       data-rubric-criterion-new="1"
-                                       placeholder="Add Criterion..." />
-                            </div>
-                            <div class="small-3 columns no-pad">
-                                <a title="Delete criterion"
-                                   class="button icon-delete hide"
-                                   data-role="remove-criterion"
-                                   href="#"></a>
-                            </div>
-                        </div>
+                        <ul class="information-list">
+                            <li class="actions-small-2" data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
+                                <div class="list-item">
+                                    <input type="text"
+                                           value=""
+                                           data-rubric-criterion
+                                           data-rubric-criterion-new="1"
+                                           placeholder="Add {TPL_LOCAL_RUBRICCRITERION_PC}..." />
+                                </div>
+                                <nav>
+                                    <a href="#" class="icon-more hide" data-dropdown-dormant title="Actions"></a>
+                                </nav>
+                                <ul class="f-dropdown" data-dropdown-content-dormant>
+                                    <li>
+                                        <a class="icon-delete"
+                                           data-role="remove-criterion"
+                                           href="#">Delete {TPL_LOCAL_RUBRICCRITERION_PC}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
                     </div>
                 </fieldset>
             </section>
@@ -286,33 +328,46 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICGROUP_PC}
-                            <input readonly type="text" value="Algebra" />
                         </label>
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Algebra" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Factorisation" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Algebraic simplification using index laws" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Fraction operations" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Determining an unknown by substitution" />
-                            </div>
-                        </div>
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Factorisation" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Algebraic simplification using index laws" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Fraction operations" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Determining an unknown by substitution" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                 </fieldset>
 
@@ -320,28 +375,41 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICGROUP_PC}
-                            <input readonly type="text" value="Linear and non-linear relations" />
                         </label>
+                        <ul class="information-list">
+                            <li class="action-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Linear and non-linear relations" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
                         </label>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Solving linear equations" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Solving simultaneous equations" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <input readonly type="text" value="Solving simple quadratic equations" />
-                            </div>
-                        </div>
+
+                        <ul class="information-list">
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving linear equations" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving simultaneous equations" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                            <li class="actions-small-0">
+                                <div class="list-item">
+                                    <input readonly type="text" value="Solving simple quadratic equations" />
+                                </div>
+                                <nav></nav>
+                            </li>
+                        </ul>
                     </div>
                 </fieldset>
             </section>
@@ -356,4 +424,11 @@ $(function() {
         <h5>Something went wrong while saving</h5>
         <p>You may try pressing the "Save Changes" button. If this persists, please contact your IT support.</p>
     </div>
+</div>
+
+<!-- Hidden text for remove criterion -->
+<div class="hide" id="criterion-remove-text">
+    If you remove this {TPL_LOCAL_RUBRICCRITERION}, it will not be available to add to future {TPL_LOCAL_ASSESSMENT_PLURAL}.
+    Are you sure you want to do this?
+    (Make sure you click save at the end of this form to save all changes you have made.)
 </div>

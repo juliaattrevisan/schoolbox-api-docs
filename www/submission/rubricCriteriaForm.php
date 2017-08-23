@@ -8,63 +8,68 @@
  */
 
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
-require_once('../../library/Bootstrap.php');
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 // this is a script and not to be SitePage'd
-if(isset($this)) {
+if (isset($this)) {
     error(4);
 }
 
-if(!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
+if (!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
     error(4);
 }
 
 $criteria = $_POST['crits'];
-$catID = $_POST['categoryID'];
+$folderId = $_POST['categoryID'];
 
 // this merely re-establishes the session
 $page = new SitePage();
 
-// "security to the foyer!"
-$groupHandler = new Group();
-if(!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
-    die('You to not have write permission to this category.');
+$userAccess = new Access();
+if (!($_SESSION['user']->isSuperuser() || $userAccess->getFolderAccess($_SESSION['user'], $folderId) >= UserAccess::ACCESS_WRITE)) {
+    error(6);
 }
 
-$data = array();
+// get category details
+$folder = FolderMapper::getInstance()->findById($folderId);
 
-foreach($criteria as $group) {
-    if(count($group['items'])) {
-        foreach($group['items'] as $critID => $crit) {
+$data = [];
+
+foreach ($criteria as $group) {
+    if (count($group['items'])) {
+        foreach ($group['items'] as $critID => $crit) {
             $critID = substr($critID, 1);
-            $data[$critID] = array(
+            $data[$critID] = [
                 'group' => $group['name'],
                 'name'  => $crit,
-            );
+            ];
         }
     }
 }
 
+/* @var $criterionMapper CriterionMapper */
 $criterionMapper = CriterionMapper::getInstance();
-
 
 
 //work out the diff and delete unnecessary criteria
 $found = array_keys($data);
 
 $criterionCollection = $criterionMapper->findByColumnList(
-                                       array(
-                                           'parent_id'   => $catID,
-                                           'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                                       )
+    [
+        'parent_id'   => $folderId,
+        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+    ]
 );
 
-foreach($criterionCollection as $crit) {
-    if(!in_array($crit->getID(), $found)) {
+foreach ($criterionCollection as $crit) {
+    if (!in_array($crit->getID(), $found)) {
         try {
             $criterionMapper->delete($crit);
         } catch (Exception $e) {
@@ -74,29 +79,26 @@ foreach($criterionCollection as $crit) {
 }
 
 
-/* @var $criterionMapper CriteriaMapper */
-
 // iterate through list of provided criteria changes
-foreach($data as $critID => $critData) {
+foreach ($data as $critID => $critData) {
     try {
         $criteria = $criterionMapper->findOneByColumnList(
-            array(
+            [
                 'id'        => $critID,
-                'parent_id' => $catID,
-            )
+                'parent_id' => $folderId,
+            ]
         );
         $criteria->setGrouping($critData['group']);
         $criteria->setName($critData['name']);
 
-        //Do not edit criteria that are in use
-        $usage = UsageMapper::getInstance()->findByColumnList(array('criterion_id' => $critID));
-        if(count($usage)) {
+        //Do not edit criteria that are in use on a class page, can edit in course though
+        $usage = UsageMapper::getInstance()->findByColumnList(['criterion_id' => $critID]);
+        if (count($usage) && !($folder->hasCourseSpecification() || $folder->hasUnitSpecification())) {
             continue; // possibly throw an error of some kind
         }
-    }
-    catch(Exception $e) {
+    } catch (Exception $e) {
         $criteria = new Criterion();
-        $criteria->setParentId($catID);
+        $criteria->setParentId($folderId);
         $criteria->setGrouping($critData['group']);
         $criteria->setName($critData['name']);
     }
@@ -105,8 +107,7 @@ foreach($data as $critID => $critData) {
 }
 
 
-if ($page->detectAjax()) {
+if ($page::detectAjax()) {
     die('Criteria updated.');
-} else {
-    $page->backToTheFuture(2);
 }
+$page::localRedir('/homepage/' . $folderId);
