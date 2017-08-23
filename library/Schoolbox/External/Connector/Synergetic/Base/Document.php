@@ -77,7 +77,7 @@ class Document extends Base implements IDocument
                         sral.FileYear,
                         sral.FileSemester,
                         sral.Description,
-                        sra.CreatedDate
+                        CONVERT(VARCHAR(20), sra.CreatedDate, 20) AS CreatedDate
             FROM        {$this->schema}.StudentReportsArchiveLink sral
             JOIN        {$this->schema}.StudentReportsArchive sra ON 
                         sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
