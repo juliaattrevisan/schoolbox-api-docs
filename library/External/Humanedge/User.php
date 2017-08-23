@@ -342,6 +342,7 @@ class External_Humanedge_User implements External_UserInterface
             LEFT JOIN Campus c ON t.CampusID = c.ID
             WHERE t.Deceased = 'N' 
             AND t.Active = 'Y'
+            AND t.Archived = 0
         ";
 
         /* Get everyone
