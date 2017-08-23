@@ -14,23 +14,37 @@ use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @requires extension ibm_db2
+ */
 class TestStatement extends PHPUnit_Framework_TestCase
 {
     use TestConnectorTrait;
 
     /**
-     * Test plain old boring statements
+     * Connect to database, begin transaction
+     */
+    public function setUp()
+    {
+        $this->connectDb2Test();
+        $this->db2Test->beginTransaction();
+    }
+
+    /**
+     * Roll back when done
+     */
+    public function tearDown()
+    {
+        $this->db2Test->rollBack();
+    }
+
+    /**
+     * Test with long-winded preparation and binding
      *
      * @requires extension ibm_db2
      */
-    public function testStatement()
+    public function testStatementWithPreparationAndBinding()
     {
-        $this->connectDb2Test();
-
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch with long-winded preparation and binding
-        // ----------------------------------------------------------------------------------------------------------------
-
         $statement = $this->db2Test->prepareQuery('SELECT * FROM USERS WHERE NAME_LAST = :nameLast OR NAME_LAST = :nameLast2 ORDER BY NAME_LAST');
         $statement->bindInputs([
             'nameLast' => 'Bailey',
@@ -49,11 +63,15 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch with long-winded preparation and binding (with type and length specified, should get ignored currently)
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetch() method
+     *
+     * @requires extension ibm_db2
+     */
+    public function testFetch()
+    {
         $statement = $this->db2Test->prepareQuery('SELECT * FROM USERS WHERE NAME_LAST = :nameLast OR NAME_LAST = :nameLast2 ORDER BY NAME_LAST');
         $statement->bindInputs([
             'nameLast' => [
@@ -80,11 +98,15 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // executeIterator
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test executeIterator() method
+     *
+     * @requires extension ibm_db2
+     */
+    public function testExecuteIterator()
+    {
         $iterator = $this->db2Test->executeQueryIterator(
             'SELECT * FROM USERS WHERE NAME_LAST LIKE :nameLast',
             ['nameLast' => '%a%']
@@ -116,11 +138,15 @@ class TestStatement extends PHPUnit_Framework_TestCase
         // Test both iterations returned same number of results
 
         $this->assertSame($count1, $count2);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchColumn
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test fetchColumn() method
+     *
+     * @requires extension ibm_db2
+     */
+    public function testFetchColumn()
+    {
         $statement = $this->db2Test->executeQuery(
             'SELECT NAME_LAST FROM USERS WHERE NAME_LAST = :nameLast',
             ['nameLast' => 'Bailey']
@@ -129,11 +155,15 @@ class TestStatement extends PHPUnit_Framework_TestCase
         while ($nameLast = $statement->fetchColumn()) {
             $this->assertSame(strtolower($nameLast), 'bailey');
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchColumnArray
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test columnArray() method
+     *
+     * @requires extension ibm_db2
+     */
+    public function testColumnArray()
+    {
         $statement = $this->db2Test->executeQuery(
             'SELECT * FROM USERS WHERE NAME_LAST = :nameLast',
             ['nameLast' => 'Bailey']
@@ -146,11 +176,15 @@ class TestStatement extends PHPUnit_Framework_TestCase
         foreach ($arrayNameLast as $nameLast) {
             $this->assertSame(strtolower($nameLast), 'bailey');
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchRowArray
-        // ----------------------------------------------------------------------------------------------------------------
-
+    /**
+     * Test rowArray() method
+     *
+     * @requires extension ibm_db2
+     */
+    public function testRowArray()
+    {
         $statement = $this->db2Test->executeQuery(
             'SELECT "ID", "NAME_FIRST", "NAME_LAST" FROM "USERS" ORDER BY "NAME_LAST"',
             ['nameLast' => 'Bailey']

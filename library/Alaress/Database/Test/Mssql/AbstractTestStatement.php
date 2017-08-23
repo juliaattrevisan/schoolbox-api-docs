@@ -8,29 +8,61 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\Test\Sqlsrv;
+namespace Alaress\Database\Test\Mssql;
 
-use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
 use PHPUnit_Framework_TestCase;
 
-class TestStatement extends PHPUnit_Framework_TestCase
+abstract class AbstractTestStatement extends PHPUnit_Framework_TestCase
 {
     use TestConnectorTrait;
 
     /**
-     * Test plain old boring statements
+     * This method should call `$this->markTestSkipped` if the database
+     * connector is unavailable.
      */
-    public function testStatement()
+    abstract public function skipIfDriverNotAvailable();
+
+    /**
+     * Connects to MSSQL database given the correct connector.
+     *
+     * @return bool
+     */
+    abstract public function connect();
+
+    /**
+     * * Skip if SQLSrv driver is not available
+     * * Connect to database, begin transaction
+     */
+    public function setUp()
     {
-        $this->connectSynergetic68();
+        $this->skipIfDriverNotAvailable();
+        $this->connect();
+        if ($this->mssqlTest instanceof IConnector) {
+            $this->mssqlTest->beginTransaction();
+        }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch with long-winded preparation and binding
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Roll back when done
+     */
+    public function tearDown()
+    {
+        if ($this->mssqlTest instanceof IConnector) {
+            $this->mssqlTest->rollBack();
+        }
+    }
 
-        $statement = $this->synergetic68->prepareQuery('SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname');
+    /**
+     * Test with long-winded preparation and binding
+     */
+    public function testStatementWithPreparationAndBinding()
+    {
+        $statement = $this->mssqlTest->prepareQuery(
+            'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname'
+        );
         $statement->bindInputs(['Surname' => 'rhodes']);
         $statement->execute();
 
@@ -42,12 +74,17 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch with long-winded preparation and binding (with type and length specified)
-        // ----------------------------------------------------------------------------------------------------------------
-
-        $statement = $this->synergetic68->prepareQuery('SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname');
+    /**
+     * Test running the same statement as a prepare, then as an execute.
+     */
+    public function testPrepareThenExecuteStatement()
+    {
+        // prepare once
+        $statement = $this->mssqlTest->prepareQuery(
+            'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname'
+        );
         $statement->bindInputs([
             'Surname' => [
                 'value' => 'rhodes',
@@ -66,11 +103,16 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $this->assertGreaterThan(1, $count);
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetch
-        // ----------------------------------------------------------------------------------------------------------------
 
-        $statement = $this->synergetic68->executeQuery(
+        // Because of some object reference voodoo which I can't figure out;
+        // running the statement again fails under DBLib
+        // (presumably because the object reference isn't cleaned up)
+        // All I can do for now is to unset the statement object.
+        unset($statement);
+
+
+        // and now fetch
+        $statement = $this->mssqlTest->executeQuery(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
         );
@@ -82,12 +124,60 @@ class TestStatement extends PHPUnit_Framework_TestCase
         }
 
         $this->assertGreaterThan(1, $count);
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // executeIterator
-        // ----------------------------------------------------------------------------------------------------------------
+    /**
+     * Test with long-winded preparation and binding (with type and length specified)
+     */
+    public function testStatementWithPreparationAndFullBinding()
+    {
+        $statement = $this->mssqlTest->prepareQuery(
+            'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname'
+        );
+        $statement->bindInputs([
+            'Surname' => [
+                'value' => 'rhodes',
+                'type' => PDO::PARAM_STR,
+                'length' => 50
+            ]
+        ]);
+        $statement->execute();
 
-        $iterator = $this->synergetic68->executeQueryIterator(
+        $count = 0;
+
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame(strtolower($row['Surname']), 'rhodes');
+        }
+
+        $this->assertGreaterThan(1, $count);
+    }
+
+    /**
+     * Test fetch() method
+     */
+    public function testFetch()
+    {
+        $statement = $this->mssqlTest->executeQuery(
+            'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
+            ['Surname' => 'rhodes']
+        );
+        $count = 0;
+
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame(strtolower($row['Surname']), 'rhodes');
+        }
+
+        $this->assertGreaterThan(1, $count);
+    }
+
+    /**
+     * Test executeIterator() method
+     */
+    public function testExecuteIterator()
+    {
+        $iterator = $this->mssqlTest->executeQueryIterator(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
         );
@@ -111,12 +201,14 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
         $this->assertSame($count1, $count2);
         */
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchColumn
-        // ----------------------------------------------------------------------------------------------------------------
-
-        $statement = $this->synergetic68->executeQuery(
+    /**
+     * Test fetchColumn() method
+     */
+    public function testFetchColumn()
+    {
+        $statement = $this->mssqlTest->executeQuery(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
         );
@@ -126,12 +218,14 @@ class TestStatement extends PHPUnit_Framework_TestCase
         while ($lastName = $statement->fetchColumn()) {
             $this->assertSame(strtolower($lastName), 'rhodes');
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchColumnArray
-        // ----------------------------------------------------------------------------------------------------------------
-
-        $statement = $this->synergetic68->executeQuery(
+    /**
+     * Test columnArray() method
+     */
+    public function testColumnArray()
+    {
+        $statement = $this->mssqlTest->executeQuery(
             'SELECT [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
         );
@@ -143,12 +237,14 @@ class TestStatement extends PHPUnit_Framework_TestCase
         foreach ($arrayLastName as $lastName) {
             $this->assertSame(strtolower($lastName), 'rhodes');
         }
+    }
 
-        // ----------------------------------------------------------------------------------------------------------------
-        // fetchRowArray
-        // ----------------------------------------------------------------------------------------------------------------
-
-        $statement = $this->synergetic68->executeQuery(
+    /**
+     * Test rowArray() method
+     */
+    public function testRowArray()
+    {
+        $statement = $this->mssqlTest->executeQuery(
             'SELECT [ID], [Given1], [Surname] FROM [dbo].[Community] WHERE [Surname] = :Surname',
             ['Surname' => 'rhodes']
         );
@@ -184,9 +280,7 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedure()
     {
-        $this->connectSynergetic68();
-
-        $statement = $this->synergetic68->executeStoredProcedure('spsStudentPersonal', [
+        $statement = $this->mssqlTest->executeStoredProcedure('spsStudentPersonal', [
             'ID' => ['value' => 133, 'type' => PDO::PARAM_INT],
             'FileYear' => ['value' => 2010, 'type' => PDO::PARAM_INT]
         ]);
@@ -202,8 +296,6 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedureWithOutputParameters()
     {
-        $this->connectSynergetic68();
-
         $currentDay = null;
         $calendarDate = null;
         $calendarDay = null;
@@ -221,7 +313,8 @@ class TestStatement extends PHPUnit_Framework_TestCase
             'DefinitionDay' => ['value' => &$definitionDay, 'type' => PDO::PARAM_INT, 'length' => 4]
         ];
 
-        $statement = $this->synergetic68->executeStoredProcedure('spgTimetableDay',
+        $statement = $this->mssqlTest->executeStoredProcedure(
+            'spgTimetableDay',
             [
                 'TimetableGroup' => 'SEN',
                 'Date' => '2010-10-03'
@@ -242,22 +335,13 @@ class TestStatement extends PHPUnit_Framework_TestCase
 
     /**
      * Test iteration of a stored procedure with output parameters and a return value.
-     *
-     * This doesn't work under the DBLib driver, but does under the SqlSrv driver.
      */
     public function testStoredProcedureIteratorWithOutputParameters()
     {
-        $this->connectSynergetic68();
-
-        // This fails under DBLib
-        if (!SqlsrvBroker::isAvailable()) {
-            $this->setExpectedException(\DomainException::class);
-        }
-
         $result   = null;
         $returns  = ['value' => &$result, 'type' => PDO::PARAM_INT, 'length' => 4];
         $outputs  = [];
-        $iterator = $this->synergetic68->executeStoredProcedureIterator(
+        $iterator = $this->mssqlTest->executeStoredProcedureIterator(
             'uReturnValueTest',
             [],
             $outputs,
@@ -283,9 +367,7 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedureWithMultipleRecordSets()
     {
-        $this->connectSynergetic68();
-
-        $iterator = $this->synergetic68->executeStoredProcedureIterator('uTestMultipleRecordsets');
+        $iterator = $this->mssqlTest->executeStoredProcedureIterator('uTestMultipleRecordsets');
 
         $count = 0;
         $expectedResults = ['1', '2', '3', '4'];
@@ -309,9 +391,7 @@ class TestStatement extends PHPUnit_Framework_TestCase
      */
     public function testStoredProcedureFunctionCall()
     {
-        $this->connectSynergetic68();
-
-        $function = $this->synergetic68->executeFunctionCall('dbo.fnTimeStr', [
+        $function = $this->mssqlTest->executeFunctionCall('dbo.fnTimeStr', [
             'ADateTime' => '2016-01-05 13:47:27'
         ]);
 

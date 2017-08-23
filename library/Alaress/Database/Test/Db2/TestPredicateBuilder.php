@@ -14,6 +14,9 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Database\Test\TestConnectorTrait;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @requires extension ibm_db2
+ */
 class TestPredicateBuilder extends PHPUnit_Framework_TestCase
 {
     use TestConnectorTrait;

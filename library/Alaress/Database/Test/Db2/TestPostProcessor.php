@@ -15,6 +15,9 @@ use Alaress\Database\Test\TestConnectorTrait;
 use Database;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * @requires extension ibm_db2
+ */
 class TestPostProcessor extends PHPUnit_Framework_TestCase
 {
     use TestConnectorTrait;

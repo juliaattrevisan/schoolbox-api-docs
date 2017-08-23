@@ -28,8 +28,13 @@ trait TestConnectorTrait
     /** @var IConnector $db2Test */
     private $db2Test;
 
+    /** @var IConnector $db2Test */
+    protected $mssqlTest;
+
     /**
      * Connect to DB2 test database
+     *
+     * @return bool Was connection successful?
      */
     private function connectDb2Test()
     {
@@ -44,7 +49,7 @@ trait TestConnectorTrait
         $factory = new Factory();
 
         $this->db2Test = $factory->createDb2();
-        $this->db2Test->connect(
+        return $this->db2Test->connect(
             'ec2-54-153-145-255.ap-southeast-2.compute.amazonaws.com:50000',
             'SBOXTEST',
             'sbox',
@@ -54,6 +59,8 @@ trait TestConnectorTrait
 
     /**
      * Connect to schoolbox database
+     *
+     * @return bool Was connection successful?
      */
     private function connectSchoolbox()
     {
@@ -68,7 +75,7 @@ trait TestConnectorTrait
         $factory = new Factory();
 
         $this->schoolbox = $factory->createMysql();
-        $this->schoolbox->connect(
+        return $this->schoolbox->connect(
             '192.168.36.10',
             'schoolbox',
             'root',
@@ -101,6 +108,8 @@ trait TestConnectorTrait
 
     /**
      * Connect to Synergetic V68 database
+     *
+     * @return bool Was connection successful?
      */
     private function connectSynergetic68()
     {
@@ -115,7 +124,59 @@ trait TestConnectorTrait
         $factory = new Factory();
 
         $this->synergetic68 = $factory->createMssql();
-        $this->synergetic68->connect(
+        return $this->synergetic68->connect(
+            '172.31.15.10',
+            'Synergetic_AUVIC_ALARESS_PRD',
+            'sa',
+            'Synergetic#1'
+        );
+    }
+
+    /**
+     * Connect to MSSQL test database using Sqlsrv
+     *
+     * @return bool Was connection successful?
+     */
+    private function connectSqlsrvTest()
+    {
+        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
+        // it tries to work out if we need to be in debug mode.
+        //
+        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
+
+        $database = Database::getInstance();
+        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
+
+        $factory = new Factory();
+
+        $this->mssqlTest = $factory->createSqlsrv();
+        return $this->mssqlTest->connect(
+            '172.31.15.10',
+            'Synergetic_AUVIC_ALARESS_PRD',
+            'sa',
+            'Synergetic#1'
+        );
+    }
+
+    /**
+     * Connect to MSSQL test database using DbLib
+     *
+     * @return bool Was connection successful?
+     */
+    private function connectDblibTest()
+    {
+        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
+        // it tries to work out if we need to be in debug mode.
+        //
+        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
+
+        $database = Database::getInstance();
+        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
+
+        $factory = new Factory();
+
+        $this->mssqlTest = $factory->createDblib();
+        return $this->mssqlTest->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',
             'sa',

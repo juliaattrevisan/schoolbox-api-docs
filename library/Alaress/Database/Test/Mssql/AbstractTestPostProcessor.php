@@ -1,23 +1,43 @@
 <?php
 
 /**
- * Mysql driver statement tests
+ * Sqlsrv driver statement tests
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Alaress\Database\Test\Sqlsrv;
+namespace Alaress\Database\Test\Mssql;
 
-use Alaress\Database\Factory;
 use Alaress\Database\Test\TestConnectorTrait;
-use Database;
 use PHPUnit_Framework_TestCase;
 
-class TestPostProcessor extends PHPUnit_Framework_TestCase
+abstract class AbstractTestPostProcessor extends PHPUnit_Framework_TestCase
 {
     use TestConnectorTrait;
+
+    /**
+     * This method should call `$this->markTestSkipped` if the database
+     * connector is unavailable.
+     */
+    abstract public function skipIfDriverNotAvailable();
+
+    /**
+     * Connects to MSSQL database given the correct connector.
+     *
+     * @return bool
+     */
+    abstract public function connect();
+
+    /**
+     * Skip if SQLSrv driver is not available
+     */
+    public function setUp()
+    {
+        $this->skipIfDriverNotAvailable();
+        $this->connect();
+    }
 
     /**
      * Test function to trim whitespace from array/value
@@ -43,26 +63,13 @@ class TestPostProcessor extends PHPUnit_Framework_TestCase
      */
     public function testPostProcessor()
     {
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
-        $factory = new Factory();
-
-        $synergetic68 = $factory->createMssql();
-        $synergetic68->connect(
-            '172.31.15.10',
-            'Synergetic_AUVIC_ALARESS_PRD',
-            'sa',
-            'Synergetic#1'
-        );
-
-        $synergetic68->addPostProcessor([$this, 'trimWhitespace']);
+        $this->mssqlTest->addPostProcessor([$this, 'trimWhitespace']);
 
         // ----------------------------------------------------------------------------------------------------------------
         // Add post-processor to trim whitespace from results
         // ----------------------------------------------------------------------------------------------------------------
 
-        $statement = $synergetic68->executeQuery("
+        $statement = $this->mssqlTest->executeQuery("
             SELECT '     douglas' AS name UNION 
             SELECT '  damian' AS name UNION 
             SELECT '  doctor    ' AS name UNION 

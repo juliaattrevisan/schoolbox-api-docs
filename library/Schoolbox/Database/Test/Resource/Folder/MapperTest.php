@@ -23,6 +23,8 @@ use PHPUnit_Framework_TestCase as TestCase;
  */
 class MapperTest extends TestCase
 {
+    use Alaress\Database\Test\TestConnectorTrait;
+
     /** @var array */
     private static $tree = [
         1 => [
@@ -86,16 +88,23 @@ class MapperTest extends TestCase
     /**
      * Load a known dataset into the DB
      */
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        $db = (new Schoolbox\Database\Factory(new Alaress\Database\Factory()))->getInternalDatabase();
+        $this->connectSchoolbox();
+        $this->schoolbox->beginTransaction();
+        $this->schoolbox->executeQuery("UPDATE `folder` SET deleted_at = '1970-01-01 00:00:00'");
+        $this->schoolbox->executeQuery('TRUNCATE `folder_code`');
 
-        $db->executeQuery("UPDATE `folder` SET deleted_at = '1970-01-01 00:00:00'");
-        $db->executeQuery('TRUNCATE `folder_code`');
-
-        self::iterate($db, 0, self::$tree);
+        self::iterate($this->schoolbox, 0, self::$tree);
     }
 
+    /**
+     * Roll back any changes we made
+     */
+    public function tearDown()
+    {
+        $this->schoolbox->rollBack();
+    }
 
     /**
      * @param IConnector $db

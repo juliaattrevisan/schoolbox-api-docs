@@ -19,11 +19,20 @@ class TestStatement extends PHPUnit_Framework_TestCase
     use TestConnectorTrait;
 
     /**
-     * Set up Schoolbox DB
+     * Connect to database, begin transaction
      */
     public function setUp()
     {
         $this->connectSchoolbox();
+        $this->schoolbox->beginTransaction();
+    }
+
+    /**
+     * Roll back when done
+     */
+    public function tearDown()
+    {
+        $this->schoolbox->rollBack();
     }
 
     /**
