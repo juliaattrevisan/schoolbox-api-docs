@@ -340,7 +340,8 @@ class External_Humanedge_User implements External_UserInterface
             FROM Staff t
             LEFT JOIN Person.PersonPhone ON Person.PersonPhone.PersonID = t.PersonID
             LEFT JOIN Campus c ON t.CampusID = c.ID
-            WHERE t.Deceased = 'N'
+            WHERE t.Deceased = 'N' 
+            AND t.Active = 'Y'
         ";
 
         /* Get everyone
