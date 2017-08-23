@@ -13,7 +13,9 @@ use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
-use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbackFileModule;
+use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
@@ -36,9 +38,9 @@ class Learning extends ModuleLoader
 
         $this->loadModule($kernel, Grades\Module::class,                "/{$namespace}/grades");
         $this->loadModule($kernel, AssessmentModule::class,             "/{$namespace}");
-        $this->loadModule($kernel, DueWork\Feedback\Module::class,      "/{$namespace}");
-        $this->loadModule($kernel, DueWork\Feedback\File\Module::class, "/{$namespace}/feedback");
-        $this->loadModule($kernel, DueWork\Response\Module::class,      "/{$namespace}");
+        $this->loadModule($kernel, DueworkFeedbackModule::class,        "/{$namespace}");
+        $this->loadModule($kernel, DueworkFeedbackFileModule::class,    "/{$namespace}/feedback");
+        $this->loadModule($kernel, DueworkResponseModule::class,        "/{$namespace}");
         $this->loadModule($kernel, QuizModule::class,                   "/{$namespace}");
         $this->loadModule($kernel, MarkbookModule::class,               "/{$namespace}/markbook");
         $this->loadModule($kernel, UpcomingModule::class,               "/{$namespace}/due");
