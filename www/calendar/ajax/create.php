@@ -25,7 +25,7 @@ $groupHandler = new Group();
 
 $user = $_SESSION['user'];
 $ownerId = $_POST['userId'];
-$owner   = UserMapper::getInstance()->createModel()->setId($ownerId);
+$owner = UserMapper::getInstance()->findById($ownerId);
 
 $event = new Event();
 

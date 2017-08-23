@@ -87,9 +87,22 @@ class Access
             return true;
         }
 
-        // If event is on a personal level, check effector is the owner or the author
+        // If event is on a personal level:
+        // Users may edit events of which they are the owner *and* author
+        // Staff may edit events of which they they are the owner *or* author
+        // Parents may edit events of their child, of which they are the author
         if ($accessLevel == Event::ACCESS_PERSONAL) {
-            if ($effector->getId() == $owner->getId() || $effector->getId() == $author->getId()) {
+            if ($owner->getRole()->isStudent() && $effector->getRole()->isParent()) {
+                $isParentOfOwner = $owner->loadParents()->isChildOf($effector);
+            } else {
+                $isParentOfOwner = false;
+            }
+
+            $isStaff = $effector->getRole()->isStaff();
+            $isOwner = $effector->getId() == $owner->getId();
+            $isAuthor = $effector->getId() == $author->getId();
+
+            if (($isOwner && $isAuthor) || ($isAuthor && $isParentOfOwner) || ($isStaff && ($isOwner || $isAuthor))) {
                 return true;
             }
         }

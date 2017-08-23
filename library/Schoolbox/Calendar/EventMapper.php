@@ -134,12 +134,15 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $categoryMapper = $this->getJoinMapper('category');
         $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
+        $userRoleMapper = $this->getJoinMapper('owner.role');
 
         return "
 			SELECT
 				{$this->getColumnString()},
 				{$ownerMapper->getColumnString('o')},
+				{$userRoleMapper->getColumnString('ro')},
 				{$authorMapper->getColumnString('a')},
+				{$userRoleMapper->getColumnString('ra')},
 				{$eventTypeMapper->getColumnString('t')},
 				{$personalMapper->getColumnString('p')},
 				{$categoryMapper->getColumnString('c')},
@@ -153,7 +156,9 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         return "
             FROM `{$this->table}` 
 			LEFT JOIN {$this->getJoinSql('owner', '', 'o', true)}
+			LEFT JOIN {$this->getJoinSql('owner.role','o', 'ro')}
 			LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
+			LEFT JOIN {$this->getJoinSql('author.role', 'a', 'ra')}
 			LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
 			LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
 			LEFT JOIN {$this->getJoinSql('category', '', 'c')}
@@ -171,6 +176,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $categoryMapper = $this->getJoinMapper('category');
         $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
+        $userRoleMapper = $this->getJoinMapper('owner.role');
 
         /* Hydrate or die
 		 */
@@ -195,12 +201,14 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
              */
             /** @var User $ownerItem */
             $ownerItem = $ownerMapper->hydrate($row, 'o');
+            $ownerItem->setRole($userRoleMapper->hydrate($row, 'ro'));
             $eventItem->setOwner($ownerItem);
 
             /* Author
              */
             /** @var User $authorItem */
             $authorItem = $authorMapper->hydrate($row, 'a');
+            $authorItem->setRole($userRoleMapper->hydrate($row, 'ra'));
             $eventItem->setAuthor($authorItem);
 
             /* Event Type

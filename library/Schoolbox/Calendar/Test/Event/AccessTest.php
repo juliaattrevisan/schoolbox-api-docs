@@ -56,36 +56,51 @@ class AccessTest extends \PHPUnit_Framework_TestCase
     private function getUser($key)
     {
         if (empty($this->users)) {
-            $newUser = function ($id) {
+            $newUser = function ($id, array $overload = null) {
                 // Set an empty access list by default on every user, this is to avoid hitting the database on
                 // User::getAccessList() when access list is not set
-                return (new User)->setId($id)->setAccessList(new Collection());
+
+                $mockUser = $this->getMockBuilder(User::class)->setMethods($overload)->getMock();
+                $mockUser->setId($id);
+                $mockUser->setAccessList(new Collection());
+
+                return $mockUser;
             };
 
             $this->users = [
-                'super' => $newUser(1)->setSuperuser(true),
-                'staff' => $newUser(2)->setRole($this->getRole('staff')),
-                'staffAlt' => $newUser(3)->setRole($this->getRole('staff')),
-                'parent' => $newUser(4)->setRole($this->getRole('parent')),
-                'student' => $newUser(5)->setRole($this->getRole('student')),
+                'super'                 => $newUser(1)->setSuperuser(true),
+                'staff'                 => $newUser(2)->setRole($this->getRole('staff')),
+                'staffAlt'              => $newUser(3)->setRole($this->getRole('staff')),
+                'parent'                => $newUser(4)->setRole($this->getRole('parent')),
+                'student'               => $newUser(5)->setRole($this->getRole('student')),
 
-                'campusModerate' => $newUser(6),
-                'campusWrite' => $newUser(7),
-                'campusRead' => $newUser(8),
-                'campusNone' => $newUser(9),
+                'campusModerate'        => $newUser(6),
+                'campusWrite'           => $newUser(7),
+                'campusRead'            => $newUser(8),
+                'campusNone'            => $newUser(9),
 
-                'groupReadSuper' => $newUser(10)->setSuperuser(true),
-                'groupAdmin' => $newUser(11),
-                'groupWrite' => $newUser(12),
-                'groupRead' => $newUser(13),
-                'groupNone' => $newUser(14),
+                'groupReadSuper'        => $newUser(10)->setSuperuser(true),
+                'groupAdmin'            => $newUser(11),
+                'groupWrite'            => $newUser(12),
+                'groupRead'             => $newUser(13),
+                'groupNone'             => $newUser(14),
+
+                'parent2'               => $newUser(15)->setRole($this->getRole('parent')),
+                'student2'              => $newUser(16)->setRole($this->getRole('student')),
+                'parentWithStudent'     => $newUser(17)->setRole($this->getRole('parent')),
+                'studentWithParent'     => $newUser(18, ['loadParents', 'getParents'])
+                                                ->setRole($this->getRole('student')),
             ];
 
-            // Create a mock user object, who is a child of $this->users['parent']
-            /** @var User|\PHPUnit_Framework_MockObject_MockObject $parentChild */
-            $this->users['parentChild'] = $this->getMockBuilder(User::class)->getMock();
-            $this->users['parentChild']->method('getParents')->willReturnCallback(function () {
-                return new Collection([$this->users['parent']]);
+            // Create a mock returns for users
+
+            // Mock returns for studentWithParent, who is a child of $this->users['parentWithStudent']
+            $this->users['studentWithParent']->method('loadParents')->willReturnCallback(function () {
+                return $this->users['studentWithParent']; //Makes function do nothing
+            });
+            $this->users['studentWithParent']->method('getParents')->willReturnCallback(function () {
+                $collection = new Collection();
+                return $collection->add($this->users['parentWithStudent']);
             });
         }
 
@@ -320,27 +335,50 @@ class AccessTest extends \PHPUnit_Framework_TestCase
             // Staff can create event for any student
             'StaffForStudent' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'staff', 'student'),
 
+            // Staff can edit own event made by super user
+            'StaffEditSuper' => $this->generateTest(true, 'staff', Event::ACCESS_PERSONAL, 'super', 'staff'),
+
             // Parent can create event for their child
-            'ParentForChild' => $this->generateTest(true, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parentChild'),
+            'ParentForChild' => $this->generateTest(
+                true,
+                'parentWithStudent',
+                Event::ACCESS_PERSONAL,
+                'parentWithStudent',
+                'studentWithParent'
+            ),
+
+            // Staff cannot edit other staff members event
+            'StaffEditStaff2' => $this->generateTest(false, 'staff', Event::ACCESS_PERSONAL, 'staffAlt', 'staffAlt'),
 
             // Parent cannot create an event for a staff member
-            // TODO: currently possible, add test with SA-4032 fix
+            'ParentForStaff' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'staff'),
 
             // Parent cannot create an event for another parent
-            // TODO: currently possible, add test with SA-4032 fix
+            'ParentForParent' => $this->generateTest(false, 'parent', Event::ACCESS_PERSONAL, 'parent', 'parent2'),
 
             // Parent cannot create an event for a student that isn't theirs
-            // TODO: currently possible, add test with SA-4032 fix
+            'ParentForOtherChild' => $this->generateTest(
+                false,
+                'parent',
+                Event::ACCESS_PERSONAL,
+                'parent',
+                'studentWithParent'
+            ),
 
             // Student cannot create event for a staff member
-            // TODO: currently possible, add test with SA-4032 fix
+            'StudentForStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'staff'),
 
             // Student cannot create event for a parent
-            // TODO: currently possible, add test with SA-4032 fix
+            'StudentForParent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'parent'),
 
             // Student cannot create event for another student
-            // TODO: currently possible, add test with SA-4032 fix
+            'StudentForStudent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'student', 'student2'),
 
+            // Student cannot edit own event made by staff
+            'StudentEditStaff' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'staff', 'student'),
+
+            // Student cannot edit own event made by parent
+            'StudentEditParent' => $this->generateTest(false, 'student', Event::ACCESS_PERSONAL, 'parent', 'student'),
 
             // --------------------------------------------------------------------------
             // Campus level events
@@ -460,16 +498,30 @@ class AccessTest extends \PHPUnit_Framework_TestCase
 
         return [
 
-            // Personal level event, staff can modify event for themselves
+            // --------------------------------------------------------------------------
+            // Personal level events
+            // --------------------------------------------------------------------------
+
+            // Staff can modify event for themselves
             'ExistingPersonal' => $this->generateTestExisting(true, 'staff', 'personal', 'staff', 'staff'),
 
-            // Personal level event, student cannot modify event for a staff member
-            // TODO: currently possible, add test with SA-4032 fix
+            // Student cannot modify event for a staff member
+            'ExistingPersonalStudentToStaff' => $this->generateTestExisting(
+                false,
+                'student',
+                'personal',
+                'staff',
+                'staff'
+            ),
 
-            // Campus level event, moderators can modify campus level event not authored or owned by themselves
+            // --------------------------------------------------------------------------
+            // Campus level events
+            // --------------------------------------------------------------------------
+
+            // Moderator can modify campus level event not authored or owned by themselves
             'ExistingCampus' => $this->generateTestExisting(true, 'campusModerate', 'campus', 'staff', 'staff'),
 
-            // Campus level event, read access cannot modify campus level event, even if they authored & own
+            // Read access cannot modify campus level event, even if they authored & own
             'ExistingCampusRead' => $this->generateTestExisting(
                 false,
                 'campusRead',
@@ -478,10 +530,14 @@ class AccessTest extends \PHPUnit_Framework_TestCase
                 'campusRead'
             ),
 
-            // Group level event, write access can modify event not authored or owned by themselves
+            // --------------------------------------------------------------------------
+            // Group level events
+            // --------------------------------------------------------------------------
+
+            // Write access can modify event not authored or owned by themselves
             'ExistingGroup' => $this->generateTestExisting(true, 'groupWrite', 'group', 'staff', 'staff'),
 
-            // Group level event, read access cannot modify group level event, even if they authored & own
+            // Read access cannot modify group level event, even if they authored & own
             'ExistingGroupRead' => $this->generateTestExisting(false, 'groupRead', 'group', 'groupRead', 'groupRead'),
 
         ];
