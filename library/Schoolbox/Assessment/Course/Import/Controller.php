@@ -635,12 +635,13 @@ class Controller extends Base\Base
 
                 /** @var GenericCollection $allCriteria */
                 $allCriteria = $courseCriteria->merge($unitCriteria);
+                $allCriteria = $allCriteria->deepClone();
 
                 //Save copy of criteria with class page as parent
                 foreach ($allCriteria as  $criteria){
                     $criteria->setParentId($classFolderId);
                 }
-                $criteriaMapper->save($allCriteria);
+                $criteriaMapper->create($allCriteria);
 
             }
         } // Else we are modifying an existing import
@@ -670,7 +671,7 @@ class Controller extends Base\Base
                 }
             }
 
-            /** @var Criterion[] $unitCriteria */
+            /** @var GenericCollection | Criterion[] $unitCriteria */
             $unitCriteria = $criteriaMapper->findByColumnList(
                 array(
                     'parent_id'   => $unitFolders,
@@ -678,12 +679,14 @@ class Controller extends Base\Base
                 )
             );
 
+            $unitCriteria = $unitCriteria->deepClone();
+
             //Save copy of criteria with class page as parent
             $classFolderId = explode(':', $ownerships)[0];
             foreach ($unitCriteria as  $criteria){
                 $criteria->setParentId($classFolderId);
             }
-            $criteriaMapper->save($unitCriteria);
+            $criteriaMapper->create($unitCriteria);
         }
 
         // Delete de-selected Units and Assessments
