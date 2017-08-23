@@ -91,7 +91,7 @@ class AccessTokenGenerator
         /* If you ended up here, the document can't be transmitted for various reasons
          * so just shove them out for logging purposes
          */
-        throw new \DomainException("Error: {$content->error} - {$content->error_description}");
+        throw new \DomainException("Error: {$content->error->code} - {$content->error->message}");
     }
 
     /* Getters/Setters

@@ -7,7 +7,7 @@ UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='2296' WHE
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='9513' WHERE c.name='plagscan_client_id' AND c2.value='secl';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='55186' WHERE c.name='plagscan_client_id' AND c2.value='sacc';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='9516' WHERE c.name='plagscan_client_id' AND c2.value='sohcs';
-UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='9506' WHERE c.name='plagscan_client_id' AND c2.value='imm';
+UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='9507' WHERE c.name='plagscan_client_id' AND c2.value='imm';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='7615' WHERE c.name='plagscan_client_id' AND c2.value='smcs';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='3507' WHERE c.name='plagscan_client_id' AND c2.value='bialik';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='43563' WHERE c.name='plagscan_client_id' AND c2.value='lml';
@@ -108,6 +108,6 @@ UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='3443' WHE
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='2313' WHERE c.name='plagscan_client_id' AND c2.value='cathedral';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='7611' WHERE c.name='plagscan_client_id' AND c2.value='scc';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='6663' WHERE c.name='plagscan_client_id' AND c2.value='kc';
-UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='9507' WHERE c.name='plagscan_client_id' AND c2.value='sim';
+UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='9506' WHERE c.name='plagscan_client_id' AND c2.value='sim';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='4562' WHERE c.name='plagscan_client_id' AND c2.value='trinity';
 UPDATE config c JOIN config c2 ON c2.name='site_location' SET c.value='97274' WHERE c.name='plagscan_client_id' AND c2.value='ecc';
