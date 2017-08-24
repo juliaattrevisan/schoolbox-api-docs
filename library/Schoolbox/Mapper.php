@@ -2599,9 +2599,9 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @brief calls save(), but forces create by nulling the identifier field.
      *
-     * @param $object
+     * @param object $object
      *
-     * @return int[]
+     * @return int[] IDs of newly-created models
      */
     public function create($object)
     {
@@ -2609,6 +2609,12 @@ abstract class Mapper implements IMapper, Serializable
         if ($this->hasIdentifier()) {
             foreach ($collection as $model) {
                 $this->setModelProperty($model, $this->getIdentifierProperty(), null);
+            }
+        }
+        if($this->createdMap){
+            $setMethod = $this->getSetMethodName($this->createdMap['property']);
+            foreach ($collection as $model) {
+                $model->{$setMethod}(null);
             }
         }
         return $this->save($collection);
