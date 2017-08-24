@@ -261,9 +261,9 @@ class AccessTest extends \PHPUnit_Framework_TestCase
      */
     private function generateTestExisting($result, $effectorKey, $eventKey, $authorKey, $ownerKey)
     {
-        $event = (clone $this->getEvent($eventKey))
-            ->setOwner($this->getUser($ownerKey))
-            ->setAuthor($this->getUser($authorKey));
+        $event = clone $this->getEvent($eventKey);
+        $event->setOwner($this->getUser($ownerKey))
+                ->setAuthor($this->getUser($authorKey));
 
         return [$result, $this->getUser($effectorKey), $event];
     }
