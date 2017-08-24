@@ -3780,6 +3780,9 @@ abstract class Mapper implements IMapper, Serializable
     private function populateSaveTimestamps(Collection $collection)
     {
         // Does the mapper have 'created_at' or 'updated_at' timestamps?
+        if (!$this->createdMap && !$this->updatedMap) {
+            return $collection;
+        }
         $now = \Alaress_Date_Format::now();
 
         if ($this->createdMap) {
