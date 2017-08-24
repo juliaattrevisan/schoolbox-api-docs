@@ -361,12 +361,11 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      */
     public function isExpired($assess_id)
     {
-        $query =    "SELECT COUNT(assess_id)
-                    FROM assess ass
-                    JOIN assessment assm on assm.id = ass.assessment_id
-                    WHERE ass.assess_id = " . $this->db->smartQuote($assess_id) . "
-                    AND assm.close_date > NOW()";
-                    
+        $query = "SELECT COUNT(assess_id)
+                  FROM assess
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
+                  AND finish > NOW()";
+
         $result = $this->db->getOne($query);
 
         if (!$result) {

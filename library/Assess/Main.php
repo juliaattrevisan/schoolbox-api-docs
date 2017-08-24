@@ -162,4 +162,28 @@ class Assess_Main extends Evaluation_Main {
     {
         return Quiz::AVAILABILITY_ASSESS;
     }
+
+    /**
+     * Find out whether this assessment has expired.
+     *
+     * @param  $assess_id
+     *
+     * @return bool
+     */
+    public function isExpired($assess_id)
+    {
+        $query = "  SELECT COUNT(assess_id)
+                    FROM assess ass
+                    JOIN assessment assm on assm.id = ass.assessment_id
+                    WHERE ass.assess_id = " . $this->db->smartQuote($assess_id) . "
+                    AND assm.close_date > NOW()";
+
+        $result = $this->db->getOne($query);
+
+        if (!$result) {
+            return true;
+        }
+
+        return false;
+    }
 }

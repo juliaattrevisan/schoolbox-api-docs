@@ -140,7 +140,7 @@ $this->setVar(array(
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
     'ASSESS_START' => $assessment->getOpenAt()->isNull() ? '' : $assessment->getOpenAt()->getShort(),
-    'ASSESS_FINISH' => $assessment->getCloseAt()->isNull() ? '' : $assessment->getCloseAt()->getShort(),
+    'ASSESS_FINISH' => $assessment->getDueAt()->isNull() ? '' : $assessment->getDueAt()->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
     'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
     'ASSESS_AUTHOR_ID' => $author->getId(),
