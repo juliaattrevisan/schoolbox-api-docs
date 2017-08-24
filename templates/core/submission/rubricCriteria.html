@@ -98,7 +98,7 @@ $(function() {
         var container = self.closest('[data-rubric-criterion-row]');
 
         // Is this new? if so no dialog
-        if (container.is('[data-rubric-criterion-new-row]')) {
+        if (container.is('[data-rubric-unsaved]')) {
             container.remove();
         } else {
             self.confirmDialog({
@@ -241,7 +241,7 @@ $(function() {
                             </div>
                             <!-- END criterion -->
                             <!-- New criterion within group -->
-                            <li class="actions-small-1" data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
                                 <div class="list-item">
                                     <input type="text"
                                            value=""
@@ -284,7 +284,7 @@ $(function() {
                     <div class="small-12 medium-6 columns">
                         <h3>{TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}</h3>
                         <ul class="information-list">
-                            <li class="actions-small-1" data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
                                 <div class="list-item">
                                     <input type="text"
                                            value=""
