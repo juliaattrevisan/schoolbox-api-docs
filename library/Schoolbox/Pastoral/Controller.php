@@ -1106,7 +1106,12 @@ class Controller extends Base
     public function postRecordDelete($record)
     {
         $studentId = $record->getStudent()->getId();
-        $this->pastoralMapper->delete($record);
+
+        if ($this->pastoralMapper->delete($record)) {
+            // Delete record from external database
+            $pastoralExternal = new External_Pastoral();
+            $pastoralExternal->deletePastoral($record);
+        }
 
         $this->getResponse()->redirect->afterPost(
             $this->getrouter()->generate('pastoral.getStudent', [
