@@ -160,6 +160,20 @@ abstract class Mapper implements IMapper, Serializable
     protected $identifier;
 
     /**
+     * 'created' timestamp map (if registered in mapping())
+     *
+     * @var null|array
+     */
+    private $createdMap;
+
+    /**
+     * 'updated' timestamp map (if registered in mapping())
+     *
+     * @var null|array
+     */
+    private $updatedMap;
+
+    /**
      * Callbacks that are called on certain events within this mapper.
      *
      * @var array
@@ -1228,6 +1242,14 @@ abstract class Mapper implements IMapper, Serializable
             $this->setIdentifier($map);
         }
 
+        if (isset($map['created_timestamp'])) {
+            $this->setCreatedMap($map);
+        }
+
+        if (isset($map['updated_timestamp'])) {
+            $this->setUpdatedMap($map);
+        }
+
         $this->map->setOffset($map['property'], $map);
 
         // Has a join definition been defined? If so create the join.
@@ -1738,6 +1760,43 @@ abstract class Mapper implements IMapper, Serializable
     public function hasIdentifier()
     {
         return !empty($this->getIdentifier());
+    }
+
+
+    /**
+     * @return null|array
+     */
+    public function getCreatedMap()
+    {
+        return $this->createdMap;
+    }
+
+    /**
+     * @param null|array $createdMap
+     * @return $this
+     */
+    public function setCreatedMap(array $createdMap = null)
+    {
+        $this->createdMap = $createdMap;
+        return $this;
+    }
+
+    /**
+     * @return null|array
+     */
+    public function getUpdatedMap()
+    {
+        return $this->updatedMap;
+    }
+
+    /**
+     * @param null|array $updatedMap
+     * @return $this
+     */
+    public function setUpdatedMap(array $updatedMap = null)
+    {
+        $this->updatedMap = $updatedMap;
+        return $this;
     }
 
     /**
@@ -3714,23 +3773,12 @@ abstract class Mapper implements IMapper, Serializable
      */
     private function populateSaveTimestamps(Collection $collection)
     {
-        $createMap = null;
-        $updateMap = null;
-
         // Does the mapper have 'created_at' or 'updated_at' timestamps?
-        foreach ($this->map as $property => $map) {
-            if (isset($map['created_timestamp'])) {
-                $createMap = $map;
-            } elseif (isset($map['updated_timestamp'])) {
-                $updateMap = $map;
-            }
-        }
-
         $now = \Alaress_Date_Format::now();
 
-        if ($createMap) {
-            $getMethod = $this->getGetMethodName($createMap['property']);
-            $setMethod = $this->getSetMethodName($createMap['property']);
+        if ($this->createdMap) {
+            $getMethod = $this->getGetMethodName($this->createdMap['property']);
+            $setMethod = $this->getSetMethodName($this->createdMap['property']);
             foreach ($collection as $model) {
                 // Has the model not been created?
                 if (null === $model->{$getMethod}()) {
@@ -3738,8 +3786,8 @@ abstract class Mapper implements IMapper, Serializable
                 }
             }
         }
-        if ($updateMap) {
-            $setMethod = $this->getSetMethodName($updateMap['property']);
+        if ($this->updatedMap) {
+            $setMethod = $this->getSetMethodName($this->updatedMap['property']);
             foreach ($collection as $model) {
                 // Always set the update timestamp
                 $model->{$setMethod}(clone $now);
