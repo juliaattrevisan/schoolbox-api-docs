@@ -48,7 +48,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
 
                 INNER JOIN fc.TimetableSubjectChoice tsc ON ts.ID          = tsc.TimetableSubjectID
                 INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
-                INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.ID
+                INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.PersonID
 
                 WHERE s.Code = $quotedId
                 AND   t.Enabled = 1
@@ -67,7 +67,7 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                 INNER JOIN fc.TimetableClass      tc   ON ts.ID             = tc.TimetableSubjectID
                 INNER JOIN fc.YearLevelSub        yls  ON tc.YearLevelSubID = yls.ID
                 INNER JOIN fc.YearLevelSubStudent ylss ON yls.ID            = ylss.YearLevelSubID
-                INNER JOIN dbo.Student            s    ON ylss.PersonID     = s.ID
+                INNER JOIN dbo.Student            s    ON ylss.PersonID     = s.PersonID
                 INNER JOIN fc.Timetable           t    ON ts.TimetableID    = t.ID
 
                 WHERE s.Code = $quotedId
@@ -88,20 +88,20 @@ class External_Schooledge_User extends External_Humanedge_User implements Extern
                     ''          AS classType
                 FROM fc.TimetableSubject ts
 
-                -- Base join to class
-                INNER JOIN fc.TimetableClass         tc  ON ts.ID = tc.TimetableSubjectID
-                INNER JOIN fc.TimetableClassInstance tci ON tc.ID = tci.TimetableClassID
-
                 -- Base join to timetable
                 INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID
 
+                -- Base join to class
+                INNER JOIN fc.TimetableClass tc ON ts.ID = tc.TimetableSubjectID
+
                 -- Base staff
                 LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-                LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
+                LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.PersonID
 
                 -- Override staff
-                LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID        = tcis.TimetableClassInstanceId
-                LEFT  JOIN dbo.Staff staff_replacement         ON tcis.PersonID = staff_replacement.ID
+                LEFT  JOIN fc.TimetableClassInstance      tci               ON tc.ID         = tci.TimetableClassID
+                LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
+                LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.PersonID
 
                 WHERE (
                     (staff_base.Code = $quotedId AND tcis.TimetableClassStaffID IS NULL)

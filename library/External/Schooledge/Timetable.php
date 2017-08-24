@@ -62,11 +62,11 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     private $timetableJoin = "INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID";
     private $baseStaffJoin = "
         LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-        LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
+        LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.PersonID
     ";
     private $replacementStaffJoin = "
         LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
-        LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.ID
+        LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.PersonID
     ";
     private $baseRoomJoin = "
         LEFT  JOIN fc.TimetableClassRoom tcr       ON tc.ID            = tcr.TimetableClassId
@@ -461,6 +461,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             WHERE t.Name = {$quotedCampus}
             ORDER BY td.SortOrder ASC
         ");
+        if (!is_array($timetableDays)) {
+            return [];
+        }
 
         // All dates within the timetable
         $timetableDates = $this->database->getAll("
@@ -473,12 +476,26 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             WHERE t.Name = {$quotedCampus}
             ORDER BY TimetableDate ASC
         ");
-        $timetableDates = array_combine(
-            array_column($timetableDates, 'TimetableDate'),
-            $timetableDates
-        );
+        if (is_array($timetableDates)) {
+            $timetableDates = array_combine(
+                array_column($timetableDates, 'TimetableDate'),
+                $timetableDates
+            );
 
-        $startDate = new Alaress_Date_Format($timetable['StartDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            // Get first date
+            ksort($timetableDates);
+            $firstDate = current($timetableDates);
+        } else {
+            // The timetable requires at least one timetable date in order to parse,
+            // so we know where to start.
+            return [];
+        }
+
+        // Start at the latest of timetable start, and first timetable date
+        $startDate = new Alaress_Date_Format(
+            max($timetable['StartDate'], $firstDate['TimetableDate']),
+            Alaress_Date_Format::DATABASE_DATE_FORMAT
+        );
         $endDate   = new Alaress_Date_Format($timetable['EndDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
         // Fill in missing timetable dates
@@ -665,7 +682,10 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
 
         } elseif ($user->getRole()->isStaff()) {
             $query = "
-                {$this->getStaffTimetableQuery($externalUserId, $campus)}
+                {$this->getStaffBlockedTimetableQuery($externalUserId, $campus)}
+                $extraWhere
+                UNION
+                {$this->getStaffNonBlockedTimetableQuery($externalUserId, $campus)}
                 $extraWhere
                 ORDER BY DayNumber ASC, PeriodStart ASC
             ";
@@ -682,7 +702,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      * @param Campus $campus
      * @return string
      */
-    protected function getStaffTimetableQuery($externalUserId, Campus $campus)
+    protected function getStaffBlockedTimetableQuery($externalUserId, Campus $campus)
     {
         $quotedId = $this->database->smartQuote($externalUserId);
         return "
@@ -694,14 +714,62 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
                 $this->replacementRoomSelect
 
             FROM       fc.TimetableSubject       ts
-            -- Join onto staff
-            INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
-            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
-            -- Expand period
+
+            -- Join onto blocked classes
+            INNER JOIN fc.TimetableClass         tc   ON ts.ID = tc.TimetableSubjectID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID = tci.TimetableClassID
             INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
+
+            -- Periods for blocked classes
             INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
             CROSS APPLY fc.PeriodExpand(tbi.TimetablePeriodID, tbi.Consecutive) tpe
             INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
+
+            -- Staff, room, timetable
+            $this->baseStaffJoin
+            $this->replacementStaffJoin
+            $this->baseRoomJoin
+            $this->replacementRoomJoin
+            $this->timetableJoin
+
+            WHERE (
+                (staff_base.Code = {$quotedId} AND tcis.TimetableClassStaffID IS NULL)
+                OR
+                staff_replacement.Code = {$quotedId}
+            )
+            AND t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND t.Enabled = 1
+        ";
+    }
+
+    /**
+     * @param mixed  $externalUserId
+     * @param Campus $campus
+     * @return string
+     */
+    protected function getStaffNonBlockedTimetableQuery($externalUserId, Campus $campus)
+    {
+        $quotedId = $this->database->smartQuote($externalUserId);
+        return "
+            SELECT
+                $this->classSelect,
+                $this->baseStaffSelect,
+                $this->replacementStaffSelect,
+                $this->baseRoomSelect,
+                $this->replacementRoomSelect
+
+            FROM       fc.TimetableSubject       ts
+
+            -- Join onto non-blocked classes
+            INNER JOIN fc.TimetableClass         tc   ON ts.ID = tc.TimetableSubjectID
+            INNER JOIN fc.TimetableClassInstance tci  ON tc.ID = tci.TimetableClassID
+                                                      AND tci.TimetableBlockInstanceID IS NULL
+
+            -- Periods for non-blocked classes
+            CROSS APPLY fc.PeriodExpand(tci.TimetablePeriodID, tci.Consecutive) tpe
+            INNER JOIN fc.TimetableDay           td   ON tpe.TimetableDayID           = td.ID
+
+            -- Staff, room, timetable
             $this->baseStaffJoin
             $this->replacementStaffJoin
             $this->baseRoomJoin
@@ -739,7 +807,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
             INNER JOIN fc.TimetableClassInstance tci  ON tc.ID             = tci.TimetableClassID
             INNER JOIN fc.TimetableSubjectChoice tsc  ON tc.ID             = tsc.TimetableClassID
-            INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.ID
+            INNER JOIN dbo.Student               s    ON tsc.PersonID      = s.PersonID
             -- Expand period
             INNER JOIN fc.TimetableBlockInstance tbi  ON tci.TimetableBlockInstanceID = tbi.ID
             INNER JOIN fc.TimetablePeriod        tp   ON tbi.TimetablePeriodID        = tp.ID
@@ -778,7 +846,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             INNER JOIN fc.TimetableClass         tc   ON ts.ID             = tc.TimetableSubjectID
             INNER JOIN fc.YearLevelSub           yls  ON tc.YearLevelSubID = yls.ID
             INNER JOIN fc.YearLevelSubStudent    ylss ON yls.ID            = ylss.YearLevelSubID
-            INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.ID
+            INNER JOIN dbo.Student               s    ON ylss.PersonID     = s.PersonID
             -- Expand period
             INNER JOIN fc.TimetableClassInstance tci  ON tc.ID                 = tci.TimetableClassID
             INNER JOIN fc.TimetablePeriod        tp   ON tci.TimetablePeriodID = tp.ID

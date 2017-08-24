@@ -67,7 +67,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
 
             INNER JOIN fc.TimetableSubjectChoice tsc ON ts.ID          = tsc.TimetableSubjectID
             INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
-            INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.ID
+            INNER JOIN dbo.Student               s   ON tsc.PersonID   = s.PersonID
 
             WHERE $classQuery
             AND   t.Enabled = 1
@@ -89,7 +89,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             INNER JOIN fc.TimetableClass      tc   ON ts.ID             = tc.TimetableSubjectID
             INNER JOIN fc.YearLevelSub        yls  ON tc.YearLevelSubID = yls.ID
             INNER JOIN fc.YearLevelSubStudent ylss ON yls.ID            = ylss.YearLevelSubID
-            INNER JOIN dbo.Student            s    ON ylss.PersonID     = s.ID
+            INNER JOIN dbo.Student            s    ON ylss.PersonID     = s.PersonID
             INNER JOIN fc.Timetable           t    ON ts.TimetableID    = t.ID
 
             WHERE $classQuery
@@ -115,18 +115,18 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
                 staff_base.Code AS code
             FROM fc.TimetableSubject ts
 
-            -- Base join to class
-            INNER JOIN fc.TimetableClass         tc  ON ts.ID = tc.TimetableSubjectID
-            INNER JOIN fc.TimetableClassInstance tci ON tc.ID = tci.TimetableClassID
-
             -- Base join to timetable
             INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID
 
+            -- Base join to class
+            INNER JOIN fc.TimetableClass tc ON ts.ID = tc.TimetableSubjectID
+
             -- Base staff
             INNER JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
-            INNER JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.ID
+            INNER JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.PersonID
 
             -- Override staff - not used in this part, but need to ensure there is no override
+            LEFT  JOIN fc.TimetableClassInstance      tci  ON tc.ID  = tci.TimetableClassID
             LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID = tcis.TimetableClassInstanceId
 
             WHERE $classQuery
@@ -140,16 +140,16 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
                 staff_replacement.Code AS code
             FROM fc.TimetableSubject ts
 
-            -- Base join to class
-            INNER JOIN fc.TimetableClass         tc  ON ts.ID = tc.TimetableSubjectID
-            INNER JOIN fc.TimetableClassInstance tci ON tc.ID = tci.TimetableClassID
-
             -- Base join to timetable
             INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID
 
+            -- Base join to class
+            INNER JOIN fc.TimetableClass tc ON ts.ID = tc.TimetableSubjectID
+
             -- Override staff
-            LEFT  JOIN fc.TimetableClassInstanceStaff tcis ON tci.ID        = tcis.TimetableClassInstanceId
-            LEFT  JOIN dbo.Staff staff_replacement         ON tcis.PersonID = staff_replacement.ID
+            INNER JOIN fc.TimetableClassInstance      tci               ON tc.ID         = tci.TimetableClassID
+            LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
+            LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.PersonID
 
             WHERE $classQuery
             AND   staff_replacement.Code IS NOT NULL
