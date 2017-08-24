@@ -15,6 +15,8 @@ class Alaress_Twitter_Search
     private $keywords = '';
     private $tweets = array();
     private $maxTweets = 20;
+
+    /** @var Alaress_Twitter_Filter_Search */
     private $filter = null;
 
     /**
@@ -22,7 +24,7 @@ class Alaress_Twitter_Search
      *
      * @param $user
      * @param $keywords
-     * @param null $filter
+     * @param Alaress_Twitter_Filter_Search $filter
      */
     public function __construct($user, $keywords, $filter = null)
     {
@@ -236,7 +238,7 @@ class Alaress_Twitter_Search
     /**
      * Set filter
      *
-     * @param $filter
+     * @param Alaress_Twitter_Filter_Search $filter
      */
     protected function setFilter($filter)
     {
@@ -246,7 +248,7 @@ class Alaress_Twitter_Search
     /**
      * Get filter
      *
-     * @return null
+     * @return Alaress_Twitter_Filter_Search
      */
     protected function getFilter()
     {
