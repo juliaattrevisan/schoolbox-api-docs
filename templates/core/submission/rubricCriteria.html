@@ -37,7 +37,8 @@ $(function() {
             if (container.length) {
                 var newContainer = container.clone(true, true);
                 newContainer.find('input').val('');
-                input.attr('placeholder', '');
+                newContainer.find('[data-rubric-criterion]').attr('data-rubric-criterion-new', true);
+                input.attr('placeholder', 'Add {TPL_LOCAL_RUBRICCRITERION_PC}...');
 
                 newContainer.appendTo(container.parent());
 
