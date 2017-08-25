@@ -91,6 +91,34 @@ $(function() {
     form.on('keyup', 'input', onCriterionUpdate);
     form.on('paste', 'input', onCriterionUpdate);
 
+    // last-minute post-processing
+    form.on('submit', function (e) {
+
+        // reapply all indices to the indicator name attributes
+        $('form[data-role=rubric-criteria-form]').find('fieldset').each(function () {
+
+            var $capabilityFieldset = $(this);
+            var $capabilityNameInput = $capabilityFieldset.find('input[name*="name"]');
+
+            var capabilityFieldName = $capabilityNameInput.attr('name');
+
+            // if this is a blank capability row, push it off the bottom of the list
+            var capabilityId = -1;
+            if (capabilityFieldName) {
+                capabilityId = $capabilityNameInput.attr('name').split(/[\[\]]/)[1];
+            }
+
+            $capabilityFieldset.find('input[name*="items"]').each(function () {
+
+                var $indicatorNameInput = $(this);
+
+                $indicatorNameInput.attr('name',
+                    $indicatorNameInput.attr('name').replace(/crits\[\d+\]/, 'crits[' + capabilityId + ']')
+                );
+            });
+        });
+    });
+
     // logic for removing inputs
     form.find('[data-role="remove-criterion"]').click(function(e) {
         e.preventDefault();
