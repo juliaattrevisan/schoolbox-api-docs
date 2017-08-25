@@ -103,7 +103,7 @@
                                         <div class="actions-small-1">
                                             <div class="grip"></div>
                                             <div class="list-item">
-                                                <div class="card small-12">
+                                                <div class="card small-12 wrap-down">
                                                     <div class="{{ icon.renderClass(assessable) }}" title="{{ assessable.getTypeName }}"></div>
 
                                                     {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: student}) %}
