@@ -11,6 +11,7 @@ $this->setBlock(TEMPLATE_content, 'post', 'post_block');
 $this->setBlock('post', 'reply_post', 'reply_post_block');
 $this->setBlock('post', 'modify', 'modify_block');
 $this->setBlock('post', 'modified', 'modified_block');
+$this->setBlock('post', 'link', 'link_block');
 $this->setBlock(TEMPLATE_content, 'reply', 'reply_block');
 $this->setBlock(TEMPLATE_content, 'modify_thread', 'modify_thread_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
@@ -136,10 +137,7 @@ if (is_array($postList)) {
     $j = 0;
 
     foreach ($postList as $post) {
-        $user = array('title' => $post['userTitle'],
-                      'firstname' => $post['userFirstname'],
-                      'lastname' => $post['userLastname'],
-        );
+        $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($post['userID']);
 
         $postTime = new Alaress_Date_Format($post['date'], 'Y-m-d H:i:s');
         // This should be a null date, it will currently parse as now.
@@ -149,10 +147,10 @@ if (is_array($postList)) {
 
         $output = array('POST_ID' => $post['postID'],
                         'POST_TITLE' => Scrub::text($post['title']),
-                        'POST_AUTHOR' => Scrub::text($userHandler->formatName($user)),
+                        'POST_AUTHOR' => Scrub::text($user->getFullName()),
                         'POST_GROUP' => Scrub::text($post['userGroup']),
                         'POST_TIME' => $postTime->getRelativeTime(),
-                        'POST_USER_ID' => $post['userID'],
+                        'POST_USER_ID' => $user->getId(),
                         'POST_BODY' => Scrub::html($post['body']),
                         'POST_MODIFIED' => $modifiedTime->getRelativeTime($postTime),
                         'POST_CENSORED' => $post['censored'] == 'true' ? '(Administrator)' : '',
@@ -161,6 +159,13 @@ if (is_array($postList)) {
                         'ON_OFF'          => ++$j % 2 ? 'dark' : ''
         );
         $this->setVar($output);
+
+        //Remove link for deleted user
+        if (!$user->getDeletedAt()->isNull()) {
+            $this->setVar('link_block', '');
+        } else {
+            $this->parse('link_block', 'link');
+        }
 
         // edit / delete post
         $this->setVar('modify_block', '');
