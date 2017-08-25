@@ -15,6 +15,8 @@ class Alaress_Twitter_Search
     private $keywords = '';
     private $tweets = array();
     private $maxTweets = 20;
+
+    /** @var Alaress_Twitter_Filter_Search */
     private $filter = null;
 
     /**
@@ -22,7 +24,7 @@ class Alaress_Twitter_Search
      *
      * @param $user
      * @param $keywords
-     * @param null $filter
+     * @param Alaress_Twitter_Filter_Search $filter
      */
     public function __construct($user, $keywords, $filter = null)
     {
@@ -71,32 +73,44 @@ class Alaress_Twitter_Search
             $cache->init($resource, $params);
 
             $all_tweets = $cache->load();
-            $tweetText = array();
 
             if (is_array($all_tweets)) {
                 foreach ($all_tweets as $result) {
-                    if ($result->possibly_sensitive) {
+
+                    if ($result->possibly_sensitive ||
+                        $result->retweeted_status->possibly_sensitive ||
+                        $result->quoted_status->possibly_sensitive
+                    ) {
                         // This might be not safe for work or children
                         continue;
                     }
-                    if (!in_array($result->text, $tweetText)) {
+
+                    if (isset($result->retweeted_status)) {
+                        $processed[] = array(
+                            'text'     => $this->getFilter()->filterText($result->retweeted_status->text),
+                            'action'   => 'Retweeted by ' . $result->user->name,
+                            'date'     => $result->created_at,
+                            'fullname' => $result->retweeted_status->user->name,
+                            'author'   => $result->retweeted_status->user->screen_name,
+                            'avatar'   => str_replace('_normal', '_bigger', $result->retweeted_status->user->profile_image_url),
+                            'media'    => $result->retweeted_status->entities->media,
+                        );
+                    } else {
                         $processed[] = array(
                             'text'     => $this->getFilter()->filterText($result->text),
+                            'action'   => 'Tweeted',
                             'date'     => $result->created_at,
                             'fullname' => $result->user->name,
                             'author'   => $result->user->screen_name,
                             'avatar'   => str_replace('_normal', '_bigger', $result->user->profile_image_url),
                             'media'    => $result->entities->media,
                         );
-                        $tweetText[] = $result->text;
                     }
                 }
-
 
                 if ($this->getMaxTweets() && is_numeric($this->getMaxTweets())) {
                     $processed = array_slice($processed, 0, $this->getMaxTweets());
                 }
-
             }
         }
 
@@ -224,7 +238,7 @@ class Alaress_Twitter_Search
     /**
      * Set filter
      *
-     * @param $filter
+     * @param Alaress_Twitter_Filter_Search $filter
      */
     protected function setFilter($filter)
     {
@@ -234,7 +248,7 @@ class Alaress_Twitter_Search
     /**
      * Get filter
      *
-     * @return null
+     * @return Alaress_Twitter_Filter_Search
      */
     protected function getFilter()
     {
