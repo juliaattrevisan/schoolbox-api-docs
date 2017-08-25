@@ -46,7 +46,6 @@
     <div class="small-12 island">
         <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="{{ saveRoute }}">
             <input type="hidden" name="id" value="{{ record.id }}">
-            <input type="hidden" id="deleteIds" name="deleteIds" value="">
             <input type="hidden" name="student_id" value="{{ student.id }}{{ record.student.id }}">
             <section>
                 <fieldset class="content">
@@ -284,8 +283,6 @@
 
         {% if record.id != '' %}
 
-        var deleteIds = [];
-
         $('[data-delete]').click(function (e) {
             e.preventDefault();
 
@@ -298,18 +295,6 @@
                         });
                 }
             });
-        });
-
-        $('[data-delete-permission]').click(function (event) {
-            event.preventDefault();
-
-            var selector = $("#deleteIds");
-            var deleteIds = selector.val();
-            if (deleteIds != '') {
-                deleteIds += ',';
-            }
-            selector.val(deleteIds + $(event.target).attr('data-delete-permission'));
-            $(event.target).closest('li').remove();
         });
 
         {% endif %}
