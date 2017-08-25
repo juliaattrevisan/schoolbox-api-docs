@@ -27,6 +27,8 @@ if (!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['
 }
 
 $criteria = $_POST['crits'];
+unset ($criteria[-1]);
+
 $folderId = $_POST['categoryID'];
 
 // this merely re-establishes the session

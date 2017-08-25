@@ -6,6 +6,10 @@ $(function() {
     var groupMaxId     = Number('{MAX_CRITGROUP_ID}');
     var criterionMaxId = Number('{MAX_CRIT_ID}');
 
+    // If there are no dropdowns at all on initial load; they must be reapplied
+    // If there are any; they must not be reapplied. Go figure
+    var hasDropdowns = form.find('[data-dropdown]').length > 0;
+
     // logic for adding new inputs
     var onCriterionUpdate = function() {
         if (this.value.length > 0) {
@@ -33,14 +37,15 @@ $(function() {
             if (container.length) {
                 var newContainer = container.clone(true, true);
                 newContainer.find('input').val('');
-                input.attr('placeholder', '');
+                newContainer.find('[data-rubric-criterion]').attr('data-rubric-criterion-new', true);
+                input.attr('placeholder', 'Add {TPL_LOCAL_RUBRICCRITERION_PC}...');
 
                 newContainer.appendTo(container.parent());
 
                 // Update the new form input - make it no longer new
                 if (addCriterion) {
                     // This is no longer a new row
-                    newContainer.removeAttr('data-rubric-criterion-new-row');
+                    container.removeAttr('data-rubric-criterion-new-row');
                     container
                         .attr('data-rubric-criterion-row', criterionId)
                         .data('rubric-criterion-row', criterionId)
@@ -57,6 +62,11 @@ $(function() {
                         .removeAttr('data-dropdown-content-dormant')
                         .attr('data-dropdown-content', '')
                         .attr('id', newDropdownId);
+
+                    // and reapply if required
+                    if (!hasDropdowns) {
+                        container.foundation('dropdown', 'reflow');
+                    }
 
                     input
                         .attr('name', 'crits['+groupId+'][items][i'+criterionId+']')
@@ -81,6 +91,34 @@ $(function() {
     form.on('keyup', 'input', onCriterionUpdate);
     form.on('paste', 'input', onCriterionUpdate);
 
+    // last-minute post-processing
+    form.on('submit', function (e) {
+
+        // reapply all indices to the indicator name attributes
+        $('form[data-role=rubric-criteria-form]').find('fieldset').each(function () {
+
+            var $capabilityFieldset = $(this);
+            var $capabilityNameInput = $capabilityFieldset.find('input[name*="name"]');
+
+            var capabilityFieldName = $capabilityNameInput.attr('name');
+
+            // if this is a blank capability row, push it off the bottom of the list
+            var capabilityId = -1;
+            if (capabilityFieldName) {
+                capabilityId = $capabilityNameInput.attr('name').split(/[\[\]]/)[1];
+            }
+
+            $capabilityFieldset.find('input[name*="items"]').each(function () {
+
+                var $indicatorNameInput = $(this);
+
+                $indicatorNameInput.attr('name',
+                    $indicatorNameInput.attr('name').replace(/crits\[\d+\]/, 'crits[' + capabilityId + ']')
+                );
+            });
+        });
+    });
+
     // logic for removing inputs
     form.find('[data-role="remove-criterion"]').click(function(e) {
         e.preventDefault();
@@ -88,7 +126,7 @@ $(function() {
         var container = self.closest('[data-rubric-criterion-row]');
 
         // Is this new? if so no dialog
-        if (container.is('[data-rubric-criterion-new-row]')) {
+        if (container.is('[data-rubric-unsaved]')) {
             container.remove();
         } else {
             self.confirmDialog({
@@ -153,9 +191,7 @@ $(function() {
                 <!-- BEGIN criterion_group -->
                 <fieldset class='content' data-rubric-group-row="{CRITGROUP_COUNT}">
                     <div class="small-12 medium-6 columns">
-                        <label>
-                            {TPL_LOCAL_RUBRICGROUP_PC}
-                        </label>
+                        <h3>{TPL_LOCAL_RUBRICGROUP_PC}</h3>
                         <ul class="information-list">
                             <li class="actions-small-0">
                                 <div class="list-item">
@@ -170,13 +206,11 @@ $(function() {
                         </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
-                        <label>
-                            {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
-                        </label>
+                        <h3>{TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}</h3>
                         <ul class="information-list">
                             <!-- BEGIN criterion -->
                             <!-- BEGIN criterion_enabled -->
-                            <li class="actions-small-2" data-rubric-criterion-row="{CRITGROUP_COUNT}">
+                            <li class="actions-small-1" data-rubric-criterion-row="{CRITGROUP_COUNT}">
                                 <div class="list-item">
                                     <input type="text"
                                            name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
@@ -185,15 +219,16 @@ $(function() {
                                            data-rubric-criterion />
                                 </div>
                                 <nav>
-                                    <!-- BEGIN criterion_in_use -->
-                                    <a class="icon-info"
-                                       data-reveal-id="criterion-{CRITERION_ID}"
-                                       href="#"
-                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
-                                    <!-- END criterion_in_use -->
                                     <a href="#" class="icon-more" data-dropdown="dropdown-i{CRITERION_ID}" title="Actions"></a>
                                 </nav>
                                 <ul id="dropdown-i{CRITERION_ID}" class="f-dropdown" data-dropdown-content="">
+                                    <!-- BEGIN criterion_in_use -->
+                                    <li>
+                                        <a class="icon-info"
+                                           data-reveal-id="criterion-{CRITERION_ID}"
+                                           href="#">Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}</a>
+                                    </li>
+                                    <!-- END criterion_in_use -->
                                     <li>
                                         <a class="icon-delete"
                                            data-role="remove-criterion"
@@ -203,7 +238,7 @@ $(function() {
                             </li>
                             <!-- END criterion_enabled -->
                             <!-- BEGIN criterion_disabled -->
-                            <li class="actions-small-2" data-rubric-criterion-row="{CRITGROUP_COUNT}">
+                            <li class="actions-small-1" data-rubric-criterion-row="{CRITGROUP_COUNT}">
                                 <div class="list-item">
                                     <input type="text"
                                            name="crits[{CRITGROUP_COUNT}][items][i{CRITERION_ID}]"
@@ -235,7 +270,7 @@ $(function() {
                             </div>
                             <!-- END criterion -->
                             <!-- New criterion within group -->
-                            <li class="actions-small-2" data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
                                 <div class="list-item">
                                     <input type="text"
                                            value=""
@@ -261,9 +296,7 @@ $(function() {
                 <!-- New group -->
                 <fieldset class='content' data-rubric-group-row="{MAX_CRITGROUP_ID}">
                     <div class="small-12 medium-6 columns">
-                        <label>
-                            {TPL_LOCAL_RUBRICGROUP_PC}
-                        </label>
+                        <h3>{TPL_LOCAL_RUBRICGROUP_PC}</h3>
                         <ul class="information-list">
                             <li class="actions-small-0">
                                 <div class="list-item">
@@ -278,11 +311,9 @@ $(function() {
                         </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
-                        <label>
-                            {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
-                        </label>
+                        <h3>{TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}</h3>
                         <ul class="information-list">
-                            <li class="actions-small-2" data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
+                            <li class="actions-small-1" data-rubric-unsaved data-rubric-criterion-new-row data-rubric-criterion-row="{MAX_CRIT_ID}">
                                 <div class="list-item">
                                     <input type="text"
                                            value=""
@@ -324,11 +355,9 @@ $(function() {
     <div class="row">
         <div class="small-12 island">
             <section>
-                <fieldset>
+                <fieldset class="content">
                     <div class="small-12 medium-6 columns">
-                        <label>
-                            {TPL_LOCAL_RUBRICGROUP_PC}
-                        </label>
+                        <h3>{TPL_LOCAL_RUBRICGROUP_PC}</h3>
                         <ul class="information-list">
                             <li class="actions-small-0">
                                 <div class="list-item">
@@ -339,33 +368,47 @@ $(function() {
                         </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
-                        <label>
-                            {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
-                        </label>
+                        <h3>{TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}</h3>
                         <ul class="information-list">
-                            <li class="actions-small-0">
+                            <li class="actions-small-1">
                                 <div class="list-item">
                                     <input readonly type="text" value="Factorisation" />
                                 </div>
-                                <nav></nav>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                </nav>
                             </li>
-                            <li class="actions-small-0">
+                            <li class="actions-small-1">
                                 <div class="list-item">
                                     <input readonly type="text" value="Algebraic simplification using index laws" />
                                 </div>
-                                <nav></nav>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                </nav>
                             </li>
-                            <li class="actions-small-0">
+                            <li class="actions-small-1">
                                 <div class="list-item">
                                     <input readonly type="text" value="Fraction operations" />
                                 </div>
-                                <nav></nav>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                </nav>
                             </li>
-                            <li class="actions-small-0">
+                            <li class="actions-small-1">
                                 <div class="list-item">
                                     <input readonly type="text" value="Determining an unknown by substitution" />
                                 </div>
-                                <nav></nav>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                </nav>
                             </li>
                         </ul>
                     </div>
@@ -373,9 +416,7 @@ $(function() {
 
                 <fieldset>
                     <div class="small-12 medium-6 columns">
-                        <label>
-                            {TPL_LOCAL_RUBRICGROUP_PC}
-                        </label>
+                        <h3>{TPL_LOCAL_RUBRICGROUP_PC}</h3>
                         <ul class="information-list">
                             <li class="action-small-0">
                                 <div class="list-item">
@@ -386,28 +427,38 @@ $(function() {
                         </ul>
                     </div>
                     <div class="small-12 medium-6 columns">
-                        <label>
-                            {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}
-                        </label>
+                        <h3>{TPL_LOCAL_RUBRICCRITERION_PLURAL_PC}</h3>
 
                         <ul class="information-list">
-                            <li class="actions-small-0">
+                            <li class="actions-small-1">
                                 <div class="list-item">
                                     <input readonly type="text" value="Solving linear equations" />
                                 </div>
-                                <nav></nav>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                </nav>
                             </li>
-                            <li class="actions-small-0">
+                            <li class="actions-small-1">
                                 <div class="list-item">
                                     <input readonly type="text" value="Solving simultaneous equations" />
                                 </div>
-                                <nav></nav>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                </nav>
                             </li>
-                            <li class="actions-small-0">
+                            <li class="actions-small-1">
                                 <div class="list-item">
                                     <input readonly type="text" value="Solving simple quadratic equations" />
                                 </div>
-                                <nav></nav>
+                                <nav>
+                                    <a class="icon-info"
+                                       href="#"
+                                       title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
+                                </nav>
                             </li>
                         </ul>
                     </div>
