@@ -222,13 +222,14 @@ $(function() {
                                     <a href="#" class="icon-more" data-dropdown="dropdown-i{CRITERION_ID}" title="Actions"></a>
                                 </nav>
                                 <ul id="dropdown-i{CRITERION_ID}" class="f-dropdown" data-dropdown-content="">
+                                    <!-- BEGIN criterion_in_use -->
                                     <li>
-                                        <!-- BEGIN criterion_in_use -->
                                         <a class="icon-info"
                                            data-reveal-id="criterion-{CRITERION_ID}"
-                                           href="#"
-                                           title="Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}"></a>
-                                        <!-- END criterion_in_use -->
+                                           href="#">Show {TPL_LOCAL_ASSESSMENT_PLURAL} using {TPL_LOCAL_RUBRICCRITERION}</a>
+                                    </li>
+                                    <!-- END criterion_in_use -->
+                                    <li>
                                         <a class="icon-delete"
                                            data-role="remove-criterion"
                                            href="#">Delete {TPL_LOCAL_RUBRICCRITERION_PC}</a>
