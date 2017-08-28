@@ -1,11 +1,19 @@
 <?php
-use Schoolbox\External\Normalise\User\Guardian;
 
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
+namespace Schoolbox\External\Normalise\User\Test\Guardian;
+
+use ArrayIterator;
+use Iterator;
+use Schoolbox\External\Normalise\User\Guardian as GuardianObject;
+use Schoolbox\Sync\Iterator\Guardian as GuardianIterator;
+use PHPUnit_Framework_TestCase;
+
 class SyncTest extends PHPUnit_Framework_TestCase
 {
 
@@ -16,9 +24,9 @@ class SyncTest extends PHPUnit_Framework_TestCase
      */
     public function testForEach(Iterator $iterator, array $ids)
     {
-        /** @var Guardian $item */
+        /** @var GuardianObject $item */
         foreach ($iterator as $key => $item) {
-            $this->assertInstanceOf(Guardian::class, $item);
+            $this->assertInstanceOf(GuardianObject::class, $item);
             $this->assertEquals($item->getId(), $ids[$key]);
         }
     }
@@ -61,7 +69,7 @@ class SyncTest extends PHPUnit_Framework_TestCase
         }
 
         return [
-            [new Schoolbox\Sync\Iterator\Guardian(new ArrayIterator($data)), [1, 2],],
+            [new GuardianIterator(new ArrayIterator($data)), [1, 2],],
         ];
     }
 }
