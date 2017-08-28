@@ -286,7 +286,7 @@ class Queue extends ResourceVideo
             if ($return == 0) {
                 return true;
             } else {
-                throw new \RuntimeException($output);
+                throw new \RuntimeException($thumbnailString . "\n" . $posterString . "\n" . implode("\n",$output));
             }
         }
         throw new \RuntimeException($processString . "\n" . implode("\n",$message));
