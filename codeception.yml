@@ -7,9 +7,13 @@ suites:
             enabled:
                 - WebDriver:
                     url: http://192.168.36.10
-                    browser: phantomjs
-                    port: 4444
-                    window_size: maximize
+                    browser: chrome
+                    port: 9515
+                    window_size: false
+                    capabilities:
+                        chromeOptions:
+                            args: ["--headless", "--disable-gpu", "--window-size=1920x1080"]
+                            binary: "/usr/bin/google-chrome"
                 - \Helper\Acceptance
                 - Db:
                     dsn: "mysql:host=localhost;dbname=schoolbox"
