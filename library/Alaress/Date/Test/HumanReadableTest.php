@@ -7,7 +7,11 @@
  * @link        http://www.alaress.com.au/
  */
 
+namespace Alaress\Date\Test;
+
 use Alaress_Date_Format as ADF;
+use InvalidArgumentException;
+use PHPUnit_Framework_TestCase;
 
 class HumanReadableTest extends PHPUnit_Framework_TestCase
 {

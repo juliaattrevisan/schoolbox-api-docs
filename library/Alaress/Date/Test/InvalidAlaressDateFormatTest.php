@@ -1,8 +1,14 @@
 <?php
 
+namespace Alaress\Date\Test;
+
+use Alaress\Test\Date\MockDateObject;
+use InvalidArgumentException;
+use PHPUnit_Framework_TestCase;
+
 class InvalidAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 
-    use Alaress\Test\Date\MockDateObject;
+    use MockDateObject;
 
 	/**
 	 * Empty string input

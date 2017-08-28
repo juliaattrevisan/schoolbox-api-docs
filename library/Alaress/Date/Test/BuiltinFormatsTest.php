@@ -7,9 +7,16 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Date\Test;
+
+use Alaress_Date_Format;
+use Alaress\Test\Date\MockDateObject;
+use DateTimeZone;
+use PHPUnit_Framework_TestCase;
+
 class BuiltinFormatsTest extends PHPUnit_Framework_TestCase
 {
-    use Alaress\Test\Date\MockDateObject;
+    use MockDateObject;
 
     // ADF internal formats
 

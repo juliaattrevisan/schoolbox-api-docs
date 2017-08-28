@@ -7,9 +7,17 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Date\Test;
+
+use Alaress_Date_Format;
+use Alaress\Test\Date\MockDateObject;
+use InvalidArgumentException;
+use PHPUnit_Framework_Error_Warning;
+use PHPUnit_Framework_TestCase;
+
 class MeridiemTest extends PHPUnit_Framework_TestCase
 {
-    use Alaress\Test\Date\MockDateObject;
+    use MockDateObject;
 
     /**
      * Data sets for testSet12Hour

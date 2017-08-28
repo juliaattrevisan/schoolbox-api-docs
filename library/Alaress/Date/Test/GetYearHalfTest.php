@@ -7,9 +7,15 @@
  * @link      http://www.alaress.com.au
  */
 
-class getYearPartTest extends PHPUnit_Framework_TestCase
+namespace Alaress\Date\Test;
+
+use Alaress_Date_Format;
+use Alaress\Test\Date\MockDateObject;
+use PHPUnit_Framework_TestCase;
+
+class GetYearHalfTest extends PHPUnit_Framework_TestCase
 {
-    use Alaress\Test\Date\MockDateObject;
+    use MockDateObject;
 
     /**
      * Data sets for testGetYearHalf

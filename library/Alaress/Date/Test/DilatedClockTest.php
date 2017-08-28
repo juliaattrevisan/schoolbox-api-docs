@@ -7,7 +7,10 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Date\Test;
+
 use Alaress\Date\DilatedClock;
+use PHPUnit_Framework_TestCase;
 
 class DilatedClockTest extends PHPUnit_Framework_TestCase
 {

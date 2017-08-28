@@ -6,6 +6,12 @@
  * @link      http://www.alaress.com.au/
  */
 
+namespace Alaress\Date\Test;
+
+use Alaress_Date_Format;
+use Alaress_Date_Locale_Config;
+use PHPUnit_Framework_TestCase;
+
 class RelativeDayTest extends PHPUnit_Framework_TestCase
 {
     /**

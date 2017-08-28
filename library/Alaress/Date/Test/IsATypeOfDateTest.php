@@ -7,9 +7,16 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Date\Test;
+
+use Alaress_Date_Format;
+use Alaress_Date_Locale_Static;
+use Alaress\Test\Date\MockDateObject;
+use PHPUnit_Framework_TestCase;
+
 class IsATypeOfDateTest extends PHPUnit_Framework_TestCase
 {
-    use Alaress\Test\Date\MockDateObject;
+    use MockDateObject;
 
     public function getIsWeekdayData()
     {

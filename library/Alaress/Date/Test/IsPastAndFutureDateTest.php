@@ -7,6 +7,11 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Date\Test;
+
+use Alaress_Date_Format;
+use PHPUnit_Framework_TestCase;
+
 class IsPastAndFutureDateTest extends PHPUnit_Framework_TestCase
 {
     /**

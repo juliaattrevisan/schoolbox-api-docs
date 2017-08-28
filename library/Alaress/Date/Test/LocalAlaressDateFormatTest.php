@@ -1,8 +1,13 @@
 <?php
 
+namespace Alaress\Date\Test;
+
+use Alaress\Test\Date\MockDateObject;
+use PHPUnit_Framework_TestCase;
+
 class LocalAlaressDateFormatTest extends PHPUnit_Framework_TestCase {
 
-    use Alaress\Test\Date\MockDateObject;
+    use MockDateObject;
 
 	/**
 	 * Australian Date, 12-hour format with time and morning meridiem

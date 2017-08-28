@@ -7,7 +7,10 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Date\Test;
+
 use Alaress\Date\Clock;
+use PHPUnit_Framework_TestCase;
 
 class ClockTest extends PHPUnit_Framework_TestCase
 {

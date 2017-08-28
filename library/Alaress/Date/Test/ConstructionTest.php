@@ -7,9 +7,19 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Date\Test;
+
+use Alaress_Date_Format;
+use Alaress_Date_Locale_Static;
+use Alaress\Test\Date\MockDateObject;
+use DateTime;
+use DateTimeZone;
+use InvalidArgumentException;
+use PHPUnit_Framework_TestCase;
+
 class ConstructionTest extends PHPUnit_Framework_TestCase
 {
-    use Alaress\Test\Date\MockDateObject;
+    use MockDateObject;
 
     public function setup()
     {

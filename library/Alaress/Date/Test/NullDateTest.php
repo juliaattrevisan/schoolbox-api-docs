@@ -7,9 +7,18 @@
  * @link      http://www.alaress.com.au
  */
 
+namespace Alaress\Date\Test;
+
+use Alaress_Date_Locale_Static;
+use Alaress_Date_NullDate;
+use Alaress\Test\Date\MockDateObject;
+use BadMethodCallException;
+use DateTimeZone;
+use PHPUnit_Framework_TestCase;
+
 class NullDateTest extends PHPUnit_Framework_TestCase
 {
-    use Alaress\Test\Date\MockDateObject;
+    use MockDateObject;
 
     /**
      * Test construction of null datetimes
