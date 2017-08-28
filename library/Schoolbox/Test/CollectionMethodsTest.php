@@ -5,12 +5,17 @@
  * @link        http://www.alaress.com.au/
  */
 
-use \Schoolbox\Collection;
+namespace Schoolbox\Test;
+
+use LogicException;
+use PHPUnit_Framework_TestCase;
+use Schoolbox\Collection;
+use UnexpectedValueException;
 
 /**
  * Logic tests for various Collection methods
  */
-class CollectionMethodsTest extends \PHPUnit_Framework_TestCase
+class CollectionMethodsTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider provider_slice_once

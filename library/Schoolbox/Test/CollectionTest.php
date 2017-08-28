@@ -5,16 +5,19 @@
  * @link      http://www.alaress.com.au/
  */
 
-use \Schoolbox\Collection;
-use Schoolbox\UserMapper;
+namespace Schoolbox\Test;
+
+use PHPUnit_Framework_TestCase;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessable;
-use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Test the mapper's getModelAsCollection()
  */
-class CollectionTest extends \PHPUnit_Framework_TestCase
+class CollectionTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider provider_Collection
@@ -86,7 +89,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [new \Schoolbox\Calendar\EventLevelCollection([], new Collection())],
-            [new EOTC\ListGroup\Collection()],
+            [new \EOTC\ListGroup\Collection()],
             [\Schoolbox\CampusMapper::getInstance()->createCollection()],
             [new \Schoolbox\MappingCollection()],
             [new \Schoolbox\External\SubjectCollection()],
