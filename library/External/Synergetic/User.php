@@ -90,7 +90,7 @@ class External_Synergetic_User implements External_UserInterface
             if ($downloadImage) {
 
                 // Do a query to retrieve the actual photo from the database
-
+                unset($queryPhoto);
                 $queryPhoto = $this->getConnector()->executeQuery(
                     "SELECT vPhotos.Photo FROM dbo.vPhotos vPhotos WHERE vPhotos.ID = :externalId",
                     ['externalId' => $externalUserId]
