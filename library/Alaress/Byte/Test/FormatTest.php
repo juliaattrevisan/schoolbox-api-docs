@@ -6,8 +6,14 @@
  * Time: 8:50 PM
  * To change this template use File | Settings | File Templates.
  */
- 
-class AlaressByteFormatTest extends PHPUnit_Framework_TestCase {
+
+namespace Alaress\Byte\Test;
+
+use Alaress_Byte_Format;
+use PHPUnit_Framework_TestCase;
+
+class FormatTest extends PHPUnit_Framework_TestCase
+{
     public function testBytesToMB() {
         $input = '1245873';
         $expected = '1.19 MB';
