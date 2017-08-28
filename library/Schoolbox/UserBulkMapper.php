@@ -115,10 +115,9 @@ class UserBulkMapper extends UserMapper
 
             /* If the campus object has no id, then it spawned a campus
              * object from nonexistent data (e.g. a user with no campus)
-             * In this case, the campus object will be totally empty but
-             * still occupy slots in the user's campus collection stack
+             * Don't add this non-existent campus to the user
              */
-            if ($campus->getId()) {
+            if ($campus instanceof Campus) {
                 $userOffset->getCampusCollection()->add($campus);
             }
         }
