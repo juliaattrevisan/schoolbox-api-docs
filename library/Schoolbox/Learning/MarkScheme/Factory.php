@@ -125,11 +125,11 @@ class Factory
     {
         switch ($project->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
-                return new Percentage();
+                return new PercentageWithoutBounds();
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_LETTER:
-                return new LetterGrade($project->getGradeGroup());
+                return new LetterGradeWithoutBounds($project->getGradeGroup());
             default:
                 throw new \DomainException("Invalid MarkType for Project: " . $project->getMarkType()->getName());
         }
