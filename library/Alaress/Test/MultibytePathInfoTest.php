@@ -1,5 +1,9 @@
 <?php
 
+namespace Alaress\Test;
+
+use PHPUnit_Framework_TestCase;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>

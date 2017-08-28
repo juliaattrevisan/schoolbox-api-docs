@@ -1,5 +1,12 @@
 <?php
 
+
+namespace Alaress\Test;
+
+use InvalidArgumentException;
+use PHPUnit_Framework_TestCase;
+use Url;
+
 /**
  * RelativeUrlTest
  *
@@ -541,7 +548,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
             [0],
             [1.1],
             [['www.google.com']],
-            [new stdClass()],
+            [new \stdClass()],
         ];
     }
 
