@@ -87,11 +87,6 @@ class Mapper extends BaseMapper
         $pastoralTagMapper = Tag\Mapper::getInstance();
         $pastoralTagMapper->deleteForRecord($model);
         $pastoralTagMapper->purgeUnassociated();
-
-        // Delete record from external database
-
-        $pastoralExternal = new External_Pastoral();
-        $pastoralExternal->deletePastoral($model);
     }
 
     /**
