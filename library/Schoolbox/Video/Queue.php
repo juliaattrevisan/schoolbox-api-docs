@@ -281,12 +281,17 @@ class Queue extends ResourceVideo
 
         if ($return == 0) {
             exec($thumbnailString, $output, $return);
-            exec($posterString, $output, $return);
+            $this->setMessage($this->getMessage() . "\n" . $thumbnailString . "\n" . implode("\n", $output));
+            if ($return != 0) {
+                throw new \RuntimeException($thumbnailString . "\n" . implode("\n",$output));
+            }
 
+            exec($posterString, $output, $return);
+            $this->setMessage($this->getMessage() . "\n" . $posterString . "\n" . implode("\n", $output));
             if ($return == 0) {
                 return true;
             } else {
-                throw new \RuntimeException($thumbnailString . "\n" . $posterString . "\n" . implode("\n",$output));
+                throw new \RuntimeException($posterString . "\n" . implode("\n",$output));
             }
         }
         throw new \RuntimeException($processString . "\n" . implode("\n",$message));
