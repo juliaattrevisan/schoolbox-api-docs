@@ -87,7 +87,6 @@ class Loader
     /**
      * Generate the remote url
      *
-     * @throws DomainException
      * @return string
      */
     public function generateRemoteUrl()
