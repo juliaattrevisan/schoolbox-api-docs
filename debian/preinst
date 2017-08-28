@@ -11,8 +11,8 @@ set -e
 case "$1" in
     install|upgrade)
         # If a schoolbox DB backup script has been previously shipped, use it
-        if [ -f /usr/share/schoolbox/tools/tools/backup-database.sh ]; then
-            /usr/share/schoolbox/tools/tools/backup-database.sh;
+        if [ -f /usr/share/schoolbox/tools/backup-database.sh ]; then
+            /usr/share/schoolbox/tools/backup-database.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         fi
         # Ensure the alaress user exists
         useradd -m alaress 2> /dev/null || true;
