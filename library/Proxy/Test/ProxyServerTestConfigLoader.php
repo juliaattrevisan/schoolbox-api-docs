@@ -7,6 +7,8 @@
  * @version     SVN: $Id$
  */
 
+namespace Proxy\Test;
+
 class ProxyServerTestConfigLoader implements \Schoolbox\IConfigLoader
 {
 

@@ -7,6 +7,11 @@
  * @version     SVN: $Id$
  */
 
+namespace Proxy\Test;
+
+use PHPUnit_Framework_Error_Warning;
+use PHPUnit_Framework_TestCase;
+
 class ProxyServerTest extends PHPUnit_Framework_TestCase
 {
 
