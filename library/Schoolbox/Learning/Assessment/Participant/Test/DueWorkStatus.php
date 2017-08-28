@@ -5,13 +5,16 @@
  * @link        http://www.alaress.com.au/
  */
 
+namespace Schoolbox\Learning\Assessment\Participant\Test;
+
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
+use PHPUnit_Framework_TestCase;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Response;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
-
-require_once 'ProjectStatus.php';
 
 /**
  * Tests that the various is*() state property methods work for DueWork Participants

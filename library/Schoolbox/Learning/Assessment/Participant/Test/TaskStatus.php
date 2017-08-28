@@ -6,14 +6,16 @@
  * @link        http://www.alaress.com.au/
  */
 
+namespace Schoolbox\Learning\Assessment\Participant\Test;
 
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
+use PHPUnit_Framework_TestCase;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\User;
-
-require_once 'ProjectStatus.php';
 
 /**
  * Tests that the various is*() state property methods work for Task Participants

@@ -6,13 +6,16 @@
  * @link        http://www.alaress.com.au/
  */
 
+namespace Schoolbox\Learning\Assessment\Participant\Test;
+
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
+use PHPUnit_Framework_TestCase;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as Attempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as Review;
 use Schoolbox\User;
-
-require_once 'ProjectStatus.php';
 
 /**
  * Tests that the various is*() state property methods work for Quiz Participants

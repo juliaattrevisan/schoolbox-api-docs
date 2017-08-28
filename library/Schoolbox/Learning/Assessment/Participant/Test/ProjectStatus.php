@@ -4,6 +4,11 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
+namespace Schoolbox\Learning\Assessment\Participant\Test;
+
+use InvalidArgumentException;
+use PHPUnit_Framework_TestCase;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Summator\Average;
@@ -13,10 +18,6 @@ use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Project;
-
-require_once 'DueWorkStatus.php';
-require_once 'QuizStatus.php';
-require_once 'TaskStatus.php';
 
 /**
  * Tests that the various is*() state property methods work for Project Participants
