@@ -115,10 +115,9 @@ class UserBulkMapper extends UserMapper
 
             /* If the campus object has no id, then it spawned a campus
              * object from nonexistent data (e.g. a user with no campus)
-             * In this case, the campus object will be totally empty but
-             * still occupy slots in the user's campus collection stack
+             * Don't add this non-existent campus to the user
              */
-            if ($campus->getId()) {
+            if ($campus instanceof Campus) {
                 $userOffset->getCampusCollection()->add($campus);
             }
         }
@@ -126,48 +125,23 @@ class UserBulkMapper extends UserMapper
         return $userCollection;
     }
 
-
-
-
     /**
      * Update campus involvement for this user
      *
      * @param User $user
      * @param array $allCampusIds
      */
-    private function updateAllCampusOptions(User $user, $allCampusIds)
+    private function assignCampuses(User $user, $allCampusIds)
     {
-
         /* Clear existing campus
          */
-        $query = "
-            DELETE FROM userCampus
-            WHERE uid = :userId
-        ";
-
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(
-            array(
-                'userId' => $user->getId()
-            )
-        );
+        $user->setCampusCollection(new GenericCollection(Campus::class));
 
         /* Apply new choices (ignore Unchanged option)
          */
         foreach ($allCampusIds as $currentCampusId) {
             if ($currentCampusId != $this->getUnchanged()) {
-                $query = "
-                    INSERT INTO userCampus (uid, campus)
-                    VALUES (:userId, :campus)
-                ";
-
-                $statement = $this->getDatabase()->prepare($query);
-                $statement->execute(
-                    array(
-                        'userId' => $user->getId(),
-                        'campus' => $currentCampusId,
-                    )
-                );
+                $user->getCampusCollection()->add(CampusMapper::getInstance()->findById($currentCampusId));
             }
         }
     }
@@ -284,12 +258,6 @@ class UserBulkMapper extends UserMapper
             $user->setDisplayGradeGraph($displayGradeGraph);
         }
 
-        $this->save($user);
-
-        /* Override the joined model persist, in $this->save()
-         * using the mappers in their current form
-         */
-
         /* Update campus settings
          */
         $campusInvolvementChanged = is_array($allCampusIds)
@@ -297,8 +265,10 @@ class UserBulkMapper extends UserMapper
             && !in_array($this->getUnchanged(), array_values($allCampusIds));
 
         if ($campusInvolvementChanged) {
-            $this->updateAllCampusOptions($user, $allCampusIds);
+            $this->assignCampuses($user, $allCampusIds);
         }
+
+        $this->save($user);
 
         /* Logging for Samuel
          */
