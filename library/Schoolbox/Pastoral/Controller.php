@@ -1107,6 +1107,13 @@ class Controller extends Base
     {
         $studentId = $record->getStudent()->getId();
 
+        /* Normally we would apply this logic in the mapper, but in this case we intentionally
+         * do so in the Controller as here we are acting on a single record.
+         * The specific risk is that during import, the system first deletes all
+         * schoolbox records that map to a SIS pastoral record. If this logic
+         * is on the mapper, it catastrophically deletes the records in both systems.
+         * Having the logic here also aligns with the approach taken for create/update SB => SIS.
+         */
         if ($this->pastoralMapper->delete($record)) {
             // Delete record from external database
             $pastoralExternal = new External_Pastoral();
