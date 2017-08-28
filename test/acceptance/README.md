@@ -18,8 +18,8 @@ Structure
 Running tests
 ---
 
-First, run `./test/acceptance/bin/phantomjs-server.sh` to download and install
-PhantomJS (headless browser).
+First, run `./test/acceptance/bin/chromedriver.sh` to download and install
+Chromedriver (driver for Chrome Headless).
 
 Then, run:
 
