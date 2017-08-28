@@ -590,7 +590,6 @@ class Controller extends Base\Base
         /** @var CourseImplementation[] $courseImpls */
         $courseImpls = [];
         $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
-        $criteriaMapper = CriterionMapper::getInstance();
 
         // Are we creating a new import?
         if ('import' === $action) {
@@ -602,17 +601,9 @@ class Controller extends Base\Base
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
 
-                //Create db entries for criteria attached to course and units
-                $courseFolder = $courseSpec->getFolder()->getId();
-                /** @var GenericCollection | Criterion[] $courseCriteria */
-                $courseCriteria = $criteriaMapper->findByColumnList(
-                    array(
-                        'parent_id'   => $courseFolder,
-                        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                    )
-                );
+                //Collect relevant folder Ids
+                $courseFolder[] = $courseSpec->getFolder()->getId();
 
-                //Collect unit criteria
                 $unitSpecs = [];
                 foreach($unitImplData as $unitImp) {
                     $unitSpecs[] = $unitImp['unit_spec_id'];
@@ -625,23 +616,9 @@ class Controller extends Base\Base
                     }
                 }
 
-                /** @var Criterion[] $unitCriteria */
-                $unitCriteria = $criteriaMapper->findByColumnList(
-                    array(
-                        'parent_id'   => $unitFolders,
-                        'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                    )
-                );
+                $allFolders = array_merge($courseFolder, $unitFolders);
 
-                /** @var GenericCollection $allCriteria */
-                $allCriteria = $courseCriteria->merge($unitCriteria);
-                $allCriteria = $allCriteria->deepClone();
-
-                //Save copy of criteria with class page as parent
-                foreach ($allCriteria as  $criteria){
-                    $criteria->setParentId($classFolderId);
-                }
-                $criteriaMapper->create($allCriteria);
+                $this->copyCriteria($allFolders, $classFolderId);
 
             }
         } // Else we are modifying an existing import
@@ -658,7 +635,7 @@ class Controller extends Base\Base
                 $unitImpl->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId()));
             }
 
-            //Collect unit criteria
+            //Collect unit folders
             $unitSpecs = [];
             foreach($unitImplData as $unitImp) {
                 $unitSpecs[] = $unitImp['unit_spec_id'];
@@ -671,22 +648,9 @@ class Controller extends Base\Base
                 }
             }
 
-            /** @var GenericCollection | Criterion[] $unitCriteria */
-            $unitCriteria = $criteriaMapper->findByColumnList(
-                array(
-                    'parent_id'   => $unitFolders,
-                    'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                )
-            );
-
-            $unitCriteria = $unitCriteria->deepClone();
-
-            //Save copy of criteria with class page as parent
             $classFolderId = explode(':', $ownerships)[0];
-            foreach ($unitCriteria as  $criteria){
-                $criteria->setParentId($classFolderId);
-            }
-            $criteriaMapper->create($unitCriteria);
+
+            $this->copyCriteria($unitFolders, $classFolderId);
         }
 
         // Delete de-selected Units and Assessments
@@ -1580,6 +1544,34 @@ class Controller extends Base\Base
     public function setReplicator(Replicator $replicator)
     {
         $this->replicator = $replicator;
+        return $this;
+    }
+
+    /**
+     * @param int[] $sourceIds
+     * @param int $destinationId
+     * @return static
+     */
+    public function copyCriteria(array $sourceIds, $destinationId) {
+        $criteriaMapper = CriterionMapper::getInstance();
+
+        /** @var GenericCollection | Criterion[] $allCriteria */
+        $allCriteria = $criteriaMapper->findByColumnList(
+            array(
+                'parent_id'   => $sourceIds,
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+            )
+        );
+
+        $allCriteria = $allCriteria->deepClone();
+
+        //Save copy of criteria with class page as parent
+        foreach ($allCriteria as  $criteria){
+            $criteria->setParentId($destinationId);
+        }
+
+        $criteriaMapper->create($allCriteria);
+
         return $this;
     }
 }
