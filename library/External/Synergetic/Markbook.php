@@ -329,51 +329,51 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      *
-     * @param ReturnedWork|QuizAttempt $result
+     * @param ReturnedWork|QuizAttempt $feedback
      * @return bool
      */
-    public function setMark($result)
+    public function setMark($feedback)
     {
         $activity = new Activity;
 
-        if ($result instanceof ReturnedWork) {
+        if ($feedback instanceof ReturnedWork) {
 
             // Handle submission box result
 
             // TODO: Someone with a better understanding of learning needs to kill this deprecated function call
 
-            $box = SubmissionBoxMapper::getInstance()->findById($result->getSubmissionBox()->getId());
+            $box = SubmissionBoxMapper::getInstance()->findById($feedback->getSubmissionBox()->getId());
             $activity->setSubmissionBox($box);
             $activity->setCategory($box->getCategory());
-            $marker = UserMapper::getInstance()->findById($result->getMarker()->getId());
-            $student = UserMapper::getInstance()->findById($result->getOwner()->getId());
+            $marker = UserMapper::getInstance()->findById($feedback->getMarker()->getId());
+            $student = UserMapper::getInstance()->findById($feedback->getOwner()->getId());
 
             // If the mark type is set to none then we shouldn't be saving a normalised mark
 
             if ($box->getMarkType()->getId() != SubmissionBox\MarkType::TYPE_NONE) {
-                $mark = $result->getNormalizedMark();
+                $mark = $feedback->getNormalizedMark();
             } else {
                 $mark = null;
             }
 
-            $comment = $result->getComment();
+            $comment = $feedback->getComment();
             $dueDate = $box->getDueDate();
 
-        } elseif ($result instanceof QuizAttempt) {
+        } elseif ($feedback instanceof QuizAttempt) {
 
             // Handle quiz attempt
 
-            $quiz = QuizMapper::getInstance()->findById($result->getQuiz()->getId());
+            $quiz = QuizMapper::getInstance()->findById($feedback->getQuiz()->getId());
             $activity->setAssessment($quiz);
             $activity->setCategory($quiz->getCategory());
-            $student = UserMapper::getInstance()->findById($result->getUser()->getId());
+            $student = UserMapper::getInstance()->findById($feedback->getUser()->getId());
             $marker = $activity->getAssessment()->getUser();
 
             // TODO: Some old handler action needs to be deprecated
 
             $evAttempt = new Assess_Attempt();
-            $total = $evAttempt->getTotalMarks($result->getQuiz()->getId(), $result->getId());
-            $actual = $evAttempt->getMarksForAttempt($result->getId());
+            $total = $evAttempt->getTotalMarks($feedback->getQuiz()->getId(), $feedback->getId());
+            $actual = $evAttempt->getMarksForAttempt($feedback->getId());
             $mark = ($actual / $total) * 100;
             $comment = '';
             $dueDate = $quiz->getFinish();
