@@ -11,6 +11,7 @@
 namespace Calendar\Import;
 
 use \Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\GenericCollection;
 
 abstract class Base {
 
@@ -74,7 +75,7 @@ abstract class Base {
 	/**
 	 * All event types, from the lookup
 	 *
-	 * @var null
+	 * @var GenericCollection
 	 */
 	protected $allEventTypes = null;
 
@@ -223,7 +224,7 @@ abstract class Base {
 	/**
 	 * Set all event types
 	 *
-	 * @param null $allEventTypes
+	 * @param GenericCollection $allEventTypes
 	 */
 	public function setAllEventTypes($allEventTypes) {
 		$this->allEventTypes = $allEventTypes;
@@ -232,7 +233,7 @@ abstract class Base {
 	/**
 	 * Get all event types
 	 *
-	 * @return null
+	 * @return GenericCollection
 	 */
 	public function getAllEventTypes() {
 		return $this->allEventTypes;
