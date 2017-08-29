@@ -18,7 +18,7 @@ class Login
     const FIELD_USERNAME       = 'username';
     const FIELD_PASSWORD       = 'password';
     const CHECKBOX_REMEMBER_ME = '#rememberme';
-    const BUTTON_LOGIN         = 'password';
+    const BUTTON_LOGIN         = 'Submit';
 
     /**
      * @var AcceptanceTester
