@@ -13,13 +13,19 @@ use Schoolbox;
 
 class MarkType
 {
-    /** @deprecated - Use SLUG_* constants instead */
+    /** @deprecated - Use SLUG_PERCENT */
     const TYPE_PERCENT    = 1;
+    /** @deprecated - Use SLUG_LETTER */
     const TYPE_LETTER     = 2;
+    /** @deprecated - Use SLUG_TOTAL */
     const TYPE_TOTAL      = 3;
+    /** @deprecated - Use SLUG_FREE */
     const TYPE_FREE       = 4;
+    /** @deprecated - Use SLUG_RUBRIC */
     const TYPE_RUBRIC     = 5;
+    /** @deprecated - Use SLUG_NONE */
     const TYPE_NONE       = 6;
+    /** @deprecated - Use SLUG_COMPLETION */
     const TYPE_COMPLETION = 7;
 
     const SLUG_PERCENT    = 'percent';
