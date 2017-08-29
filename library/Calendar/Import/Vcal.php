@@ -84,7 +84,7 @@ class Vcal extends Base {
 			$allEvents = VObject\Reader::read(file_get_contents($this->getFile()));
 			$allEvents->expand(new \DateTime($now->getDatabaseDate()), new \DateTime($later->getDatabaseDate()));
 
-			foreach ($allEvents->children as $currentEvent) {
+			foreach ($allEvents->getComponents() as $currentEvent) {
 				if ($currentEvent instanceof VEvent) {
 
 					/* Set up some aliases
