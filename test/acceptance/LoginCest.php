@@ -1,25 +1,46 @@
 <?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+use Page\Login as LoginPage;
+
 class LoginCest
 {
+    /**
+     * Go to the login page before every test
+     *
+     * @param AcceptanceTester $i
+     */
     public function _before(AcceptanceTester $i)
     {
-        $i->amOnPage('/login');
+        $i->amOnPage(LoginPage::URL);
     }
 
-    public function loginSuccessfully(AcceptanceTester $i)
+    /**
+     * Test for login success
+     *
+     * @param AcceptanceTester $i
+     * @param LoginPage        $loginPage
+     */
+    public function loginSuccessfully(AcceptanceTester $i, LoginPage $loginPage)
     {
-        $i->fillField('username', 'alaress');
-        $i->fillField('password', 'alaress');
-        $i->click('Submit');
-        $i->see("NEWS HEADLINES");
+        $loginPage->login('alaress', 'alaress', true);
+        $loginPage->verifyLoginSuccess();
     }
 
-    public function loginWithInvalidPassword(AcceptanceTester $i)
+    /**
+     * Test for login failure
+     *
+     * @param AcceptanceTester $i
+     * @param LoginPage        $loginPage
+     */
+    public function loginWithInvalidPassword(AcceptanceTester $i, LoginPage $loginPage)
     {
-        $i->fillField('username', 'wrong');
-        $i->fillField('password', 'wrong');
-        $i->click('Submit');
-        $i->see("The username or password you typed is incorrect, please try again.");
+        $loginPage->login('wrong', 'wrong', true);
+        $loginPage->verifyLoginFailure();
 
         // Test DB contents
         $i->dontSeeInDatabase('user', ['username' => 'wrong']);
