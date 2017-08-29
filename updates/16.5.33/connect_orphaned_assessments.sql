@@ -14,4 +14,4 @@ left join assessment_course_unit_specification acus on acus.assessment_id = ass.
 left join assessment_course_unit_implementation acut ON acut.assessment_id = ass.id
 left join assessment_folder af ON af.assessment_id = ass.id
 inner join course_unit_specification cus ON cus.folder_id = assess.category_id
-where acus.assessment_id is null and acut.assessment_id is null and af.assessment_id is null;
+where assess.availability = "assess" and acus.assessment_id is null and acut.assessment_id is null and af.assessment_id is null;
