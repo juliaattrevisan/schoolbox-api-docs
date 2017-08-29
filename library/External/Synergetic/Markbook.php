@@ -341,55 +341,39 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function setMark($feedback)
     {
-        $activity = new Activity;
-        $mark     = null;
+        $mark = null;
 
         if ($feedback instanceof ReturnedWork) {
-
             // Handle submission box result
-
-            // TODO: Someone with a better understanding of learning needs to kill this deprecated function call
-
-            $box = SubmissionBoxMapper::getInstance()->findById($feedback->getSubmissionBox()->getId());
-            $activity->setSubmissionBox($box);
-            $activity->setCategory($box->getCategory());
-            $marker = UserMapper::getInstance()->findById($feedback->getMarker()->getId());
-            $student = UserMapper::getInstance()->findById($feedback->getOwner()->getId());
+            $box      = SubmissionBoxMapper::getInstance()->findById($feedback->getSubmissionBox()->getId());
+            $activity = $this->buildActivityFromSubmissionBox($box);
+            $marker   = UserMapper::getInstance()->findById($feedback->getMarker()->getId());
+            $student  = UserMapper::getInstance()->findById($feedback->getOwner()->getId());
 
             // If the mark type is set to none then we shouldn't be saving a normalised mark
-
             if ($box->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
                 $mark = $feedback->getNormalizedMark();
             }
-
             $comment = $feedback->getComment();
-            $dueDate = $box->getDueDate();
 
         } elseif ($feedback instanceof QuizAttempt) {
-
             // Handle quiz attempt
-
-            $quiz = QuizMapper::getInstance()->findById($feedback->getQuiz()->getId());
-            $activity->setAssessment($quiz);
-            $activity->setCategory($quiz->getCategory());
-            $student = UserMapper::getInstance()->findById($feedback->getUser()->getId());
-            $marker = $activity->getAssessment()->getUser();
+            $quiz     = QuizMapper::getInstance()->findById($feedback->getQuiz()->getId());
+            $activity = $this->buildActivityFromQuiz($quiz);
+            $student  = UserMapper::getInstance()->findById($feedback->getUser()->getId());
+            $marker   = $activity->getAssessment()->getUser();
 
             // TODO: Some old handler action needs to be deprecated
-
             $evAttempt = new Assess_Attempt();
-            $total = $evAttempt->getTotalMarks($feedback->getQuiz()->getId(), $feedback->getId());
-            $actual = $evAttempt->getMarksForAttempt($feedback->getId());
+            $total = (float)$evAttempt->getTotalMarks($feedback->getQuiz()->getId(), $feedback->getId());
+            $actual = (float)$evAttempt->getMarksForAttempt($feedback->getId());
             $mark = ($actual / $total) * 100;
             $comment = '';
-            $dueDate = $quiz->getFinish();
 
         } else {
 
             throw new Exception('Unknown object passed');
         }
-
-        $activity->setOwner($student);
 
         if (!(
             $this->isExternalIdValid($student->getExternalId())
@@ -398,141 +382,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $assessmentRemoteList = $this->getAssessment($activity);
-
-        // If assessment box does not exist, create it first
-
-        if (!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1) {
-            $this->createAssessment($activity);
-            $assessmentRemoteList = $this->getAssessment($activity);
-        }
-
-        $result = true;
-
-        /* Ensure we cater for 0 which coerces to 'false'.
-         * If no mark, set the insert value to a magic number.
-         */
-        $markValue = null === $mark
-            ? self::NO_MARK_GIVEN
-            : round($mark);
-
-        foreach ($assessmentRemoteList as $assessmentRemote) {
-
-            if ($this->doesMarkExist(
-                $assessmentRemote['FileType'],
-                $assessmentRemote['ClassCampus'],
-                $assessmentRemote['ClassCode'],
-                $assessmentRemote['MarkBookSeq'],
-                $student->getExternalId()
-            )) {
-                if (null !== $mark || !empty($comment)) {
-
-                    $bindings = [
-                        'mark' => $markValue,
-                        'topicComment' => $comment,
-                        'fileType' => $assessmentRemote['FileType'],
-                        'fileYear' => $this->fileYear,
-                        'fileSemester' => $this->fileSemester,
-                        'classCampus' => $assessmentRemote['ClassCampus'],
-                        'classCode' => $assessmentRemote['ClassCode'],
-                        'ID' => $student->getExternalId(),
-                        'markbookSeq' => $assessmentRemote['MarkBookSeq'],
-                    ];
-
-                    $sql = "
-                        UPDATE  StudentAssessmentMarkBook 
-                        SET     Result = :mark,
-                                TopicComment = :topicComment
-                        WHERE   FileType = :fileType AND
-                                FileYear = :fileYear AND
-                                FileSemester = :fileSemester AND
-                                ClassCampus = :classCampus AND
-                                ClassCode = :classCode AND
-                                ID = :ID AND
-                                MarkBookSeq = :markbookSeq
-                    ";
-
-                } else {
-
-                    $bindings = [
-                        'fileType' => $assessmentRemote['FileType'],
-                        'fileYear' => $this->fileYear,
-                        'fileSemester' => $this->fileSemester,
-                        'classCampus' => $assessmentRemote['ClassCampus'],
-                        'classCode' => $assessmentRemote['ClassCode'],
-                        'ID' => $student->getExternalId(),
-                        'markbookSeq' => $assessmentRemote['MarkBookSeq'],
-                    ];
-
-                    $sql = "
-                        DELETE FROM StudentAssessmentMarkBook
-                        WHERE       FileType = :fileType AND
-                                    FileYear = :fileYear AND
-                                    FileSemester = :fileSemester AND
-                                    ClassCampus = :classCampus AND
-                                    ClassCode = :classCode AND
-                                    ID = :ID AND
-                                    MarkBookSeq = :markbookSeq
-                    ";
-                }
-
-            } elseif (null !== $mark || !empty($comment)) {
-
-                $bindings = [
-                    'fileType' => $assessmentRemote['FileType'],
-                    'fileYear' => $this->fileYear,
-                    'fileSemester' => $this->fileSemester,
-                    'classCampus' => $assessmentRemote['ClassCampus'],
-                    'classCode' => $assessmentRemote['ClassCode'],
-                    'externalID' => $student->getExternalId(),
-                    'markbookSeq' => $assessmentRemote['MarkBookSeq'],
-                    'mark' => $markValue,
-                    'topicComment' => $comment,
-                    'resultDate' => $dueDate->getDatabase(),
-                    'markerExternalId' => $marker->getExternalId()
-                ];
-
-                $sql = "
-                    INSERT INTO StudentAssessmentMarkBook (
-                        FileType,
-                        FileYear,
-                        FileSemester,
-                        ClassCampus,
-                        ClassCode,
-                        ID,
-                        StaffID,
-                        MarkBookSeq,
-                        Result,
-                        TopicComment,
-                        ResultDate,
-                        ModifiedByID,
-                        ModifiedDate
-                    ) VALUES (
-                        :fileType,
-                        :fileYear,
-                        :fileSemester,
-                        :classCampus,
-                        :classCode,
-                        :externalID,
-                        '0',
-                        :markbookSeq,
-                        :mark,
-                        :topicComment,
-                        :resultDate,
-                        :markerExternalId,
-                        CURRENT_TIMESTAMP
-                    )
-                ";
-            }
-
-            if (isset($sql) && isset($bindings)) {
-                $statement = $this->getConnector()->prepareQuery($sql, $bindings);
-                $result = $statement->execute();
-            }
-        }
-
-        return $result;
+        return $this->setActivityMark($activity, $marker, $student, $mark, $comment);
     }
+
+
 
     /**
      * Determines if a student has already been marked or not, used to determining if to use insert or update
@@ -591,5 +444,238 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     {
         $this->externalUser = $externalUser;
         return $this;
+    }
+
+
+    /**
+     * @param SubmissionBox $submissionBox
+     * @return Activity
+     */
+    private function buildActivityFromSubmissionBox(SubmissionBox $submissionBox)
+    {
+        $activity = new Activity();
+        $activity->setSubmissionBox($submissionBox)
+                 ->setOwner($submissionBox->getOwner())
+                 ->setCategory($submissionBox->getCategory())
+                 ->setDate($submissionBox->getDueDate());
+        return $activity;
+    }
+
+    /**
+     * @param Quiz $quiz
+     * @return Activity
+     */
+    private function buildActivityFromQuiz(Quiz $quiz)
+    {
+        $activity = new Activity();
+        $activity->setAssessment($quiz)
+                 ->setOwner($quiz->getUser())
+                 ->setCategory($quiz->getCategory())
+                 ->setDate($quiz->getFinish());
+        return $activity;
+    }
+
+
+    /**
+     * Inserts/Updates a student's mark and comment in Synergetic
+     *
+     * @param Activity        $activity
+     * @param \Schoolbox\User $marker
+     * @param \Schoolbox\User $student
+     * @param null|float      $mark
+     * @param string          $comment
+     * @return bool
+     */
+    private function setActivityMark(Activity $activity, Schoolbox\User $marker, Schoolbox\User $student, $mark, $comment)
+    {
+        $assessmentRemoteList = $this->getAssessment($activity);
+
+        // If assessment box does not exist, create it first
+        if (!is_array($assessmentRemoteList) || count($assessmentRemoteList) < 1) {
+            // In this context, we need to ensure the fileYear etc match the student, not the marker
+            $activity->setOwner($student);
+            $this->createAssessment($activity);
+            $assessmentRemoteList = $this->getAssessment($activity);
+        }
+
+        $result = true;
+
+        /* Ensure we cater for 0 which coerces to 'false'.
+         * If no mark, set the insert value to a magic number.
+         */
+        $markValue = null === $mark
+            ? self::NO_MARK_GIVEN
+            : round($mark);
+
+        $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment));
+
+        foreach ($assessmentRemoteList as $assessmentRemote) {
+            // Does the student have already have a mark for the assessment in Synergetic?
+            $remoteMarkExists = $this->doesMarkExist(
+                $assessmentRemote['FileType'],
+                $assessmentRemote['ClassCampus'],
+                $assessmentRemote['ClassCode'],
+                $assessmentRemote['MarkBookSeq'],
+                $student->getExternalId()
+            );
+
+            if (!$remoteMarkExists && $hasMarkOrComment) {
+                // No mark in synergetic, mark/comment in SB
+                $result = $this->insertActivityMark(
+                    $activity, $assessmentRemote, $marker, $student, $markValue, $comment
+                );
+            } elseif ($hasMarkOrComment) {
+                // Mark/Comment in synergetic + SB
+                $result = $this->updateActivityMark($assessmentRemote, $student, $markValue, $comment);
+            } elseif ($remoteMarkExists) {
+                // Mark/Comment in synergetic , none in SB
+                $result = $this->deleteActivityMark($assessmentRemote, $student);
+            }
+        }
+        return $result;
+    }
+
+
+    /**
+     * Update a student's existing mark/comment in synergetic
+     *
+     * @param array           $assessmentRemote
+     * @param \Schoolbox\User $student
+     * @param                 $markValue
+     * @param                 $comment
+     * @return bool
+     */
+    private function updateActivityMark(
+        array $assessmentRemote,
+        Schoolbox\User $student,
+        $markValue,
+        $comment
+    ) {
+        $sql = '
+            UPDATE  StudentAssessmentMarkBook
+            SET     Result = :mark,
+                    TopicComment = :topicComment
+            WHERE   FileType = :fileType AND
+                    FileYear = :fileYear AND
+                    FileSemester = :fileSemester AND
+                    ClassCampus = :classCampus AND
+                    ClassCode = :classCode AND
+                    ID = :ID AND
+                    MarkBookSeq = :markbookSeq
+        ';
+        $bindings = [
+            'mark'         => $markValue,
+            'topicComment' => $comment,
+            'fileType'     => $assessmentRemote['FileType'],
+            'fileYear'     => $this->fileYear,
+            'fileSemester' => $this->fileSemester,
+            'classCampus'  => $assessmentRemote['ClassCampus'],
+            'classCode'    => $assessmentRemote['ClassCode'],
+            'ID'           => $student->getExternalId(),
+            'markbookSeq'  => $assessmentRemote['MarkBookSeq'],
+        ];
+        $statement = $this->getConnector()->prepareQuery($sql, $bindings);
+        return $statement->execute();
+    }
+
+
+    /**
+     * Delete a student's mark/comment from synergetic
+     *
+     * @param array           $assessmentRemote
+     * @param \Schoolbox\User $student
+     * @return bool
+     */
+    private function deleteActivityMark(array $assessmentRemote, Schoolbox\User $student)
+    {
+        $sql = '
+            DELETE FROM StudentAssessmentMarkBook
+            WHERE       FileType = :fileType AND
+                        FileYear = :fileYear AND
+                        FileSemester = :fileSemester AND
+                        ClassCampus = :classCampus AND
+                        ClassCode = :classCode AND
+                        ID = :ID AND
+                        MarkBookSeq = :markbookSeq
+        ';
+        $bindings = [
+            'fileType'     => $assessmentRemote['FileType'],
+            'fileYear'     => $this->fileYear,
+            'fileSemester' => $this->fileSemester,
+            'classCampus'  => $assessmentRemote['ClassCampus'],
+            'classCode'    => $assessmentRemote['ClassCode'],
+            'ID'           => $student->getExternalId(),
+            'markbookSeq'  => $assessmentRemote['MarkBookSeq'],
+        ];
+        $statement = $this->getConnector()->prepareQuery($sql, $bindings);
+        return $statement->execute();
+    }
+
+
+    /**
+     * Insert a student's mark/comment into Synergetic
+     *
+     * @param Activity        $activity
+     * @param array           $assessmentRemote
+     * @param \Schoolbox\User $marker
+     * @param \Schoolbox\User $student
+     * @param int             $markValue
+     * @param string          $comment
+     * @return bool
+     */
+    private function insertActivityMark(
+        Activity $activity,
+        array $assessmentRemote,
+        Schoolbox\User $marker,
+        Schoolbox\User $student,
+        $markValue,
+        $comment
+    ) {
+        $sql = "
+            INSERT INTO StudentAssessmentMarkBook (
+                FileType,
+                FileYear,
+                FileSemester,
+                ClassCampus,
+                ClassCode,
+                ID,
+                StaffID,
+                MarkBookSeq,
+                Result,
+                TopicComment,
+                ResultDate,
+                ModifiedByID,
+                ModifiedDate
+            ) VALUES (
+                :fileType,
+                :fileYear,
+                :fileSemester,
+                :classCampus,
+                :classCode,
+                :externalID,
+                '0',
+                :markbookSeq,
+                :mark,
+                :topicComment,
+                :resultDate,
+                :markerExternalId,
+                CURRENT_TIMESTAMP
+            )
+        ";
+        $bindings = [
+            'fileType'         => $assessmentRemote['FileType'],
+            'fileYear'         => $this->fileYear,
+            'fileSemester'     => $this->fileSemester,
+            'classCampus'      => $assessmentRemote['ClassCampus'],
+            'classCode'        => $assessmentRemote['ClassCode'],
+            'externalID'       => $student->getExternalId(),
+            'markbookSeq'      => $assessmentRemote['MarkBookSeq'],
+            'mark'             => $markValue,
+            'topicComment'     => $comment,
+            'resultDate'       => $activity->getDate()->getDatabase(),
+            'markerExternalId' => $marker->getExternalId(),
+        ];
+        $statement = $this->getConnector()->prepareQuery($sql, $bindings);
+        return $statement->execute();
     }
 }

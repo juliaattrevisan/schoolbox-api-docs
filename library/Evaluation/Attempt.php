@@ -352,7 +352,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
      * Get the marks given to an attempt
      *
      * @param  $attempt_id
-     * @return mixed
+     * @return string
      */
     public function getMarksForAttempt($attempt_id)
     {
