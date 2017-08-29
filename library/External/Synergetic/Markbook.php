@@ -358,7 +358,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
             // If the mark type is set to none then we shouldn't be saving a normalised mark
 
-            if ($box->getMarkType()->getId() != SubmissionBox\MarkType::TYPE_NONE) {
+            if ($box->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
                 $mark = $feedback->getNormalizedMark();
             }
 
