@@ -17,7 +17,7 @@ class Login
     const URL                  = '/login/';
     const FIELD_USERNAME       = 'username';
     const FIELD_PASSWORD       = 'password';
-    const CHECKBOX_REMEMBER_ME = 'rememberme';
+    const CHECKBOX_REMEMBER_ME = '#rememberme';
     const BUTTON_LOGIN         = 'password';
 
     /**
