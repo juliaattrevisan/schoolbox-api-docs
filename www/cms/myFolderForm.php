@@ -47,13 +47,20 @@ elseif (is_numeric($_GET['delete'])) {
     }
 }
 elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+    $isAjax = isset($_REQUEST['ajax']) && $_REQUEST['ajax'];
+
     /* Move file from one category to another, after checking permission on both from and to categories */
-    if ($_POST['move'] == $_POST['categoryID'] || !$folder = $folderHandler->getByID($_POST['move'])) {
-        echo "Failed";
+    if ($_POST['move'] === $_POST['categoryID']){
+        respondFailure($isAjax, "Cannot move folder to itself. ID: {$_POST['move']}");
+    }
+
+    $folder = $folderHandler->getByID($_POST['move']);
+    if (!$folder){
+        respondFailure($isAjax, 'Destination folder not found');
     }
 
     if ($folder['owner'] != $_SESSION['id']) {
-        echo "Insufficient permssions";
+        respondFailure($isAjax, 'Insufficient permissions');
     }
 
     $folderHandler->update(array('id' => $_POST['move'], 'parent' => $_POST['categoryID']));
@@ -62,3 +69,21 @@ elseif (is_numeric($_POST['portfolioID'])) {
     $_SESSION['portfolioID'] = $_POST['portfolioID'];
 }
 
+/**
+ * Send a failure response back to the browser and terminate script execution
+ *
+ * @param bool   $isAjax
+ * @param string $message
+ * @param int    $code
+ */
+function respondFailure($isAjax, $message, $code = 400)
+{
+    http_response_code($code);
+    if ($isAjax) {
+        die(json_encode([
+            'result'  => 'failure',
+            'message' => $message,
+        ]));
+    }
+    die($message);
+}
