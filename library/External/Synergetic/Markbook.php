@@ -40,6 +40,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     const ASSESSMENT_PREFIX = 'Q-';
     const SUBMISSION_PREFIX = 'W-';
 
+    /** @const int NO_MARK_GIVEN Magic number to represent 'No Mark' when nulls not permitted */
+    const NO_MARK_GIVEN = -1;
+
     /**
      * Constructor
      */
@@ -329,12 +332,17 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      *
+     * Synergetic does not permit null or empty string '' to be inserted in `StudentAssessmentMarkBook`.`Result`.
+     * However, we still want to sync a comment from SB -> Synergetic when it is published.
+     * In this case, we enter a -1 to represent 'No mark' in Synergetic
+     *
      * @param ReturnedWork|QuizAttempt $feedback
      * @return bool
      */
     public function setMark($feedback)
     {
         $activity = new Activity;
+        $mark     = null;
 
         if ($feedback instanceof ReturnedWork) {
 
@@ -352,8 +360,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
             if ($box->getMarkType()->getId() != SubmissionBox\MarkType::TYPE_NONE) {
                 $mark = $feedback->getNormalizedMark();
-            } else {
-                $mark = null;
             }
 
             $comment = $feedback->getComment();
@@ -403,11 +409,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $result = true;
 
-        foreach ($assessmentRemoteList as $assessmentRemote) {
+        /* Ensure we cater for 0 which coerces to 'false'.
+         * If no mark, set the insert value to a magic number.
+         */
+        $markValue = null === $mark
+            ? self::NO_MARK_GIVEN
+            : round($mark);
 
-            if (isset($mark) && is_numeric($mark)) {
-                $mark = round($mark);
-            }
+        foreach ($assessmentRemoteList as $assessmentRemote) {
 
             if ($this->doesMarkExist(
                 $assessmentRemote['FileType'],
@@ -416,10 +425,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $assessmentRemote['MarkBookSeq'],
                 $student->getExternalId()
             )) {
-                if (isset($mark) || !empty($comment)) {
+                if (null !== $mark || !empty($comment)) {
 
                     $bindings = [
-                        'mark' => $mark,
+                        'mark' => $markValue,
                         'topicComment' => $comment,
                         'fileType' => $assessmentRemote['FileType'],
                         'fileYear' => $this->fileYear,
@@ -467,7 +476,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     ";
                 }
 
-            } else if (isset($mark) || !empty($comment)) {
+            } elseif (null !== $mark || !empty($comment)) {
 
                 $bindings = [
                     'fileType' => $assessmentRemote['FileType'],
@@ -477,7 +486,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                     'classCode' => $assessmentRemote['ClassCode'],
                     'externalID' => $student->getExternalId(),
                     'markbookSeq' => $assessmentRemote['MarkBookSeq'],
-                    'mark' => $mark,
+                    'mark' => $markValue,
                     'topicComment' => $comment,
                     'resultDate' => $dueDate->getDatabase(),
                     'markerExternalId' => $marker->getExternalId()
