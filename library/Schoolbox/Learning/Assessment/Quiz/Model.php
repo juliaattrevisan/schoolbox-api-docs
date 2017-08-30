@@ -107,13 +107,16 @@ class Model extends AbstractAssessment
     public function getNormalisedMark(Participant $participant, $publishedOnly)
     {
         // Determine which QuizAttempt we are taking the mark from
-        /** @var Attempt\Model $authoritativeAttempt */
         $authoritativeAttempt = $this->getAuthoritativeResponse($participant, $publishedOnly);
 
         if (null === $authoritativeAttempt) {
             return null;
         }
-        return IMarkScheme::NORMALISED_MARK_MAX * $authoritativeAttempt->getMarksGiven() / $authoritativeAttempt->getMarksAvailable();
+        $marksAvailable = $authoritativeAttempt->getMarksAvailable();
+        if (0.0 === (float)$marksAvailable) {
+            return null;
+        }
+        return IMarkScheme::NORMALISED_MARK_MAX * $authoritativeAttempt->getMarksGiven() / $marksAvailable;
     }
 
 
@@ -129,6 +132,7 @@ class Model extends AbstractAssessment
      * equivalent to the teacher providing draft marks.
      *
      * @inheritdoc
+     * @return null|Attempt\Model
      */
     public function getAuthoritativeResponse(Participant $participant, $publishedOnly)
     {
