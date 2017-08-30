@@ -80,6 +80,7 @@ function respondFailure($isAjax, $message, $code = 400)
 {
     http_response_code($code);
     if ($isAjax) {
+        header('Content-type:application/json');
         die(json_encode([
             'result'  => 'failure',
             'message' => $message,
