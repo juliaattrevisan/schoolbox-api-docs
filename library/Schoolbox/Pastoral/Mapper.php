@@ -264,6 +264,7 @@ class Mapper extends BaseMapper
                         `pastoral_revision`.`parent_id` = :id_0
                     ) AND
                        `pastoral_revision`.`id` <> :id_1
+                     AND `pastoral_revision`.deleted_at IS NULL
                 ";
             } else {
                 $query .= "                
@@ -273,6 +274,7 @@ class Mapper extends BaseMapper
                         `pastoral`.`parent_id` = :id_0
                     ) AND
                         `pastoral`.`id` <> :id_1
+                    AND `pastoral`.deleted_at IS NULL
                 ";
             }
 
@@ -285,7 +287,7 @@ class Mapper extends BaseMapper
 
             // This is a parent item, just find its children
 
-            $query .= "WHERE `parent_id` = :parent_id";
+            $query .= "WHERE `parent_id` = :parent_id AND pastoral.deleted_at IS NULL";
             $bindings['parent_id'] = $record->getId();
         }
 
