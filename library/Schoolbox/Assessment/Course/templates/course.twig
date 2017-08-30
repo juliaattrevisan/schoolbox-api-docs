@@ -5,6 +5,7 @@ Usage:
         curriculumEnabled: bool                 - disable curriculum tagging ?
         folderAccess:      int[]                - indexed by folder.id
         encodedReturnUrls: string[]             - indexed by UnitSpec.id
+        isValidFacultyRoot: bool                - is configured faculty root valid
     ]
 #}
 
@@ -253,6 +254,22 @@ Usage:
                             <input type="hidden" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
                         </label>
                     </div>
+
+                    {% if not isValidFacultyRoot %}
+                    <div class="small-12 column">
+                        <div data-alert="" class="alert-box alert">
+                            <p>
+                            <strong>Warning</strong>: The configured faculty root is invalid and the system has fallen back to the resource root.<br>
+                            <br>Please
+                            {% if USER.isSuperuser %}
+                                <a href="/adminv2/setting/LMS+Policy#course_homepage">configure a valid faculty root</a> in the Administration system.
+                            {% else %}
+                                ask your System Administrator to configure a valid faculty root
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     {% if curriculumEnabled %}
                         <div class="small-12 column">

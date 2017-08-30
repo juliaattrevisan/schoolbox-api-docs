@@ -388,6 +388,7 @@ class Controller extends Base\Base
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'folderAccess'      => $folderAccess,
             'encodedReturnUrls' => $encodedReturnUrls,
+            'isValidFacultyRoot'=> $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);
     }
 
