@@ -13,7 +13,6 @@ namespace Schoolbox\PTO;
 use DomainException;
 use Schoolbox\User;
 use Schoolbox\Config\Loader as ConfigLoader;
-use Zend\Uri\Uri;
 
 class Loader
 {
@@ -22,7 +21,7 @@ class Loader
      *
      * @var string
      */
-    const REMOTE_URL = "https://bookings.parentteacheronline.com.au?school=[school]&Type=[type]&P1=[username]&P2=[epoch]&P3=[hash]";
+    const REMOTE_URL = "https://bookings.parentteacheronline.com.au/";
 
     /** @var string */
     private $ptoKey;
@@ -88,26 +87,21 @@ class Loader
     /**
      * Generate the remote url
      *
-     * @throws DomainException
      * @return string
      */
     public function generateRemoteUrl()
     {
         $epoch = date('U');
 
-        $remoteUrl = strtr(self::REMOTE_URL, [
-            'epoch' => $epoch,
-            'school' => $this->getSchool(),
-            'username' => $this->getUser()->getUsername(),
-            'type' => $this->determineUserType(),
-            'hash' => $this->generateHash($epoch)
-        ]);
+        $urlArgs = [
+            'School' => $this->getSchool(),
+            'Type' => $this->determineUserType(),
+            'P1' => $this->getUser()->getUsername(),
+            'P2' => $epoch,
+            'P3' => $this->generateHash($epoch)
+        ];
 
-        $url = new Uri($remoteUrl);
-
-        if (!$url->isValid()) {
-            throw new DomainException('Invalid remote url generated');
-        }
+        $remoteUrl = self::REMOTE_URL .'?'. http_build_query($urlArgs);
 
         return $remoteUrl;
     }
