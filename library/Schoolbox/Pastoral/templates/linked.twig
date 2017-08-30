@@ -37,13 +37,6 @@
         {% if routeGetStudentRecordInsertForm %}
             <a href="{{ routeGetStudentRecordInsertForm }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record To {{ student.fullName }}"></a>
         {% endif %}
-
-        {# Modify record #}
-
-        {% set routeGetStudentRecordUpdateForm = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
-        {% if routeGetStudentRecordUpdateForm %}
-            <a class="icon-modify no-text" href="{{ routeGetStudentRecordUpdateForm }}" title="Modify"></a>
-        {% endif %}
     </nav>
 
     {% if linkedStudents | length %}
