@@ -648,7 +648,7 @@ class Mapper extends BaseMapper
                     $orderParts[] = "`sv`.order";
                     break;
                 case 'date':
-                    $orderParts[] = "`pastoral`.created_at";
+                    $orderParts[] = "`pastoral`.created_at desc";
                     break;
                 case 'category':
                     $orderParts[] = "`c`.name";
