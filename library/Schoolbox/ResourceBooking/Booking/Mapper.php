@@ -255,8 +255,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('resource.image',    'im')}
             FROM {$this->getTable()} `b`
             INNER JOIN {$this->getJoinSql('event',             'b', 'e')}
-            LEFT  JOIN {$this->getJoinSql('event.owner',       'e', 'eo')}
-            LEFT  JOIN {$this->getJoinSql('event.author',      'e', 'ea')}
+            LEFT  JOIN {$this->getJoinSql('event.owner',       'e', 'eo', true)}
+            LEFT  JOIN {$this->getJoinSql('event.author',      'e', 'ea', true)}
             INNER JOIN {$this->getJoinSql('status',            'b', 's')}
             LEFT  JOIN {$this->getJoinSql('reviewer',          'b', 'r')}
             INNER JOIN {$this->getJoinSql('resource',          'b', 'i')}
