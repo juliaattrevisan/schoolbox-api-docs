@@ -95,7 +95,7 @@
                 var normalisedNewGroup = normaliseForComparison(name);
                 var $groups =  $('[data-groupname]');
                 for (var i = 0; i < $groups.length; i++) {
-                    var existingGroup = $($groups.get(i)).data('groupname');
+                    var existingGroup = $($groups.get(i)).data('groupname').toString();
                     if(normalisedNewGroup === normaliseForComparison(existingGroup)){
                         $toastFeedback.toastTimeout({text: 'Group name already exists!', css: 'alert'});
                         $input.val('');
@@ -586,7 +586,8 @@
      */
     function normaliseForComparison(string)
     {
-        return string.replace(/\s+/g, ' ').trim().toLowerCase();
+        // Ensure var really is a string before performing string operations
+        return string.toString().replace(/\s+/g, ' ').trim().toLowerCase();
     }
 
 })(jQuery, window, document);
