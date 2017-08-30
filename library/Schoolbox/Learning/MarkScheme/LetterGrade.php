@@ -48,6 +48,7 @@ class LetterGrade extends AbstractMarkScheme
             return null;
         }
 
+        $normalisedMark = $this->filterNormalisedMark($normalisedMark);
         $this->validateNormalisedMark($normalisedMark);
 
         $lowestGradeLevel = null;

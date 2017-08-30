@@ -67,6 +67,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
             return null;
         }
 
+        $normalisedMark = $this->filterNormalisedMark($normalisedMark);
         $this->validateNormalisedMark($normalisedMark);
 
         $denominator = $this->deriveDenominator($response);
