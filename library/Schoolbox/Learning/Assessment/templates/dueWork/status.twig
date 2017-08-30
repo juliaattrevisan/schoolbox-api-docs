@@ -96,7 +96,7 @@
     <div class="small-12 column">
 
         {% if fbUrl %}
-        <form data-feedback-form method="post" action="{{ fbUrl }}">
+        <form data-feedback-form data-student="{{ participant.user.id }}" data-assessment="{{ participant.assessable.id }}" method="post" action="{{ fbUrl }}">
         {% endif %}
 
             <input type="hidden" name="responseId" value="{{ response.id }}" />
@@ -321,9 +321,88 @@
                 userSelector: '[data-mass-publish]',
                 userList: $userList,
                 onSubmit: function (toPublish) {
+                    var feedback = [];
+                    var buttons = [];
+                    var $toast = $('[data-save-draft]');
+
+                    $toast.toastActivate({text: 'Publishing drafts...'});
+
+                    {# Iterate through each publish button #}
+
                     toPublish.each(function () {
-                        $(this).find('[data-draft="publish"]').trigger('click');
+
+                        var $button      = $(this),
+                            buttonText   = $button.html(),
+                            $actionBar   = $button.closest('[data-action-bar]'),
+                            $participant = $actionBar.closest('[data-participant]'),
+                            $statusIcon  = $participant.find('[data-status]'),
+                            $statusLabel = $participant.find('[data-status-label]'),
+                            $form        = $participant.find('[data-feedback-form]');
+
+                        buttons[$form.attr('data-student')] = {
+                            '$button': $button,
+                            'buttonText': buttonText,
+                            '$actionBar': $actionBar,
+                            '$participant': $participant,
+                            '$statusIcon': $statusIcon,
+                            '$statusLabel': $statusLabel,
+                        };
+
+                        {# Throw the necessary data into an array so we can submit in a single AJAX request #}
+
+                        feedback.push({
+                            assessmentId: $form.attr('data-assessment'),
+                            studentId: $form.attr('data-student'),
+                            formData: $form.serializeArray()
+                        });
                     });
+
+
+                    $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks') }}', {'feedback': feedback})
+                        .done(function (response) {
+                            var toastError = '';
+
+                            response.forEach(function(feedback) {
+
+                                var button = buttons[feedback.participantId];
+
+                                if (feedback.success) {
+                                    {# Remove the publish button on success #}
+
+                                    soboSuccess(
+                                        button.$participant,
+                                        button.$button,
+                                        button.$actionBar,
+                                        button.$statusIcon,
+                                        button.$statusLabel,
+                                        feedback.submittedLate
+                                    );
+                                } else {
+                                    {# On error concatenate all of the error messages #}
+
+                                    soboFailure(
+                                        button.$button,
+                                        button.buttonText
+                                    );
+
+                                    toastError += feedback.message;
+                                }
+                            });
+
+                            {# Update the toast depending on error/success #}
+
+                            if (toastError !== '') {
+                                $toast.toastTimeout({text: toastError, css: 'alert'});
+                            } else {
+                                $toast.toastTimeout({text: 'Published all drafts', css: 'success'});
+                            }
+
+                        })
+                        .fail(function (response) {
+                            {# Something went wrong, display an error toast#}
+
+                            $toast.toastTimeout({text: response, css: 'alert'});
+                        });
                 }
             });
 
@@ -392,7 +471,9 @@
              */
             function soboSuccess($participant, $button, $actionBar, $statusIcon, $statusLabel, submittedLate, $toast)
             {
-                $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
+                if ($toast !== undefined) {
+                    $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
+                }
                 $button.fadeOut({done: function(){
                     if(!$actionBar.is('[data-mass-publish]')){
                          $actionBar.slideUp();
@@ -417,7 +498,10 @@
             {
                 $button.html(buttonText);
                 $button.removeAttr('disabled');
-                $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
+
+                if ($toast !== undefined) {
+                    $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
+                }
             }
         });
     </script>

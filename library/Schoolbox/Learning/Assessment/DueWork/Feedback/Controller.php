@@ -8,6 +8,9 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Web\Controller\Base;
 use Aura\Web\Request\Values as RequestValues;
+use PDOException;
+use RangeException;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -15,25 +18,50 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\MarkMapper as RubricMarkMapper;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
 
-    /**
-     * @var IFeedbackDataSource
-     */
+    /** @var IFeedbackDataSource */
     protected $feedbackDataSource;
 
+    /** @var ParticipantDataSource */
+    protected $participantDataSource;
+
+    /** @var AssessmentDataSource */
+    protected $assessmentDataSource;
+
+    /** @var ResponseDataSource */
+    protected $responseDataSource;
+
+    /** @var UserMapper */
+    protected $userMapper;
 
     /**
      * Controller constructor.
      *
      * @param IFeedbackDataSource $feedbackDataSource
+     * @param ParticipantDataSource $participantDataSource
+     * @param AssessmentDataSource $assessmentDataSource
+     * @param ResponseDataSource $responseDataSource
+     * @param UserMapper $userMapper
      */
-    public function __construct(IFeedbackDataSource $feedbackDataSource)
-    {
+    public function __construct(
+        IFeedbackDataSource $feedbackDataSource,
+        ParticipantDataSource $participantDataSource,
+        AssessmentDataSource $assessmentDataSource,
+        ResponseDataSource $responseDataSource,
+        UserMapper $userMapper
+    ) {
         $this->feedbackDataSource = $feedbackDataSource;
+        $this->participantDataSource = $participantDataSource;
+        $this->assessmentDataSource = $assessmentDataSource;
+        $this->responseDataSource = $responseDataSource;
+        $this->userMapper = $userMapper;
     }
 
     /**
@@ -43,7 +71,6 @@ class Controller extends Base
      *
      * @api   POST /learning/assessments/{assessmentId}/{studentId}/feedback
      * @level 165
-     *
      * @param Participant $participant
      */
     public function postParticipantFeedback(Participant $participant)
@@ -55,7 +82,7 @@ class Controller extends Base
             $this->processFeedback($participant, $mostRecentFeedback, $post);
             $this->processRubric($participant, $post);
         }
-        catch (\RangeException $e) {
+        catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
             return;
         }
@@ -63,9 +90,80 @@ class Controller extends Base
             $this->sendError('Invalid mark provided');
             return;
         }
-        catch (\PDOException $e) {
+        catch (PDOException $e) {
             $this->sendError('Unable to save results');
         }
+    }
+
+
+    /**
+     * Submit multiple feedbacks in single call
+     *
+     * This is a dueWork-only route
+     *
+     * @api   POST /learning/assessments/feedbacks
+     * @level 165
+     */
+    public function postParticipantFeedbacks()
+    {
+        $results = [];
+
+        $post = $this->getRequest()->post->getArrayCopy();
+
+        foreach ($post['feedback'] as $feedback) {
+            $student = $this->userMapper->findById($feedback['studentId']);
+            $assessment = $this->assessmentDataSource->findById($feedback['assessmentId']);
+            $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+            $participant = $assessment->getParticipant($student);
+            $response = $this->responseDataSource->findForAssessment($assessment, $student);
+            $mostRecentFeedback = $participant->findMostRecentFeedback();
+
+            $formData = [
+                'response' => $response,
+                'publish' => 1
+            ];
+
+            foreach ($feedback['formData'] as $data) {
+                $formData[$data['name']] = $data['value'];
+            }
+
+            try {
+                $feedback = $this->processFeedback($participant, $mostRecentFeedback, $formData);
+                $this->processRubric($participant, $formData);
+
+                $results[] = [
+                    'id'                => $feedback->getId(),
+                    'participantId'     => $participant->getUser()->getId(),
+                    'success'           => true,
+                    'submittedLate'     => $assessment->isOverdue() || $assessment->isPastClose()
+                ];
+            }
+            catch (RangeException $e) {
+                $results[] = [
+                    'participantId'     => $participant->getUser()->getId(),
+                    'success'           => false,
+                    'message'           => 'Invalid mark provided for ' . $participant->getUser()->getFullName() . ". "
+                ];
+            }
+            catch (MapperException $e) {
+                $results[] = [
+                    'participantId'     => $participant->getUser()->getId(),
+                    'success'           => false,
+                    'message'           => 'Invalid mark provided for ' . $participant->getUser()->getFullName() . ". "
+                ];
+            }
+            catch (PDOException $e) {
+                $results[] = [
+                    'participantId'     => $participant->getUser()->getId(),
+                    'success'           => false,
+                    'message'           => 'Unable to save results for ' . $participant->getUser()->getFullName() . ". "
+                ];
+            }
+        }
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput($results)
+        );
     }
 
     /**
@@ -111,15 +209,15 @@ class Controller extends Base
             $this->processFeedback($participant, $mostRecentFeedback, $this->getRequest()->post, $response);
             $this->processRubric($participant, $this->getRequest()->post->getArrayCopy());
         }
-        catch (\RangeException $e) {
+        catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
             return;
         }
-        catch (\Schoolbox\Mapper\Exception $e) {
+        catch (MapperException $e) {
             $this->sendError('Invalid mark provided');
             return;
         }
-        catch (\PDOException $e) {
+        catch (PDOException $e) {
             $this->sendError('Unable to save results');
         }
     }
@@ -180,7 +278,7 @@ class Controller extends Base
         try {
             $this->getFeedbackDataSource()->delete($feedback);
 
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             $code = 400;
             $data = $e->getMessage();
         }

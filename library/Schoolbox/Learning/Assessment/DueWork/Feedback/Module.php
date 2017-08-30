@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
@@ -52,6 +53,48 @@ class Module extends BaseModule
             )
         );
 
+        // If multiple feedbacks are passed in the POST['feeback'] array we need to check that the logged in user has write access to
+        // each of the folders these assessables are stored in. This is horrible- but I can't find a way to create dynamic permissions
+        // based on the contents of POST data any other way
+
+        if (isset($_POST['feedback'])) {
+            $ruleArguments = [];
+
+            foreach ($_POST['feedback'] as $feedback) {
+                // Find each assessable
+
+                $assessment = $this->getAssessmentDataSource()->findById($feedback['assessmentId']);
+
+                // Make sure the current user has access to write to the folder in which the assessable is located
+
+                $ruleArguments[] = new Rule\HasHomepageAccess(
+                    UserAccess::ACCESS_WRITE,
+                    $assessment->getContext()->getFolder()->getId(),
+                    Access::getInstance()
+                );
+            }
+
+            if (count($ruleArguments) > 0) {
+                $ruleClass = new \ReflectionClass(Rule\All::class);
+                $rulesHomepageAccess = $ruleClass->newInstanceArgs($ruleArguments);
+            }
+        }
+
+        if (isset($rulesHomepageAccess)) {
+            $canGiveFeedbackFromAllParticipants = new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    $rulesHomepageAccess,
+                    new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+                )
+            );
+        } else {
+            $canGiveFeedbackFromAllParticipants = new Rule\Any(
+                new Rule\IsSuperuser(),
+                new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+            );
+        }
+
         $canDeleteFeedback = new Rule\IsSuperuser();
 
         // preloads
@@ -79,6 +122,7 @@ class Module extends BaseModule
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
         $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback',  $canGiveFeedbackFromParticipant, $preloadParticipant); // p
+        $this->register('POST',   "/assessments/feedbacks",                   'postParticipantFeedbacks', $canGiveFeedbackFromAllParticipants);
         $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback',     $canGiveFeedbackFromParticipant, $preloadParticipantAndResponse); // p
         $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canDeleteFeedback,              $preloadFeedback); // f
     }
@@ -105,10 +149,13 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
         $injector->params[Controller::class] = [
-            'feedbackDataSource' => $injector->lazyGet('feedbackDataSource')
+            'feedbackDataSource' => $injector->lazyGet('feedbackDataSource'),
+            'participantDataSource' => $injector->lazyGet('participantDataSource'),
+            'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
+            'userMapper' => $this->getMapperFactory()->get(UserMapper::class),
+            'responseDataSource' => $injector->lazyGet('responseDataSource')
         ];
     }
-
 
     /**
      * @inheritdoc
@@ -138,7 +185,7 @@ class Module extends BaseModule
      * @param $assessmentId
      * @param int $responseId
      * @return Assessment\IResponse
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     protected function preloadResponse($assessmentId, $responseId)
     {
@@ -153,14 +200,14 @@ class Module extends BaseModule
             }
         }
 
-        throw new Mapper\Exception("Response '$responseId' not found for assessment '$assessmentId'.");
+        throw new MapperException("Response '$responseId' not found for assessment '$assessmentId'.");
     }
 
     /**
      * @param int $assessmentId
      * @param int $feedbackId
      * @return Assessment\IFeedback
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     protected function preloadFeedback($assessmentId, $feedbackId)
     {
@@ -175,7 +222,7 @@ class Module extends BaseModule
             }
         }
 
-        throw new Mapper\Exception("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
+        throw new MapperException("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
     }
 
     /**
