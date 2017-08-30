@@ -107,7 +107,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 ':semester'   => "'".$this->database->quote($semester)."'",
             )
         );
-//        new Alaress_Probe($query);
+        
         return $this->database->getAll($query);
     }
 
@@ -144,7 +144,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             $externalId, 'DetentionDate', $fromDate, $toDate
         );
         $query = strtr(sprintf($query, $wherePart), $params);
-//        new Alaress_Probe($query);
+
         return $this->database->getAll($query);
     }
 
@@ -189,7 +189,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             $externalId, 'EventDateTime', $fromDate, $toDate
         );
         $query = strtr(sprintf($query, $wherePart), $params);
-//        new Alaress_Probe($query);
+
         return $this->database->getAll($query);
     }
 

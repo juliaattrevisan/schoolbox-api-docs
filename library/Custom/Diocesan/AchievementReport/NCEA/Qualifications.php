@@ -12,8 +12,6 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-use Alaress_Probe as Probe;
-
 class Qualifications extends Base {
 
     /**

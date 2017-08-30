@@ -12,7 +12,6 @@ namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
 use MSSQL;
-use Alaress_Probe as Probe;
 use Schoolbox\User;
 
 class Controller extends Base {
