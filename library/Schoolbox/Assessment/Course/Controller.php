@@ -515,7 +515,7 @@ class Controller extends Base\Base
         }
 
         // Explicitly set to root (as opposed to not set)
-        if("0" === $parentFolderId){
+        if('0' === $parentFolderId && 0 !== $this->courseSpecificationMapper->getFacultyRootFolder()->getId()){
             throw new Base\Exception("Courses may not be created in the root folder");
         }
 
@@ -987,7 +987,8 @@ class Controller extends Base\Base
             'Courses'
         );
 
-        $treeData = $treeBuilder->buildPartialTree($folderId, $this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId());
+        $facultyRootFolder = $this->getCourseSpecificationMapper()->getFacultyRootFolder();
+        $treeData = $treeBuilder->buildPartialTree($folderId, $facultyRootFolder->getId() ?: '#');
 
         $data = [
             'treedata' => json_encode($treeData),
