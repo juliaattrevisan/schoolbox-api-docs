@@ -263,23 +263,6 @@ class Controller extends Base
                 ),
             )
         );
-
-        // And spit this thing out
-
-//        $this->getResponse()->content->set(
-//            array(
-//                'template' => '@pastoralReportBuilder/reportResults.twig',
-//                'data' => array(
-//                    'results'           => $paginatedRecords,
-//                    'resultsPerPage'    => $resultsPerPage,
-//                    'pagesToDisplay'    => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
-//                    'totalPages'        => $totalPages,
-//                    'totalResults'      => $records->count(),
-//                    'pageCurrent'       => $pageCurrent,
-//                    'report'            => $report
-//                ),
-//            )
-//        );
     }
 
     /**
