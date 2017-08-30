@@ -300,15 +300,15 @@ class Mapper extends BaseMapper
                             `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
                             `pastoral_report_dashboard`.`user_id` = {$userId} AND
                             `pastoral_report_dashboard`.`deleted_at` IS NULL
-            WHERE       `pastoral_report`.`owner_id` = :userId OR (
+            WHERE       `pastoral_report`.`deleted_at` IS NULL AND
+            (`pastoral_report`.`owner_id` = :userId OR (
                             `pastoral_report`.`id` IN (
                                 SELECT    `report_id` 
                                 FROM      `pastoral_report_groups` 
                                 WHERE     {$groupSql}
                                           `deleted_at` IS NULL
                             )
-                        ) AND
-                        `pastoral_report`.`deleted_at` IS NULL
+                        ))
             GROUP BY    `pastoral_report`.`id`
         ";
 
