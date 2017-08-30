@@ -25,8 +25,8 @@ class Index
     const LINK_ARCHIVE  = '.icon-archive';
     const LINK_RSS      = '.icon-rss';
 
-    CONST ELEMENT_BREADCRUMB = '.breadcrumb';
-    CONST ELEMENT_TOPIC_TABS = '.tabs';
+    CONST ELEMENT_BREADCRUMB   = '.breadcrumb';
+    CONST ELEMENT_FILTER_TOPIC = '.tabs';
 
     CONST ELEMENT_NEWS_LIST             = '.information-list';
     CONST ELEMENT_NEWS_ITEM             = self::ELEMENT_NEWS_LIST . ' .actions-small-1';
