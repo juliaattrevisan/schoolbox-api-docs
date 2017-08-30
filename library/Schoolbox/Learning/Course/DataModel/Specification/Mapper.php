@@ -110,7 +110,12 @@ class Mapper extends AbstractCourseMapper
         /** @var FolderMapper $folderMapper */
         $folderMapper        = $this->getJoinMapper('folder');
         $facultyRootFolderId = preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
-        $this->setFacultyRootFolder($folderMapper->findCheaplyById($facultyRootFolderId));
+        try{
+            $facultyRoot = $folderMapper->findCheaplyById($facultyRootFolderId);
+        } catch (BaseMapper\Exception $e){
+            $facultyRoot = $folderMapper->findCheaplyById(0);
+        }
+        $this->setFacultyRootFolder($facultyRoot);
     }
 
     /**
