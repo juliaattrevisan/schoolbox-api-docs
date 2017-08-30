@@ -631,3 +631,25 @@ foreach ($data as $country => $kingdoms) {
 > Try adding extra content to our `$data` array - perhaps add some heirs to the throne and so on, so that you can explore nested blocks some more. 
 
 If you made it this far - good work! You've survived the fundamentals of phplib sorcery and can go on to greater (and more convenient) things.
+
+# Data sanitisation, escaping dangerous content
+There are various philosophies regarding approach, but the one we use here is: we accept whatever the end user supplies (even if it's dangerous html/javascript content etc) and we "defuse" or colloquially, `scrub`, rendering this content harmless when outputting to the user.
+
+```php
+<?php
+$this->setVar([
+    'TITLE' => Scrub::text($model->getTitle());  // render title as text-only
+    'DESCRIPTION' => Scrub::html($model->getDescription()); // render description as html-capable
+]);
+```
+Twig-based locations are a bit more advanced - it does some stuff for you. However, use the `| purify` filter to achieve the same as `Scrub::html`. A twig equivalent to the above would be something like this:
+
+```twig
+{{ model.title }}
+{{ model.description | purify }}
+```
+
+* Always `scrub` on output. 
+* Never `scrub` on input.
+
+You can read more in `scrub.md`
