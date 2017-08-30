@@ -25,12 +25,12 @@ class Item
     const LINK_PREVIOUS = '.icon-previous';
     const LINK_NEXT     = '.icon-next';
 
-    CONST ELEMENT_BREADCRUMB = '.breadcrumb';
+    const ELEMENT_BREADCRUMB = '.breadcrumb';
 
-    CONST ELEMENT_META_AUTHOR   = '.card > .meta:nth-of-type(1)';
-    CONST ELEMENT_META_DATE     = '.card > .meta:nth-of-type(2)';
-    CONST ELEMENT_FEATURE_IMAGE = '.large-3 img';
-    CONST ELEMENT_ARTICLE       = '.large-9 article';
+    const ELEMENT_META_AUTHOR   = '.card > .meta:nth-of-type(1)';
+    const ELEMENT_META_DATE     = '.card > .meta:nth-of-type(2)';
+    const ELEMENT_FEATURE_IMAGE = '.large-3 img';
+    const ELEMENT_ARTICLE       = '.large-9 article';
 
     /**
      * @var AcceptanceTester
