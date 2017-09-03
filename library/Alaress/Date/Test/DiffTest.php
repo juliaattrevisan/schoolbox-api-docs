@@ -9,8 +9,8 @@
 
 namespace Alaress\Date\Test;
 
-use Alaress_Date_Format;
 use Alaress\Test\Date\MockDateObject;
+use Alaress_Date_Format;
 use DateTimeZone;
 use PHPUnit_Framework_TestCase;
 
@@ -126,20 +126,20 @@ class DiffTest extends PHPUnit_Framework_TestCase
                 $this->buildDateObject('2015-03-26 12:34:56', Alaress_Date_Format::DATABASE_FORMAT),
                 1,
             ],
-//            [
-//                // Different timezones, how do you handle that?
-//                $this->buildDateObject(
-//                    '2015-03-25 12:34:56',
-//                    Alaress_Date_Format::DATABASE_FORMAT,
-//                    new DateTimeZone('UTC')
-//                ),
-//                $this->buildDateObject(
-//                    '2015-03-25 12:34:56',
-//                    Alaress_Date_Format::DATABASE_FORMAT,
-//                    new DateTimeZone('Australia/Queensland')
-//                ),
-//                0,
-//            ],
+            //            [
+            //                // Different timezones, how do you handle that?
+            //                $this->buildDateObject(
+            //                    '2015-03-25 12:34:56',
+            //                    Alaress_Date_Format::DATABASE_FORMAT,
+            //                    new DateTimeZone('UTC')
+            //                ),
+            //                $this->buildDateObject(
+            //                    '2015-03-25 12:34:56',
+            //                    Alaress_Date_Format::DATABASE_FORMAT,
+            //                    new DateTimeZone('Australia/Queensland')
+            //                ),
+            //                0,
+            //            ],
         ];
     }
 
@@ -258,14 +258,18 @@ class DiffTest extends PHPUnit_Framework_TestCase
             [
                 // 1 month - 1 second: 1 month, apparently
                 // I think it should be 0 but i'm just testing the passthru
-                $this->buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT, new DateTimeZone('UTC')),
-                $this->buildDateObject('2015-04-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT, new DateTimeZone('UTC')),
+                $this->buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')),
+                $this->buildDateObject('2015-04-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')),
                 0,
             ],
             [
                 // 1 month
-                $this->buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT, new DateTimeZone('UTC')),
-                $this->buildDateObject('2015-04-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT, new DateTimeZone('UTC')),
+                $this->buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')),
+                $this->buildDateObject('2015-04-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')),
                 1,
             ],
         ];
@@ -410,13 +414,13 @@ class DiffTest extends PHPUnit_Framework_TestCase
             [
                 $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 $this->buildDateObject('2015-03-23 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                0
+                0,
             ],
             [
                 $this->buildDateObject('2014-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
                 $this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                -1
-            ]
+                -1,
+            ],
         ];
     }
 

@@ -23,19 +23,19 @@ class MultibytePathInfoTest extends PHPUnit_Framework_TestCase
     {
         //    input,              path,   basename,            ext,     filename
         return [
-            [ 'foo.doc',          null,   'foo.doc',           'doc',   'foo'        ],
-            [ 'foo.'      ,       null,   'foo.',              '',      'foo'        ],
-            [ '.foo'      ,       null,   '.foo',              'foo',   null         ],
-            [ 'foo'       ,       null,   'foo',               null,    'foo'        ],
-            [ 'foo.tar.gz',       null,   'foo.tar.gz',        'gz',    'foo.tar'    ],
-            [ 'foo.tar..gz',      null,   'foo.tar..gz',       'gz',    'foo.tar.'   ],
-            [ '怎样节约用水.jpeg',   null,   '怎样节约用水.jpeg',   'jpeg',  '怎样节约用水'  ],
-            [ '_怎样节约用水.jpeg',  null,   '_怎样节约用水.jpeg',  'jpeg',  '_怎样节约用水' ],
-            [ 'אַהֲוָא.jpeg',         null,   'אַהֲוָא.jpeg',         'jpeg',  'אַהֲוָא'        ],
-            [ '/foo/אַהֲוָא.jpeg',    '/foo', 'אַהֲוָא.jpeg',         'jpeg',  'אַהֲוָא'        ],
-            [ '/foo/_אַהֲוָא.jpeg',   '/foo', '_אַהֲוָא.jpeg',        'jpeg',  '_אַהֲוָא'       ],
-            [ '/foo/bar/_אַהֲוָא.jpeg', '/foo/bar', '_אַהֲוָא.jpeg',   'jpeg',  '_אַהֲוָא'       ],
-            [ '/foo/bar/',           '/foo', 'bar',             null,    'bar'       ],
+            ['foo.doc', null, 'foo.doc', 'doc', 'foo'],
+            ['foo.', null, 'foo.', '', 'foo'],
+            ['.foo', null, '.foo', 'foo', null],
+            ['foo', null, 'foo', null, 'foo'],
+            ['foo.tar.gz', null, 'foo.tar.gz', 'gz', 'foo.tar'],
+            ['foo.tar..gz', null, 'foo.tar..gz', 'gz', 'foo.tar.'],
+            ['怎样节约用水.jpeg', null, '怎样节约用水.jpeg', 'jpeg', '怎样节约用水'],
+            ['_怎样节约用水.jpeg', null, '_怎样节约用水.jpeg', 'jpeg', '_怎样节约用水'],
+            ['אַהֲוָא.jpeg', null, 'אַהֲוָא.jpeg', 'jpeg', 'אַהֲוָא'],
+            ['/foo/אַהֲוָא.jpeg', '/foo', 'אַהֲוָא.jpeg', 'jpeg', 'אַהֲוָא'],
+            ['/foo/_אַהֲוָא.jpeg', '/foo', '_אַהֲוָא.jpeg', 'jpeg', '_אַהֲוָא'],
+            ['/foo/bar/_אַהֲוָא.jpeg', '/foo/bar', '_אַהֲוָא.jpeg', 'jpeg', '_אַהֲוָא'],
+            ['/foo/bar/', '/foo', 'bar', null, 'bar'],
         ];
     }
 
@@ -48,15 +48,20 @@ class MultibytePathInfoTest extends PHPUnit_Framework_TestCase
      * @param string $expectedExtension
      * @param string $expectedFilename
      */
-    public function testMultiBytePathInfo($input, $expectedDirname, $expectedBasename, $expectedExtension, $expectedFilename)
-    {
+    public function testMultiBytePathInfo(
+        $input,
+        $expectedDirname,
+        $expectedBasename,
+        $expectedExtension,
+        $expectedFilename
+    ) {
         $info = mb_pathinfo($input);
 
         $expected = [
             'dirname'   => $expectedDirname,
             'basename'  => $expectedBasename,
             'extension' => $expectedExtension,
-            'filename'  => $expectedFilename
+            'filename'  => $expectedFilename,
         ];
 
         // as with pathinfo(), if any part is empty, it is not included in the returned array

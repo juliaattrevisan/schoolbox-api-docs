@@ -10,41 +10,44 @@
  */
 
 namespace Schoolbox\Test;
+
 use PHPUnit_Framework_TestCase;
 
-abstract class TestCase extends PHPUnit_Framework_TestCase {
-	/**
-	 * The object that's being tested.
-	 *
-	 * @var object
-	 */
-	protected $object;
+abstract class TestCase extends PHPUnit_Framework_TestCase
+{
+    /**
+     * The object that's being tested.
+     *
+     * @var object
+     */
+    protected $object;
 
-	/**
-	 * Configuration variables to set in the mock config.
-	 *
-	 * @var array
-	 */
-	protected $config_vars = array();
+    /**
+     * Configuration variables to set in the mock config.
+     *
+     * @var array
+     */
+    protected $config_vars = [];
 
-	/**
-	 * Mock object of ConfigLoader
-	 *
-	 * @var \PHPUnit_Framework_MockObject_MockObject
-	 */
-	protected $mock_config;
+    /**
+     * Mock object of ConfigLoader
+     *
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $mock_config;
 
-	public function setUp() {
-		unset($this->object);
+    public function setUp()
+    {
+        unset($this->object);
 
-		//
-		// Set up a mock configuration.
-		$mock_config = $this->getMock(\Schoolbox\Config\Loader::class);
-		$mock_config
-			->expects($this->any())
-			->method('get')
-			->will($this->returnValueMap($this->config_vars));
-		$this->mock_config = $mock_config;
-	}
+        //
+        // Set up a mock configuration.
+        $mock_config = $this->getMock(\Schoolbox\Config\Loader::class);
+        $mock_config
+            ->expects($this->any())
+            ->method('get')
+            ->will($this->returnValueMap($this->config_vars));
+        $this->mock_config = $mock_config;
+    }
 
 }

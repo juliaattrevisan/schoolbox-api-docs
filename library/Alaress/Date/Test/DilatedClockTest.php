@@ -29,8 +29,8 @@ class DilatedClockTest extends PHPUnit_Framework_TestCase
      */
     public function testSlowClockInPast()
     {
-        $now   = time();
-        $clock = new DilatedClock(3, '@'.($now-1));
+        $now = time();
+        $clock = new DilatedClock(3, '@' . ($now - 1));
         sleep(3);
         $this->assertEquals($now, $clock->time());
     }
@@ -40,10 +40,10 @@ class DilatedClockTest extends PHPUnit_Framework_TestCase
      */
     public function testFastClockInPast()
     {
-        $now   = time();
-        $clock = new DilatedClock(1/10, '@'.($now-3));
+        $now = time();
+        $clock = new DilatedClock(1 / 10, '@' . ($now - 3));
         sleep(1);
-        $this->assertEquals($now+7, $clock->time());
+        $this->assertEquals($now + 7, $clock->time());
     }
 
     /**
@@ -51,10 +51,10 @@ class DilatedClockTest extends PHPUnit_Framework_TestCase
      */
     public function testSlowClockInFuture()
     {
-        $now   = time();
-        $clock = new DilatedClock(3, '@'.($now+1));
+        $now = time();
+        $clock = new DilatedClock(3, '@' . ($now + 1));
         sleep(3);
-        $this->assertEquals($now+2, $clock->time());
+        $this->assertEquals($now + 2, $clock->time());
     }
 
     /**
@@ -62,9 +62,9 @@ class DilatedClockTest extends PHPUnit_Framework_TestCase
      */
     public function testFastClockInFuture()
     {
-        $now   = time();
-        $clock = new DilatedClock(1/10, '@'.($now+1));
+        $now = time();
+        $clock = new DilatedClock(1 / 10, '@' . ($now + 1));
         sleep(1);
-        $this->assertEquals($now+11, $clock->time());
+        $this->assertEquals($now + 11, $clock->time());
     }
 }

@@ -10,9 +10,9 @@ namespace Schoolbox\External\Normalise\User\Test\Guardian;
 
 use ArrayIterator;
 use Iterator;
+use PHPUnit_Framework_TestCase;
 use Schoolbox\External\Normalise\User\Guardian as GuardianObject;
 use Schoolbox\Sync\Iterator\Guardian as GuardianIterator;
-use PHPUnit_Framework_TestCase;
 
 class SyncTest extends PHPUnit_Framework_TestCase
 {
@@ -55,11 +55,101 @@ class SyncTest extends PHPUnit_Framework_TestCase
         ];
 
         $values = [
-            ['1', 'Mr', 'John', 'John', 'Smith', 'Male', 'john@gmail.com', 'john1@gmail.com', 'john@gmail.com', 'john_smith', '101', 'Anna', 'Smith', 'Female', '9', 'JUN', 'Fox'],
-            ['1', 'Mr', 'John', 'John', 'Smith', 'Male', 'john@gmail.com', 'john2@gmail.com', 'john@gmail.com', 'john_smith', '102', 'Brad', 'Smith', 'Male', '10', 'JUN', 'Fox'],
-            ['1', 'Mr', 'John', 'John', 'Smith', 'Male', 'john@gmail.com', 'john3@gmail.com', 'john@gmail.com', 'john_smith', '103', 'Chad', 'Smith', 'Male', '11', 'SEN', 'Fox'],
-            ['1', 'Mr', 'John', 'John', 'Smith', 'Male', 'john@gmail.com', 'john4@gmail.com', 'john@gmail.com', 'john_smith', '104', 'Doug', 'Smith', 'Male', '12', 'SEN', 'Fox'],
-            ['2','Mrs','Wendy','Bubbles','Pierce','Female','wendy@gmail.com', null, 'wendy2@hotmail.com','wendy_pierce','105','Wendy Junior','Pierce','Female','8','JUN','Beaver',],
+            [
+                '1',
+                'Mr',
+                'John',
+                'John',
+                'Smith',
+                'Male',
+                'john@gmail.com',
+                'john1@gmail.com',
+                'john@gmail.com',
+                'john_smith',
+                '101',
+                'Anna',
+                'Smith',
+                'Female',
+                '9',
+                'JUN',
+                'Fox',
+            ],
+            [
+                '1',
+                'Mr',
+                'John',
+                'John',
+                'Smith',
+                'Male',
+                'john@gmail.com',
+                'john2@gmail.com',
+                'john@gmail.com',
+                'john_smith',
+                '102',
+                'Brad',
+                'Smith',
+                'Male',
+                '10',
+                'JUN',
+                'Fox',
+            ],
+            [
+                '1',
+                'Mr',
+                'John',
+                'John',
+                'Smith',
+                'Male',
+                'john@gmail.com',
+                'john3@gmail.com',
+                'john@gmail.com',
+                'john_smith',
+                '103',
+                'Chad',
+                'Smith',
+                'Male',
+                '11',
+                'SEN',
+                'Fox',
+            ],
+            [
+                '1',
+                'Mr',
+                'John',
+                'John',
+                'Smith',
+                'Male',
+                'john@gmail.com',
+                'john4@gmail.com',
+                'john@gmail.com',
+                'john_smith',
+                '104',
+                'Doug',
+                'Smith',
+                'Male',
+                '12',
+                'SEN',
+                'Fox',
+            ],
+            [
+                '2',
+                'Mrs',
+                'Wendy',
+                'Bubbles',
+                'Pierce',
+                'Female',
+                'wendy@gmail.com',
+                null,
+                'wendy2@hotmail.com',
+                'wendy_pierce',
+                '105',
+                'Wendy Junior',
+                'Pierce',
+                'Female',
+                '8',
+                'JUN',
+                'Beaver',
+            ],
         ];
 
         $data = [];

@@ -24,13 +24,48 @@ class HumanReadableTest extends PHPUnit_Framework_TestCase
     public function dataHumanReadable()
     {
         return [
-            [ 'today',                  function () { return ADF::now()->setTime(0, 0, 0); } ],
-            [ 'tomorrow',               function () { return ADF::now()->addDays(1)->setTime(0, 0, 0); } ],
-            [ 'yesterday at 8:45am',    function () { return ADF::now()->addDays(-1)->setTime(8, 45, 0); } ],
-            [ 'May 4th 2017 at 2pm',    function () { return ADF::newDatabaseDate('2017-05-04 14:00:00'); } ],
-            [ 'in five days at 9:30am', function () { return ADF::now()->addDays(5)->setTime(9, 30, 0); } ],
-            [ '17th Mar 2018 12:00pm',  function () { return ADF::newDatabaseDate('2018-03-17 12:00:00'); } ],
-            [ '2 weeks from now',       function () { return ADF::now()->addDays(14); } ],
+            [
+                'today',
+                function () {
+                    return ADF::now()->setTime(0, 0, 0);
+                },
+            ],
+            [
+                'tomorrow',
+                function () {
+                    return ADF::now()->addDays(1)->setTime(0, 0, 0);
+                },
+            ],
+            [
+                'yesterday at 8:45am',
+                function () {
+                    return ADF::now()->addDays(-1)->setTime(8, 45, 0);
+                },
+            ],
+            [
+                'May 4th 2017 at 2pm',
+                function () {
+                    return ADF::newDatabaseDate('2017-05-04 14:00:00');
+                },
+            ],
+            [
+                'in five days at 9:30am',
+                function () {
+                    return ADF::now()->addDays(5)->setTime(9, 30, 0);
+                },
+            ],
+            [
+                '17th Mar 2018 12:00pm',
+                function () {
+                    return ADF::newDatabaseDate('2018-03-17 12:00:00');
+                },
+            ],
+            [
+                '2 weeks from now',
+                function () {
+                    return ADF::now()->addDays(14);
+                },
+            ],
         ];
     }
 
@@ -38,7 +73,7 @@ class HumanReadableTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataHumanReadable
      *
-     * @param string   $naturalLanguage
+     * @param string $naturalLanguage
      * @param callable $callable
      * @throws InvalidArgumentException
      */

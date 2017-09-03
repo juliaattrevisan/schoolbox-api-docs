@@ -9,8 +9,8 @@
 
 namespace Alaress\Date\Test;
 
-use Alaress_Date_Format;
 use Alaress\Test\Date\MockDateObject;
+use Alaress_Date_Format;
 use DateTimeZone;
 use PHPUnit_Framework_TestCase;
 

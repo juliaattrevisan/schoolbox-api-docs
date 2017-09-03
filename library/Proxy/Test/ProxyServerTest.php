@@ -33,8 +33,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
 
 
     /**
-    * @var \Proxy\Server
-    */
+     * @var \Proxy\Server
+     */
     protected $proxyServer;
 
     protected function setUp()
@@ -51,19 +51,20 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
 
 
     /**
-    * When a custom config loader is imported, its settings override the Config singleton
-    */
+     * When a custom config loader is imported, its settings override the Config singleton
+     */
     public function testDependencyInjection()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('proxy.alaress.com.au', '8080', 'matt.day', 'l4mp'));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('proxy.alaress.com.au', '8080',
+            'matt.day', 'l4mp'));
 
         $this->assertEquals('proxy.alaress.com.au:8080', $this->proxyServer->getURI());
         $this->assertEquals(base64_encode('matt.day:l4mp'), $this->proxyServer->getUserPwd(true));
     }
 
     /**
-    * When Host and Port are set, usesProxy() returns true
-    */
+     * When Host and Port are set, usesProxy() returns true
+     */
     public function testUsingProxy()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, '', ''));
@@ -71,8 +72,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * When Host and Port are unset, usesProxy() returns false
-    */
+     * When Host and Port are unset, usesProxy() returns false
+     */
     public function testNoProxy()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('', '', '', ''));
@@ -80,8 +81,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * When Username and Password are not provided, connection is anonymous
-    */
+     * When Username and Password are not provided, connection is anonymous
+     */
     public function testIsAnonymous()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, '', ''));
@@ -89,19 +90,20 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * When Username and Password are provided, connection is authenticated
-    */
+     * When Username and Password are provided, connection is authenticated
+     */
     public function testIsAuthenticated()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER, self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
+            self::PASS));
         $this->assertTrue($this->proxyServer->isAuthenticated());
 
     }
 
 
     /**
-    * Direct HTTP connection using cURL returns a 200 code with content
-    */
+     * Direct HTTP connection using cURL returns a 200 code with content
+     */
     public function testDirectHttpCurl()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('', '', '', ''));
@@ -112,8 +114,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Direct HTTP connection using streams returns a 200 code with content
-    */
+     * Direct HTTP connection using streams returns a 200 code with content
+     */
     public function testDirectHttpFopen()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('', '', '', ''));
@@ -124,8 +126,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Direct HTTPS connection using cURL returns a 200 code with content
-    */
+     * Direct HTTPS connection using cURL returns a 200 code with content
+     */
     public function testDirectHttpsCurl()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('', '', '', ''));
@@ -136,8 +138,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Direct HTTP connection using streams returns a 200 code with content
-    */
+     * Direct HTTP connection using streams returns a 200 code with content
+     */
     public function testDirectHttpsFopen()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('', '', '', ''));
@@ -149,8 +151,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
 
 
     /**
-    * HTTP connection using an invalid server using cURL fails to connect to host
-    */
+     * HTTP connection using an invalid server using cURL fails to connect to host
+     */
     public function testInvalidServerHttpCurl()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('192.168.1.200', '8080', '', ''));
@@ -160,10 +162,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * HTTP connection using an invalid server using streams fails to connect to host
-    *
-    * @expectedException PHPUnit_Framework_Error_Warning
-    */
+     * HTTP connection using an invalid server using streams fails to connect to host
+     *
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
     public function testInvalidServerHttpFopen()
     {
 
@@ -174,8 +176,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * HTTPS connection using an invalid server using cURL fails to connect to host
-    */
+     * HTTPS connection using an invalid server using cURL fails to connect to host
+     */
     public function testInvalidServerHttpsCurl()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('192.168.1.200', '8080', '', ''));
@@ -185,10 +187,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * HTTPS connection using an invalid server using streams fails to connect to host
-    *
-    * @expectedException PHPUnit_Framework_Error_Warning
-    */
+     * HTTPS connection using an invalid server using streams fails to connect to host
+     *
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
     public function testInvalidServerHttpsFopen()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('192.168.1.200', '8080', '', ''));
@@ -198,8 +200,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Anonymous proxied HTTP connection using cURL returns a 200 code with content
-    */
+     * Anonymous proxied HTTP connection using cURL returns a 200 code with content
+     */
     public function testAnonymousHttpCurl()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, '', ''));
@@ -210,8 +212,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Anonymous proxied HTTP connection using streams returns a 200 code with content
-    */
+     * Anonymous proxied HTTP connection using streams returns a 200 code with content
+     */
     public function testAnonymousHttpFopen()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, '', ''));
@@ -222,8 +224,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Anonymous proxied HTTPS connection using cURL returns a 200 code with content
-    */
+     * Anonymous proxied HTTPS connection using cURL returns a 200 code with content
+     */
     public function testAnonymousHttpsCurl()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, '', ''));
@@ -234,8 +236,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Anonymous proxied HTTPS connection using streams returns a 200 code with content
-    */
+     * Anonymous proxied HTTPS connection using streams returns a 200 code with content
+     */
     public function testAnonymousHttpsFopen()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, '', ''));
@@ -246,8 +248,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Unauthorised proxy HTTP connection using cURL returns a 407 code with proxy response
-    */
+     * Unauthorised proxy HTTP connection using cURL returns a 407 code with proxy response
+     */
     public function testUnauthorizedHttpCurl()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, 'fail', 'fail'));
@@ -257,10 +259,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Unauthorised proxy HTTP connection using streams returns a 407 code with proxy response
-    *
-    * @expectedException PHPUnit_Framework_Error_Warning
-    */
+     * Unauthorised proxy HTTP connection using streams returns a 407 code with proxy response
+     *
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
     public function testUnauthorizedHttpFopen()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, 'fail', 'fail'));
@@ -270,8 +272,8 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Unauthorised proxy HTTPS connection using cURL returns a 407 code with proxy response
-    */
+     * Unauthorised proxy HTTPS connection using cURL returns a 407 code with proxy response
+     */
     public function testUnauthorizedHttpsCurl()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, 'fail', 'fail'));
@@ -281,10 +283,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Unauthorised proxy HTTPS connection using streams returns a 407 code with proxy response
-    *
-    * @expectedException PHPUnit_Framework_Error_Warning
-    */
+     * Unauthorised proxy HTTPS connection using streams returns a 407 code with proxy response
+     *
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
     public function testUnauthorizedHttpsFopen()
     {
         $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, 'fail', 'fail'));
@@ -294,11 +296,12 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Authorised proxy HTTP connection using cURL returns a 200 code with content
-    */
+     * Authorised proxy HTTP connection using cURL returns a 200 code with content
+     */
     public function testAuthorizedHttpCurl()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER, self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
+            self::PASS));
         $data = $this->curl(false);
 
         $this->assertEquals(self::HTTP_OK, $data['code']);
@@ -306,11 +309,12 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Authorised proxy HTTP connection using streams returns a 200 code with content
-    */
+     * Authorised proxy HTTP connection using streams returns a 200 code with content
+     */
     public function testAuthorizedHttpFopen()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER, self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
+            self::PASS));
         $data = $this->fopen(false);
 
         $this->assertEquals(self::HTTP_OK, $data['code']);
@@ -318,11 +322,12 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Authorised proxy HTTPS connection using cURL returns a 200 code with content
-    */
+     * Authorised proxy HTTPS connection using cURL returns a 200 code with content
+     */
     public function testAuthorizedHttpsCurl()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER, self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
+            self::PASS));
         $data = $this->curl(true);
 
         $this->assertEquals(self::HTTP_OK, $data['code']);
@@ -330,11 +335,12 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-    * Authorised proxy HTTPS connection using streams returns a 200 code with content
-    */
+     * Authorised proxy HTTPS connection using streams returns a 200 code with content
+     */
     public function testAuthorizedHttpsFopen()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER, self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
+            self::PASS));
         $data = $this->fopen(true);
 
         $this->assertEquals(self::HTTP_OK, $data['code']);
@@ -352,10 +358,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
         $response = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        return array(
-            'code' => (int)$code,
-            'response' => $response
-        );
+        return [
+            'code'     => (int)$code,
+            'response' => $response,
+        ];
     }
 
     protected function fopen($https = false)
@@ -376,10 +382,10 @@ class ProxyServerTest extends PHPUnit_Framework_TestCase
         preg_match('`[0-9]{3}`', $http_response_header[0], $matches);
         $code = $matches[0];
 
-        return array(
-            'code' => (int)$code,
-            'response' => $response
-        );
+        return [
+            'code'     => (int)$code,
+            'response' => $response,
+        ];
 
     }
 }

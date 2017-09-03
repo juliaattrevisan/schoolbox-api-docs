@@ -70,7 +70,6 @@ class CollectionTest extends PHPUnit_Framework_TestCase
     }
 
 
-
     // ============= Data Providers =============
 
     public function provider_Collection()
@@ -80,7 +79,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
             [new Collection([])],
             [(new Collection())->add(null)],
             [(new Collection())->add(1)->add(2)],
-            [(new Collection())->add([1,2,3])],
+            [(new Collection())->add([1, 2, 3])],
             [(new Collection())->add(new User())],
         ];
     }
@@ -103,8 +102,8 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         return [
             [[]],
             [[null]],
-            [[1,2,3]],
-            [[null,1, new User(), []]],
+            [[1, 2, 3]],
+            [[null, 1, new User(), []]],
         ];
     }
 

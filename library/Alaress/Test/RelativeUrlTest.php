@@ -74,7 +74,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
 
     public function testNoSiteHostExplicit()
     {
-        if(isset($_SERVER['HTTP_HOST'])){
+        if (isset($_SERVER['HTTP_HOST'])) {
             unset($_SERVER['HTTP_HOST']);
         }
 
@@ -204,7 +204,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
      * @dataProvider provider_normaliseNonLocalUrls
      * @param string $url
      * @param string $localSiteHost
-     * @param string$expected
+     * @param string $expected
      */
     public function testNormaliseNotLocalUrl($url, $localSiteHost, $expected)
     {
@@ -460,10 +460,10 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     public function provider_getSlugMapping()
     {
         return [
-            ['/path/to/file.ext',                               '-path-to-fileext'],
-            ['mongy mongy mongy',                               'mongy-mongy-mongy'],
-            ['this is my file that I have given unto you.txt',  'this-is-my-file-that-i-have-given-unto-youtxt'],
-            ["I'M SHOUTING",                                    'im-shouting'],
+            ['/path/to/file.ext', '-path-to-fileext'],
+            ['mongy mongy mongy', 'mongy-mongy-mongy'],
+            ['this is my file that I have given unto you.txt', 'this-is-my-file-that-i-have-given-unto-youtxt'],
+            ["I'M SHOUTING", 'im-shouting'],
         ];
     }
 
@@ -472,16 +472,16 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $localSiteHost = $this->getLocalSiteHost();
         $otherSiteHost = $this->getNotLocalSiteHost();
         return [
-            ["$otherSiteHost",                      $localSiteHost, "http://$otherSiteHost"],
-            ["$otherSiteHost/",                     $localSiteHost, "http://$otherSiteHost/"],
-            ["$otherSiteHost:8080",                 $localSiteHost, "http://$otherSiteHost:8080"],
-            ["$otherSiteHost:8080/",                $localSiteHost, "http://$otherSiteHost:8080/"],
-            ["http://{$otherSiteHost}u",            $localSiteHost, "http://{$otherSiteHost}u"],
-            ["http://$otherSiteHost/",              $localSiteHost, "http://$otherSiteHost/"],
-            ["http://$otherSiteHost:8080",          $localSiteHost, "http://$otherSiteHost:8080"],
-            ["http://$otherSiteHost:8080/",         $localSiteHost, "http://$otherSiteHost:8080/"],
-            ["http://$otherSiteHost/homepage/43",   $localSiteHost, "http://$otherSiteHost/homepage/43"],
-            ["//$otherSiteHost/homepage/43",        $localSiteHost, "http://$otherSiteHost/homepage/43"],
+            ["$otherSiteHost", $localSiteHost, "http://$otherSiteHost"],
+            ["$otherSiteHost/", $localSiteHost, "http://$otherSiteHost/"],
+            ["$otherSiteHost:8080", $localSiteHost, "http://$otherSiteHost:8080"],
+            ["$otherSiteHost:8080/", $localSiteHost, "http://$otherSiteHost:8080/"],
+            ["http://{$otherSiteHost}u", $localSiteHost, "http://{$otherSiteHost}u"],
+            ["http://$otherSiteHost/", $localSiteHost, "http://$otherSiteHost/"],
+            ["http://$otherSiteHost:8080", $localSiteHost, "http://$otherSiteHost:8080"],
+            ["http://$otherSiteHost:8080/", $localSiteHost, "http://$otherSiteHost:8080/"],
+            ["http://$otherSiteHost/homepage/43", $localSiteHost, "http://$otherSiteHost/homepage/43"],
+            ["//$otherSiteHost/homepage/43", $localSiteHost, "http://$otherSiteHost/homepage/43"],
         ];
     }
 
@@ -489,52 +489,52 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     {
         $localSiteHost = $this->getLocalSiteHost();
         return [
-            ['         ',                                    $localSiteHost, ''],
-            ['',                                             $localSiteHost, ''],
-            ["\t\t\t\t",                                     $localSiteHost, ''],
-            ["\n",                                           $localSiteHost, ''],
-            ['sbvagrant.alaress.com.au',                     $localSiteHost, '/'],
-            ['sbvagrant.alaress.com.au/',                    $localSiteHost, '/'],
-            ['sbvagrant.alaress.com.au:8080',                $localSiteHost, '/'],
-            ['sbvagrant.alaress.com.au:8080/',               $localSiteHost, '/'],
-            ['http://sbvagrant.alaress.com.au',              $localSiteHost, '/'],
-            ['http://sbvagrant.alaress.com.au/',             $localSiteHost, '/'],
-            ['http://sbvagrant.alaress.com.au:8080',         $localSiteHost, '/'],
-            ['http://sbvagrant.alaress.com.au:8080/',        $localSiteHost, '/'],
-            ['http://sbvagrant.alaress.com.au/homepage/43',  $localSiteHost, '/homepage/43'],
-            ['//sbvagrant.alaress.com.au/homepage/43',       $localSiteHost, '/homepage/43'],
-            ['/homepage/43',                                 $localSiteHost, '/homepage/43'],
+            ['         ', $localSiteHost, ''],
+            ['', $localSiteHost, ''],
+            ["\t\t\t\t", $localSiteHost, ''],
+            ["\n", $localSiteHost, ''],
+            ['sbvagrant.alaress.com.au', $localSiteHost, '/'],
+            ['sbvagrant.alaress.com.au/', $localSiteHost, '/'],
+            ['sbvagrant.alaress.com.au:8080', $localSiteHost, '/'],
+            ['sbvagrant.alaress.com.au:8080/', $localSiteHost, '/'],
+            ['http://sbvagrant.alaress.com.au', $localSiteHost, '/'],
+            ['http://sbvagrant.alaress.com.au/', $localSiteHost, '/'],
+            ['http://sbvagrant.alaress.com.au:8080', $localSiteHost, '/'],
+            ['http://sbvagrant.alaress.com.au:8080/', $localSiteHost, '/'],
+            ['http://sbvagrant.alaress.com.au/homepage/43', $localSiteHost, '/homepage/43'],
+            ['//sbvagrant.alaress.com.au/homepage/43', $localSiteHost, '/homepage/43'],
+            ['/homepage/43', $localSiteHost, '/homepage/43'],
         ];
     }
 
     public function provider_relativeUrlMapping()
     {
         return [
-            ['             ',                                   ''],
-            ['\t\t\t',                                          '/\t\t\t'],
-            ["\t\t\t",                                          ''],
-            ["\n",                                              ''],
-            ["&%20",                                            '/&%20'],
-            ['',                                                ''],
-            ['www.google.com',                                  '/'],
-            ['/',                                               '/'],
-            ['#',                                               '#'],
-            ['#tags',                                           '#tags'],
-            ['?key',                                            '?key'],
-            ['?key=val',                                        '?key=val'],
-            ['?key=val&key2=val2',                              '?key=val&key2=val2'],
-            ['/path/to/file.ext',                               '/path/to/file.ext'],
-            ['//www.google.com/path/to/file.ext',               '/path/to/file.ext'],
-            ['www.google.com/path/to/file.ext',                 '/path/to/file.ext'],
-            ['localhost/path/to/file.ext',                      '/path/to/file.ext'],
-            ['sbvagrant.alaress.com.au/path/to/file.ext',       '/path/to/file.ext'],
-            ['ftp://www.google.com/path/to/file.ext',           '/path/to/file.ext'],
-            ['ftps://www.google.com/path/to/file.ext',          '/path/to/file.ext'],
-            ['http://www.google.com/path/to/file.ext',          '/path/to/file.ext'],
-            ['https://www.google.com/path/to/file.ext',         '/path/to/file.ext'],
-            ['http://www.google.com/path/to/file.ext#tag',      '/path/to/file.ext#tag'],
-            ['http://www.google.com/path/to/file.ext?key',      '/path/to/file.ext?key'],
-            ['http://www.google.com/path/to/file.ext?key=val',  '/path/to/file.ext?key=val'],
+            ['             ', ''],
+            ['\t\t\t', '/\t\t\t'],
+            ["\t\t\t", ''],
+            ["\n", ''],
+            ["&%20", '/&%20'],
+            ['', ''],
+            ['www.google.com', '/'],
+            ['/', '/'],
+            ['#', '#'],
+            ['#tags', '#tags'],
+            ['?key', '?key'],
+            ['?key=val', '?key=val'],
+            ['?key=val&key2=val2', '?key=val&key2=val2'],
+            ['/path/to/file.ext', '/path/to/file.ext'],
+            ['//www.google.com/path/to/file.ext', '/path/to/file.ext'],
+            ['www.google.com/path/to/file.ext', '/path/to/file.ext'],
+            ['localhost/path/to/file.ext', '/path/to/file.ext'],
+            ['sbvagrant.alaress.com.au/path/to/file.ext', '/path/to/file.ext'],
+            ['ftp://www.google.com/path/to/file.ext', '/path/to/file.ext'],
+            ['ftps://www.google.com/path/to/file.ext', '/path/to/file.ext'],
+            ['http://www.google.com/path/to/file.ext', '/path/to/file.ext'],
+            ['https://www.google.com/path/to/file.ext', '/path/to/file.ext'],
+            ['http://www.google.com/path/to/file.ext#tag', '/path/to/file.ext#tag'],
+            ['http://www.google.com/path/to/file.ext?key', '/path/to/file.ext?key'],
+            ['http://www.google.com/path/to/file.ext?key=val', '/path/to/file.ext?key=val'],
         ];
     }
 
@@ -916,17 +916,17 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     public function provider_parsableHostnames()
     {
         return [
-            ['protocol://www.example.com',        'www.example.com'],
-            ['//www.example.com',                 'www.example.com'],
-            ['//www.example.com/',                'www.example.com'],
-            ['www.example.com',                   'www.example.com'],
-            ['www.example.com/path/to/file.ext',  'www.example.com'],
-            ['localhost/and.some.extra',          'localhost'],
-            ['localhost:8080',                    'localhost'],
-            ['localhost:8080/path/file.ext',      'localhost'],
-            ['localhost#tag',                     'localhost'],
-            ['localhost?key',                     'localhost'],
-            ['localhost?key=val',                 'localhost'],
+            ['protocol://www.example.com', 'www.example.com'],
+            ['//www.example.com', 'www.example.com'],
+            ['//www.example.com/', 'www.example.com'],
+            ['www.example.com', 'www.example.com'],
+            ['www.example.com/path/to/file.ext', 'www.example.com'],
+            ['localhost/and.some.extra', 'localhost'],
+            ['localhost:8080', 'localhost'],
+            ['localhost:8080/path/file.ext', 'localhost'],
+            ['localhost#tag', 'localhost'],
+            ['localhost?key', 'localhost'],
+            ['localhost?key=val', 'localhost'],
         ];
     }
 

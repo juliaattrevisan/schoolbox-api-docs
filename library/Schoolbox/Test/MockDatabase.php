@@ -28,12 +28,14 @@ class MockDatabase implements IDatabase, IQuoter
 
     /**
      * The test case, required for creating mocks
+     *
      * @var PHPUnit_Framework_TestCase
      */
     protected $test_case;
 
     /**
      * The mock statement
+     *
      * @var PHPUnit_Framework_MockObject_MockObject|PDOStatement
      */
     protected $mock_statement;
@@ -50,7 +52,8 @@ class MockDatabase implements IDatabase, IQuoter
      *
      * @param PHPUnit_Framework_TestCase $test_case
      */
-    public function __construct(PHPUnit_Framework_TestCase $test_case) {
+    public function __construct(PHPUnit_Framework_TestCase $test_case)
+    {
         $this->test_case = $test_case;
         $this->resetStatement();
     }
@@ -58,7 +61,8 @@ class MockDatabase implements IDatabase, IQuoter
     /**
      * Resets this item's mock statement.
      */
-    public function resetStatement() {
+    public function resetStatement()
+    {
         $this->mock_statement = $this->test_case->getMock(PDOStatement::class);
     }
 
@@ -67,8 +71,9 @@ class MockDatabase implements IDatabase, IQuoter
      *
      * @param mixed $result
      */
-    public function setNextFetch($result) {
-        $this->setResultSet([ $result ]);
+    public function setNextFetch($result)
+    {
+        $this->setResultSet([$result]);
     }
 
     /**
@@ -76,7 +81,8 @@ class MockDatabase implements IDatabase, IQuoter
      *
      * @param mixed $result
      */
-    public function setNextFetchAll($result) {
+    public function setNextFetchAll($result)
+    {
         $this->setResultSet($result);
     }
 
@@ -120,7 +126,8 @@ class MockDatabase implements IDatabase, IQuoter
      *
      * @return PDOStatement|PHPUnit_Framework_MockObject_MockObject
      */
-    public function prepare($query, array $args = []) {
+    public function prepare($query, array $args = [])
+    {
         return $this->mock_statement;
     }
 
@@ -130,7 +137,8 @@ class MockDatabase implements IDatabase, IQuoter
      * @param  string $string
      * @return string
      */
-    public function quoteIdentifier($string) {
+    public function quoteIdentifier($string)
+    {
         return $string;
     }
 

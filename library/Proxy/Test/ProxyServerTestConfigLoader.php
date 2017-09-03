@@ -12,16 +12,16 @@ namespace Proxy\Test;
 class ProxyServerTestConfigLoader implements \Schoolbox\IConfigLoader
 {
 
-    protected $auth = array();
+    protected $auth = [];
 
     public function __construct($host, $port, $user, $pass)
     {
-        $this->auth = array(
+        $this->auth = [
             'proxy_host' => $host,
             'proxy_port' => $port,
             'proxy_user' => $user,
-            'proxy_pass' => $pass
-        );
+            'proxy_pass' => $pass,
+        ];
     }
 
     public function get($var)

@@ -11,7 +11,8 @@ namespace Schoolbox\Test;
 
 use Schoolbox\ISoftDeletable;
 
-class SoftDeleteTestModel implements ISoftDeletable {
+class SoftDeleteTestModel implements ISoftDeletable
+{
     /**
      * @var int
      */
@@ -31,7 +32,8 @@ class SoftDeleteTestModel implements ISoftDeletable {
      * @param  boolean $deleted
      * @return $this
      */
-    public function setDeleted($deleted) {
+    public function setDeleted($deleted)
+    {
         $this->deleted = $deleted;
         return $this;
     }
@@ -39,7 +41,8 @@ class SoftDeleteTestModel implements ISoftDeletable {
     /**
      * @return boolean
      */
-    public function getDeleted() {
+    public function getDeleted()
+    {
         return $this->deleted;
     }
 
@@ -47,7 +50,8 @@ class SoftDeleteTestModel implements ISoftDeletable {
      * @param  int $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -55,7 +59,8 @@ class SoftDeleteTestModel implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -63,7 +68,8 @@ class SoftDeleteTestModel implements ISoftDeletable {
      * @param  string $name
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -71,14 +77,16 @@ class SoftDeleteTestModel implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isDeleted() {
+    public function isDeleted()
+    {
         return $this->getDeleted();
     }
 }

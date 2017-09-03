@@ -9,9 +9,9 @@
 
 namespace Alaress\Date\Test;
 
+use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
-use Alaress\Test\Date\MockDateObject;
 use PHPUnit_Framework_TestCase;
 
 class LocaleTest extends PHPUnit_Framework_TestCase
@@ -35,12 +35,12 @@ class LocaleTest extends PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap([
                     ['date_database', 'Y-m-d H:i:s',],
-                    ['date_local',    'd/m/Y',],
-                    ['date_long',     'l F jS Y',],
-                    ['date_notime',   'jS M Y',],
-                    ['date_only',     'jS M',],
-                    ['date_short',    'jS M Y',],
-                    ['date_time',     'g:ia',],
+                    ['date_local', 'd/m/Y',],
+                    ['date_long', 'l F jS Y',],
+                    ['date_notime', 'jS M Y',],
+                    ['date_only', 'jS M',],
+                    ['date_short', 'jS M Y',],
+                    ['date_time', 'g:ia',],
                     ['date_timezone', 'Australia/Victoria',],
                 ])
             );

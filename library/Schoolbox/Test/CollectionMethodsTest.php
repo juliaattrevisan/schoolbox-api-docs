@@ -44,10 +44,15 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
      * @param int        $count
      * @param bool       $preserveKeys
      */
-    public function test_slice_invert_key_preservation(Collection $input, Collection $expected, $offset, $count, $preserveKeys)
-    {
+    public function test_slice_invert_key_preservation(
+        Collection $input,
+        Collection $expected,
+        $offset,
+        $count,
+        $preserveKeys
+    ) {
         // Ignore 0 length arrays or arrays starting from first index (these do not give different keys)
-        if(!$offset || !$count){
+        if (!$offset || !$count) {
             return;
         }
         $beforeSlice = new Collection($input->getAll());
@@ -67,10 +72,11 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
      * @param int[] $offsets
      * @param int[] $counts
      */
-    public function test_slice_multi(Collection $input, $expectedSlices, $offsets, $counts){
+    public function test_slice_multi(Collection $input, $expectedSlices, $offsets, $counts)
+    {
 
         // Ensure our test data is correct
-        if(count($expectedSlices) != count($offsets)){
+        if (count($expectedSlices) != count($offsets)) {
             throw new LogicException("Argument count mismatch.");
         }
 
@@ -78,10 +84,10 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
 
         $beforeSlice = $input->getAll();
 
-        for($i = 0; $i < $countSlices; $i++){
+        for ($i = 0; $i < $countSlices; $i++) {
             $expected = $expectedSlices[$i];
-            $offset   = $offsets[$i];
-            $count    = isset($counts[$i]) ? $counts[$i] : null;
+            $offset = $offsets[$i];
+            $count = isset($counts[$i]) ? $counts[$i] : null;
 
             $actual = $input->slice($offset, $count);
             $this->assertEquals($expected->getAll(), $actual->getAll());
@@ -96,23 +102,23 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider provider_merge
      * @param Collection[] $inputs
-     * @param Collection $expected
+     * @param Collection   $expected
      */
     public function test_merge($inputs, Collection $expected)
     {
         $beforeMerge = [];
-        foreach($inputs as $input){
+        foreach ($inputs as $input) {
             $beforeMerge[] = $input->getAll();
         }
 
         $actual = new Collection();
-        foreach($inputs as $input){
+        foreach ($inputs as $input) {
             $actual = $actual->merge($input);
         }
 
         $this->assertEquals($expected, $actual);
 
-        for($i = 0; $i < count($inputs); $i++){
+        for ($i = 0; $i < count($inputs); $i++) {
             $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
         }
     }
@@ -122,23 +128,23 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider provider_merge_unique
      * @param Collection[] $inputs
-     * @param Collection $expected
+     * @param Collection   $expected
      */
     public function test_merge_unique($inputs, Collection $expected)
     {
         $beforeMerge = [];
-        foreach($inputs as $input){
+        foreach ($inputs as $input) {
             $beforeMerge[] = $input->getAll();
         }
 
         $actual = new Collection();
-        foreach($inputs as $input){
+        foreach ($inputs as $input) {
             $actual = $actual->mergeUnique($input);
         }
 
         $this->assertEquals($expected->getAll(), $actual->getAll());
 
-        for($i = 0; $i < count($inputs); $i++){
+        for ($i = 0; $i < count($inputs); $i++) {
             $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
         }
     }
@@ -164,23 +170,23 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider provider_merge
      * @param Collection[] $inputs
-     * @param Collection $expected
+     * @param Collection   $expected
      */
-    public function test_merge_not_unique($inputs, Collection $expected )
+    public function test_merge_not_unique($inputs, Collection $expected)
     {
         $beforeMerge = [];
-        foreach($inputs as $input){
+        foreach ($inputs as $input) {
             $beforeMerge[] = $input->getAll();
         }
 
         $actual = new Collection();
-        foreach($inputs as $input){
+        foreach ($inputs as $input) {
             $actual = $actual->mergeUnique($input);
         }
 
         $this->assertNotEquals($expected->getAll(), $actual->getAll());
 
-        for($i = 0; $i < count($inputs); $i++){
+        for ($i = 0; $i < count($inputs); $i++) {
             $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
         }
     }
@@ -190,24 +196,24 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider provider_merge_empty
      * @param Collection[] $inputs
-     * @param Collection $expected
+     * @param Collection   $expected
      */
     public function test_merge_empty($inputs, Collection $expected)
     {
         $beforeMerge = [];
-        foreach($inputs as $input){
+        foreach ($inputs as $input) {
             $beforeMerge[] = $input->getAll();
         }
 
         $actual = new Collection();
-        foreach($inputs as $input){
+        foreach ($inputs as $input) {
             $actual = $actual->mergeUnique($input, 'id');
         }
 
         //var_dump($actual);
         $this->assertEquals($expected->getAll(), $actual->getAll());
 
-        for($i = 0; $i < count($inputs); $i++){
+        for ($i = 0; $i < count($inputs); $i++) {
             $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
         }
     }
@@ -237,10 +243,10 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
 
     public function provider_limit()
     {
-        $array = [0,1,2,3,4,5,6,7,8,9];
+        $array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         $data = [];
 
-        for($i = 0; $i < 9; $i++){
+        for ($i = 0; $i < 9; $i++) {
             $data[] = [new Collection($array), new Collection(array_slice($array, 0, $i)), $i];
         }
 
@@ -255,17 +261,17 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
             [
                 new Collection([]),
                 new Collection([1]),
-                new Collection([1])
+                new Collection([1]),
             ],
-            new Collection([1,1]),
+            new Collection([1, 1]),
         ];
         $data[] = [
             [
                 new Collection([]),
                 new Collection([1]),
-                new Collection([1,2,3,4])
+                new Collection([1, 2, 3, 4]),
             ],
-            new Collection([1,1,2,3,4]),
+            new Collection([1, 1, 2, 3, 4]),
         ];
         return $data;
     }
@@ -278,7 +284,7 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
             [
                 new Collection([]),
                 new Collection([1]),
-                new Collection([1])
+                new Collection([1]),
             ],
             new Collection([1]),
         ];
@@ -286,9 +292,9 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
             [
                 new Collection([]),
                 new Collection([1]),
-                new Collection([1,2,3,4])
+                new Collection([1, 2, 3, 4]),
             ],
-            new Collection([1,2,3,4]),
+            new Collection([1, 2, 3, 4]),
         ];
 
         return $data;
@@ -314,8 +320,8 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
             [
                 new Collection([]),
                 new Collection([$campusOne]),
-                new Collection([$campusOne,$campusTwo,$campusThree,$campusFour]),
-                new Collection([$campusThree,$campusFour])
+                new Collection([$campusOne, $campusTwo, $campusThree, $campusFour]),
+                new Collection([$campusThree, $campusFour]),
             ],
         ];
 
@@ -343,7 +349,7 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
             [
                 new Collection([]),
                 new Collection([$campusOne]),
-                new Collection([$campusOne])
+                new Collection([$campusOne]),
             ],
             new Collection([$campusOne]),
         ];
@@ -351,23 +357,23 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
             [
                 new Collection([]),
                 new Collection([$campusOne]),
-                new Collection([$campusOne,$campusTwo,$campusThree,$campusFour]),
-                new Collection([$campusThree,$campusFour])
+                new Collection([$campusOne, $campusTwo, $campusThree, $campusFour]),
+                new Collection([$campusThree, $campusFour]),
 
             ],
-            new Collection([$campusOne,$campusTwo,$campusThree,$campusFour]),
+            new Collection([$campusOne, $campusTwo, $campusThree, $campusFour]),
         ];
         return $data;
     }
 
     public function provider_slice_once()
     {
-        $array = [1,2,3,4,5,6,7,8,9];
+        $array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         $input = new Collection($array);
         $data = [];
 
-        for($i = 0; $i < 9; $i++){
-            for($j = 0; $j < count($array) - $i; $j++ ){
+        for ($i = 0; $i < 9; $i++) {
+            for ($j = 0; $j < count($array) - $i; $j++) {
                 $data[] = [$input, new Collection(array_slice($array, $i, $j, true)), $i, $j, true];
                 $data[] = [$input, new Collection(array_slice($array, $i, $j, false)), $i, $j, false];
             }
@@ -378,7 +384,7 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
 
     public function provider_slice_multiple()
     {
-        $array = [1,2,3,4,5,6,7,8,9];
+        $array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         $input = new Collection($array);
         $data = [];
 
@@ -388,47 +394,47 @@ class CollectionMethodsTest extends PHPUnit_Framework_TestCase
                 new Collection([1]),
                 new Collection([2]),
             ],
-            [0,1],
-            [1,1]
+            [0, 1],
+            [1, 1],
         ];
 
         $data[] = [
             $input,
             [
-                new Collection([1,2,3,4]),
-                new Collection([2,3,4,5]),
+                new Collection([1, 2, 3, 4]),
+                new Collection([2, 3, 4, 5]),
             ],
-            [0,1],
-            [4,4],
+            [0, 1],
+            [4, 4],
         ];
 
         $data[] = [
             $input,
             [
-                new Collection([1,2,3,4]),
-                new Collection([5,6,7,8,9]),
+                new Collection([1, 2, 3, 4]),
+                new Collection([5, 6, 7, 8, 9]),
             ],
-            [0,4],
+            [0, 4],
             [4],
         ];
 
         $data[] = [
             $input,
             [
-                new Collection([1,2,3,4]),
-                new Collection([5,6,7,8,9]),
+                new Collection([1, 2, 3, 4]),
+                new Collection([5, 6, 7, 8, 9]),
             ],
-            [0,4],
+            [0, 4],
             [4, null],
         ];
 
         $data[] = [
             $input,
             [
-                new Collection([1,2,3,4]),
-                new Collection([5,6,7,8,9]),
+                new Collection([1, 2, 3, 4]),
+                new Collection([5, 6, 7, 8, 9]),
             ],
-            [0,4],
+            [0, 4],
             [4, PHP_INT_MAX],
         ];
         return $data;

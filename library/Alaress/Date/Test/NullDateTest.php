@@ -9,9 +9,9 @@
 
 namespace Alaress\Date\Test;
 
+use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Locale_Static;
 use Alaress_Date_NullDate;
-use Alaress\Test\Date\MockDateObject;
 use BadMethodCallException;
 use DateTimeZone;
 use PHPUnit_Framework_TestCase;
@@ -100,7 +100,7 @@ class NullDateTest extends PHPUnit_Framework_TestCase
     public function testClone()
     {
         $nullDate = new Alaress_Date_NullDate();
-        $clone    = clone $nullDate;
+        $clone = clone $nullDate;
         $this->assertEquals($nullDate, $clone);
     }
 }

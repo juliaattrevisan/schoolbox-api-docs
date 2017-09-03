@@ -14,53 +14,60 @@ use PHPUnit_Framework_TestCase;
 
 class FormatTest extends PHPUnit_Framework_TestCase
 {
-    public function testBytesToMB() {
+    public function testBytesToMB()
+    {
         $input = '1245873';
         $expected = '1.19 MB';
 
-        $this->assertEquals(Alaress_Byte_Format::bytesToString($input),$expected);
+        $this->assertEquals(Alaress_Byte_Format::bytesToString($input), $expected);
     }
 
-    public function testBytesToMBPrecision() {
+    public function testBytesToMBPrecision()
+    {
         $input = '1245873';
         $expected = '1 MB';
 
-        $this->assertEquals(Alaress_Byte_Format::bytesToString($input, 0),$expected);
+        $this->assertEquals(Alaress_Byte_Format::bytesToString($input, 0), $expected);
     }
 
-    public function testBytesToGB() {
+    public function testBytesToGB()
+    {
         $input = '12458731246';
         $expected = '11.6 GB';
 
-        $this->assertEquals(Alaress_Byte_Format::bytesToString($input),$expected);
+        $this->assertEquals(Alaress_Byte_Format::bytesToString($input), $expected);
     }
 
-    public function testMToBytes() {
+    public function testMToBytes()
+    {
         $input = '11.19M';
         $expected = '11733565';
 
-        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input),$expected);
+        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input), $expected);
     }
 
-    public function testKToBytes() {
+    public function testKToBytes()
+    {
         $input = '10 k';
         $expected = '10240';
 
-        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input),$expected);
+        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input), $expected);
     }
 
-    public function testMBToBytes() {
+    public function testMBToBytes()
+    {
         $input = '11.19 mb';
         $expected = '11733565';
 
-        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input),$expected);
+        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input), $expected);
     }
 
-    public function testGBToBytes() {
+    public function testGBToBytes()
+    {
         $input = '11.6 gB';
         $expected = '12455405158';
 
-        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input),$expected);
+        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input), $expected);
     }
 
 

@@ -9,8 +9,8 @@
 
 namespace Alaress\Date\Test;
 
-use Alaress_Date_Format;
 use Alaress\Test\Date\MockDateObject;
+use Alaress_Date_Format;
 use InvalidArgumentException;
 use PHPUnit_Framework_Error_Warning;
 use PHPUnit_Framework_TestCase;
@@ -121,11 +121,11 @@ class MeridiemTest extends PHPUnit_Framework_TestCase
             // No leading zeros (default)
             [$this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
             [$this->buildDateObject('2015-03-25 00:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
-            [$this->buildDateObject('2015-03-25 01:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1',  false],
+            [$this->buildDateObject('2015-03-25 01:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1', false],
             [$this->buildDateObject('2015-03-25 11:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', false],
             [$this->buildDateObject('2015-03-25 12:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
             [$this->buildDateObject('2015-03-25 12:00:01', Alaress_Date_Format::DATABASE_FORMAT), '12', false],
-            [$this->buildDateObject('2015-03-25 13:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1',  false],
+            [$this->buildDateObject('2015-03-25 13:00:00', Alaress_Date_Format::DATABASE_FORMAT), '1', false],
             [$this->buildDateObject('2015-03-25 23:59:59', Alaress_Date_Format::DATABASE_FORMAT), '11', false],
             // Leading zeros
             [$this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT), '12', true],

@@ -6,10 +6,11 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 namespace Schoolbox\Test;
 
-class TestMapper extends AbstractTestMapper {
+class TestMapper extends AbstractTestMapper
+{
 
     /**
      * @var MapperTest
@@ -34,44 +35,45 @@ class TestMapper extends AbstractTestMapper {
         $this->enableCache();
     }
 
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('test_table');
-		$this->hasModel(TestModel::class);
-		$this->hasMap(array(
-			'column'     => 'storage_id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'filename',
-			'property'   => 'filename',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'is_viewed',
-			'property'   => 'isViewed',
-			'type'       => self::TYPE_BOOLEAN,
-		));
-		$this->hasMap(array(
-			'column'     => 'file',
-			'property'   => 'file',
-			'type'       => self::TYPE_LOB,
-		));
-		$this->hasMap(array(
-			'column'     => 'parent',
-			'property'   => 'parent',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasJoin('parent', array(
-			'mapper'    => '\\Schoolbox\\Test\\TestMapper',
-			'this_key'  => 'category',
-			'other_key' => 'id',
-		));
+        $this->hasModel(TestModel::class);
+        $this->hasMap([
+            'column'     => 'storage_id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true,
+        ]);
+        $this->hasMap([
+            'column'   => 'filename',
+            'property' => 'filename',
+            'type'     => self::TYPE_STRING,
+        ]);
+        $this->hasMap([
+            'column'   => 'is_viewed',
+            'property' => 'isViewed',
+            'type'     => self::TYPE_BOOLEAN,
+        ]);
+        $this->hasMap([
+            'column'   => 'file',
+            'property' => 'file',
+            'type'     => self::TYPE_LOB,
+        ]);
+        $this->hasMap([
+            'column'   => 'parent',
+            'property' => 'parent',
+            'type'     => self::TYPE_INTEGER,
+        ]);
+        $this->hasJoin('parent', [
+            'mapper'    => '\\Schoolbox\\Test\\TestMapper',
+            'this_key'  => 'category',
+            'other_key' => 'id',
+        ]);
 
-		$this->registerCallback(self::CALLBACK_POSTSAVE, function (TestModel $model, TestModel $previous = null) {
+        $this->registerCallback(self::CALLBACK_POSTSAVE, function (TestModel $model, TestModel $previous = null) {
             $this->test->internalTestNotSame($model, $previous);
             return true;
         });
-	}
+    }
 }

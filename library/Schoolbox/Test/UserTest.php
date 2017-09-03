@@ -8,39 +8,43 @@
  */
 
 namespace Schoolbox\Test;
+
 use Schoolbox\User;
-use Schoolbox\Test\TestCase;
 
-class UserTest extends TestCase {
+class UserTest extends TestCase
+{
 
-	/**
-	 * @var User
-	 */
-	protected $object;
+    /**
+     * @var User
+     */
+    protected $object;
 
-	protected $config_vars = array(
-		array('site_domain',  'localhost'),
-		array('mail_address', 'localhost'),
-	);
+    protected $config_vars = [
+        ['site_domain', 'localhost'],
+        ['mail_address', 'localhost'],
+    ];
 
-	public function setUp() {
-		parent::setUp();
-		$this->object = new User();
-		$this->object->setConfigLoader($this->mock_config);
-	}
+    public function setUp()
+    {
+        parent::setUp();
+        $this->object = new User();
+        $this->object->setConfigLoader($this->mock_config);
+    }
 
-	public function testLocalEmailAddress() {
-		$this->object->setLocalEmail(true);
-		$this->object->setUsername('testuser');
-		$expected = $this->object->getUsername().'@'.$this->mock_config->get('site_domain');
-		$this->assertEquals($expected, $this->object->getEmail());
-	}
+    public function testLocalEmailAddress()
+    {
+        $this->object->setLocalEmail(true);
+        $this->object->setUsername('testuser');
+        $expected = $this->object->getUsername() . '@' . $this->mock_config->get('site_domain');
+        $this->assertEquals($expected, $this->object->getEmail());
+    }
 
-	public function testAltEmailAddress() {
-		$email = 'testuser@gmail.com';
-		$this->object->setLocalEmail(false);
-		$this->object->setUsername('testuser');
-		$this->object->setAltEmail($email);
-		$this->assertEquals($email, $this->object->getEmail());
-	}
+    public function testAltEmailAddress()
+    {
+        $email = 'testuser@gmail.com';
+        $this->object->setLocalEmail(false);
+        $this->object->setUsername('testuser');
+        $this->object->setAltEmail($email);
+        $this->assertEquals($email, $this->object->getEmail());
+    }
 }

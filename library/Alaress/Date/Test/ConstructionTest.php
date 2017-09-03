@@ -9,9 +9,9 @@
 
 namespace Alaress\Date\Test;
 
+use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Static;
-use Alaress\Test\Date\MockDateObject;
 use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -54,7 +54,7 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
 
     public function testCreateFromDateTime()
     {
-        $date       = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
+        $date = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME']);
         $copiedDate = $this->buildDateObject($date);
         $this->assertEquals($copiedDate->getDatabase(), $date->format(Alaress_Date_Format::DATABASE_FORMAT));
     }
@@ -72,7 +72,7 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
 
     public function testCreateFromDateTimeWithTimezone()
     {
-        $date       = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME'], new DateTimeZone('UTC'));
+        $date = DateTime::createFromFormat('U', $_SERVER['REQUEST_TIME'], new DateTimeZone('UTC'));
         $copiedDate = $this->buildDateObject($date, null, new DateTimeZone('Australia/Victoria'));
         $this->assertEquals($copiedDate->getUnixTimeStamp(), $date->getTimestamp());
         $this->assertEquals('Australia/Victoria', $copiedDate->getTimezone()->getName());
@@ -100,7 +100,7 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
 
     public function testClone()
     {
-        $date  = Alaress_Date_Format::newLocalShort(
+        $date = Alaress_Date_Format::newLocalShort(
             '25/03/2015',
             new DateTimeZone('UTC'),
             new Alaress_Date_Locale_Static()
