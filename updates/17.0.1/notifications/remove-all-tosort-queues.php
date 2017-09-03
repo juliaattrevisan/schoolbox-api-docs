@@ -35,9 +35,6 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log) {
     /** @var AMQPConnector $amqp */
     $amqp  = $di->get('amqp');
 
-    /** @var Redis|ClientInterface $redis */
-    $redis = $di->get('redis');
-
     /** @var IConfigLoader $conf */
     $conf  = $di->get('config');
 
