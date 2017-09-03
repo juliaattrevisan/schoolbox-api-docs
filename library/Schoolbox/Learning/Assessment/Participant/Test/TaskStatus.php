@@ -8,14 +8,8 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
-use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use PHPUnit_Framework_TestCase;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-use Schoolbox\User;
 
 /**
  * Tests that the various is*() state property methods work for Task Participants
@@ -33,14 +27,14 @@ class TaskStatus extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider_selfAssessable_isResponseRequired
      * @param Participant $participant
-     * @param bool $isResponseRequired
+     * @param bool        $isResponseRequired
      */
     public function test_selfAssessable_isResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -54,7 +48,7 @@ class TaskStatus extends PHPUnit_Framework_TestCase
         $expected = $isFeedbackRequired;
         $actual = $participant->isFeedbackRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -68,21 +62,21 @@ class TaskStatus extends PHPUnit_Framework_TestCase
         $expected = $isReviewComplete;
         $actual = $participant->isReviewComplete();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
     /**
      * @dataProvider provider_notSelfAssessable_isResponseRequired
      * @param Participant $participant
-     * @param bool $isResponseRequired
+     * @param bool        $isResponseRequired
      */
     public function test_NotSelfAssessable_isResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -96,7 +90,7 @@ class TaskStatus extends PHPUnit_Framework_TestCase
         $expected = $isFeedbackRequired;
         $actual = $participant->isFeedbackRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -110,7 +104,7 @@ class TaskStatus extends PHPUnit_Framework_TestCase
         $expected = $isReviewComplete;
         $actual = $participant->isReviewComplete();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -121,13 +115,13 @@ class TaskStatus extends PHPUnit_Framework_TestCase
     public function test_mutual_exclusive_states(Participant $participant)
     {
         $countStates = 0;
-        if($participant->isResponseRequired()){
+        if ($participant->isResponseRequired()) {
             $countStates++;
         }
-        if($participant->isFeedbackRequired()){
+        if ($participant->isFeedbackRequired()) {
             $countStates++;
         }
-        if($participant->isReviewComplete()){
+        if ($participant->isReviewComplete()) {
             $countStates++;
         }
 
@@ -237,10 +231,10 @@ class TaskStatus extends PHPUnit_Framework_TestCase
         $task2 = DemoData::getSelfAssessableTask(2);
 
         $data = [];
-        foreach($task1->getAllParticipants() as $participant){
+        foreach ($task1->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
-        foreach($task2->getAllParticipants() as $participant){
+        foreach ($task2->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
         return $data;

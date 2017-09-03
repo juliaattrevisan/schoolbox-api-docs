@@ -7,17 +7,13 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
-use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Summator\Average;
-use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\User;
-use Schoolbox\Learning\Assessment\Project;
 
 /**
  * Tests that the various is*() state property methods work for Project Participants
@@ -35,41 +31,41 @@ class ProjectStatus extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider_requiresResponse_optionalSubAssessments
      * @param Participant $participant
-     * @param bool $isResponseRequired
+     * @param bool        $isResponseRequired
      */
     public function test_requiresResponse_optionalSubAssessments(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
     /**
      * @dataProvider provider_requiresResponse_mandatorySubAssessments
      * @param Participant $participant
-     * @param bool $isResponseRequired
+     * @param bool        $isResponseRequired
      */
     public function test_requiresResponse_mandatorySubAssessments(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
     /**
      * @dataProvider provider_requiresFeedback
      * @param Participant $participant
-     * @param bool $isFeedbackRequired
+     * @param bool        $isFeedbackRequired
      */
     public function test_requiresFeedback(Participant $participant, $isFeedbackRequired)
     {
         $actual = $participant->isFeedbackRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($isFeedbackRequired ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($isFeedbackRequired ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($isFeedbackRequired, $actual, $message);
     }
 
@@ -82,7 +78,7 @@ class ProjectStatus extends PHPUnit_Framework_TestCase
     {
         $actual = $participant->isReviewComplete();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($isReviewComplete ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($isReviewComplete ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($isReviewComplete, $actual, $message);
     }
 
@@ -95,7 +91,7 @@ class ProjectStatus extends PHPUnit_Framework_TestCase
     {
         $actual = $participant->isReviewComplete();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($isReviewComplete ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($isReviewComplete ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($isReviewComplete, $actual, $message);
     }
 
@@ -109,27 +105,27 @@ class ProjectStatus extends PHPUnit_Framework_TestCase
         $project = $participant->getAssessable();
 
         // Only test the projects which have all sub-assessments in the same state.
-        foreach($project->getAssessables() as $subAssessment){
-            if($subAssessment->isParticipant($participant->getUser())){
+        foreach ($project->getAssessables() as $subAssessment) {
+            if ($subAssessment->isParticipant($participant->getUser())) {
                 $subParticipant = $subAssessment->getParticipant($participant->getUser());
                 $subResponseRequired = $subParticipant->isResponseRequired();
                 $subFeedbackRequired = $subParticipant->isFeedbackRequired();
-                $subReviewComplete   = $subParticipant->isReviewComplete();
+                $subReviewComplete = $subParticipant->isReviewComplete();
 
-                if($subResponseRequired != $subFeedbackRequired || $subFeedbackRequired != $subReviewComplete){
+                if ($subResponseRequired != $subFeedbackRequired || $subFeedbackRequired != $subReviewComplete) {
                     return;
                 }
             }
         }
 
         $countStates = 0;
-        if($participant->isResponseRequired()){
+        if ($participant->isResponseRequired()) {
             $countStates++;
         }
-        if($participant->isFeedbackRequired()){
+        if ($participant->isFeedbackRequired()) {
             $countStates++;
         }
-        if($participant->isReviewComplete()){
+        if ($participant->isReviewComplete()) {
             $countStates++;
         }
 
@@ -281,16 +277,16 @@ class ProjectStatus extends PHPUnit_Framework_TestCase
     public function provider_participants()
     {
         $data = [];
-        foreach(DemoData::getProject(new Minimum())->getAllParticipants() as $participant){
+        foreach (DemoData::getProject(new Minimum())->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
-        foreach(DemoData::getProject(new Maximum())->getAllParticipants() as $participant){
+        foreach (DemoData::getProject(new Maximum())->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
-        foreach(DemoData::getProject(new WeightedAverage())->getAllParticipants() as $participant){
+        foreach (DemoData::getProject(new WeightedAverage())->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
-        foreach(DemoData::getProject(new Average())->getAllParticipants() as $participant){
+        foreach (DemoData::getProject(new Average())->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
         return $data;

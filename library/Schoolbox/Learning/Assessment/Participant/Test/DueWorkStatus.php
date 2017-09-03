@@ -7,14 +7,8 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
-use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use PHPUnit_Framework_TestCase;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\User;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Response;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 
 /**
  * Tests that the various is*() state property methods work for DueWork Participants
@@ -32,14 +26,14 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider_isResponseRequired
      * @param Participant $participant
-     * @param bool $isResponseRequired
+     * @param bool        $isResponseRequired
      */
     public function test_isResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -53,7 +47,7 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $expected = $isFeedbackRequired;
         $actual = $participant->isFeedbackRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -67,7 +61,7 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $expected = $isReviewComplete;
         $actual = $participant->isReviewComplete();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -79,13 +73,13 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
     public function test_mutual_exclusive_states(Participant $participant)
     {
         $countStates = 0;
-        if($participant->isResponseRequired()){
+        if ($participant->isResponseRequired()) {
             $countStates++;
         }
-        if($participant->isFeedbackRequired()){
+        if ($participant->isFeedbackRequired()) {
             $countStates++;
         }
-        if($participant->isReviewComplete()){
+        if ($participant->isReviewComplete()) {
             $countStates++;
         }
 
@@ -182,7 +176,7 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
         $dueWork = DemoData::getDueWork(1);
 
         $data = [];
-        foreach($dueWork->getAllParticipants() as $participant){
+        foreach ($dueWork->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
         return $data;

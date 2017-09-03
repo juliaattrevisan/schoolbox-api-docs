@@ -8,14 +8,8 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
-use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use PHPUnit_Framework_TestCase;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as Attempt;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as Review;
-use Schoolbox\User;
 
 /**
  * Tests that the various is*() state property methods work for Quiz Participants
@@ -34,14 +28,14 @@ class QuizStatus extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider_isResponseRequired
      * @param Participant $participant
-     * @param bool $isResponseRequired
+     * @param bool        $isResponseRequired
      */
     public function test_isResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -56,7 +50,7 @@ class QuizStatus extends PHPUnit_Framework_TestCase
         $expected = $isFeedbackRequired;
         $actual = $participant->isFeedbackRequired();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -70,10 +64,9 @@ class QuizStatus extends PHPUnit_Framework_TestCase
         $expected = $isReviewComplete;
         $actual = $participant->isReviewComplete();
 
-        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '". ($expected ? 'true' : 'false') ."', Actual: '". ($actual ? 'true' : 'false') ."'";
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
         $this->assertEquals($expected, $actual, $message);
     }
-
 
 
     /**
@@ -83,13 +76,13 @@ class QuizStatus extends PHPUnit_Framework_TestCase
     public function test_mutual_exclusive_states(Participant $participant)
     {
         $countStates = 0;
-        if($participant->isResponseRequired()){
+        if ($participant->isResponseRequired()) {
             $countStates++;
         }
-        if($participant->isFeedbackRequired()){
+        if ($participant->isFeedbackRequired()) {
             $countStates++;
         }
-        if($participant->isReviewComplete()){
+        if ($participant->isReviewComplete()) {
             $countStates++;
         }
 
@@ -150,7 +143,7 @@ class QuizStatus extends PHPUnit_Framework_TestCase
         $quiz = DemoData::getQuiz(1);
 
         $data = [];
-        foreach($quiz->getAllParticipants() as $participant){
+        foreach ($quiz->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
         return $data;
