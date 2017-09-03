@@ -48,6 +48,10 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log) {
 
     $queues = $ctrl->listQueues([ BunnyControl::QUEUE_NAME, BunnyControl::QUEUE_MSGS ]);
 
+    if (empty($queues)) {
+        $log->notice('No queues to drain, nothing to do.');
+    }
+
     foreach ($queues as $queueData) {
 
         $queueName   = $queueData[ BunnyControl::QUEUE_NAME ];
