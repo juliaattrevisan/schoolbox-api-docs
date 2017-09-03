@@ -5,6 +5,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+namespace Schoolbox\External\Connector\Offline\Base;
+
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
