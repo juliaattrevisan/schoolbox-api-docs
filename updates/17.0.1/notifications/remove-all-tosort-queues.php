@@ -25,7 +25,7 @@ $opts = require  __DIR__ . '/../../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
+    'verbose' => isset($opts['v']) ? $opts['v'] : [ false, false, false ],
     'errors'  => E_ALL,
     'fields'  => array_keys($opts),
 ]);
