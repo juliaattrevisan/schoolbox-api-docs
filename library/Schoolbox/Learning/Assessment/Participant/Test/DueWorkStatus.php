@@ -532,6 +532,6 @@ class DueWorkStatus extends PHPUnit_Framework_TestCase
      */
     private static function getDemoStudent($userChar)
     {
-        return ProjectStatus::getDemoStudent($userChar);
+        return DemoData::getDemoStudent($userChar);
     }
 }

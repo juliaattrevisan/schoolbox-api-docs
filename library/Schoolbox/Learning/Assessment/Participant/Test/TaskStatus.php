@@ -642,7 +642,7 @@ class TaskStatus extends PHPUnit_Framework_TestCase
      */
     private static function getDemoStudent($userChar)
     {
-        return ProjectStatus::getDemoStudent($userChar);
+        return DemoData::getDemoStudent($userChar);
     }
 
     /**
@@ -651,6 +651,6 @@ class TaskStatus extends PHPUnit_Framework_TestCase
      */
     private static function getDemoTeacher($userChar)
     {
-        return ProjectStatus::getDemoTeacher($userChar);
+        return DemoData::getDemoTeacher($userChar);
     }
 }
