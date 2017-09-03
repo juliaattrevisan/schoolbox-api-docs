@@ -36,10 +36,9 @@ class Factory
     public function build($config, $databaseExternal, $type)
     {
         // Check if external DB is unavailable and return offline class if we can't access
-
+        $classOffline = "\\Schoolbox\\External\\Connector\\Offline\\Base\\{$type}";
         if (!$databaseExternal instanceof IConnector) {
-            $offlineClass = "\\Schoolbox\\External\\Connector\\Offline\\Base\\{$type}";
-            return new $offlineClass($config, null);
+            return new $classOffline($config, null);
         }
 
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type'));
@@ -48,10 +47,18 @@ class Factory
         $classBase = "{$prefixBase}\\Base\\{$type}";
         $classSchool = "{$prefixBase}\\{$schoolCode}\\{$type}";
 
+        // Return in preference:
+        // * School-specific connector for external type
+        // * Standard connector for external type
+        // * Offline connector
         if (class_exists($classSchool)) {
             return new $classSchool($config, $databaseExternal);
-        } elseif (class_exists($classBase)) {
+        }
+        if (class_exists($classBase)) {
             return new $classBase($config, $databaseExternal);
+        }
+        if (class_exists($classOffline)) {
+            return new $classOffline($config, null);
         }
 
         throw new UnexpectedValueException("Could not located requested external object class: '{$classBase}'");
