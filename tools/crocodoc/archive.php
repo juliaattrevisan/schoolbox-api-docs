@@ -269,15 +269,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                 'fileName'   => $row['fileName'],
                 'now'        => Alaress_Date_Format::now(),
             ]);
-            $log->info('Crocodoc document attached to feedback');
+            $log->info('Crocodoc document successfully attached to feedback');
         } else {
             $log->info('Crocodoc document already attached to feedback - not attaching again');
         }
-
-
-        // Think about how to mark this as not requiring more processing
         $successCount++;
-        $log->notice('Crocodoc document successfully archived');
     }
 
 
