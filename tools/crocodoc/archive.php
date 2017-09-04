@@ -155,9 +155,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
 
     // Go
+    $successCount = 0;
+    $failureCount = 0;
     foreach ($selectCrocodocQuery->executeIterator() as $row) {
 
-        $log->info(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
+        $log->notice(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
 
 
         // Finagle together the pieces the facade requires
@@ -182,6 +184,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                     $e->getMessage()
                 )
             );
+            $failureCount++;
             continue;
         }
         if ($result->isError()) {
@@ -195,6 +198,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                     $result->getMessage()
                 )
             );
+            $failureCount++;
             continue;
         }
         $log->info('Crocodoc document successfully retrieved');
@@ -246,9 +250,22 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
 
         // Think about how to mark this as not requiring more processing
+        $successCount++;
+        $log->notice('Crocodoc document successfully archived');
     }
 
 
     // At the end of the day: log something
+    $message = sprintf(
+        'Archival completed - %d archived, %d failed, %d to do',
+        $successCount,
+        $failureCount,
+        $crocodocCount - $successCount - $failureCount
+    );
+    if ($failureCount > 0) {
+        $log->warning($message);
+    } else {
+        $log->notice($message);
+    }
     exit;
 });
