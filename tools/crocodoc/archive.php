@@ -24,27 +24,29 @@ use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
-$options = getopt('v', ['skip-duplicates', 'enable-eportfolio', 'dry-run']);
+$options = getopt('v', ['dry-run']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Crocodoc Archiver',
     [
         'verbose' => isset($options['v']) ? $options['v'] : null,
         'errors'  => E_ALL,
+        'dryRun'  => isset($options['dry-run']),
     ]
 );
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
 
-    $httpClient = new HttpClient();
-
-    /** @var MapperFactory $mapperFactory */
+    /**
+     * @var MapperFactory $mapperFactory
+     * @var StorageMapper $storageMapper
+     * @var UserMapper    $userMapper
+     */
+    $httpClient    = new HttpClient();
     $mapperFactory = $di->get('mapperFactory');
-
-    /** @var UserMapper $userMapper */
-    $userMapper = $mapperFactory->get(UserMapper::class);
-
-    /** @var StorageMapper $storageMapper */
+    $userMapper    = $mapperFactory->get(UserMapper::class);
     $storageMapper = $mapperFactory->get(StorageMapper::class);
+    $dryRun        = $options['dryRun'];
+
 
     // Figure out a system user
     try {
@@ -58,7 +60,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
 
-    // Fetch first 10 remaining crocodocuments
+    // Fetch first x remaining crocodocuments
     $selectCrocodocQuery = $db->prepareQuery("
         SELECT
             ssf.id          AS fileId,
@@ -170,6 +172,49 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $log->notice(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
 
 
+        // Figure out where to put the document. In order of preference:
+        // 1. most recent feedback for this response
+        // 2. most recent feedback with no response
+        // 3. a new draft feedback
+        $selectAttachedFeedbackQuery->execute([
+            'responseId' => $row['responseId'],
+        ]);
+        $feedbackId = $selectAttachedFeedbackQuery->fetchColumn();
+        if ($feedbackId) {
+            $log->info(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
+        } else {
+            $log->debug('No non-floating feedback found - searching for non-floating feedback');
+            $selectFloatingFeedbackQuery->execute([
+                'studentId' => $row['studentId'],
+                'boxId'     => $row['boxId'],
+            ]);
+            $feedbackId = $selectFloatingFeedbackQuery->fetchColumn();
+            if ($feedbackId) {
+                $log->info(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
+            } else {
+                $log->debug('No floating feedback found - creating a new draft floating feedback');
+                // create one, if not a dry run
+                if ($dryRun) {
+                    $log->info(sprintf('Attaching document to new draft floating feedback'));
+                } else {
+                    $insertNewFeedbackQuery->execute([
+                        'systemUserId' => $systemUser->getId(),
+                        'studentId'    => $row['studentId'],
+                        'boxId'        => $row['boxId'],
+                        'now'          => Alaress_Date_Format::now(),
+                    ]);
+                    $feedbackId = $db->lastInsertId();
+                    $log->info(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
+                }
+            }
+        }
+        if ($dryRun) {
+            $successCount++;
+            $log->info('Crocodoc document successfully attached to feedback');
+            continue;
+        }
+
+
         // Finagle together the pieces the facade requires
         $response = (new DueWorkResponse())
             ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT));
@@ -212,40 +257,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $log->info('Crocodoc document successfully retrieved');
 
 
-        // Put it into relevant feedback, whichever that might be.
-        // 1. most recent feedback for this response
-        // 2. most recent feedback with no response
-        // 3. a new draft feedback
-        $selectAttachedFeedbackQuery->execute([
-            'responseId' => $row['responseId'],
-        ]);
-        $feedbackId = $selectAttachedFeedbackQuery->fetchColumn();
-        if ($feedbackId) {
-            $log->info(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
-        } else {
-            $log->debug('No non-floating feedback found - searching for non-floating feedback');
-            $selectFloatingFeedbackQuery->execute([
-                'studentId' => $row['studentId'],
-                'boxId'     => $row['boxId'],
-            ]);
-            $feedbackId = $selectFloatingFeedbackQuery->fetchColumn();
-            if ($feedbackId) {
-                $log->info(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
-            } else {
-                $log->debug('No floating feedback found - creating a new draft floating feedback');
-                // create one
-                $insertNewFeedbackQuery->execute([
-                    'systemUserId' => $systemUser->getId(),
-                    'studentId'    => $row['studentId'],
-                    'boxId'        => $row['boxId'],
-                    'now'          => Alaress_Date_Format::now(),
-                ]);
-                $feedbackId = $db->lastInsertId();
-                $log->info(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
-            }
-        }
-
-
         // Shoehorn it into storage
         $matches = [];
         if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
@@ -279,7 +290,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
     // At the end of the day: log something
     $message = sprintf(
-        'Archival completed - %d archived, %d failed, %d to do',
+        'Archival %s completed - %d archived, %d failed, %d to do',
+        ($dryRun ? 'dry run' : ''),
         $successCount,
         $failureCount,
         $crocodocCount - $successCount - $failureCount
