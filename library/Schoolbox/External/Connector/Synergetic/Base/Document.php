@@ -243,7 +243,7 @@ class Document extends Base implements IDocument
 
             $query = "
                 SELECT    Document,
-                          'PDF' AS DocumentType
+                          'PDF' AS DocumentType,
                           Description
                 FROM      {$this->schema}.StudentReportsArchive sra
                 JOIN      {$this->schema}.StudentReportsArchiveLink sral ON 
@@ -259,7 +259,7 @@ class Document extends Base implements IDocument
             $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
             if ($date !== false) {
-                $query .= ' AND sra.CreatedDate >= :createdDate';
+                $query .= ' AND sra.CreatedDate >= :createdDate ';
 
                 $params = array_merge($params, [
                     'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
@@ -271,6 +271,9 @@ class Document extends Base implements IDocument
         }
 
         // Get the document from the database
+
+        echo $query;
+        var_dump($params);
 
         $result = $this->databaseExternal->executeQuery($query, $params);
 
