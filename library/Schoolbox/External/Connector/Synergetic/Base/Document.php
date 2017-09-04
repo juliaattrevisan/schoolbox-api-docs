@@ -202,6 +202,11 @@ class Document extends Base implements IDocument
             return [];
         }
 
+        $params = [
+            'id' => $student->getExternalId(),
+            'documentId' => $documentId
+        ];
+
         // Create query to get the document from the database
 
         if ($source == 'tDocuments') {
@@ -217,6 +222,21 @@ class Document extends Base implements IDocument
                 WHERE     dr.ID = :id
                 AND       d.tDocumentsSeq = :documentId
             ";
+
+            // Add date filter (if we find a parseable date in the config)
+
+            $minimumDateString = $this->config->get('external_document_report_minimum_date');
+
+            $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+
+            if ($date !== false) {
+                $query .= ' AND d.SourceDate >= :createdDate';
+
+                $params = array_merge($params, [
+                    'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                ]);
+            }
+
         } elseif ($source = 'StudentReportsArchive') {
 
             // Loading from school reports archive table
@@ -232,27 +252,22 @@ class Document extends Base implements IDocument
                 AND       sra.StudentReportsArchiveSeq = :documentId
             ";
 
+            // Add date filter (if we find a parseable date in the config)
+
+            $minimumDateString = $this->config->get('external_document_report_minimum_date');
+
+            $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+
+            if ($date !== false) {
+                $query .= ' AND sra.CreatedDate >= :createdDate';
+
+                $params = array_merge($params, [
+                    'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                ]);
+            }
+
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
-        }
-
-        $params = [
-            'id' => $student->getExternalId(),
-            'documentId' => $documentId
-        ];
-
-        // Add date filter (if we find a parseable date in the config)
-
-        $minimumDateString = $this->config->get('external_document_report_minimum_date');
-
-        $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
-
-        if ($date !== false) {
-            $query .= ' AND sra.CreatedDate >= :createdDate';
-
-            $params = array_merge($params, [
-                'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
-            ]);
         }
 
         // Get the document from the database
