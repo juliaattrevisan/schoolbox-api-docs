@@ -26,7 +26,8 @@ interface IDocument
      *
      * @param User $student
      * @param string $documentId
+     * @param string $source
      * @return array
      */
-    public function downloadAcademicReportForStudent(User $student, $documentId);
+    public function downloadAcademicReportForStudent(User $student, $documentId, $source);
 }
