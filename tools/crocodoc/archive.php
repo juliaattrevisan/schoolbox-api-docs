@@ -183,15 +183,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
         $log->info('Crocodoc document successfully retrieved');
 
-        // Figure out a filename
-        $matches = [];
-        if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
-            list(, $filename) = $matches;
-        } else {
-            // Make something up
-            $filename = 'return_' . $file->getBasename();
-        }
-
         // Put it into most recent submission, whichever that might be
         $selectMostRecentReturnQuery->execute([
             'studentId' => $row['studentId'],
@@ -210,7 +201,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         }
 
         // Shoehorn it into storage
-        $storageModel = $storageMapper->acceptStream($filename, $result->getBody());
+        $storageModel = $storageMapper->acceptStream('return_' . $file->getBasename(), $result->getBody());
         $insertNewReturnFileQuery->execute([
             'returnId' => $mostRecentReturnId,
             'hash'     => $storageModel->getHash(),
