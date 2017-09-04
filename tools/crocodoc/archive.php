@@ -19,6 +19,7 @@ use Schoolbox\Learning\InlineGrader\Authenticator;
 use Schoolbox\Learning\InlineGrader\Facade;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
@@ -41,6 +42,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
     /** @var UserMapper $userMapper */
     $userMapper = $mapperFactory->get(UserMapper::class);
+
+    /** @var StorageMapper $storageMapper */
+    $storageMapper = $mapperFactory->get(StorageMapper::class);
 
     // Figure out a system user
     try {
@@ -116,11 +120,48 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $facade   = new Facade(new Authenticator(), $response, $file, $systemUser);
 
         // Try to download the Crocodocument
-        $result   = $httpClient->get($facade->getDownloadUrl())->send();
-        $contents = $result->getBody(true);
+        try {
+            $result = $httpClient->get($facade->getDownloadUrl())->send();
+        } catch (RuntimeException $e) {
+            // skip this one; consider jittering
+            $log->warning(
+                sprintf(
+                    'Exception raised when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
+                    $e->getCode(),
+                    $e->getMessage()
+                )
+            );
+            continue;
+        }
+        if ($result->isError()) {
+            // skip this one; consider jittering
+            // Also consider exiting completely if there's too many errors
+            $response = json_decode($result, true);
+            $log->warning(
+                sprintf(
+                    'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
+                    $response['error'],
+                    $result->getMessage()
+                )
+            );
+            continue;
+        }
 
-        // Put it in Storage
-        file_put_contents(sprintf('%s.pdf', $row['fileId']), $contents);
+        $log->info('Crocodoc document successfully retrieved');
+
+        // Figure out a filename
+        $matches = [];
+        if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
+            list($filename) = $matches;
+        } else {
+            // Make something up
+            $filename = 'return_' . $file->getBasename();
+        }
+
+        // Shoehorn it into storage
+        $storageModel = $storageMapper->acceptStream($filename, $result);
+
+        // Put it into most recent submission
     }
 
     exit;
