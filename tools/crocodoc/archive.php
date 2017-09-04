@@ -192,10 +192,31 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             $filename = 'return_' . $file->getBasename();
         }
 
+        // Put it into most recent submission, whichever that might be
+        $selectMostRecentReturnQuery->execute([
+            'studentId' => $row['studentId'],
+            'boxId'     => $row['boxId'],
+        ]);
+        $mostRecentReturnId = $selectMostRecentReturnQuery->fetchColumn();
+        if (!$mostRecentReturnId) {
+            // create one
+            $insertNewReturnQuery->execute([
+                'systemUserId' => $systemUser->getId(),
+                'studentId'    => $row['studentId'],
+                'boxId'        => $row['boxId'],
+                'now'          => Alaress_Date_Format::now(),
+            ]);
+            $mostRecentReturnId = $db->lastInsertId();
+        }
+
         // Shoehorn it into storage
         $storageModel = $storageMapper->acceptStream($filename, $result);
-
-        // Put it into most recent submission, whichever that might be
+        $insertNewReturnFileQuery->execute([
+            'returnId' => $mostRecentReturnId,
+            'hash'     => $storageModel->getHash(),
+            'fileName' => $row['fileName'],
+            'now'      => Alaress_Date_Format::now(),
+        ]);
     }
 
     exit;
