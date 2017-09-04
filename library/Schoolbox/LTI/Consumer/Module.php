@@ -1,15 +1,17 @@
 <?php
 
 namespace Schoolbox\LTI\Consumer;
+
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
-use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
+use Component_Homepage_Factory;
+use Component_InstanceMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
-use Twig_Loader_Chain;
-use Schoolbox\Mapper\Exception as MapperException;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
+use Schoolbox\User;
+use SitePage;
+use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
@@ -24,96 +26,94 @@ class Module extends BaseModule
     /** @var ProviderMapper $providerMapper */
     private $providerMapper;
 
-    /** @var \Component_InstanceMapper $componentInstanceMapper */
+    /** @var Component_InstanceMapper $componentInstanceMapper */
     private $componentInstanceMapper;
-
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        $this->folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
-        $this->providerMapper = $this->getMapperFactory()->get(ProviderMapper::class);
-        $this->componentInstanceMapper = $this->getMapperFactory()->get(\Component_InstanceMapper::class);
-    }
-
 
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function registerRoutes()
     {
-        $routes = [
+        $this->registerRoutesArray([
             'GET' => [
-                '/launch/{providerId}/{componentId}/{folderId}' => 'getLaunch'
+                '/launch/{providerId}/{componentId}/{folderId}'                             => 'getLaunch',
+                '/folder/{folderId}/component/{componentId}/provider/{providerId}/callback' => 'getComponentCallback'
             ],
             'POST' => [
-                '/component/{componentId}/provider/{providerId}' => 'postComponentProvider'
+                '/component/{componentId}/provider/{providerId}'                            => 'postComponentProvider'
             ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
+        ]);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param PathMatcher $matcher
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // Preload required data for the various routes
 
-        $folderMapper = $this->folderMapper;
-        $providerMapper = $this->providerMapper;
+        $folderMapper            = $this->folderMapper;
+        $providerMapper          = $this->providerMapper;
         $componentInstanceMapper = $this->componentInstanceMapper;
 
-        $this->addRoutePreload(
-            $matcher,
-            '.*',
-            function ($params) use ($folderMapper, $providerMapper, $componentInstanceMapper) {
+        $this->addRoutePreload($matcher, '.*', function ($params) use ($folderMapper, $providerMapper, $componentInstanceMapper) {
+            $returnArray = [];
 
-                $returnArray = [];
+            // Load LTI provider record
 
-                // Load student record
-
-                if (array_key_exists('providerId', $params)) {
-                    $returnArray['provider'] = $providerMapper->findById($params['providerId']);
-                }
-
-                // Load comment
-
-                if (array_key_exists('componentId', $params)) {
-
-                    $page = new \SitePage();
-                    $page->setDi($this->getInjector());
-
-                    $factory       = new \Component_Homepage_Factory(new User(), $page);
-                    $component = $componentInstanceMapper->findByInstanceId($params['componentId']);
-
-                    $returnArray['component'] = $factory->buildComponent($component);
-                }
-
-                if (array_key_exists('folderId', $params)) {
-                    $returnArray['folder'] = $folderMapper->findById($params['folderId']);
-                }
-
-                return $returnArray;
+            if (array_key_exists('providerId', $params)) {
+                $returnArray['provider'] = $providerMapper->findById($params['providerId']);
             }
-        );
+
+            // Load homepage component
+
+            if (array_key_exists('componentId', $params)) {
+
+                $page = new SitePage();
+                $page->setDi($this->getInjector());
+
+                $factory   = new Component_Homepage_Factory(new User(), $page);
+                $component = $componentInstanceMapper->findByInstanceId($params['componentId']);
+
+                $returnArray['component'] = $factory->buildComponent($component);
+            }
+
+            // Load folder
+
+            if (array_key_exists('folderId', $params)) {
+                $returnArray['folder'] = $folderMapper->findById($params['folderId']);
+            }
+
+            return $returnArray;
+        });
+    }
+
+    /**
+     * @param ContainerInterface $injector
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        $this->folderMapper            = $this->getMapperFactory()->get(FolderMapper::class);
+        $this->providerMapper          = $this->getMapperFactory()->get(ProviderMapper::class);
+        $this->componentInstanceMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param ContainerInterface $injector
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param Twig_Loader_Chain $templateLoader
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {

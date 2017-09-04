@@ -1,24 +1,38 @@
 <?php
+
 namespace Schoolbox\LTI\Consumer;
 
 use Alaress\Web\Controller\Base;
+use Component_Config;
+use Component_ConfigDefinitionMapper;
+use Component_ConfigMapper;
 use Component_ControllerAbstract;
-use Schoolbox\Mapper\Exception as MapperException;
+use DateTime;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\LTI\Component\Homepage\Controller as Component;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Controller extends Base
 {
+    /** @var Component_ConfigDefinitionMapper $componentConfigDefinitionMapper */
     private $componentConfigDefinitionMapper;
+
+    /** @var Component_ConfigMapper $componentConfigMapper */
     private $componentConfigMapper;
+
+    /**
+     * Allowed LTI return types
+     */
+    const RETURN_TYPE_IFRAME = 'iframe';
 
     /**
      * Controller constructor.
      */
     public function __construct()
     {
-        $this->componentConfigMapper = \Component_ConfigMapper::getInstance();
-        $this->componentConfigDefinitionMapper = \Component_ConfigDefinitionMapper::getInstance();
+        $this->componentConfigMapper           = Component_ConfigMapper::getInstance();
+        $this->componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
     }
 
     /**
@@ -26,8 +40,8 @@ class Controller extends Base
      * @param Provider $provider
      * @param Component_ControllerAbstract $component
      */
-    public function postComponentProvider($provider, $component) {
-
+    public function postComponentProvider($provider, $component)
+    {
         $post = $this->getRequest()->post;
 
         $configDefinition = $this->componentConfigDefinitionMapper->findByColumnList([
@@ -41,7 +55,7 @@ class Controller extends Base
         ))->first();
 
         if (empty($configInstance)) {
-            $configInstance = new \Component_Config();
+            $configInstance = new Component_Config();
             $configInstance->setConfigDefinitionId($configDefinition->getId());
             $configInstance->setInstanceId($component->getInstance()->getId());
         }
@@ -63,7 +77,7 @@ class Controller extends Base
             ))->first();
 
             if (empty($configInstance)) {
-                $configInstance = new \Component_Config();
+                $configInstance = new Component_Config();
                 $configInstance->setConfigDefinitionId($configDefinition->getId());
                 $configInstance->setInstanceId($component->getInstance()->getId());
             }
@@ -74,7 +88,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => [
+            'data' => [
                 'result' => 'OK'
             ]
         ]);
@@ -82,44 +96,78 @@ class Controller extends Base
 
     /**
      * Create LTI launch form
+     *
      * @param Provider $provider
      * @param Component_ControllerAbstract $component
      * @param Folder $folder
      */
-    public function getLaunch($provider, $component, $folder) {
-
+    public function getLaunch($provider, $component, $folder)
+    {
         $this->setAllowBackToTheFuture(false);
 
+        // Check if there was an embed URL in the configuration
+
+        $url = $component->getConfig('url');
+
+        if (!empty($url)) {
+
+            // Redirect to the embed URL
+
+            $this->getResponse()->redirect->to($url);
+            return;
+        }
+
+        // Otherwise go to the LTI provider
+
+        $scheme = $_SERVER['REQUEST_SCHEME'];
+        $baseUrl = $_SERVER['SERVER_NAME'];
+
+        // Define return URL
+
+        $extContentReturnUrl = "{$scheme}://{$baseUrl}" . $this->getRouteIfAuthorized('ltiConsumer.getComponentCallback', [
+            'folderId' => $folder->getId(),
+            'providerId' => $provider->getId(),
+            'componentId' => $component->getInstance()->getId()
+        ]);
+
+        // Define allowed return types
+
+        $returnTypes = implode(',', [
+            self::RETURN_TYPE_IFRAME
+        ]);
+
         $launch_data = [
-            'resource_link_id' => $folder->getId() . '_' . $component->getInstance()->getId(),
-            'resource_link_title' => $component->getConfig('componentname'),
-            'resource_link_description' => '',
-            'user_id' => $this->getUser()->getId(),
-            'user_image' => urlencode("http://{$_SERVER['SERVER_NAME']}/portrait.php?userId={$this->getUser()->getExternalId()}&size=square80"),
+            'resource_link_id'                          => $folder->getId() . '_' . $component->getInstance()->getId(),
+            'resource_link_title'                       => $component->getConfig('componentname'),
+            'resource_link_description'                 => '',
+            'user_id'                                   => $this->getUser()->getId(),
+            'user_image'                                => "{$scheme}://{$baseUrl}portrait.php?userId={$this->getUser()->getExternalId()}&size=square80",
             'roles' =>
                 $this->getUser()->getRole()->isStudent() ? 'Student' : (
                 $this->getUser()->getRole()->isStaff() ? 'Instructor' :
                     'Guest'
                 ),
-            'lis_person_name_given' => $this->getUser()->getFirstname(),
-            'lis_person_name_family' => $this->getUser()->getLastname(),
-            'lis_person_name_full' => $this->getUser()->getFullName(),
-            'lis_person_contact_email_primary' => $this->getUser()->getEmail(),
-            'context_id' => $folder->getId(),
-            'context_type' => 'CourseSection',
-            'context_title' => $folder->getName(),
-            'context_label' => $folder->getCodeString(),
-            'launch_presentation_locale' => 'en-US',
-            'launch_presentation_document_target' => 'iframe',
-            'launch_presentation_return_url' => urlencode('#'),
-            'tool_consumer_instance_guid' => $this->getDi()->get('config')->get('site_location'),
-            'tool_consumer_instance_name' => $this->getDi()->get('config')->get('school_name'),
-            'tool_consumer_instance_description' => 'Schoolbox LMS',
-            'tool_consumer_instance_url' => urlencode("http://" . $_SERVER['SERVER_NAME']),
-            'tool_consumer_instance_contact_email' => $this->getDi()->get('config')->get('mail_from_address'),
-            'tool_consumer_info_product_family_code' => 'schoolbox',
-            'tool_consumer_info_version' => $this->getDi()->get('config')->get('site_version'),
-            'ext_lms' => 'schoolbox-' . $this->getDi()->get('config')->get('site_version')
+            'lis_person_name_given'                     => $this->getUser()->getFirstname(),
+            'lis_person_name_family'                    => $this->getUser()->getLastname(),
+            'lis_person_name_full'                      => $this->getUser()->getFullName(),
+            'lis_person_contact_email_primary'          => $this->getUser()->getEmail(),
+            'context_id'                                => $folder->getId(),
+            'context_type'                              => 'CourseSection',
+            'context_title'                             => $folder->getName(),
+            'context_label'                             => $folder->getCodeString(),
+            'launch_presentation_locale'                => 'en-US',
+            'launch_presentation_document_target'       => 'iframe',
+            'launch_presentation_return_url'            => "{$scheme}://{$baseUrl}homepage/{$folder->getId()}",
+            'ext_content_return_types'                  => $returnTypes,
+            'ext_content_return_url'                    => $extContentReturnUrl,
+            'tool_consumer_instance_guid'               => $this->getDi()->get('config')->get('site_location'),
+            'tool_consumer_instance_name'               => $this->getDi()->get('config')->get('school_name'),
+            'tool_consumer_instance_description'        => 'Schoolbox LMS',
+            'tool_consumer_instance_url'                => "{$scheme}://{$baseUrl}",
+            'tool_consumer_instance_contact_email'      => $this->getDi()->get('config')->get('mail_from_address'),
+            'tool_consumer_info_product_family_code'    => 'schoolbox',
+            'tool_consumer_info_version'                => $this->getDi()->get('config')->get('site_version'),
+            'ext_lms'                                   => 'schoolbox-' . $this->getDi()->get('config')->get('site_version')
         ];
 
         // Learning Field custom URL mangling
@@ -134,17 +182,16 @@ class Controller extends Base
 
         // Sign request
 
-        $now = new \DateTime();
+        $now = new DateTime();
 
-        $launch_data["lti_version"] = "LTI-1p0";
-        $launch_data["lti_message_type"] = "basic-lti-launch-request";
-
-        $launch_data["oauth_callback"] = "about:blank";
-        $launch_data["oauth_consumer_key"] = $provider->getKey();
-        $launch_data["oauth_version"] = "1.0";
-        $launch_data["oauth_nonce"] = uniqid('', true);
-        $launch_data["oauth_timestamp"] = $now->getTimestamp();
-        $launch_data["oauth_signature_method"] = "HMAC-SHA1";
+        $launch_data["lti_version"]             = "LTI-1p0";
+        $launch_data["lti_message_type"]        = "basic-lti-launch-request";
+        $launch_data["oauth_callback"]          = "about:blank";
+        $launch_data["oauth_consumer_key"]      = $provider->getKey();
+        $launch_data["oauth_version"]           = "1.0";
+        $launch_data["oauth_nonce"]             = uniqid('', true);
+        $launch_data["oauth_timestamp"]         = $now->getTimestamp();
+        $launch_data["oauth_signature_method"]  = "HMAC-SHA1";
 
         // OAuth requires that keys be sorted alphabetically
 
@@ -155,13 +202,13 @@ class Controller extends Base
             array_push($launch_params, $key . "=" . rawurlencode($launch_data[$key]));
         }
         $base_string = "POST&" . urlencode($provider->getUrl()) . "&" . rawurlencode(implode("&", $launch_params));
-        $secret = urlencode($provider->getSecret()) . "&";
-        $signature = base64_encode(hash_hmac("sha1", $base_string, $secret, true));
+        $secret      = urlencode($provider->getSecret()) . "&";
+        $signature   = base64_encode(hash_hmac("sha1", $base_string, $secret, true));
 
         $this->getResponse()->content->set(
             array(
                 'template' => '@ltiConsumer/form.twig',
-                'format'   => 'nochrome',
+                'format' => 'nochrome',
                 'data' => [
                     'params' => $launch_data,
                     'provider' => $provider,
@@ -169,6 +216,76 @@ class Controller extends Base
                 ],
             )
         );
+    }
+
+
+    /**
+     * Handle callback from an LTI provider
+     *
+     * @param Folder $folder
+     * @param Component $component
+     * @param Provider $provider
+     */
+    public function getComponentCallback($folder, $component, $provider)
+    {
+        $get = $this->getRequest()->query;
+
+        $return_type = $get['return_type'];
+
+        // Decide what to do based on the return type
+
+        if ($return_type == self::RETURN_TYPE_IFRAME) {
+            $url    = $get['url'];
+            $title  = $get['title'];
+
+            // Update the components title
+
+            $configDefinition = $this->componentConfigDefinitionMapper->findByColumnList([
+                'key' => 'componentname',
+                'component_definition_id' => $component->getInstance()->getDefinitionId()
+            ])->first();
+
+            $configInstance = $this->componentConfigMapper->findByColumnList(array(
+                'component_config_definition_id' => $configDefinition->getId(),
+                'component_instance_id' => $component->getInstance()->getId()
+            ))->first();
+
+            if (empty($configInstance)) {
+                $configInstance = new Component_Config();
+                $configInstance->setConfigDefinitionId($configDefinition->getId());
+                $configInstance->setInstanceId($component->getInstance()->getId());
+            }
+
+            $configInstance->setValue($title);
+            $this->componentConfigMapper->save($configInstance);
+
+            // Update the components embed URL
+
+            $configDefinition = $this->componentConfigDefinitionMapper->findByColumnList([
+                'key' => 'url',
+                'component_definition_id' => $component->getInstance()->getDefinitionId()
+            ])->first();
+
+            $configInstance = $this->componentConfigMapper->findByColumnList(array(
+                'component_config_definition_id' => $configDefinition->getId(),
+                'component_instance_id' => $component->getInstance()->getId()
+            ))->first();
+
+            if (empty($configInstance)) {
+                $configInstance = new Component_Config();
+                $configInstance->setConfigDefinitionId($configDefinition->getId());
+                $configInstance->setInstanceId($component->getInstance()->getId());
+            }
+
+            $configInstance->setValue($url);
+            $this->componentConfigMapper->save($configInstance);
+
+            $this->getResponse()->redirect->to($url);
+            return;
+        }
+
+
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 }
 

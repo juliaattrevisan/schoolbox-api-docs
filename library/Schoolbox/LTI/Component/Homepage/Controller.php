@@ -12,7 +12,6 @@ namespace Schoolbox\LTI\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
@@ -27,10 +26,11 @@ class Controller extends Component_Homepage_ControllerAbstract
      * Injectable constructor
      *
      * @param Component_Instance $instance
-     * @param User               $user
-     * @param SitePage           $sitepage
+     * @param User $user
+     * @param SitePage $sitepage
      */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
         parent::__construct($instance, $user, $sitepage);
         $this->providerMapper = $sitepage->getDi()->get('mapperFactory')->get(ProviderMapper::class);
     }
@@ -61,15 +61,15 @@ class Controller extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@lti/component.twig',
             array(
-                'session'               => $_SESSION,
-                'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName(),
-                'providerId'            => $this->getConfig('ltiprovider'),
-                'providers'             => $providers,
-                'folderId'              => $this->getContext()->getId(),
-                'height'                => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
-                'readOnly'              => ($this->getContentPermission() < UserAccess::ACCESS_WRITE),
-                'user'                  => $_SESSION['user']
+                'session' => $_SESSION,
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'componentClass' => $this->getComponentName(),
+                'providerId' => $this->getConfig('ltiprovider'),
+                'providers' => $providers,
+                'folderId' => $this->getContext()->getId(),
+                'height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
+                'readOnly' => ($this->getContentPermission() < UserAccess::ACCESS_WRITE),
+                'user' => $_SESSION['user']
             ),
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
