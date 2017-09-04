@@ -124,7 +124,7 @@ class Document extends Base implements IDocument
                         WHERE d.SourceDate 
                         BETWEEN StartDate AND EndDate
                     ) AS FileSemester,
-                    d.SourceDate as CreatedDate,
+                    CONVERT(VARCHAR(20), d.SourceDate, 20) as CreatedDate,
                     'tDocuments' AS Source
             FROM    {$this->schema}.tDocuments d
             JOIN    {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
