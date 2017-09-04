@@ -134,7 +134,7 @@ class Document extends Base implements IDocument
         $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
         if ($date !== false) {
-            $query .= ' AND d.SourceDate >= :createdDate2';
+            $query .= ' AND d.SourceDate >= :createdDate2 ';
 
             $params = array_merge($params, [
                 'createdDate2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
