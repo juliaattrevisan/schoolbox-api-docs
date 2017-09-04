@@ -124,6 +124,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         ) 
     ");
 
+    // Query for figuring out if this file is already attached to this feedback
+    $countExistingFileQuery = $db->prepareQuery("
+        SELECT COUNT(*)
+        FROM submission_return_file
+        WHERE submission_return_id = :feedbackId
+        AND   hash                 = :hash
+    ");
+
     // Query for attaching a new file to the feedback.
     $insertNewFeedbackFileQuery = $db->prepareQuery("
         INSERT INTO submission_return_file (
@@ -247,13 +255,24 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             $filename = 'return_' . $file->getFilename() . '.pdf';
         }
         $storageModel = $storageMapper->acceptStream($filename, $result->getBody());
-        $insertNewFeedbackFileQuery->execute([
+
+
+        // Attach to the feedback, if it isn't already
+        $countExistingFileQuery->execute([
             'feedbackId' => $feedbackId,
             'hash'       => $storageModel->getHash(),
-            'fileName'   => $row['fileName'],
-            'now'        => Alaress_Date_Format::now(),
         ]);
-        $log->info('Crocodoc document attached to feedback');
+        if ($countExistingFileQuery->fetchColumn() > 0) {
+            $insertNewFeedbackFileQuery->execute([
+                'feedbackId' => $feedbackId,
+                'hash'       => $storageModel->getHash(),
+                'fileName'   => $row['fileName'],
+                'now'        => Alaress_Date_Format::now(),
+            ]);
+            $log->info('Crocodoc document attached to feedback');
+        } else {
+            $log->info('Crocodoc document already attached to feedback - not attaching again');
+        }
 
 
         // Think about how to mark this as not requiring more processing
