@@ -90,11 +90,6 @@ class BindingLoader implements ILoader
             $router->add($from, $to, true);
         }
 
-        foreach ($this->getInheritances() as $from => $to) {
-            $this->log->info("Adding inheritance `$from` -> `$to`");
-            $router->add($from, $to, true);
-        }
-
         return $this;
     }
 
@@ -130,17 +125,7 @@ class BindingLoader implements ILoader
         while (list ($from, $to) = $stmt->fetch(\PDO::FETCH_NUM)) {
             yield $from => $to;
         }
-    }
 
-
-    /**
-     * Yield the inheritance of one folder from another (which will have the effect of cascading up to the NNIAN)
-     * The direction of the yield is child => parent.
-     *
-     * @return Traversable
-     */
-    private function getInheritances()
-    {
         /** @var Folder\Model[] $folders */
         $folders = $this->folderMapper->findByColumn('inherit', true);
 
