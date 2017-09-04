@@ -131,6 +131,16 @@ class Document extends Base implements IDocument
             WHERE   dr.ID = :id2 
         ";
 
+        $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+
+        if ($date !== false) {
+            $query .= ' AND d.SourceDate >= :createdDate2';
+
+            $params = array_merge($params, [
+                'createdDate2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+            ]);
+        }
+
         $params['id2'] = $student->getExternalId();
 
         // Check if we need to apply a classification filter
