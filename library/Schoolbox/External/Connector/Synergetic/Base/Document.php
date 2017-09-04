@@ -272,9 +272,6 @@ class Document extends Base implements IDocument
 
         // Get the document from the database
 
-        echo $query;
-        var_dump($params);
-
         $result = $this->databaseExternal->executeQuery($query, $params);
 
         if ($row = $result->fetch()) {
