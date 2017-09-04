@@ -18,6 +18,9 @@ abstract class Evaluation_Section extends DeprecatedModel
      */
     const SECTION_EXCLUDE = true;
 
+    /** @const int POOL_SIZE_ALL Indicates to use all questions in section */
+    const POOL_SIZE_ALL = 0;
+
     /**
      * Creates a new section.
      *

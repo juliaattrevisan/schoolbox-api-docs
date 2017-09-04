@@ -99,7 +99,7 @@ if (!$attempt) {
             $responseHandler->assignQuestions(
                 $attemptId,
                 $section['section_id'],
-                0,
+                $pool = Survey_Section::POOL_SIZE_ALL,
                 false
             );
         }

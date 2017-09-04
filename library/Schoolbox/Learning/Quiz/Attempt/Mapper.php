@@ -196,11 +196,12 @@ class Mapper extends BaseMapper
                 (
                     SELECT `as`.section_id
                     FROM assess_section `as`
-                    WHERE `as`.section_id = aq.section_id
+                    WHERE `as`.assess_id = q.assess_id
                     ORDER BY `as`.sequence ASC
                     LIMIT 1
                 ) AS first_section
             FROM assess_attempt aa
+            JOIN assess q ON q.assess_id = aa.assess_id
             LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
             LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
             WHERE aa.attempt_id IN {$this->getArrayPlaceholders($attemptIds)}

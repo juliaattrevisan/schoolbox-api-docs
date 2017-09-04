@@ -108,7 +108,7 @@ if (!$attempt) {
                 $pool = $section['pool'];
                 $randomise = Assess_Response::RANDOMISE_QUESTIONS;
             } else {
-                $pool = 0;
+                $pool = Assess_Section::POOL_SIZE_ALL;
                 $randomise = Assess_Response::ORDERED_QUESTIONS;
             }
             $responseHandler->assignQuestions(
