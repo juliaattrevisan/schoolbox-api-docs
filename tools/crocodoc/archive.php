@@ -10,6 +10,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Aura\Di;
+use Guzzle\Http\Client as HttpClient;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
@@ -32,37 +33,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
 
-//    // Mapper technique
-//
-//    /** @var MapperFactory $mapperFactory */
-//    $mapperFactory = $di->get('mapperFactory');
-//
-//    // Fetch a bunch of due work response files
-//    $responseFileMapper = $mapperFactory->get(ResponseFileMapper::class);
-//
-//    $responseFilePredicate = $responseFileMapper->getPredicateBuilder()
-//        ->notNull('uuid');
-//
-//    $crocodocCount = $responseFileMapper->countByPredicates($responseFilePredicate);
-//
-//    $log->notice(sprintf('%d Crocodoc documents require archival', $crocodocCount));
-//
-//    // Go thru the entire list
-//    $queryOptions = [
-//        'order'  => ['created_at' => 'desc'],
-//        'limit'  => 10,
-//    ];
-//    foreach ($responseFileMapper->findByPredicates($responseFilePredicate, $queryOptions) as $responseFile) {
-//        /** @var ResponseFile $responseFile */
-//        // Do stuff with the doc
-//        $log->notice(sprintf('Archiving Crocodoc document "%s"...', $responseFile->getUuid()));
-//
-//        // Get the crocodocument
-//        // use getDownloadUrl
-//        // need mappers to use facade anyway
-//
-//        $facade = new Facade(new Authenticator(), $responseFile->getSubmission(), $responseFile, $this->getUser());
-//    }
+    $httpClient = new HttpClient();
 
     /** @var MapperFactory $mapperFactory */
     $mapperFactory = $di->get('mapperFactory');
@@ -136,7 +107,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             ->setFilename($row['fileName']);
         $facade   = new Facade(new Authenticator(), $response, $file, $systemUser);
 
-        $log->notice(sprintf('Crocodoc document ID is "%s"', $facade->getDownloadUrl()));
+        // Try to download the Crocodocument
+        $result   = $httpClient->get($facade->getDownloadUrl())->send();
+        $contents = $result->getBody(true);
+
+        file_put_contents(sprintf('%s.pdf', $row['fileId']), $contents);
     }
 
     exit;
