@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
 use Schoolbox\Learning\InlineGrader\Authenticator;
 use Schoolbox\Learning\InlineGrader\Facade;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
 
@@ -40,8 +41,15 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
     /** @var UserMapper $userMapper */
     $userMapper = $mapperFactory->get(UserMapper::class);
-    // If I die, I can do nothing
-    $systemUser = $userMapper->findOneByColumn('username', 'alaress');
+
+    // Figure out a system user
+    try {
+        $systemUser = $userMapper->findOneByColumn('username', 'alaress');
+    } catch (MapperException $e) {
+        // Deleted user _might_ be fine, but let's not take the risk
+        $log->error('User "alaress" not found! New due work feedback and files will be created for this user, so they must exist.');
+        exit(1);
+    }
 
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
@@ -111,6 +119,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $result   = $httpClient->get($facade->getDownloadUrl())->send();
         $contents = $result->getBody(true);
 
+        // Put it in Storage
         file_put_contents(sprintf('%s.pdf', $row['fileId']), $contents);
     }
 
