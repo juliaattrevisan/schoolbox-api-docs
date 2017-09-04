@@ -66,6 +66,9 @@ if (isset($_POST['name'])) {
     }
     $destination = $myFolderMapper->findById($destinationId);
 
+    if($myFolderMapper->isDescendant($destination, $myFolder)){
+        respondFailure($isAjax, 'Cannot move folder to own descendant');
+    }
     $myFolder->setParent($destination);
     $myFolderMapper->save($myFolder);
 } elseif (is_numeric($_POST['portfolioID'])) {
