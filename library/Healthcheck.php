@@ -414,8 +414,7 @@ class Healthcheck
             'AttendanceMaster',
             'tAttendances',
             'IndividualPlans',
-            'StudentYears',
-
+            'StudentYears'
         ];
 
         // Pastoral Care Tables (Only If Module Enabled)
@@ -437,8 +436,12 @@ class Healthcheck
 
         if ($this->configMapper->get('external_document_report_enabled')) {
             $externalPing = new \External_Ping();
-            $this->selectTest(
-                ['StudentReportsArchiveLink', 'StudentReportsArchive'],
+            $this->selectTest([
+                    'StudentReportsArchiveLink',
+                    'StudentReportsArchive',
+                    'tDocuments',
+                    'DocumentReferences'
+                ],
                 ($externalPing->getVersion() == "68") ? 'media' : 'SynergyOneMedia'
             );
         }
@@ -449,15 +452,16 @@ class Healthcheck
 
         // Stored Procedures
 
-        $procedures = ['spgTimetableDay',
-                       'spsConfigUserDefaultYearSemester',
-                       'spsTimetable',
-                       'spiwkAttendances',
-                       'spswkAttendances',
-                       'sptwkAttendances',
-                       'spiExcursions',
-                       'spuExcursionDetails',
-                        'spiCommunityEventsCurrent',
+        $procedures = [
+            'spgTimetableDay',
+            'spsConfigUserDefaultYearSemester',
+            'spsTimetable',
+            'spiwkAttendances',
+            'spswkAttendances',
+            'sptwkAttendances',
+            'spiExcursions',
+            'spuExcursionDetails',
+            'spiCommunityEventsCurrent',
         ];
 
         $this->procedureTest($procedures);
