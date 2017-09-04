@@ -11,6 +11,8 @@ namespace Schoolbox\Realtime\Routing\Subscription\Loader;
 use Alaress\Routing\IRouter;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use Traversable;
 
@@ -26,17 +28,21 @@ class BindingLoader implements ILoader
     /** @var UserMapper */
     private $userMapper;
 
+    /** @var Folder\Mapper */
+    private $folderMapper;
 
     /**
      * @param GeneratorInterface $generator
      * @param UserMapper         $userMapper
+     * @param Folder\Mapper      $folderMapper
      * @param LoggerInterface    $log
      */
-    public function __construct(GeneratorInterface $generator, UserMapper $userMapper, LoggerInterface $log)
+    public function __construct(GeneratorInterface $generator, UserMapper $userMapper, Folder\Mapper $folderMapper, LoggerInterface $log)
     {
-        $this->log        = $log;
-        $this->generator  = $generator;
-        $this->userMapper = $userMapper;
+        $this->log         = $log;
+        $this->generator   = $generator;
+        $this->userMapper  = $userMapper;
+        $this->folderMapper = $folderMapper;
     }
 
 
@@ -118,6 +124,31 @@ class BindingLoader implements ILoader
 
         while (list ($from, $to) = $stmt->fetch(\PDO::FETCH_NUM)) {
             yield $from => $to;
+        }
+    }
+
+
+    /**
+     * Yield the inheritance of one folder from another (which will have the effect of cascading up to the NNIAN)
+     * The direction of the yield is child => parent.
+     *
+     * @return Traversable
+     */
+    private function getInheritances()
+    {
+        /** @var Folder\Model[] $folders */
+        $folders = $this->folderMapper->findByColumn('inherit', true);
+
+        $perms = [ UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL ];
+
+        foreach ($folders as $folder) {
+            // we have to manually map each access level (sigh)
+            foreach ($perms as $p) {
+                $from = "*.notify.service.1.{$folder->getId()}.{$p}.#";
+                $to   = "*.notify.service.1.{$folder->getParent()->getId()}.{$p}.#";
+
+                yield $from => $to;
+            }
         }
     }
 
