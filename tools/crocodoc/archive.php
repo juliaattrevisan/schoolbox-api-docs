@@ -165,11 +165,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         // Finagle together the pieces the facade requires
         $response = (new DueWorkResponse())
             ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT));
-        $file     = (new DueWorkResponseFile())
+        $file = (new DueWorkResponseFile())
             ->setId($row['fileId'])
             ->setCrocodocId($row['crocodocDocumentId'])
             ->setFilename($row['fileName']);
-        $facade   = new Facade(new Authenticator(), $response, $file, $systemUser);
+        $facade = new Facade(new Authenticator(), $response, $file, $systemUser);
 
 
         // Try to download the annotated Crocodocument
@@ -239,7 +239,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
 
         // Shoehorn it into storage
-        $storageModel = $storageMapper->acceptStream('return_' . $file->getBasename(), $result->getBody());
+        $matches = [];
+        if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
+            list(, $filename) = $matches;
+        } else {
+            // Make something up
+            $filename = 'return_' . $file->getFilename() . '.pdf';
+        }
+        $storageModel = $storageMapper->acceptStream($filename, $result->getBody());
         $insertNewFeedbackFileQuery->execute([
             'feedbackId' => $feedbackId,
             'hash'       => $storageModel->getHash(),
