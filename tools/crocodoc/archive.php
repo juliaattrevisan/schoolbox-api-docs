@@ -81,13 +81,47 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
     // Which return does the crocodocument get put in?
     $selectMostRecentReturnQuery = $db->prepareQuery("
-        SELECT id
+        SELECT id AS returnId
         FROM submission_return
         WHERE owner  = :studentId
         AND   box_id = :boxId
         AND   published_at IS NOT NULL
         ORDER BY published_at DESC
         LIMIT 1
+    ");
+
+    $insertNewReturnQuery = $db->prepareQuery("
+        INSERT INTO submission_return (
+            box_id,
+            marker,
+            owner,
+            created_at,
+            published_at,
+            updated_at
+        ) VALUES (
+            :boxId,
+            :systemUserId,
+            :studentId,
+            :now,
+            NULL,
+            :now
+        ) 
+    ");
+
+    $insertNewReturnFileQuery = $db->prepareQuery("
+        INSERT INTO submission_return_file (
+            submission_return_id,
+            hash,
+            realname,
+            created_at,
+            updated_at
+        ) VALUES (
+            :returnId,
+            :hash,
+            :fileName,
+            :now,
+            :now
+        )
     ");
 
     // Get a count
@@ -161,7 +195,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         // Shoehorn it into storage
         $storageModel = $storageMapper->acceptStream($filename, $result);
 
-        // Put it into most recent submission
+        // Put it into most recent submission, whichever that might be
     }
 
     exit;
