@@ -64,6 +64,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             ssf.id          AS fileId,
             ssf.realname    AS fileName,
             ssf.uuid        AS crocodocDocumentId,
+            ss.id           AS responseId,
             ss.owner        AS studentId,
             ss.submitted_at AS submittedDate,
             sb.id           AS boxId
@@ -80,12 +81,22 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $clearCrocodocQuery = $db->prepareQuery("UPDATE student_submission_file SET uuid = NULL WHERE id = :fileId");
 
     // Which return does the crocodocument get put in?
+    $selectRelevantReturnQuery = $db->prepareQuery("
+        SELECT id AS returnId
+        FROM submission_return
+        WHERE student_submission_id = :responseId
+        AND   published_at IS NOT NULL
+        ORDER BY published_at DESC
+        LIMIT 1
+    ");
+
     $selectMostRecentReturnQuery = $db->prepareQuery("
         SELECT id AS returnId
         FROM submission_return
         WHERE owner  = :studentId
         AND   box_id = :boxId
         AND   published_at IS NOT NULL
+        AND   student_submission_id IS NULL
         ORDER BY published_at DESC
         LIMIT 1
     ");
@@ -183,27 +194,45 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
         $log->info('Crocodoc document successfully retrieved');
 
-        // Put it into most recent submission, whichever that might be
-        $selectMostRecentReturnQuery->execute([
-            'studentId' => $row['studentId'],
-            'boxId'     => $row['boxId'],
+
+        // Put it into relevant feedback, whichever that might be.
+        // 1. most recent feedback for this response
+        // 2. most recent feedback with no response
+        // 3. a new draft feedback
+        $selectRelevantReturnQuery->execute([
+            'responseId' => $row['responseId'],
         ]);
-        $mostRecentReturnId = $selectMostRecentReturnQuery->fetchColumn();
-        if (!$mostRecentReturnId) {
-            // create one
-            $insertNewReturnQuery->execute([
-                'systemUserId' => $systemUser->getId(),
-                'studentId'    => $row['studentId'],
-                'boxId'        => $row['boxId'],
-                'now'          => Alaress_Date_Format::now(),
+        $returnId = $selectRelevantReturnQuery->fetchColumn();
+        if ($returnId) {
+            $log->info(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $returnId));
+        } else {
+            $log->debug('No non-floating feedback found - searching for non-floating feedback');
+            $selectMostRecentReturnQuery->execute([
+                'studentId' => $row['studentId'],
+                'boxId'     => $row['boxId'],
             ]);
-            $mostRecentReturnId = $db->lastInsertId();
+            $returnId = $selectMostRecentReturnQuery->fetchColumn();
+            if ($returnId) {
+                $log->info(sprintf('Attaching document to most recent floating feedback (id: %d)', $returnId));
+            } else {
+                $log->debug('No floating feedback found - creating a new draft floating feedback');
+                // create one
+                $insertNewReturnQuery->execute([
+                    'systemUserId' => $systemUser->getId(),
+                    'studentId'    => $row['studentId'],
+                    'boxId'        => $row['boxId'],
+                    'now'          => Alaress_Date_Format::now(),
+                ]);
+                $returnId = $db->lastInsertId();
+                $log->info(sprintf('Attaching document to new draft floating feedback (id: %d)', $returnId));
+            }
         }
+
 
         // Shoehorn it into storage
         $storageModel = $storageMapper->acceptStream('return_' . $file->getBasename(), $result->getBody());
         $insertNewReturnFileQuery->execute([
-            'returnId' => $mostRecentReturnId,
+            'returnId' => $returnId,
             'hash'     => $storageModel->getHash(),
             'fileName' => $row['fileName'],
             'now'      => Alaress_Date_Format::now(),
