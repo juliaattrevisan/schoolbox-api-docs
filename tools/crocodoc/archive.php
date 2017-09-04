@@ -80,9 +80,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     // Remove crocodocument link
     $clearCrocodocQuery = $db->prepareQuery("UPDATE student_submission_file SET uuid = NULL WHERE id = :fileId");
 
-    // Which return does the crocodocument get put in?
-    $selectRelevantReturnQuery = $db->prepareQuery("
-        SELECT id AS returnId
+
+    // Which feedback does the crocodocument get put in?
+    // This query fetches the most recent published feedback attached to the response.
+    $selectAttachedFeedbackQuery = $db->prepareQuery("
+        SELECT id AS feedbackId
         FROM submission_return
         WHERE student_submission_id = :responseId
         AND   published_at IS NOT NULL
@@ -90,8 +92,10 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         LIMIT 1
     ");
 
-    $selectMostRecentReturnQuery = $db->prepareQuery("
-        SELECT id AS returnId
+    // This query fetches the most recent published floating feedback for this assessment,
+    // for when there's no directly attached feedback.
+    $selectFloatingFeedbackQuery = $db->prepareQuery("
+        SELECT id AS feedbackId
         FROM submission_return
         WHERE owner  = :studentId
         AND   box_id = :boxId
@@ -101,7 +105,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         LIMIT 1
     ");
 
-    $insertNewReturnQuery = $db->prepareQuery("
+    // This query inserts a new draft feedback, for if there is no published feedback at all.
+    $insertNewFeedbackQuery = $db->prepareQuery("
         INSERT INTO submission_return (
             box_id,
             marker,
@@ -119,7 +124,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         ) 
     ");
 
-    $insertNewReturnFileQuery = $db->prepareQuery("
+    // Query for attaching a new file to the feedback.
+    $insertNewFeedbackFileQuery = $db->prepareQuery("
         INSERT INTO submission_return_file (
             submission_return_id,
             hash,
@@ -127,13 +133,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             created_at,
             updated_at
         ) VALUES (
-            :returnId,
+            :feedbackId,
             :hash,
             :fileName,
             :now,
             :now
         )
     ");
+
 
     // Get a count
     $crocodocCount = $db->executeQuery("
@@ -146,16 +153,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     ")->fetchColumn();
     $log->notice(sprintf('%d Crocodoc documents require archival', $crocodocCount));
 
-    // Go thru the entire list
+
+    // Go
     foreach ($selectCrocodocQuery->executeIterator() as $row) {
-        // Do stuff with the doc
-        $log->notice(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
 
-        // Get the crocodocument
-        // use getDownloadUrl
-        // need mappers to use facade anyway
+        $log->info(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
 
-        // Finagle together the pieces the facade purports to require
+
+        // Finagle together the pieces the facade requires
         $response = (new DueWorkResponse())
             ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT));
         $file     = (new DueWorkResponseFile())
@@ -164,7 +169,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             ->setFilename($row['fileName']);
         $facade   = new Facade(new Authenticator(), $response, $file, $systemUser);
 
-        // Try to download the Crocodocument
+
+        // Try to download the annotated Crocodocument
         try {
             $result = $httpClient->get($facade->getDownloadUrl())->send();
         } catch (RuntimeException $e) {
@@ -191,7 +197,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             );
             continue;
         }
-
         $log->info('Crocodoc document successfully retrieved');
 
 
@@ -199,45 +204,51 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         // 1. most recent feedback for this response
         // 2. most recent feedback with no response
         // 3. a new draft feedback
-        $selectRelevantReturnQuery->execute([
+        $selectAttachedFeedbackQuery->execute([
             'responseId' => $row['responseId'],
         ]);
-        $returnId = $selectRelevantReturnQuery->fetchColumn();
-        if ($returnId) {
-            $log->info(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $returnId));
+        $feedbackId = $selectAttachedFeedbackQuery->fetchColumn();
+        if ($feedbackId) {
+            $log->info(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
         } else {
             $log->debug('No non-floating feedback found - searching for non-floating feedback');
-            $selectMostRecentReturnQuery->execute([
+            $selectFloatingFeedbackQuery->execute([
                 'studentId' => $row['studentId'],
                 'boxId'     => $row['boxId'],
             ]);
-            $returnId = $selectMostRecentReturnQuery->fetchColumn();
-            if ($returnId) {
-                $log->info(sprintf('Attaching document to most recent floating feedback (id: %d)', $returnId));
+            $feedbackId = $selectFloatingFeedbackQuery->fetchColumn();
+            if ($feedbackId) {
+                $log->info(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
             } else {
                 $log->debug('No floating feedback found - creating a new draft floating feedback');
                 // create one
-                $insertNewReturnQuery->execute([
+                $insertNewFeedbackQuery->execute([
                     'systemUserId' => $systemUser->getId(),
                     'studentId'    => $row['studentId'],
                     'boxId'        => $row['boxId'],
                     'now'          => Alaress_Date_Format::now(),
                 ]);
-                $returnId = $db->lastInsertId();
-                $log->info(sprintf('Attaching document to new draft floating feedback (id: %d)', $returnId));
+                $feedbackId = $db->lastInsertId();
+                $log->info(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
             }
         }
 
 
         // Shoehorn it into storage
         $storageModel = $storageMapper->acceptStream('return_' . $file->getBasename(), $result->getBody());
-        $insertNewReturnFileQuery->execute([
-            'returnId' => $returnId,
-            'hash'     => $storageModel->getHash(),
-            'fileName' => $row['fileName'],
-            'now'      => Alaress_Date_Format::now(),
+        $insertNewFeedbackFileQuery->execute([
+            'feedbackId' => $feedbackId,
+            'hash'       => $storageModel->getHash(),
+            'fileName'   => $row['fileName'],
+            'now'        => Alaress_Date_Format::now(),
         ]);
+        $log->info('Crocodoc document attached to feedback');
+
+
+        // Think about how to mark this as not requiring more processing
     }
 
+
+    // At the end of the day: log something
     exit;
 });
