@@ -13,6 +13,7 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
+use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
 class Factory
@@ -32,6 +33,9 @@ class Factory
     /** @var UserMapper */
     private $userMapper;
 
+    /** @var Folder\Mapper */
+    private $folderMapper;
+
 
     /**
      * @param ClientInterface $redis
@@ -42,6 +46,7 @@ class Factory
         $this->redis = $redis;
         $this->log   = $log;
     }
+
 
     /**
      * @param string $cacheKey
@@ -70,7 +75,7 @@ class Factory
      */
     public function getNoCache()
     {
-        return new BindingLoader($this->getGenerator(), $this->getUserMapper(), $this->log);
+        return new BindingLoader($this->getGenerator(), $this->getUserMapper(), $this->getFolderMapper(), $this->log);
     }
 
 
@@ -110,6 +115,17 @@ class Factory
 
 
     /**
+     * @param Folder\Mapper $folderMapper
+     * @return $this
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
      * @return UserMapper
      */
     private function getUserMapper()
@@ -118,6 +134,18 @@ class Factory
             $this->setUserMapper(UserMapper::getInstance());
         }
         return $this->userMapper;
+    }
+
+
+    /**
+     * @return Folder\Mapper
+     */
+    private function getFolderMapper()
+    {
+        if (null === $this->folderMapper) {
+            $this->setFolderMapper(Folder\Mapper::getInstance());
+        }
+        return $this->folderMapper;
     }
 
 }
