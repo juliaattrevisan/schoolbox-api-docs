@@ -632,16 +632,460 @@ foreach ($data as $country => $kingdoms) {
 
 If you made it this far - good work! You've survived the fundamentals of phplib sorcery and can go on to greater (and more convenient) things.
 
+## Aura Paradigm
+The Aura Paradigm uses a model-view-controller (MVC) framework to figure out how to render contents. https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
+
+We kind of made our own with the help of Aura (hence the title) http://auraphp.com/ Compared to the Handler paradigm, the Aura approach gives us nicer tools to use. 
+
+There are five major pieces to look at:
+
+ * *Model.* A php class that represents a concept and its associated behaviours. Very specific to its purpose (high cohesion).
+ * *Mapper.* Conceptually synonymous with a Handler, but it's much smarter and returns you objects instead of arrays.
+ * *Controller.* This php class uses the models to generate content to pass into the View. Controllers shouldn't contain much logic; the classes that spawn in the controllers should contain the logic.
+ * *View.* This is performed by the second rendering engine, `twig`. You can read more about twig here: https://twig.symfony.com/ It's much nicer to use than `phplib`.
+ * *Module.* This is something we built which deals with routes (urls) and parameters, permissions and which controller methods are associated with each routes.
+
+Let's start making something. For now we'll use the Kingdom universe, but you can substitute this out for whatever you're building - just do a case-sensitive find and replace.
+
+### Model (and schema)
+Firstly, let's carve out a piece of land to start our new Kingdom. In `libray/Schoolbox/Kingdom`, create `Model.php`. This model lets us define the properties and behaviours of our Kingdom instances. For the time being we'll keep it straightforward with a `name` and `country`.
+
+```php
+<?php
+namespace Schoolbox\Kingdom;
+
+class Model
+{
+    /**
+     * @var int
+     */
+    private $id;
+
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var string
+     */
+    private $country;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * @param string $country
+     * @return $this
+     */
+    public function setCountry($country)
+    {
+        $this->country = $country;
+        return $this;
+    }
+}
+```
+
+> About Chaining
+>
+> Note the `return $this` in the setters; this allows us to "chain" methods; there are some drawbacks/hazards but the convenience makes them worthwhile:
+>
+> `$model->setName('test name')->setLocation('test location');`
+>
+> You can read more about it here: https://en.wikipedia.org/wiki/Method_chaining
+
+You'll also need to create a corresponding database schema. This is a simplified schema for illustration - there's normally more stuff in them, but that's for another time.
+
+```sql
+CREATE TABLE `kingdom`( 
+    `id` INT(11) NOT NULL AUTO_INCREMENT, 
+    `name` VARCHAR(255), 
+    `country` VARCHAR(255), 
+    PRIMARY KEY (`id`) 
+);
+```
+
+Now that we have a Kingdom representation and storage location, we need to build a Mapper so that we can persist it to the database.
+
+### Mapper
+The mapper's primary responsibility is to insert and extract Kingdom records to and from the database. They're similar in concept to handlers, but they understand object instances. They will typically return you a Collection of instances, each of which have their own set of properties and methods.
+
+> About Collections
+> 
+> A Collection is an object that contains an array. The object has methods that allow you to manipulate the array's contents in a more sophisticated and self-contained manner. For example, traversing, sorting and splicing.
+
+The mapper requires an explicit statement of which database columns "map" to object properties - hence the term "Mapper". The act of setting the object's properties to values is known as *hydrating*. You can read more about hydrating here: https://stackoverflow.com/questions/6991135/what-does-it-mean-to-hydrate-an-object
+
+Anyway, most of its fundamental (read: convenient) methods are already built for you. For the time being you don't actually need much more than this in `library/Schoolbox/Kingdom/Mapper.php`
+
+```php
+<?php
+namespace Schoolbox\Kingdom;
+
+use Schoolbox\Mapper as BaseMapper;
+
+class Mapper extends BaseMapper
+{
+    /**
+     * @inheritdoc
+     * @throws BaseMapper\Exception If unable to derive an ID for mapped joins
+     */
+    protected function mapping()
+    {
+        $this->hasTable('kingdom');
+        $this->hasModel(Model::class);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('country', self::TYPE_STRING);
+    }
+}
+```
+
+The `uses()` method determines which database columns map to object properties and accepts four arguments - some are optional: 
+* the database column
+* the data type
+  * `TYPE_INTEGER`, `TYPE_STRING` and `TYPE_DATETIME` are the most common
+* options *(optional)*
+  * typically `null` unless it's the primary key, at which point it'll be `COLUMN_IDENTIFIER`
+* the corresponding object property *(optional)*
+  * sometimes database columns and object properties don't match up exactly. This allows you to represent a database column with a different name in the object. For example, the database column may be `user_id` but is accessed in an object via `$this->getAuthor()`. This aliasing occurs sometimes when we update code, but don't want to change schema (there are a variety of reasons)
+
+### Experiment
+At this point you'll have set up a database table for our Kingdoms, a Mapper to get data into (and out of) the database and a Model to represent it in the business logic - the Controller. You can put together a `test.php` which allows you to try things out in a rudimentary fashion. 
+
+We'll take this opportunity to also load in some test data for later. Here you'll see how to retrieve data and how to insert new data.
+
+```php
+<?php
+use Schoolbox\Kingdom\Mapper as KingdomMapper;
+
+$kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+
+// For convenience
+
+$kingdomMapper = KingdomMapper::getInstance();
+
+// Spawn some new kingdoms and save them to database
+
+$kingdom1 = $kingdomMapper->createModel();
+$kingdom1->setName('The Kingdom of Doug')->setCountry('New Dougland');
+$kingdomMapper->save($kingdom1);
+
+$kingdom2 = $kingdomMapper->createModel();
+$kingdom2->setName('The Realm of Sloane Town')->setCountry('New Zealand');
+$kingdomMapper->save($kingdom2);
+
+// Get all the kingdoms from the database
+
+var_dump($allKingdoms = $kingdomMapper->findAll());
+
+die();
+```
+
+You can inspect the contents of your database using MySQL Workbench or sqlyog (whichever app you prefer). You can also add content via these apps if you want.
+
+> createModel()
+>
+> We use this syntax so that:
+> * abstract instantiation (see Factory https://en.wikipedia.org/wiki/Factory_method_pattern)
+> * we don't have to update `new Kingdom()` everywhere, in case its name changes (e.g. becomes a subclass);
+> * it isn't inadvertently caught in some other search-and-replace
+
+### Configuration
+We need to configure our Module and Controller setup with a configuration file. Create this new file in `conf/modules/Kingdom.php`
+
+```php
+<?php
+namespace Config\Modules;
+
+use Alaress\Application\Kernel;
+use \Schoolbox\Kingdom\Module as KingdomModule;
+
+class Kingdom implements ModuleConfigInterface
+{
+    /**
+     * Run configuration for the given module
+     *
+     * @param Kernel $kernel
+     * @return void
+     */
+    public function configure($kernel)
+    {
+        $namespace = 'kingdom';
+
+        $kingdomModule = new KingdomModule($kernel->getDependencyInjector());
+        $kingdomModule->init("/$namespace");
+    }
+}
+```
+
+### Module
+The Module lets us decide the format of urls where we can interact with our future. We'll see how to do that later. For now we'll create a _Kingdom_ module. Create `library/Schoolbox/Kingdom/Module.php` 
+
+```php
+<?php
+namespace Schoolbox\Kingdom;
+
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule;
+use Alaress\Module\Module as BaseModule;
+use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
+use Twig_Error_Loader;
+use Twig_Loader_Chain;
+
+class Module extends BaseModule
+{
+    /** @var string */
+    protected $basename = 'kingdom';
+
+    /**
+     * Initializes any routes for this module, with a given base path.
+     *
+     * The base path for each route needs to match up to the name of the
+     * controller in $this->initControllers(), so if its base path is
+     * "user", there must be a controller in the DI container called
+     * "controller:user"
+     *
+     * @param Router $router
+     * @param string $basePath The base route for this module
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        $routes = [
+            'GET' => [
+            ],
+            'POST' => [
+            ]
+        ];
+
+        foreach ($routes['GET'] as $path => $alias) {
+            $this->addGetRoute($router, $alias, $basePath, $path);
+        }
+
+        foreach ($routes['POST'] as $path => $alias) {
+            $this->addPostRoute($router, $alias, $basePath, $path);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePermissions(Authorizer $authorizer) {
+    }
+
+    /**
+     * @param Twig_Loader_Chain $templateLoader
+     * @throws Twig_Error_Loader
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /**
+     * Initializes controller classes into the dependency injector.
+     *
+     * @param ContainerInterface $injector The dependency injection container.
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set(
+            'controller:'.$this->basename,
+            $injector->lazyNew(Controller::class)
+        );
+    }
+}
+```
+
+The only methods you really need to think about for now is `initRoutes()` and `initRoutePermissions()`. Respectively, these determine urls and who can access those urls. We'll look at those later.
+
+### Controller
+Now we need something to harness the power of Mappers, Models and the Module itself. The Controller manipulates the Mapper and Model(s) and produces output for twig, which can be accessed via the Module. This is where all the pieces come together and we'll finally be able to access it from the browser.
+ 
+Start up a `library/Schoolbox/Kingdom/Controller.php` and add the `getList()` method. All this does is get a list of Kingdoms and passes the output to twig.
+
+```php
+<?php
+namespace Schoolbox\Kingdom;
+
+use Alaress\Web\Controller\Base;
+use Schoolbox\Kingdom\Mapper as KingdomMapper;
+
+class Controller extends Base
+{
+    /**
+     * Load $templateName
+     */
+    public function getList()
+    {
+        // If you Experimented earlier, this will be familiar
+        
+        $kingdomMapper = KingdomMapper::getInstance();
+        
+        $twigData = [
+            'allKingdoms' => $kingdomMapper->findAll()
+        ];
+        
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput("@kingdom/list.twig", $twigData)
+        );
+    }
+}
+```
+
+At this stage you should also create a `templates` folder in `library/Schoolbox/Kingdom`. Our module's folder structure is meant to be as self-contained as possible; its `twig` templates will exist in this folder. Let's create a `library/Schoolbox/Kingdom/templates/list.twig`
+
+```twig
+{% for kingdom in allKingdoms %}
+<p>Welcome to <strong>{{ kingdom.name }}</strong>, established in <em>{{ kingdom.country }}</em></p>
+{% endfor %}
+```
+
+Note that in the Controller, we passed some content to twig via the `allKingdoms` var which is made available to the twig rendering engine. 
+
+> About Twig
+> 
+> `Twig` is a templating engine that is much nicer than `phplib`. It gives front-end developers a lot of power and control over rendering of data. It's actually php-based, but has its own syntax and stuff. You can read about `twig` here: https://twig.symfony.com/
+>
+> Due to its powerful nature, it can be utilised independently of php controllers - unfortunately it means bugs can manifest in two places: data generation or data rendering (or both)
+
+### Routes and Url Access
+To access `getList()` we need to make *routes*. These are urls that match a particular pattern and we specify them in Module, along with a corresponding Controller method which creates the output found at these urls. Let's do that now by updating `$routes` to contain a new `GET` route for our Kingdom list.
+
+> GET and POST
+> 
+> Routes are divided into two sections: `GET` and `POST`. These corresponding to the http request type. See https://stackoverflow.com/questions/3477333/what-is-the-difference-between-post-and-get for some more debates.
+
+```php
+<?php
+// route (url) => controllerMethod()
+$routes = [
+    'GET' => [
+        '/myKingdomList' => 'getList',
+    ],
+    'POST' => [
+    ]
+];
+```
+
+Now you can finally visit http://192.168.36.10/kingdom/myKingdomList and see the list of Kingdoms! 
+
+> Time To Experiment!
+>
+> You can change the output by using a different controller method for the same url, or add more urls.
+
+### More About Routes
+Routes, as previously seen, are all listed in Modules. These represent all the available urls for a Module. They're actually regular-expressions so that you can pass parameters on the url and manipulate them in your Controller. Regular expressions are a topic unto themselves, but you can read more about them here: https://en.wikipedia.org/wiki/Regular_expression
+
+Let's add some dynamic data to the url. We'll pass in a kingdom id and display their data. The `{kingdomId}` is a regular expression token that extracts its value from the url and rams it into your Controller's method. We'll see that in action shortly.
+
+```php
+<?php
+// route (url) => controllerMethod()
+$routes = [
+    'GET' => [
+        
+        // Get a list of kingdoms
+        '/myKingdomList' => 'getList',
+        
+        // Show the details of a particular kingdom via /kingdom/detail/1 etc.
+        '/detail/{kingdomId}' => 'getKingdom',
+    ],
+    'POST' => [
+    ]
+];
+```
+
+Add the `getKingdom()` method to the Controller as well. Note that in our route, the `{kingdomId}` value is inserted as a `$kingdomId` parameter in our Controller method:
+
+```php
+<?php
+    public function getDetail($kingdomId)
+    {
+        // If you Experimented earlier, this will be familiar
+
+        $kingdomMapper = KingdomMapper::getInstance();
+
+        $twigData = [
+            'allKingdoms' => $kingdomMapper->findByColumn('id', $kingdomId),
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput("@kingdom/list.twig", $twigData)
+        );
+    }
+```
+
+Routes have a 1:1 relation to Controller methods. 
+* multiple routes cannot use the same Controller method
+* a route cannot use multiple Controller methods
+
+> Time To Experiment!
+>
+> Have a go at adding more methods and properties to your Kingdom model, and render them in the twig template.
+>
+> Also try adding more arbitrary data to the `$twigData` array so that twig templates can render it out. You might find exploring BaseMapper methods interesting - there are a number of methods that are commonly used and if you look around you'll see them in more-engineered and safer implementations.
+>
+> Try these Mapper methods out:
+>
+> * findAll()
+> * findByColumn()
+> * findByColumnList()
+> * findOneByColumn()
+
 # Data sanitisation, escaping dangerous content
 There are various philosophies regarding approach, but the one we use here is: we accept whatever the end user supplies (even if it's dangerous html/javascript content etc) and we "defuse" or colloquially, `scrub`, rendering this content harmless when outputting to the user.
 
 ```php
 <?php
 $this->setVar([
-    'TITLE' => Scrub::text($model->getTitle());  // render title as text-only
-    'DESCRIPTION' => Scrub::html($model->getDescription()); // render description as html-capable
+    'TITLE' => Scrub::text($model->getTitle()),  // render title as text-only
+    'DESCRIPTION' => Scrub::html($model->getDescription()), // render description as html-capable
 ]);
 ```
+
 Twig-based locations are a bit more advanced - it does some stuff for you. However, use the `| purify` filter to achieve the same as `Scrub::html`. A twig equivalent to the above would be something like this:
 
 ```twig
