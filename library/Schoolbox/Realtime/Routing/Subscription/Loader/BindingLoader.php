@@ -90,6 +90,11 @@ class BindingLoader implements ILoader
             $router->add($from, $to, true);
         }
 
+        foreach ($this->getInheritances() as $from => $to) {
+            $this->log->info("Adding inheritance `$from` -> `$to`");
+            $router->add($from, $to, true);
+        }
+
         return $this;
     }
 
