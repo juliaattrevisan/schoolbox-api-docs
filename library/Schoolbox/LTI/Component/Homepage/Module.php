@@ -15,9 +15,7 @@ use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $basename = 'lti';
 
     /**

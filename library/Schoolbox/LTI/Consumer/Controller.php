@@ -37,6 +37,9 @@ class Controller extends Base
      *
      * This is not part of the core LTI specification. Further documentation can be found here:
      * https://www.edu-apps.org/extensions/content.html
+     *
+     * OEmbed has been intentionally skipped for now as its a pain in the butt to implement and I
+     * don't currently have any examples of LTI providers that use this
      */
     const RETURN_TYPE_IFRAME = 'iframe';
     const RETURN_TYPE_URL = 'url';
@@ -230,6 +233,7 @@ class Controller extends Base
         // and it will just redirect to the target URL. The only real difference at this point
         // is that the return parameter names differ slightly.
 
+        $url = null;
         $height = null;
         $title  = null;
 
@@ -267,7 +271,7 @@ class Controller extends Base
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        // Update the component configuration
+        // Update the component configuration with any details we are able to retrieve
 
         if (!empty($title)) {
             $this->updateComponentValue($component, 'componentname', $title);
@@ -307,7 +311,7 @@ class Controller extends Base
      * Return the LTI role for a schoolbox user
      *
      * @param User $user
-     * @return string One of the allowed LTI role types
+     * @return string One of the allowed LTI role types (as defined by LTI_ROLE_* constants)
      */
     public function getLTIRole($user)
     {
@@ -366,8 +370,9 @@ class Controller extends Base
         $this->componentConfigMapper->save($configInstance);
     }
 }
+
 /*
- * This code will self-destruct in 5 seconds...
+ * This code (along with the entire LTI specification) will self-destruct in 5 seconds...
  *
           ,--.!,
        __/   -*-

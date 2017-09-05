@@ -1,10 +1,9 @@
 <?php
 /**
- * Homepage blog component controller. Is responsible for rendering the TWIG into component
- * on homepage pages
+ * LTI homepage component
  *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
@@ -12,10 +11,10 @@ namespace Schoolbox\LTI\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\User;
-use SitePage;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
+use SitePage;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -46,11 +45,15 @@ class Controller extends Component_Homepage_ControllerAbstract
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @param String $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)
     {
+        // Retrieve list of all LTI providers from database
+
         $providers = $this->providerMapper->findAll([
             'order' => ['name' => 'asc']
         ]);
