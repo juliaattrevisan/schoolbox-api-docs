@@ -10,6 +10,7 @@
 
 namespace SocialStream;
 
+use Schoolbox\User;
 use Scrub;
 
 class Threads
@@ -209,7 +210,7 @@ class Threads
         /* Determine whether you have access to the input form
          */
         $newPost       = new \SocialStream_Post_String();
-        $currentUser   = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($_SESSION['id']);
+        $currentUser   = $_SESSION['user'];
         $authenticator = new Authenticator($newPost, $this->getInstance(), $currentUser);
 
         /* Simply hide the comment icon if you can't view it
