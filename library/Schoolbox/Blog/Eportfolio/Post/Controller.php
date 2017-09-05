@@ -78,15 +78,14 @@ class Controller extends Base
     /**
      * Insert new record
      *
-     * @param User                $owner
      * @param EportfolioPageModel $page
      */
-    public function postInsert(User $owner, EportfolioPageModel $page)
+    public function postInsert(EportfolioPageModel $page)
     {
         // Inserting new record, create an object and shunt in the required values
         /** @var EportfolioBlogModel $record */
         $record = $this->getEportfolioBlogMapper()->createModel();
-        $record->setOwner($owner);
+        $record->setOwner($this->getUser());
         $record->setPageId($page->getPageId());
         $this->postModify($record);
     }
