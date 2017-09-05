@@ -98,7 +98,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $selectCrocodocJoin
         $selectCrocodocWhere
         ORDER BY ssf.created_at DESC
-        LIMIT 10 OFFSET 0
+        LIMIT :limit OFFSET :offset
     ");
 
     // Log
@@ -191,173 +191,182 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
 
     // Get a count
-    $crocodocCount = $db->executeQuery("
+    $countCrocodocQuery = $db->prepareQuery("
         SELECT COUNT(*)
         FROM student_submission_file ssf
         $selectCrocodocJoin
         $selectCrocodocWhere
-    ")->fetchColumn();
+    ");
+    $countCrocodocQuery->execute();
+    $crocodocCount = $countCrocodocQuery->fetchColumn();
+    $countCrocodocQuery->close();
     $log->notice(sprintf('%d Crocodoc documents require archival', $crocodocCount));
 
 
     // Go
     $successCount = 0;
     $failureCount = 0;
-    foreach ($selectCrocodocQuery->executeIterator() as $row) {
 
-        $log->notice(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
+    // Rerun the select query over and over again in batches
+    $stepCount = $crocodocCount;
+    while ($stepCount > 0) {
+        foreach ($selectCrocodocQuery->executeIterator() as $row) {
+            $stepCount--;
+            $log->notice(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
 
 
-        // Figure out where to put the document. In order of preference:
-        // 1. most recent feedback for this response
-        // 2. most recent feedback with no response
-        // 3. a new draft feedback
-        $selectAttachedFeedbackQuery->execute([
-            'responseId' => $row['responseId'],
-        ]);
-        $feedbackId = $selectAttachedFeedbackQuery->fetchColumn();
-        if ($feedbackId) {
-            $log->debug(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
-        } else {
-            $log->debug('No non-floating feedback found - searching for floating feedback');
-            $selectFloatingFeedbackQuery->execute([
-                'studentId' => $row['studentId'],
-                'boxId'     => $row['boxId'],
+            // Figure out where to put the document. In order of preference:
+            // 1. most recent feedback for this response
+            // 2. most recent feedback with no response
+            // 3. a new draft feedback
+            $selectAttachedFeedbackQuery->execute([
+                'responseId' => $row['responseId'],
             ]);
-            $feedbackId = $selectFloatingFeedbackQuery->fetchColumn();
+            $feedbackId = $selectAttachedFeedbackQuery->fetchColumn();
             if ($feedbackId) {
-                $log->debug(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
+                $log->debug(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
             } else {
-                $log->debug('No floating feedback found - creating a new draft floating feedback');
-                // create one, if not a dry run
-                if ($dryRun) {
-                    $log->debug(sprintf('Attaching document to new draft floating feedback'));
+                $log->debug('No non-floating feedback found - searching for floating feedback');
+                $selectFloatingFeedbackQuery->execute([
+                    'studentId' => $row['studentId'],
+                    'boxId'     => $row['boxId'],
+                ]);
+                $feedbackId = $selectFloatingFeedbackQuery->fetchColumn();
+                if ($feedbackId) {
+                    $log->debug(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
                 } else {
-                    $insertNewFeedbackQuery->execute([
-                        'systemUserId' => $systemUser->getId(),
-                        'studentId'    => $row['studentId'],
-                        'boxId'        => $row['boxId'],
-                        'now'          => Alaress_Date_Format::now(),
-                    ]);
-                    $feedbackId = $db->lastInsertId();
-                    $log->debug(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
+                    $log->debug('No floating feedback found - creating a new draft floating feedback');
+                    // create one, if not a dry run
+                    if ($dryRun) {
+                        $log->debug(sprintf('Attaching document to new draft floating feedback'));
+                    } else {
+                        $insertNewFeedbackQuery->execute([
+                            'systemUserId' => $systemUser->getId(),
+                            'studentId'    => $row['studentId'],
+                            'boxId'        => $row['boxId'],
+                            'now'          => Alaress_Date_Format::now(),
+                        ]);
+                        $feedbackId = $db->lastInsertId();
+                        $log->debug(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
+                    }
                 }
             }
-        }
-        if ($dryRun) {
-            $successCount++;
-            $log->info('Crocodoc document successfully attached to feedback');
-            continue;
-        }
+            if ($dryRun) {
+                $successCount++;
+                $log->info('Crocodoc document successfully attached to feedback');
+                continue;
+            }
 
 
-        // All systems go
-        $updateLogQuery->execute([
-            'fileId'             => $row['fileId'],
-            'feedbackFileId'     => null,
-            'crocodocDocumentId' => $row['crocodocDocumentId'],
-            'status'             => 'processing',
-            'message'            => '',
-            'now'                => Alaress_Date_Format::now(),
-        ]);
-
-        // Finagle together the pieces the facade requires
-        $response = (new DueWorkResponse())
-            ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT));
-        $file = (new DueWorkResponseFile())
-            ->setId($row['fileId'])
-            ->setCrocodocId($row['crocodocDocumentId'])
-            ->setFilename($row['fileName']);
-        $facade = new Facade(new Authenticator(), $response, $file, $systemUser);
-
-
-        // Try to download the annotated Crocodocument
-        try {
-            $result = $httpClient->get($facade->getDownloadUrl())->send();
-        } catch (RuntimeException $e) {
-            // skip this one; consider jittering
-            $log->warning(
-                sprintf(
-                    'Exception raised when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
-                    $e->getCode(),
-                    $e->getMessage()
-                )
-            );
+            // All systems go
             $updateLogQuery->execute([
                 'fileId'             => $row['fileId'],
                 'feedbackFileId'     => null,
                 'crocodocDocumentId' => $row['crocodocDocumentId'],
-                'status'             => 'failed',
-                'message'            => $e->getMessage(),
+                'status'             => 'processing',
+                'message'            => '',
                 'now'                => Alaress_Date_Format::now(),
             ]);
-            $failureCount++;
-            continue;
-        }
-        if ($result->isError()) {
-            // skip this one; consider jittering
-            // Also consider exiting completely if there's too many errors
-            $response = json_decode($result, true);
-            $log->warning(
-                sprintf(
-                    'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
-                    $response['error'],
-                    $result->getMessage()
-                )
-            );
-            $updateLogQuery->execute([
-                'fileId'             => $row['fileId'],
-                'feedbackFileId'     => null,
-                'crocodocDocumentId' => $row['crocodocDocumentId'],
-                'status'             => 'failed',
-                'message'            => $response['error'],
-                'now'                => Alaress_Date_Format::now(),
-            ]);
-            $failureCount++;
-            continue;
-        }
-        $log->debug('Crocodoc document successfully retrieved');
+
+            // Finagle together the pieces the facade requires
+            $response = (new DueWorkResponse())
+                ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT));
+            $file = (new DueWorkResponseFile())
+                ->setId($row['fileId'])
+                ->setCrocodocId($row['crocodocDocumentId'])
+                ->setFilename($row['fileName']);
+            $facade = new Facade(new Authenticator(), $response, $file, $systemUser);
 
 
-        // Shoehorn it into storage
-        $matches = [];
-        if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
-            list(, $filename) = $matches;
-        } else {
-            // Make something up
-            $filename = 'return_' . $file->getFilename() . '.pdf';
-        }
-        $storageModel = $storageMapper->acceptStream($filename, $result->getBody());
+            // Try to download the annotated Crocodocument
+            try {
+                $result = $httpClient->get($facade->getDownloadUrl())->send();
+            } catch (RuntimeException $e) {
+                // skip this one; consider jittering
+                $log->warning(
+                    sprintf(
+                        'Exception raised when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
+                        $e->getCode(),
+                        $e->getMessage()
+                    )
+                );
+                $updateLogQuery->execute([
+                    'fileId'             => $row['fileId'],
+                    'feedbackFileId'     => null,
+                    'crocodocDocumentId' => $row['crocodocDocumentId'],
+                    'status'             => 'failed',
+                    'message'            => $e->getMessage(),
+                    'now'                => Alaress_Date_Format::now(),
+                ]);
+                $failureCount++;
+                continue;
+            }
+            if ($result->isError()) {
+                // skip this one; consider jittering
+                // Also consider exiting completely if there's too many errors
+                $response = json_decode($result, true);
+                $log->warning(
+                    sprintf(
+                        'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
+                        $response['error'],
+                        $result->getMessage()
+                    )
+                );
+                $updateLogQuery->execute([
+                    'fileId'             => $row['fileId'],
+                    'feedbackFileId'     => null,
+                    'crocodocDocumentId' => $row['crocodocDocumentId'],
+                    'status'             => 'failed',
+                    'message'            => $response['error'],
+                    'now'                => Alaress_Date_Format::now(),
+                ]);
+                $failureCount++;
+                continue;
+            }
+            $log->debug('Crocodoc document successfully retrieved');
 
 
-        // Attach to the feedback, if it isn't already
-        $selectExistingFeedbackFileQuery->execute([
-            'feedbackId' => $feedbackId,
-            'hash'       => $storageModel->getHash(),
-        ]);
-        $feedbackFileId = $selectExistingFeedbackFileQuery->fetchColumn();
-        if (!$feedbackFileId) {
-            $insertNewFeedbackFileQuery->execute([
+            // Shoehorn it into storage
+            $matches = [];
+            if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
+                list(, $filename) = $matches;
+            } else {
+                // Make something up
+                $filename = 'return_' . $file->getFilename() . '.pdf';
+            }
+            $storageModel = $storageMapper->acceptStream($filename, $result->getBody());
+
+
+            // Attach to the feedback, if it isn't already
+            $selectExistingFeedbackFileQuery->execute([
                 'feedbackId' => $feedbackId,
                 'hash'       => $storageModel->getHash(),
-                'fileName'   => $row['fileName'],
-                'now'        => Alaress_Date_Format::now(),
             ]);
-            $feedbackFileId = $db->lastInsertId();
-            $log->info('Crocodoc document successfully attached to feedback');
-        } else {
-            $log->info('Crocodoc document already attached to feedback - not attaching again');
-        }
+            $feedbackFileId = $selectExistingFeedbackFileQuery->fetchColumn();
+            if (!$feedbackFileId) {
+                $insertNewFeedbackFileQuery->execute([
+                    'feedbackId' => $feedbackId,
+                    'hash'       => $storageModel->getHash(),
+                    'fileName'   => $row['fileName'],
+                    'now'        => Alaress_Date_Format::now(),
+                ]);
+                $feedbackFileId = $db->lastInsertId();
+                $log->info('Crocodoc document successfully attached to feedback');
+            } else {
+                $log->info('Crocodoc document already attached to feedback - not attaching again');
+            }
 
-        $updateLogQuery->execute([
-            'fileId'             => $row['fileId'],
-            'feedbackFileId'     => $feedbackFileId,
-            'crocodocDocumentId' => $row['crocodocDocumentId'],
-            'status'             => 'completed',
-            'message'            => '',
-            'now'                => Alaress_Date_Format::now(),
-        ]);
-        $successCount++;
+            $updateLogQuery->execute([
+                'fileId'             => $row['fileId'],
+                'feedbackFileId'     => $feedbackFileId,
+                'crocodocDocumentId' => $row['crocodocDocumentId'],
+                'status'             => 'completed',
+                'message'            => '',
+                'now'                => Alaress_Date_Format::now(),
+            ]);
+            $successCount++;
+        }
+        $selectCrocodocQuery->close();
     }
 
 
