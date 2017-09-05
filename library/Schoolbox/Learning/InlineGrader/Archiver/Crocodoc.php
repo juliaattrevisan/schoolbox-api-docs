@@ -341,17 +341,8 @@ class Crocodoc
                 }
 
 
-                // All systems go
-                $this->updateLogQuery->execute([
-                    'fileId'             => $row['fileId'],
-                    'feedbackFileId'     => null,
-                    'crocodocDocumentId' => $row['crocodocDocumentId'],
-                    'status'             => 'processing',
-                    'message'            => '',
-                    'now'                => Alaress_Date_Format::now(),
-                ]);
-
-                $facade = $this->buildFacade($systemUser, $row);
+                // Log where we're at
+                $this->logToDatabase($row);
 
 
                 // Try to download the annotated Crocodocument
@@ -570,5 +561,23 @@ class Crocodoc
             $log->info('Crocodoc document already attached to feedback - not attaching again');
         }
         return (int)$feedbackFileId;
+    }
+
+    /**
+     * Log what is happening with the archive process to the database.
+     *
+     * @param array $row
+     * @throws DatabaseException if the log query breaks
+     */
+    private function logToDatabase($row)
+    {
+        $this->updateLogQuery->execute([
+            'fileId'             => $row['fileId'],
+            'feedbackFileId'     => null,
+            'crocodocDocumentId' => $row['crocodocDocumentId'],
+            'status'             => 'processing',
+            'message'            => '',
+            'now'                => Alaress_Date_Format::now(),
+        ]);
     }
 }
