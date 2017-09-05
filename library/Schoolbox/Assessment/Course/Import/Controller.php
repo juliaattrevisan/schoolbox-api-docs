@@ -534,7 +534,7 @@ class Controller extends Base\Base
      * @var int      $post['course_spec_id']
      * @var int|null $post['course_impl_id']
      * @var int|null $post['component_id']
-     * @var string   $post['ownerships']
+     * @var string   $post['ownerships']                                       comma-separated 'classId:userId' pairs
      * @var array    $post['unit']  Indexed by unitSpec.id
      * @var int      $post['unit'][unitSpecId]['unit_spec_id']
      * @var int|null $post['unit'][unitSpecId]['unit_impl_id']
@@ -581,7 +581,7 @@ class Controller extends Base\Base
         $courseImpls = [];
 
         // Are we creating a new import?
-        if ('import' == $action) {
+        if ('import' === $action) {
             $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
             $ownerships = explode(',', $ownerships);
             foreach ($ownerships as $ownership) {
@@ -692,7 +692,7 @@ class Controller extends Base\Base
                  * else
                  *   create a new CourseOutline component (at top of the page)
                  */
-                if ('import' == $action) {
+                if ('import' === $action) {
                     $componentInstance = null;
                     $compInstanceMapper = $this->getComponentInstanceMapper();
                     // Was a componentId supplied?
