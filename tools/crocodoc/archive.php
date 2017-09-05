@@ -191,15 +191,12 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
 
     // Get a count
-    $countCrocodocQuery = $db->prepareQuery("
-        SELECT COUNT(*)
-        FROM student_submission_file ssf
-        $selectCrocodocJoin
-        $selectCrocodocWhere
-    ");
-    $countCrocodocQuery->execute();
-    $crocodocCount = $countCrocodocQuery->fetchColumn();
-    $countCrocodocQuery->close();
+    $crocodocCount = $db->executeQuery("
+         SELECT COUNT(*)
+         FROM student_submission_file ssf
+         $selectCrocodocJoin
+         $selectCrocodocWhere
+     ")->fetchColumn();
     $log->notice(sprintf('%d Crocodoc documents require archival', $crocodocCount));
 
 
