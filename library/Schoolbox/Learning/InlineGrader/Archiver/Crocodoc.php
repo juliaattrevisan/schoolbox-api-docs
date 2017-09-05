@@ -342,7 +342,7 @@ class Crocodoc
 
 
                 // Log where we're at
-                $this->logToDatabase($row);
+                $this->logToDatabase($row['fileId'], null, $row['crocodocDocumentId'], 'processing', '');
 
 
                 // Try to download the annotated Crocodocument
@@ -359,14 +359,7 @@ class Crocodoc
                             $e->getMessage()
                         )
                     );
-                    $this->updateLogQuery->execute([
-                        'fileId'             => $row['fileId'],
-                        'feedbackFileId'     => null,
-                        'crocodocDocumentId' => $row['crocodocDocumentId'],
-                        'status'             => 'failed',
-                        'message'            => $e->getMessage(),
-                        'now'                => Alaress_Date_Format::now(),
-                    ]);
+                    $this->logToDatabase($row['fileId'], null, $row['crocodocDocumentId'], 'failed', $e->getMessage());
                     $failureCount++;
                     continue;
                 }
@@ -381,14 +374,7 @@ class Crocodoc
                             $result->getMessage()
                         )
                     );
-                    $this->updateLogQuery->execute([
-                        'fileId'             => $row['fileId'],
-                        'feedbackFileId'     => null,
-                        'crocodocDocumentId' => $row['crocodocDocumentId'],
-                        'status'             => 'failed',
-                        'message'            => $response['error'],
-                        'now'                => Alaress_Date_Format::now(),
-                    ]);
+                    $this->logToDatabase($row['fileId'], null, $row['crocodocDocumentId'], 'failed', $response['error']);
                     $failureCount++;
                     continue;
                 }
@@ -409,14 +395,7 @@ class Crocodoc
                     )
                 );
 
-                $this->updateLogQuery->execute([
-                    'fileId'             => $row['fileId'],
-                    'feedbackFileId'     => $feedbackFileId,
-                    'crocodocDocumentId' => $row['crocodocDocumentId'],
-                    'status'             => 'completed',
-                    'message'            => '',
-                    'now'                => Alaress_Date_Format::now(),
-                ]);
+                $this->logToDatabase($row['fileId'], $feedbackFileId, $row['crocodocDocumentId'], 'completed', '');
                 $successCount++;
             }
             $selectCrocodocQuery->close();
@@ -566,17 +545,22 @@ class Crocodoc
     /**
      * Log what is happening with the archive process to the database.
      *
-     * @param array $row
+     * @param int    $fileId
+     * @param int    $feedbackFileId
+     * @param string $crocodocDocumentId
+     * @param string $status
+     * @param string $message
+     *
      * @throws DatabaseException if the log query breaks
      */
-    private function logToDatabase($row)
+    private function logToDatabase($fileId, $feedbackFileId, $crocodocDocumentId, $status, $message)
     {
         $this->updateLogQuery->execute([
-            'fileId'             => $row['fileId'],
-            'feedbackFileId'     => null,
-            'crocodocDocumentId' => $row['crocodocDocumentId'],
-            'status'             => 'processing',
-            'message'            => '',
+            'fileId'             => $fileId,
+            'feedbackFileId'     => $feedbackFileId,
+            'crocodocDocumentId' => $crocodocDocumentId,
+            'status'             => $status,
+            'message'            => $message,
             'now'                => Alaress_Date_Format::now(),
         ]);
     }
