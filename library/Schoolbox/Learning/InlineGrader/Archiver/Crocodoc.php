@@ -120,9 +120,9 @@ class Crocodoc
      */
     public function __construct(IConnector $database, HttpClient $httpClient, LoggerInterface $log)
     {
-        $this->database   = $database;
+        $this->database = $database;
         $this->httpClient = $httpClient;
-        $this->log        = $log;
+        $this->log = $log;
         $this->setupQueries();
     }
 
@@ -153,7 +153,7 @@ class Crocodoc
             AND   ss.submitted_at IS NOT NULL
         ";
         $crocodocWhereUnarchived = $crocodocWhere . "AND log.status IS NULL";
-        $crocodocWhereFailed    = $crocodocWhere . "AND log.status = 'failed'";
+        $crocodocWhereFailed = $crocodocWhere . "AND log.status = 'failed'";
 
         $this->selectUnarchivedCrocodocQuery = $this->database->prepareQuery("
             $crocodocSelect
