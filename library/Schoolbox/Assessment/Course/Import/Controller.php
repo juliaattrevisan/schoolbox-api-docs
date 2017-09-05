@@ -591,6 +591,21 @@ class Controller extends Base\Base
         $courseImpls = [];
         $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
 
+        // Collect folders for unit and course pages - needed for criteria import
+        $unitSpecs = [];
+        foreach($unitImplData as $unitImp) {
+            $unitSpecs[] = $unitImp['unit_spec_id'];
+        }
+
+        $unitFolders = [];
+        foreach($courseSpec->getUnits() as $unitSpec) {
+            if(in_array($unitSpec->getId(),$unitSpecs)) {
+                $unitFolders[] = $unitSpec->getFolder()->getId();
+            }
+        }
+
+        $courseFolder[] = $courseSpec->getFolder()->getId();
+
         // Are we creating a new import?
         if ('import' === $action) {
             $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
@@ -601,25 +616,9 @@ class Controller extends Base\Base
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
 
-                //Collect relevant folder Ids
-                $courseFolder[] = $courseSpec->getFolder()->getId();
-
-                $unitSpecs = [];
-                foreach($unitImplData as $unitImp) {
-                    $unitSpecs[] = $unitImp['unit_spec_id'];
-                }
-
-                $unitFolders = [];
-                foreach($courseSpec->getUnits() as $unitSpec) {
-                    if(in_array($unitSpec->getId(),$unitSpecs)) {
-                        $unitFolders[] = $unitSpec->getFolder()->getId();
-                    }
-                }
-
+                //Save unit criteria to class page
                 $allFolders = array_merge($courseFolder, $unitFolders);
-
                 $this->copyCriteria($allFolders, $classFolderId);
-
             }
         } // Else we are modifying an existing import
         else {
@@ -635,21 +634,8 @@ class Controller extends Base\Base
                 $unitImpl->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId()));
             }
 
-            //Collect unit folders
-            $unitSpecs = [];
-            foreach($unitImplData as $unitImp) {
-                $unitSpecs[] = $unitImp['unit_spec_id'];
-            }
-
-            $unitFolders = [];
-            foreach($courseSpec->getUnits() as $unitSpec) {
-                if(in_array($unitSpec->getId(),$unitSpecs)) {
-                    $unitFolders[] = $unitSpec->getFolder()->getId();
-                }
-            }
-
+            //Save unit criteria to class page
             $classFolderId = explode(':', $ownerships)[0];
-
             $this->copyCriteria($unitFolders, $classFolderId);
         }
 
@@ -1552,7 +1538,8 @@ class Controller extends Base\Base
      * @param int $destinationId
      * @return static
      */
-    public function copyCriteria(array $sourceIds, $destinationId) {
+    public function copyCriteria(array $sourceIds, $destinationId)
+    {
         $criteriaMapper = CriterionMapper::getInstance();
 
         /** @var GenericCollection | Criterion[] $allCriteria */
