@@ -10,10 +10,7 @@ namespace Schoolbox\Learning\MarkScheme;
 /**
  * Percentage mark scheme, with no upper or lower bound on its normalised mark.
  *
- * This is used by the project assessment type, and in the markbook - either
- * could contain quiz marks high or low enough to cause an overall mark to be
- * above or below the normalised min or max, and thus cause an exception when
- * rendering a human-readable mark.
+ * @deprecated 17.0; unused now human-readable marks can't raise range exceptions
  */
 class PercentageWithoutBounds extends Percentage
 {

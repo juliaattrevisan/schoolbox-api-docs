@@ -32,7 +32,8 @@ class Percentage extends AbstractMarkScheme
         if (null === $normalisedMark) {
             return null;
         }
-        $this->validateNormalisedMark($normalisedMark);
+
+        $normalisedMark = $this->filterNormalisedMark($normalisedMark);
 
         $percentage = round($normalisedMark);
         return "$percentage %";

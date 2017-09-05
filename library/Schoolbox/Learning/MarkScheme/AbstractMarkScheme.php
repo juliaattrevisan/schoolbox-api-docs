@@ -35,6 +35,20 @@ abstract class AbstractMarkScheme implements IMarkScheme
     }
 
     /**
+     * Filters normalised mark to between its min and max value.
+     *
+     * @param float|null $normalisedMark
+     * @return float|null null if $normalisedMark is null
+     */
+    protected function filterNormalisedMark($normalisedMark)
+    {
+        if (null === $normalisedMark) {
+            return null;
+        }
+        return min(self::NORMALISED_MARK_MAX, max(self::NORMALISED_MARK_MIN, $normalisedMark));
+    }
+
+    /**
      * Validates normalised mark type
      *
      * @param float|int $normalisedMark
