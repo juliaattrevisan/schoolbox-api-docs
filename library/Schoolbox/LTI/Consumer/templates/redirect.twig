@@ -1,0 +1,51 @@
+{# We need to include the core schoolbox javascript to access jQuery #}
+
+<script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ version }}"></script>
+
+<script>
+    {# Locate the homepage component in parent page #}
+
+    var component = $('#component{{ componentId | e('js') }}', window.parent.document);
+
+    {# Update the components if we have one, otherwise leave the default one in place #}
+
+    {% if componentTitle is not empty %}
+
+        {# Update the input in the components configuration #}
+
+        component.find('input[name="componentname"]').val('{{ componentTitle | e('js') }}');
+
+        {# Update the heading displayed on the component #}
+
+        component.find('h2').html('{{ componentTitle | e('js') }}');
+
+    {% endif %}
+
+    {# Resize the iframe to match the component configuration #}
+
+    {% if height is not empty %}
+
+    {# Update the input in the components configuration #}
+
+    component.find('input[name="pixel"]').val('{{ height | e('js') }}');
+
+    {# Update the iframe height style #}
+
+    $('#ltiFrame{{ componentId }}', window.parent.document).css('height', '{{ height | e('js') }}');
+
+    {% endif %}
+
+    {# Resize the iframe to match the component configuration #}
+
+    {% if url is not empty %}
+
+    {# Update the input in the components configuration #}
+
+    component.find('input[name="url"]').val('{{ url | e('js') }}');
+
+    {% endif %}
+
+    {# Redirect to the required resource #}
+
+    window.location.href = '{{ url | e('js') }}';
+</script>

@@ -7,35 +7,18 @@
 
 namespace Schoolbox\LTI\Provider;
 
-use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 class Model implements ISoftDeletable
 {
-    use ModelTrait\DeletedAtDate;
-    use ModelTrait\CreatedAtDate;
-    use ModelTrait\UpdatedAtDate;
-
-    /** @var int */
-    protected $id;
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+    use Id;
+    use DeletedAtDate;
+    use CreatedAtDate;
+    use UpdatedAtDate;
 
     /** @var string */
     protected $name;
@@ -77,7 +60,7 @@ class Model implements ISoftDeletable
     public function getCustom()
     {
         return $this->custom;
-    }    
+    }
 
     /** @var string */
     protected $key;

@@ -11,9 +11,7 @@ use Schoolbox\Mapper As BaseMapper;
 
 /**
  * Class Mapper
- * @method Model createModel()
- * @method Model findById($identifierValue)
- * @package Schoolbox\SportsFixtures\Match
+ * @package Schoolbox\LTI\Provider
  */
 class Mapper extends BaseMapper
 {

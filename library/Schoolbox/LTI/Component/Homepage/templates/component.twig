@@ -83,7 +83,7 @@
         <iframe id="lti-frame" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
 
     {% else %}
-        <iframe style="height:{{ height }}px;" src="{{ routeLookup('ltiConsumer.getLaunch', {providerId: providerId, componentId: componentInstanceId, folderId: folderId}) }}" frameborder="0"></iframe>
+        <iframe id="ltiFrame{{ componentInstanceId }}" style="height:{{ height }}px;" src="{{ routeLookup('ltiConsumer.getLaunch', {providerId: providerId, componentId: componentInstanceId, folderId: folderId}) }}" frameborder="0"></iframe>
     {% endif %}
 
 {% endif %}
