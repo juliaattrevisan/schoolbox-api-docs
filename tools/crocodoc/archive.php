@@ -82,9 +82,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         LIMIT 10 OFFSET 0
     ");
 
-    // Remove crocodocument link
-    $clearCrocodocQuery = $db->prepareQuery("UPDATE student_submission_file SET uuid = NULL WHERE id = :fileId");
-
     // Log
     $updateLogQuery = $db->prepareQuery("
         REPLACE INTO student_submission_file_crocodoc_archive_log (
@@ -330,9 +327,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             'crocodocDocumentId' => $row['crocodocDocumentId'],
             'status'             => 'completed',
             'message'            => '',
-        ]);
-        $clearCrocodocQuery->execute([
-            'fileId' => $row['fileId'],
         ]);
         $successCount++;
     }
