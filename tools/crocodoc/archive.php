@@ -24,7 +24,7 @@ use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
-$options = getopt('v', ['dry-run', 'rescan-failed']);
+$options = getopt('v', ['dry-run', 'rescan-failed', 'help']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Crocodoc Archiver',
     [
@@ -34,6 +34,23 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
         'rescanFailed' => isset($options['rescan-failed']),
     ]
 );
+
+if (isset($options['help'])) {
+    echo <<<HELP
+Archives Crocodoc documents.
+
+Usage: archive.php -v[vv] [--dry-run] [--rescan-failed]
+    -v:                  Verbosity level, -vvv: most verbose
+    --dry-run:           if set, don't actually archive anything, but show what
+                         would be archived.
+    --rescan-failed:     if set, attempt to archive documents that failed
+                         archive in a previous run of this script.
+                         By default, it will only attempt to archive documents
+                         that have not yet been attempted.
+
+HELP;
+    exit;
+}
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
 
