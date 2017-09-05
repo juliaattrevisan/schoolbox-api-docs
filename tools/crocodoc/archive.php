@@ -174,9 +174,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $crocodocCount = $db->executeQuery("
         SELECT COUNT(*)
         FROM student_submission_file ssf
+        LEFT  JOIN student_submission_file_crocodoc_archive_log log ON ssf.id = log.student_submission_file_id
         INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
         INNER JOIN submission_box sb ON ss.box_id = sb.id
         WHERE ssf.uuid IS NOT NULL
+        AND   log.status IS NULL
         AND   ss.submitted_at IS NOT NULL
     ")->fetchColumn();
     $log->notice(sprintf('%d Crocodoc documents require archival', $crocodocCount));
@@ -329,14 +331,17 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             'status'             => 'completed',
             'message'            => '',
         ]);
+        $clearCrocodocQuery->execute([
+            'fileId' => $row['fileId'],
+        ]);
         $successCount++;
     }
 
 
     // At the end of the day: log something
     $message = sprintf(
-        'Archival %s completed - %d archived, %d failed, %d to do',
-        ($dryRun ? 'dry run' : ''),
+        'Archival %scompleted - %d archived, %d failed, %d to do',
+        ($dryRun ? 'dry run ' : ''),
         $successCount,
         $failureCount,
         $crocodocCount - $successCount - $failureCount
