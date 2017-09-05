@@ -12,6 +12,7 @@ use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
 use Guzzle\Http\Client as HttpClient;
+use Guzzle\Http\Message\Response;
 use PDO;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -20,6 +21,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkRespon
 use Schoolbox\Learning\InlineGrader\Authenticator;
 use Schoolbox\Learning\InlineGrader\Facade;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 
 /**
@@ -390,6 +392,7 @@ class Crocodoc
 
 
                 // Try to download the annotated Crocodocument
+                /** @var Response $result */
                 try {
                     $result = $this->httpClient->get($facade->getDownloadUrl())->send();
                 } catch (RuntimeException $e) {
@@ -437,15 +440,7 @@ class Crocodoc
                 $log->debug('Crocodoc document successfully retrieved');
 
 
-                // Shoehorn it into storage
-                $matches = [];
-                if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
-                    list(, $filename) = $matches;
-                } else {
-                    // Make something up
-                    $filename = 'return_' . $row['fileName'] . '.pdf';
-                }
-                $storageModel = $this->storageMapper->acceptStream($filename, $result->getBody());
+                $storageModel = $this->uploadCrocodocToStorage($result, $row);
 
 
                 // Attach to the feedback, if it isn't already
@@ -526,5 +521,25 @@ class Crocodoc
             ->setCrocodocId($row['crocodocDocumentId'])
             ->setFilename($row['fileName']);
         return new Facade(new Authenticator(), $response, $file, $systemUser);
+    }
+
+    /**
+     * Uploads a Crocodoc document into storage, for later attachment to a
+     * feedback file.
+     *
+     * @param Response $result
+     * @param array    $row
+     * @return StorageModel
+     */
+    private function uploadCrocodocToStorage(Response $result, $row)
+    {
+        $matches = [];
+        if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
+            list(, $filename) = $matches;
+        } else {
+            // Make something up
+            $filename = 'return_' . $row['fileName'] . '.pdf';
+        }
+        return $this->storageMapper->acceptStream($filename, $result->getBody());
     }
 }
