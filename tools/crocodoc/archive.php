@@ -87,13 +87,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     }
     $selectCrocodocQuery = $db->prepareQuery("
         SELECT
-            ssf.id          AS fileId,
-            ssf.realname    AS fileName,
-            ssf.uuid        AS crocodocDocumentId,
-            ss.id           AS responseId,
-            ss.owner        AS studentId,
-            ss.submitted_at AS submittedDate,
-            sb.id           AS boxId
+            ssf.id           AS fileId,
+            ssf.realname     AS fileName,
+            ssf.uuid         AS crocodocDocumentId,
+            ss.id            AS responseId,
+            ss.owner         AS studentId,
+            ss.submitted_at  AS submittedDate,
+            sb.id            AS boxId,
+            sb.assessment_id AS assessmentId
         FROM student_submission_file ssf
         $selectCrocodocJoin
         $selectCrocodocWhere
@@ -364,6 +365,16 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             } else {
                 $log->info('Crocodoc document already attached to feedback - not attaching again');
             }
+
+
+            // Here, have a helpful link to the inline grader so you can see the doc
+            $log->info(
+                sprintf(
+                    'Archived document visible at: /learning/assessments/%d/%d/responses/',
+                    $row['assessmentId'],
+                    $row['studentId']
+                )
+            );
 
             $updateLogQuery->execute([
                 'fileId'             => $row['fileId'],
