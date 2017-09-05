@@ -1,0 +1,1 @@
+DELETE acus FROM assessment_course_unit_specification acus, project_assessment pa WHERE pa.assessment_id = acus.assessment_id;
