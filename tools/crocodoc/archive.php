@@ -239,7 +239,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
         foreach ($selectCrocodocQuery->executeIterator() as $row) {
             $stepCount--;
-            $log->notice(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
+            $log->notice(
+                sprintf(
+                    'Archiving Crocodoc document "%s" (%d/%d)',
+                    $row['crocodocDocumentId'],
+                    $successCount + $failureCount + 1,
+                    $crocodocCount
+                )
+            );
 
 
             // Figure out where to put the document. In order of preference:
