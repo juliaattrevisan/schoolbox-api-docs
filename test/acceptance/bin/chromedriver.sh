@@ -9,5 +9,9 @@ then
     unzip $DIR/chromedriver_linux64.zip -d $DIR/
 fi
 
-# run
-$DIR/chromedriver --url-base=/wd/hub
+# is it not in our PATH?
+if hash chromedriver 2>/dev/null; then
+    echo "chromedriver already exists in PATH"
+else
+    sudo ln -v --symbolic "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/chromedriver" /usr/bin/chromedriver
+fi
