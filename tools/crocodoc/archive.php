@@ -24,17 +24,28 @@ use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
-$options = getopt('v', ['dry-run']);
+$options = getopt('v', ['dry-run', 'rescan-failed']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Crocodoc Archiver',
     [
-        'verbose' => isset($options['v']) ? $options['v'] : null,
-        'errors'  => E_ALL,
-        'dryRun'  => isset($options['dry-run']),
+        'verbose'      => isset($options['v']) ? $options['v'] : null,
+        'errors'       => E_ALL,
+        'dryRun'       => isset($options['dry-run']),
+        'rescanFailed' => isset($options['rescan-failed']),
     ]
 );
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
+
+    $dryRun = $options['dryRun'];
+    if ($dryRun) {
+        $log->notice('Performing dry run - no documents will be archived');
+    }
+
+    $rescanFailed = $options['rescanFailed'];
+    if ($dryRun) {
+        $log->notice('Attempting to rescan documents that have failed processing previously');
+    }
 
     /**
      * @var MapperFactory $mapperFactory
@@ -45,7 +56,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $mapperFactory = $di->get('mapperFactory');
     $userMapper    = $mapperFactory->get(UserMapper::class);
     $storageMapper = $mapperFactory->get(StorageMapper::class);
-    $dryRun        = $options['dryRun'];
 
 
     // Figure out a system user
@@ -61,7 +71,20 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $db = $di->get('databaseInternal');
 
     // Fetch first x remaining crocodocuments
-    // TODO attempt to allow rescan of failed
+    $selectCrocodocJoin  = "
+        LEFT  JOIN student_submission_file_crocodoc_archive_log log ON ssf.id = log.student_submission_file_id
+        INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
+        INNER JOIN submission_box sb ON ss.box_id = sb.id
+    ";
+    $selectCrocodocWhere = "
+        WHERE ssf.uuid IS NOT NULL
+        AND   ss.submitted_at IS NOT NULL
+    ";
+    if ($rescanFailed) {
+        $selectCrocodocWhere .= "AND log.status = 'failed'";
+    } else {
+        $selectCrocodocWhere .= 'AND log.status IS NULL';
+    }
     $selectCrocodocQuery = $db->prepareQuery("
         SELECT
             ssf.id          AS fileId,
@@ -72,12 +95,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             ss.submitted_at AS submittedDate,
             sb.id           AS boxId
         FROM student_submission_file ssf
-        LEFT  JOIN student_submission_file_crocodoc_archive_log log ON ssf.id = log.student_submission_file_id
-        INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
-        INNER JOIN submission_box sb ON ss.box_id = sb.id
-        WHERE ssf.uuid IS NOT NULL
-        AND   log.status IS NULL
-        AND   ss.submitted_at IS NOT NULL
+        $selectCrocodocJoin
+        $selectCrocodocWhere
         ORDER BY ssf.created_at DESC
         LIMIT 10 OFFSET 0
     ");
@@ -171,12 +190,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $crocodocCount = $db->executeQuery("
         SELECT COUNT(*)
         FROM student_submission_file ssf
-        LEFT  JOIN student_submission_file_crocodoc_archive_log log ON ssf.id = log.student_submission_file_id
-        INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
-        INNER JOIN submission_box sb ON ss.box_id = sb.id
-        WHERE ssf.uuid IS NOT NULL
-        AND   log.status IS NULL
-        AND   ss.submitted_at IS NOT NULL
+        $selectCrocodocJoin
+        $selectCrocodocWhere
     ")->fetchColumn();
     $log->notice(sprintf('%d Crocodoc documents require archival', $crocodocCount));
 
@@ -334,8 +349,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
     // At the end of the day: log something
     $message = sprintf(
-        'Archival %scompleted - %d archived, %d failed, %d to do',
-        ($dryRun ? 'dry run ' : ''),
+        'Archival completed - %d archived, %d failed, %d to do',
         $successCount,
         $failureCount,
         $crocodocCount - $successCount - $failureCount
