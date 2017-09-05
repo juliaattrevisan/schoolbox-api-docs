@@ -59,8 +59,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@lti/component.twig',
-            array(
+            '@lti/component.twig', [
                 'session' => $_SESSION,
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'componentClass' => $this->getComponentName(),
@@ -70,7 +69,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
                 'readOnly' => ($this->getContentPermission() < UserAccess::ACCESS_WRITE),
                 'user' => $_SESSION['user']
-            ),
+            ],
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
     }
