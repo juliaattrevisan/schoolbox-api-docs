@@ -105,11 +105,13 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $updateLogQuery = $db->prepareQuery("
         REPLACE INTO student_submission_file_crocodoc_archive_log (
             student_submission_file_id,
+            submission_return_file_id,
             crocodoc_document_id,
             status,
             message
         ) VALUES (
             :fileId,
+            :feedbackFileId,
             :crocodocDocumentId,
             :status,
             :message
@@ -161,8 +163,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     ");
 
     // Query for figuring out if this file is already attached to this feedback
-    $countExistingFileQuery = $db->prepareQuery("
-        SELECT COUNT(*)
+    $selectExistingFeedbackFileQuery = $db->prepareQuery("
+        SELECT id
         FROM submission_return_file
         WHERE submission_return_id = :feedbackId
         AND   hash                 = :hash
@@ -250,6 +252,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         // All systems go
         $updateLogQuery->execute([
             'fileId'             => $row['fileId'],
+            'feedbackFileId'     => null,
             'crocodocDocumentId' => $row['crocodocDocumentId'],
             'status'             => 'processing',
             'message'            => '',
@@ -279,6 +282,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             );
             $updateLogQuery->execute([
                 'fileId'             => $row['fileId'],
+                'feedbackFileId'     => null,
                 'crocodocDocumentId' => $row['crocodocDocumentId'],
                 'status'             => 'failed',
                 'message'            => $e->getMessage(),
@@ -299,6 +303,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             );
             $updateLogQuery->execute([
                 'fileId'             => $row['fileId'],
+                'feedbackFileId'     => null,
                 'crocodocDocumentId' => $row['crocodocDocumentId'],
                 'status'             => 'failed',
                 'message'            => $response['error'],
@@ -321,17 +326,19 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
 
         // Attach to the feedback, if it isn't already
-        $countExistingFileQuery->execute([
+        $selectExistingFeedbackFileQuery->execute([
             'feedbackId' => $feedbackId,
             'hash'       => $storageModel->getHash(),
         ]);
-        if ($countExistingFileQuery->fetchColumn() > 0) {
+        $feedbackFileId = $selectExistingFeedbackFileQuery->fetchColumn();
+        if (!$feedbackFileId) {
             $insertNewFeedbackFileQuery->execute([
                 'feedbackId' => $feedbackId,
                 'hash'       => $storageModel->getHash(),
                 'fileName'   => $row['fileName'],
                 'now'        => Alaress_Date_Format::now(),
             ]);
+            $feedbackFileId = $db->lastInsertId();
             $log->info('Crocodoc document successfully attached to feedback');
         } else {
             $log->info('Crocodoc document already attached to feedback - not attaching again');
@@ -339,6 +346,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
         $updateLogQuery->execute([
             'fileId'             => $row['fileId'],
+            'feedbackFileId'     => $feedbackFileId,
             'crocodocDocumentId' => $row['crocodocDocumentId'],
             'status'             => 'completed',
             'message'            => '',
