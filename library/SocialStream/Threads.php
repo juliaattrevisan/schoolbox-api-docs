@@ -10,7 +10,6 @@
 
 namespace SocialStream;
 
-use Schoolbox\User;
 use Scrub;
 
 class Threads
