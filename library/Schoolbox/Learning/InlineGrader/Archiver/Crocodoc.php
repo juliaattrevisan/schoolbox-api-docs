@@ -386,15 +386,7 @@ class Crocodoc
                     'now'                => Alaress_Date_Format::now(),
                 ]);
 
-                // Finagle together the pieces the facade requires
-                $response = (new DueWorkResponse())
-                    ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'],
-                        Alaress_Date_Format::DATABASE_FORMAT));
-                $file = (new DueWorkResponseFile())
-                    ->setId($row['fileId'])
-                    ->setCrocodocId($row['crocodocDocumentId'])
-                    ->setFilename($row['fileName']);
-                $facade = new Facade(new Authenticator(), $response, $file, $systemUser);
+                $facade = $this->buildFacade($systemUser, $row);
 
 
                 // Try to download the annotated Crocodocument
@@ -451,7 +443,7 @@ class Crocodoc
                     list(, $filename) = $matches;
                 } else {
                     // Make something up
-                    $filename = 'return_' . $file->getFilename() . '.pdf';
+                    $filename = 'return_' . $row['fileName'] . '.pdf';
                 }
                 $storageModel = $this->storageMapper->acceptStream($filename, $result->getBody());
 
@@ -516,5 +508,23 @@ class Crocodoc
             'successful' => $successCount,
             'failed'     => $failureCount,
         ];
+    }
+
+    /**
+     * Build a facade as required for downloading a Crocodoc document.
+     *
+     * @param User  $systemUser
+     * @param array $row
+     * @return Facade
+     */
+    private function buildFacade(User $systemUser, $row)
+    {
+        $response = (new DueWorkResponse())
+            ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT));
+        $file = (new DueWorkResponseFile())
+            ->setId($row['fileId'])
+            ->setCrocodocId($row['crocodocDocumentId'])
+            ->setFilename($row['fileName']);
+        return new Facade(new Authenticator(), $response, $file, $systemUser);
     }
 }
