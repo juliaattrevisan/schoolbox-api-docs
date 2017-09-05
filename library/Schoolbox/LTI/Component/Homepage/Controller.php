@@ -62,7 +62,8 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         return $this->renderTwigTemplate(
             $templateHandle,
-            '@lti/component.twig', [
+            '@lti/component.twig',
+            [
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'providerId' => $this->getConfig('ltiprovider'),
                 'providers' => $providers,
