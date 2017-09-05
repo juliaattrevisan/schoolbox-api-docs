@@ -36,18 +36,32 @@ class Crocodoc
     // -- Queries
 
     /**
-     * Query for fetching the first remaining crocodocuments.
+     * Query for fetching the first remaining crocodocuments that are not archived.
      *
      * @var IQuery
      */
-    private $selectCrocodocQuery;
+    private $selectUnarchivedCrocodocQuery;
 
     /**
-     * Query for fetching the number of crocodocument left to be processed.
+     * Query for fetching the number of crocodocuments that are not archived.
      *
      * @var IQuery
      */
-    private $countCrocodocQuery;
+    private $countUnarchivedCrocodocQuery;
+
+    /**
+     * Query for fetching the first crocodocuments that previously failed archival.
+     *
+     * @var IQuery
+     */
+    private $selectFailedCrocodocQuery;
+
+    /**
+     * Query for fetching the number of crocodocuments that previously failed archival.
+     *
+     * @var IQuery
+     */
+    private $countFailedCrocodocQuery;
 
     /**
      * Query for fetching a log of what we've done.
@@ -112,21 +126,12 @@ class Crocodoc
         $this->setupQueries();
     }
 
+    /**
+     * Prepare all required queries.
+     */
     private function setupQueries()
     {
-        $selectCrocodocJoin  = "
-            LEFT  JOIN student_submission_file_crocodoc_archive_log log ON ssf.id = log.student_submission_file_id
-            INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
-            INNER JOIN submission_box sb ON ss.box_id = sb.id
-        ";
-        $selectCrocodocWhere = "
-            WHERE ssf.uuid IS NOT NULL
-            AND   ss.submitted_at IS NOT NULL
-        ";
-        $selectCrocodocWhereProcessUnscanned = $selectCrocodocWhere .= "AND log.status IS NULL";
-        $selectCrocodocWhereRescanFailed     = $selectCrocodocWhere .= "AND log.status = 'failed'";
-
-        $this->selectCrocodocQuery = $this->database->prepareQuery("
+        $crocodocSelect = "
             SELECT
                 ssf.id           AS fileId,
                 ssf.realname     AS fileName,
@@ -136,18 +141,46 @@ class Crocodoc
                 ss.submitted_at  AS submittedDate,
                 sb.id            AS boxId,
                 sb.assessment_id AS assessmentId
+        ";
+        $crocodocFrom = "
             FROM student_submission_file ssf
-            $selectCrocodocJoin
-            $selectCrocodocWhere
+            LEFT  JOIN student_submission_file_crocodoc_archive_log log ON ssf.id = log.student_submission_file_id
+            INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
+            INNER JOIN submission_box sb ON ss.box_id = sb.id
+        ";
+        $crocodocWhere = "
+            WHERE ssf.uuid IS NOT NULL
+            AND   ss.submitted_at IS NOT NULL
+        ";
+        $crocodocWhereUnarchived = $crocodocWhere . "AND log.status IS NULL";
+        $crocodocWhereFailed    = $crocodocWhere . "AND log.status = 'failed'";
+
+        $this->selectUnarchivedCrocodocQuery = $this->database->prepareQuery("
+            $crocodocSelect
+            $crocodocFrom
+            $crocodocWhereUnarchived
             ORDER BY ssf.created_at DESC
             LIMIT 10 OFFSET :offset
         ");
 
-        $this->countCrocodocQuery = $this->database->prepareQuery("
+        $this->countUnarchivedCrocodocQuery = $this->database->prepareQuery("
              SELECT COUNT(*)
-             FROM student_submission_file ssf
-             $selectCrocodocJoin
-             $selectCrocodocWhere
+             $crocodocFrom
+             $crocodocWhereUnarchived
+        ");
+
+        $this->selectFailedCrocodocQuery = $this->database->prepareQuery("
+            $crocodocSelect
+            $crocodocFrom
+            $crocodocWhereFailed
+            ORDER BY ssf.created_at DESC
+            LIMIT 10 OFFSET :offset
+        ");
+
+        $this->countFailedCrocodocQuery = $this->database->prepareQuery("
+             SELECT COUNT(*)
+             $crocodocFrom
+             $crocodocWhereFailed
         ");
 
         $this->updateLogQuery = $this->database->prepareQuery("
