@@ -19,8 +19,7 @@ Running tests
 ---
 
 These tests are currently configured to run within Schoolbox's Vagrant box.
-You will need two connections: one to run Chromedriver (the web driver for
-Chrome Headless), and a second to run the tests themselves.
+The acceptance tests are configured to automatically start chromedriver (the web driver for Chrome Headless).
 
 ### Demo data set
 
@@ -39,14 +38,14 @@ If you've not yet reprovisioned after checking out this branch: run
 
 ### Chromedriver
 
-To run Chromedriver (and download and install it if required):
+To download, install and configure Chromedriver:
 
     vagrant ssh
     cd /vagrant
     ./test/acceptance/bin/chromedriver.sh
 
-This starts Chromedriver as a daemon; you'll need to open a separate terminal
-window in order to run the tests themselves.
+This will ensure chromedriver is available in vagrant's PATH, where it can be
+invoked by codeception.
 
 ### Codeception test
 
