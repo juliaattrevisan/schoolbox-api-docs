@@ -1322,6 +1322,8 @@ class User implements JsonSerializable, ISoftDeletable
      */
     public function getPortraitUrl($size = 'square80')
     {
-        return "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}portrait.php?userId={$this->getExternalId()}&size={$size}";
+        $baseUrl = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}";
+
+        return "{$baseUrl}portrait.php?userId={$this->getExternalId()}&size={$size}";
     }
 }
