@@ -217,7 +217,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         ]);
         $feedbackId = $selectAttachedFeedbackQuery->fetchColumn();
         if ($feedbackId) {
-            $log->info(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
+            $log->debug(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
         } else {
             $log->debug('No non-floating feedback found - searching for floating feedback');
             $selectFloatingFeedbackQuery->execute([
@@ -226,12 +226,12 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             ]);
             $feedbackId = $selectFloatingFeedbackQuery->fetchColumn();
             if ($feedbackId) {
-                $log->info(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
+                $log->debug(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
             } else {
                 $log->debug('No floating feedback found - creating a new draft floating feedback');
                 // create one, if not a dry run
                 if ($dryRun) {
-                    $log->info(sprintf('Attaching document to new draft floating feedback'));
+                    $log->debug(sprintf('Attaching document to new draft floating feedback'));
                 } else {
                     $insertNewFeedbackQuery->execute([
                         'systemUserId' => $systemUser->getId(),
@@ -240,7 +240,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                         'now'          => Alaress_Date_Format::now(),
                     ]);
                     $feedbackId = $db->lastInsertId();
-                    $log->info(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
+                    $log->debug(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
                 }
             }
         }
@@ -316,7 +316,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             $failureCount++;
             continue;
         }
-        $log->info('Crocodoc document successfully retrieved');
+        $log->debug('Crocodoc document successfully retrieved');
 
 
         // Shoehorn it into storage
