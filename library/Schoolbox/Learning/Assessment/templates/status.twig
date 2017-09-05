@@ -52,13 +52,13 @@
             <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
 
             {% if assessment.markVisibility == "2" %}
-                <li class="icon-staff">Staff, Students and Parents</li>
+                <li class="icon-staff" title="Visibility">Staff, Students and Parents</li>
             {% endif %}
             {% if assessment.markVisibility == "1" %}
-                <li class="icon-staff-students">Staff and Students</li>
+                <li class="icon-staff-students" title="Visibility">Staff and Students</li>
             {% endif %}
             {% if assessment.markVisibility == "0" %}
-                <li class="icon-teacher">Staff</li>
+                <li class="icon-teacher" title="Visibility">Staff</li>
             {% endif %}
 
             {% if readonly %}
