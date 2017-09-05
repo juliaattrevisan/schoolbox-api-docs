@@ -324,6 +324,7 @@ class Crocodoc
 
                 $fileId             = $row['fileId'];
                 $crocodocDocumentId = $row['crocodocDocumentId'];
+                $filename           = $row['fileName'];
 
                 $stepCount--;
                 $log->notice(
@@ -386,7 +387,7 @@ class Crocodoc
 
 
                 // Now store it and create a feedback for it
-                $storageModel   = $this->uploadCrocodocToStorage($response, $row);
+                $storageModel   = $this->uploadCrocodocToStorage($response, $filename);
                 $feedbackFileId = $this->archiveCrocodocInFeedback($log, $storageModel, $feedbackId, $row);
 
 
@@ -448,19 +449,12 @@ class Crocodoc
      * feedback file.
      *
      * @param Response $result
-     * @param array    $row
+     * @param string   $filename
      * @return StorageModel
      */
-    private function uploadCrocodocToStorage(Response $result, $row)
+    private function uploadCrocodocToStorage(Response $result, $filename)
     {
-        $matches = [];
-        if (preg_match('/filename="(.*?)"$/', $result->getContentDisposition(), $matches)) {
-            list(, $filename) = $matches;
-        } else {
-            // Make something up
-            $filename = 'return_' . $row['fileName'] . '.pdf';
-        }
-        return $this->storageMapper->acceptStream($filename, $result->getBody());
+        return $this->storageMapper->acceptStream('return_' . $filename . '.pdf', $result->getBody());
     }
 
     /**
