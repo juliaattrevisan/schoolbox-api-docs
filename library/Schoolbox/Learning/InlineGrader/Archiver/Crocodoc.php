@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
 use Schoolbox\Learning\InlineGrader\Authenticator;
 use Schoolbox\Learning\InlineGrader\Facade;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 
 /**
@@ -35,6 +36,11 @@ class Crocodoc
      * @var HttpClient
      */
     private $httpClient;
+
+    /**
+     * @var StorageMapper
+     */
+    private $storageMapper;
 
     // -- Queries
 
@@ -117,13 +123,15 @@ class Crocodoc
     /**
      * Build the archiver.
      *
-     * @param IConnector $database
-     * @param HttpClient $httpClient
+     * @param IConnector    $database
+     * @param HttpClient    $httpClient
+     * @param StorageMapper $storageMapper
      */
-    public function __construct(IConnector $database, HttpClient $httpClient)
+    public function __construct(IConnector $database, HttpClient $httpClient, StorageMapper $storageMapper)
     {
         $this->database = $database;
         $this->httpClient = $httpClient;
+        $this->storageMapper = $storageMapper;
         $this->setupQueries();
     }
 
@@ -271,6 +279,9 @@ class Crocodoc
      * @param LoggerInterface $log
      * @param bool            $dryRun
      * @param bool            $rescanFailed
+     * @return array attempted:  number of items we attempted to archive
+     *               successful: number of items successfully archived
+     *               failed:     number that failed for whatever reason
      * @throws DatabaseException if a query went wrong
      */
     public function archive(User $systemUser, LoggerInterface $log, $dryRun = false, $rescanFailed = false)
@@ -500,5 +511,10 @@ class Crocodoc
         } else {
             $log->notice($message);
         }
+        return [
+            'attempted'  => $successCount + $failureCount,
+            'successful' => $successCount,
+            'failed'     => $failureCount,
+        ];
     }
 }
