@@ -115,6 +115,7 @@ module.exports = function(grunt) {
 
                     // Data tables
                     'www/javascript/components/datatables/media/js/jquery.dataTables.min.js',
+                    'www/javascript/components/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
 
                     // Toasts, popups to notify something has happened
                     'www/javascript/shared/jquery.toast-timeout.js',
