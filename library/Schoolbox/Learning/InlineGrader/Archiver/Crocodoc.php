@@ -321,6 +321,10 @@ class Crocodoc
             ]);
 
             foreach ($selectCrocodocQuery->executeIterator() as $row) {
+
+                $fileId             = $row['fileId'];
+                $crocodocDocumentId = $row['crocodocDocumentId'];
+
                 $stepCount--;
                 $log->notice(
                     sprintf(
@@ -342,7 +346,7 @@ class Crocodoc
 
 
                 // Log where we're at
-                $this->logToDatabase($row['fileId'], null, $row['crocodocDocumentId'], 'processing', '');
+                $this->logToDatabase($fileId, null, $crocodocDocumentId, 'processing', '');
 
 
                 // Try to download the annotated Crocodocument
@@ -359,7 +363,7 @@ class Crocodoc
                             $e->getMessage()
                         )
                     );
-                    $this->logToDatabase($row['fileId'], null, $row['crocodocDocumentId'], 'failed', $e->getMessage());
+                    $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $e->getMessage());
                     $failureCount++;
                     continue;
                 }
@@ -374,7 +378,7 @@ class Crocodoc
                             $result->getMessage()
                         )
                     );
-                    $this->logToDatabase($row['fileId'], null, $row['crocodocDocumentId'], 'failed', $response['error']);
+                    $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $response['error']);
                     $failureCount++;
                     continue;
                 }
@@ -395,7 +399,7 @@ class Crocodoc
                     )
                 );
 
-                $this->logToDatabase($row['fileId'], $feedbackFileId, $row['crocodocDocumentId'], 'completed', '');
+                $this->logToDatabase($fileId, $feedbackFileId, $crocodocDocumentId, 'completed', '');
                 $successCount++;
             }
             $selectCrocodocQuery->close();
