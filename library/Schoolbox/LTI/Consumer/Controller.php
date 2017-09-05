@@ -116,7 +116,6 @@ class Controller extends Base
         $url = $component->getConfig('url');
 
         if (!empty($url)) {
-
             $this->getResponse()->redirect->to($url);
         }
 
@@ -336,7 +335,7 @@ class Controller extends Base
      *
      * @param Component_ControllerAbstract $component
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      */
     private function updateComponentValue($component, $key, $value)
     {
@@ -354,7 +353,7 @@ class Controller extends Base
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        // Try to find an existing configuration instance for the requested configuration item 
+        // Try to find an existing configuration instance for the requested configuration item
 
         $configInstance = $this->componentConfigMapper->findByColumnList([
             'component_config_definition_id' => $configDefinition->getId(),
