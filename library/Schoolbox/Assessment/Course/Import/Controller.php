@@ -560,6 +560,13 @@ class Controller extends Base\Base
         $ownerships = trim($post['ownerships']);
         $unitImplData = $post['unit'];
 
+        // Convert class owners to convenient data structure
+        $classOwners = [];
+        foreach (explode(',', $ownerships) as $classAndUser) {
+            list($classFolderId, $userId) = explode(':', $classAndUser);
+            $classOwners[$classFolderId] = $this->userMapper->findById($userId);
+        }
+
         // Algorithm:
         //
         // 1. Create a graph of the CourseImpl that exists in DB
@@ -583,11 +590,9 @@ class Controller extends Base\Base
         // Are we creating a new import?
         if ('import' === $action) {
             $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
-            $ownerships = explode(',', $ownerships);
-            foreach ($ownerships as $ownership) {
+            foreach ($classOwners as $classFolderId => $user) {
                 $courseImpl = $this->getCourseImplementationMapper()->createModel();
                 $courseImpl->setSpecification($courseSpec);
-                $classFolderId = explode(':', $ownership)[0];
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
             }
