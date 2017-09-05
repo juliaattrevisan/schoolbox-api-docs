@@ -20,6 +20,10 @@ suites:
                     user: "root"
                     password: "tnp879"
                     # dump goes here
+        extensions:
+            enabled:
+                - Codeception\Extension\RunProcess:
+                  - 'chromedriver --url-base=/wd/hub'
 
 extensions:
     enabled:
