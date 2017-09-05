@@ -332,6 +332,7 @@ class Crocodoc
                 );
 
 
+                // What feedback does this belong in?
                 $feedbackId = $this->findFeedbackId($systemUser, $log, $dryRun, $row);
                 if ($dryRun) {
                     $successCount++;
@@ -356,6 +357,7 @@ class Crocodoc
                 // Try to download the annotated Crocodocument
                 /** @var Response $result */
                 try {
+                    $facade = $this->buildFacade($systemUser, $row);
                     $result = $this->httpClient->get($facade->getDownloadUrl())->send();
                 } catch (RuntimeException $e) {
                     // skip this one; consider jittering
@@ -402,8 +404,8 @@ class Crocodoc
                 $log->debug('Crocodoc document successfully retrieved');
 
 
+                // Now store it and create a feedback for it
                 $storageModel = $this->uploadCrocodocToStorage($result, $row);
-
                 $feedbackFileId = $this->archiveCrocodocInFeedback($log, $storageModel, $feedbackId, $row);
 
 
