@@ -162,7 +162,7 @@ class Module extends BaseModule
                 $newParams = [];
                 try {
                     if (array_key_exists('ownerId', $params)) {
-                        $newParams['owner'] = $this->getUserMapper()->findById($params['ownerId']);
+                        $newParams['owner'] = $_SESSION['user'];
                     }
                     if (array_key_exists('commentId', $params)) {
                         /** @var EportfolioBlogCommentModel $comment */
