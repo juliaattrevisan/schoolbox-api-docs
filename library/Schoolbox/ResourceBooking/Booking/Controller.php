@@ -241,6 +241,14 @@ class Controller extends Base
         $code   = 200;
         $errors = $this->validateBookingFromPostData($item->getResource(), $item);
 
+        //If item is moderated and already approved, set to need approval again
+        if($item->getResource()->getModerationType()->getId() == Item\ModerationType\Model::TYPE_MODERATED &&
+            $item->getStatus()->getId() == Status\Model::STATUS_APPROVED) {
+            $status = new Status\Model();
+            $status->setId(Status\Model::STATUS_PENDING);
+            $item->setStatus($status);
+        }
+
         if (empty($errors)) {
             $isTimeChanged = false;
             $item
