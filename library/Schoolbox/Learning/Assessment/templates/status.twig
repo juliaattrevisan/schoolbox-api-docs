@@ -45,6 +45,12 @@
 <div class="row">
     <div class="small-12 large-4 columns">
         <ul class="meta">
+            {% if not assessment.dueAt.isNull %}
+                <li class="icon-calendar">{{ dueDate.dueDate(assessment, USER) }}</li>
+            {% endif %}
+
+            <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
+
             {% if assessment.markVisibility == "2" %}
                 <li class="icon-staff">Staff, Students and Parents</li>
             {% endif %}
@@ -54,10 +60,7 @@
             {% if assessment.markVisibility == "0" %}
                 <li class="icon-teacher">Staff</li>
             {% endif %}
-            <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
-            {% if not assessment.dueAt.isNull %}
-            <li class="icon-calendar">{{ dueDate.dueDate(assessment, USER) }}</li>
-            {% endif %}
+
             {% if readonly %}
                 <li class="icon-archive">Term has been archived</li>
             {% endif %}
