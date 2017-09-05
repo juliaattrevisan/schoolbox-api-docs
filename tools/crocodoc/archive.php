@@ -61,6 +61,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $db = $di->get('databaseInternal');
 
     // Fetch first x remaining crocodocuments
+    // TODO attempt to allow rescan of failed
     $selectCrocodocQuery = $db->prepareQuery("
         SELECT
             ssf.id          AS fileId,
@@ -71,9 +72,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             ss.submitted_at AS submittedDate,
             sb.id           AS boxId
         FROM student_submission_file ssf
+        LEFT  JOIN student_submission_file_crocodoc_archive_log log ON ssf.id = log.student_submission_file_id
         INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
         INNER JOIN submission_box sb ON ss.box_id = sb.id
         WHERE ssf.uuid IS NOT NULL
+        AND   log.status IS NULL
         AND   ss.submitted_at IS NOT NULL
         ORDER BY ssf.created_at DESC
         LIMIT 10 OFFSET 0
@@ -81,6 +84,21 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
 
     // Remove crocodocument link
     $clearCrocodocQuery = $db->prepareQuery("UPDATE student_submission_file SET uuid = NULL WHERE id = :fileId");
+
+    // Log
+    $updateLogQuery = $db->prepareQuery("
+        REPLACE INTO student_submission_file_crocodoc_archive_log (
+            student_submission_file_id,
+            crocodoc_document_id,
+            status,
+            message
+        ) VALUES (
+            :fileId,
+            :crocodocDocumentId,
+            :status,
+            :message
+        )
+    ");
 
 
     // Which feedback does the crocodocument get put in?
@@ -215,6 +233,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         }
 
 
+        // All systems go
+        $updateLogQuery->execute([
+            'fileId'             => $row['fileId'],
+            'crocodocDocumentId' => $row['crocodocDocumentId'],
+            'status'             => 'processing',
+            'message'            => '',
+        ]);
+
         // Finagle together the pieces the facade requires
         $response = (new DueWorkResponse())
             ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT));
@@ -237,6 +263,12 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                     $e->getMessage()
                 )
             );
+            $updateLogQuery->execute([
+                'fileId'             => $row['fileId'],
+                'crocodocDocumentId' => $row['crocodocDocumentId'],
+                'status'             => 'failed',
+                'message'            => $e->getMessage(),
+            ]);
             $failureCount++;
             continue;
         }
@@ -251,6 +283,12 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                     $result->getMessage()
                 )
             );
+            $updateLogQuery->execute([
+                'fileId'             => $row['fileId'],
+                'crocodocDocumentId' => $row['crocodocDocumentId'],
+                'status'             => 'failed',
+                'message'            => $response['error'],
+            ]);
             $failureCount++;
             continue;
         }
@@ -284,6 +322,13 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         } else {
             $log->info('Crocodoc document already attached to feedback - not attaching again');
         }
+
+        $updateLogQuery->execute([
+            'fileId'             => $row['fileId'],
+            'crocodocDocumentId' => $row['crocodocDocumentId'],
+            'status'             => 'completed',
+            'message'            => '',
+        ]);
         $successCount++;
     }
 
