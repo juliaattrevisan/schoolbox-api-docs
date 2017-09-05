@@ -404,25 +404,7 @@ class Crocodoc
 
                 $storageModel = $this->uploadCrocodocToStorage($result, $row);
 
-
-                // Attach to the feedback, if it isn't already
-                $this->selectExistingFeedbackFileQuery->execute([
-                    'feedbackId' => $feedbackId,
-                    'hash'       => $storageModel->getHash(),
-                ]);
-                $feedbackFileId = $this->selectExistingFeedbackFileQuery->fetchColumn();
-                if (!$feedbackFileId) {
-                    $this->insertNewFeedbackFileQuery->execute([
-                        'feedbackId' => $feedbackId,
-                        'hash'       => $storageModel->getHash(),
-                        'fileName'   => $row['fileName'],
-                        'now'        => Alaress_Date_Format::now(),
-                    ]);
-                    $feedbackFileId = $this->database->lastInsertId();
-                    $log->info('Crocodoc document successfully attached to feedback');
-                } else {
-                    $log->info('Crocodoc document already attached to feedback - not attaching again');
-                }
+                $feedbackFileId = $this->archiveCrocodocInFeedback($log, $storageModel, $feedbackId, $row);
 
 
                 // Here, have a helpful link to the inline grader so you can see the doc
@@ -515,7 +497,7 @@ class Crocodoc
      * @param LoggerInterface $log
      * @param bool            $dryRun
      * @param array           $row
-     * @return int The PK of the new feedback ID in which to upload
+     * @return int The PK of the feedback ID in which to upload
      * @throws DatabaseException if a query breaks
      */
     private function findFeedbackId(User $systemUser, LoggerInterface $log, $dryRun, $row)
@@ -553,5 +535,38 @@ class Crocodoc
             }
         }
         return (int)$feedbackId;
+    }
+
+    /**
+     * Archives the uploaded Crocodoc document in a feedback.
+     *
+     * @param LoggerInterface $log
+     * @param int             $feedbackId
+     * @param StorageModel    $storageModel
+     * @param array           $row
+     * @return int The PK of the new feedback file ID in which the Crocodoc was uploaded
+     * @throws DatabaseException if a query breaks
+     */
+    private function archiveCrocodocInFeedback(LoggerInterface $log, StorageModel $storageModel, $feedbackId, $row)
+    {
+        // Attach to the feedback, if it isn't already
+        $this->selectExistingFeedbackFileQuery->execute([
+            'feedbackId' => $feedbackId,
+            'hash'       => $storageModel->getHash(),
+        ]);
+        $feedbackFileId = $this->selectExistingFeedbackFileQuery->fetchColumn();
+        if (!$feedbackFileId) {
+            $this->insertNewFeedbackFileQuery->execute([
+                'feedbackId' => $feedbackId,
+                'hash'       => $storageModel->getHash(),
+                'fileName'   => $row['fileName'],
+                'now'        => Alaress_Date_Format::now(),
+            ]);
+            $feedbackFileId = $this->database->lastInsertId();
+            $log->info('Crocodoc document successfully attached to feedback');
+        } else {
+            $log->info('Crocodoc document already attached to feedback - not attaching again');
+        }
+        return (int)$feedbackFileId;
     }
 }
