@@ -108,13 +108,15 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             submission_return_file_id,
             crocodoc_document_id,
             status,
-            message
+            message,
+            date
         ) VALUES (
             :fileId,
             :feedbackFileId,
             :crocodocDocumentId,
             :status,
-            :message
+            :message,
+            :now
         )
     ");
 
@@ -256,6 +258,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             'crocodocDocumentId' => $row['crocodocDocumentId'],
             'status'             => 'processing',
             'message'            => '',
+            'now'                => Alaress_Date_Format::now(),
         ]);
 
         // Finagle together the pieces the facade requires
@@ -286,6 +289,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                 'crocodocDocumentId' => $row['crocodocDocumentId'],
                 'status'             => 'failed',
                 'message'            => $e->getMessage(),
+                'now'                => Alaress_Date_Format::now(),
             ]);
             $failureCount++;
             continue;
@@ -307,6 +311,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
                 'crocodocDocumentId' => $row['crocodocDocumentId'],
                 'status'             => 'failed',
                 'message'            => $response['error'],
+                'now'                => Alaress_Date_Format::now(),
             ]);
             $failureCount++;
             continue;
@@ -350,6 +355,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
             'crocodocDocumentId' => $row['crocodocDocumentId'],
             'status'             => 'completed',
             'message'            => '',
+            'now'                => Alaress_Date_Format::now(),
         ]);
         $successCount++;
     }

@@ -4,7 +4,8 @@ CREATE TABLE `student_submission_file_crocodoc_archive_log` (
     `submission_return_file_id` INT(11) UNSIGNED NULL DEFAULT NULL,
     `crocodoc_document_id` VARCHAR(255) CHARACTER SET 'utf8mb4' NOT NULL,
     `status` ENUM('pending', 'processing', 'completed', 'failed') CHARACTER SET 'ascii' NOT NULL DEFAULT 'pending',
-    `message` TEXT CHARACTER SET 'utf8mb4'
+    `message` TEXT CHARACTER SET 'utf8mb4',
+    `date` DATETIME NOT NULL
 );
 
 ALTER TABLE `student_submission_file_crocodoc_archive_log`
