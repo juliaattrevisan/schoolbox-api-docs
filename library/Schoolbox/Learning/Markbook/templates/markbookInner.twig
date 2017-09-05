@@ -19,7 +19,7 @@
 
         /* Controls for Averages and Dynamic updates for input fields
          */
-        $.fn.marksheetAverages();
+        $('[data-mark-sheet]').marksheetAverages();
         $('[data-mark-sheet]').marksheetInputs();
 
         // Enable the download report menu
@@ -49,9 +49,9 @@
 
 <div class="row">
     <div class="small-12 island">
-        <div class="scrollable">
-            <table data-mark-sheet>
-                <thead>
+
+        <table data-mark-sheet>
+            <thead>
                 <tr class="rotate-headers" data-headers data-hidable-columns>
                     <th>&nbsp;</th>
                     <th>
@@ -72,6 +72,7 @@
                     </th>
                     {% endfor %}
                 </tr>
+
                 <tr data-hidable-columns>
                     <th style="min-width: 200px;width: 200px;">
                         <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
@@ -107,29 +108,30 @@
 
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
 
-                </thead>
-                <tbody>
+            </thead>
+
+            <tbody>
                 {# Need all students that ever participated in any assessments #}
                 {% for student in markbook.students %}
-                <tr data-student="{{ student.id }}" data-hidable-columns>
-                    <th class="no-pad">
+                <tr data-student="{{ student.id }}">
+                    <td class="no-pad">
                         <div class="compact card no-pad small-12">
                             <a href="/search/user/{{ student.id }}" title="View Profile">
                                 <img src="/portrait.php?userId={{ student.externalId }}&size=square32" alt="View Profile" />
                                 <p>{{ student.lastname }}, {{ student.firstname }}</p>
                             </a>
                         </div>
-                    </th>
+                    </td>
 
                     {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
                     {% set meanNormalised = markbook.studentStatistics[student.id].meanNormalised %}
-                    <th class="{{ urgency.marks(meanNormalised) }}-bg">
+                    <td class="{{ urgency.marks(meanNormalised) }}-bg">
                         {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
                         <a class="{{ urgency.marks(meanNormalised) }}-bg"
                            href="{{ routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students {{ locale.grades.plural }}">
                             {{ studentMean | default('–') }}
                         </a>
-                    </th>
+                    </td>
 
                     {% for assessment in markbook.assessments %}
                         <td class="column-{{ assessment.id }}" data-assessment="{{ assessment.id }}">
@@ -159,9 +161,9 @@
                     {% endfor %}
                 </tr>
                 {% endfor %}
-                </tbody>
+            </tbody>
             </table>
-        </div>
+
         <div class="toast" data-alert data-save-progress-state></div>
     </div>
 </div>
