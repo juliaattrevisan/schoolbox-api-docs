@@ -219,7 +219,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         if ($feedbackId) {
             $log->info(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
         } else {
-            $log->debug('No non-floating feedback found - searching for non-floating feedback');
+            $log->debug('No non-floating feedback found - searching for floating feedback');
             $selectFloatingFeedbackQuery->execute([
                 'studentId' => $row['studentId'],
                 'boxId'     => $row['boxId'],
