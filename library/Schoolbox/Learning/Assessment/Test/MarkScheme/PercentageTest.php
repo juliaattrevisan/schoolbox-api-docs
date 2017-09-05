@@ -28,26 +28,6 @@ class PercentageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RangeException
-     */
-    public function test_getHumanReadable_TooLow()
-    {
-        $normalised = -0.0001;
-        $markScheme = new Percentage();
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_getHumanReadable_TooHigh()
-    {
-        $normalised = 100.0000001;
-        $markScheme = new Percentage();
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
      * @dataProvider provider_humanReadableToNormalised
      * @param string $humanReadable
      * @param float $expected
@@ -114,6 +94,7 @@ class PercentageTest extends \PHPUnit_Framework_TestCase
     public function provider_normalisedToHumanReadable()
     {
         return [
+            [-0.0001,     '0 %'],
             [0,           '0 %'],
             [0.0,         '0 %'],
             [0.000000000, '0 %'],
@@ -130,6 +111,7 @@ class PercentageTest extends \PHPUnit_Framework_TestCase
             [99.5,        '100 %'],
             [100,         '100 %'],
             [100.0,       '100 %'],
+            [100.0000001, '100 %'],
         ];
     }
 
