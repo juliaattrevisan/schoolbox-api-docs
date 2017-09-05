@@ -350,10 +350,10 @@ class Crocodoc
 
 
                 // Try to download the annotated Crocodocument
-                /** @var Response $result */
+                /** @var Response $response */
                 try {
-                    $facade = $this->buildFacade($systemUser, $row);
-                    $result = $this->httpClient->get($facade->getDownloadUrl())->send();
+                    $facade   = $this->buildFacade($systemUser, $row);
+                    $response = $this->httpClient->get($facade->getDownloadUrl())->send();
                 } catch (RuntimeException $e) {
                     // skip this one; consider jittering
                     $log->warning(
@@ -367,18 +367,18 @@ class Crocodoc
                     $failureCount++;
                     continue;
                 }
-                if ($result->isError()) {
+                if ($response->isError()) {
                     // skip this one; consider jittering
                     // Also consider exiting completely if there's too many errors
-                    $response = json_decode($result, true);
+                    $responseJson = json_decode($response, true);
                     $log->warning(
                         sprintf(
                             'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
-                            $response['error'],
-                            $result->getMessage()
+                            $responseJson['error'],
+                            $response->getMessage()
                         )
                     );
-                    $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $response['error']);
+                    $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $responseJson['error']);
                     $failureCount++;
                     continue;
                 }
@@ -386,7 +386,7 @@ class Crocodoc
 
 
                 // Now store it and create a feedback for it
-                $storageModel = $this->uploadCrocodocToStorage($result, $row);
+                $storageModel   = $this->uploadCrocodocToStorage($response, $row);
                 $feedbackFileId = $this->archiveCrocodocInFeedback($log, $storageModel, $feedbackId, $row);
 
 
