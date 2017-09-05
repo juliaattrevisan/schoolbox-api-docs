@@ -332,45 +332,7 @@ class Crocodoc
                 );
 
 
-                // Figure out where to put the document. In order of preference:
-                // 1. most recent feedback for this response
-                // 2. most recent feedback with no response
-                // 3. a new draft feedback
-                $this->selectAttachedFeedbackQuery->execute([
-                    'responseId' => $row['responseId'],
-                ]);
-                $feedbackId = $this->selectAttachedFeedbackQuery->fetchColumn();
-                if ($feedbackId) {
-                    $log->debug(sprintf('Attaching document to most recent non-floating feedback (id: %d)',
-                        $feedbackId));
-                } else {
-                    $log->debug('No non-floating feedback found - searching for floating feedback');
-                    $this->selectFloatingFeedbackQuery->execute([
-                        'studentId' => $row['studentId'],
-                        'boxId'     => $row['boxId'],
-                    ]);
-                    $feedbackId = $this->selectFloatingFeedbackQuery->fetchColumn();
-                    if ($feedbackId) {
-                        $log->debug(sprintf('Attaching document to most recent floating feedback (id: %d)',
-                            $feedbackId));
-                    } else {
-                        $log->debug('No floating feedback found - creating a new draft floating feedback');
-                        // create one, if not a dry run
-                        if ($dryRun) {
-                            $log->debug(sprintf('Attaching document to new draft floating feedback'));
-                        } else {
-                            $this->insertNewFeedbackQuery->execute([
-                                'systemUserId' => $systemUser->getId(),
-                                'studentId'    => $row['studentId'],
-                                'boxId'        => $row['boxId'],
-                                'now'          => Alaress_Date_Format::now(),
-                            ]);
-                            $feedbackId = $this->database->lastInsertId();
-                            $log->debug(sprintf('Attaching document to new draft floating feedback (id: %d)',
-                                $feedbackId));
-                        }
-                    }
-                }
+                $feedbackId = $this->findFeedbackId($systemUser, $log, $dryRun, $row);
                 if ($dryRun) {
                     $successCount++;
                     $log->info('Crocodoc document successfully attached to feedback');
@@ -541,5 +503,55 @@ class Crocodoc
             $filename = 'return_' . $row['fileName'] . '.pdf';
         }
         return $this->storageMapper->acceptStream($filename, $result->getBody());
+    }
+
+    /**
+     * Finds the feedback in which to upload the Crocodoc document. In order of preference:
+     * 1. most recent feedback for this response
+     * 2. most recent floating feedback for this participant
+     * 3. a new draft feedback for this participant (not created if `$dryRun` is on)
+     *
+     * @param User            $systemUser
+     * @param LoggerInterface $log
+     * @param bool            $dryRun
+     * @param array           $row
+     * @return int The PK of the new feedback ID in which to upload
+     * @throws DatabaseException if a query breaks
+     */
+    private function findFeedbackId(User $systemUser, LoggerInterface $log, $dryRun, $row)
+    {
+        $this->selectAttachedFeedbackQuery->execute([
+            'responseId' => $row['responseId'],
+        ]);
+        $feedbackId = $this->selectAttachedFeedbackQuery->fetchColumn();
+        if ($feedbackId) {
+            $log->debug(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
+        } else {
+            $log->debug('No non-floating feedback found - searching for floating feedback');
+            $this->selectFloatingFeedbackQuery->execute([
+                'studentId' => $row['studentId'],
+                'boxId'     => $row['boxId'],
+            ]);
+            $feedbackId = $this->selectFloatingFeedbackQuery->fetchColumn();
+            if ($feedbackId) {
+                $log->debug(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
+            } else {
+                $log->debug('No floating feedback found - creating a new draft floating feedback');
+                // create one, if not a dry run
+                if ($dryRun) {
+                    $log->debug(sprintf('Attaching document to new draft floating feedback'));
+                } else {
+                    $this->insertNewFeedbackQuery->execute([
+                        'systemUserId' => $systemUser->getId(),
+                        'studentId'    => $row['studentId'],
+                        'boxId'        => $row['boxId'],
+                        'now'          => Alaress_Date_Format::now(),
+                    ]);
+                    $feedbackId = $this->database->lastInsertId();
+                    $log->debug(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
+                }
+            }
+        }
+        return (int)$feedbackId;
     }
 }
