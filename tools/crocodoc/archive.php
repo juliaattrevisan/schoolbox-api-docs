@@ -98,7 +98,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $selectCrocodocJoin
         $selectCrocodocWhere
         ORDER BY ssf.created_at DESC
-        LIMIT :limit OFFSET :offset
+        LIMIT 10 OFFSET :offset
     ");
 
     // Log
@@ -210,6 +210,18 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     // Rerun the select query over and over again in batches
     $stepCount = $crocodocCount;
     while ($stepCount > 0) {
+
+        // Fetch the next rowset.
+        // For wet runs: offset by 0 always
+        // (as each attempt marks the crocodoc as processed, and therefore not fetchable)
+        // For dry runs: offset by the processed count each step
+        $selectCrocodocQuery->bindInputs([
+            'offset' => [
+                'value' => $dryRun ? $successCount + $failureCount : 0,
+                'type'  => PDO::PARAM_INT,
+            ]
+        ]);
+
         foreach ($selectCrocodocQuery->executeIterator() as $row) {
             $stepCount--;
             $log->notice(sprintf('Archiving Crocodoc document "%s"...', $row['crocodocDocumentId']));
