@@ -46,6 +46,13 @@
                 </section>
             </div>
         </div>
+        <div id="lti-select-preloader" style="display:none;">
+            <div class="small-12 island">
+                <section class="content">
+                    <div class="loader"></div>
+                </section>
+            </div>
+        </div>
         <script>
             $(function() {
 
@@ -62,10 +69,52 @@
 
                 $('[data-provider]').click(function() {
 
+                    {# Display a preloader #}
+
+                    $('#lti-select-provider').hide();
+                    $('#lti-select-preloader').show();
+
+                    {# When a provider is clicked we need to dynamically update the component and launch the LTI request in its iframe #}
+
                     var providerId = $(this).data('provider');
-                    $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, providerId))
-                    .success(function() {
-                        window.location.reload();
+
+                    $.post(
+                        '{{ routeLookup('ltiConsumer.postComponentProvider', {
+                            providerId: 'providerId',
+                            componentId: componentInstanceId
+                        }) }}'.replace(/providerId/g, providerId)
+                    ).success(function(result) {
+                        var component = $('#component{{ componentInstanceId }}');
+
+                        {# Hide preloader #}
+
+                        $('#lti-select-preloader').hide();
+
+                        {# Update selected provider name in component configuration settings #}
+
+                        component.find('.ltiprovider').find('p').html(result.providerName);
+
+                        {# Update heading #}
+
+                        component.find('input[name="componentname"]').val(result.providerName);
+
+                        {# Update component heading #}
+
+                        component.find('h2').html(result.providerName);
+
+                        {# Launch LTI in the iframe and make it visibile #}
+
+                        var iframe = $('#lti-frame');
+
+                        iframe.attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, providerId));
+                        iframe.show();
+                    }).fail(function() {
+                        {# This shouldn't happen, but just in case something goes wrong #}
+
+                        $('#lti-select-preloader').hide();
+                        $('#lti-select-provider').show();
+
+                        alert('An unexpected error occurred while attempting to load the requested LTI provider, please try again.');
                     });
                 });
 

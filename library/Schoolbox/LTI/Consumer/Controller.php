@@ -75,12 +75,17 @@ class Controller extends Base
 
         $this->updateComponentValue($component, 'ltiprovider', $provider->getId());
         $this->updateComponentValue($component, 'componentname', $provider->getName());
-        $this->updateComponentValue($component, 'description', $post['url']);
+
+        if (isset($post['url'])) {
+            $this->updateComponentValue($component, 'description', $post['url']);
+        }
 
         $this->getResponse()->content->set([
             'format' => 'json',
             'data' => [
-                'result' => 'OK'
+                'result' => 'OK',
+                'providerName' => $provider->getName(),
+                'url' => $post['url']
             ]
         ]);
     }
