@@ -13,7 +13,7 @@
 >
   <testsuites>
     <testsuite name="default">
-      <directory suffix=".php">test/unit/</directory>
+      <directory suffix=".php">library/Proxy/</directory>
       <directory suffix=".php">library/Alaress/</directory>
       <directory suffix=".php">library/Schoolbox/</directory>
       <exclude>library/Alaress/Database/</exclude>

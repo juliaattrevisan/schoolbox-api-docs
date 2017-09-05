@@ -1,0 +1,48 @@
+# suite config
+suites:
+    acceptance:
+        actor: AcceptanceTester
+        path: .
+        modules:
+            enabled:
+                - WebDriver:
+                    url: http://192.168.36.10
+                    browser: chrome
+                    port: 9515
+                    window_size: false
+                    capabilities:
+                        chromeOptions:
+                            args: ["--headless", "--disable-gpu", "--window-size=1920x1080"]
+                            binary: "/usr/bin/google-chrome"
+                - \Helper\Acceptance
+                - Db:
+                    dsn: "mysql:host=localhost;dbname=schoolbox"
+                    user: "root"
+                    password: "tnp879"
+                    # dump goes here
+
+extensions:
+    enabled:
+        - Codeception\Extension\Logger
+        - Codeception\Extension\RunFailed
+        - Codeception\Extension\Recorder
+#        - Codeception\Extension\Recorder:
+#            delete_successful: false
+
+params: 
+    - env
+
+gherkin: []    
+
+# additional paths
+paths:
+    tests: test/acceptance
+    output: test/acceptance/_output
+    data: test/acceptance/_data
+    support: test/acceptance/_support
+    envs: test/acceptance/_envs
+
+settings:
+    shuffle: false
+    lint: true
+    bootstrap: ./_bootstrap.php

@@ -73,9 +73,6 @@
     "require-dev": {
         "lox/xhprof": "dev-master",
         "phpunit/phpunit": "~4.8.35",
-        "behat/behat": "2.5.*",
-        "behat/mink": "1.5.*",
-        "behat/mink-extension": "1.3.*",
-        "behat/mink-selenium2-driver": "1.1.*"
+        "codeception/codeception": "^2.3"
     }
 }

@@ -42,7 +42,7 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
         $campus3->setName('Cedars');
 
         $this->dummyUser = new Student();
-        $this->dummyUser->setCampus(new Collection([ $campus1, $campus2, $campus3 ]));
+        $this->dummyUser->setCampus(new Collection([$campus1, $campus2, $campus3]));
 
         $email1 = new Email();
         $email1->setAddress('apple.house@schoolbox.com.au');
@@ -67,10 +67,10 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
     public function stringCoercionDataToStringWithStringOutput()
     {
         return [
-            [ 'string', 'string' ],
-            [ 0, '0' ],
-            [ true, '1' ],
-            [ false, ''],
+            ['string', 'string'],
+            [0, '0'],
+            [true, '1'],
+            [false, ''],
         ];
     }
 
@@ -82,7 +82,7 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
     public function stringCoercionDataToStringWithObjectOutput()
     {
         return [
-            [ new ObjectReaderStringableClass('helloWorld'), new ObjectReaderStringableClass('helloWorld'), ],
+            [new ObjectReaderStringableClass('helloWorld'), new ObjectReaderStringableClass('helloWorld'),],
         ];
     }
 
@@ -94,8 +94,8 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
     public function stringCoercionDataInvalid()
     {
         return [
-            [ ['a','b','c'] ],
-            [ new stdClass() ],
+            [['a', 'b', 'c']],
+            [new stdClass()],
         ];
     }
 
@@ -103,7 +103,7 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
      * Test coercion of values to string
      *
      * @dataProvider stringCoercionDataToStringWithStringOutput
-     * @param mixed $input
+     * @param mixed  $input
      * @param string $expected
      */
     public function testCoerceToStringWithStringOutput($input, $expected)
@@ -118,7 +118,7 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
      * Test coercion of values to string
      *
      * @dataProvider stringCoercionDataToStringWithObjectOutput
-     * @param mixed $input
+     * @param mixed  $input
      * @param object $expected
      */
     public function testCoerceToStringWithObjectOutput($input, $expected)
@@ -154,9 +154,9 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
         $input = [
             'a' => [
                 'b' => [
-                    'c' => $value
-                ]
-            ]
+                    'c' => $value,
+                ],
+            ],
         ];
 
         $output = $reader->read($input, 'a.b.c');
@@ -177,9 +177,9 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
         $input = (object)[
             'a' => (object)[
                 'b' => (object)[
-                    'c' => $value
-                ]
-            ]
+                    'c' => $value,
+                ],
+            ],
         ];
 
         $output = $reader->read($input, 'a.b.c');
@@ -268,21 +268,21 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
         $input = (object)[
             'a' => (object)[
                 'b' => (object)[
-                    'c' => $value
-                ]
+                    'c' => $value,
+                ],
             ],
             'b' => (object)[
                 'c' => (object)[
                     'd' => $value,
-                    'e' => $value
+                    'e' => $value,
                 ],
                 'd' => (object)[
                     'e' => $value,
-                    'f' => $value
+                    'f' => $value,
                 ],
-                'e' => $value
+                'e' => $value,
             ],
-            'c' => $value
+            'c' => $value,
         ];
 
 

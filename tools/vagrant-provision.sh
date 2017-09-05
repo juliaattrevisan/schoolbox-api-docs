@@ -60,6 +60,15 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing IBM_DB2";
 apt-get install -u php7.1-ibmdb2;
 phpenmod ibm_db2;
 
+# Install chrome for headless tests
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing Google Chrome for headless tests";
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+echo "deb https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list
+apt-get update
+# Install Chromedriver reqs too:
+# unzip for extracting it, libgconf-2-4 for running it
+apt-get install -y google-chrome-stable unzip libgconf-2-4
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;

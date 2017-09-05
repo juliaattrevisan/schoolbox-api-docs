@@ -1,0 +1,294 @@
+<?php
+/**
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Learning\Assessment\Participant\Test;
+
+use PHPUnit_Framework_TestCase;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
+use Schoolbox\Learning\Assessment\Summator\Minimum;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+
+/**
+ * Tests that the various is*() state property methods work for Project Participants
+ *
+ * Also ensures the states are mutually exclusive
+ *
+ * @see Participant::isResponseRequired()
+ * @see Participant::isFeedbackRequired()
+ * @see Participant::isReviewComplete()
+ * @see Participant::hasSubmittedResponse()
+ * @see Participant::hasPublishedFeedback()
+ */
+class ProjectStatus extends PHPUnit_Framework_TestCase
+{
+    /**
+     * @dataProvider provider_requiresResponse_optionalSubAssessments
+     * @param Participant $participant
+     * @param bool        $isResponseRequired
+     */
+    public function test_requiresResponse_optionalSubAssessments(Participant $participant, $isResponseRequired)
+    {
+        $expected = $isResponseRequired;
+        $actual = $participant->isResponseRequired();
+
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_requiresResponse_mandatorySubAssessments
+     * @param Participant $participant
+     * @param bool        $isResponseRequired
+     */
+    public function test_requiresResponse_mandatorySubAssessments(Participant $participant, $isResponseRequired)
+    {
+        $expected = $isResponseRequired;
+        $actual = $participant->isResponseRequired();
+
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($expected ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_requiresFeedback
+     * @param Participant $participant
+     * @param bool        $isFeedbackRequired
+     */
+    public function test_requiresFeedback(Participant $participant, $isFeedbackRequired)
+    {
+        $actual = $participant->isFeedbackRequired();
+
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($isFeedbackRequired ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
+        $this->assertEquals($isFeedbackRequired, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_reviewComplete_optionalSubAssessments
+     * @param Participant $participant
+     * @param bool        $isReviewComplete
+     */
+    public function test_reviewComplete_optionalSubAssessments(Participant $participant, $isReviewComplete)
+    {
+        $actual = $participant->isReviewComplete();
+
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($isReviewComplete ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
+        $this->assertEquals($isReviewComplete, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_reviewComplete_mandatorySubAssessments
+     * @param Participant $participant
+     * @param bool        $isReviewComplete
+     */
+    public function test_reviewComplete_mandatorySubAssessments(Participant $participant, $isReviewComplete)
+    {
+        $actual = $participant->isReviewComplete();
+
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected: '" . ($isReviewComplete ? 'true' : 'false') . "', Actual: '" . ($actual ? 'true' : 'false') . "'";
+        $this->assertEquals($isReviewComplete, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_participants
+     * @param Participant $participant
+     */
+    public function test_mutual_exclusive_states_ifAllSame(Participant $participant)
+    {
+        /** @var Project $project */
+        $project = $participant->getAssessable();
+
+        // Only test the projects which have all sub-assessments in the same state.
+        foreach ($project->getAssessables() as $subAssessment) {
+            if ($subAssessment->isParticipant($participant->getUser())) {
+                $subParticipant = $subAssessment->getParticipant($participant->getUser());
+                $subResponseRequired = $subParticipant->isResponseRequired();
+                $subFeedbackRequired = $subParticipant->isFeedbackRequired();
+                $subReviewComplete = $subParticipant->isReviewComplete();
+
+                if ($subResponseRequired != $subFeedbackRequired || $subFeedbackRequired != $subReviewComplete) {
+                    return;
+                }
+            }
+        }
+
+        $countStates = 0;
+        if ($participant->isResponseRequired()) {
+            $countStates++;
+        }
+        if ($participant->isFeedbackRequired()) {
+            $countStates++;
+        }
+        if ($participant->isReviewComplete()) {
+            $countStates++;
+        }
+
+        $message = "User: {$participant->getUser()->getFirstname()}, Expected count: 1, Actual count: $countStates.";
+        $this->assertEquals(1, $countStates, $message);
+    }
+
+    // ================= Data Providers =================
+
+    public function provider_requiresResponse_optionalSubAssessments()
+    {
+        // Only 'Maximum' implies optionality
+        $project = DemoData::getProject(new Maximum());
+
+        return [
+            [$project->getParticipant(DemoData::getDemoStudent('A')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('B')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('C')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('D')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('E')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('F')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('G')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('H')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('I')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('J')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('K')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('L')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('M')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('N')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('O')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('P')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('Q')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('R')), false],
+        ];
+    }
+
+    public function provider_requiresResponse_mandatorySubAssessments()
+    {
+        // 'Minimum', 'Average', 'WeightedAverage' all imply assessments are not expected to be optional
+        $project = DemoData::getProject(new Minimum());
+
+        return [
+            [$project->getParticipant(DemoData::getDemoStudent('A')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('B')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('C')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('D')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('E')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('F')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('G')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('H')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('I')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('J')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('K')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('L')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('M')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('N')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('O')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('P')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('Q')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('R')), false],
+        ];
+    }
+
+    public function provider_requiresFeedback()
+    {
+        // Only 'Maximum' implies optionality
+        $project = DemoData::getProject();
+
+        return [
+            [$project->getParticipant(DemoData::getDemoStudent('A')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('B')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('C')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('D')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('E')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('F')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('G')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('H')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('I')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('J')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('K')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('L')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('M')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('N')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('O')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('P')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('Q')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('R')), true],
+        ];
+    }
+
+    public function provider_reviewComplete_optionalSubAssessments()
+    {
+        // Only 'Maximum' implies optionality
+        $project = DemoData::getProject(new Maximum());
+
+        return [
+            [$project->getParticipant(DemoData::getDemoStudent('A')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('B')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('C')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('D')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('E')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('F')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('G')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('H')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('I')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('J')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('K')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('L')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('M')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('N')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('O')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('P')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('Q')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('R')), false],
+        ];
+    }
+
+    public function provider_reviewComplete_mandatorySubAssessments()
+    {
+        // 'Minimum', 'Average', 'WeightedAverage' all imply assessments are not expected to be optional
+        $project = DemoData::getProject(new Minimum());
+
+        return [
+            [$project->getParticipant(DemoData::getDemoStudent('A')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('B')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('C')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('D')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('E')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('F')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('G')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('H')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('I')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('J')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('K')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('L')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('M')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('N')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('O')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('P')), false],
+            [$project->getParticipant(DemoData::getDemoStudent('Q')), true],
+            [$project->getParticipant(DemoData::getDemoStudent('R')), false],
+        ];
+    }
+
+
+    /**
+     * @return Participant[][]
+     */
+    public function provider_participants()
+    {
+        $data = [];
+        foreach (DemoData::getProject(new Minimum())->getAllParticipants() as $participant) {
+            $data[] = [$participant];
+        }
+        foreach (DemoData::getProject(new Maximum())->getAllParticipants() as $participant) {
+            $data[] = [$participant];
+        }
+        foreach (DemoData::getProject(new WeightedAverage())->getAllParticipants() as $participant) {
+            $data[] = [$participant];
+        }
+        foreach (DemoData::getProject(new Average())->getAllParticipants() as $participant) {
+            $data[] = [$participant];
+        }
+        return $data;
+    }
+}
