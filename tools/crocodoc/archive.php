@@ -43,7 +43,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     }
 
     $rescanFailed = $options['rescanFailed'];
-    if ($dryRun) {
+    if ($rescanFailed) {
         $log->notice('Attempting to rescan documents that have failed processing previously');
     }
 
