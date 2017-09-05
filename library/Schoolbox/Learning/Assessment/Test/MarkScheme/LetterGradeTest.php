@@ -29,28 +29,6 @@ class LetterGradeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RangeException
-     */
-    public function test_Normalised_Negative()
-    {
-        $normalised = -5;
-        $gradeGroup = $this->getDummyLetterGradeGroup();
-        $markScheme = new LetterGrade($gradeGroup);
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_Normalised_TooHigh()
-    {
-        $normalised = 100.1;
-        $gradeGroup = $this->getDummyLetterGradeGroup();
-        $markScheme = new LetterGrade($gradeGroup);
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
      * @dataProvider provider_normalisedToHumanReadable
      * @param float $normalised
      * @param string $expected
@@ -83,6 +61,7 @@ class LetterGradeTest extends \PHPUnit_Framework_TestCase
     public function provider_normalisedToHumanReadable()
     {
         return [
+            [-5,     'Needs Attention'],
             [0,      'Needs Attention'],
             [39,     'Needs Attention'],
             [39.999, 'Needs Attention'],
@@ -92,6 +71,7 @@ class LetterGradeTest extends \PHPUnit_Framework_TestCase
             [90,     'Excellent'],
             [100,    'Excellent'],
             [100.000,'Excellent'],
+            [100.1,  'Excellent'],
         ];
     }
 

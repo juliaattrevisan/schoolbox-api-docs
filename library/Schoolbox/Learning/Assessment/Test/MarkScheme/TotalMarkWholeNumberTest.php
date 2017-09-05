@@ -77,28 +77,6 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
-    /**
-     * @expectedException RangeException
-     */
-    public function test_GetHumanReadable_NegativeNumerator()
-    {
-        $normalised = -10;
-        $totalMark = 100;
-        $markScheme = new TotalMarkWholeNumber($totalMark);
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_NumeratorTooHigh()
-    {
-        $normalised = 100.25;
-        $totalMark = 100;
-        $markScheme = new TotalMarkWholeNumber($totalMark);
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
 
 
 
@@ -200,6 +178,7 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
     {
         $totalMark = 200;
         return [
+            [-1,    $totalMark,      '0 / 200'],
             [0,     $totalMark,      '0 / 200'],
             [0.05,   $totalMark,     '0 / 200'],
             [0.1,   $totalMark,   '0.25 / 200'],
@@ -214,6 +193,7 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
             [99.95,  $totalMark,   '200 / 200'],
             [100,   $totalMark,    '200 / 200'],
             [100.0, $totalMark,    '200 / 200'],
+            [100.1, $totalMark,    '200 / 200'],
         ];
     }
 
