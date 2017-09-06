@@ -230,9 +230,10 @@ class Module extends BaseModule
         );
 
         // TODO: Migrate this to DataSource
-        foreach ($responses as $r) {
-            if ($r->getId() == $responseId) {
-                return $r;
+
+        foreach ($responses as $responseCurrent) {
+            if ($responseCurrent->getId() == $responseId) {
+                return $responseCurrent;
             }
         }
 
@@ -253,9 +254,9 @@ class Module extends BaseModule
 
         // TODO: Migrate this to DataSource
 
-        foreach ($feedbacks as $f) {
-            if ($f->getId() == $feedbackId) {
-                return $f;
+        foreach ($feedbacks as $feedbackCurrent) {
+            if ($feedbackCurrent->getId() == $feedbackId) {
+                return $feedbackCurrent;
             }
         }
 
