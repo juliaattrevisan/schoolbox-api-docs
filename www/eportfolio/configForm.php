@@ -1,5 +1,8 @@
 <?php
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
+
+use Schoolbox\Mapper\Exception as MapperException;
+
 $kernel = require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
 $page = new SitePage();
@@ -80,15 +83,15 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
         elseif (is_numeric($_POST['add']) || is_numeric($_POST['reload'])) {
             if (is_numeric($_POST['add'])) {
-                $newComp = new Component_Instance();
-                $newComp
+                $component = new Component_Instance();
+                $component
                     ->setDefinitionId($_POST['add'])
                     ->setIdentifier($_POST['page_id'])
                     ->setModule('eportfolio')
                     ->setSequence(0)
                     ->setPosition('top');
 
-                $ids = $componentInstanceMapper->save($newComp);
+                $ids = $componentInstanceMapper->save($component);
 
                 $instanceID = $ids[0];
                 // Save the component's configuration here
@@ -112,49 +115,56 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
             // If this is a new component, set its name
             if (is_numeric($_POST['add'])) {
-                foreach ($component->getInstance()->getConfig() as $currentConfig) {
-                    /** @var Component_ConfigDefinition $currentConfig */
-                    if ($currentConfig->getKey() == 'componentname') {
-                        $configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
-                            'component_config_definition_id' => $currentConfig->getId(),
-                            'component_instance_id' => $_POST['from'],
-                        ))->first();
+                $componentInstance       = $component->getInstance();
+                $componentInstanceConfig = $componentInstance->getConfig();
 
-                        if ($configInstance instanceof Component_Config) {
-                            $componentName = $configInstance->getValue();
+                // Define configuration items to be copied. To be honest I don't know why we don't copy all the defaults, but I
+                // don't want to screw up school expectations by changing default behaviour, so I'm only adding the selected survey stuff
 
-                            /* Presave a config for this newly added component
-                             * so it always has the name we gave it
-                             */
+                $configurationToCopy = [
+                    'componentname',
+                    'survey',
+                    'size'
+                ];
+
+                /** @var Component_ConfigDefinition $currentConfig */
+                foreach ($componentInstance->getConfig() as $currentConfig) {
+                    if (in_array($currentConfig->getKey(), $configurationToCopy)) {
+                        try {
+                            $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList([
+                                'component_config_definition_id' => $currentConfig->getId(),
+                                'component_instance_id' => $_POST['from'],
+                            ]);
+
+                            $value = $configInstance->getValue();
+
                             $newConfigInstance = new Component_Config();
                             $newConfigInstance->setId(null);
                             $newConfigInstance->setConfigDefinitionId($currentConfig->getId());
-                            $newConfigInstance->setInstanceId($component->getInstance()->getId());
-                            $newConfigInstance->setValue($componentName);
+                            $newConfigInstance->setInstanceId($componentInstance->getId());
+                            $newConfigInstance->setValue($value);
 
                             Component_ConfigMapper::getInstance()->save($newConfigInstance);
 
-                            /* Force inherited name
-                             */
-                            $component->getInstance()->getConfig()->offsetGet($currentConfig->getId())
-                                ->setDefaultValue($componentName);
-                        } else {
-                            $componentName = $currentConfig->getDefaultValue();
+                            // Update the configuration item on the component in memory so that it renders properly later
+
+                            $component->setConfigValue($currentConfig->getKey(), $value);
+                        } catch (MapperException $e) {
+                            $value = $currentConfig->getDefaultValue();
                         }
                     }
                 }
             }
 
-            $renderer = new Component_Renderer();
-            $renderer->renderEportfolioComponent(
-                new Eportfolio_Page_Instance(
-                    $page,
-                    $eportfolioHandler->getPageInstance()->getUid(),
-                    $eportfolioHandler->getPageId(),
-                    FULL_ACCESS
-                ),
-                $component
+            $eportfolioPage = new Eportfolio_Page_Instance(
+                $page,
+                $eportfolioHandler->getPageInstance()->getUid(),
+                $eportfolioHandler->getPageId(),
+                FULL_ACCESS
             );
+
+            $renderer = new Component_Renderer();
+            $renderer->renderEportfolioComponent($eportfolioPage, $component);
         } /* AJAX new column widths
 		 */
         elseif (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
