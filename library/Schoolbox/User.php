@@ -1313,17 +1313,4 @@ class User implements JsonSerializable, ISoftDeletable
         $this->teacherCollection = $teacherCollection;
         return $this;
     }
-
-    /**
-     * Return the URL to the users portrait
-     *
-     * @param string $size
-     * @return string
-     */
-    public function getPortraitUrl($size = 'square80')
-    {
-        $baseUrl = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}";
-
-        return "{$baseUrl}portrait.php?userId={$this->getExternalId()}&size={$size}";
-    }
 }

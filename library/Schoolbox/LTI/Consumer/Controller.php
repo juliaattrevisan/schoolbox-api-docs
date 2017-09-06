@@ -144,7 +144,7 @@ class Controller extends Base
             'resource_link_title' => $component->getConfig('componentname'),
             'resource_link_description' => '',
             'user_id' => $user->getId(),
-            'user_image' => $user->getPortraitUrl(),
+            'user_image' => $this->getUserPortraitUrl($user),
             'roles' => $this->getLTIRole($user),
             'lis_person_name_given' => $user->getFirstname(),
             'lis_person_name_family' => $user->getLastname(),
@@ -310,6 +310,22 @@ class Controller extends Base
 
         return;
     }
+
+
+    /**
+     * Return the URL to the users portrait
+     *
+     * @param User $user
+     * @param string $size
+     * @return string
+     */
+    private function getUserPortraitUrl($user, $size = 'square80')
+    {
+        $baseUrl = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}";
+
+        return "{$baseUrl}portrait.php?userId={$user->getExternalId()}&size={$size}";
+    }
+
 
     /**
      * Return the LTI role for a schoolbox user
