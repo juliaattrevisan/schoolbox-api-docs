@@ -1,6 +1,6 @@
 {% if providers is empty %}
 
-    <div id="lti-select-provider" class="row " data-collapsable="true" data-collapse-state="uncollapsed">
+    <div id="lti-select-provider{{ componentInstanceId }}" class="row " data-collapsable="true" data-collapse-state="uncollapsed">
         <div class="small-12 island">
             <section>
                 <div class="empty-state">
@@ -27,7 +27,7 @@
     {% set learningfieldProviderId = '' %}
 
     {% if providerId is empty %}
-        <div id="lti-select-provider" class="row" data-collapsable="true" data-collapse-state="uncollapsed">
+        <div id="lti-select-provider{{ componentInstanceId }}" class="row" data-collapsable="true" data-collapse-state="uncollapsed">
             <div class="small-12 island">
                 <section>
                     <div class="empty-state">
@@ -52,7 +52,7 @@
                 </section>
             </div>
         </div>
-        <div id="lti-select-preloader" style="display:none;">
+        <div id="lti-select-preloader{{ componentInstanceId }}" style="display:none;">
             <div class="small-12 island">
                 <section class="content">
                     <div class="loader"></div>
@@ -62,8 +62,11 @@
         <script>
             $(function () {
 
+                var component = $('#component{{ componentInstanceId }}');
+
+
                 {% if foundLearningField %}
-                $('[data-provider-learningfield]').click(function () {
+                component.find('[data-provider-learningfield]').click(function () {
 
                     $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {
                         providerId: 'providerId',
@@ -76,15 +79,15 @@
                 });
                 {% endif %}
 
-                $('[data-provider]').click(function () {
+                component.find('[data-provider]').click(function () {
 
-                    var $toaster = $('#lti-toaster');
+                    var $toaster = $('#lti-toaster{{ componentInstanceId }}');
                     $toaster.toastActivate({text: 'Loading LTI Provider...'});
 
                     {# Display a preloader #}
 
-                    $('#lti-select-provider').hide();
-                    $('#lti-select-preloader').show();
+                    $('#lti-select-provider{{ componentInstanceId }}').hide();
+                    $('#lti-select-preloader{{ componentInstanceId }}').show();
 
                     {# When a provider is clicked we need to dynamically update the component and launch the #}
                     {# LTI request in its iframe #}
@@ -97,13 +100,12 @@
                             componentId: componentInstanceId
                         }) }}'.replace(/providerId/g, providerId)
                     ).success(function (result) {
-                        var component = $('#component{{ componentInstanceId }}');
 
                         {# Hide preloader #}
 
-                        $('#lti-select-preloader').hide();
+                        $('#lti-select-preloader{{ componentInstanceId }}').hide();
 
-                        $toaster.toastTimeout({text: 'Done'});
+                        $toaster.toastTimeout({text:'Component loaded'});
 
                         {# Update selected provider name in component configuration settings #}
 
@@ -119,7 +121,7 @@
 
                         {# Launch LTI in the iframe and make it visibile #}
 
-                        var iframe = $('#lti-frame');
+                        var iframe = $('#lti-frame{{ componentInstanceId }}');
 
                         iframe.attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {
                             providerId: 'providerId',
@@ -131,10 +133,10 @@
                     }).fail(function () {
                         {# This shouldn't happen, but just in case something goes wrong #}
 
-                        $('#lti-select-preloader').hide();
-                        $('#lti-select-provider').show();
+                        $('#lti-select-preloader{{ componentInstanceId }}').hide();
+                        $('#lti-select-provider{{ componentInstanceId }}').show();
 
-                        $toaster.toastTimeout({text: 'Error Loading LTI Provider', css: 'alert'});
+                        $toaster.toastTimeout({text: 'Unable to load LTI Provider', css: 'alert'});
                     });
                 });
 
@@ -154,7 +156,7 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
-        <iframe id="lti-frame" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
+        <iframe id="lti-frame{{ componentInstanceId }}" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
 
     {% else %}
         <iframe id="ltiFrame{{ componentInstanceId }}"
@@ -168,4 +170,4 @@
 
 {% endif %}
 
-<div id="lti-toaster" class="toast"></div>
+<div id="lti-toaster{{ componentInstanceId }}" class="toast"></div>
