@@ -338,7 +338,14 @@ class Crocodoc
 
 
                 // What feedback does this belong in?
-                $feedbackId = $this->findFeedbackId($systemUser, $log, $dryRun, $row);
+                $feedbackId = $this->findFeedbackId(
+                    $systemUser,
+                    $log,
+                    $dryRun,
+                    (int)$row['responseId'],
+                    (int)$row['studentId'],
+                    (int)$row['boxId']
+                );
                 if ($dryRun) {
                     $successCount++;
                     $log->info('Crocodoc document successfully attached to feedback');
@@ -475,23 +482,23 @@ class Crocodoc
      * @param User            $systemUser
      * @param LoggerInterface $log
      * @param bool            $dryRun
-     * @param array           $row
+     * @param int             $responseId
+     * @param int             $studentId
+     * @param int             $boxId
      * @return int The PK of the feedback ID in which to upload
      * @throws DatabaseException if a query breaks
      */
-    private function findFeedbackId(User $systemUser, LoggerInterface $log, $dryRun, $row)
+    private function findFeedbackId(User $systemUser, LoggerInterface $log, $dryRun, $responseId, $studentId, $boxId)
     {
-        $this->selectAttachedFeedbackQuery->execute([
-            'responseId' => $row['responseId'],
-        ]);
+        $this->selectAttachedFeedbackQuery->execute(['responseId' => $responseId,]);
         $feedbackId = $this->selectAttachedFeedbackQuery->fetchColumn();
         if ($feedbackId) {
             $log->debug(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
         } else {
             $log->debug('No non-floating feedback found - searching for floating feedback');
             $this->selectFloatingFeedbackQuery->execute([
-                'studentId' => $row['studentId'],
-                'boxId'     => $row['boxId'],
+                'studentId' => $studentId,
+                'boxId'     => $boxId,
             ]);
             $feedbackId = $this->selectFloatingFeedbackQuery->fetchColumn();
             if ($feedbackId) {
@@ -504,8 +511,8 @@ class Crocodoc
                 } else {
                     $this->insertNewFeedbackQuery->execute([
                         'systemUserId' => $systemUser->getId(),
-                        'studentId'    => $row['studentId'],
-                        'boxId'        => $row['boxId'],
+                        'studentId'    => $studentId,
+                        'boxId'        => $boxId,
                         'now'          => Alaress_Date_Format::now(),
                     ]);
                     $feedbackId = $this->database->lastInsertId();
