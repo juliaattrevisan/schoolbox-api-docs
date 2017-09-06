@@ -353,8 +353,7 @@ class Crocodoc
                     (int)$row['studentId'],
                     (int)$row['boxId'],
                     $systemUser->getId(),
-                    $dryRun,
-                    $this->log
+                    $dryRun
                 );
                 if ($dryRun) {
                     $successCount++;
