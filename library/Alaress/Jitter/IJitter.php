@@ -6,6 +6,8 @@
  */
 
 namespace Alaress\Jitter;
+use Exception;
+use Throwable;
 
 /**
  * Interface for jitter classes.
@@ -38,7 +40,8 @@ interface IJitter
      *
      * @param callable $callable
      * @return mixed Whatever `$callable` returns if it doesn't exception out
-     * @throws MaxRetriesExceededException if `$callable` never returned
+     * @throws Exception|Throwable if `$callable` never returned, rethrow the
+     *                             last exception it threw
      */
     public function retry(callable $callable);
 }

@@ -8,6 +8,8 @@
 namespace Alaress\Jitter;
 
 use Alaress\Random\IGenerator;
+use Exception;
+use Throwable;
 
 /**
  * Class Jitter
@@ -93,19 +95,29 @@ class Jitter implements IJitter
      *
      * @param callable $callable
      * @return mixed Whatever `$callable` returns if it doesn't exception out
-     * @throws MaxRetriesExceededException if `$callable` never returned
+     * @throws Exception|Throwable if `$callable` never returned, rethrow the
+     *                             last exception it threw
      */
     public function retry(callable $callable)
     {
         $retries = 0;
+        $lastException = null;
         while (true) {
-            $jitter = $this->calculateJitter($retries);
+            try {
+                $jitter = $this->calculateJitter($retries);
+            } catch (MaxRetriesExceededException $e) {
+                if ($lastException instanceof Exception || $lastException instanceof Throwable) {
+                    throw $lastException;
+                }
+                throw $e;
+            }
             if ($jitter > 0) {
                 usleep($jitter * 1000);
             }
             try {
                 return $callable();
             } catch (\Exception $e) {
+                $lastException = $e;
                 $retries++;
             }
         }
