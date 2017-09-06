@@ -8,7 +8,6 @@
 namespace Alaress\Jitter\Test;
 
 use Alaress\Jitter\Jitter;
-use Alaress\Jitter\MaxRetriesExceededException;
 use Alaress\Random\PredeterminedGenerator;
 use PHPUnit_Framework_TestCase;
 
@@ -49,12 +48,15 @@ class JitterTest extends PHPUnit_Framework_TestCase
         // Retry 5: random .9
         // 2 ^ (5-1) is greater than max retries, so multiply by that instead
         $this->assertEquals(450, $jitter->calculateJitter(5));
+
+        // Retry 6: too many
+        $this->assertTrue($jitter->tooManyRetries(6));
     }
 
     /**
      * Test jitter object when max retries is exceeded
      *
-     * @expectedException MaxRetriesExceededException
+     * @expectedException \Alaress\Jitter\MaxRetriesExceededException
      */
     public function testJitterMaxRetries()
     {

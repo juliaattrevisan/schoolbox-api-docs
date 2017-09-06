@@ -13,6 +13,14 @@ namespace Alaress\Jitter;
 interface IJitter
 {
     /**
+     * Is $retries above max retries?
+     *
+     * @param int $retries
+     * @return bool
+     */
+    public function tooManyRetries($retries);
+
+    /**
      * Calculates jitter based on amount of time.
      *
      * If the last request failed, wait a little while before trying again.

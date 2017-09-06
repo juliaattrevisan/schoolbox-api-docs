@@ -50,6 +50,17 @@ class Jitter implements IJitter
     }
 
     /**
+     * Is $retries above max retries?
+     *
+     * @param int $retries
+     * @return bool
+     */
+    public function tooManyRetries($retries)
+    {
+        return $retries > $this->maxRetries;
+    }
+
+    /**
      * Calculates jitter based on amount of time.
      *
      * If the last request failed, wait a little while before trying again.
@@ -66,7 +77,7 @@ class Jitter implements IJitter
         }
 
         // Too many failures? error out
-        if ($retries > $this->maxRetries) {
+        if ($this->tooManyRetries($retries)) {
             throw new MaxRetriesExceededException(sprintf('Maximum of %d retries exceeded', $this->maxRetries));
         }
 
