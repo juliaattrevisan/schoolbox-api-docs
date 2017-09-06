@@ -1,0 +1,1 @@
+UPDATE component_config_definition SET default_value = '800' WHERE default_value = '200' and `key` = 'pixel';
