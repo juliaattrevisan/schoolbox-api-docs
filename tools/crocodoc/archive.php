@@ -10,7 +10,7 @@
 
 use Alaress\Database\Connector\IConnector;
 use Aura\Di;
-use Guzzle\Http\Client as HttpClient;
+use GuzzleHttp\Client as HttpClient;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Learning\InlineGrader\Archiver\Crocodoc as CrocodocArchiver;

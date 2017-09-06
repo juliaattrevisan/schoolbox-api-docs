@@ -11,7 +11,8 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
-use Guzzle\Http\Client as HttpClient;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Request;
 use Guzzle\Http\Message\Response;
 use PDO;
 use Psr\Log\LoggerInterface;
@@ -35,7 +36,7 @@ class Crocodoc
     private $database;
 
     /**
-     * @var HttpClient
+     * @var ClientInterface
      */
     private $httpClient;
 
@@ -131,11 +132,11 @@ class Crocodoc
      * Build the archiver.
      *
      * @param IConnector      $database
-     * @param HttpClient      $httpClient
+     * @param ClientInterface $httpClient
      * @param StorageMapper   $storageMapper
      * @param LoggerInterface $log
      */
-    public function __construct(IConnector $database, HttpClient $httpClient, StorageMapper $storageMapper, LoggerInterface $log)
+    public function __construct(IConnector $database, ClientInterface $httpClient, StorageMapper $storageMapper, LoggerInterface $log)
     {
         $this->database = $database;
         $this->httpClient = $httpClient;
@@ -380,7 +381,7 @@ class Crocodoc
                 // Try to download the annotated Crocodocument
                 /** @var Response $response */
                 try {
-                    $response = $this->httpClient->get($facade->getDownloadUrl())->send();
+                    $response = $this->httpClient->send(new Request('GET', $facade->getDownloadUrl()));
                 } catch (RuntimeException $e) {
                     // skip this one; consider jittering
                     $this->log->warning(
