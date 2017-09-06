@@ -13,8 +13,8 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
-use Guzzle\Http\Message\Response;
 use PDO;
+use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
@@ -379,7 +379,6 @@ class Crocodoc
 
 
                 // Try to download the annotated Crocodocument
-                /** @var Response $response */
                 try {
                     $response = $this->httpClient->send(new Request('GET', $facade->getDownloadUrl()));
                 } catch (RuntimeException $e) {
@@ -396,7 +395,8 @@ class Crocodoc
                     $sequentialFailures++;
                     continue;
                 }
-                if ($response->isError()) {
+
+                if ($response->getStatusCode() >= 400) {
                     // skip this one; consider jittering
                     // Also consider exiting completely if there's too many errors
                     $responseJson = json_decode($response, true);
@@ -404,7 +404,7 @@ class Crocodoc
                         sprintf(
                             'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
                             $response->getStatusCode(),
-                            $response->getMessage()
+                            $responseJson['error']
                         )
                     );
                     $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $responseJson['error']);
@@ -415,7 +415,7 @@ class Crocodoc
 
 
                 // Now store it and create a feedback for it
-                $storageModel = $this->uploadCrocodocToStorage($response, $filename);
+                $storageModel = $this->uploadCrocodocToStorage($response->getBody(), $filename);
                 $feedbackFileId = $this->archiveCrocodocInFeedback($storageModel, $feedbackId, $filename);
 
 
@@ -481,13 +481,13 @@ class Crocodoc
      * Uploads a Crocodoc document into storage, for later attachment to a
      * feedback file.
      *
-     * @param Response $result
-     * @param string   $filename
+     * @param StreamInterface $result
+     * @param string          $filename
      * @return StorageModel
      */
-    private function uploadCrocodocToStorage(Response $result, $filename)
+    private function uploadCrocodocToStorage(StreamInterface $result, $filename)
     {
-        return $this->storageMapper->acceptStream('return_' . $filename . '.pdf', $result->getBody());
+        return $this->storageMapper->acceptStream('return_' . $filename . '.pdf', $result->getContents());
     }
 
     /**
