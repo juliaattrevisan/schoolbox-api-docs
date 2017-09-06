@@ -23,7 +23,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
-use Schoolbox\ResourceBooking\Item\ModerationType\Model as ModerationTypeModel;
 
 class Controller extends Base
 {
@@ -259,6 +258,18 @@ class Controller extends Base
                 $isTimeChanged
             );
 
+            // Get the date and time changes from original booking
+            $startDelta = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getStartDateTime()->getDateTimeObject(),
+                $originalStart
+            );
+            $endDelta = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getEndDateTime()->getDateTimeObject(),
+                $originalEnd
+            );
+
+            $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
+            
             // Save the whole series
             $bookingList = new Collection();
             foreach ($series as $booking) {
@@ -269,26 +280,12 @@ class Controller extends Base
                 $event->setDetail($booking->getNotes());
                 $this->eventMapper->save($event);
 
-                // Get the date and time changes from original booking
-                $startDelta = Interval::createFromDateTimeDifference(
-                    $item->getEvent()->getStartDateTime()->getDateTimeObject(),
-                    $originalStart
-                );
-                $endDelta = Interval::createFromDateTimeDifference(
-                    $item->getEvent()->getEndDateTime()->getDateTimeObject(),
-                    $originalEnd
-                );
-
-                $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
-
                 //If item is moderated, already approved, and time changed, set item to need approval again
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId = $booking->getStatus()->getId();
-                if ($moderationId == ModerationTypeModel::TYPE_MODERATED &&
+                if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
                     $statusId == Status\Model::STATUS_APPROVED && $isTimeChanged) {
-                    $status = new Status\Model();
-                    $status->setId(Status\Model::STATUS_PENDING);
-                    $booking->setStatus($status);
+                    $booking->getStatus()->setId(Status\Model::STATUS_PENDING);
                 }
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
