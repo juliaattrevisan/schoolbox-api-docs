@@ -9,6 +9,8 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Jitter\Jitter;
+use Alaress\Random\FloatGenerator;
 use Aura\Di;
 use GuzzleHttp\Client as HttpClient;
 use Psr\Log\LoggerInterface as Logger;
@@ -70,6 +72,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $mapperFactory = $di->get('mapperFactory');
     $userMapper = $mapperFactory->get(UserMapper::class);
     $storageMapper = $mapperFactory->get(StorageMapper::class);
+    $jitter = new Jitter(new FloatGenerator(), 3, 500);
 
 
     // Figure out a system user
@@ -84,7 +87,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
 
-    $archiver = new CrocodocArchiver($db, $httpClient, $storageMapper, $log);
+    $archiver = new CrocodocArchiver($db, $httpClient, $jitter, $storageMapper, $log);
     $result = $archiver->archive($systemUser, $dryRun, $rescanFailed);
     if ($result['failed'] > 0) {
         exit(1);

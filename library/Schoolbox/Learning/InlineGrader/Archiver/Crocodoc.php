@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\InlineGrader\Archiver;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Statement\Query\IQuery;
+use Alaress\Jitter\IJitter;
 use Alaress_Date_Format;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
@@ -49,6 +50,11 @@ class Crocodoc
      * @var LoggerInterface
      */
     private $log;
+
+    /**
+     * @var IJitter
+     */
+    private $jitter;
 
     // -- Queries
 
@@ -133,13 +139,20 @@ class Crocodoc
      *
      * @param IConnector      $database
      * @param ClientInterface $httpClient
+     * @param IJitter         $jitter
      * @param StorageMapper   $storageMapper
      * @param LoggerInterface $log
      */
-    public function __construct(IConnector $database, ClientInterface $httpClient, StorageMapper $storageMapper, LoggerInterface $log)
-    {
+    public function __construct(
+        IConnector $database,
+        ClientInterface $httpClient,
+        IJitter $jitter,
+        StorageMapper $storageMapper,
+        LoggerInterface $log
+    ) {
         $this->database = $database;
         $this->httpClient = $httpClient;
+        $this->jitter = $jitter;
         $this->storageMapper = $storageMapper;
         $this->log = $log;
         $this->setupQueries();
