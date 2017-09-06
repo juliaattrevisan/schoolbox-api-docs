@@ -37,4 +37,24 @@ interface IAssessmentContextDataModel
      * @return int
      */
     public function getId();
+
+    /**
+     * Is this a context for specification assessments?
+     *
+     * Specification assessments can be used as a template for creating
+     * implementation assessments, in which students actually participate.
+     *
+     * @return bool
+     */
+    public function isSpecificationContext();
+
+    /**
+     * Is this a context for implementation assessments?
+     *
+     * Implementation assessments are the assessments in which students
+     * actually participate.
+     *
+     * @return bool
+     */
+    public function isImplementationContext();
 }

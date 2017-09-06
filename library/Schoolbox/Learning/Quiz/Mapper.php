@@ -227,18 +227,33 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
      *
      * @param  Model $object
      * @param  Model|null $previous
-     * @return true
+     * @return bool
      */
     public function updateExternalMarkbook(Model $object, $previous = null)
     {
+        // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
+        if($this->isAssessmentSpecification($object)){
+            return false;
+        }
+
         $externalMarkbook = new \External_Markbook();
         $activityFactory = new ActivityFactory();
         if (is_null($previous)) {
-            $externalMarkbook->createAssessment($activityFactory->buildFromOnlineAssessment($object, 'upcoming'));
-        } else {
-            $externalMarkbook->updateAssessment($activityFactory->buildFromOnlineAssessment($object, 'upcoming'));
+            return $externalMarkbook->createAssessment($activityFactory->buildFromOnlineAssessment($object, 'upcoming'));
         }
-        return true;
+        return $externalMarkbook->updateAssessment($activityFactory->buildFromOnlineAssessment($object, 'upcoming'));
+    }
+
+
+    /**
+     * @param Model $quiz
+     * @return bool
+     */
+    private function isAssessmentSpecification(Model $quiz)
+    {
+        /** @var Schoolbox\Learning\Assessment\DataModel\Model $assessment */
+        $assessment = $this->getJoinMapper('am')->findById($quiz->getAssessmentModel()->getId());
+        return $assessment->getAssessmentContext()->isSpecificationContext();
     }
 
     /**
