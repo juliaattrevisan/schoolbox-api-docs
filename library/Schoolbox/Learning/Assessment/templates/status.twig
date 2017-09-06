@@ -52,7 +52,7 @@
 
             <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
 
-            {{ markVisibilityMeta.markVisibility(assessment) }}
+            {{ markVisibilityMeta.markVisibility(assessment, false) }}
 
             {% if readonly %}
                 <li class="icon-archive">Term has been archived</li>

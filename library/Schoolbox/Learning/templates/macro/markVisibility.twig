@@ -2,12 +2,12 @@
  # Display the mark visiblity for an assessment
  # Note: you may need to name this something other than 'markVisibility' when you import, due to naming conflict.
  #}
-{% macro markVisibility(assessment) %}
+{% macro markVisibility(assessment, plural = false) %}
     {% if assessment.markVisibility == 2 %}
-        <li class="icon-staff">Marks visible to staff, students and parents</li>
+        <li class="icon-staff">{{ (plural) ? locale.properPlural : locale.proper }} visible to staff, students and parents</li>
     {% elseif assessment.markVisibility == 1 %}
-        <li class="icon-staff-students">Marks visible to staff and students</li>
+        <li class="icon-staff-students">{{ (plural) ? locale.properPlural : locale.proper }} visible to staff and students</li>
     {% elseif assessment.markVisibility == 0 %}
-        <li class="icon-teacher">Marks visible to staff</li>
+        <li class="icon-teacher">{{ (plural) ? locale.grades.properPlural : locale.grades.proper }} visible to staff</li>
     {% endif %}
 {% endmacro %}
