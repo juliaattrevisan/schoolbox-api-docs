@@ -71,8 +71,8 @@ class Module extends BaseModule
             '/{studentId}/download/{documentId}/source/{source}',
             'getDownload',
             $permission,
-            $preloader)
-        ;
+            $preloader
+        );
     }
 
     /**
