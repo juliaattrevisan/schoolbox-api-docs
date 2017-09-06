@@ -70,7 +70,7 @@ class Module extends BaseModule
                 /** @var int $assessmentId */
                 $assessmentId = $feedback['assessmentId'];
 
-                $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
+                $assessment = $this->getAssessmentDataSource()->findById((int)$assessmentId);
 
                 // Make sure the current user has access to write to the folder in which the assessable is located
 
