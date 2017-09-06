@@ -283,7 +283,6 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 );
 
                 $renderer->renderEportfolioComponent($eportfolioPage, $component);
-                exit;
             } else {
                 SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
             }

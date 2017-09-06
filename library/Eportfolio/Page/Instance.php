@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\User;
+
 /**
  * Eportfolio_Page
  *
@@ -176,6 +179,29 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             $i = 0;
             $previous = new Component_Instance();
             foreach ($instanceCollection as $component) {
+
+                // The ePortfolio Survey component should only be visible to non-superusers if it has a survey selected,
+                // otherwise there is nothing they can do with it- and if they try to add it to their ePortfolio page
+                // they will receive an error message
+
+                // Annoyingly the `$this->getUser()` method returns the ePortfolio page owner, not the current logged
+                // in user, so we have to read the user from the session directly.
+
+                /** @var User $sessionUser */
+                $sessionUser = $_SESSION['user'];
+
+                if (!$sessionUser->isSuperuser()) {
+                    $componentClass = $component->getDefinition()->getClass();
+
+                    if ($componentClass == 'Custom\Loyola\Survey\Component\Eportfolio\Controller') {
+                        $configSurvey = $component->getConfigByKey('survey');
+                        if (empty($configSurvey->getValue())) {
+                            // Survey value was not set in the configuration, skip this component
+                            continue;
+                        }
+                    }
+                }
+
                 /** @var Component_Instance $component */
                 ++$i;
                 $class = $component->getDefinition()->getCssClass();
