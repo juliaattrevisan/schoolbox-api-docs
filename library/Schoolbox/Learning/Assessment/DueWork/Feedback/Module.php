@@ -4,6 +4,7 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Authorizer\Failure\Forbidden;
@@ -11,35 +12,39 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use InvalidArgumentException;
+use Schoolbox\Assessment\Term;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
-use \Twig_Loader_Chain;
-use Schoolbox\Assessment\Term;
+use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
-    /**
-     * @inheritdoc
-     */
+    /** @var string $basename */
     protected $basename = 'learningDueWorkFeedback';
-
 
     /**
      * Hook method for setting up routes via self::register()
      *
      * @return void
      * @throws Forbidden If user authenticated but lacks perms for request
-     * @throws \InvalidArgumentException If assessment's due date is null
+     * @throws InvalidArgumentException If assessment's due date is null
      */
     protected function registerRoutes()
     {
-        // rules
+        // Rules
+
         $canGiveFeedbackFromParticipant = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\All(
@@ -78,7 +83,7 @@ class Module extends BaseModule
             }
 
             if (count($ruleArguments) > 0) {
-                $ruleClass = new \ReflectionClass(Rule\All::class);
+                $ruleClass           = new \ReflectionClass(Rule\All::class);
                 $rulesHomepageAccess = $ruleClass->newInstanceArgs($ruleArguments);
             }
         }
@@ -124,20 +129,47 @@ class Module extends BaseModule
         $participantRoute = $assessmentRoute . '/{studentId:\d+}';
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
-        $this->register('POST', "/$participantRoute/feedback", 'postParticipantFeedback', $canGiveFeedbackFromParticipant, $preloadParticipant); // p
-        $this->register('POST', "/assessments/feedbacks", 'postParticipantFeedbacks', $canGiveFeedbackFromAllParticipants);
-        $this->register('POST', "/$participantRoute{/responseId}/feedback", 'postResponseFeedback', $canGiveFeedbackFromParticipant, $preloadParticipantAndResponse); // p
-        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute", 'deleteAssessmentFeedback', $canDeleteFeedback, $preloadFeedback); // f
+        $this->register(
+            'POST',
+            "/{$participantRoute}/feedback",
+            'postParticipantFeedback',
+            $canGiveFeedbackFromParticipant,
+            $preloadParticipant
+        );
+
+        $this->register(
+            'POST',
+            "/assessments/feedbacks",
+            'postParticipantFeedbacks',
+            $canGiveFeedbackFromAllParticipants
+        );
+
+        $this->register(
+            'POST',
+            "/{$participantRoute}{/responseId}/feedback",
+            'postResponseFeedback',
+            $canGiveFeedbackFromParticipant,
+            $preloadParticipantAndResponse
+        );
+
+        $this->register(
+            'DELETE',
+            "/{$assessmentRoute}/$feedbackRoute",
+            'deleteAssessmentFeedback',
+            $canDeleteFeedback,
+            $preloadFeedback
+        );
     }
 
     /**
      * @inheritdoc
+     *
+     * @param Twig_Loader_Chain $templateLoader
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
 
     /**
      * Override with any steps required for a controller and its routes
@@ -161,6 +193,8 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
+     *
+     * @param ContainerInterface $injector
      */
     public function initControllers(ContainerInterface $injector)
     {
@@ -195,14 +229,14 @@ class Module extends BaseModule
             $this->getAssessmentDataSource()->findById($assessmentId)
         );
 
-        // TODO migrate this to DataSource
+        // TODO: Migrate this to DataSource
         foreach ($responses as $r) {
             if ($r->getId() == $responseId) {
                 return $r;
             }
         }
 
-        throw new MapperException("Response '$responseId' not found for assessment '$assessmentId'.");
+        throw new MapperException("Response '{$responseId}' not found for assessment '{$assessmentId}'.");
     }
 
     /**
@@ -217,14 +251,15 @@ class Module extends BaseModule
             $this->getAssessmentDataSource()->findById($assessmentId)
         );
 
-        // TODO migrate this to DataSource
+        // TODO: Migrate this to DataSource
+
         foreach ($feedbacks as $f) {
             if ($f->getId() == $feedbackId) {
                 return $f;
             }
         }
 
-        throw new MapperException("Feedback '$feedbackId' not found for assessment '$assessmentId'.");
+        throw new MapperException("Feedback '{$feedbackId}' not found for assessment '{$assessmentId}'.");
     }
 
     /**
@@ -236,16 +271,16 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper|Term\Mapper
-     * @throws \InvalidArgumentException If unable to find mapper class
+     * @return Mapper|TermMapper
+     * @throws InvalidArgumentException If unable to find mapper class
      */
     private function getTermMapper()
     {
-        return $this->getMapperFactory()->get(Term\Mapper::class);
+        return $this->getMapperFactory()->get(TermMapper::class);
     }
 
     /**
-     * @return object|Assessment\DataModel\MapperProxy
+     * @return object|AssessmentDataSource
      */
     public function getAssessmentDataSource()
     {
@@ -253,7 +288,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return object|Participant\DataSource
+     * @return object|ParticipantDataSource
      */
     public function getParticipantDataSource()
     {
@@ -261,7 +296,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return object|Assessment\Response\DataSource
+     * @return object|ResponseDataSource
      */
     public function getResponseDataSource()
     {
@@ -269,7 +304,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return object|Assessment\Feedback\DataSource
+     * @return object|FeedbackDataSource
      */
     public function getFeedbackDataSource()
     {
