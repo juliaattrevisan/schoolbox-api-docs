@@ -339,12 +339,12 @@ class Crocodoc
 
                 // What feedback does this belong in?
                 $feedbackId = $this->findFeedbackId(
-                    $systemUser->getId(),
-                    $log,
-                    $dryRun,
                     (int)$row['responseId'],
                     (int)$row['studentId'],
-                    (int)$row['boxId']
+                    (int)$row['boxId'],
+                    $systemUser->getId(),
+                    $dryRun,
+                    $log
                 );
                 if ($dryRun) {
                     $successCount++;
@@ -400,7 +400,7 @@ class Crocodoc
 
                 // Now store it and create a feedback for it
                 $storageModel   = $this->uploadCrocodocToStorage($response, $filename);
-                $feedbackFileId = $this->archiveCrocodocInFeedback($log, $storageModel, $feedbackId, $filename);
+                $feedbackFileId = $this->archiveCrocodocInFeedback($storageModel, $feedbackId, $filename, $log);
 
 
                 // Done
@@ -479,16 +479,16 @@ class Crocodoc
      * 2. most recent floating feedback for this participant
      * 3. a new draft feedback for this participant (not created if `$dryRun` is on)
      *
-     * @param int             $systemUserId
-     * @param LoggerInterface $log
+     * @param int             $responseId The ID of the student's response
+     * @param int             $studentId The student's ID
+     * @param int             $boxId The ID of the submission box to which the response belongs to
+     * @param int             $systemUserId A user ID to use as the owner for a new feedback, if required
      * @param bool            $dryRun
-     * @param int             $responseId
-     * @param int             $studentId
-     * @param int             $boxId
+     * @param LoggerInterface $log
      * @return int The PK of the feedback ID in which to upload
      * @throws DatabaseException if a query breaks
      */
-    private function findFeedbackId($systemUserId, LoggerInterface $log, $dryRun, $responseId, $studentId, $boxId)
+    private function findFeedbackId($responseId, $studentId, $boxId, $systemUserId, $dryRun, LoggerInterface $log)
     {
         $this->selectAttachedFeedbackQuery->execute(['responseId' => $responseId,]);
         $feedbackId = $this->selectAttachedFeedbackQuery->fetchColumn();
@@ -526,14 +526,14 @@ class Crocodoc
     /**
      * Archives the uploaded Crocodoc document in a feedback.
      *
-     * @param LoggerInterface $log
-     * @param int             $feedbackId
      * @param StorageModel    $storageModel
+     * @param int             $feedbackId
      * @param string          $filename
+     * @param LoggerInterface $log
      * @return int The PK of the new feedback file ID in which the Crocodoc was uploaded
      * @throws DatabaseException if a query breaks
      */
-    private function archiveCrocodocInFeedback(LoggerInterface $log, StorageModel $storageModel, $feedbackId, $filename)
+    private function archiveCrocodocInFeedback(StorageModel $storageModel, $feedbackId, $filename, LoggerInterface $log)
     {
         // Attach to the feedback, if it isn't already
         $this->selectExistingFeedbackFileQuery->execute([
