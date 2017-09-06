@@ -11,35 +11,12 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
-use Schoolbox\Mapper\Exception as MapperException;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $basename = 'lti';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        $routes = [
-            'GET' => [
-            ],
-            'POST' => [
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias)
-            $this->addGetRoute($router, $alias, $basePath, $path);
-
-        foreach ($routes['POST'] as $path => $alias)
-            $this->addPostRoute($router, $alias, $basePath, $path);
-    }
 
     /**
      * {@inheritdoc}
@@ -54,7 +31,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**
