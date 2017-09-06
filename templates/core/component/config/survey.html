@@ -1,8 +1,8 @@
-<input id="component-survey-{COMPONENT_CONFIG_ID}" name="survey" value="{COMPONENT_CONFIG_VALUE}">
+<input id="component-survey-{COMPONENT_INSTANCE_ID}-{COMPONENT_CONFIG_ID}" name="survey" value="{COMPONENT_CONFIG_VALUE}">
 
 <script>
     $(function() {
-        $('#component-survey-{COMPONENT_CONFIG_ID}').selectizeSelector({
+        $('#component-survey-{COMPONENT_INSTANCE_ID}-{COMPONENT_CONFIG_ID}').selectizeSelector({
             ajax: {
                 url: '/survey/ajax',
                 type: 'GET',
