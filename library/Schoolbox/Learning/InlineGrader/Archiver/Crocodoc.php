@@ -308,9 +308,9 @@ class Crocodoc
      * @param User $systemUser
      * @param bool $dryRun
      * @param bool $retryFailed
-     * @param int  $maxSkips              Maximum tolerable skipped documents in a row.
-     *                                    Sequential failures suggest something
-     *                                    is broken that needs attention.
+     * @param int  $maxSkips Maximum tolerable skipped documents in a row.
+     *                       Sequential failures suggest something broken
+     *                       in either Crocodoc or our configuration.
      * @return array attempted:  number of items we attempted to archive
      *               successful: number of items successfully archived
      *               failed:     number that failed for whatever reason
