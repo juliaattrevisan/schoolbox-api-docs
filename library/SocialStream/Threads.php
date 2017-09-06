@@ -209,7 +209,7 @@ class Threads
         /* Determine whether you have access to the input form
          */
         $newPost       = new \SocialStream_Post_String();
-        $currentUser   = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+        $currentUser   = $_SESSION['user'];
         $authenticator = new Authenticator($newPost, $this->getInstance(), $currentUser);
 
         /* Simply hide the comment icon if you can't view it
