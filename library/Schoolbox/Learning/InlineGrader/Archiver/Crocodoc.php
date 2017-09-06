@@ -354,7 +354,6 @@ class Crocodoc
 
             $breakCompletely = false;
             foreach ($selectCrocodocQuery->executeIterator() as $row) {
-
                 $fileId = (int)$row['fileId'];
                 $crocodocDocumentId = $row['crocodocDocumentId'];
                 $filename = $row['fileName'];
