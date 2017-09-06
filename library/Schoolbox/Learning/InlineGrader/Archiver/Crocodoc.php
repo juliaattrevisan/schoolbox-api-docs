@@ -341,7 +341,6 @@ class Crocodoc
         // Rerun the select query over and over again in batches
         $stepCount = $crocodocCount;
         while ($stepCount > 0) {
-
             // Fetch the next rowset.
             // For wet runs: offset by 0 always
             // (as each attempt marks the crocodoc as processed, and therefore not fetchable)
@@ -613,11 +612,11 @@ class Crocodoc
     /**
      * Log what is happening with the archive process to the database.
      *
-     * @param int    $fileId
-     * @param int?   $feedbackFileId
-     * @param string $crocodocDocumentId
-     * @param string $status
-     * @param string $message
+     * @param int      $fileId
+     * @param int|null $feedbackFileId
+     * @param string   $crocodocDocumentId
+     * @param string   $status
+     * @param string   $message
      *
      * @throws DatabaseException if the log query breaks
      */
