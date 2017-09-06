@@ -1,7 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
-{% import '@learning/macro/markVisibility.twig' as markVisibilityMeta %}
+{% import '@learning/macro/markVisibilityMeta.twig' as markVisibilityMeta %}
 
 {# data-attributes (same for all assessment types) #}
 {% set statusIncomplete = 'incomplete' %}
@@ -52,7 +52,7 @@
 
             <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
 
-            {{ markVisibilityMeta.markVisibility(assessment, false) }}
+            {{ markVisibilityMeta.markVisibilityMeta(assessment, false) }}
 
             {% if readonly %}
                 <li class="icon-archive">Term has been archived</li>
