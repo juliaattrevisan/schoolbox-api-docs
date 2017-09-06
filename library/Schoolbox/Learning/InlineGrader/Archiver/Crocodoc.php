@@ -381,7 +381,7 @@ class Crocodoc
                     $log->warning(
                         sprintf(
                             'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
-                            $responseJson['error'],
+                            $response->getStatusCode(),
                             $response->getMessage()
                         )
                     );
