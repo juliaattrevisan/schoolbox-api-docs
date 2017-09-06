@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
