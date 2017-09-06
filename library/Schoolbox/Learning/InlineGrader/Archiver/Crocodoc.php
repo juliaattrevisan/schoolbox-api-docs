@@ -11,7 +11,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Jitter\IJitter;
-use Alaress\Jitter\MaxRetriesExceededException;
 use Alaress_Date_Format;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
@@ -193,7 +192,7 @@ class Crocodoc
             AND   ss.submitted_at IS NOT NULL
         ";
         $crocodocWhereUnarchived = $crocodocWhere . "AND log.status IS NULL";
-        $crocodocWhereFailed = $crocodocWhere . "AND log.status = 'failed'";
+        $crocodocWhereFailed = $crocodocWhere . "AND log.status != 'complete'";
 
         $this->selectUnarchivedCrocodocQuery = $this->database->prepareQuery("
             $crocodocSelect
