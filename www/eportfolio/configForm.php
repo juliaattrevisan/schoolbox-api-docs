@@ -224,7 +224,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             // Prepare filter value
 
             if (isset($config['filter'])) {
-                // Tetrieve the instance so we know how to insert this data
+                // Retrieve the instance so we know how to insert this data
                 $cclass = $instance->getDefinition()->getClass();
 
                 /** @var Component_ControllerAbstract $controller */
