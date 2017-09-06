@@ -33,6 +33,12 @@ use Schoolbox\User;
  */
 class Crocodoc
 {
+
+    const STATUS_PENDING = 'pending';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_FAILED = 'failed';
+
     /**
      * @var IConnector
      */
@@ -382,7 +388,7 @@ class Crocodoc
 
 
                 // Log where we're at
-                $this->logToDatabase($fileId, null, $crocodocDocumentId, 'processing', '');
+                $this->logToDatabase($fileId, null, $crocodocDocumentId, self::STATUS_PROCESSING, '');
 
 
                 // Connect to the Crocodoc thing
@@ -414,7 +420,13 @@ class Crocodoc
                         return $response;
                     });
                 } catch (\Exception $e) {
-                    $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $e->getMessage());
+                    $this->logToDatabase(
+                        $fileId,
+                        null,
+                        $crocodocDocumentId,
+                        self::STATUS_FAILED,
+                        $e->getMessage()
+                    );
                     $this->log->warning('Fetch failed too many times: skipping this document!');
                     $failureCount++;
                     $sequentialFailures++;
@@ -445,7 +457,7 @@ class Crocodoc
                     )
                 );
 
-                $this->logToDatabase($fileId, $feedbackFileId, $crocodocDocumentId, 'completed', '');
+                $this->logToDatabase($fileId, $feedbackFileId, $crocodocDocumentId, self::STATUS_COMPLETED, '');
                 $successCount++;
                 $sequentialFailures = 0;
             }
