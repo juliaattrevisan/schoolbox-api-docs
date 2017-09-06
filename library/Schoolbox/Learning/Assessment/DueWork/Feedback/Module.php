@@ -203,8 +203,8 @@ class Module extends BaseModule
 
 
     /**
-     * @param $assessmentId
-     * @param $studentId
+     * @param int $assessmentId
+     * @param int $studentId
      * @return Participant
      */
     protected function preloadParticipant($assessmentId, $studentId)
@@ -218,7 +218,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @param $assessmentId
+     * @param int $assessmentId
      * @param int $responseId
      * @return Assessment\IResponse
      * @throws MapperException
