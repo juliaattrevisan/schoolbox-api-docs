@@ -38,8 +38,9 @@ class Jitter
     /**
      * Constructor
      *
-     * @param int $baseTimeout
-     * @param int $maxRetries
+     * @param IGenerator $rng
+     * @param int        $maxRetries
+     * @param int        $baseTimeout
      */
     public function __construct(IGenerator $rng, $maxRetries = 10, $baseTimeout = 500)
     {
@@ -55,12 +56,12 @@ class Jitter
      * The amount of time to wait increases with the number of retries.
      *
      * @param int $retries
-     * @return int A number of milliseconds to sleep for
+     * @return int Amount of jitter
      * @throws MaxRetriesExceededException if $retries is more than allowed
      */
     public function calculateJitter($retries)
     {
-        if ($retries === 0) {
+        if ($retries <= 0) {
             return 0;
         }
 
@@ -69,10 +70,7 @@ class Jitter
             throw new MaxRetriesExceededException(sprintf('Maximum of %d retries exceeded', $this->maxRetries));
         }
 
-        $sleep = min(
-            $this->baseTimeout * $this->maxRetries,
-            $this->baseTimeout * (2 ^ $retries)
-        );
-        return $sleep * $this->rng->generate() * 1000;
+        $sleep = $this->baseTimeout * min($this->maxRetries, pow(2, ($retries-1)));
+        return $sleep * $this->rng->generate();
     }
 }
