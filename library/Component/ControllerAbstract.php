@@ -201,10 +201,20 @@ abstract class Component_ControllerAbstract
     protected function getTemplate($templateName = '', $templatePath = '')
     {
         if (empty($templateName)) {
-            // Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase
+            // Break apart class name by underscores
 
-            $templateName = array_pop(explode('_', $this->getInstance()->getDefinition()->getClass()));
+            $templateNameArray = explode('_', $this->getInstance()->getDefinition()->getClass());
+
+            // Get only last segment
+
+            $templateName = array_pop($templateNameArray);
+
+            // Remove last 10 characters
+
             $templateName = substr($templateName, 0, -10);
+
+            // And lowercase it
+
             $templateName = ucfirst($templateName);
         }
 

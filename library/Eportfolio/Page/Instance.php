@@ -179,7 +179,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             $i = 0;
             $previous = new Component_Instance();
             foreach ($instanceCollection as $component) {
-
                 // The ePortfolio Survey component should only be visible to non-superusers if it has a survey selected,
                 // otherwise there is nothing they can do with it- and if they try to add it to their ePortfolio page
                 // they will receive an error message
