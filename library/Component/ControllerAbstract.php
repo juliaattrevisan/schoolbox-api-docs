@@ -1,136 +1,58 @@
 <?php
-
 /**
- *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
- *
  */
 
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-use \Schoolbox\Config\ConfigMapper;
-use \Schoolbox\MapperFactory;
 
 abstract class Component_ControllerAbstract
 {
-    /* Reasons for showing a component empty state */
-    /** @const int EMPTY_STATE_REASON_UNKNOWN. Default. */
-    const EMPTY_STATE_REASON_UNKNOWN = 0;
+    // Reasons for showing a component empty state
 
-    /** @const int EMPTY_STATE_REASON_DENIED. No READ+ access to data source folder */
-    const EMPTY_STATE_REASON_DENIED = 1;
+    const EMPTY_STATE_REASON_UNKNOWN = 0;           // Default
+    const EMPTY_STATE_REASON_DENIED = 1;            // No read access to data source folder
+    const EMPTY_STATE_REASON_DELETED = 2;           // Component's data source folder is deleted
 
-    /** @const int EMPTY_STATE_REASON_DELETED. Component's data source folder is deleted */
-    const EMPTY_STATE_REASON_DELETED = 2;
-
-    /**
-     * @var Component_Instance
-     */
+    /** @var Component_Instance $instance */
     private $instance;
 
-    /**
-     * @var User
-     */
+    /** @var User $user */
     private $user;
 
-    /**
-     * @var SitePage
-     */
+    /** @var SitePage $sitepage */
     private $sitepage;
 
-    /**
-     * @var MapperFactory
-     */
+    /** @var MapperFactory $mapperFactory */
     private $mapperFactory;
 
-    /**
-     * The folder|page the component is on, if any.
-     *
-     * @var Folder|Eportfolio_Page_Instance|null
-     */
+    /** @var Folder|Eportfolio_Page_Instance|null $context The folder|page the component is on */
     private $context;
 
-    /**
-     * The folder|page the component pulls data from, if any.
-     *
-     * @var Folder|Eportfolio_Page_Instance|null
-     */
+    /** @var Folder|Eportfolio_Page_Instance|null $source The folder|page the component pulls data from */
     private $source;
 
-    /**
-     * @var array
-     */
+    /** @var array $config */
     private $config;
 
-    /**
-     * Permission for component contents.
-     *
-     * @var int
-     */
+    /** @var int Permission for component contents */
     private $contentPermission = UserAccess::ACCESS_DENY;
 
-    /**
-     * Permission for component controls, as opposed to the component content.
-     *
-     * These permissions are always based off of the component's context, as
-     * opposed to component content permissions (@see $this->contentPermission), which
-     * may be based off of an alternate source.
-     *
-     * @var int
-     */
-    private $contextPermission = UserAccess::ACCESS_DENY;
-
-    /**
-     * The maximum permission allowed for this component.
-     *
-     * Set to ACCESS_READ to force a read-only view of this component.
-     *
-     * @var int
-     */
-    private $maximumPermission = UserAccess::ACCESS_FULL;
-
-    /**
-     * Available sort fields for this component.
-     *
-     * @var string[]
-     */
+    /** @var string[] Available sort fields for this component */
     protected $sortFields = [];
 
-    /**
-     * Available filters for this component.
-     *
-     * @see Component_Config_Filter for how this data is passed in/out of the database
-     * @var string[]
-     */
-    protected $filterFields = [];
-
-    /**
-     * Name of the component
-     *
-     * @var string
-     */
+    /** @var string $componentName Name of the component */
     private $componentName = '';
 
-    /**
-     * Link that the component header points to. Usually nowhere?
-     *
-     * @var string
-     */
+    /** @var string $componentHref Link that the component header points to */
     private $componentHref = '#';
-
-    /**
-     * Configuration template to use.
-     *
-     * Usually determined by `$this->determineTemplate()`, but can be set with
-     * `$this->setConfigurationTemplate()`.
-     */
-    private $configurationTemplate = '';
 
     /** @var FolderMapper $folderMapper */
     private $folderMapper;
@@ -138,26 +60,56 @@ abstract class Component_ControllerAbstract
     /** @var ErrorMapper $errorMapper */
     private $errorMapper;
 
-    /**
-     * @var ConfigMapper
-     */
+    /** @var ConfigMapper $configMapper */
     private $configMapper;
+
+    /** @var int $maximumPermission The maximum permission allowed for this component */
+    private $maximumPermission = UserAccess::ACCESS_FULL;
+
+    /**
+     * Permission for component controls, as opposed to the component content.
+     *
+     * These permissions are always based off of the component's context, as opposed to component content permissions
+     * (@see $this->contentPermission), which may be based off of an alternate source.
+     *
+     * @var int $contextPermission
+     */
+    private $contextPermission = UserAccess::ACCESS_DENY;
+
+    /**
+     * Available filters for this component.
+     *
+     * @see Component_Config_Filter for how this data is passed in/out of the database
+     * @var string[] $filterFields
+     */
+    protected $filterFields = [];
+
+    /**
+     * Configuration template to use.
+     * Usually determined by `determineTemplate` but can be set with `setConfigurationTemplate()`
+     *
+     * @var string $configurationTemplate
+     */
+    private $configurationTemplate = '';
 
     /**
      * Constructor
      *
-     * @param Component_Instance                   $instance
-     * @param User                                 $user
-     * @param SitePage                             $sitepage
+     * @param Component_Instance $instance
+     * @param User $user
+     * @param SitePage $sitepage
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $sitepage->getDi()->get('mapperFactory');
+
         /** @var FolderMapper $folderMapper */
         $folderMapper = $mapperFactory->get(FolderMapper::class);
+
         /** @var ErrorMapper $errorMapper */
         $errorMapper = $mapperFactory->get(ErrorMapper::class);
+
         /** @var ConfigMapper $configMapper */
         $configMapper = $mapperFactory->get(ConfigMapper::class);
 
@@ -177,8 +129,8 @@ abstract class Component_ControllerAbstract
      *
      * Responsible for permission setup
      *
-     * Note: Cannot inject $context in constructor because in many scenarios it is
-     *       irrelevant (eg admin config) and causes un-necessary processing.
+     * Note: Cannot inject $context in constructor because in many scenarios it is irrelevant (e.g. admin config) and
+     * causes un-necessary processing.
      *
      * @param Folder|Eportfolio_Page_Instance|null $context
      */
@@ -187,32 +139,30 @@ abstract class Component_ControllerAbstract
         $this->setContext($context);
 
         if ($this->isUsingAltSource()) {
-            // remove any non-numeric values from the source config (legacy support)
+            // Remove any non-numeric values from the source config (legacy support)
             $folderId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
 
-            // source may be deleted
+            // Source may be deleted
             $source = $this->getFolderMapper()->findByIdWithFallback($folderId);
 
             if (!($source instanceof Folder)) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
+
             $this->setSource($source);
         } else {
             $this->setSource($context);
         }
     }
 
-
     /**
      * Prepares data for the render function. Business logic.
-     *
      * All permission checks, data retrieval & object creation should happen here.
      *
      * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
-        // Default to no action
         return true;
     }
 
@@ -230,11 +180,11 @@ abstract class Component_ControllerAbstract
             return false;
         }
 
-        $output = array(
-            'COMPONENT_INSTANCE_ID'   => $this->instance->getId(),
+        $output = [
+            'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
             'COMPONENT_DEFINITION_ID' => $this->instance->getDefinitionId(),
-            'COMPONENT_HANDLE'        => $templateHandle
-        );
+            'COMPONENT_HANDLE' => $templateHandle
+        ];
 
         $this->setVar($output);
 
@@ -251,40 +201,35 @@ abstract class Component_ControllerAbstract
     protected function getTemplate($templateName = '', $templatePath = '')
     {
         if (empty($templateName)) {
-            /* Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase */
-            $templateName = ucfirst(substr(array_pop(explode('_', $this->getInstance()->getDefinition()->getClass())),
-                0, -10));
+            // Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase
+
+            $templateName = array_pop(explode('_', $this->getInstance()->getDefinition()->getClass()));
+            $templateName = substr($templateName, 0, -10);
+            $templateName = ucfirst($templateName);
         }
 
         if (empty($templatePath)) {
             $templatePath = "component";
         }
 
-        $templateFile = "$templatePath/$templateName.html";
-
-        return $templateFile;
+        return "{$templatePath}/{$templateName}.html";
     }
 
     /**
-     * Renders view using Component_AbstractController::$templateObject.
-     *
+     * Renders view using Component_AbstractController::$templateObject
      * Responsible just for rendering objects already retrieved during execute()
+     * Should never be called if some sort of rendering is not to take place
      *
-     * Should never be called if some sort of rendering is not to take place.
-     *
-     * @param String $templateHandle
-     * @return boolean
+     * @param string $templateHandle
+     * @return bool
      */
     public function renderTemplate($templateHandle)
     {
-        if (!$this->loadTemplate($templateHandle)) {
-            return false;
-        }
-        return true;
+        return $this->loadTemplate($templateHandle);
     }
 
     /**
-     * @param $varname
+     * @param string $varname
      * @return mixed
      */
     public function getVar($varname)
@@ -293,7 +238,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param $var
+     * @param string|array $var
      * @param string $value
      */
     public function setVar($var, $value = '')
@@ -302,8 +247,8 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param $handle
-     * @param $file
+     * @param mixed $handle
+     * @param string $file
      */
     public function setFile($handle, $file)
     {
@@ -311,8 +256,8 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param $parent
-     * @param $handle
+     * @param string $parent
+     * @param string $handle
      * @param string $name
      */
     public function setBlock($parent, $handle, $name = '')
@@ -321,8 +266,8 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param $target
-     * @param $handle
+     * @param string $target
+     * @param string $handle
      * @param bool $append
      */
     public function parse($target, $handle, $append = false)
@@ -330,6 +275,9 @@ abstract class Component_ControllerAbstract
         $this->sitepage->parse($target, $handle, $append);
     }
 
+    /**
+     * @param string $file
+     */
     public function setJavascript($file)
     {
         $this->sitepage->setJavascript($file);
@@ -338,17 +286,14 @@ abstract class Component_ControllerAbstract
     /**
      * Component Config facade ingredients
      *
-     * This should really have been a separate class, but I'll probably do that
-     * another time
+     * This should really have been a separate class, but I'll probably do that another time
      */
 
     /**
-     * Parses configuration for display when rendering a template. Some config
-     * options don't show on templates, but do when an instance of the template
-     * gets shown.
+     * Parses configuration for display when rendering a template. Some config options don't show on templates, but do
+     * when an instance of the template gets shown.
      *
      * @param string $targetHandle
-     *
      * @return bool
      */
     public function parseConfigForTemplate($targetHandle = 'CONFIGURATION')
@@ -358,37 +303,50 @@ abstract class Component_ControllerAbstract
 
     /**
      * Determine the permissions for this particular config
-     *
      * Ingredient of parseConfig() facade
      *
-     * @param $config
+     * @param array|null $config
      * @return array
      */
     protected function determineConfigPermissions($config)
     {
         if (is_array($config) && count($config)) {
-            // have write access
             if ($this->contextPermission > UserAccess::ACCESS_READ) {
-                // display full configuration block
-                return array(true, true, true);
-            } // do not have write access
-            else {
-                // parse configuration display variables for readonly
+                // Have write access, display full configuration block
 
-                /* One of the schools will tell us what this meant
-                 */
-                return array(false, true, false);
+                return [
+                    true,
+                    true,
+                    true
+                ];
+            } else {
+                // No write access, display readonly variables
+
+                return [
+                    false,
+                    true,
+                    false
+                ];
             }
-        } // there is no configuration
-        else {
-            // have write access
+        } else {
+            // There is no configuration block to display
+
             if ($this->contextPermission > UserAccess::ACCESS_READ) {
-                // display delete option
-                return array(true, false, false);
-            } // do not have write access
-            else {
-                // no config, no write access: do nothing
-                return array(false, false, false);
+                // Display delete option if they have write access
+
+                return [
+                    true,
+                    false,
+                    false
+                ];
+            } else {
+                // No config, no write access, do nothing
+
+                return [
+                    false,
+                    false,
+                    false
+                ];
             }
         }
     }
@@ -414,9 +372,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Determine which config template to use, if it hasn't been set with
-     * `$this->setConfigurationTemplate()`.
-     *
+     * Determine which config template to use, if it hasn't been set with `setConfigurationTemplate()`
      * Ingredient of parseConfig() facade
      *
      * @return string
@@ -425,67 +381,64 @@ abstract class Component_ControllerAbstract
     {
         if ($configTemplate = $this->getConfigurationTemplate()) {
             return $configTemplate;
-        }
-        // Admin area; used when configuring dashboard/homepage/eportfolio layouts
-        else if (in_array($this->instance->getModule(), ['homepage_template', 'eportfolio_template'])) {
+        } elseif (in_array($this->instance->getModule(), ['homepage_template', 'eportfolio_template'])) {
+            // Admin area used when configuring dashboard/homepage/eportfolio layouts
             return 'component/config/_templatewrapper.html';
-        }
-        // Public-facing pages for dashboard, homepage, eportfolio
-        else if (in_array($this->instance->getModule(), ['dashboard', 'homepage', 'eportfolio'])) {
+        } elseif (in_array($this->instance->getModule(), ['dashboard', 'homepage', 'eportfolio'])) {
+            // Public-facing pages for dashboard, homepage, eportfolio
             return 'component/config/' . $this->instance->getModule() . '_wrapper.html';
         }
+
         throw new DomainException('Could not determine template file.');
     }
 
     /**
      * Set up statue of phpliberty
-     *
      * Ingredient of parseConfig() facade
      *
      * @param $targetHandle
      */
     protected function setupConfigRendering($targetHandle)
     {
+        // Explicitly clear configTpl - repeated assignations won't workand will erroneously use _wrapper.html
 
-        /* Explicitly clear configTpl - repeated assignations won't work
-         * and will erroneously use _wrapper.html
-         */
-        $this->sitepage->setVar(array(
+        $this->sitepage->setVar([
             'configTpl' => ''
-        ));
+        ]);
 
         // if we're building in the context of the admin system, use a different template (_templatewrapper.html),
         // otherwise use the regular one (_wrapper.html)
+
         $this->sitepage->setFile('configTpl', $this->determineTemplate());
         $this->sitepage->setBlock('configTpl', 'settings_link', 'settings_link_block');
         $this->sitepage->setBlock('configTpl', 'settings_panel', 'settings_panel_block');
         $this->sitepage->setBlock('configTpl', 'settings_collapse', 'settings_collapse_block');
         $this->sitepage->setBlock('configTpl', 'settings_close', 'settings_close_block');
         $this->sitepage->setBlock('settings_panel', 'config_element', 'config_element_block');
-        $this->sitepage->setVar(array(
+
+        $this->sitepage->setVar([
             $targetHandle => '',
             'config_element_block' => '',
 
-            /* The close button which removes components
-             */
+            // The close button which removes components
+
             'settings_close_block' => '',
 
-            /* The little triangle which drops down the config options
-             * contained in settings_panel_block
-             */
+            // The little triangle which drops down the config options contained in settings_panel_block
+
             'settings_link_block' => '',
             'settings_panel_block' => '',
 
-            /* Collapsable control button
-             */
+            // Collapsable control button
+
             'settings_collapse_block' => '',
 
-            /* Component Name
-             */
+            // Component Name
+
             'COMPONENT_NAME' => $this->getComponentName(),
             'COMPONENT_HREF' => $this->getComponentHref(),
             'COMPONENT_CLASS' => $this->getInstance()->getDefinition()->getCssClass(),
-        ));
+        ]);
     }
 
     /**
@@ -496,19 +449,18 @@ abstract class Component_ControllerAbstract
      */
     protected function renderConfigElements($processConfig, $is_for_template)
     {
-        // it's possible hiding configs will hide all; check for this and hide the config dropdown if need be
+        // It's possible hiding configs will hide all; check for this and hide the config dropdown if need be
+
         $configCount = 0;
 
-        /* Conditionally decide whether to render each config ingredient
-         *
-         * If you didn't need to display it, don't iterate through every
-         * element and set it up, to save some processing
-         */
-        // every config key has a corresponding controller and template to be called
-        foreach ($this->getInstance()->getConfigArray() as $key => $params) {
+        // Conditionally decide whether to render each config ingredient
 
-            /* Special case for componentname default value when empty
-             */
+        // If you didn't need to display it, don't iterate through every element and set it up, to save some processing
+        // every config key has a corresponding controller and template to be called
+
+        foreach ($this->getInstance()->getConfigArray() as $key => $params) {
+            // Special case for componentname default value when empty
+
             if ($key == 'componentname') {
                 if (!strlen(trim($params['value']))) {
                     $componentname = $this->getComponentName();
@@ -516,20 +468,18 @@ abstract class Component_ControllerAbstract
                     $componentname = Scrub::text($params['value']);
                 }
 
-                $this->sitepage->setVar(array(
+                $this->sitepage->setVar([
                     'COMPONENT_NAME' => $componentname,
                     'COMPONENT_HREF' => $this->getComponentHref(),
-                ));
+                ]);
             }
 
-            $this->sitepage->setVar(
-                array(
-                    'CONFIG_ELEMENT_LABEL' => $params['label'],
-                    'CONFIG_ELEMENT_CLASS' => str_replace(' ', '', strtolower($params['label']))
-                )
-            );
+            $this->sitepage->setVar([
+                'CONFIG_ELEMENT_LABEL' => $params['label'],
+                'CONFIG_ELEMENT_CLASS' => str_replace(' ', '', strtolower($params['label']))
+            ]);
 
-            $fields = array();
+            $fields = [];
 
             if ($this->getSortFields()) {
                 $fields['sort'] = $this->sortFields;
@@ -539,7 +489,8 @@ abstract class Component_ControllerAbstract
                 $fields['filter'] = $this->filterFields;
             }
 
-            // attempt to build a configuration instance from the key provided
+            // Attempt to build a configuration instance from the key provided
+
             if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                 if (!($is_for_template && !$conf->isShownOnTemplate())) {
                     $this->parseConfigInstance($conf, $key, $this->sitepage, $params);
@@ -557,7 +508,6 @@ abstract class Component_ControllerAbstract
 
     /**
      * Parse configuration and settings panels for each component
-     *
      * Facade method
      *
      * @param string $targetHandle
@@ -566,30 +516,28 @@ abstract class Component_ControllerAbstract
      */
     public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
     {
-        // DETERMINE WHAT TO DISPLAY
-        // there is configuration
+        // Determine what to display
+
         list ($hasWriteAccess, $processConfig) = $this->determineConfigPermissions($this->instance->getConfigArray());
 
-        // if all 3 above vars are false, bug out
+        // If all 3 above vars are false, there is no configuration to display
+
         if (!($hasWriteAccess || $processConfig)) {
             return false;
         }
 
         $this->setupConfigRendering($targetHandle);
 
-        /* If you don't have write access, just leave before dealing with any
-         * config element rendering and stuff
-         */
         if (!$hasWriteAccess) {
+            // If you don't have write access, just leave before dealing with any config element rendering and stuff
+
             $this->renderConfigElements(false, $is_for_template);
             $this->sitepage->parse($targetHandle, 'configTpl', false);
             return false;
         } else {
-            /* If you want to process the config, then do so and display it
-             * Also provide a triangle so you can alter them through the ui
-             *
-             * Otherwise do nothing
-             */
+            // If you want to process the config, then do so and display it. Also provide a triangle so you can alter
+            // them through the UI Otherwise do nothing
+
             if ($processConfig) {
                 $this->renderConfigElements($processConfig, $is_for_template);
 
@@ -630,12 +578,12 @@ abstract class Component_ControllerAbstract
      *
      * @param string $templateHandle Some PHPLib BS which I don't understand. Just pass $templateHandle from
      *                               $this->renderTemplate($templateHandle).
-     * @param string $twigTemplate   The path to a Twig template.
-     * @param array  $twigData       Data to pass into the Twig template.
-     * @param bool   $renderHeader   Set to false if you don't want the PHPLib controlled header to show.
-     * @param bool   $renderConfig   Set to false if you don't want the PHPLib controlled configuration to show.
+     * @param string $twigTemplate The path to a Twig template.
+     * @param array $twigData Data to pass into the Twig template.
+     * @param bool $renderHeader Set to false if you don't want the PHPLib controlled header to show.
+     * @param bool $renderConfig Set to false if you don't want the PHPLib controlled configuration to show.
      *                               (Dashboard components show the collapse controls if this is true.)
-     * @param bool   $contentRaw     This is a flag that lets you dump the twig raw rather than using standard header block
+     * @param bool $contentRaw This is a flag that lets you dump the twig raw rather than using standard header block
      * @return bool Was the template renderable?
      * @throws Exception
      */
@@ -650,16 +598,20 @@ abstract class Component_ControllerAbstract
         if (!$this->loadTemplate($templateHandle, 'twig', 'component/')) {
             return false;
         }
+
         $this->parseConfig();
+
         if (!$renderConfig) {
             $this->setVar('CONFIGURATION', '');
         }
 
         // Residual blockage
+
         $this->setBlock($templateHandle, 'header', 'header_block');
         $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
         $this->setVar('header_block', '');
         $this->setVar('dashboard_header_block', '');
+
         if ($renderHeader) {
             if ($this->getInstance()->getModule() == 'dashboard') {
                 $this->parse('dashboard_header_block', 'dashboard_header');
@@ -669,12 +621,12 @@ abstract class Component_ControllerAbstract
         }
 
         // Render the twig template
+
         try {
             $content = $this->sitepage->getTwig()->render($twigTemplate, $twigData);
         } catch (\Exception $e) {
-
             // Are we in debug mode?
-            if($this->configMapper->get('debug_mode')){
+            if ($this->configMapper->get('debug_mode')) {
                 // Ka-boom!
                 throw $e;
             } else {
@@ -684,6 +636,7 @@ abstract class Component_ControllerAbstract
         }
 
         // If we are rending raw we want to dump the TWIG content into the header rather than COMPONENT_CONTENT block
+
         if ($contentRaw) {
             if ($this->getInstance()->getModule() == 'dashboard') {
                 $this->setVar('dashboard_header_block', $content);
@@ -699,7 +652,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * If current user has WRITE+ access to current context, render an empty state, else render nothing.
+     * If current user has write access to current context, render an empty state, else render nothing.
      *
      * Used by phpLib-based components.
      *
@@ -718,14 +671,14 @@ abstract class Component_ControllerAbstract
                 }
             }
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
 
     /**
-     * If current user has WRITE+ access to current context, render an empty state, else render nothing.
+     * If current user has write access to current context, render an empty state, else render nothing.
      *
      * Used by twig-based components.
      *
@@ -744,13 +697,14 @@ abstract class Component_ControllerAbstract
                     return $this->renderTwigEmptyState($templateHandle);
                 }
             }
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
      * Convenience method for twig-based Components to render the 'AltSourceDeleted' empty state
+     *
      * @param string $templateHandle
      * @return bool
      */
@@ -761,6 +715,7 @@ abstract class Component_ControllerAbstract
 
     /**
      * Convenience method for twig-based Components to render the 'AltSourceDenied' empty state
+     *
      * @param string $templateHandle
      * @return bool
      */
@@ -770,10 +725,9 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Renders empty state into twig-based Components
+     * Renders empty state into twig-based components
      *
-     * Private to prevent direct calls. Instead use convenience methods which
-     * define a consistent message.
+     * Private to prevent direct calls. Instead use convenience methods which define a consistent message.
      *
      * @param string $templateHandle
      * @param int $reason Why we are unable to display this component's content.
@@ -781,22 +735,23 @@ abstract class Component_ControllerAbstract
      */
     private function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN)
     {
-        $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
+        $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED === $reason;
         $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
 
         return $this->renderTwigTemplate(
             $templateHandle,
             'sub/componentSourceUnavailable.twig',
-            array(
+            [
                 'componentInstanceId' => $this->getInstance()->getId(),
-                'isAltSourceDenied'   => $isAltSourceDenied,
-                'isAltSourceDeleted'  => $isAltSourceDeleted,
-            )
+                'isAltSourceDenied' => $isAltSourceDenied,
+                'isAltSourceDeleted' => $isAltSourceDeleted,
+            ]
         );
     }
 
     /**
      * Convenience method for PHPLib-based Components to render the 'AltSourceDenied' empty state
+     *
      * @return bool
      */
     protected function renderAltSourceDenied()
@@ -806,6 +761,7 @@ abstract class Component_ControllerAbstract
 
     /**
      * Convenience method for PHPLib-based Components to render the 'AltSourceDeleted' empty state
+     *
      * @return bool
      */
     protected function renderAltSourceDeleted()
@@ -816,39 +772,37 @@ abstract class Component_ControllerAbstract
     /**
      * Renders empty state into PHPLib-based Components
      *
-     * Private to prevent direct calls. Instead use convenience methods which
-     * define a consistent message.
+     * Private to prevent direct calls. Instead use convenience methods which define a consistent message.
      *
      * @param int $reason Why we are unable to display this component's content.
      * @return true
      */
     private function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN)
     {
-        $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
+        $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED === $reason;
         $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
 
         $twigTemplate = 'sub/componentSourceUnavailable.twig';
-        $twigData = array(
+        $twigData     = [
             'componentInstanceId' => $this->getInstance()->getId(),
-            'isAltSourceDenied'   => $isAltSourceDenied,
-            'isAltSourceDeleted'  => $isAltSourceDeleted,
-        );
+            'isAltSourceDenied' => $isAltSourceDenied,
+            'isAltSourceDeleted' => $isAltSourceDeleted,
+        ];
         $this->setVar('SOURCE_FOLDER_UNAVAILABLE', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
         $this->parse('source_folder_deleted_block', 'source_folder_deleted');
         $this->setVar('source_folder_exists_block', '');
+
         return true;
     }
 
-
     /**
-     * @param $key
+     * @param string $key
      * @return bool
      */
     public function hasConfig($key)
     {
         return isset($this->config[$key]) ? true : false;
     }
-
 
     /**
      * @return Template
@@ -857,7 +811,6 @@ abstract class Component_ControllerAbstract
     {
         return $this->getSitePage()->template;
     }
-
 
     /**
      * Checks if the user's permission on this component is at least read level.
@@ -929,10 +882,10 @@ abstract class Component_ControllerAbstract
         return intval($this->getConfig("src")) > 0;
     }
 
-
     /**
      * Return whether we are able to render this component's content for current user.
-     * False if lacks READ+ permission on content, or because content is deleted.
+     * False if lacks read permission on content, or because content is deleted.
+     *
      * @return bool
      */
     public function isSourceRenderable()
@@ -941,18 +894,12 @@ abstract class Component_ControllerAbstract
             return false;
         }
 
-        // Dashboard components that pull data from a homepage
-        // source will be null until a homepage is selected
+        // Dashboard components that pull data from a homepage source will be null until a homepage is selected
+
         return null != $this->getSource();
     }
 
-
-
-
-
-    /*
-     * Getters / Setters
-     */
+    // Getters & Setters
 
     /**
      * @return MapperFactory
@@ -1008,7 +955,6 @@ abstract class Component_ControllerAbstract
         return $this;
     }
 
-
     /**
      * @param string $key
      * @param string $attr
@@ -1020,7 +966,7 @@ abstract class Component_ControllerAbstract
             return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
         }
 
-        $return = array();
+        $return = [];
 
         foreach ($this->config as $key => $item) {
             $return[$key] = $item['value'];
@@ -1032,11 +978,12 @@ abstract class Component_ControllerAbstract
     /**
      * Override a single configuration variable on the component
      *
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed $value
      * @return static
      */
-    public function setConfigValue($key, $value) {
+    public function setConfigValue($key, $value)
+    {
         $this->config[$key]['value'] = $value;
         return $this;
     }
@@ -1068,7 +1015,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @return \Component_Instance
+     * @return Component_Instance
      */
     public function getInstance()
     {
@@ -1076,7 +1023,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param \Component_Instance $instance
+     * @param Component_Instance $instance
      * @return static
      */
     public function setInstance(Component_Instance $instance)
@@ -1094,7 +1041,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param  int $maximumPermission
+     * @param int $maximumPermission
      * @return static
      */
     public function setMaximumPermission($maximumPermission)
@@ -1104,7 +1051,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Gets the Folder, if any, this component draws its data from
+     * Gets the folder (if any) this component draws its data from
      *
      * @return Folder|Eportfolio_Page_Instance|null
      */
@@ -1114,7 +1061,7 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Sets the Folder, if any, this component draws its data from
+     * Sets the folder (if any) this component draws its data from
      *
      * @param Folder|Eportfolio_Page_Instance|null $source
      * @return static
@@ -1132,22 +1079,20 @@ abstract class Component_ControllerAbstract
      */
     protected function getComponentName()
     {
-        /* Special case for Manage Folders and any other
-         * arbitrarily-constructed components
-         */
+        // Special case for Manage Folders and any other arbitrarily-constructed components
+
         if (!$this->instance->getId()) {
             return '';
         }
 
-        /* Return db version of the name if class var is empty
-        * or not set
-        */
+        // Return db version of the name if class var is empty or not set
+
         if (!strlen($this->componentName)) {
             return $this->instance->getDefinition()->getName();
         }
 
-        /* Otherwise allow a per-controller hardcoded version
-         */
+        // Otherwise allow a per-controller hardcoded version
+
         return $this->componentName;
     }
 
@@ -1164,9 +1109,8 @@ abstract class Component_ControllerAbstract
         return $this;
     }
 
-
     /**
-     * @return Schoolbox\Resource\Folder\Mapper
+     * @return FolderMapper
      */
     public function getFolderMapper()
     {
@@ -1174,8 +1118,8 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param  Schoolbox\Resource\Folder\Mapper $folderMapper
-     * @return $this
+     * @param FolderMapper $folderMapper
+     * @return static
      */
     public function setFolderMapper(FolderMapper $folderMapper)
     {
@@ -1192,8 +1136,8 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param  ErrorMapper $errorMapper
-     * @return $this
+     * @param ErrorMapper $errorMapper
+     * @return static
      */
     public function setErrorMapper(ErrorMapper $errorMapper)
     {
@@ -1202,8 +1146,6 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Get component href
-     *
      * @return string
      */
     protected function getComponentHref()
@@ -1211,13 +1153,12 @@ abstract class Component_ControllerAbstract
         if (!strlen(trim($this->componentHref))) {
             return '#';
         }
+        
         return $this->componentHref;
     }
 
     /**
-     * Assign component href default
-     *
-     * @param $componentHref
+     * @param string $componentHref
      * @return static
      */
     protected function setComponentHref($componentHref)
@@ -1254,7 +1195,7 @@ abstract class Component_ControllerAbstract
 
     /**
      * @param int $contextPermission
-     * @return $this
+     * @return static
      */
     protected function setContextPermission($contextPermission)
     {
@@ -1272,7 +1213,7 @@ abstract class Component_ControllerAbstract
 
     /**
      * @param int $contentPermission
-     * @return $this
+     * @return static
      */
     protected function setContentPermission($contentPermission)
     {
@@ -1297,5 +1238,4 @@ abstract class Component_ControllerAbstract
         $this->configMapper = $configMapper;
         return $this;
     }
-
 }
