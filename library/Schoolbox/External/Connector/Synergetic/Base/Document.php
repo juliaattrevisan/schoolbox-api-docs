@@ -152,7 +152,14 @@ class Document extends Base implements IDocument
         if (count($classificationCodes) > 0) {
             $bindings = PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode');
             $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
-            $params = array_merge($params, $bindings['bindings']);
+
+            $params = array_merge(
+                $params,
+                array_map(
+                    'trim',
+                    $bindings['bindings']
+                )
+            );
         }
 
         $query .= "
