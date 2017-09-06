@@ -13,11 +13,7 @@ use Aura\Di;
 use Guzzle\Http\Client as HttpClient;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
 use Schoolbox\Learning\InlineGrader\Archiver\Crocodoc as CrocodocArchiver;
-use Schoolbox\Learning\InlineGrader\Authenticator;
-use Schoolbox\Learning\InlineGrader\Facade;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -70,9 +66,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
      * @var StorageMapper $storageMapper
      * @var UserMapper    $userMapper
      */
-    $httpClient    = new HttpClient();
+    $httpClient = new HttpClient();
     $mapperFactory = $di->get('mapperFactory');
-    $userMapper    = $mapperFactory->get(UserMapper::class);
+    $userMapper = $mapperFactory->get(UserMapper::class);
     $storageMapper = $mapperFactory->get(StorageMapper::class);
 
 
@@ -89,7 +85,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $db = $di->get('databaseInternal');
 
     $archiver = new CrocodocArchiver($db, $httpClient, $storageMapper);
-    $result   = $archiver->archive($systemUser, $log, $dryRun, $rescanFailed);
+    $result = $archiver->archive($systemUser, $log, $dryRun, $rescanFailed);
     if ($result['failed'] > 0) {
         exit(1);
     }

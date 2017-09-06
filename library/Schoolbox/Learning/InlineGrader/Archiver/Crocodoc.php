@@ -16,8 +16,8 @@ use Guzzle\Http\Message\Response;
 use PDO;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
 use Schoolbox\Learning\InlineGrader\Authenticator;
 use Schoolbox\Learning\InlineGrader\Facade;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -322,9 +322,9 @@ class Crocodoc
 
             foreach ($selectCrocodocQuery->executeIterator() as $row) {
 
-                $fileId             = (int)$row['fileId'];
+                $fileId = (int)$row['fileId'];
                 $crocodocDocumentId = $row['crocodocDocumentId'];
-                $filename           = $row['fileName'];
+                $filename = $row['fileName'];
 
                 $stepCount--;
                 $log->notice(
@@ -360,7 +360,7 @@ class Crocodoc
                 // Try to download the annotated Crocodocument
                 /** @var Response $response */
                 try {
-                    $facade   = $this->buildFacade(
+                    $facade = $this->buildFacade(
                         $systemUser,
                         $fileId,
                         $crocodocDocumentId,
@@ -399,7 +399,7 @@ class Crocodoc
 
 
                 // Now store it and create a feedback for it
-                $storageModel   = $this->uploadCrocodocToStorage($response, $filename);
+                $storageModel = $this->uploadCrocodocToStorage($response, $filename);
                 $feedbackFileId = $this->archiveCrocodocInFeedback($storageModel, $feedbackId, $filename, $log);
 
 
@@ -479,9 +479,9 @@ class Crocodoc
      * 2. most recent floating feedback for this participant
      * 3. a new draft feedback for this participant (not created if `$dryRun` is on)
      *
-     * @param int             $responseId The ID of the student's response
-     * @param int             $studentId The student's ID
-     * @param int             $boxId The ID of the submission box to which the response belongs to
+     * @param int             $responseId   The ID of the student's response
+     * @param int             $studentId    The student's ID
+     * @param int             $boxId        The ID of the submission box to which the response belongs to
      * @param int             $systemUserId A user ID to use as the owner for a new feedback, if required
      * @param bool            $dryRun
      * @param LoggerInterface $log
