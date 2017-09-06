@@ -436,7 +436,8 @@ class Healthcheck
 
         if ($this->configMapper->get('external_document_report_enabled')) {
             $externalPing = new \External_Ping();
-            $this->selectTest([
+            $this->selectTest(
+                [
                     'StudentReportsArchiveLink',
                     'StudentReportsArchive',
                     'tDocuments',

@@ -210,7 +210,6 @@ class Document extends Base implements IDocument
         // Create query to get the document from the database
 
         if ($source == 'tDocuments') {
-
             // Loading from generic DocMan table
 
             $query = "
@@ -236,9 +235,7 @@ class Document extends Base implements IDocument
                     'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 ]);
             }
-
         } elseif ($source = 'StudentReportsArchive') {
-
             // Loading from school reports archive table
 
             $query = "
@@ -265,7 +262,6 @@ class Document extends Base implements IDocument
                     'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 ]);
             }
-
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
@@ -275,8 +271,8 @@ class Document extends Base implements IDocument
         $result = $this->databaseExternal->executeQuery($query, $params);
 
         if ($row = $result->fetch()) {
-
-            // If we found a database record, return an array with the details necessary for downloading using the historical code
+            // If we found a database record, return an array with the details necessary for downloading using
+            // the historical code
 
             return [
                 'filename' => "{$row["Description"]}.{$row["DocumentType"]}",
