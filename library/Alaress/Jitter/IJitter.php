@@ -6,6 +6,7 @@
  */
 
 namespace Alaress\Jitter;
+
 use Exception;
 use Throwable;
 

@@ -404,7 +404,7 @@ class Crocodoc
                 // Try to download the annotated Crocodocument
                 try {
                     /** @var ResponseInterface $response */
-                    $response = $this->jitter->retry(function() use ($facade) {
+                    $response = $this->jitter->retry(function () use ($facade) {
                         try {
                             $response = $this->httpClient->send(new Request('GET', $facade->getDownloadUrl()));
                         } catch (RuntimeException $e) {
@@ -566,7 +566,12 @@ class Crocodoc
                         'now'          => Alaress_Date_Format::now(),
                     ]);
                     $feedbackId = $this->database->lastInsertId();
-                    $this->log->debug(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
+                    $this->log->debug(
+                        sprintf(
+                            'Attaching document to new draft floating feedback (id: %d)',
+                            $feedbackId
+                        )
+                    );
                 }
             }
         }
@@ -609,7 +614,7 @@ class Crocodoc
      * Log what is happening with the archive process to the database.
      *
      * @param int    $fileId
-     * @param int    $feedbackFileId
+     * @param int?   $feedbackFileId
      * @param string $crocodocDocumentId
      * @param string $status
      * @param string $message
