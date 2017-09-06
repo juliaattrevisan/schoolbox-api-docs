@@ -7,16 +7,14 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use ICollection;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\User;
 
 /**
  * Responsible for replicating Assessments in a new Context
@@ -63,13 +61,16 @@ class Replicator
      *
      * @param IAssessable       $assessmentSpec  the assessments to replicate
      * @param AssessmentContext $destination     the location into which to replicate the assessments
+     * @param User              $newOwner        who should own the newly created assessment
      * @throws Mapper\Exception                  if any part of the replication fails
+     * @throws \InvalidArgumentException         If Destination Quiz already has Sections
      * @return IAssessable                       the NEW assessments, as replicated
      */
-    public function replicateInNewContext(IAssessable $assessmentSpec, AssessmentContext $destination)
+    public function replicateInNewContext(IAssessable $assessmentSpec, AssessmentContext $destination, User $newOwner)
     {
         $newAssessment = $assessmentSpec->cloneForCopy();
         $newAssessment->setContext($destination);
+        $newAssessment->setCreator($newOwner);
 
         $this->assessmentMapperProxy->save($newAssessment);
         $destination->getAssessables()->add($newAssessment);
@@ -91,6 +92,7 @@ class Replicator
      * Can handle when $assessable is a Quiz, or any level of Project (via Recursion)
      *
      * @param IAssessable $assessable
+     * @throws \InvalidArgumentException If Destination Quiz already has Sections
      */
     protected function replicateQuizConstituents(IAssessable $assessable)
     {

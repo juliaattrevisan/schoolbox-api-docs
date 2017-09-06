@@ -25,6 +25,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -681,9 +682,7 @@ class Controller extends Base\Base
                     if (is_array($unitPair['a'])) {
                         // Create/Update AssessmentImpls
                         foreach ($unitPair['a'] as $aData) {
-
-                            $this->parseAssessmentForm($unitImpl, $aData);
-
+                            $this->parseAssessmentForm($unitImpl, $aData, $classOwners[$classFolderId]);
                         }
                     }
                 }
@@ -730,14 +729,15 @@ class Controller extends Base\Base
      * Recursive method to create/update assessments using form data
      *
      * @param AssessmentContext $context
-     * @param array $data
+     * @param array             $data
+     * @param User              $newOwner
      * @var null|int      $data['spec_id']    Will be null if not imported from a Spec
      * @var null|int      $data['impl_id']    Will be null if not yet imported
      * @var null|1        $data['checked']    Did user check the item?
      * @var null|string[] $data['dates']
      * @var null|mixed[]  $data['a']          If this assessment is a Project, the data for its sub-assessables
      */
-    protected function parseAssessmentForm(AssessmentContext $context, array $data)
+    protected function parseAssessmentForm(AssessmentContext $context, array $data, User $newOwner)
     {
         $specId    = isset($data['spec_id']) ? $data['spec_id'] : null;
         $implId    = isset($data['impl_id']) ? $data['impl_id'] : null;
@@ -776,7 +776,7 @@ class Controller extends Base\Base
 
         if(!$implId){
             // INSERT - Create Impl from Spec
-            $newAssessment = $this->replicator->replicateInNewContext($assessment, $context);
+            $newAssessment = $this->replicator->replicateInNewContext($assessment, $context, $newOwner);
         } else {
             // UPDATE
             $newAssessment = null;
@@ -788,7 +788,7 @@ class Controller extends Base\Base
             foreach($subData as $subDatum){
                 /** @var Project $project */
                 $project = $newAssessment ?: $assessment;
-                $this->parseAssessmentForm($project, $subDatum);
+                $this->parseAssessmentForm($project, $subDatum, $newOwner);
             }
         }
     }
