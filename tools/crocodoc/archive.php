@@ -21,9 +21,10 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+$fields  = ['dry-run', 'rescan-failed', 'help', 'max-attempts:', 'max-skips:'];
+$options = require_once __DIR__ . '/../../conf/core/require-cli.php';
 
-$options = getopt('v', ['dry-run', 'rescan-failed', 'help', 'max-attempts:', 'max-skips:']);
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Crocodoc Archiver',
     [
@@ -31,8 +32,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
         'errors'      => E_ALL,
         'dryRun'      => isset($options['dry-run']),
         'retryFailed' => isset($options['retry-failed']),
-        'maxAttempts' => $options['max-attempts'],
-        'maxSkips'    => $options['max-skips'],
+        'maxAttempts' => isset($options['max-attempts']) ? $options['max-attempts'] : null,
+        'maxSkips'    => isset($options['max-skips']) ? $options['max-skips'] : null,
     ]
 );
 
