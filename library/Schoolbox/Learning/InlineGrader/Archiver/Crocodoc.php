@@ -396,7 +396,6 @@ class Crocodoc
                     $failureCount++;
                     continue;
                 }
-                $log->debug('Crocodoc document successfully retrieved');
 
 
                 // Now store it and create a feedback for it
@@ -404,10 +403,11 @@ class Crocodoc
                 $feedbackFileId = $this->archiveCrocodocInFeedback($log, $storageModel, $feedbackId, $filename);
 
 
-                // Here, have a helpful link to the inline grader so you can see the doc
+                // Done
+                // Have a helpful link to the inline grader so you can see the doc, too
                 $log->info(
                     sprintf(
-                        'Archived document visible at: /learning/assessments/%d/%d/responses/',
+                        'Crocodoc document successfully archived; visible at: /learning/assessments/%d/%d/responses/',
                         $row['assessmentId'],
                         $row['studentId']
                     )
