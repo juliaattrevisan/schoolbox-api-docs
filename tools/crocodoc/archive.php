@@ -84,8 +84,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
 
-    $archiver = new CrocodocArchiver($db, $httpClient, $storageMapper);
-    $result = $archiver->archive($systemUser, $log, $dryRun, $rescanFailed);
+    $archiver = new CrocodocArchiver($db, $httpClient, $storageMapper, $log);
+    $result = $archiver->archive($systemUser, $dryRun, $rescanFailed);
     if ($result['failed'] > 0) {
         exit(1);
     }

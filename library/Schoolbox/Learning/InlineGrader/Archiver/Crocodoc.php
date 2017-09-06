@@ -44,6 +44,11 @@ class Crocodoc
      */
     private $storageMapper;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $log;
+
     // -- Queries
 
     /**
@@ -125,15 +130,17 @@ class Crocodoc
     /**
      * Build the archiver.
      *
-     * @param IConnector    $database
-     * @param HttpClient    $httpClient
-     * @param StorageMapper $storageMapper
+     * @param IConnector      $database
+     * @param HttpClient      $httpClient
+     * @param StorageMapper   $storageMapper
+     * @param LoggerInterface $log
      */
-    public function __construct(IConnector $database, HttpClient $httpClient, StorageMapper $storageMapper)
+    public function __construct(IConnector $database, HttpClient $httpClient, StorageMapper $storageMapper, LoggerInterface $log)
     {
         $this->database = $database;
         $this->httpClient = $httpClient;
         $this->storageMapper = $storageMapper;
+        $this->log = $log;
         $this->setupQueries();
     }
 
@@ -277,16 +284,15 @@ class Crocodoc
     /**
      * Start archiving
      *
-     * @param User            $systemUser
-     * @param LoggerInterface $log
-     * @param bool            $dryRun
-     * @param bool            $rescanFailed
+     * @param User $systemUser
+     * @param bool $dryRun
+     * @param bool $rescanFailed
      * @return array attempted:  number of items we attempted to archive
      *               successful: number of items successfully archived
      *               failed:     number that failed for whatever reason
      * @throws DatabaseException if a query went wrong
      */
-    public function archive(User $systemUser, LoggerInterface $log, $dryRun = false, $rescanFailed = false)
+    public function archive(User $systemUser, $dryRun = false, $rescanFailed = false)
     {
         // Get a count
         if ($rescanFailed) {
@@ -298,16 +304,20 @@ class Crocodoc
             $crocodocCount = $this->countUnarchivedCrocodocQuery->fetchColumn();
             $selectCrocodocQuery = $this->selectUnarchivedCrocodocQuery;
         }
-        $log->notice(sprintf('%d Crocodoc documents require archival', $crocodocCount));
+        $this->log->notice(sprintf('%d Crocodoc documents require archival', $crocodocCount));
 
 
         // Go
         $successCount = 0;
         $failureCount = 0;
+        // How many times has this failed in a row? Use this to determine jitter
+        $sequentialFailures = 0;
 
         // Rerun the select query over and over again in batches
         $stepCount = $crocodocCount;
         while ($stepCount > 0) {
+
+            // Die if sequential failures amount is past a threshold
 
             // Fetch the next rowset.
             // For wet runs: offset by 0 always
@@ -327,7 +337,7 @@ class Crocodoc
                 $filename = $row['fileName'];
 
                 $stepCount--;
-                $log->notice(
+                $this->log->notice(
                     sprintf(
                         'Archiving Crocodoc document "%s" (%d/%d)',
                         $row['crocodocDocumentId'],
@@ -344,11 +354,12 @@ class Crocodoc
                     (int)$row['boxId'],
                     $systemUser->getId(),
                     $dryRun,
-                    $log
+                    $this->log
                 );
                 if ($dryRun) {
                     $successCount++;
-                    $log->info('Crocodoc document successfully attached to feedback');
+                    $sequentialFailures = 0;
+                    $this->log->info('Crocodoc document successfully attached to feedback');
                     continue;
                 }
 
@@ -370,7 +381,7 @@ class Crocodoc
                     $response = $this->httpClient->get($facade->getDownloadUrl())->send();
                 } catch (RuntimeException $e) {
                     // skip this one; consider jittering
-                    $log->warning(
+                    $this->log->warning(
                         sprintf(
                             'Exception raised when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
                             $e->getCode(),
@@ -379,13 +390,14 @@ class Crocodoc
                     );
                     $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $e->getMessage());
                     $failureCount++;
+                    $sequentialFailures++;
                     continue;
                 }
                 if ($response->isError()) {
                     // skip this one; consider jittering
                     // Also consider exiting completely if there's too many errors
                     $responseJson = json_decode($response, true);
-                    $log->warning(
+                    $this->log->warning(
                         sprintf(
                             'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
                             $response->getStatusCode(),
@@ -394,18 +406,19 @@ class Crocodoc
                     );
                     $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $responseJson['error']);
                     $failureCount++;
+                    $sequentialFailures++;
                     continue;
                 }
 
 
                 // Now store it and create a feedback for it
                 $storageModel = $this->uploadCrocodocToStorage($response, $filename);
-                $feedbackFileId = $this->archiveCrocodocInFeedback($storageModel, $feedbackId, $filename, $log);
+                $feedbackFileId = $this->archiveCrocodocInFeedback($storageModel, $feedbackId, $filename);
 
 
                 // Done
                 // Have a helpful link to the inline grader so you can see the doc, too
-                $log->info(
+                $this->log->info(
                     sprintf(
                         'Crocodoc document successfully archived; visible at: /learning/assessments/%d/%d/responses/',
                         $row['assessmentId'],
@@ -415,6 +428,7 @@ class Crocodoc
 
                 $this->logToDatabase($fileId, $feedbackFileId, $crocodocDocumentId, 'completed', '');
                 $successCount++;
+                $sequentialFailures = 0;
             }
             $selectCrocodocQuery->close();
         }
@@ -428,9 +442,9 @@ class Crocodoc
             $crocodocCount - $successCount - $failureCount
         );
         if ($failureCount > 0) {
-            $log->warning($message);
+            $this->log->warning($message);
         } else {
-            $log->notice($message);
+            $this->log->notice($message);
         }
         return [
             'attempted'  => $successCount + $failureCount,
@@ -479,35 +493,34 @@ class Crocodoc
      * 2. most recent floating feedback for this participant
      * 3. a new draft feedback for this participant (not created if `$dryRun` is on)
      *
-     * @param int             $responseId   The ID of the student's response
-     * @param int             $studentId    The student's ID
-     * @param int             $boxId        The ID of the submission box to which the response belongs to
-     * @param int             $systemUserId A user ID to use as the owner for a new feedback, if required
-     * @param bool            $dryRun
-     * @param LoggerInterface $log
+     * @param int  $responseId   The ID of the student's response
+     * @param int  $studentId    The student's ID
+     * @param int  $boxId        The ID of the submission box to which the response belongs to
+     * @param int  $systemUserId A user ID to use as the owner for a new feedback, if required
+     * @param bool $dryRun
      * @return int The PK of the feedback ID in which to upload
      * @throws DatabaseException if a query breaks
      */
-    private function findFeedbackId($responseId, $studentId, $boxId, $systemUserId, $dryRun, LoggerInterface $log)
+    private function findFeedbackId($responseId, $studentId, $boxId, $systemUserId, $dryRun)
     {
         $this->selectAttachedFeedbackQuery->execute(['responseId' => $responseId,]);
         $feedbackId = $this->selectAttachedFeedbackQuery->fetchColumn();
         if ($feedbackId) {
-            $log->debug(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
+            $this->log->debug(sprintf('Attaching document to most recent non-floating feedback (id: %d)', $feedbackId));
         } else {
-            $log->debug('No non-floating feedback found - searching for floating feedback');
+            $this->log->debug('No non-floating feedback found - searching for floating feedback');
             $this->selectFloatingFeedbackQuery->execute([
                 'studentId' => $studentId,
                 'boxId'     => $boxId,
             ]);
             $feedbackId = $this->selectFloatingFeedbackQuery->fetchColumn();
             if ($feedbackId) {
-                $log->debug(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
+                $this->log->debug(sprintf('Attaching document to most recent floating feedback (id: %d)', $feedbackId));
             } else {
-                $log->debug('No floating feedback found - creating a new draft floating feedback');
+                $this->log->debug('No floating feedback found - creating a new draft floating feedback');
                 // create one, if not a dry run
                 if ($dryRun) {
-                    $log->debug(sprintf('Attaching document to new draft floating feedback'));
+                    $this->log->debug(sprintf('Attaching document to new draft floating feedback'));
                 } else {
                     $this->insertNewFeedbackQuery->execute([
                         'systemUserId' => $systemUserId,
@@ -516,7 +529,7 @@ class Crocodoc
                         'now'          => Alaress_Date_Format::now(),
                     ]);
                     $feedbackId = $this->database->lastInsertId();
-                    $log->debug(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
+                    $this->log->debug(sprintf('Attaching document to new draft floating feedback (id: %d)', $feedbackId));
                 }
             }
         }
@@ -526,14 +539,13 @@ class Crocodoc
     /**
      * Archives the uploaded Crocodoc document in a feedback.
      *
-     * @param StorageModel    $storageModel
-     * @param int             $feedbackId
-     * @param string          $filename
-     * @param LoggerInterface $log
+     * @param StorageModel $storageModel
+     * @param int          $feedbackId
+     * @param string       $filename
      * @return int The PK of the new feedback file ID in which the Crocodoc was uploaded
      * @throws DatabaseException if a query breaks
      */
-    private function archiveCrocodocInFeedback(StorageModel $storageModel, $feedbackId, $filename, LoggerInterface $log)
+    private function archiveCrocodocInFeedback(StorageModel $storageModel, $feedbackId, $filename)
     {
         // Attach to the feedback, if it isn't already
         $this->selectExistingFeedbackFileQuery->execute([
@@ -549,9 +561,9 @@ class Crocodoc
                 'now'        => Alaress_Date_Format::now(),
             ]);
             $feedbackFileId = $this->database->lastInsertId();
-            $log->info('Crocodoc document successfully attached to feedback');
+            $this->log->info('Crocodoc document successfully attached to feedback');
         } else {
-            $log->info('Crocodoc document already attached to feedback - not attaching again');
+            $this->log->info('Crocodoc document already attached to feedback - not attaching again');
         }
         return (int)$feedbackFileId;
     }
