@@ -13,7 +13,7 @@ INSERT INTO component_definition
 )
   SELECT
     'Survey Summary',
-    'Custom\\demo\\Survey\\Component\\Eportfolio\\Controller',
+    'Custom\\Loyola\\Survey\\Component\\Eportfolio\\Controller',
     'Provides a summary of latest survey results for a student on their ePortfolio page',
     'eportfolio',
     1,
@@ -31,7 +31,7 @@ INSERT INTO component_config_definition
   description
 )
   SELECT
-    (SELECT `id` FROM `component_definition` WHERE class = 'Custom\\demo\\Survey\\Component\\Eportfolio\\Controller'),
+    (SELECT `id` FROM `component_definition` WHERE class = 'Custom\\Loyola\\Survey\\Component\\Eportfolio\\Controller'),
     'collapse',
     '1',
     'Display Component Heading On Student View',
@@ -48,7 +48,7 @@ INSERT INTO component_config_definition
   description
 )
   SELECT
-    (SELECT `id` FROM `component_definition` WHERE class = 'Custom\\demo\\Survey\\Component\\Eportfolio\\Controller'),
+    (SELECT `id` FROM `component_definition` WHERE class = 'Custom\\Loyola\\Survey\\Component\\Eportfolio\\Controller'),
     'componentname',
     'Survey',
     'Heading',
@@ -65,7 +65,7 @@ INSERT INTO component_config_definition
   description
 )
   SELECT
-    (SELECT `id` FROM `component_definition` WHERE class = 'Custom\\demo\\Survey\\Component\\Eportfolio\\Controller'),
+    (SELECT `id` FROM `component_definition` WHERE class = 'Custom\\Loyola\\Survey\\Component\\Eportfolio\\Controller'),
     'survey',
     '',
     'Select Survey',
@@ -83,7 +83,7 @@ INSERT INTO component_config_definition
 )
 
   SELECT
-    (SELECT `id` FROM `component_definition` WHERE class = 'Custom\\demo\\Survey\\Component\\Eportfolio\\Controller'),
+    (SELECT `id` FROM `component_definition` WHERE class = 'Custom\\Loyola\\Survey\\Component\\Eportfolio\\Controller'),
     'size',
     '4',
     'Number Of Questions To Display',
