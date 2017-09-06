@@ -192,7 +192,7 @@ class Crocodoc
             AND   ss.submitted_at IS NOT NULL
         ";
         $crocodocWhereUnarchived = $crocodocWhere . "AND log.status IS NULL";
-        $crocodocWhereFailed = $crocodocWhere . "AND log.status != 'complete'";
+        $crocodocWhereFailed = $crocodocWhere . "AND log.status NOT IN ('pending', 'complete')";
 
         $this->selectUnarchivedCrocodocQuery = $this->database->prepareQuery("
             $crocodocSelect
@@ -307,7 +307,7 @@ class Crocodoc
      *
      * @param User $systemUser
      * @param bool $dryRun
-     * @param bool $rescanFailed
+     * @param bool $retryFailed
      * @param int  $maxSequentialFailures Maximum tolerable failures in a row.
      *                                    Sequential failures suggest something
      *                                    is broken that needs attention.
@@ -316,10 +316,10 @@ class Crocodoc
      *               failed:     number that failed for whatever reason
      * @throws DatabaseException if a query went wrong
      */
-    public function archive(User $systemUser, $dryRun = false, $rescanFailed = false, $maxSequentialFailures = 3)
+    public function archive(User $systemUser, $dryRun = false, $retryFailed = false, $maxSequentialFailures = 3)
     {
         // Get a count
-        if ($rescanFailed) {
+        if ($retryFailed) {
             $this->countFailedCrocodocQuery->execute();
             $crocodocCount = $this->countFailedCrocodocQuery->fetchColumn();
             $selectCrocodocQuery = $this->selectFailedCrocodocQuery;

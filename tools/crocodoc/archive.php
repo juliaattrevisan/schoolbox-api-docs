@@ -27,10 +27,10 @@ $options = getopt('v', ['dry-run', 'rescan-failed', 'help']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Crocodoc Archiver',
     [
-        'verbose'      => isset($options['v']) ? $options['v'] : null,
-        'errors'       => E_ALL,
-        'dryRun'       => isset($options['dry-run']),
-        'rescanFailed' => isset($options['rescan-failed']),
+        'verbose'     => isset($options['v']) ? $options['v'] : null,
+        'errors'      => E_ALL,
+        'dryRun'      => isset($options['dry-run']),
+        'retryFailed' => isset($options['retry-failed']),
     ]
 );
 
@@ -42,7 +42,7 @@ Usage: archive.php -v[vv] [--dry-run] [--rescan-failed]
     -v:                  Verbosity level, -vvv: most verbose
     --dry-run:           if set, don't actually archive anything, but show what
                          would be archived.
-    --rescan-failed:     if set, attempt to archive documents that failed
+    --retry-failed:      if set, attempt to archive documents that failed
                          archive in a previous run of this script.
                          By default, it will only attempt to archive documents
                          that have not yet been attempted.
@@ -58,9 +58,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $log->notice('Performing dry run - no documents will be archived');
     }
 
-    $rescanFailed = $options['rescanFailed'];
-    if ($rescanFailed) {
-        $log->notice('Attempting to rescan documents that have failed processing previously');
+    $retryFailed = $options['retryFailed'];
+    if ($retryFailed) {
+        $log->notice('Attempting to retry documents that have failed processing previously');
     }
 
     /**
@@ -88,7 +88,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $db = $di->get('databaseInternal');
 
     $archiver = new CrocodocArchiver($db, $httpClient, $jitter, $storageMapper, $log);
-    $result = $archiver->archive($systemUser, $dryRun, $rescanFailed);
+    $result = $archiver->archive($systemUser, $dryRun, $retryFailed);
     if ($result['failed'] > 0) {
         exit(1);
     }
