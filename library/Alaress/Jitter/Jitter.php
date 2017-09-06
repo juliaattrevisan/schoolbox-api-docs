@@ -39,14 +39,16 @@ class Jitter implements IJitter
      * Constructor
      *
      * @param IGenerator $rng
-     * @param int        $maxRetries
-     * @param int        $baseTimeout
+     * @param int        $maxRetries  How many attempts to make
+     * @param int        $baseTimeout A base number of milliseconds to wait.
+     *                                The actual wait will be based on this,
+     *                                and increase roughly exponentially.
      */
     public function __construct(IGenerator $rng, $maxRetries = 10, $baseTimeout = 500)
     {
-        $this->rng         = $rng;
+        $this->rng = $rng;
         $this->baseTimeout = $baseTimeout;
-        $this->maxRetries  = $maxRetries;
+        $this->maxRetries = $maxRetries;
     }
 
     /**
@@ -81,7 +83,34 @@ class Jitter implements IJitter
             throw new MaxRetriesExceededException(sprintf('Maximum of %d retries exceeded', $this->maxRetries));
         }
 
-        $sleep = $this->baseTimeout * min($this->maxRetries, pow(2, ($retries-1)));
+        $sleep = $this->baseTimeout * min($this->maxRetries, pow(2, ($retries - 1)));
         return $sleep * $this->rng->generate();
+    }
+
+    /**
+     * Built-in retry of `$callable` until it either returns or retries too
+     * many times.
+     *
+     * @param callable $callable
+     * @return mixed Whatever `$callable` returns if it doesn't exception out
+     * @throws MaxRetriesExceededException if `$callable` never returned
+     */
+    public function retry(callable $callable)
+    {
+        $retries = 0;
+        while (true) {
+            $jitter = $this->calculateJitter($retries);
+            if ($jitter > 0) {
+                usleep($jitter * 1000);
+            }
+            try {
+                return $callable();
+            } catch (\Exception $e) {
+                $retries++;
+            }
+        }
+
+        // Should never get here, but:
+        return null;
     }
 }

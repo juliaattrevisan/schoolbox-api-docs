@@ -31,4 +31,14 @@ interface IJitter
      * @throws MaxRetriesExceededException if $retries is more than allowed
      */
     public function calculateJitter($retries);
+
+    /**
+     * Built-in retry of `$callable` until it either returns or retries too
+     * many times.
+     *
+     * @param callable $callable
+     * @return mixed Whatever `$callable` returns if it doesn't exception out
+     * @throws MaxRetriesExceededException if `$callable` never returned
+     */
+    public function retry(callable $callable);
 }
