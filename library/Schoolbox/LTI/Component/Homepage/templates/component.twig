@@ -9,7 +9,10 @@
                     {% if readOnly %}
                         <p>There is no embedded learning tool to interact with at this time.</p>
                     {% elseif user.superUser %}
-                        <p><a href="/adminv2/lti">Add an LTI provider</a> in the Administration system to allow users to embed third party embedded learning tools in this component.</p>
+                        <p>
+                            <a href="/adminv2/lti">Add an LTI provider</a> in the Administration system to allow
+                            users to embed third party embedded learning tools in this component.
+                        </p>
                     {% else %}
                         <p>Ask your System Administrator to add LTI providers to use this feature.</p>
                     {% endif %}
@@ -29,7 +32,10 @@
                 <section>
                     <div class="empty-state">
                         <i class="icon-settings"></i>
-                        <p>Select a third party embedded learning tool to display in this component for users to interact with.</p>
+                        <p>
+                            Select a third party embedded learning tool to display in this component for users to
+                            interact with.
+                        </p>
                         <p>
                             {% set foundLearningField = false %}
                             {% for provider in providers %}
@@ -54,20 +60,23 @@
             </div>
         </div>
         <script>
-            $(function() {
+            $(function () {
 
                 {% if foundLearningField %}
-                    $('[data-provider-learningfield]').click(function() {
+                $('[data-provider-learningfield]').click(function () {
 
-                        $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {providerId: 'providerId', componentId: componentInstanceId}) }}'.replace(/providerId/g, '{{ learningfieldProviderId }}'), {
-                            url: $('#learningfieldUrl').val()
-                        }).success(function () {
-                            window.location.reload();
-                        });
+                    $.post('{{ routeLookup('ltiConsumer.postComponentProvider', {
+                        providerId: 'providerId',
+                        componentId: componentInstanceId
+                    }) }}'.replace(/providerId/g, '{{ learningfieldProviderId }}'), {
+                        url: $('#learningfieldUrl').val()
+                    }).success(function () {
+                        window.location.reload();
                     });
+                });
                 {% endif %}
 
-                $('[data-provider]').click(function() {
+                $('[data-provider]').click(function () {
 
                     var $toaster = $('#lti-toaster');
                     $toaster.toastActivate({text: 'Loading LTI Provider...'});
@@ -77,7 +86,8 @@
                     $('#lti-select-provider').hide();
                     $('#lti-select-preloader').show();
 
-                    {# When a provider is clicked we need to dynamically update the component and launch the LTI request in its iframe #}
+                    {# When a provider is clicked we need to dynamically update the component and launch the #}
+                    {# LTI request in its iframe #}
 
                     var providerId = $(this).data('provider');
 
@@ -86,7 +96,7 @@
                             providerId: 'providerId',
                             componentId: componentInstanceId
                         }) }}'.replace(/providerId/g, providerId)
-                    ).success(function(result) {
+                    ).success(function (result) {
                         var component = $('#component{{ componentInstanceId }}');
 
                         {# Hide preloader #}
@@ -111,9 +121,14 @@
 
                         var iframe = $('#lti-frame');
 
-                        iframe.attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {providerId: 'providerId', componentId: componentInstanceId, folderId: folderId}) }}'.replace(/providerId/g, providerId));
+                        iframe.attr('src', '{{ routeLookup('ltiConsumer.getLaunch', {
+                            providerId: 'providerId',
+                            componentId: componentInstanceId,
+                            folderId: folderId
+                        }) }}'.replace(/providerId/g, providerId));
+
                         iframe.show();
-                    }).fail(function() {
+                    }).fail(function () {
                         {# This shouldn't happen, but just in case something goes wrong #}
 
                         $('#lti-select-preloader').hide();
@@ -126,10 +141,15 @@
             });
         </script>
 
-        <div id="modal-learningfield" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+        <div id="modal-learningfield"
+             class="reveal-modal"
+             data-reveal aria-labelledby="modalTitle"
+             aria-hidden="true"
+             role="dialog">
             <p class="lead">Book Source</p>
             <p>Please copy/paste the URL of the resource you want to embed below.</p>
-            <input type="text" id="learningfieldUrl" placeholder="(e.g. https://bookshelf.vitalsource.com/books/LF9781740813518/pageid/152)">
+            <input type="text" id="learningfieldUrl"
+                   placeholder="(e.g. https://bookshelf.vitalsource.com/books/LF9781740813518/pageid/152)">
             <button data-provider-learningfield="learningfieldProviderId">Save</button>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
@@ -137,7 +157,13 @@
         <iframe id="lti-frame" style="height:{{ height }}px;display:none;" src="about:blank" frameborder="0"></iframe>
 
     {% else %}
-        <iframe id="ltiFrame{{ componentInstanceId }}" style="height:{{ height }}px;" src="{{ routeLookup('ltiConsumer.getLaunch', {providerId: providerId, componentId: componentInstanceId, folderId: folderId}) }}" frameborder="0"></iframe>
+        <iframe id="ltiFrame{{ componentInstanceId }}"
+                style="height:{{ height }}px;"
+                src="{{ routeLookup('ltiConsumer.getLaunch', {
+                    providerId: providerId,
+                    componentId: componentInstanceId,
+                    folderId: folderId
+                }) }}" frameborder="0"></iframe>
     {% endif %}
 
 {% endif %}
