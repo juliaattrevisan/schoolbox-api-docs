@@ -1030,6 +1030,18 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * Override a single configuration variable on the component
+     *
+     * @param $key
+     * @param $value
+     * @return static
+     */
+    public function setConfigValue($key, $value) {
+        $this->config[$key]['value'] = $value;
+        return $this;
+    }
+
+    /**
      * @param array $config
      * @return static
      */
