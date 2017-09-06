@@ -184,8 +184,9 @@ class Crocodoc
         $crocodocFrom = "
             FROM student_submission_file ssf
             LEFT  JOIN student_submission_file_crocodoc_archive_log log ON ssf.id = log.student_submission_file_id
-            INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
+            INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id AND ss.deleted_at IS NULL
             INNER JOIN submission_box sb ON ss.box_id = sb.id
+            INNER JOIN assessment a ON sb.assessment_id = a.id AND a.deleted_at IS NULL
         ";
         $crocodocWhere = "
             WHERE ssf.uuid IS NOT NULL
