@@ -12,7 +12,7 @@ use Alaress\Random\IGenerator;
 /**
  * Class Jitter
  */
-class Jitter
+class Jitter implements IJitter
 {
     /**
      * A random number generator; injected so it's unit-testable
