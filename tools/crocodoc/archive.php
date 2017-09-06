@@ -41,7 +41,7 @@ if (isset($options['help'])) {
     echo <<<HELP
 Archives Crocodoc documents.
 
-Usage: archive.php -v[vv] [--dry-run] [--retry-failed] [--max-failures=3]
+Usage: archive.php -v[vv] [--dry-run] [--retry-failed] [--max-attempts=3] [--max-skips=3]
     -v:                  Verbosity level, -vvv: most verbose
     --dry-run:           if set, don't actually archive anything, but show what
                          would be archived.
