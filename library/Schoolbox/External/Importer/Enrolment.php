@@ -81,8 +81,8 @@ class Enrolment extends AbstractImporter
         }
         $result = [];
         foreach ($this->reader as $i => $row) {
-            $classCode   = $row['Class Code'];
-            $studentCode = $row['Student Code'];
+            $classCode   = trim($row['Class Code']);
+            $studentCode = trim($row['Student Code']);
             if (!isset($classCode) || !isset($studentCode)) {
                 $this->log->warning('Mandatory fields "Class Code" and "Student Code" not defined: skipping!');
                 continue;
@@ -91,13 +91,13 @@ class Enrolment extends AbstractImporter
             // Load student and class from DB
             /** @var ClassEntry $class */
             try {
-                $class = $this->classMapper->findOneByColumn('code', $classCode);
+                $class = $this->classMapper->findOneByColumn('code', $classCode, [], ['cache'=>false]);
             } catch (Mapper\Exception $e) {
                 $this->log->warning(sprintf('Class "%s" not found: creating a new class', $classCode));
                 $class = $this->classMapper->createModel();
                 $class
                     ->setCode($classCode)
-                    ->setName($row['Class Title'] ?: '')
+                    ->setName(trim($row['Class Title']))
                 ;
             }
             try {
@@ -132,7 +132,7 @@ class Enrolment extends AbstractImporter
                     // This same class might have been created in an earlier enrolment update.
                     // I still need the ID regardless.
                     try {
-                        $class = $this->classMapper->findOneByColumn('code', $class->getCode());
+                        $class = $this->classMapper->findOneByColumn('code', $class->getCode(),  [], ['cache'=>false]);
                     } catch (Mapper\Exception $e) {
                         $createdClasses[$class->getCode()] = true;
                         $this->log->info(sprintf('Creating class "%s"', $class->getCode()));
