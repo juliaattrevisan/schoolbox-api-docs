@@ -23,7 +23,7 @@ use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
-$options = getopt('v', ['dry-run', 'rescan-failed', 'help', 'max-failures:']);
+$options = getopt('v', ['dry-run', 'rescan-failed', 'help', 'max-attempts:', 'max-skips:']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Crocodoc Archiver',
     [
@@ -31,7 +31,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
         'errors'      => E_ALL,
         'dryRun'      => isset($options['dry-run']),
         'retryFailed' => isset($options['retry-failed']),
-        'maxFailures' => $options['maxFailures'],
+        'maxAttempts' => $options['max-attempts'],
+        'maxSkips'    => $options['max-skips'],
     ]
 );
 
@@ -47,9 +48,12 @@ Usage: archive.php -v[vv] [--dry-run] [--retry-failed] [--max-failures=3]
                          archive in a previous run of this script.
                          By default, it will only attempt to archive documents
                          that have not yet been attempted.
-    --max-failures:      if set, the maximum number of failed sequential
-                         failures before the script aborts.
-                         Defaults to 3
+    --max-attempts:      The maximum number of attempts to download a document
+                         before skipping that document.
+                         Defaults to 3.
+    --max-skips:         The maximum number of times in a row that a document
+                         may be skipped before the script aborts.
+                         Defaults to 3.
 
 HELP;
     exit;
@@ -67,9 +71,14 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $log->notice('Attempting to retry documents that have failed processing previously');
     }
 
-    $maxFailures = (int)$options['maxFailures'];
-    if (!$maxFailures) {
-        $maxFailures = 3;
+    $maxAttempts = (int)$options['maxAttempts'];
+    if (!$maxAttempts) {
+        $maxAttempts = 3;
+    }
+
+    $maxSkips = (int)$options['maxSkips'];
+    if (!$maxSkips) {
+        $maxSkips = 3;
     }
 
     /**
@@ -81,7 +90,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $mapperFactory = $di->get('mapperFactory');
     $userMapper = $mapperFactory->get(UserMapper::class);
     $storageMapper = $mapperFactory->get(StorageMapper::class);
-    $jitter = new Jitter(new FloatGenerator(), 3, 500);
+    $jitter = new Jitter(new FloatGenerator(), $maxAttempts, 500);
 
 
     // Figure out a system user
@@ -97,7 +106,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $db = $di->get('databaseInternal');
 
     $archiver = new CrocodocArchiver($db, $httpClient, $jitter, $storageMapper, $log);
-    $result = $archiver->archive($systemUser, $dryRun, $retryFailed, $maxFailures);
+    $result = $archiver->archive($systemUser, $dryRun, $retryFailed, $maxSkips);
     if ($result['failed'] > 0) {
         exit(1);
     }
