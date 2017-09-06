@@ -1,0 +1,13 @@
+{##
+ # Display the mark visiblity for an assessment
+ # Note: you may need to name this something other than 'markVisibility' when you import, due to naming conflict.
+ #}
+{% macro markVisibility(assessment) %}
+    {% if assessment.markVisibility == 2 %}
+        <li class="icon-staff">Marks visible to staff, students and parents</li>
+    {% elseif assessment.markVisibility == 1 %}
+        <li class="icon-staff-students">Marks visible to staff and students</li>
+    {% elseif assessment.markVisibility == 0 %}
+        <li class="icon-teacher">Marks visible to staff</li>
+    {% endif %}
+{% endmacro %}
