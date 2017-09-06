@@ -11,10 +11,12 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Jitter\IJitter;
+use Alaress\Jitter\MaxRetriesExceededException;
 use Alaress_Date_Format;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
 use PDO;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -393,36 +395,39 @@ class Crocodoc
 
                 // Try to download the annotated Crocodocument
                 try {
-                    $response = $this->httpClient->send(new Request('GET', $facade->getDownloadUrl()));
-                } catch (RuntimeException $e) {
-                    // skip this one; consider jittering
-                    $this->log->warning(
-                        sprintf(
-                            'Exception raised when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
-                            $e->getCode(),
-                            $e->getMessage()
-                        )
-                    );
-                    $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $e->getMessage());
-                    $failureCount++;
-                    $sequentialFailures++;
-                    continue;
-                }
+                    /** @var ResponseInterface $response */
+                    $response = $this->jitter->retry(function() use ($facade, $fileId, $crocodocDocumentId) {
+                        try {
+                            $response = $this->httpClient->send(new Request('GET', $facade->getDownloadUrl()));
+                        } catch (RuntimeException $e) {
+                            $this->log->warning(
+                                sprintf(
+                                    'Exception raised when fetching Crocodoc document (code: %d, message: "%s")',
+                                    $e->getCode(),
+                                    $e->getMessage()
+                                )
+                            );
+                            throw $e;
+                        }
 
-                if ($response->getStatusCode() >= 400) {
-                    // skip this one; consider jittering
-                    // Also consider exiting completely if there's too many errors
-                    $responseJson = json_decode($response, true);
-                    $this->log->warning(
-                        sprintf(
-                            'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
-                            $response->getStatusCode(),
-                            $responseJson['error']
-                        )
-                    );
-                    $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $responseJson['error']);
+//                        if ($response->getStatusCode() >= 400) {
+//                            // skip this one; consider jittering
+//                            // Also consider exiting completely if there's too many errors
+//                            $responseJson = json_decode($response, true);
+//                            $this->log->warning(
+//                                sprintf(
+//                                    'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
+//                                    $response->getStatusCode(),
+//                                    $responseJson['error']
+//                                )
+//                            );
+//                            $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $responseJson['error']);
+//                        }
+                        return $response;
+                    });
+                } catch (MaxRetriesExceededException $e) {
+                    $this->log->warning('Fetch failed too many times: skipping!');
                     $failureCount++;
-                    $sequentialFailures++;
                     continue;
                 }
 
