@@ -69,6 +69,9 @@
 
                 $('[data-provider]').click(function() {
 
+                    var $toaster = $('#lti-toaster');
+                    $toaster.toastActivate({text: 'Loading LTI Provider...'});
+
                     {# Display a preloader #}
 
                     $('#lti-select-provider').hide();
@@ -89,6 +92,8 @@
                         {# Hide preloader #}
 
                         $('#lti-select-preloader').hide();
+
+                        $toaster.toastTimeout({text: 'Done'});
 
                         {# Update selected provider name in component configuration settings #}
 
@@ -114,7 +119,7 @@
                         $('#lti-select-preloader').hide();
                         $('#lti-select-provider').show();
 
-                        alert('An unexpected error occurred while attempting to load the requested LTI provider, please try again.');
+                        $toaster.toastTimeout({text: 'Error Loading LTI Provider', css: 'alert'});
                     });
                 });
 
@@ -136,3 +141,5 @@
     {% endif %}
 
 {% endif %}
+
+<div id="lti-toaster" class="toast"></div>
