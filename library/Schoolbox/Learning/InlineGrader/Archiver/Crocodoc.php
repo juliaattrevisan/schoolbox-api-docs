@@ -333,8 +333,6 @@ class Crocodoc
         $stepCount = $crocodocCount;
         while ($stepCount > 0) {
 
-            // Die if sequential failures amount is past a threshold
-
             // Fetch the next rowset.
             // For wet runs: offset by 0 always
             // (as each attempt marks the crocodoc as processed, and therefore not fetchable)
@@ -346,6 +344,7 @@ class Crocodoc
                 ],
             ]);
 
+            $breakCompletely = false;
             foreach ($selectCrocodocQuery->executeIterator() as $row) {
 
                 $fileId = (int)$row['fileId'];
@@ -413,8 +412,17 @@ class Crocodoc
                     });
                 } catch (\Exception $e) {
                     $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $e->getMessage());
-                    $this->log->warning('Fetch failed too many times: skipping!');
+                    $this->log->warning('Fetch failed too many times: skipping this document!');
                     $failureCount++;
+                    $sequentialFailures++;
+
+                    // Die if sequential failures amount is past a threshold
+                    if ($sequentialFailures >= 3) {
+                        $this->log->error('Too many sequential failures: aborting!');
+                        $breakCompletely = true;
+                        break;
+                    }
+
                     continue;
                 }
 
@@ -439,6 +447,12 @@ class Crocodoc
                 $sequentialFailures = 0;
             }
             $selectCrocodocQuery->close();
+
+
+            // Break the loop completely if we've had too many failures
+            if ($breakCompletely) {
+                break;
+            }
         }
 
 
