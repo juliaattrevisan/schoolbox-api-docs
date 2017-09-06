@@ -8,9 +8,9 @@
 namespace Alaress\Random;
 
 /**
- * Generator for a pseudo-random number.
+ * Generator for a pseudo-random float between 0 and 1.
  */
-class Generator implements IGenerator
+class FloatGenerator implements IGenerator
 {
     /**
      * Constructor
@@ -27,7 +27,7 @@ class Generator implements IGenerator
     /**
      * @return float
      */
-    public function random()
+    public function generate()
     {
         $randmax = mt_getrandmax();
         return mt_rand(0, $randmax) / $randmax;

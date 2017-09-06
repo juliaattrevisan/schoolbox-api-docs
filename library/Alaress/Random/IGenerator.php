@@ -15,9 +15,10 @@ namespace Alaress\Random;
 interface IGenerator
 {
     /**
-     * Returns a random float between 0 and 1.
+     * Generates a random value.
+     * The type of random value is determined by the generator.
      *
-     * @return float
+     * @return mixed
      */
-    public function random();
+    public function generate();
 }

@@ -12,24 +12,26 @@ use InfiniteIterator;
 use LengthException;
 
 /**
- * Generator for a pseudo-random number.
+ * Generator for a predetermined set of values.
+ *
+ * This generator will cycle through all values within $values.
  */
-class Predetermined implements IGenerator
+class PredeterminedGenerator implements IGenerator
 {
     /**
      *  A list of values to cycle through, forever.
      *
-     * @var float[]|InfiniteIterator
+     * @var mixed[]|InfiniteIterator
      */
     private $values;
 
     /**
      * Constructor
      *
-     * @param float[] $values
+     * @param mixed[] $values
      * @throws LengthException if $values is empty
      */
-    public function __construct($values)
+    public function __construct(array $values)
     {
         if (count($values) === 0) {
             throw new LengthException('$values may not be an empty array');
@@ -40,9 +42,9 @@ class Predetermined implements IGenerator
     }
 
     /**
-     * @return float
+     * @return mixed
      */
-    public function random()
+    public function generate()
     {
         $return = $this->values->current();
         $this->values->next();

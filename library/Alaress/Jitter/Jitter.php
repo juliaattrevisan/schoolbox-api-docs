@@ -73,6 +73,6 @@ class Jitter
             $this->baseTimeout * $this->maxRetries,
             $this->baseTimeout * (2 ^ $retries)
         );
-        return $sleep * $this->rng->random() * 1000;
+        return $sleep * $this->rng->generate() * 1000;
     }
 }
