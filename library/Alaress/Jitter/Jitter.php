@@ -7,11 +7,20 @@
 
 namespace Alaress\Jitter;
 
+use Alaress\Random\IGenerator;
+
 /**
  * Class Jitter
  */
 class Jitter
 {
+    /**
+     * A random number generator; injected so it's unit-testable
+     *
+     * @var IGenerator
+     */
+    private $rng;
+
     /**
      * Base timeout, in milliseconds
      *
@@ -32,8 +41,9 @@ class Jitter
      * @param int $baseTimeout
      * @param int $maxRetries
      */
-    public function __construct($maxRetries = 10, $baseTimeout = 500)
+    public function __construct(IGenerator $rng, $maxRetries = 10, $baseTimeout = 500)
     {
+        $this->rng         = $rng;
         $this->baseTimeout = $baseTimeout;
         $this->maxRetries  = $maxRetries;
     }
@@ -54,19 +64,15 @@ class Jitter
             return 0;
         }
 
+        // Too many failures? error out
         if ($retries > $this->maxRetries) {
             throw new MaxRetriesExceededException(sprintf('Maximum of %d retries exceeded', $this->maxRetries));
         }
-
-        // Too many failures? error out
-        $randmax    = mt_getrandmax();
-        $randfloat  = mt_rand(0, $randmax) / $randmax;
 
         $sleep = min(
             $this->baseTimeout * $this->maxRetries,
             $this->baseTimeout * (2 ^ $retries)
         );
-
-        return $sleep * $randfloat * 1000;
+        return $sleep * $this->rng->random() * 1000;
     }
 }
