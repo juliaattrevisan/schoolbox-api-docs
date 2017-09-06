@@ -401,7 +401,7 @@ class Crocodoc
 
                 // Now store it and create a feedback for it
                 $storageModel   = $this->uploadCrocodocToStorage($response, $filename);
-                $feedbackFileId = $this->archiveCrocodocInFeedback($log, $storageModel, $feedbackId, $row);
+                $feedbackFileId = $this->archiveCrocodocInFeedback($log, $storageModel, $feedbackId, $filename);
 
 
                 // Here, have a helpful link to the inline grader so you can see the doc
@@ -529,11 +529,11 @@ class Crocodoc
      * @param LoggerInterface $log
      * @param int             $feedbackId
      * @param StorageModel    $storageModel
-     * @param array           $row
+     * @param string          $filename
      * @return int The PK of the new feedback file ID in which the Crocodoc was uploaded
      * @throws DatabaseException if a query breaks
      */
-    private function archiveCrocodocInFeedback(LoggerInterface $log, StorageModel $storageModel, $feedbackId, $row)
+    private function archiveCrocodocInFeedback(LoggerInterface $log, StorageModel $storageModel, $feedbackId, $filename)
     {
         // Attach to the feedback, if it isn't already
         $this->selectExistingFeedbackFileQuery->execute([
@@ -545,7 +545,7 @@ class Crocodoc
             $this->insertNewFeedbackFileQuery->execute([
                 'feedbackId' => $feedbackId,
                 'hash'       => $storageModel->getHash(),
-                'fileName'   => $row['fileName'],
+                'fileName'   => $filename,
                 'now'        => Alaress_Date_Format::now(),
             ]);
             $feedbackFileId = $this->database->lastInsertId();
