@@ -121,7 +121,7 @@ class Module extends BaseModule
         $preloadParticipantAndResponse = function ($params) {
             return [
                 'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
-                'response' => $this->preloadResponse($params['assessmentId'], $params['responseId'])
+                'response'    => $this->preloadResponse($params['assessmentId'], $params['responseId'])
             ];
         };
 
@@ -183,11 +183,11 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
         $injector->params[Controller::class] = [
-            'feedbackDataSource' => $injector->lazyGet('feedbackDataSource'),
+            'feedbackDataSource'    => $injector->lazyGet('feedbackDataSource'),
             'participantDataSource' => $injector->lazyGet('participantDataSource'),
-            'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
-            'userMapper' => $this->getMapperFactory()->get(UserMapper::class),
-            'responseDataSource' => $injector->lazyGet('responseDataSource')
+            'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
+            'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
+            'responseDataSource'    => $injector->lazyGet('responseDataSource')
         ];
     }
 
