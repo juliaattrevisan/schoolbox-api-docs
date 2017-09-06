@@ -244,27 +244,25 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 
 
     /**
-    * Post-save method for submission boxes - saves new submission box files
-    *
-    * @param SubmissionBox $object
-    * @param SubmissionBox $previous
-    *
-    * @return bool
-    */
-    public function postSave(SubmissionBox $object, $previous = null)
+     * Post-save method for submission boxes - saves new submission box files
+     *
+     * @param SubmissionBox $object
+     * @return bool
+     */
+    public function postSave(SubmissionBox $object)
     {
         // Don't attempt to sync assessment specs to external markbook (they cannot have interactions)
-        if($this->isAssessmentSpecification($object)){
+        if ($this->isAssessmentSpecification($object)) {
             return false;
         }
 
         // This saves the assessment to the remote system
         $externalMarkbook = new External_Markbook();
-        $activityFactory = new ActivityFactory();
-        if(is_null($previous)) {
-            return $externalMarkbook->createAssessment($activityFactory->buildFromSubmissionBox($object,'upcoming'));
+        $activity         = (new ActivityFactory())->buildFromSubmissionBox($object, 'upcoming');
+        if (!$externalMarkbook->hasAssessment($activity)) {
+            return $externalMarkbook->createAssessment($activity);
         }
-        return $externalMarkbook->updateAssessment($activityFactory->buildFromSubmissionBox($object,'upcoming'));
+        return $externalMarkbook->updateAssessment($activity);
     }
 
     /**
