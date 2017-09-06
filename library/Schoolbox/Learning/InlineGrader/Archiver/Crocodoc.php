@@ -353,7 +353,13 @@ class Crocodoc
                 // Try to download the annotated Crocodocument
                 /** @var Response $response */
                 try {
-                    $facade   = $this->buildFacade($systemUser, $row);
+                    $facade   = $this->buildFacade(
+                        $systemUser,
+                        $fileId,
+                        $crocodocDocumentId,
+                        $filename,
+                        new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT)
+                    );
                     $response = $this->httpClient->get($facade->getDownloadUrl())->send();
                 } catch (RuntimeException $e) {
                     // skip this one; consider jittering
@@ -429,18 +435,21 @@ class Crocodoc
     /**
      * Build a facade as required for downloading a Crocodoc document.
      *
-     * @param User  $systemUser
-     * @param array $row
+     * @param User                $systemUser
+     * @param int                 $fileId
+     * @param string              $crocodocDocumentId
+     * @param string              $filename
+     * @param Alaress_Date_Format $submittedDate
      * @return Facade
      */
-    private function buildFacade(User $systemUser, $row)
+    private function buildFacade(User $systemUser, $fileId, $crocodocDocumentId, $filename, $submittedDate)
     {
         $response = (new DueWorkResponse())
-            ->setSubmittedAt(new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT));
+            ->setSubmittedAt($submittedDate);
         $file = (new DueWorkResponseFile())
-            ->setId($row['fileId'])
-            ->setCrocodocId($row['crocodocDocumentId'])
-            ->setFilename($row['fileName']);
+            ->setId($fileId)
+            ->setCrocodocId($crocodocDocumentId)
+            ->setFilename($filename);
         return new Facade(new Authenticator(), $response, $file, $systemUser);
     }
 
