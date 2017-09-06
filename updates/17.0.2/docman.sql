@@ -29,4 +29,4 @@ WHERE   `name` = 'external_document_docman_categories' AND
                 WHERE   `name` = 'external_document_report_enabled' AND
                         `value` = '1'
             ) `configInternal`
-        ) = 1
+        ) = 1;
