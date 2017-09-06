@@ -303,12 +303,15 @@ class Crocodoc
      * @param User $systemUser
      * @param bool $dryRun
      * @param bool $rescanFailed
+     * @param int  $maxSequentialFailures Maximum tolerable failures in a row.
+     *                                    Sequential failures suggest something
+     *                                    is broken that needs attention.
      * @return array attempted:  number of items we attempted to archive
      *               successful: number of items successfully archived
      *               failed:     number that failed for whatever reason
      * @throws DatabaseException if a query went wrong
      */
-    public function archive(User $systemUser, $dryRun = false, $rescanFailed = false)
+    public function archive(User $systemUser, $dryRun = false, $rescanFailed = false, $maxSequentialFailures = 3)
     {
         // Get a count
         if ($rescanFailed) {
@@ -417,7 +420,7 @@ class Crocodoc
                     $sequentialFailures++;
 
                     // Die if sequential failures amount is past a threshold
-                    if ($sequentialFailures >= 3) {
+                    if ($sequentialFailures >= $maxSequentialFailures) {
                         $this->log->error('Too many sequential failures: aborting!');
                         $breakCompletely = true;
                         break;
