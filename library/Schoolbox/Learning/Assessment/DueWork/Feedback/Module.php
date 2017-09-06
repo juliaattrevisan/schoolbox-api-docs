@@ -53,9 +53,9 @@ class Module extends BaseModule
             )
         );
 
-        // If multiple feedbacks are passed in the POST['feeback'] array we need to check that the logged in user has write access to
-        // each of the folders these assessables are stored in. This is horrible- but I can't find a way to create dynamic permissions
-        // based on the contents of POST data any other way
+        // If multiple feedbacks are passed in the POST['feeback'] array we need to check that the logged in user has
+        // write access to each of the folders these assessables are stored in. This is horrible- but I can't find a
+        // way to create dynamic permissions based on the contents of POST data any other way
 
         if (isset($_POST['feedback'])) {
             $ruleArguments = [];
@@ -63,7 +63,10 @@ class Module extends BaseModule
             foreach ($_POST['feedback'] as $feedback) {
                 // Find each assessable
 
-                $assessment = $this->getAssessmentDataSource()->findById($feedback['assessmentId']);
+                /** @var int $assessmentId */
+                $assessmentId = $feedback['assessmentId'];
+
+                $assessment = $this->getAssessmentDataSource()->findById($assessmentId);
 
                 // Make sure the current user has access to write to the folder in which the assessable is located
 
@@ -121,12 +124,11 @@ class Module extends BaseModule
         $participantRoute = $assessmentRoute . '/{studentId:\d+}';
         $feedbackRoute    = 'feedback/{feedbackId:\d+}';
 
-        $this->register('POST',   "/$participantRoute/feedback",              'postParticipantFeedback',  $canGiveFeedbackFromParticipant, $preloadParticipant); // p
-        $this->register('POST',   "/assessments/feedbacks",                   'postParticipantFeedbacks', $canGiveFeedbackFromAllParticipants);
-        $this->register('POST',   "/$participantRoute{/responseId}/feedback", 'postResponseFeedback',     $canGiveFeedbackFromParticipant, $preloadParticipantAndResponse); // p
-        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute",         'deleteAssessmentFeedback', $canDeleteFeedback,              $preloadFeedback); // f
+        $this->register('POST', "/$participantRoute/feedback", 'postParticipantFeedback', $canGiveFeedbackFromParticipant, $preloadParticipant); // p
+        $this->register('POST', "/assessments/feedbacks", 'postParticipantFeedbacks', $canGiveFeedbackFromAllParticipants);
+        $this->register('POST', "/$participantRoute{/responseId}/feedback", 'postResponseFeedback', $canGiveFeedbackFromParticipant, $preloadParticipantAndResponse); // p
+        $this->register('DELETE', "/$assessmentRoute/$feedbackRoute", 'deleteAssessmentFeedback', $canDeleteFeedback, $preloadFeedback); // f
     }
-
 
     /**
      * @inheritdoc
