@@ -95,7 +95,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
             return '#' === $possibleAncestor->getId();
         }
 
-        // Nodes do not descent from themselves
+        // Nodes do not descend from themselves
         if ((int)$possibleDescendant->getId() === (int)$possibleAncestor->getId()) {
             return false;
         }
@@ -105,12 +105,12 @@ class Mapper extends AbstractFolderMapper implements ILocator
             return true;
         }
 
-        /** @var true[] $parentIds Loop detection, indexed by id */
-        $parentIds = [];
+        /** @var true[] $ancestry Loop detection, indexed by id */
+        $ancestry = [];
 
         // Climb inheritance tree
         $parent                      = $this->findById($possibleDescendant->getParent()->getId());
-        $parentIds[$parent->getId()] = true;
+        $ancestry[$parent->getId()] = true;
         while (0 !== $parent->getId()) {
             if ((int)$parent->getId() === (int)$possibleAncestor->getId()) {
                 return true;
@@ -118,13 +118,13 @@ class Mapper extends AbstractFolderMapper implements ILocator
             $parent   = $this->findById($parent->getParent()->getId());
             $parentId = $parent->getId();
             // Have we see this parent before?
-            if (array_key_exists($parentId, $parentIds)) {
-                $loop = "{$possibleDescendant->getId()}," . implode(',', array_keys($parentIds));
+            if (array_key_exists($parentId, $ancestry)) {
+                $loop = "{$possibleDescendant->getId()}," . implode(',', array_keys($ancestry));
                 throw new \OverflowException(
                     "Ancestry loop detected. MyFolder '{$possibleDescendant->getId()}' is its own ancestor [$loop]"
                 );
             }
-            $parentIds[$parentId] = true;
+            $ancestry[$parentId] = true;
         }
         return false;
     }
