@@ -23,7 +23,7 @@ use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
-$options = getopt('v', ['dry-run', 'rescan-failed', 'help']);
+$options = getopt('v', ['dry-run', 'rescan-failed', 'help', 'max-failures:']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Crocodoc Archiver',
     [
@@ -31,6 +31,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
         'errors'      => E_ALL,
         'dryRun'      => isset($options['dry-run']),
         'retryFailed' => isset($options['retry-failed']),
+        'maxFailures' => $options['maxFailures'],
     ]
 );
 
@@ -38,7 +39,7 @@ if (isset($options['help'])) {
     echo <<<HELP
 Archives Crocodoc documents.
 
-Usage: archive.php -v[vv] [--dry-run] [--rescan-failed]
+Usage: archive.php -v[vv] [--dry-run] [--retry-failed] [--max-failures=3]
     -v:                  Verbosity level, -vvv: most verbose
     --dry-run:           if set, don't actually archive anything, but show what
                          would be archived.
@@ -46,6 +47,9 @@ Usage: archive.php -v[vv] [--dry-run] [--rescan-failed]
                          archive in a previous run of this script.
                          By default, it will only attempt to archive documents
                          that have not yet been attempted.
+    --max-failures:      if set, the maximum number of failed sequential
+                         failures before the script aborts.
+                         Defaults to 3
 
 HELP;
     exit;
@@ -61,6 +65,11 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $retryFailed = $options['retryFailed'];
     if ($retryFailed) {
         $log->notice('Attempting to retry documents that have failed processing previously');
+    }
+
+    $maxFailures = (int)$options['maxFailures'];
+    if (!$maxFailures) {
+        $maxFailures = 3;
     }
 
     /**
@@ -88,7 +97,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     $db = $di->get('databaseInternal');
 
     $archiver = new CrocodocArchiver($db, $httpClient, $jitter, $storageMapper, $log);
-    $result = $archiver->archive($systemUser, $dryRun, $retryFailed);
+    $result = $archiver->archive($systemUser, $dryRun, $retryFailed, $maxFailures);
     if ($result['failed'] > 0) {
         exit(1);
     }
