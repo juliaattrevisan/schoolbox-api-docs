@@ -134,7 +134,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                         /**
                          * Check for folder cover image
                          */
-                        if ($currentFolder['coverImage']->getHash() != '') {
+                        if ($currentFolder['coverImage'] instanceof Schoolbox\Resource\Storage\Model) {
                             $folderCoverImage = 'background-image: url(\'/storage/image.php?hash=' . $currentFolder['coverImage']->getHash() . '&size=cardImageLarge\'); background-size: cover; background-repeat: no-repeat; background-position: center;';
                         } else {
                             $folderCoverImage = '';
