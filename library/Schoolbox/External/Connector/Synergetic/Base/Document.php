@@ -30,7 +30,7 @@ class Document extends Base implements IDocument
      * Performs normal setup stuff, and also determines which schema to use
      * based on database version.
      *
-     * @param IConfigLoader    $config
+     * @param IConfigLoader $config
      * @param IConnector|array $databaseExternal
      */
     public function __construct(IConfigLoader $config, $databaseExternal)
@@ -73,7 +73,7 @@ class Document extends Base implements IDocument
         // Otherwise attempt to find the documents for this user
 
         $query =
-        "
+            "
             SELECT      sral.StudentReportsArchiveLinkSeq as ID,
                         sral.Description,
                         sral.FileYear,
@@ -151,7 +151,7 @@ class Document extends Base implements IDocument
 
         if (count($classificationCodes) > 0) {
             $bindings = PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode');
-            $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
+            $query    .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
 
             $params = array_merge(
                 $params,
@@ -177,11 +177,11 @@ class Document extends Base implements IDocument
         $reports = [];
 
         foreach ($iterator as $row) {
-            $reportId = $row['ID'];
-            $year = $row['FileYear'];
-            $semester = $row['FileSemester'];
+            $reportId    = $row['ID'];
+            $year        = $row['FileYear'];
+            $semester    = $row['FileSemester'];
             $description = $row['Description'];
-            $source = $row['Source'];
+            $source      = $row['Source'];
 
             $reports[$year][$semester][$reportId] = [
                 'description' => $description,
@@ -210,7 +210,7 @@ class Document extends Base implements IDocument
         }
 
         $params = [
-            'id' => $student->getExternalId(),
+            'id'         => $student->getExternalId(),
             'documentId' => $documentId
         ];
 
@@ -284,7 +284,7 @@ class Document extends Base implements IDocument
             return [
                 'filename' => "{$row["Description"]}.{$row["DocumentType"]}",
                 'filesize' => strlen($row["Document"]),
-                'blob' => $row["Document"],
+                'blob'     => $row["Document"],
             ];
         }
 
