@@ -368,16 +368,19 @@ class Crocodoc
                 $this->logToDatabase($fileId, null, $crocodocDocumentId, 'processing', '');
 
 
+                // Connect to the Crocodoc thing
+                $facade = $this->buildFacade(
+                    $systemUser,
+                    $fileId,
+                    $crocodocDocumentId,
+                    $filename,
+                    new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT)
+                );
+
+
                 // Try to download the annotated Crocodocument
                 /** @var Response $response */
                 try {
-                    $facade = $this->buildFacade(
-                        $systemUser,
-                        $fileId,
-                        $crocodocDocumentId,
-                        $filename,
-                        new Alaress_Date_Format($row['submittedDate'], Alaress_Date_Format::DATABASE_FORMAT)
-                    );
                     $response = $this->httpClient->get($facade->getDownloadUrl())->send();
                 } catch (RuntimeException $e) {
                     // skip this one; consider jittering
