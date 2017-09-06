@@ -339,7 +339,7 @@ class Crocodoc
 
                 // What feedback does this belong in?
                 $feedbackId = $this->findFeedbackId(
-                    $systemUser,
+                    $systemUser->getId(),
                     $log,
                     $dryRun,
                     (int)$row['responseId'],
@@ -479,7 +479,7 @@ class Crocodoc
      * 2. most recent floating feedback for this participant
      * 3. a new draft feedback for this participant (not created if `$dryRun` is on)
      *
-     * @param User            $systemUser
+     * @param int             $systemUserId
      * @param LoggerInterface $log
      * @param bool            $dryRun
      * @param int             $responseId
@@ -488,7 +488,7 @@ class Crocodoc
      * @return int The PK of the feedback ID in which to upload
      * @throws DatabaseException if a query breaks
      */
-    private function findFeedbackId(User $systemUser, LoggerInterface $log, $dryRun, $responseId, $studentId, $boxId)
+    private function findFeedbackId($systemUserId, LoggerInterface $log, $dryRun, $responseId, $studentId, $boxId)
     {
         $this->selectAttachedFeedbackQuery->execute(['responseId' => $responseId,]);
         $feedbackId = $this->selectAttachedFeedbackQuery->fetchColumn();
@@ -510,7 +510,7 @@ class Crocodoc
                     $log->debug(sprintf('Attaching document to new draft floating feedback'));
                 } else {
                     $this->insertNewFeedbackQuery->execute([
-                        'systemUserId' => $systemUser->getId(),
+                        'systemUserId' => $systemUserId,
                         'studentId'    => $studentId,
                         'boxId'        => $boxId,
                         'now'          => Alaress_Date_Format::now(),
