@@ -124,14 +124,23 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $componentInstance       = $component->getInstance();
                 $componentInstanceConfig = $componentInstance->getConfig();
 
-                // Define configuration items to be copied. To be honest I don't know why we don't copy all the defaults, but I
-                // don't want to screw up school expectations by changing default behaviour, so I'm only adding the selected survey stuff
+                // Define configuration items to be copied. To be honest I don't know why we don't copy all the
+                // defaults, but I  don't want to screw up school expectations by changing default behaviour,
+                // so I'm only adding the selected survey stuff if the component is the new ePortfolio controller
 
                 $configurationToCopy = [
                     'componentname',
-                    'survey',
-                    'size'
                 ];
+
+                $componentClass = $component->getInstance()->getDefinition()->getClass();
+
+                if ($componentClass == 'Custom\Loyola\Survey\Component\Eportfolio\Controller') {
+                    $configurationToCopy = array_merge($configurationToCopy, [
+                        'survey',
+                        'size',
+                        'collapse'
+                    ]);
+                }
 
                 /** @var Component_ConfigDefinition $currentConfig */
                 foreach ($componentInstance->getConfig() as $currentConfig) {
