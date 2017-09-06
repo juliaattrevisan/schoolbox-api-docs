@@ -1,6 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learning/macro/markVisibilityMeta.twig' as markVisibilityMeta %}
 
 {# data-attributes (same for all assessment types) #}
 {% set statusIncomplete = 'incomplete' %}
@@ -45,19 +46,14 @@
 <div class="row">
     <div class="small-12 large-4 columns">
         <ul class="meta">
-            {% if assessment.markVisibility == "2" %}
-                <li class="icon-staff">Staff, Students and Parents</li>
-            {% endif %}
-            {% if assessment.markVisibility == "1" %}
-                <li class="icon-staff-students">Staff and Students</li>
-            {% endif %}
-            {% if assessment.markVisibility == "0" %}
-                <li class="icon-teacher">Staff</li>
-            {% endif %}
-            <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
             {% if not assessment.dueAt.isNull %}
-            <li class="icon-calendar">{{ dueDate.dueDate(assessment, USER) }}</li>
+                <li class="icon-calendar">{{ dueDate.dueDate(assessment, USER) }}</li>
             {% endif %}
+
+            <li class="{{ icon.renderClass(assessment) }}">{{ assessment.typeName }}</li>
+
+            {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
+
             {% if readonly %}
                 <li class="icon-archive">Term has been archived</li>
             {% endif %}
