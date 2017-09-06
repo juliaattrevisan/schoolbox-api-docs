@@ -97,7 +97,7 @@ class Enrolment extends AbstractImporter
                 $class = $this->classMapper->createModel();
                 $class
                     ->setCode($classCode)
-                    ->setName($row['Class Title'] ?: '')
+                    ->setName(trim($row['Class Title']))
                 ;
             }
             try {
