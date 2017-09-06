@@ -396,7 +396,7 @@ class Crocodoc
                 // Try to download the annotated Crocodocument
                 try {
                     /** @var ResponseInterface $response */
-                    $response = $this->jitter->retry(function() use ($facade, $fileId, $crocodocDocumentId) {
+                    $response = $this->jitter->retry(function() use ($facade) {
                         try {
                             $response = $this->httpClient->send(new Request('GET', $facade->getDownloadUrl()));
                         } catch (RuntimeException $e) {
@@ -409,23 +409,10 @@ class Crocodoc
                             );
                             throw $e;
                         }
-
-//                        if ($response->getStatusCode() >= 400) {
-//                            // skip this one; consider jittering
-//                            // Also consider exiting completely if there's too many errors
-//                            $responseJson = json_decode($response, true);
-//                            $this->log->warning(
-//                                sprintf(
-//                                    'Error occurred when fetching Crocodoc document: skipping! (code: %d, message: "%s")',
-//                                    $response->getStatusCode(),
-//                                    $responseJson['error']
-//                                )
-//                            );
-//                            $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $responseJson['error']);
-//                        }
                         return $response;
                     });
-                } catch (MaxRetriesExceededException $e) {
+                } catch (\Exception $e) {
+                    $this->logToDatabase($fileId, null, $crocodocDocumentId, 'failed', $e->getMessage());
                     $this->log->warning('Fetch failed too many times: skipping!');
                     $failureCount++;
                     continue;
