@@ -21,6 +21,10 @@ class Connector
     // Intentional trailing slash (@see https://github.com/guzzle/guzzle)
     const BASE_URI = 'https://api.notablepdf.com/';
 
+    // Correspond to API paths. @see http://docs.kamiembeddingapi.apiary.io
+    const PATH_UPLOAD_DOCUMENT_MULTIPART = 'upload/embed/documents';
+    const PATH_GET_DOCUMENT = 'embed/documents/';
+
     /**
      * @var IConfigLoader
      */
@@ -136,7 +140,7 @@ class Connector
      */
     private function getPathGetDocument($documentId)
     {
-        return "embed/documents/{$documentId}";
+        return self::PATH_GET_DOCUMENT . $documentId;
     }
 
 
@@ -147,7 +151,7 @@ class Connector
      */
     private function getPathUploadDocument()
     {
-        return 'upload/embed/documents';
+        return self::PATH_UPLOAD_DOCUMENT_MULTIPART;
     }
 
 
