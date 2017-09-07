@@ -377,16 +377,12 @@ class Crocodoc
                     $systemUser->getId(),
                     $dryRun
                 );
-                if ($dryRun) {
-                    $successCount++;
-                    $sequentialFailures = 0;
-                    $this->log->info('Crocodoc document successfully attached to feedback');
-                    continue;
-                }
 
 
                 // Log where we're at
-                $this->logToDatabase($fileId, null, $crocodocDocumentId, self::STATUS_PROCESSING, '');
+                if (!$dryRun) {
+                    $this->logToDatabase($fileId, null, $crocodocDocumentId, self::STATUS_PROCESSING, '');
+                }
 
 
                 // Connect to the Crocodoc thing
@@ -402,7 +398,7 @@ class Crocodoc
                 // Try to download the annotated Crocodocument
                 try {
                     /** @var ResponseInterface $response */
-                    $response = $this->jitter->retry(function () use ($facade) {
+                    $response = $this->jitter->retry(function () use ($facade, $dryRun) {
                         try {
                             $response = $this->httpClient->send(new Request('GET', $facade->getDownloadUrl()));
                         } catch (RuntimeException $e) {
@@ -418,13 +414,15 @@ class Crocodoc
                         return $response;
                     });
                 } catch (\Exception $e) {
-                    $this->logToDatabase(
-                        $fileId,
-                        null,
-                        $crocodocDocumentId,
-                        self::STATUS_FAILED,
-                        $e->getMessage()
-                    );
+                    if (!$dryRun) {
+                        $this->logToDatabase(
+                            $fileId,
+                            null,
+                            $crocodocDocumentId,
+                            self::STATUS_FAILED,
+                            $e->getMessage()
+                        );
+                    }
                     $this->log->warning('Fetch failed too many times: skipping this document!');
                     $failureCount++;
                     $sequentialFailures++;
@@ -436,6 +434,15 @@ class Crocodoc
                         break;
                     }
 
+                    continue;
+                }
+
+
+                // Dry run? Break out
+                if ($dryRun) {
+                    $successCount++;
+                    $sequentialFailures = 0;
+                    $this->log->info('Crocodoc document would have been successfully archived');
                     continue;
                 }
 
