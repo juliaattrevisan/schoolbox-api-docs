@@ -111,11 +111,7 @@ class Mapper extends AbstractCourseMapper
      */
     public function isConfiguredFacultyRootValid()
     {
-        $configuredId = $this->getConfiguredFacultyRootFolderId();
-        if (null === $configuredId) {
-            return false;
-        }
-        return $this->getFacultyRootFolder()->getId() === $configuredId;
+        return (int)$this->getFacultyRootFolder()->getId() === $this->getConfiguredFacultyRootFolderId();
     }
 
 
@@ -289,6 +285,8 @@ class Mapper extends AbstractCourseMapper
 
     /**
      * Get the ID of the configured faculty root folder
+     *
+     * Will return NULL if not configured or no numeric ID found
      *
      * @return null|int
      */
