@@ -43,7 +43,7 @@ Communicate priority and customer requirements and business requirements, determ
 
 #### Scrum Master
 
-Will serve to facilitate and enable team to deliver
+Proactively work to facilitate team's ability to successfully deliver the sprint
 
 * Ensure sprints run smoothly and are communicated
 * Minimise roadblocks
