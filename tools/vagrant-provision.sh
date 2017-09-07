@@ -63,11 +63,12 @@ phpenmod ibm_db2;
 # Install chrome for headless tests
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing Google Chrome for headless tests";
 wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-echo "deb https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list
+echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
 apt-get update
 # Install Chromedriver reqs too:
-# unzip for extracting it, libgconf-2-4 for running it
-apt-get install -y google-chrome-stable unzip libgconf-2-4
+# unzip for extracting it, libgconf-2-4 for running it.
+# Absence of libnss3 causes complaints from Chrome as well.
+apt-get install -y google-chrome-stable unzip libgconf-2-4 libnss3
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
