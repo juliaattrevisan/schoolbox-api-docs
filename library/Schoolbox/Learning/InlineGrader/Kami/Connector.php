@@ -47,7 +47,8 @@ class Connector
      */
     public function isEnabled()
     {
-        return (bool)$this->config->get('kami_api_key');
+        // Any non-empty value is considered 'enabled', regardless of whether it is 'valid'
+        return (bool)$this->getApiKey();
     }
 
 
