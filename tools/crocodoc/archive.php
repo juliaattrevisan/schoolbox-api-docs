@@ -21,7 +21,7 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 
-$fields  = ['dry-run', 'rescan-failed', 'help', 'max-attempts:', 'max-skips:'];
+$fields  = ['dry-run', 'retry-failed', 'help', 'max-attempts:', 'max-skips:'];
 $options = require_once __DIR__ . '/../../conf/core/require-cli.php';
 
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
