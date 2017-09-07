@@ -1,7 +1,5 @@
 <?php
 /**
- * Course builder admin page
- *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -17,6 +15,7 @@ use Schoolbox\Resource\LogMapper;
 use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
+use Schoolbox\Learning\InlineGrader\Kami;
 
 class Controller extends Base
 {
@@ -204,6 +203,8 @@ class Controller extends Base
             }
         }
 
+        $kamiConnector = new Kami\Connector($this->getConfigLoader());
+
         // Get the navigation
 
         // Render this thing out
@@ -232,7 +233,10 @@ class Controller extends Base
                     'ldap_alt_status' => $ldap_alt_status,
                     'www_light' => $www_light,
                     'www_status' => $www_status,
-                    'logs' => $logs
+                    'logs' => $logs,
+                    'kamiEnabled' => $kamiConnector->isEnabled(),
+                    'kamiOnline' => $kamiConnector->isOnline(),
+
                 ),
             )
         );
