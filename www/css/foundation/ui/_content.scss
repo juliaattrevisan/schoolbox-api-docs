@@ -503,6 +503,12 @@ tr.sub-row {
             }
 
         }
+
+        // Remove scrollbar from fixed column, is a bug that needs a workaround
+        // https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap
+        .DTFC_LeftBodyLiner {
+            overflow-x: hidden;
+        }
     }
 }
 
@@ -519,6 +525,7 @@ $square-grid-td-size: 4rem;
 $rotate-width: 4.5rem;
 $rotate-angle: 45;
 $rotate-th-width: $square-grid-td-size;
+$rotate-span-width: 11rem;
 
 .square-grid {
     td, thead th {
@@ -575,7 +582,7 @@ $rotate-th-width: $square-grid-td-size;
                 bottom: 3.75rem;
                 left: -3.75rem;
                 display: inline-block;
-                width: 11rem;
+                width: $rotate-span-width;
                 text-align: left;
                 white-space: nowrap;
                 text-overflow: ellipsis;

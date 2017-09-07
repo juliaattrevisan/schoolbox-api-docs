@@ -1,0 +1,4 @@
+// Make room for the final header (with the diagonal style)
+.marksheet thead tr:first-child th:last-child {
+    padding-right: $rotate-span-width !important;
+}

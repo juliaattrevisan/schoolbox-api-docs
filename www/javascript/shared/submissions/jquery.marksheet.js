@@ -9,7 +9,7 @@
         var config = init(options, $(this));
 
         $(this).DataTable({
-            scrollY: '38rem',
+            scrollY: '38rem', // Arbitrary height
             scrollX: true,
             scrollCollapse: true,
             paging: false,
