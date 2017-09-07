@@ -21,12 +21,14 @@ use Schoolbox\UserMapper;
  * MyFolder Mapper. Maps myFolder table to portfolio folder objects.
  *
  * @package Schoolbox\Resource\My\Folder
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends AbstractFolderMapper implements ILocator
 {
 
     /**
      * {@inheritdoc}
+     * @return Model|object
      */
     public function findById($id)
     {
@@ -70,4 +72,60 @@ class Mapper extends AbstractFolderMapper implements ILocator
         ]);
     }
 
+
+    /**
+     * Is $possibleDescendant a descendant of $possibleAncestor?
+     *
+     * For maximum robustness, we treat pseudo-root as child of '#'
+     *
+     * @param Model $possibleDescendant The folder that may be a descendant of $possibleAncestor
+     * @param Model $possibleAncestor
+     * @return bool
+     * @throws \OverflowException If ancestry loop detected
+     */
+    public function isDescendant(Model $possibleDescendant, Model $possibleAncestor)
+    {
+        // Pseudo-root parent is never a descendant
+        if ('#' === $possibleDescendant->getId()) {
+            return false;
+        }
+
+        // Pseudo-root is only a descendant of its imaginary parent
+        if (0 === (int)$possibleDescendant->getId()) {
+            return '#' === $possibleAncestor->getId();
+        }
+
+        // Nodes do not descend from themselves
+        if ((int)$possibleDescendant->getId() === (int)$possibleAncestor->getId()) {
+            return false;
+        }
+
+        // All folders are descendant from pseudo-root (and its parent)
+        if (0 === (int)$possibleAncestor->getId() || '#' === $possibleAncestor->getId()) {
+            return true;
+        }
+
+        /** @var true[] $ancestry Loop detection, indexed by id */
+        $ancestry = [];
+
+        // Climb inheritance tree
+        $parent                      = $this->findById($possibleDescendant->getParent()->getId());
+        $ancestry[$parent->getId()] = true;
+        while (0 !== $parent->getId()) {
+            if ((int)$parent->getId() === (int)$possibleAncestor->getId()) {
+                return true;
+            }
+            $parent   = $this->findById($parent->getParent()->getId());
+            $parentId = $parent->getId();
+            // Have we see this parent before?
+            if (array_key_exists($parentId, $ancestry)) {
+                $loop = "{$possibleDescendant->getId()}," . implode(',', array_keys($ancestry));
+                throw new \OverflowException(
+                    "Ancestry loop detected. MyFolder '{$possibleDescendant->getId()}' is its own ancestor [$loop]"
+                );
+            }
+            $ancestry[$parentId] = true;
+        }
+        return false;
+    }
 } 
