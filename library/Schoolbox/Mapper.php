@@ -2611,7 +2611,7 @@ abstract class Mapper implements IMapper, Serializable
                 $this->setModelProperty($model, $this->getIdentifierProperty(), null);
             }
         }
-        if($this->createdMap){
+        if ($this->createdMap) {
             $setMethod = $this->getSetMethodName($this->createdMap['property']);
             foreach ($collection as $model) {
                 $model->{$setMethod}(null);

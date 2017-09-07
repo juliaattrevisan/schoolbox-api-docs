@@ -274,14 +274,13 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
     /**
      * {@inheritdoc}
      *
-     * @param Component_Definition $model The model to get values from
-     * @param bool $includeTimestamps Whether or not to include timestamps in the dehydrated output
+     * @param Component_Definition $model             The model to get values from
      * @throws MapperException if the map is not valid
      * @return array
      */
-    public function dehydrate($model, $includeTimestamps = false)
+    public function dehydrate($model)
     {
-        $dehydration = parent::dehydrate($model, $includeTimestamps);
+        $dehydration = parent::dehydrate($model);
 
         // Override ns.id to ns.slug - this is to overcome a limitation of the Mapper system that can't handle the
         // scenario where you join onto a non-primary key
