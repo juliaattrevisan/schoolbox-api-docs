@@ -427,7 +427,7 @@ class Crocodoc
                     $failureCount++;
                     $sequentialFailures++;
 
-                    // Die if sequential failures amount is past a threshold
+                    // Break if sequential failures amount is past a threshold
                     if ($sequentialFailures >= $maxSkips) {
                         $this->log->error('Too many sequential failures: aborting!');
                         $breakCompletely = true;

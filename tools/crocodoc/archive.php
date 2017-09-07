@@ -72,15 +72,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $log->notice('Attempting to retry documents that have failed processing previously');
     }
 
-    $maxAttempts = (int)$options['maxAttempts'];
-    if (!$maxAttempts) {
-        $maxAttempts = 3;
-    }
-
-    $maxSkips = (int)$options['maxSkips'];
-    if (!$maxSkips) {
-        $maxSkips = 3;
-    }
+    $maxAttempts = isset($options['maxAttempts']) ? (int)$options['maxAttempts'] : 3;
+    $maxSkips = isset($options['maxSkips']) ? (int)$options['maxSkips'] : 3;
 
     /**
      * @var MapperFactory $mapperFactory
