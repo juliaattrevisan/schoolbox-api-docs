@@ -64,7 +64,7 @@ class Connector
             'headers' => $this->getAuthorisationHeader(),
         ];
 
-        $client = new Client(['base_uri' => self::BASE_URI]);
+        $client = $this->buildClient();
         try {
             $client->request('GET', $path, $options);
         } catch (ClientException $e) {
@@ -100,7 +100,7 @@ class Connector
     {
         $path = $this->getPathGetDocument($documentId);
         // TODO make GuzzleHttp request to Kami API
-        return new Document(null, null, null, null, new \Alaress_Date_NullDate());
+        return new Document('exampleId', 'exampleName', Document::FILE_STATUS_DONE, null, new \Alaress_Date_NullDate());
     }
 
 
@@ -146,6 +146,15 @@ class Connector
     private function getPathUploadDocument()
     {
         return 'upload/embed/documents';
+    }
+
+
+    /**
+     * @return Client
+     */
+    private function buildClient()
+    {
+        return new Client(['base_uri' => self::BASE_URI]);
     }
 
 }
