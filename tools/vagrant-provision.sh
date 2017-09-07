@@ -49,7 +49,14 @@ echo "# This file is managed by Puppet. DO NOT EDIT.
 # schoolbox-deps
 deb http://schoolbox:4verrm9z@deb.alaress.com.au/ubuntu trustybackports main
 deb-src http://schoolbox:4verrm9z@deb.alaress.com.au/ubuntu trustybackports main" > /etc/apt/sources.list.d/schoolbox-deps2.list;
+
+# Install chrome for headless tests
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing Google Chrome for headless tests";
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+
 apt-get update;
+
 apt-get install -y libgss3 gcc-6-base libstdc++6;
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
 apt-get install -y php7.1-pdosqlsrv;
@@ -59,12 +66,6 @@ phpenmod pdo_sqlsrv;
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing IBM_DB2";
 apt-get install -u php7.1-ibmdb2;
 phpenmod ibm_db2;
-
-# Install chrome for headless tests
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing Google Chrome for headless tests";
-wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-apt-get update
 # Install Chromedriver reqs too:
 # unzip for extracting it, libgconf-2-4 for running it.
 # Absence of libnss3 causes complaints from Chrome as well.
