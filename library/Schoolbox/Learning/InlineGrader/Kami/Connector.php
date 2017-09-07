@@ -81,19 +81,21 @@ class Connector
 
 
     /**
+     * Upload a file into Kami and return the newly assigned Kami Document Identifier
+     *
      * @param IStorage $storage
-     * @return int
+     * @return string
      */
     public function uploadDocument(IStorage $storage)
     {
-        // TODO upload a storage into Kami and return the ID
+        // TODO upload a storage into Kami and return the Kami Document ID
         $path = $this->getPathUploadDocument();
-        return -1;
+        return 'exampleId';
     }
 
 
     /**
-     * @param $documentId
+     * @param string $documentId
      * @return Document
      */
     public function getDocument($documentId)
@@ -129,7 +131,7 @@ class Connector
     /**
      * Build the path for the 'Get Document' call
      *
-     * @param $documentId
+     * @param string $documentId
      * @return string
      */
     private function getPathGetDocument($documentId)
