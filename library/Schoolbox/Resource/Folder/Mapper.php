@@ -12,8 +12,10 @@
 
 namespace Schoolbox\Resource\Folder;
 
+use Alaress;
 use PDO;
 use PDOStatement;
+use Psr\Log\NullLogger;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\GenericCollection;
@@ -31,6 +33,8 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
+use Schoolbox\Realtime\Routing\Subscription\Loader;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\Group;
@@ -194,6 +198,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'unMuteClassNotifications']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCourseSpecification']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'refreshNotificationRedirects']);
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'hardDeleteCategoryCodes']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCategoryCodes']);
@@ -291,6 +296,28 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // Wasn't a unit being updated, just move on
 
         return true;
+    }
+
+
+    /**
+     * @param Model $folder
+     * @param Model $previous
+     */
+    public function refreshNotificationRedirects(Model $folder, $previous = null)
+    {
+        /** @noinspection NotOptimalIfConditionsInspection */
+        if (($previous && $folder->getInherit() === $previous->getInherit()) || $folder->getInherit()) {
+            // inheritance has changed, OR the folder is new AND inheritance is enabled
+
+            // TODO desingleton these
+            $redis = Alaress\Redis::getClientInstance();
+            $log = new NullLogger();
+
+            // update the cache
+            $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log));
+
+            $cache->cacheRedirects(INSTANCE_ID);
+        }
     }
 
     /**
