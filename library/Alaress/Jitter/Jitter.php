@@ -61,7 +61,7 @@ class Jitter implements IJitter
      */
     public function tooManyRetries($retries)
     {
-        return $retries > $this->maxRetries;
+        return $retries >= $this->maxRetries;
     }
 
     /**

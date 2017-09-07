@@ -45,12 +45,8 @@ class JitterTest extends PHPUnit_Framework_TestCase
         // 2 ^ (4-1) is greater than max retries, so multiply by that instead
         $this->assertEquals(350, $jitter->calculateJitter(4));
 
-        // Retry 5: random .9
-        // 2 ^ (5-1) is greater than max retries, so multiply by that instead
-        $this->assertEquals(450, $jitter->calculateJitter(5));
-
-        // Retry 6: too many
-        $this->assertTrue($jitter->tooManyRetries(6));
+        // Retry 5: too many
+        $this->assertTrue($jitter->tooManyRetries(5));
     }
 
     /**
