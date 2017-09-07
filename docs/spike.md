@@ -8,12 +8,17 @@ scope of work with no additional input from the author, collaborators or any ext
 In a lot of ways, a spike is the solo reconnaissance mission variant of refinement, which is done co-op with the entire 
 team.
 
+As you spike, consult with Subject Matter Experts (be that developers or otherwise) as required to make as much progress
+with the description and acceptance criteria as you can. Refinement sessions are ideally short, sharp and punchy, which
+can't be achieved if tickets have to be deliberated at great length. All this said, don't stress about your AC being
+**perfect**; they will be fleshed out and finalised as part of the refinement session as a collaborative effort.
+
 ## What a Spike Isn't
 
 * A spike isn't coding.
 * It's not ironing out absolutely every final tiny minutia - developers are capable of problem-solving.
-* You don't _necessarily_ need to completely solidify the Acceptance Criteria; making a start is great, but AC can be
-  fleshed out and finalised as part of the refinement session as a collaborative effort.
+* You don't _necessarily_ need to completely solidify the Acceptance Criteria, but in more or less all circumstances you
+  should make a start.
 
 ## Discover and Explore
 
@@ -26,8 +31,15 @@ ticket Ready.
 ## Assume Nothing!
 
 Critical thinking is essential to a spike. Every assumption you make needs to be noted and either left for consideration
-for the developer who ultimately does the work, or for you to resolve and document. What are the implications of what's 
-proposed in the ticket? Are there technical constraints? What foreseeable pitfalls are there? What **don't** we know??
+for the developer who ultimately does the work, or for you to resolve and document.
+
+What are the implications of what's proposed in the ticket?
+
+Are there technical constraints?
+
+What foreseeable pitfalls are there?
+
+What **don't** we know??
 
 If there are external dependencies, try your utmost to resolve them. That means obtaining things like API keys, external
 URLs, etc. so that, when the ticket hits the Sprint it's able to be done without being held up by having to go hunting 
