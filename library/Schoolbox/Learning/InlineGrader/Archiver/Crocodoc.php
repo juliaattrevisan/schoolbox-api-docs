@@ -192,8 +192,8 @@ class Crocodoc
             WHERE ssf.uuid IS NOT NULL
             AND   ss.submitted_at IS NOT NULL
         ";
-        $crocodocWhereUnarchived = $crocodocWhere . "AND log.status IS NULL";
-        $crocodocWhereFailed = $crocodocWhere . "AND log.status NOT IN ('pending', 'complete')";
+        $crocodocWhereUnarchived = $crocodocWhere . "AND log.status IS NULL OR log.status = 'pending'";
+        $crocodocWhereFailed = $crocodocWhere . "AND log.status IS NOT NULL AND log.status IN ('processing', 'failed')";
 
         $this->selectUnarchivedCrocodocQuery = $this->database->prepareQuery("
             $crocodocSelect
