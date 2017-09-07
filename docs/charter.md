@@ -90,6 +90,10 @@ Coalesce data from Discovery into a usable state, such as personas, empathy maps
 * Actively assist fellow developers with their sprint pipeline if you finish yours early
 * Fall back to BAU or foundation work (as directed by the Scrum Master) if no further sprint assistance can be rendered
 
+#### Spiker
+
+* Perform technical investigation on a ticket prior to it reaching Sprint. See [the spike guide](spike.md) on how to do that.
+
 #### Technical Lead
 
 * Provide support to other developers in the form of guidance, mentoring and up-skilling.
