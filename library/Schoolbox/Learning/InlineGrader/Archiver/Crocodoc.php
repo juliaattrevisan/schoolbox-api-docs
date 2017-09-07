@@ -280,10 +280,10 @@ class Crocodoc
         ");
 
         $this->selectExistingFeedbackFileQuery = $this->database->prepareQuery("
-            SELECT id
-            FROM submission_return_file
-            WHERE submission_return_id = :feedbackId
-            AND   hash                 = :hash
+            SELECT submission_return_file_id
+            FROM student_submission_file_crocodoc_archive_log
+            WHERE student_submission_file_id = :fileId
+            AND   submission_return_file_id IS NOT NULL
         ");
 
         $this->insertNewFeedbackFileQuery = $this->database->prepareQuery("
@@ -442,7 +442,7 @@ class Crocodoc
 
                 // Now store it and create a feedback for it
                 $storageModel = $this->uploadCrocodocToStorage($response->getBody(), $filename);
-                $feedbackFileId = $this->archiveCrocodocInFeedback($storageModel, $feedbackId, $filename);
+                $feedbackFileId = $this->archiveCrocodocInFeedback($storageModel, $fileId, $feedbackId, $filename);
 
 
                 // Done
@@ -580,18 +580,16 @@ class Crocodoc
      * Archives the uploaded Crocodoc document in a feedback.
      *
      * @param StorageModel $storageModel
+     * @param int          $fileId
      * @param int          $feedbackId
      * @param string       $filename
      * @return int The PK of the new feedback file ID in which the Crocodoc was uploaded
      * @throws DatabaseException if a query breaks
      */
-    private function archiveCrocodocInFeedback(StorageModel $storageModel, $feedbackId, $filename)
+    private function archiveCrocodocInFeedback(StorageModel $storageModel, $fileId, $feedbackId, $filename)
     {
         // Attach to the feedback, if it isn't already
-        $this->selectExistingFeedbackFileQuery->execute([
-            'feedbackId' => $feedbackId,
-            'hash'       => $storageModel->getHash(),
-        ]);
+        $this->selectExistingFeedbackFileQuery->execute(['fileId' => $fileId,]);
         $feedbackFileId = $this->selectExistingFeedbackFileQuery->fetchColumn();
         if (!$feedbackFileId) {
             $this->insertNewFeedbackFileQuery->execute([
