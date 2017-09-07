@@ -162,6 +162,16 @@
                         <span class="full-width {{ www_light }} label" data-light="www">{{ www_status }}</span>
                     </div>
                 </li>
+                {% if kamiEnabled %}
+                    {% set kamiStatus = kamiOnline ? 'success' : 'alert' %}
+                    {% set kamiLabel = kamiOnline ? 'Online' : 'Offline' %}
+                    <li>
+                        <div class="small-5 columns content">Kami</div>
+                        <div class="small-7 columns content">
+                            <span class="full-width {{ kamiStatus }} label">{{ kamiLabel }}</span>
+                        </div>
+                    </li>
+                {% endif %}
             </ul>
         </section>
 

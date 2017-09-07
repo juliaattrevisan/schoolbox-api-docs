@@ -10,11 +10,13 @@ namespace Schoolbox\Admin\Home;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Exception\ClientException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
+use GuzzleHttp\Client;
 
 class Controller extends Base
 {
@@ -230,7 +232,10 @@ class Controller extends Base
                     'ldap_alt_status' => $ldap_alt_status,
                     'www_light' => $www_light,
                     'www_status' => $www_status,
-                    'logs' => $logs
+                    'logs' => $logs,
+                    'kamiEnabled' => $this->isKamiEnabled(),
+                    'kamiOnline' => $this->isKamiOnline(),
+
                 ),
             )
         );
@@ -266,5 +271,52 @@ class Controller extends Base
                 )
             )
         );
+    }
+
+
+    /**
+     * Is Kami enabled for this school ?
+     *
+     * @return bool
+     */
+    private function isKamiEnabled()
+    {
+        return (bool)$this->getConfigLoader()->get('kami_api_key');
+    }
+
+
+    /**
+     * Is Kami online ?
+     *
+     * @return bool
+     */
+    private function isKamiOnline()
+    {
+        if (!$this->isKamiEnabled()) {
+            return false;
+        }
+        $kamiApiKey = $this->getConfigLoader()->get('kami_api_key');
+        $fakeDocId  = 'TEST_DOC_ID';
+        $path       = "embed/documents/{$fakeDocId}";
+        $options    = [
+            'headers' => [
+                'Authorization' => "Token {$kamiApiKey}",
+            ],
+        ];
+
+        // TODO make BASE_URI a constant
+        $client = new Client(['base_uri' => 'https://api.notablepdf.com/']);
+        try{
+            $client->request('GET', $path, $options);
+        } catch (ClientException $e){
+            // We expect to get a 404 'Not Found' because the requested document has an invalid ID
+            $response = $e->getResponse();
+            if(404 === $response->getStatusCode() && 'Not Found' === $response->getReasonPhrase()){
+                return true;
+            }
+        } catch (\Exception $e){
+            // Any thing else is considered a failure
+        }
+        return false;
     }
 }
