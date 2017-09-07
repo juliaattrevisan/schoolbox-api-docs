@@ -398,7 +398,7 @@ class Crocodoc
                 // Try to download the annotated Crocodocument
                 try {
                     /** @var ResponseInterface $response */
-                    $response = $this->jitter->retry(function () use ($facade, $dryRun) {
+                    $response = $this->jitter->retry(function () use ($facade) {
                         try {
                             $response = $this->httpClient->send(new Request('GET', $facade->getDownloadUrl()));
                         } catch (RuntimeException $e) {
