@@ -101,7 +101,7 @@ It does this sort of stuff when you haven't specified an html file for it to pro
 Let's fix this problem by specifying an html template for it to render.
 
 ### The HTML Template
-Make a `kingdoms.html` file in `templates` folder. Dump in some html content of your choosing if you like.
+Make a `kingdoms.html` file in `templates/core` folder. Dump in some html content of your choosing if you like.
 
 ```html
 <!-- templates/kingdoms.html -->
