@@ -101,6 +101,20 @@ class Mapper extends AbstractCourseMapper
         return true;
     }
 
+
+    /**
+     * Return whether the configured faculty root is valid.
+     *
+     * This will be false if syntax is invalid, or because the folder is missing, or soft-deleted
+     *
+     * @return bool
+     */
+    public function isConfiguredFacultyRootValid()
+    {
+        return (int)$this->getFacultyRootFolder()->getId() === $this->getConfiguredFacultyRootFolderId();
+    }
+
+
     /**
      * Load the faculty root folder - this is used for validating whether a
      * folder can be made into a course.
@@ -109,8 +123,13 @@ class Mapper extends AbstractCourseMapper
     {
         /** @var FolderMapper $folderMapper */
         $folderMapper        = $this->getJoinMapper('folder');
-        $facultyRootFolderId = preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
-        $this->setFacultyRootFolder($folderMapper->findCheaplyById($facultyRootFolderId));
+        $facultyRootFolderId = $this->getConfiguredFacultyRootFolderId();
+        try {
+            $facultyRoot = $folderMapper->findCheaplyById($facultyRootFolderId);
+        } catch (BaseMapper\Exception $e) {
+            $facultyRoot = $folderMapper->findCheaplyById(0);
+        }
+        $this->setFacultyRootFolder($facultyRoot);
     }
 
     /**
@@ -261,5 +280,22 @@ class Mapper extends AbstractCourseMapper
     protected function getUnitOrderByClause()
     {
         return ['f.name' => 'asc'];
+    }
+
+
+    /**
+     * Get the ID of the configured faculty root folder
+     *
+     * Will return NULL if not configured or no numeric ID found
+     *
+     * @return null|int
+     */
+    private function getConfiguredFacultyRootFolderId()
+    {
+        $configuredId = preg_replace('/[\D]/', '', $this->getConfigLoader()->get('course_homepage'));
+        if (null === $configuredId || '' === $configuredId) {
+            return null;
+        }
+        return (int)$configuredId;
     }
 }

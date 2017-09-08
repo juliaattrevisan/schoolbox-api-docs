@@ -483,6 +483,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function isDescendant(Model $possibleDescendant, Model $possibleAncestor)
     {
+        // All folders are descendant of pseudo-root
+        if (0 === $possibleAncestor->getId()) {
+            return true;
+        }
+
         foreach ($this->findParents($possibleDescendant, null, true) as $ancestor) {
             if ($ancestor->getId() == $possibleAncestor->getId()) {
                 return true;

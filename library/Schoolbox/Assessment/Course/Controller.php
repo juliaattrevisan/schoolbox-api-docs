@@ -8,7 +8,6 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller as Base;
-use Alaress\Web\Controller\Exception;
 use Aura\Di\Exception\ServiceNotFound;
 use Component_DefinitionMapper;
 use Component_Instance;
@@ -46,7 +45,6 @@ use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
-use Schoolbox\Resource\Folder\IFolder;
 use \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
@@ -388,6 +386,7 @@ class Controller extends Base\Base
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'folderAccess'      => $folderAccess,
             'encodedReturnUrls' => $encodedReturnUrls,
+            'isValidFacultyRoot'=> $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);
     }
 
@@ -515,7 +514,7 @@ class Controller extends Base\Base
         }
 
         // Explicitly set to root (as opposed to not set)
-        if("0" === $parentFolderId){
+        if ('0' === $parentFolderId && 0 !== $this->courseSpecificationMapper->getFacultyRootFolder()->getId()) {
             throw new Base\Exception("Courses may not be created in the root folder");
         }
 
@@ -987,7 +986,8 @@ class Controller extends Base\Base
             'Courses'
         );
 
-        $treeData = $treeBuilder->buildPartialTree($folderId, $this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId());
+        $facultyRootFolder = $this->getCourseSpecificationMapper()->getFacultyRootFolder();
+        $treeData = $treeBuilder->buildPartialTree($folderId, $facultyRootFolder->getId() ?: '#');
 
         $data = [
             'treedata' => json_encode($treeData),
