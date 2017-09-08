@@ -15,7 +15,7 @@ use Aura\Di;
 use GuzzleHttp\Client as HttpClient;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Learning\InlineGrader\Archiver\Crocodoc as CrocodocArchiver;
+use Schoolbox\Learning\InlineGrader\Crocodoc\Archiver as CrocodocArchiver;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
