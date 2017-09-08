@@ -23,58 +23,58 @@ class JitterTest extends PHPUnit_Framework_TestCase
     {
         $jitter = new Jitter(new PredeterminedGenerator([0.3, 0.1, 0.5, 0.7, 0.9]), 5, 100);
 
-        // Retry -1: always 0 too, I guess
+        // Attempt -1: always 0 too, I guess
         $this->assertEquals(0, $jitter->calculateJitter(-1));
 
-        // Retry 0: always 0
+        // Attempt 0: always 0
         $this->assertEquals(0, $jitter->calculateJitter(0));
 
         // Jitter algo:
-        // timeout * min(maxRetries, pow(2, retries-1)) * random()
+        // timeout * min(maxAttempts, pow(2, attempts-1)) * random()
 
-        // Retry 1: random .3
+        // Attempt 1: random .3
         $this->assertEquals(30, $jitter->calculateJitter(1));
 
-        // Retry 2: random .1
+        // Attempt 2: random .1
         $this->assertEquals(20, $jitter->calculateJitter(2));
 
-        // Retry 3: random .5
+        // Attempt 3: random .5
         $this->assertEquals(200, $jitter->calculateJitter(3));
 
-        // Retry 4: random .7
-        // 2 ^ (4-1) is greater than max retries, so multiply by that instead
+        // Attempt 4: random .7
+        // 2 ^ (4-1) is greater than max attempts, so multiply by that instead
         $this->assertEquals(350, $jitter->calculateJitter(4));
 
-        // Retry 5: too many
-        $this->assertTrue($jitter->tooManyRetries(5));
+        // Attempt 5: too many
+        $this->assertTrue($jitter->tooManyAttempts(5));
     }
 
     /**
-     * Test jitter with no retries
+     * Test jitter with no attempts (maxAttempts = 1)
      */
-    public function testJitterWithNoRetries()
+    public function testJitterWithNoAttempts()
     {
-        $jitter = new Jitter(new PredeterminedGenerator([0.3, 0.1]), 0, 100);
+        $jitter = new Jitter(new PredeterminedGenerator([0.3, 0.1]), 1, 100);
 
-        // Retry -1: always 0 too, I guess
+        // Attempt -1: always 0 too, I guess
         $this->assertEquals(0, $jitter->calculateJitter(-1));
 
-        // Retry 0: always 0
+        // Attempt 0: always 0
         $this->assertEquals(0, $jitter->calculateJitter(0));
 
-        // Retry 1: too many
-        $this->assertTrue($jitter->tooManyRetries(1));
+        // Attempt 1: too many
+        $this->assertTrue($jitter->tooManyAttempts(1));
     }
 
     /**
-     * Test jitter object when max retries is exceeded
+     * Test jitter object when max attempts is exceeded
      *
-     * @expectedException \Alaress\Jitter\MaxRetriesExceededException
+     * @expectedException \Alaress\Jitter\MaxAttemptsExceededException
      */
-    public function testJitterMaxRetries()
+    public function testJitterMaxAttempts()
     {
         $jitter = new Jitter(new PredeterminedGenerator([0.3, 0.1, 0.5, 0.7, 0.9]), 5, 100);
 
-        $jitter->calculateJitter(6);
+        $jitter->calculateJitter(5);
     }
 }

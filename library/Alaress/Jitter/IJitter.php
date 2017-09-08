@@ -16,28 +16,28 @@ use Throwable;
 interface IJitter
 {
     /**
-     * Is $retries above max retries?
+     * Is `$attempts` above the max number of allowable attempts?
      *
-     * @param int $retries
+     * @param int $attempts
      * @return bool
      */
-    public function tooManyRetries($retries);
+    public function tooManyAttempts($attempts);
 
     /**
      * Calculates jitter based on amount of time.
      *
      * If the last request failed, wait a little while before trying again.
-     * The amount of time to wait increases with the number of retries.
+     * The amount of time to wait increases with the number of attempts.
      *
-     * @param int $retries
+     * @param int $attempts
      * @return int Amount of jitter
-     * @throws MaxRetriesExceededException if $retries is more than allowed
+     * @throws MaxAttemptsExceededException if `$attempts` is more than allowed
      */
-    public function calculateJitter($retries);
+    public function calculateJitter($attempts);
 
     /**
-     * Built-in retry of `$callable` until it either returns or retries too
-     * many times.
+     * Built-in retry of `$callable` until it either returns or too many
+     * attempts have been made.
      *
      * @param callable $callable
      * @return mixed Whatever `$callable` returns if it doesn't exception out

@@ -10,8 +10,9 @@ namespace Alaress\Jitter;
 use RuntimeException;
 
 /**
- * Class MaxRetriesExceededException
+ * Exception that is thrown when `Jitter::calculateJitter` has attempted too
+ * many times.
  */
-class MaxRetriesExceededException extends RuntimeException
+class MaxAttemptsExceededException extends RuntimeException
 {
 }
