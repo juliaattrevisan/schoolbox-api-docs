@@ -101,6 +101,13 @@ class Crocodoc
     private $updateLogQuery;
 
     /**
+     * Query for determining if this process has timed out.
+     *
+     * @var IQuery
+     */
+    private $selectIsTimedOutQuery;
+
+    /**
      * Query for marking all currently processing crocodocuments as timed out.
      *
      * @var IQuery
@@ -246,6 +253,13 @@ class Crocodoc
                 :message,
                 :now
             )
+        ");
+
+        $this->selectIsTimedOutQuery = $this->database->prepareQuery("
+            SELECT COUNT(*)
+            FROM student_submission_file_crocodoc_archive_log
+            WHERE status = :statusProcessing
+            AND   (date + INTERVAL :timeout SECOND) < :now
         ");
 
         $this->updateProcessingAsTimedOutQuery = $this->database->prepareQuery("
@@ -515,9 +529,30 @@ class Crocodoc
     }
 
     /**
-     * Callback for when the processor is judged to have timed out.
+     * Has the archiver timed out?
      *
-     * All crocodocuments that are still processing are judged to have failed, and timed out.
+     * In practise, this finds the newest item that is still in Processing; if
+     * it's more than `$seconds` seconds old, this process has timed out.
+     *
+     * @param int $seconds How many seconds need to have passed since the last processed?
+     * @return bool
+     * @throws DatabaseException if a query went wrong
+     */
+    public function isTimedOut($seconds)
+    {
+        $this->selectIsTimedOutQuery->execute([
+            'seconds'          => $seconds,
+            'statusProcessing' => self::STATUS_PROCESSING,
+            'now'              => Alaress_Date_Format::now()->getDatabase(),
+        ]);
+        return (int)$this->selectIsTimedOutQuery->fetchColumn() > 0;
+    }
+
+    /**
+     * Mark all crocodocuments that are still processing as timed out.
+     *
+     * Timed out crocodocuments are also marked as failed, so that `archive()`
+     * with `$retryFailed` on will attempt to re-process them.
      *
      * @throws DatabaseException if a query went wrong
      */
