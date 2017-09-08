@@ -142,7 +142,7 @@ class External_Isams_Timetable implements External_TimetableInterface
      * @param int $date UNIX timestamp of the date we are looking at
      * @return int              Day ID
      */
-    public function getDayId(CampusModel $campus, $date = 0)
+    private function getDayId(CampusModel $campus, $date = 0)
     {
 
 
