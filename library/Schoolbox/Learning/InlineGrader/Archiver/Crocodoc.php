@@ -266,13 +266,7 @@ class Crocodoc
             UPDATE student_submission_file_crocodoc_archive_log
             SET status = :statusFailed, message = :timeoutMessage
             WHERE status = :statusProcessing
-        ",
-            [
-                'statusFailed'     => self::STATUS_FAILED,
-                'statusProcessing' => self::STATUS_PROCESSING,
-                'timeoutMessage'   => 'Processing timed out',
-            ]
-        );
+        ");
 
         $this->selectAttachedFeedbackQuery = $this->database->prepareQuery("
             SELECT id AS feedbackId
@@ -541,7 +535,7 @@ class Crocodoc
     public function isTimedOut($seconds)
     {
         $this->selectIsTimedOutQuery->execute([
-            'seconds'          => $seconds,
+            'timeout'          => $seconds,
             'statusProcessing' => self::STATUS_PROCESSING,
             'now'              => Alaress_Date_Format::now()->getDatabase(),
         ]);
@@ -558,7 +552,11 @@ class Crocodoc
      */
     public function timeout()
     {
-        $this->updateProcessingAsTimedOutQuery->execute();
+        $this->updateProcessingAsTimedOutQuery->execute([
+            'statusFailed'     => self::STATUS_FAILED,
+            'statusProcessing' => self::STATUS_PROCESSING,
+            'timeoutMessage'   => 'Processing timed out',
+        ]);
     }
 
     /**
