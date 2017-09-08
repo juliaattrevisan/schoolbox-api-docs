@@ -128,17 +128,23 @@ class External_Isams_Timetable implements External_TimetableInterface
         return date('w', strototime($date));
     }
 
+    /** The days in Isams have no correlation to an actual calendar date- it is purely based on the day of the week
+     *  (Monday - Friday) and a week number (of which there is a single week set up for each campus).
+     *
+     * To work out the day ID we are doing the following...
+     *
+     * 1. Start with the campus external timetable code (SS/PS/TK) stored in $campus->getExtTimetableCode()
+     * 2. Look up the corresponding week ID number in V_Weeks where the 'txtShortName' field is equal to this campus code
+     * 3. Look up the day number 'V_Days.TblTimetableManagerDaysId' using the week ID we found in step 2, along with the
+     *    day of the week number (where 2 = Monday, 6 = Friday) which is stored in the 'intDay' field.
+     *
+     * @param CampusModel $campus Campus of the date we are looking at
+     * @param int $date UNIX timestamp of the date we are looking at
+     * @return int              Day ID
+     */
     public function getDayId(CampusModel $campus, $date = 0)
     {
-        // The days in Isams have no correlation to an actual calendar date- it is purely based on the day of the week
-        // (Monday - Friday) and a week number (of which there is a single week set up for each campus).
-        //
-        // To work out the day number we are doing the following...
-        //
-        // 1. Start with the campus external timetable code (SS/PS/TK) stored in $campus->getExtTimetableCode()
-        // 2. Look up the corresponding week ID number in V_Weeks where the 'txtShortName' field is equal to this campus code
-        // 3. Look up the day number 'V_Days.TblTimetableManagerDaysId' using the week ID we found in step 2, along with the
-        //    day of the week number (where 2 = Monday, 6 = Friday) which is stored in the 'intDay' field.
+
 
         // Add one because ISAMS starts days at 1 and PHP starts at 0
 
