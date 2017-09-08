@@ -50,6 +50,23 @@ class JitterTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test jitter with no retries
+     */
+    public function testJitterWithNoRetries()
+    {
+        $jitter = new Jitter(new PredeterminedGenerator([0.3, 0.1]), 0, 100);
+
+        // Retry -1: always 0 too, I guess
+        $this->assertEquals(0, $jitter->calculateJitter(-1));
+
+        // Retry 0: always 0
+        $this->assertEquals(0, $jitter->calculateJitter(0));
+
+        // Retry 1: too many
+        $this->assertTrue($jitter->tooManyRetries(1));
+    }
+
+    /**
      * Test jitter object when max retries is exceeded
      *
      * @expectedException \Alaress\Jitter\MaxRetriesExceededException
