@@ -79,13 +79,34 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
      * @var MapperFactory $mapperFactory
      * @var StorageMapper $storageMapper
      * @var UserMapper    $userMapper
+     * @var IConnector    $db
      */
     $httpClient = new HttpClient();
     $mapperFactory = $di->get('mapperFactory');
     $userMapper = $mapperFactory->get(UserMapper::class);
     $storageMapper = $mapperFactory->get(StorageMapper::class);
     $jitter = new Jitter(new FloatGenerator(), $maxAttempts, 500);
+    $db = $di->get('databaseInternal');
 
+    $archiver = new CrocodocArchiver($db, $httpClient, $jitter, $storageMapper, $log);
+
+    // Check timeout before anything else
+    $lock = new Alaress_Lock(__DIR__ . '/.archive.lock');
+    if (!$lock->acquire()) {
+        $log->critical("An archiver is already running, checking timeout");
+
+        // For now, hardcode timeout to 300s
+        $timeout = 300;
+        if ($archiver->isTimedOut($timeout)) {
+            $log->warning("Previous archiver has timed out - marking these as failed, and continuing");
+            $lock->killProcess();
+            $lock->acquire();
+            $archiver->timeout();
+        } else {
+            $log->info("No archiver process has yet timed out - exiting");
+            exit;
+        }
+    }
 
     // Figure out a system user
     try {
@@ -96,10 +117,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         exit(1);
     }
 
-    /** @var IConnector $db */
-    $db = $di->get('databaseInternal');
-
-    $archiver = new CrocodocArchiver($db, $httpClient, $jitter, $storageMapper, $log);
+    // Run the archiver
     $result = $archiver->archive($systemUser, $dryRun, $retryFailed, $maxSkips);
     if ($result['failed'] > 0) {
         exit(1);
