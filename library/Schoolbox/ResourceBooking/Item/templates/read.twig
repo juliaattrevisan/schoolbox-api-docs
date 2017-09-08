@@ -113,7 +113,7 @@
                     }
                     element.attr({
                         'data-start':  event.start.format(),
-                        'data-end':    event.end.format(),
+                        'data-end':    (event.end || event.start).format(),
                         'data-allday': event.allDay ? 1 : 0
                     })
 
