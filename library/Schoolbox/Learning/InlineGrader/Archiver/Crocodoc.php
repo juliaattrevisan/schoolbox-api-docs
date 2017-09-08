@@ -94,11 +94,18 @@ class Crocodoc
     private $countFailedCrocodocQuery;
 
     /**
-     * Query for fetching a log of what we've done.
+     * Query for storing a log of what we've done.
      *
      * @var IQuery
      */
     private $updateLogQuery;
+
+    /**
+     * Query for marking all currently processing crocodocuments as timed out.
+     *
+     * @var IQuery
+     */
+    private $updateProcessingAsTimedOutQuery;
 
     /**
      * Query for fetching the most recent published feedback attached to the
@@ -240,6 +247,18 @@ class Crocodoc
                 :now
             )
         ");
+
+        $this->updateProcessingAsTimedOutQuery = $this->database->prepareQuery("
+            UPDATE student_submission_file_crocodoc_archive_log
+            SET status = :statusFailed, message = :timeoutMessage
+            WHERE status = :statusProcessing
+        ",
+            [
+                'statusFailed'     => self::STATUS_FAILED,
+                'statusProcessing' => self::STATUS_PROCESSING,
+                'timeoutMessage'   => 'Processing timed out',
+            ]
+        );
 
         $this->selectAttachedFeedbackQuery = $this->database->prepareQuery("
             SELECT id AS feedbackId
@@ -493,6 +512,18 @@ class Crocodoc
             'successful' => $successCount,
             'failed'     => $failureCount,
         ];
+    }
+
+    /**
+     * Callback for when the processor is judged to have timed out.
+     *
+     * All crocodocuments that are still processing are judged to have failed, and timed out.
+     *
+     * @throws DatabaseException if a query went wrong
+     */
+    public function timeout()
+    {
+        $this->updateProcessingAsTimedOutQuery->execute();
     }
 
     /**
