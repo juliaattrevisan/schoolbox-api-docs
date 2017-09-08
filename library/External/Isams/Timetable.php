@@ -53,10 +53,7 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getTimetableDefinition($externalUserId, CampusModel $campus, $day = null, $date = null)
     {
-        if (empty($day)) {
-            // If no day number is specified, use the current one for this campus
-            $day = $this->getDayNumber($campus);
-        }
+        $dayId = $this->getDayId($campus, $date);
 
         $query =
             "
@@ -75,7 +72,7 @@ class External_Isams_Timetable implements External_TimetableInterface
 	    ";
         $periods = $this->getConnector()->executeQueryIterator($query, [
             'campus_code'   => $campus->getExtTimetableCode(),
-            'day_id'        => $day
+            'day_id'        => $dayId
         ]);
 
         $definitionArray = [];
@@ -100,7 +97,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         ";
 
         $periods = $this->getConnector()->executeQuery($queryPeriodCount,[
-            'day_id' => $day
+            'day_id' => $dayId
         ])->fetch();
 
         $definitionArray['periodCount'] = $periods['PeriodCount'];
@@ -128,6 +125,11 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getDayNumber(CampusModel $campus, $date = 0)
     {
+        return date('w', strototime($date));
+    }
+
+    public function getDayId(CampusModel $campus, $date = 0)
+    {
         // The days in Isams have no correlation to an actual calendar date- it is purely based on the day of the week
         // (Monday - Friday) and a week number (of which there is a single week set up for each campus).
         //
@@ -140,7 +142,13 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         // Add one because ISAMS starts days at 1 and PHP starts at 0
 
-        $dayOfWeek = date("w") + 1;
+        if($date) {
+            $dayOfWeek = date("w",strtotime($date)) + 1;
+        }
+        else {
+            $dayOfWeek = date("w") + 1;
+        }
+
 
         $queryDay = "
            SELECT   TblTimetableManagerDaysID as DayID 
@@ -179,7 +187,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             'Monday',
             'Tuesday',
             'Wednesday',
-            'Thusday',
+            'Thursday',
             'Friday'
         ];
 
@@ -210,7 +218,7 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         $period = $this->getConnector()->executeQuery($queryPeriod, [
             'time_val'  => $time,
-            'day_id'    => $this->getDayNumber($campus, $time)
+            'day_id'    => $this->getDayId($campus, $time)
         ])->fetch();
 
         if ($period) {
@@ -258,7 +266,9 @@ class External_Isams_Timetable implements External_TimetableInterface
             return array();
         }
 
-        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
+        $dayId = $this->getDayId($campus,$date);
+
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
 
         // Can't do anything without the timetable definition either
 
@@ -303,7 +313,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         ";
 
         $iterator = $this->getConnector()->executeQueryIterator($queryTimetable, [
-            'day_id'            => $dayNumber,
+            'day_id'            => $dayId,
             'campus_code'       => $campus->getExtTimetableCode(),
             'external_user_id'  => $externalUserId
         ]);
