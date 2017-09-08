@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\InlineGrader\Archiver;
+namespace Schoolbox\Learning\InlineGrader\Crocodoc;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
@@ -30,7 +30,7 @@ use Schoolbox\User;
 /**
  * Archival tool for Crocodoc documents.
  */
-class Crocodoc
+class Archiver
 {
 
     const STATUS_PENDING = 'pending';
