@@ -105,7 +105,7 @@ try {
             break;
 
         case 'timetable':
-            $api = new Calendar_Api_EventType_Timetable_External_Default($user, []);
+            $api = new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($user, []);
             $filename = 'timetable';
             $start = $_SERVER['REQUEST_TIME'];
             $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
