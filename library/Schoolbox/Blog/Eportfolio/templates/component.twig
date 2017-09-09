@@ -59,7 +59,7 @@
 
                             {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: blog }) %}
                                 <nav>
-                                    <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}" title="Modify Blog post"></a>
+                                    <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: blog.getId}) }}" title="Modify Blog post"></a>
                                 </nav>
                             {% endif %}
 
@@ -107,9 +107,8 @@
                                     <div class="column small-12 no-pad">
                                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
                                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
-                                            <input type="hidden" name="ownerId" value="{{ page.getUid }}">
                                             <div class="card small-12">
-                                                <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
+                                                <img src="/portrait.php?userId={{ USER.getExternalId }}&size=square64" />
                                                 <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                                             </div>
                                             <input type="submit" name="comment" value="Add Comment"/>
@@ -129,11 +128,11 @@
 </div>
 <div class="component-action">
     <section>
-        {% if isRouteAuthorized('eportfolioBlog.getArchiveCurrent', {ownerId: page.getUid, page: page}) %}
-            <a href="{{ routeLookup('eportfolioBlog.getArchiveCurrent', {ownerId: page.getUid, pageId: page.getPageId}) }}" class="button">View Archive</a>
+        {% if isRouteAuthorized('eportfolioBlog.getArchiveCurrent', {page: page}) %}
+            <a href="{{ routeLookup('eportfolioBlog.getArchiveCurrent', {pageId: page.getPageId}) }}" class="button">View Archive</a>
         {% endif %}
-        {% if isRouteAuthorized('eportfolioBlog.getInsert', {ownerId: page.getUid, page: page, blog: blog}) %}
-            <a href="{{ routeLookup('eportfolioBlog.getInsert', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}" class="button">Post Blog</a>
+        {% if isRouteAuthorized('eportfolioBlog.getInsert', {page: page, blog: blog}) %}
+            <a href="{{ routeLookup('eportfolioBlog.getInsert', {pageId: page.getPageId, id: blog.getId}) }}" class="button">Post Blog</a>
         {% endif %}
     </section>
 </div>
