@@ -45,7 +45,7 @@
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="island small-12">
             <section>
-                <ul class="information-list">
+                <ul class="information-list social-stream">
 
                     {% for blog in blogs %}
 
@@ -102,22 +102,20 @@
 
                                 {% endfor %}
 
-                                {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
-                                <li class="row hide" id="commentform-{{ blog.getId }}">
-                                    <div class="column small-12 no-pad">
-                                        <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
-                                            <input type="hidden" name="pageId" value="{{ page.getPageId }}">
-                                            <div class="card small-12">
-                                                <img src="/portrait.php?userId={{ USER.getExternalId }}&size=square64" />
-                                                <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                                            </div>
-                                            <input type="submit" name="comment" value="Add Comment"/>
-                                        </form>
-                                    </div>
-                                </li>
-                                {% endif %}
+
                             </ul>
                         </li>
+                        {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
+                            <li class="row hide" id="commentform-{{ blog.getId }}">
+                                <div class="editPanel socialstream-new-post">
+                                    <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
+                                        <input type="hidden" name="pageId" value="{{ page.getPageId }}">
+                                        <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                                        <input type="submit" name="comment" value="Add Comment"/>
+                                    </form>
+                                </div>
+                            </li>
+                        {% endif %}
 
                     {% endfor %}
 

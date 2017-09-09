@@ -59,7 +59,7 @@
         <div class="small-12 large-9 island">
             <h2 class="subheader">{{ blogs[0].getCreatedAt | date('F Y') }} Blog Posts</h2>
             <section>
-                <ul class="information-list">
+                <ul class="information-list social-stream">
 
                     {% for blog in blogs %}
 
@@ -90,7 +90,7 @@
                             {% for comment in blogComments[blog.getId] %}
 
                             <li>
-                                <div class="card small-12">
+                                <div class="small card small-12">
                                     {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
                                     <p class="meta">Commented {{ comment.createdAt.getLong }}</p>
                                 </div>
@@ -104,13 +104,14 @@
                             {% endfor %}
 
                         </ul>
-
                         {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
-                        <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
-                            <input type="hidden" name="pageId" value="{{ page.getPageId }}">
-                            <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                            <input type="submit" class="expand" name="comment" value="Add comment"/>
-                        </form>
+                        <div class="editPanel socialstream-new-post">
+                            <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
+                                <input type="hidden" name="pageId" value="{{ page.getPageId }}">
+                                <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                                <input type="submit" class="expand" name="comment" value="Add comment"/>
+                                </form>
+                        </div>
                         {% endif %}
                     </li>
 
