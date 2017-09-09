@@ -50,13 +50,13 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find all the blog entries for a homepage
+     * Find all the blog entries posted in a particular users ePortfolio
      *
-     * @param User $owner
+     * @param User $user
      * @param $limit
      * @return GenericCollection
      */
-    public function findForOwner(User $owner, $limit = 0)
+    public function findForPortfolioOwner(User $user, $limit = 0)
     {
         $query =
             "
@@ -82,7 +82,7 @@ class Mapper extends BaseMapper
 
         $stmt->execute(
             array(
-                'owner_id' => $owner->getId(),
+                'owner_id' => $user->getId(),
             )
         );
 
