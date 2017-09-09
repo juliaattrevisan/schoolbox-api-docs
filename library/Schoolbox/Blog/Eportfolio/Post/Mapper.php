@@ -40,7 +40,7 @@ class Mapper extends BaseMapper
         /** Joins */
 
         $this->hasJoin(
-            'user',
+            'owner',
             array(
                 'mapper' => UserMapper::class,
                 'this_key' => 'owner_id',
@@ -62,12 +62,12 @@ class Mapper extends BaseMapper
             "
 			SELECT
 				{$this->getColumnString('b')},
-				{$this->getJoinColumnString('user', 'u')}
+				{$this->getJoinColumnString('owner', 'u')}
 			FROM `{$this->getTable()}` AS `b`
-            INNER JOIN {$this->getJoinSql('user', '', 'u',true)}
+            INNER JOIN {$this->getJoinSql('owner', 'b', 'u',true)}
             JOIN `eportfolio_page` p ON p.page_id = b.page_id
 			WHERE `b`.`deleted_at` IS NULL
-				AND `b`.`owner_id` = :owner_id
+				AND `p`.`uid` = :owner_id
 				AND `p`.`deleted_at` IS NULL
 			ORDER BY `b`.`created_at` DESC
 		";
@@ -90,7 +90,7 @@ class Mapper extends BaseMapper
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var User $user */
-            $user = $this->hydrateJoin($r, 'user', 'u');
+            $user = $this->hydrateJoin($r, 'owner', 'u');
 
             /** @var EportfolioBlogModel $blog */
             $blog = $this->hydrate($r, 'b');
@@ -111,9 +111,9 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('owner', 'u')}
             FROM {$this->database->quoteIdentifier($this->table)}
-            INNER JOIN {$this->getJoinSql('user', '', 'u',true)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'u',true)}
         ";
     }
 
@@ -130,7 +130,7 @@ class Mapper extends BaseMapper
             $model = $this->hydrate($row);
 
             // set user and division only if retrieved properly
-            $user = $this->hydrateJoin($row, 'user', 'u');
+            $user = $this->hydrateJoin($row, 'owner', 'u');
             if ($user instanceof User) {
                 $model->setOwner($user);
             }
