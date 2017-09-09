@@ -300,8 +300,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function renderRecentBlogs()
     {
+        //  TODO do this properly instead of by fetching amount*2 then filtering
         $allBlogs = \Schoolbox\Blog\Eportfolio\Post\Mapper::getInstance()
-            ->findForPortfolioOwner($this->getUser(),$this->getNumRecentBlogs());
+            ->findForPortfolioOwner($this->getUser(),$this->getNumRecentBlogs(), $this->getNumRecentBlogs() * 2);
 
         $allBlogs = $allBlogs->filter(function($blog) {
             /** @var Schoolbox\Blog\Eportfolio\Post\Model $blog */
