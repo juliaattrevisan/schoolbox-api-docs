@@ -11,6 +11,7 @@
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use PDO;
+use PDOStatement;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
@@ -67,7 +68,7 @@ class Mapper extends BaseMapper
 				{$this->getColumnString('b')},
 				{$this->getJoinColumnString('user', 'u')}
 			FROM `{$this->getTable()}` AS `b`
-            LEFT JOIN {$this->getJoinSql('user', 'b', 'u')}
+            INNER JOIN {$this->getJoinSql('user', '', 'u',true)}
             JOIN `eportfolio_page` p ON p.page_id = b.page_id
 			WHERE `b`.`deleted_at` IS NULL
 				AND `b`.`owner_id` = :owner_id
@@ -103,5 +104,44 @@ class Mapper extends BaseMapper
 
         return $c;
     }
+
+    /**
+     * This mapper's find* methods always hydrate the owner
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('user', 'u')}
+            FROM {$this->database->quoteIdentifier($this->table)}
+            INNER JOIN {$this->getJoinSql('user', '', 'u',true)}
+        ";
+    }
+
+    /**
+     * Hydrate joins added in `getSelectString`.
+     *
+     * @param  PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            $model = $this->hydrate($row);
+
+            // set user and division only if retrieved properly
+            $user = $this->hydrateJoin($row, 'user', 'u');
+            if ($user instanceof User) {
+                $model->setOwner($user);
+            }
+            $collection->add($model);
+        }
+        return $collection;
+    }
+
 
 }

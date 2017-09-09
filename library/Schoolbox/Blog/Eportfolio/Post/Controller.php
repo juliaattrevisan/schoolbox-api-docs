@@ -169,12 +169,6 @@ class Controller extends Base
     {
         try
         {
-            // Hydrate owner details
-
-            /** @var User $user */
-            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
-            $blog->setOwner($user);
-
             // Load any comments and hydrate their owners
             $comments = $this->getEportfolioBlogCommentMapper()->findByColumn("blog_id", $blog->getId());
 
@@ -332,8 +326,6 @@ class Controller extends Base
         /** @var EportfolioBlogModel $blog */
         foreach ($blogs as $blog) {
             $dateSelectorArray[$blog->getCreatedAt()->getYear() . "-" . $blog->getCreatedAt()->getMonth(true)] = $blog->getCreatedAt();
-            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
-            $blog->setOwner($user);
 
             if ($blog->getCreatedAt()->getYear() == $year && $blog->getCreatedAt()->getMonth() == $month) {
 
@@ -355,7 +347,7 @@ class Controller extends Base
                 'template' => '@eportfolioBlog/archive.twig',
                 'data'     => array(
                     'blogs'             => $blogsSelectedMonth,
-                    'blogImages'      => $blogImages,
+                    'blogImages'        => $blogImages,
                     'blogComments'      => $blogComments,
                     'dateSelectorArray' => $dateSelectorArray,
                     'page'              => $page,
