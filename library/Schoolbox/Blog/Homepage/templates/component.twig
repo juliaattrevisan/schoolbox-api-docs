@@ -54,7 +54,7 @@
 
 {% else %}
 
-    <ul class="information-list">
+    <ul class="information-list social-stream">
 
         {% for blog in blogs %}
 
@@ -85,11 +85,8 @@
                     <a data-toggle="commentform-{{ blog.getId }}" class='button icon-add' >Add Comment</a>
                     {% endif %}
                 </article>
-
                 <ul class="information-list reply" id="blogComment_{{ blog.getId }}">
-
                     {% for comment in blogComments[blog.getId] %}
-
                         <li class="actions-small-1" data-thread>
                             <div class="list-item">
                                 <div class="card small-12">
@@ -108,28 +105,21 @@
                                 <p>{{ comment.getBody | nl2br }}</p>
                             </article>
                         </li>
-
                     {% endfor %}
-
-                    {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
-                    <li class="row hide" id="commentform-{{ blog.getId }}">
-                        <div class="column small-12 no-pad">
-                            <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post">
-                                <input type="hidden" name="component" value="1">
-                                <div class="card small-12">
-                                    <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
-                                    <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                                </div>
-                                <input type="submit" name="comment" value="Add Comment"/>
-                            </form>
-                        </div>
-                    </li>
-                    {% endif %}
                 </ul>
             </li>
-
+            {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
+                <li class="row hide" id="commentform-{{ blog.getId }}">
+                    <div class="editPanel socialstream-new-post">
+                        <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post">
+                            <input type="hidden" name="component" value="1">
+                            <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                            <input type="submit" name="comment" value="Add Comment"/>
+                        </form>
+                    </div>
+                </li>
+            {% endif %}
         {% endfor %}
-
     </ul>
     <div class="component-action">
         <section>
