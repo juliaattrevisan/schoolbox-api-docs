@@ -13,7 +13,7 @@ namespace Schoolbox\Blog\Eportfolio\Post;
 use PDO;
 use PDOStatement;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -54,7 +54,7 @@ class Mapper extends BaseMapper
      *
      * @param User $owner
      * @param $limit
-     * @return Collection
+     * @return GenericCollection
      */
     public function findForOwner(User $owner, $limit = 0)
     {
@@ -121,7 +121,7 @@ class Mapper extends BaseMapper
      * Hydrate joins added in `getSelectString`.
      *
      * @param  PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -138,6 +138,4 @@ class Mapper extends BaseMapper
         }
         return $collection;
     }
-
-
 }

@@ -13,7 +13,7 @@ namespace Schoolbox\Blog\Eportfolio\Comment;
 use PDOStatement;
 use Schoolbox\Blog\Eportfolio\Comment\Model as EportfolioBlogCommentModel;
 use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -77,7 +77,7 @@ class Mapper extends BaseMapper
      * Hydrate joins added in `getSelectString`.
      *
      * @param  PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -94,5 +94,4 @@ class Mapper extends BaseMapper
         }
         return $collection;
     }
-
 }
