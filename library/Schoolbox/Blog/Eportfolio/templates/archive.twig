@@ -58,31 +58,23 @@
 
         <div class="small-12 large-9 island">
             <h2 class="subheader">{{ blogs[0].getCreatedAt | date('F Y') }} Blog Posts</h2>
-            <section class="content">
+            <section>
                 <ul class="information-list">
 
                     {% for blog in blogs %}
 
-                    <li>
-                        <a id="{{ blog.getId() }}"></a>
-                        <div class="actions-small-1 row">
-                            <div class="list-item">
-                                <div class="small-12 column">
-                                    <h2>{{ blog.getHeading }}</h2>
-                                </div>
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                {% include '@eportfolioBlog/sub/blogAvatarCard.twig' with {blog: blog} %}
                             </div>
-                            {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: blog }) %}
-                            <nav>
-                                <a class="icon-modify" title="Modify" href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: blog.getId }) }}"></a>
-                            </nav>
-                            {% endif %}
                         </div>
-
-                        <div class="card small-12">
-                            {% include '@blog/sub/userAvatarCard.twig' with {user: blog.getOwner()} %}
-                            <p class="meta">Posted {{ blog.getCreatedAt.getLong }}</p>
-                        </div>
-
+                        {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: blog }) %}
+                        <nav>
+                            <a class="icon-modify" title="Modify" href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: blog.getId }) }}"></a>
+                        </nav>
+                        {% endif %}
+                        <a id="{{ blog.getId() }}"></a>
                         <article>
 
                             {{ blog.getBody | purify }}

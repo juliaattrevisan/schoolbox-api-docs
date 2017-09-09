@@ -14,11 +14,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Collection;
-use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Searchable;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 

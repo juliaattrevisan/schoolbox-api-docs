@@ -172,13 +172,6 @@ class Controller extends Base
             // Load any comments and hydrate their owners
             $comments = $this->getEportfolioBlogCommentMapper()->findByColumn("blog_id", $blog->getId());
 
-            /** @var EportfolioBlogCommentModel $comment */
-            foreach ($comments as $comment) {
-                /** @var User $user */
-                $user = $this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId());
-                $comment->setOwner($user);
-            }
-
             // Load any images
             $images = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
         }
@@ -331,11 +324,6 @@ class Controller extends Base
 
                 $blogComments[$blog->getId()] = $this->getEportfolioBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
                 $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn('blog_id', $blog->getId());
-
-                /** @var EportfolioBlogCommentModel $comment */
-                foreach ($blogComments[$blog->getId()] as $comment) {
-                    $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
-                }
 
                 $blogsSelectedMonth[] = $blog;
             }

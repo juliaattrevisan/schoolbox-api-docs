@@ -10,18 +10,15 @@
 
 namespace Schoolbox\Blog\Eportfolio\Comment;
 
-use PDO;
+use PDOStatement;
 use Schoolbox\Blog\Eportfolio\Comment\Model as EportfolioBlogCommentModel;
 use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
-use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Collection;
-use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Mapper extends BaseMapper implements FeedableMapperInterface
+class Mapper extends BaseMapper
 {
     /**
      * Setup mapper
@@ -59,99 +56,43 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         );
     }
 
+
     /**
-     * @param int $ownerId
-     * @param int $limit
-     * @param int $offset
-     * @param int $time
-     * @return Collection|EportfolioBlogModel[]
+     * This mapper's find* methods always hydrate the owner
+     *
+     * @return string
      */
-    public function findForFeed($folderId, $limit, $offset = 0, $time = 0)
+    protected function getSelectString()
     {
-        $time = date('Y-m-d H:i:s', $time ? : time());
-
-        $limit = (int)$limit;
-        $offset = (int)$offset;
-
-        $stmt = $this->database->prepare(
-            "
-			SELECT
-				{$this->getColumnString('bc')},
-				{$this->getJoinColumnString('owner', 'u')},
-				{$this->getJoinColumnString('blog', 'b')}
-			FROM `{$this->getTable()}` AS `bc`
-				LEFT JOIN {$this->getJoinSql('owner', 'bc', 'u', true)}
-				INNER JOIN {$this->getJoinSql('blog', 'bc', 'b')}
-			WHERE `bc`.`deleted_at` IS NULL
-				AND `b`.`folder_id` = :folder_id
-				AND `bc`.`created_at` < :time
-			ORDER BY `bc`.`created_at` DESC
-			LIMIT $offset, $limit
-		"
-        );
-
-        $stmt->execute(
-            array(
-                'folder_id' => $folderId,
-                'time' => $time
-            )
-        );
-
-        $c = $this->createCollection();
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var User $owner */
-            $owner = $this->hydrateJoin($r, 'owner', 'u');
-
-            /** @var FolderModel $folder */
-            $folder = $this->hydrateJoin($r, 'folder', 'c');
-
-            /** @var EportfolioBlogModel $blog */
-            $blog = $this->hydrate($r, 'b');
-            $blog->setOwner($owner);
-            $blog->setFolder($folder);
-            $c->add($blog);
-        }
-
-        return $c;
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('owner', 'u')}
+            FROM {$this->database->quoteIdentifier($this->table)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'u',true)}
+        ";
     }
 
     /**
-     * Find all the comments for a particular blog
+     * Hydrate joins added in `getSelectString`.
      *
-     * @param EportfolioBlogModel $blog
+     * @param  PDOStatement $statement
      * @return Collection
      */
-    public function findForBlog(EportfolioBlogModel $blog) {
-        $stmt = $this->database->prepare("
-			SELECT
-				{$this->getColumnString('c')},
-				{$this->getJoinColumnString('owner', 'u')}
-			FROM
-				`{$this->getTable()}` `c`
-            LEFT JOIN {$this->getJoinSql('owner', 'c', 'u')}
-			WHERE
-				`c`.`deleted_at` IS NULL
-				AND `c`.blog_id = :blogId
-			ORDER BY `c`.`created_at` DESC
-		");
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            $model = $this->hydrate($row);
 
-        $stmt->execute(array(
-            'blogId' => $blog->getId()
-        ));
-
-        $c = $this->createCollection();
-
-        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var User $user */
-            $user = $this->hydrateJoin($r, 'owner', 'u');
-
-            /** @var EportfolioBlogCommentModel $comment */
-            $comment = $this->hydrate($r, 'c');
-            $comment->setOwner($user);
-            $c->add($comment);
+            // set user and division only if retrieved properly
+            $user = $this->hydrateJoin($row, 'owner', 'u');
+            if ($user instanceof User) {
+                $model->setOwner($user);
+            }
+            $collection->add($model);
         }
-
-        return $c;
+        return $collection;
     }
+
 }
