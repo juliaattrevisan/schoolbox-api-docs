@@ -65,6 +65,7 @@
                 scrollTime: '08:00',
                 defaultDate: calendarDate,
                 defaultView: calendarView,
+                defaultTimedEventDuration: '00:30:00',
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
                 firstDay: Number({{ config.calendar_start_day }}),
                 events: function(start, end, timezone, callback) {
