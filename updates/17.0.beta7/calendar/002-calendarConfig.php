@@ -10,8 +10,8 @@ use Psr\Log\LoggerInterface;
 $opts = require  __DIR__ . '/../../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
+$kernel = new Schoolbox\Application\Daemon\Kernel('Change name of timetable calendar connector', [
+    'verbose' => [false, false, false],
     'errors'  => E_ALL,
     'fields'  => array_keys($opts),
 ]);
@@ -52,6 +52,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log) {
 
         } catch (DomainException $e) {
             //config does not exist or is disabled
+            $log->warning('Calendar Timetable config not found, this can be ignored if its not enabled');
+
         }
     }
 });
