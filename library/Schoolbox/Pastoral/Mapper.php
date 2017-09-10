@@ -695,8 +695,10 @@ class Mapper extends BaseMapper
             $criteriaParts[] = $filter;
         }
 
+        $criteriaSql = ' WHERE pastoral.deleted_at IS NULL ';
+
         if (!empty($criteriaParts)) {
-            $criteriaSql = ' WHERE ' . implode(' AND ', $criteriaParts);
+            $criteriaSql .= ' AND' . implode(' AND ', $criteriaParts);
         }
 
         // Execute SQL
