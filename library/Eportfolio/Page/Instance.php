@@ -166,20 +166,22 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
         /** @var Component_Instance $instance */
         foreach ($instanceCollection as $instance) {
-            foreach ($this->getComponentCollection() as $inst) {
-                /** @var Component_Eportfolio_ControllerAbstract $inst */
-                if ($inst->getInstance()->getDefinitionId() == $instance->getDefinitionId()) {
+            /** @var Component_Eportfolio_ControllerAbstract $component */
+            foreach ($this->getComponentCollection() as $component) {
+                if ($component->getInstance()->getDefinitionId() == $instance->getDefinitionId()) {
                     $instance->incrementInstanceCount();
                 }
             }
         }
 
         $tabNumber = 0;
+
         if ($total = $instanceCollection->count()) {
             $i = 0;
             $previous = new Component_Instance();
+
+            /** @var Component_Instance $component */
             foreach ($instanceCollection as $component) {
-                /** @var Component_Instance $component */
                 ++$i;
                 $class = $component->getDefinition()->getCssClass();
                 $multipleClass = '';

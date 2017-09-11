@@ -1,26 +1,28 @@
 <?php
-
 /**
- *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
- *
  */
 
-use Schoolbox\Resource\Folder;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderHomepageComponentController;
 
 /**
  * Class Component_InstanceMapper
+ * 
  * @method Component_Instance createModel($idValue = null)
  * @method Component_Instance findById($id)
  * @method Component_Instance hydrate(array $row, $alias = '', $callback = null)
  */
 class Component_InstanceMapper extends Schoolbox\Mapper
 {
+    /**
+     * {@inheritDoc} 
+     */
     protected function mapping()
     {
         $this->hasTable('component_instance');
@@ -35,20 +37,19 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     }
 
     /**
-    * Find all the known instances of a particular kind of component within
-    * a module context
-    *
-    * @param $module
-    * @param $definitionId
-    * @return Component_Instance[]|GenericCollection
-    */
+     * Find all the known instances of a particular kind of component within a module context
+     *
+     * @param $module
+     * @param $definitionId
+     * @return Component_Instance[]|GenericCollection
+     */
     public function findByDefinition($module, $definitionId)
     {
         $sql = '
-			SELECT '.$this->getColumnString('ci').'
-				 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
-				 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
-				 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
+			SELECT ' . $this->getColumnString('ci') . '
+				 , ' . Component_DefinitionMapper::getInstance()->getColumnString('cd') . '
+				 , ' . Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd') . '
+				 , ' . Component_ConfigMapper::getInstance()->getColumnString('cci') . "
 			FROM component_instance ci
 			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
 			LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -58,25 +59,25 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 			ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
 		";
 
-        return $this->findByFields($sql, array(
-            ':module' => $module,
+        return $this->findByFields($sql, [
+            ':module'       => $module,
             ':definitionId' => $definitionId
-        ));
+        ]);
     }
 
     /**
-    * Find component records by a module, but without an identifier
-    *
-    * @param $module
-    * @return Component_Instance[]|GenericCollection
-    */
+     * Find component records by a module, but without an identifier
+     *
+     * @param $module
+     * @return Component_Instance[]|GenericCollection
+     */
     public function findByModule($module)
     {
         $sql = '
-			SELECT '.$this->getColumnString('ci').'
-				 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
-				 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
-				 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
+			SELECT ' . $this->getColumnString('ci') . '
+				 , ' . Component_DefinitionMapper::getInstance()->getColumnString('cd') . '
+				 , ' . Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd') . '
+				 , ' . Component_ConfigMapper::getInstance()->getColumnString('cci') . "
 			FROM component_instance ci
 			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
 			  LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -85,22 +86,24 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 			ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
 		";
 
-        return $this->findByFields($sql, array(':module' => $module));
+        return $this->findByFields($sql, [
+            ':module' => $module
+        ]);
     }
 
     /**
-    * @param string $module
-    * @param string $identifier
-    *
-    * @return Component_Instance[]|GenericCollection
-    */
+     * @param string $module
+     * @param string $identifier
+     *
+     * @return Component_Instance[]|GenericCollection
+     */
     public function findByContext($module, $identifier)
     {
         $sql = '
-			SELECT '.$this->getColumnString('ci').'
-				 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
-				 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
-				 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
+			SELECT ' . $this->getColumnString('ci') . '
+				 , ' . Component_DefinitionMapper::getInstance()->getColumnString('cd') . '
+				 , ' . Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd') . '
+				 , ' . Component_ConfigMapper::getInstance()->getColumnString('cci') . "
 			FROM component_instance ci
 			INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
 			  LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -109,7 +112,11 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 			AND identifier = :identifier
 			ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
 		";
-        return $this->findByFields($sql, array(':module' => $module, ':identifier' => $identifier));
+        
+        return $this->findByFields($sql, [
+            ':module' => $module, 
+            ':identifier' => $identifier
+        ]);
     }
 
 
@@ -117,34 +124,37 @@ class Component_InstanceMapper extends Schoolbox\Mapper
      * Locates a Course Builder component on a homepage
      *
      * @param int $folderId
-     * @throws Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @return Component_Instance
      */
     public function findCourseBuilder($folderId)
     {
-        $c = $this->findByContextAndClass('homepage', $folderId, CourseBuilderHomepageComponentController::class);
+        $c = $this->findByContextAndClass(
+            'homepage', 
+            $folderId, 
+            CourseBuilderHomepageComponentController::class
+        );
 
         if ($c->count()) {
             return $c->first();
         }
 
-        throw new Schoolbox\Mapper\Exception("Instance of Course Builder not found on folder $folderId.");
+        throw new MapperException("Instance of Course Builder not found on folder $folderId.");
     }
 
     /**
      * @param string $module
      * @param string $identifier
      * @param string $class
-     *
      * @return Component_Instance[]|GenericCollection
      */
     public function findByContextAndClass($module, $identifier, $class)
     {
         $sql = '
-            SELECT '.$this->getColumnString('ci').'
-                 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
-                 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
-                 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
+            SELECT ' . $this->getColumnString('ci') . '
+                 , ' . Component_DefinitionMapper::getInstance()->getColumnString('cd') . '
+                 , ' . Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd') . '
+                 , ' . Component_ConfigMapper::getInstance()->getColumnString('cci') . "
             FROM component_instance ci
             INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
               LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -154,14 +164,12 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             AND cd.class = :class
             ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
         ";
-        return $this->findByFields(
-            $sql,
-            array(
-                ':module'     => $module,
-                ':identifier' => $identifier,
-                ':class'      => $class,
-            )
-        );
+        
+        return $this->findByFields($sql, [
+            ':module'     => $module,
+            ':identifier' => $identifier,
+            ':class'      => $class,
+        ]);
     }
 
     /**
@@ -172,7 +180,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     {
         $sql = '
 			SELECT ' . $this->getColumnString('ci') . '
-				 , ' . Component_DefinitionMapper::getInstance()->getColumnString('cd') .'
+				 , ' . Component_DefinitionMapper::getInstance()->getColumnString('cd') . '
 				 , ' . Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd') . '
 				 , ' . Component_ConfigMapper::getInstance()->getColumnString('cci') . "
 			FROM component_instance ci
@@ -183,30 +191,35 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 			ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
 		";
 
-        return $this->findByFields($sql, array(':id' => $id))->first();
+        return $this->findByFields($sql, [
+            ':id' => $id
+        ])->first();
     }
 
     /**
-    * @param $sql
-    * @param $fields
-    * @return Component_Instance[]|GenericCollection
-    */
+     * @param $sql
+     * @param $fields
+     * @return Component_Instance[]|GenericCollection
+     */
     protected function findByFields($sql, $fields)
     {
         $statement = $this->database->prepare($sql);
         $statement->execute($fields);
 
         // Hydrate a whole bunch of stuff here.
+        
         $instanceCollection         = $this->createCollection();
         $definitionCollection       = Component_DefinitionMapper::getInstance()->createCollection();
         $configInstanceCollection   = Component_ConfigMapper::getInstance()->createCollection();
         $configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->createCollection();
 
-        // hydrate rows
-        /** @var Component_Instance         $instance */
-        /** @var Component_Definition       $definition */
-        /** @var Component_Config           $configInstance */
+        // Hydrate rows
+        
+        /** @var Component_Instance $instance */
+        /** @var Component_Definition $definition */
+        /** @var Component_Config $configInstance */
         /** @var Component_ConfigDefinition $configDef */
+        
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $instanceId   = $row['ci.id'];
             $definitionId = $row['cd.id'];
@@ -240,9 +253,9 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             $configInstance = $configInstanceCollection->getOffset($configId);
 
             // n:1 :: configDefinitions:instance
-            if($configDef){
+            if ($configDef) {
                 $config = clone $configDef;
-                if($configInstance){
+                if ($configInstance) {
                     $config->setValue($configInstance->getValue());
                 }
                 $instance->getConfig()->setOffset($config->getId(), $config);
@@ -252,8 +265,13 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         return $instanceCollection;
     }
 
-
-    public function save ($object)
+    /**
+     * {@inheritDoc}
+     * 
+     * @param $object
+     * @return bool|int[]
+     */
+    public function save($object)
     {
         $dirtyInstanceCollection = $this->getModelAsCollection($object);
 
@@ -268,11 +286,11 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 
             // Check for multiple instances with the same definition if disallowed
             if ($dirtyInstance->getDefinition()->getMultiple() == 'false') {
-                $similarInstanceCollection = $instanceMapper->findByColumnList(array(
-                    'module'     => $dirtyInstance->getModule(),
-                    'identifier' => $dirtyInstance->getIdentifier(),
+                $similarInstanceCollection = $instanceMapper->findByColumnList([
+                    'module'                  => $dirtyInstance->getModule(),
+                    'identifier'              => $dirtyInstance->getIdentifier(),
                     'component_definition_id' => $dirtyInstance->getDefinition()->getId(),
-                ));
+                ]);
 
                 foreach ($similarInstanceCollection as $similarInstance) {
                     /* @var $similarInstance Component_Instance */
@@ -295,11 +313,11 @@ class Component_InstanceMapper extends Schoolbox\Mapper
                 // Resequence source components
                 $clean_instance_id = $cleanInstance->getId();
                 if (!empty($clean_instance_id)) {
-                    $sourceInstanceCollection = $instanceMapper->findByColumnList(array(
+                    $sourceInstanceCollection = $instanceMapper->findByColumnList([
                         'module'     => $cleanInstance->getModule(),
                         'identifier' => $cleanInstance->getIdentifier(),
                         'position'   => $cleanInstance->getPosition(),
-                    ));
+                    ]);
 
                     //
                     // Iterate a copy of the source instance collection, because
@@ -309,7 +327,7 @@ class Component_InstanceMapper extends Schoolbox\Mapper
                         if ($sourceInstance->getId() == $cleanInstance->getId()) {
                             $sourceInstanceCollection->offsetUnset($index);
                         } elseif ($sourceInstance->getSequence() > $cleanInstance->getSequence()) {
-                            $sourceInstance->setSequence($sourceInstance->getSequence()-1);
+                            $sourceInstance->setSequence($sourceInstance->getSequence() - 1);
                             $sourceInstanceCollection->offsetSet($index, $sourceInstance);
                         }
                     }
@@ -318,11 +336,11 @@ class Component_InstanceMapper extends Schoolbox\Mapper
                 }
 
                 // Resequence destination components
-                $destinationInstanceCollection = $instanceMapper->findByColumnList(array(
+                $destinationInstanceCollection = $instanceMapper->findByColumnList([
                     'module'     => $dirtyInstance->getModule(),
                     'identifier' => $dirtyInstance->getIdentifier(),
                     'position'   => $dirtyInstance->getPosition(),
-                ));
+                ]);
 
                 foreach ($destinationInstanceCollection as $destinationInstance) {
                     /* @var $destinationInstance Component_Instance */
@@ -339,22 +357,28 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         return parent::save($dirtyInstanceCollection);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @param object|Collection $object
+     * @return bool
+     */
     public function delete($object)
     {
-        $instanceMapper = Component_InstanceMapper::getInstance();
+        $instanceMapper     = Component_InstanceMapper::getInstance();
         $instanceCollection = $this->getModelAsCollection($object);
 
         // container for parents if configs that need deletion
-        $instanceIDs = array();
+        $instanceIDs = [];
 
         foreach ($instanceCollection as $instance) {
             /* @var $instance Component_Instance */
-            $instanceIDs[] = $this->database->quote($instance->getId(), PDO::PARAM_INT);
-            $sourceInstanceCollection = $instanceMapper->findByColumnList(array(
+            $instanceIDs[]            = $this->database->quote($instance->getId(), PDO::PARAM_INT);
+            $sourceInstanceCollection = $instanceMapper->findByColumnList([
                 'module'     => 'dashboard',
                 'identifier' => $instance->getIdentifier(),
                 'position'   => $instance->getPosition()
-            ));
+            ]);
 
             //
             // Iterate a copy of the source instance collection, because it will
@@ -388,17 +412,17 @@ class Component_InstanceMapper extends Schoolbox\Mapper
     }
 
     /**
-    * Forcibly resequence a set of components, optionally protecting one
-    *
-    * @param $module
-    * @param $identifier
-    * @param int $protect - the component that has had its sequence changed, and so should be preserved
-    * @param string $position
-    * @return bool
-    */
+     * Forcibly resequence a set of components, optionally protecting one
+     *
+     * @param $module
+     * @param $identifier
+     * @param int $protect - the component that has had its sequence changed, and so should be preserved
+     * @param string $position
+     * @return bool
+     */
     public function resequenceComponents($module, $identifier, $protect = 0, $position = '')
     {
-        $cols = array('top', 'left', 'right');
+        $cols = ['top', 'left', 'right'];
 
         if ($position) {
             if (!in_array($position, $cols)) {
@@ -410,12 +434,19 @@ class Component_InstanceMapper extends Schoolbox\Mapper
             foreach ($cols as $c) {
                 $success[] = $this->resequenceColumn($module, $identifier, $protect, $c);
             }
-            return array_reduce($success, function($result, $item) {
+            return array_reduce($success, function ($result, $item) {
                 return $result || $item;
             });
         }
     }
 
+    /**
+     * @param $module
+     * @param $identifier
+     * @param $protect
+     * @param $position
+     * @return bool
+     */
     private function resequenceColumn($module, $identifier, $protect, $position)
     {
         // extract the current listing
@@ -427,14 +458,14 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 			ORDER BY ci.identifier ASC, ci.position ASC, ci.sequence ASC
 		");
 
-        $stmt->execute(array(
+        $stmt->execute([
             'mod' => $module,
-            'id' => $identifier,
+            'id'  => $identifier,
             'pos' => $position
-        ));
+        ]);
 
-        $cursequence = array();
-        $resequence = array();
+        $cursequence = [];
+        $resequence  = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if ($protect && $row['id'] == $protect) {
@@ -468,49 +499,49 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 
         // apply the sequence changes
         foreach ($resequence as $s => $id) {
-            $stmt->execute(array(
+            $stmt->execute([
                 'ciid' => $id,
-                'cis' => $s
-            ));
+                'cis'  => $s
+            ]);
         }
 
         return true;
     }
 
     /**
-    * When a new component is inserted at sequence 0, increment all the indices
-    * @param $identifier
-    * @param string $position
-    * @param string $module
-    */
+     * When a new component is inserted at sequence 0, increment all the indices
+     * 
+     * @param int $identifier
+     * @param string $position
+     * @param string $module
+     */
     public function cascadeSequence($identifier, $position = 'left', $module = 'homepage')
     {
-        // cascade the sequence change
-        $stmt = Database::getInstance()->prepare("
+        $stmt = $this->database->prepare("
 			UPDATE component_instance ci
 			SET ci.`sequence` = ci.sequence + 1
 			WHERE `position` = :pos
 			AND ci.`module` = :mod
 			AND ci.`identifier` = :id
 		");
-        $stmt->execute(array(
+
+        $stmt->execute([
             'pos' => $position,
             'mod' => $module,
-            'id' => $identifier
-        ));
+            'id'  => $identifier
+        ]);
     }
 
     /**
-    * This method really only serves to retrieve components that have a 'src' config pointed at a particular category
-    * so that we can delete them when that page is deleted. But we might have other uses for it later.
-    *
-    * @param $key
-    * @param $value
-    * @return \Schoolbox\Collection
-    */
+     * This method really only serves to retrieve components that have a 'src' config pointed at a particular category
+     * so that we can delete them when that page is deleted. But we might have other uses for it later.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return Collection
+     */
     public function findComponentByConfigValue($key, $value)
     {
-
         $stmt = $this->database->prepare("
 			SELECT component_instance_id
 			FROM component_config_instance
@@ -523,30 +554,31 @@ class Component_InstanceMapper extends Schoolbox\Mapper
 			AND `value` = :v
 		");
 
-        $stmt->execute(array(
+        $stmt->execute([
             'k' => $key,
             'v' => $value
-        ));
+        ]);
 
         $collection = new Schoolbox\Collection();
+        
         while ($record = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $collection->add($this->findByInstanceId($record['component_instance_id']));
         }
+        
         return $collection;
     }
 
-
     /**
-     * @param Folder\Model $folder
-     * @param array        $config
-     * @param string       $controller
+     * @param Folder $folder
+     * @param array $config
+     * @param string $controller
      * @return Component_Instance
      */
-    public function injectNewComponent(Folder\Model $folder, array $config = [], $controller =  \Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller::class)
+    public function injectNewComponent(Folder $folder, array $config = [], $controller = \Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller::class)
     {
-        $definitionMapper = \Component_DefinitionMapper::getInstance(); // $this->getComponentDefinitionMapper();
-        $configDefinitionMapper = \Component_ConfigDefinitionMapper::getInstance();
-        $configInstanceMapper = \Component_ConfigMapper::getInstance();
+        $definitionMapper       = Component_DefinitionMapper::getInstance(); // $this->getComponentDefinitionMapper();
+        $configDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
+        $configInstanceMapper   = Component_ConfigMapper::getInstance();
 
         // Doesn't exist. We need that to exist. Make it exist.
         $definition = $definitionMapper->findOneByColumn('class', $controller);
@@ -567,13 +599,13 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         foreach ($config as $key => $value) {
             $configDefinitionIds = $configDefinitionMapper->findIdsByColumnList([
                 'component_definition_id' => $definition->getId(),
-                'key' => $key
+                'key'                     => $key
             ]);
 
             $conf = $configInstanceMapper->createModel()
-                                         ->setConfigDefinitionId($configDefinitionIds[0])
-                                         ->setInstanceId($newInstance->getId())
-                                         ->setValue($value);
+                ->setConfigDefinitionId($configDefinitionIds[0])
+                ->setInstanceId($newInstance->getId())
+                ->setValue($value);
 
             $newInstance->getConfig()->add($conf);
         }
@@ -587,18 +619,16 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         return $newInstance;
     }
 
-
     /**
      * This model does not have any notifications
      *
      * @param object $object
      * @param string $verb
-     * @param null   $previous
+     * @param object|null $previous
      * @return bool
      */
     protected function raiseNotification($object, $verb, $previous = null)
     {
-        // noop
         return false;
     }
 }
