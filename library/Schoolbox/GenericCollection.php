@@ -92,7 +92,9 @@ class GenericCollection extends Collection
             throw new UnexpectedValueException("Items cannot be {$type}s. Expected: {$this->elementType}");
         }
 
-        if (!$item instanceof $this->elementType) {
+        // Make sure the item is of the expected type, or is a subclass of the expected type
+
+        if (!$item instanceof $this->elementType && !is_subclass_of($this->elementType, get_class($item))) {
             throw new UnexpectedValueException("Invalid type. Expected: {$this->elementType}, Actual: " . get_class($item));
         }
     }
