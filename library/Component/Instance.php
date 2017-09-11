@@ -73,6 +73,16 @@ class Component_Instance
     }
 
     /**
+     * Overridable function that determines if the component should be rendered in the component palette
+     *
+     * @return bool
+     */
+    public function renderInPalette()
+    {
+        return true;
+    }
+
+    /**
      * Converts a Collection of ConfigDefinitions into an array of $key => $val
      *
      * @param bool $compat
