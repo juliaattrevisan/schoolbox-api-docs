@@ -154,14 +154,16 @@ class Component_Renderer
             if ($component->renderTemplate($templateHandle) !== false) {
                 $component->setVar('COMPONENT_NAME', $component->getConfig('componentname'));
                 $component->parse($templateTarget, $templateHandle, true);
+
+                // These aren't normally parsed so have to do it explicitly
+
+                $component->getPageTemplate()->setVar([
+                    'PAGE_ID' => $eportfolioPage->getPageId(),
+                ]);
+
+                $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
             }
         }
 
-        /* These aren't normally parsed so have to do it explicitly
-         */
-        $component->getPageTemplate()->setVar(array(
-            'PAGE_ID' => $eportfolioPage->getPageId(),
-        ));
-        $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
 }
