@@ -14,6 +14,34 @@
 	</nav>
 </div>
 
+<div class="row hide-for-print">
+	<div class="small-12 island">
+		<form data-form_type="search">
+			<section class="content">
+				<fieldset>
+					<legend>Search</legend>
+					<div class="small-12 medium-12 large-2 columns">
+						<select name="reportTimespan">
+							<!-- BEGIN report_timespan -->
+							<option value="{REPORT_TIMESPAN_VALUE}" {REPORT_TIMESPAN_SELECTED}>{REPORT_TIMESPAN_LABEL}</option>
+							<!-- END report_timespan -->
+						</select>
+					</div>
+					<div class="small-12 medium-4 columns" data-date-start>
+						<input name="reportDateStart" type="text" value="{REPORT_DATE_START}" data-datepicker data-datepicker-buttontext="">
+					</div>
+					<div class="small-12 medium-4 columns" data-date-end>
+						<input name="reportDateEnd" type="text" value="{REPORT_DATE_END}" data-datepicker data-datepicker-buttontext="">
+					</div>
+					<div class="small-12 medium-4 large-2 columns">
+						<input type="submit" title="Search" value='Search' data-action="search">
+					</div>
+				</fieldset>
+			</section>
+		</form>
+	</div>
+</div>
+
 <!-- BEGIN event_list_group -->
 <div class="row">
     <div class="small-12 columns">
