@@ -30,23 +30,6 @@ use Schoolbox\UserMapper;
  */
 class EventMapper extends CalendarEventMapper
 {
-
-    /**
-     * Only show events that are at most 6 months old
-     */
-    const INTERVAL_MAX_6MONTH_OLD = 2;
-
-    /**
-     * Only show events that are at most 1 month old
-     * and also show all future events
-     */
-    const INTERVAL_MAX_1MONTH_OLD_AND_FUTURE = 1;
-
-    /**
-     * Show all events (very heavy)
-     */
-    const INTERVAL_ALL = 0;
-
     /**
      * Calls for the core mapping of events, then extends it
      */
