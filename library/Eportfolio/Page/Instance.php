@@ -182,6 +182,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
             /** @var Component_Instance $component */
             foreach ($instanceCollection as $component) {
+
+                // Make sure the component is allowed to be rendered in the palette
+
+                if (!$component->renderInPalette()) {
+                    continue;
+                }
+
                 ++$i;
                 $class = $component->getDefinition()->getCssClass();
                 $multipleClass = '';
@@ -375,7 +382,9 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             $vars['current_' . $field] = $colour;
         }
 
-        $this->getPage()->setVar($vars);
+        if (isset($vars)) {
+            $this->getPage()->setVar($vars);
+        }
     }
 
     /**
