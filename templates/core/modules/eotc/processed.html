@@ -55,48 +55,43 @@
 <div class="row hide-for-print">
     <div class="small-12 island">
         <form data-form_type="search">
-            <section class="content">
-                <fieldset>
-                    <legend>Search</legend>
-                    <div class="small-12 medium-12 large-2 columns">
-                        <select id="reportTimespan" name="reportTimespan">
-                            <!-- BEGIN report_timespan -->
-                            <option value="{REPORT_TIMESPAN_ID}" {REPORT_TIMESPAN_ID_SELECTED}>{REPORT_TIMESPAN_NAME}
-                            </option>
-                            <!-- END report_timespan -->
-                        </select>
-                    </div>
-                    <div class="small-12 medium-4 columns {CLASS_REPORT_DATE}" data-date-start>
-                        <input id="reportDateStart" name="reportDateStart" type="text" value="{REPORT_DATE_START}"
-                               data-datepicker data-datepicker-buttontext="">
-                    </div>
-                    <div class="small-12 medium-4 columns {CLASS_REPORT_DATE}" data-date-end>
-                        <input id="reportDateEnd" name="reportDateEnd" type="text" value="{REPORT_DATE_END}"
-                               data-datepicker data-datepicker-buttontext="">
-                    </div>
+            <section class="content flex-container">
+                <div class="item">
+                    <h4>Timespan</h4>
+                    <select id="reportTimespan" name="reportTimespan">
+                        <!-- BEGIN report_timespan -->
+                        <option value="{REPORT_TIMESPAN_ID}" {REPORT_TIMESPAN_ID_SELECTED}>{REPORT_TIMESPAN_NAME}
+                        </option>
+                        <!-- END report_timespan -->
+                    </select>
+                </div>
+                <div class="item {CLASS_REPORT_DATE}" data-date-start>
+                    <h4>From</h4>
+                    <input id="reportDateStart" name="reportDateStart" type="text" value="{REPORT_DATE_START}"
+                           data-datepicker data-datepicker-buttontext="">
+                </div>
+                <div class="item {CLASS_REPORT_DATE}" data-date-end>
+                    <h4>To</h4>
+                    <input id="reportDateEnd" name="reportDateEnd" type="text" value="{REPORT_DATE_END}"
+                           data-datepicker data-datepicker-buttontext="">
+                </div>
 
-                    <div class="small-12 medium-6 columns checklist">
-                        <legend>
-                            Statuses
-                        </legend>
-                        <input type="checkbox" id="reportStatusAll" value="{}" name="" data-select-all data-select-all-for-group="status"  />
-                        <label for="reportStatusAll" class="checkbox-label">Select all</label>
+                <div class="item">
+                    <h4>Status</h4>
+                    <input type="checkbox" id="reportStatusAll" value="{}" name="" data-select-all data-select-all-for-group="status"  />
+                    <label for="reportStatusAll" class="checkbox-label">Select all</label>
 
-                        <!-- BEGIN report_status -->
-                        <input type="checkbox"
-                               id="reportStatus-{REPORT_STATUS_ID}"
-                               value="{REPORT_STATUS_ID}"
-                               name="status[]"
-                               {REPORT_STATUS_ID_SELECTED}
-                               data-select-all-group="status" />
-                        <label for="reportStatus-{REPORT_STATUS_ID}" class="checkbox-label">{REPORT_STATUS_NAME}</label>
-                        <!-- END report_status -->
-                    </div>
-
-                    <div class="small-12 medium-4 large-2 columns">
-                        <input type="submit" title="Search" value='Search' data-action="search">
-                    </div>
-                </fieldset>
+                    <!-- BEGIN report_status -->
+                    <input type="checkbox"
+                           id="reportStatus-{REPORT_STATUS_ID}"
+                           value="{REPORT_STATUS_ID}"
+                           name="status[]"
+                           {REPORT_STATUS_ID_SELECTED}
+                           data-select-all-group="status" />
+                    <label for="reportStatus-{REPORT_STATUS_ID}" class="checkbox-label">{REPORT_STATUS_NAME}</label>
+                    <!-- END report_status -->
+                </div>
+                <input type="submit" title="Search" value='Search' data-action="search">
             </section>
         </form>
     </div>
