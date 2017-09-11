@@ -5,12 +5,13 @@
 <script type="text/javascript">
     $(function () {
 
-        var inputTimespan = $('#reportTimespan'),
-            inputStartDate = $('#reportDateStart'),
-            inputEndDate = $('#reportDateEnd');
+        var searchForm = $('form#reportSearchForm'),
+            inputTimespan = searchForm.find('#reportTimespan'),
+            inputStartDate = searchForm.find('#reportDateStart'),
+            inputEndDate = searchForm.find('#reportDateEnd');
 
         // User searches
-        $(document).on('click', '[data-action]', function (event) {
+        searchForm.on('submit', function (event) {
             event.preventDefault();
 
             var timespan = inputTimespan.val(),
@@ -59,7 +60,7 @@
 
 <div class="row hide-for-print">
     <div class="small-12 island">
-        <form data-form_type="search">
+        <form data-form_type="search" id="reportSearchForm">
             <section class="content flex-container">
                 <div class="item">
                     <h4>Timespan</h4>
