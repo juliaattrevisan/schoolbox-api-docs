@@ -32,8 +32,11 @@ $this->setVar(array(
 
 $eventMapper = \EOTC\EventMapper::getInstance();
 
-/* Show a list of approved, rejected events no older than one month
- * Shows all future events that are approved/rejected
+/*
+ * Report types:
+ * /range/{from}/{to}: show a list of approved, rejected events between from, to
+ * /:                  /range/{-1 month}/{now}
+ * /all:               show all future events that are approved/rejected
  */
 if (!count($this->arg)) {
 	$this->parse('has_all_block', 'has_all');
