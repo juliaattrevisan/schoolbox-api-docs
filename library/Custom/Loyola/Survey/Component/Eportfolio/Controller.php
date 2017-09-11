@@ -16,11 +16,11 @@ use Scrub;
 
 class Controller extends Component_Eportfolio_ControllerAbstract
 {
-    /** @var Survey $survey  */
-    protected $survey;
-
     /** @var SurveyMapper $surveyMapper */
     protected $surveyMapper;
+
+    /** @var Survey $survey  */
+    protected $survey;
 
     /** @var User $currentUser */
     protected $currentUser;
@@ -29,34 +29,43 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     protected $config;
 
     /**
-     * Work out whether we should display this thing or not
+     * {@inheritDoc}
+     *
      * @return bool
      */
     public function execute()
     {
-        $this->surveyMapper = SurveyMapper::getInstance();
-        $this->config = $this->getConfig();
-        $this->currentUser = $this->getSitePage()->getDi()->get('user');
+        // Rather annoyingly at this point the getUser() function returns an unhydrated object, so we're going to
+        // read the user straight out of the session variable rather than doing a double hydration
 
-        // Try to retrieve the survey this component is linked to
+        /** @var User $user */
+        $user = $_SESSION["user"];
+
+        // Try to load the survey we are going to render
+
+        $this->surveyMapper = SurveyMapper::getInstance();
 
         try {
             $this->survey = $this->surveyMapper->findById($this->config['survey']);
         } catch (MapperException $e) {
-            // The survey was not found, only show the component if the user is a staff member so they can configure it
-            if ($this->currentUser->getRole()->isStaff || $this->currentUser->isSuperuser()) {
-                return true;
-            } else {
+            // The survey was not found (or no survey was set in the configuration)
+            if (!$this->survey instanceof Survey && $user->getRole()->isStudent()) {
+                // The logged in user is a student, they can't do anything meaningful with the component so hide it
                 return false;
             }
         }
 
-        // We found the survey, lets get this party on the road
+        // Setup all of the other properties required for this show to get on the road
+
+        $this->config = $this->getConfig();
+        $this->currentUser = $this->getSitePage()->getDi()->get('user');
 
         return true;
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param String $templateHandle
      * @return bool
      */
@@ -133,7 +142,10 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
         // Students see a static title bar
 
-        $showStudentHeading = (!$this->currentUser->getRole()->isStaff() && !$this->currentUser->isSuperuser()) && $this->config['collapse'];
+        $showStudentHeading = (
+                !$this->currentUser->getRole()->isStaff() &&
+                !$this->currentUser->isSuperuser()
+            ) && $this->config['collapse'];
 
         // Render this mess out
 
@@ -153,7 +165,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             ],
             true,                       // This does nothing useful on ePortfolio components
             $showStaffHeading,          // Show configuration from PHPLIB if the user is staff/superuser
-            $showStudentHeading         // We need to raw render if showing the student heading, the heading HTML is in the Twig template
+            $showStudentHeading         // We need to raw render if showing the student heading
         );
     }
 }

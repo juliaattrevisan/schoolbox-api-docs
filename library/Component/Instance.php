@@ -1,87 +1,47 @@
 <?php
-
 /**
- *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
- *
  */
+
+use Schoolbox\Collection;
 
 class Component_Instance
 {
-    /**
-    * @var int
-    */
+    /** @var int $id */
     protected $id;
 
-    /**
-    * @var int
-    */
+    /** @var int $definitionId */
     protected $definitionId;
 
-    /**
-    * @var Component_Definition
-    */
+    /** @var Component_Definition $definition */
     protected $definition;
 
-    /**
-    * @var string
-    */
+    /** @var string $module */
     protected $module;
 
-    /**
-     * Id of the Folder where this Component resides
-     *
-     * @var int
-     */
+    /** @var int $identifier ID of the Folder where this component resides */
     protected $identifier;
 
-    /**
-    * @var string
-    */
+    /** @var string $position */
     protected $position;
 
-    /**
-    * @var int
-    */
+    /** @var int $sequence */
     protected $sequence;
 
-    /**
-    * An unmapped count of instances of this item.
-    *
-    * @var int
-    */
+    /** @var int $instanceCount An unmapped count of instances of this item. */
     protected $instanceCount = 0;
 
-    /**
-    * @var Schoolbox\Collection|Component_ConfigDefinition[]
-    */
+    /** @var Collection|Component_ConfigDefinition[] $config */
     protected $config;
 
+    /**
+     * Component_Instance constructor.
+     */
     public function __construct()
     {
-        $this->setConfig(new \Schoolbox\Collection());
-    }
-
-    /**
-    * @param  \Schoolbox\Collection|Component_ConfigDefinition[] $config
-    *
-    * @return $this
-    */
-    public function setConfig($config)
-    {
-        $this->config = $config;
-        return $this;
-    }
-
-    /**
-     * @return Component_ConfigDefinition[]|\Schoolbox\Collection
-     */
-    public function getConfig()
-    {
-        return $this->config;
+        $this->setConfig(new Collection());
     }
 
     /**
@@ -92,19 +52,109 @@ class Component_Instance
      */
     public function getConfigByKey($key)
     {
-        foreach($this->config as $config){
-            if($config->getKey() == $key){
+        foreach ($this->config as $config) {
+            if ($config->getKey() == $key) {
                 return $config;
             }
         }
-        throw new DomainException("Config with key: '$key' not found");
+
+        throw new DomainException("Config with key: '{$key}' not found");
+    }
+
+
+    /**
+     * Increments the instance count for this definition.
+     *
+     * @return void
+     */
+    public function incrementInstanceCount()
+    {
+        $this->instanceCount++;
     }
 
     /**
-    * @param  Component_Definition $definition
-    *
-    * @return $this
-    */
+     * Converts a Collection of ConfigDefinitions into an array of $key => $val
+     *
+     * @param bool $compat
+     * @return array
+     */
+    public function getConfigArray($compat = true)
+    {
+        if (isset($this->config)) {
+            // Dead index, this is actually not a config
+            $dumb_index = $this->config->getOffset('');
+
+            if (count($this->config) == 1 && isset($dumb_index)) {
+                return [];
+            }
+
+            $output = [];
+
+            /** @var Component_ConfigDefinition $opt */
+            foreach ($this->config as $opt) {
+                $key = $compat ? $this->compatMap($opt->getKey()) : $opt->getKey();
+                $val = $opt->getValue();
+
+                if (!isset($val)) {
+                    $val = $opt->getDefaultValue();
+                }
+
+                $output[$key] = [
+                    'label' => $opt->getLabel(),
+                    'value' => $val
+                ];
+            }
+
+            return $output;
+        }
+
+        return [];
+    }
+
+    /**
+     * Converts new keys to old keys to preserve integrity with old components
+     *
+     * @param $key
+     * @return mixed
+     */
+    protected function compatMap($key)
+    {
+        $map = [
+            'limit' => 'size',
+            'title' => 'componentname',
+        ];
+
+        if (isset($map[$key])) {
+            return $map[$key];
+        }
+
+        return $key;
+    }
+
+    // Getters & Setters
+
+    /**
+     * @param Collection|Component_ConfigDefinition[] $config
+     * @return self
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+        return $this;
+    }
+
+    /**
+     * @return Component_ConfigDefinition[]|Collection
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * @param Component_Definition $definition
+     * @return self
+     */
     public function setDefinition($definition)
     {
         $this->definition = $definition;
@@ -112,18 +162,17 @@ class Component_Instance
     }
 
     /**
-    * @return Component_Definition
-    */
+     * @return Component_Definition
+     */
     public function getDefinition()
     {
         return $this->definition;
     }
 
     /**
-    * @param  int $definitionId
-    *
-    * @return $this
-    */
+     * @param int $definitionId
+     * @return self
+     */
     public function setDefinitionId($definitionId)
     {
         $this->definitionId = $definitionId;
@@ -131,18 +180,17 @@ class Component_Instance
     }
 
     /**
-    * @return int
-    */
+     * @return int
+     */
     public function getDefinitionId()
     {
         return $this->definitionId;
     }
 
     /**
-    * @param  int $id
-    *
-    * @return $this
-    */
+     * @param int $id
+     * @return self
+     */
     public function setId($id)
     {
         $this->id = $id;
@@ -150,18 +198,17 @@ class Component_Instance
     }
 
     /**
-    * @return int
-    */
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
 
     /**
-    * @param  int $identifier
-    *
-    * @return $this
-    */
+     * @param int $identifier
+     * @return self
+     */
     public function setIdentifier($identifier)
     {
         $this->identifier = $identifier;
@@ -177,10 +224,9 @@ class Component_Instance
     }
 
     /**
-    * @param  string $module
-    *
-    * @return $this
-    */
+     * @param string $module
+     * @return self
+     */
     public function setModule($module)
     {
         $this->module = $module;
@@ -188,18 +234,17 @@ class Component_Instance
     }
 
     /**
-    * @return string
-    */
+     * @return string
+     */
     public function getModule()
     {
         return $this->module;
     }
 
     /**
-    * @param  string $position
-    *
-    * @return $this
-    */
+     * @param string $position
+     * @return self
+     */
     public function setPosition($position)
     {
         $this->position = $position;
@@ -207,18 +252,17 @@ class Component_Instance
     }
 
     /**
-    * @return string
-    */
+     * @return string
+     */
     public function getPosition()
     {
         return $this->position;
     }
 
     /**
-    * @param  int $sequence
-    *
-    * @return $this
-    */
+     * @param int $sequence
+     * @return self
+     */
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
@@ -226,17 +270,17 @@ class Component_Instance
     }
 
     /**
-    * @return int
-    */
+     * @return int
+     */
     public function getSequence()
     {
         return $this->sequence;
     }
 
     /**
-    * @param  int   $instanceCount
-    * @return $this
-    */
+     * @param int $instanceCount
+     * @return self
+     */
     public function setInstanceCount($instanceCount)
     {
         $this->instanceCount = $instanceCount;
@@ -244,70 +288,10 @@ class Component_Instance
     }
 
     /**
-    * @return int
-    */
+     * @return int
+     */
     public function getInstanceCount()
     {
         return $this->instanceCount;
-    }
-
-    /**
-    * Increments the instance count for this definition.
-    *
-    * @return void
-    */
-    public function incrementInstanceCount()
-    {
-        $this->instanceCount++;
-    }
-
-
-    /**
-     * Converts a Collection of ConfigDefinitions into an array of $key => $val
-     *
-     * @param bool $compat
-     * @return array
-     */
-    public function getConfigArray($compat = true)
-    {
-        if (isset($this->config)) {
-   // dead index, this is actually not a config
-            $dumb_index = $this->config->getOffset('');
-            if (count($this->config) == 1 && isset($dumb_index)) {
-                return array();
-            }
-            $output = array();
-            /** @var Component_ConfigDefinition $opt */
-            foreach ($this->config as $opt) {
-                $key = $compat ? $this->compatMap($opt->getKey()) : $opt->getKey();
-                $val = $opt->getValue();
-                if (!isset($val)) {
-                    $val = $opt->getDefaultValue();
-                }
-                $output[$key] = array(
-                'label' => $opt->getLabel(),
-                'value' => $val,
-                );
-            }
-            return $output;
-        }
-        return array();
-    }
-
-    /**
-    * Converts new keys to old keys to preserve integrity with old components
-    * @param $key
-    * @return mixed
-    */
-    protected function compatMap($key)
-    {
-        $map = array(
-         'limit'  => 'size',
-         'title'  => 'componentname',
-        );
-        if (isset($map[$key])) {
-            return $map[$key];
-        }
-        return $key;
     }
 }
