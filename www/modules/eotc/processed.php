@@ -11,6 +11,8 @@
  * @version     SVN: $Id$
  */
 
+use EOTC\EventStatusMapper;
+
 /** @var SitePage $this */
 
 /* Only EOTC Administrators can view this page
@@ -22,6 +24,7 @@ $sessionUser = $_SESSION['user'];
 
 $this->setFile(TEMPLATE_content, 'modules/eotc/processed.html');
 $this->setBlock(TEMPLATE_content, 'report_timespan', 'report_timespan_block');
+$this->setBlock(TEMPLATE_content, 'report_status', 'report_status_block');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
 
@@ -42,8 +45,9 @@ $dateFrom = '';
 $dateTo = '';
 $statuses = isset($_GET['status'])
     ? $_GET['status']
-    : [\EOTC\EventStatusMapper::STATUS_APPROVED, \EOTC\EventStatusMapper::STATUS_REJECTED,]
+    : [EventStatusMapper::STATUS_APPROVED, EventStatusMapper::STATUS_REJECTED,]
 ;
+$statusList = EventStatusMapper::getInstance()->findAll();
 if ($timespanType === 'range') {
     // get from/to date out
     $dateFrom = isset($this->arg[1])
@@ -84,6 +88,16 @@ $this->dropDown(
     [
         'id'   => 'REPORT_TIMESPAN_ID',
         'type' => 'REPORT_TIMESPAN_NAME',
+    ]
+);
+$this->checkList(
+    'report_status',
+    $statusList,
+    $statuses,
+    TEMPLATE_content,
+    [
+        'id'   => 'REPORT_STATUS_ID',
+        'name' => 'REPORT_STATUS_NAME',
     ]
 );
 $this->setVar('CLASS_REPORT_DATE', $timespanType === 'all' ? 'hide' : '');

@@ -74,6 +74,25 @@
                         <input id="reportDateEnd" name="reportDateEnd" type="text" value="{REPORT_DATE_END}"
                                data-datepicker data-datepicker-buttontext="">
                     </div>
+
+                    <div class="small-12 medium-6 columns checklist">
+                        <legend>
+                            Statuses
+                        </legend>
+                        <input type="checkbox" id="reportStatusAll" value="{}" name="" data-select-all data-select-all-for-group="status"  />
+                        <label for="reportStatusAll" class="checkbox-label">Select all</label>
+
+                        <!-- BEGIN report_status -->
+                        <input type="checkbox"
+                               id="reportStatus-{REPORT_STATUS_ID}"
+                               value="{REPORT_STATUS_ID}"
+                               name="status[]"
+                               {REPORT_STATUS_ID_SELECTED}
+                               data-select-all-group="status" />
+                        <label for="reportStatus-{REPORT_STATUS_ID}" class="checkbox-label">{REPORT_STATUS_NAME}</label>
+                        <!-- END report_status -->
+                    </div>
+
                     <div class="small-12 medium-4 large-2 columns">
                         <input type="submit" title="Search" value='Search' data-action="search">
                     </div>
