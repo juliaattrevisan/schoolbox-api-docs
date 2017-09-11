@@ -40,6 +40,10 @@ $eventMapper = \EOTC\EventMapper::getInstance();
 $timespanType = isset($this->arg[0]) ? $this->arg[0] : 'range';
 $dateFrom = '';
 $dateTo = '';
+$statuses = isset($_GET['status'])
+    ? $_GET['status']
+    : [\EOTC\EventStatusMapper::STATUS_APPROVED, \EOTC\EventStatusMapper::STATUS_REJECTED,]
+;
 if ($timespanType === 'range') {
     // get from/to date out
     $dateFrom = isset($this->arg[1])
@@ -51,10 +55,7 @@ if ($timespanType === 'range') {
 
     /** @var \EOTC\ListGroup\Collection $allListGroups */
     $allListGroups = $eventMapper->findAllByListGroups(
-        [
-            \EOTC\EventStatusMapper::STATUS_APPROVED,
-            \EOTC\EventStatusMapper::STATUS_REJECTED,
-        ],
+        $statuses,
         $dateFrom,
         $dateTo
     );
@@ -65,10 +66,7 @@ if ($timespanType === 'range') {
      */
     /** @var \EOTC\ListGroup\Collection $allListGroups */
     $allListGroups = $eventMapper->findAllByListGroups(
-        [
-            \EOTC\EventStatusMapper::STATUS_APPROVED,
-            \EOTC\EventStatusMapper::STATUS_REJECTED,
-        ],
+        $statuses,
         null
     );
 }
