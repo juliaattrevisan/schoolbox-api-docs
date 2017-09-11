@@ -23,6 +23,10 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use OutOfBoundsException;
 use InvalidArgumentException;
+use External_UserInterface;
+use External_User;
+use External_ClassInterface;
+use External_Class;
 
 
 class Notifier extends AbstractModuleNotifier
@@ -40,6 +44,16 @@ class Notifier extends AbstractModuleNotifier
      * @var UserMapper
      */
     private $userMapper;
+
+    /**
+     * @var External_UserInterface
+     */
+    private $externalUser;
+
+    /**
+     * @var External_ClassInterface
+     */
+    private $externalClass;
 
 
     /**
@@ -60,6 +74,14 @@ class Notifier extends AbstractModuleNotifier
         $dependencies['userMapper'] = isset($dependencies['userMapper'])
             ? $dependencies['userMapper']
             : UserMapper::getInstance();
+
+        $dependencies['externalUser'] = isset($dependencies['externalUser'])
+            ? $dependencies['externalUser']
+            : new External_User();
+
+        $dependencies['externalClass'] = isset($dependencies['externalClass'])
+            ? $dependencies['externalClass']
+            : new External_Class();
 
         parent::loadDependencies($dependencies);
     }
@@ -89,6 +111,68 @@ class Notifier extends AbstractModuleNotifier
 
 
     /* ASYNC NOTIFICATION METHODS */
+
+    /**
+     * Notify staff that someone posted on one of their student's eportfolio blogs
+     *
+     * @param Model $post
+     * @param User  $effector
+     * @return Envelope
+     * @throws OutOfBoundsException     If severity is not set
+     * @throws InvalidArgumentException If a required property was not set
+     */
+    public function notifyStaffPosted(Model $post, User $effector)
+    {
+        $envelope    = new Envelope();
+        $bob         = new Builder();
+        $page        = $this->pageMapper->findById($post->getPage()->getPageId());
+        $owner       = $this->userMapper->findById($page->getUid());
+        $authorExtId = $effector->getExternalId();
+
+        $params = [];
+
+        // Is author and owner the same?
+        if($effector->getId() === $owner->getId()){
+            $title = ':author posted :title on their eportfolio blog';
+        } else {
+            $title = ":author posted :title on :student's eportfolio blog";
+            $params = [
+                'student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE),
+            ];
+        }
+
+        $bob->setTitle($title)
+            ->setParams(array_merge($params, [
+                'author' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                'title'  => new Param($post->getHeading(), $this->buildBlogUrl($owner, $post)),
+            ]))
+            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
+            ->setHref($this->buildBlogUrl($owner, $post))
+            ->setSeverity(Logger::INFO)
+            ->setNamespace($this->getSlug())
+            ->addTopic("eportfolio.blog.{$post->getId()}." . self::TRIGGER_POSTED)
+            ->setTimestamp($post->getCreatedAt()->getUnixTimeStamp())
+            ->setBody($post->getBody());
+
+        // Send it to all their teachers (across all subjects)
+        $teachers = $this->userMapper->createCollection();
+        foreach($this->externalUser->getSubjectList($owner) as $subject){
+            $externalIds = $this->externalClass->getTeacherName($subject['code']);
+            foreach($externalIds as $externalId){
+                try{
+                    $classTeacher = $this->userMapper->findByExternalId($externalId);
+                    $teachers[$classTeacher->getId()] = $classTeacher;
+                } catch (BaseMapper\Exception $e){
+                    // no teacher found in Schoolbox - that's ok.
+                }
+            }
+        }
+        foreach($teachers as $teacher){
+            $envelope->targetToUser($teacher->getId(), $bob->build());
+        }
+
+        return $envelope;
+    }
 
     /**
      * Advise a student someone posted on their Eportfolio blog
@@ -125,6 +209,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
 
+
     /**
      * @param UserMapper $userMapper
      * @return $this
@@ -143,6 +228,27 @@ class Notifier extends AbstractModuleNotifier
     protected function setPageMapper(PageMapper $pageMapper)
     {
         $this->pageMapper = $pageMapper;
+        return $this;
+    }
+
+    /**
+     * @param External_UserInterface $externalUser
+     * @return $this
+     */
+    protected function setExternalUser(External_UserInterface $externalUser)
+    {
+        $this->externalUser = $externalUser;
+        return $this;
+    }
+
+
+    /**
+     * @param External_ClassInterface $externalClass
+     * @return $this
+     */
+    protected function setExternalClass(External_ClassInterface $externalClass)
+    {
+        $this->externalClass = $externalClass;
         return $this;
     }
 
