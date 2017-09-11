@@ -155,9 +155,9 @@ abstract class Component_FactoryAbstract
      */
     protected function buildDependencyList($class, $offset = 0)
     {
-        $dependencyList = [];
+        $dependencyList  = [];
         $classReflection = new ReflectionClass($class);
-        $parameterList = $classReflection->getConstructor()->getParameters();
+        $parameterList   = $classReflection->getConstructor()->getParameters();
 
         if (!empty($parameterList)) {
             foreach ($parameterList as $i => $parameter) {

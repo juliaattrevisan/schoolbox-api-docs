@@ -203,7 +203,7 @@ class Component_Definition
     {
         $this->configCopy = $configCopy;
         return $this;
-    }    
+    }
 
     /**
      * @return string
@@ -212,6 +212,7 @@ class Component_Definition
     {
         return $this->module;
     }
+
     /**
      * @param string $module
      * @return self
@@ -265,6 +266,7 @@ class Component_Definition
     {
         return $this->visible;
     }
+
     /**
      * @param string $visible
      * @return self

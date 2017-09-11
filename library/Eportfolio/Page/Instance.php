@@ -202,7 +202,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     }
                 } else {
                     // If there aren't any configs, use a default pair from definition
-                    
+
                     $componentName        = $component->getDefinition()->getName();
                     $componentDescription = $component->getDefinition()->getDescription();
                 }
@@ -221,11 +221,11 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
                 $this_category = $component->getIdentifier();
                 $last_category = null;
-                
+
                 if ($previous->getDefinition() instanceof Component_Definition) {
                     $last_category = $previous->getIdentifier();
                 }
-                
+
                 if ($this_category != $last_category && $i > 1) {
                     $this->getPage()->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
                     $this->getPage()->setVar('eportfolio_component_block', '');
@@ -514,7 +514,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 ];
             }
         }
-        
+
         $this->getPage()->setVar('USER_LIST', json_encode($individualList));
     }
 

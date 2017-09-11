@@ -181,9 +181,9 @@ abstract class Component_ControllerAbstract
         }
 
         $output = [
-            'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
+            'COMPONENT_INSTANCE_ID'   => $this->instance->getId(),
             'COMPONENT_DEFINITION_ID' => $this->instance->getDefinitionId(),
-            'COMPONENT_HANDLE' => $templateHandle
+            'COMPONENT_HANDLE'        => $templateHandle
         ];
 
         $this->setVar($output);
@@ -427,7 +427,7 @@ abstract class Component_ControllerAbstract
         $this->sitepage->setBlock('settings_panel', 'config_element', 'config_element_block');
 
         $this->sitepage->setVar([
-            $targetHandle => '',
+            $targetHandle          => '',
             'config_element_block' => '',
 
             // The close button which removes components
@@ -436,7 +436,7 @@ abstract class Component_ControllerAbstract
 
             // The little triangle which drops down the config options contained in settings_panel_block
 
-            'settings_link_block' => '',
+            'settings_link_block'  => '',
             'settings_panel_block' => '',
 
             // Collapsable control button
@@ -445,8 +445,8 @@ abstract class Component_ControllerAbstract
 
             // Component Name
 
-            'COMPONENT_NAME' => $this->getComponentName(),
-            'COMPONENT_HREF' => $this->getComponentHref(),
+            'COMPONENT_NAME'  => $this->getComponentName(),
+            'COMPONENT_HREF'  => $this->getComponentHref(),
             'COMPONENT_CLASS' => $this->getInstance()->getDefinition()->getCssClass(),
         ]);
     }
@@ -753,8 +753,8 @@ abstract class Component_ControllerAbstract
             'sub/componentSourceUnavailable.twig',
             [
                 'componentInstanceId' => $this->getInstance()->getId(),
-                'isAltSourceDenied' => $isAltSourceDenied,
-                'isAltSourceDeleted' => $isAltSourceDeleted,
+                'isAltSourceDenied'   => $isAltSourceDenied,
+                'isAltSourceDeleted'  => $isAltSourceDeleted,
             ]
         );
     }
@@ -795,8 +795,8 @@ abstract class Component_ControllerAbstract
         $twigTemplate = 'sub/componentSourceUnavailable.twig';
         $twigData     = [
             'componentInstanceId' => $this->getInstance()->getId(),
-            'isAltSourceDenied' => $isAltSourceDenied,
-            'isAltSourceDeleted' => $isAltSourceDeleted,
+            'isAltSourceDenied'   => $isAltSourceDenied,
+            'isAltSourceDeleted'  => $isAltSourceDeleted,
         ];
         $this->setVar('SOURCE_FOLDER_UNAVAILABLE', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
         $this->parse('source_folder_deleted_block', 'source_folder_deleted');
@@ -1163,7 +1163,7 @@ abstract class Component_ControllerAbstract
         if (!strlen(trim($this->componentHref))) {
             return '#';
         }
-        
+
         return $this->componentHref;
     }
 

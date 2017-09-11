@@ -18,7 +18,7 @@ class Instance extends Component_Instance
     /** @var SurveyMapper $surveyMapper */
     protected $surveyMapper;
 
-    /** @var Survey $survey  */
+    /** @var Survey $survey */
     protected $survey;
 
     /**

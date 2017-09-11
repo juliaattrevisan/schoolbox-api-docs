@@ -19,7 +19,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     /** @var SurveyMapper $surveyMapper */
     protected $surveyMapper;
 
-    /** @var Survey $survey  */
+    /** @var Survey $survey */
     protected $survey;
 
     /** @var User $currentUser */
@@ -43,8 +43,8 @@ class Controller extends Component_Eportfolio_ControllerAbstract
 
         // Setup all of the other properties required for this show to get on the road
 
-        $this->currentUser = $this->getSitePage()->getDi()->get('user');
-        $this->config = $this->getConfig();
+        $this->currentUser  = $this->getSitePage()->getDi()->get('user');
+        $this->config       = $this->getConfig();
         $this->surveyMapper = SurveyMapper::getInstance();
 
         // Try to load the survey we are going to render
@@ -152,15 +152,15 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             $templateHandle,
             '@surveyEportfolio/component.twig',
             [
-                'eportfolioUser'        => $this->getContext()->getUser(),
-                'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName(),
-                'config'                => $this->config,
-                'showStudentHeading'    => $showStudentHeading,
-                'survey'                => $this->survey,
-                'answers'               => $answersRenderArray,
-                'questionCount'         => $maximumQuestions,
-                'columnWidth'           => $maximumQuestions > 0 ? (90 / $maximumQuestions) . "%" : ""
+                'eportfolioUser'      => $this->getContext()->getUser(),
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'componentClass'      => $this->getComponentName(),
+                'config'              => $this->config,
+                'showStudentHeading'  => $showStudentHeading,
+                'survey'              => $this->survey,
+                'answers'             => $answersRenderArray,
+                'questionCount'       => $maximumQuestions,
+                'columnWidth'         => $maximumQuestions > 0 ? (90 / $maximumQuestions) . "%" : ""
             ],
             true,                       // This does nothing useful on ePortfolio components
             $showStaffHeading,          // Show configuration from PHPLIB if the user is staff/superuser

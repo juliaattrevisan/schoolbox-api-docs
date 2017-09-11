@@ -38,13 +38,13 @@ class HtmlTemplate
      * If set, echo assignments
      * @var bool
      */
-    var $debug     = false;
+    var $debug = false;
 
     /**
      * $file[handle] = 'filename';
      * @var array
      */
-    var $file  = array();
+    var $file = array();
 
     /**
      * fallback paths that should be defined in a child class
@@ -56,7 +56,7 @@ class HtmlTemplate
      * Relative filenames are relative to this pathname
      * @var string
      */
-    var $root   = '';
+    var $root = '';
 
     /*
      * $_varKeys[key] = 'key'
@@ -85,30 +85,34 @@ class HtmlTemplate
      * 'no'     => ignore error quietly, return false from functions
      * @var string
      */
-    var $haltOnError  = 'report';
+    var $haltOnError = 'report';
 
     /**
      * The last error message is retained here
      * @var string
      * @see halt
      */
-    var $_lastError     = '';
+    var $_lastError = '';
 
 
     /**
      * Constructor
      *
-     * @param string $root     Template root directory
+     * @param string $root Template root directory
      * @param string $unknowns How to handle unknown variables
-     * @param array  $fallback Fallback paths
+     * @param array $fallback Fallback paths
      *
      * @access public
      */
-    function __construct($root = '.', $unknowns = '', $fallback='')
+    function __construct($root = '.', $unknowns = '', $fallback = '')
     {
         $this->setRoot($root);
-		if ($unknowns !== '') $this->setUnknowns($unknowns);
-        if (is_array($fallback)) $this->file_fallbacks = $fallback;
+        if ($unknowns !== '') {
+            $this->setUnknowns($unknowns);
+        }
+        if (is_array($fallback)) {
+            $this->file_fallbacks = $fallback;
+        }
     }
 
     /**
@@ -210,7 +214,7 @@ class HtmlTemplate
     function setUnknowns($unknowns)
     {
         $this->unknowns = $unknowns;
-	}
+    }
 
     /**
      * Set appropriate template files
@@ -222,7 +226,7 @@ class HtmlTemplate
      * handle and $filename as the filename if you want to define only
      * one template.
      *
-     * @param mixed  $handle   Handle for a filename or array with
+     * @param mixed $handle Handle for a filename or array with
      *                          handle/name value pairs
      * @param string $filename Name of template file
      *
@@ -255,7 +259,7 @@ class HtmlTemplate
                 $file = $this->_filename($f);
                 if ($this->isError($file)) {
                     $this->file[$h] = false;
-                    $allok = $file;
+                    $allok          = $file;
                 } else {
                     $this->file[$h] = $file;
                 }
@@ -283,7 +287,7 @@ class HtmlTemplate
      *
      * @param string $parent Parent handle
      * @param string $handle Block name handle
-     * @param string $name   Variable substitution name
+     * @param string $name Variable substitution name
      *
      * @return mixed True if all went well
      * @access public
@@ -302,7 +306,7 @@ class HtmlTemplate
 
         $str = $this->getVar($parent);
         $reg = "/[ \t]*<!--\\s+BEGIN $handle\\s+-->\\s*?\n?(\\s*.*?\n?)"
-             . "\\s*<!--\\s+END $handle\\s+-->\\s*?\n?/sm";
+            . "\\s*<!--\\s+END $handle\\s+-->\\s*?\n?/sm";
         $m   = array();
         preg_match_all($reg, $str, $m);
         $str = preg_replace($reg, '{' . $name . '}', $str);
@@ -332,13 +336,13 @@ class HtmlTemplate
             if (!empty($varname)) {
                 if ($this->debug) {
                     print 'scalar: set *' . $varname . '* to *'
-                         . $value . '*<br>\n';
+                        . $value . '*<br>\n';
                 }
             }
 
             $this->_varKeys[$varname] = $this->_varname($varname);
             ($append) ? $this->_varVals[$varname] .= $value
-                      : $this->_varVals[$varname] = $value;
+                : $this->_varVals[$varname] = $value;
 
         } else {
             reset($varname);
@@ -352,7 +356,7 @@ class HtmlTemplate
 
                 $this->_varKeys[$k] = $this->_varname($k);
                 ($append) ? $this->_varVals[$k] .= $v
-                          : $this->_varVals[$k] = $v;
+                    : $this->_varVals[$k] = $v;
             }
         }
     }
@@ -372,7 +376,7 @@ class HtmlTemplate
         }
 
         return @str_replace($this->_varKeys,
-                            $this->_varVals, $this->getVar($handle));
+            $this->_varVals, $this->getVar($handle));
     }
 
     /**
@@ -397,8 +401,8 @@ class HtmlTemplate
      * appending handle at $target if $append is defined
      * as TRUE.
      *
-     * @param string  $target Target handle to parse into
-     * @param string  $handle Which handle should be parsed
+     * @param string $target Target handle to parse into
+     * @param string $handle Which handle should be parsed
      * @param boolean $append Append it to $target or not?
      *
      * @return string parsed handle
@@ -410,7 +414,7 @@ class HtmlTemplate
             $str = $this->subst($handle);
 
             ($append) ? $this->setVar($target, $this->getVar($target) . $str)
-                      : $this->setVar($target, $str);
+                : $this->setVar($target, $str);
         } else {
             reset($handle);
 
@@ -450,7 +454,7 @@ class HtmlTemplate
     {
         reset($this->_varKeys);
 
-        while (list($k, ) = each($this->_varKeys)) {
+        while (list($k,) = each($this->_varKeys)) {
             $result[$k] = $this->getVar($k);
         }
 
@@ -478,7 +482,7 @@ class HtmlTemplate
         } else {
             reset($varname);
 
-            while (list($k, ) = each($varname)) {
+            while (list($k,) = each($varname)) {
                 $result[$k] = (isset($this->_varVals[$k]))
                     ? $this->_varVals[$k] : '';
             }
@@ -532,14 +536,14 @@ class HtmlTemplate
     function finish($str)
     {
         switch ($this->unknowns) {
-        case 'remove':
-            $str = preg_replace('/{[^ \t\r\n}]+}/', '', $str);
-            break;
+            case 'remove':
+                $str = preg_replace('/{[^ \t\r\n}]+}/', '', $str);
+                break;
 
-        case 'comment':
-            $str = preg_replace('/{([^ \t\r\n}]+)}/',
-                '<!-- Template variable \\1 undefined -->', $str);
-            break;
+            case 'comment':
+                $str = preg_replace('/{([^ \t\r\n}]+)}/',
+                    '<!-- Template variable \\1 undefined -->', $str);
+                break;
         }
 
         return $str;
@@ -593,9 +597,9 @@ class HtmlTemplate
 
         if (is_array($this->file_fallbacks) && count($this->file_fallbacks) > 0) {
             reset($this->file_fallbacks);
-            while (list(,$v) = each($this->file_fallbacks)) {
-                if (file_exists($v.basename($filename))) {
-                    return $v.basename($filename);
+            while (list(, $v) = each($this->file_fallbacks)) {
+                if (file_exists($v . basename($filename))) {
+                    return $v . basename($filename);
                 }
             }
             return $this->halt(sprintf(
@@ -623,9 +627,11 @@ class HtmlTemplate
         if (substr($filename, 0, 1) == '/') {
             //unix
             return true;
-        } else if (substr($filename, 1, 2) == ':\\') {
-            //windows
-            return true;
+        } else {
+            if (substr($filename, 1, 2) == ':\\') {
+                //windows
+                return true;
+            }
         }
         return false;
     }
@@ -727,7 +733,6 @@ class HtmlTemplate
     }
 
 
-
     /**
      * Checks if the given value is an error
      *
@@ -737,32 +742,38 @@ class HtmlTemplate
     {
         if ($val === false) {
             return true;
-        } else if ($this->haltOnError == 'return' && is_object($val)) {
-            require_once 'PEAR.php';
-            return PEAR::isError($val);
+        } else {
+            if ($this->haltOnError == 'return' && is_object($val)) {
+                require_once 'PEAR.php';
+                return PEAR::isError($val);
+            }
         }
         return false;
     }//function isError($val)
 
 
-	/**
-	 * Deprecated Functions
-	 */
-	function set_file($handle, $filename = '') {
-		return $this->setFile($handle, $filename);
-	}
+    /**
+     * Deprecated Functions
+     */
+    function set_file($handle, $filename = '')
+    {
+        return $this->setFile($handle, $filename);
+    }
 
-	function set_block($parent, $handle, $name = '') {
-		return $this->setBlock($parent, $handle, $name);
-	}
+    function set_block($parent, $handle, $name = '')
+    {
+        return $this->setBlock($parent, $handle, $name);
+    }
 
-	function set_var($varname, $value = '', $append = false) {
-		return $this->setVar($varname, $value, $append);
-	}
+    function set_var($varname, $value = '', $append = false)
+    {
+        return $this->setVar($varname, $value, $append);
+    }
 
-	function get_var($varname) {
-		return $this->getVar($varname);
-	}
+    function get_var($varname)
+    {
+        return $this->getVar($varname);
+    }
 
 
 }

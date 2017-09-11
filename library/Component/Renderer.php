@@ -2,6 +2,7 @@
 
 use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Redirect;
+
 /**
  * Really basic component renderer, copied out of /homepage/configForm.php
  *
@@ -40,7 +41,7 @@ class Component_Renderer
             $component->setup();
 
             $page->setVar(array(
-                'ID' => $instance_no,
+                'ID'                        => $instance_no,
                 'COMPONENT_INSTANCE_ID'     => $instance_no,
                 'COMPONENT_DEFINITION_ID'   => $definitionId,
                 'COMPONENT_HANDLE'          => $instance_no,
@@ -78,10 +79,10 @@ class Component_Renderer
 
         $component->setup();
 
-        $instance_no = $component->getInstance()->getId();
+        $instance_no  = $component->getInstance()->getId();
         $definitionId = $component->getInstance()->getDefinition()->getId();
         $page->setVar(array(
-            'ID' => $instance_no,
+            'ID'                        => $instance_no,
             'COMPONENT_INSTANCE_ID'     => $instance_no,
             'COMPONENT_DEFINITION_ID'   => $definitionId,
             'COMPONENT_HANDLE'          => $instance_no,

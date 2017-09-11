@@ -121,9 +121,9 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
     {
         // Hide invisible components from all queries EXCEPT the ones that explicitly ask for it
         // it's like a soft-delete, but with an inverted boolenum, because SOMEONE thought that was ever a good idea...
-        
+
         if (!(isset($options['hidden']) && $options['hidden'])) {
-            $predicate->equals('visible', 'true'); 
+            $predicate->equals('visible', 'true');
         }
 
         return parent::buildWherePart($predicate, $columnList, $options);
@@ -159,27 +159,27 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
     /**
      * Create new custom components that need to be inserted AFTER the other new definitions
      *
-     * Takes component structures in the following format 
+     * Takes component structures in the following format
      * (yes i know it should be in a Definition Object.. but it doesnt have support for config)
      *
      * $classList = [
-     *      'name'  => 'Class List',
-     *      'module' => 'homepage',
-     *      'component_category' => '3',
-     *      'class' => 'Component_Homepage_ClassListController',
-     *      'description' => 'Show your students portraits on your class homepage',
-     *      'multiple' => 'false',
+     *      'name'                  => 'Class List',
+     *      'module'                => 'homepage',
+     *      'component_category'    => '3',
+     *      'class'                 => 'Component_Homepage_ClassListController',
+     *      'description'           => 'Show your students portraits on your class homepage',
+     *      'multiple'              => 'false',
      *      'config' => [
      *          'displayPortraits' => [
-     *              'default_value' => 'grid',
-     *              'label' => 'Layout Style'
+     *              'default_value'     => 'grid',
+     *              'label'             => 'Layout Style'
      *          ]
      *      ]
      * ]
-     * 
+     *
      * @param array $component
      * @param $component
-     * @return void
+     * @return int[]
      */
     public function create($component)
     {
@@ -189,11 +189,11 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         }
 
         $pdoFields = [];
-        
+
         foreach (array_keys($component) as $f) {
             $pdoFields[] = ':' . $f;
         }
-        
+
         $pdoString = implode(', ', $pdoFields);
         $colString = implode('`, `', array_keys($component));
 
@@ -205,7 +205,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         if ($this->database->prepare($sql)->execute($component)) {
             if (isset($config) && is_array($config)) {
                 $defnID = $this->database->lastInsertId();
-                
+
                 $stmt = $this->database->prepare("
 					INSERT INTO `component_config_definition` (
 					    `component_definition_id`, 
@@ -229,8 +229,12 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
                         'label'         => $value['label']
                     ]);
                 }
+
+                return [(int)$defnID];
             }
         }
+
+        return [];
     }
 
     /**
@@ -260,7 +264,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
 
         // Override ns.id to ns.slug - this is to overcome a limitation of the Mapper system that can't handle the
         // scenario where you join onto a non-primary key
-        
+
         $dehydration['msg_namespace_slug'] = $model->getNamespace() ? $model->getNamespace()->getSlug() : null;
 
         return $dehydration;
