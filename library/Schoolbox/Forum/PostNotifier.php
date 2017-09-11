@@ -234,9 +234,10 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $bob      = $this->newBuilder($post, $poster, ':user replied to your post in :thread in :folder', self::TRIGGER_MENTIONED, true)
                          ->addFilter('roletype', array($roletype));
 
-        if ($parentId = $post->getParent()->getId()) {
+        $parent = $post->getParent();
+        if ($parent instanceof Post) {
             try {
-                $parent = $this->mapper->findById($parentId);
+                $parent = $this->mapper->findById($parent->getId());
                 $envelope->targetToUser($parent->getOwner(), $bob->build());
             } catch (Mapper\Exception $e) {
                 // I can't target a non-existent post
