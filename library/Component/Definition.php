@@ -48,6 +48,9 @@ class Component_Definition
     /** @var int $instanceCount An unmapped count of instances of this item */
     protected $instanceCount = 0;
 
+    /** @var string $configCopy CSV list of configurations to copy from template during creation */
+    protected $configCopy;
+
     /**
      * @return bool
      */
@@ -183,6 +186,24 @@ class Component_Definition
         $this->id = $id;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getConfigCopy()
+    {
+        return $this->configCopy;
+    }
+
+    /**
+     * @param string $configCopy
+     * @return self
+     */
+    public function setConfigCopy($configCopy)
+    {
+        $this->configCopy = $configCopy;
+        return $this;
+    }    
 
     /**
      * @return string
