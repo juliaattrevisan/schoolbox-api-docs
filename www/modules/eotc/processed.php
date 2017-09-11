@@ -21,6 +21,7 @@ $authenticator = new \EOTC\Authenticator($this);
 $sessionUser = $_SESSION['user'];
 
 $this->setFile(TEMPLATE_content, 'modules/eotc/processed.html');
+$this->setBlock(TEMPLATE_content, 'report_timespan', 'report_timespan_block');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
 $this->setBlock(TEMPLATE_content, 'has_all', 'has_all_block');
@@ -64,6 +65,22 @@ else {
 		null
 	);
 }
+
+// Output blocks
+$options = ['range' => 'Date Range', 'all' => 'All'];
+$this->dropDown(
+    'report_timespan',
+    [
+        ['id' => 'range', 'type' => 'Date Range'],
+        ['id' => 'all',   'type' => 'All'],
+    ],
+    'range',
+    TEMPLATE_content,
+    [
+        'id'   => 'REPORT_TIMESPAN_ID',
+        'type' => 'REPORT_TIMESPAN_NAME',
+    ]
+);
 
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
