@@ -41,7 +41,7 @@ $allListGroups = EventMapper::getInstance()->findAllByListGroups([
 	EventStatusMapper::STATUS_DETAILSCOMPLETED,
 	EventStatusMapper::STATUS_READYFORFINALAPPROVAL,
 	EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
-], EventMapper::INTERVAL_MAX_6MONTH_OLD);
+], Alaress_Date_Format::now()->addMonths(-6));
 
 /** @var Schoolbox\L10n\RosettaStone $l10n */
 $l10n = $this->getDi()->get('l10n');

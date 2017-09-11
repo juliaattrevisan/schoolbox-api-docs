@@ -45,17 +45,19 @@ $dateTo       = '';
 if (!count($this->arg)) {
 	$this->parse('has_all_block', 'has_all');
 
+    $dateFrom = (Alaress_Date_Format::now()->addMonths(-1));
+    $dateTo   = null;
+
 	/** @var \EOTC\ListGroup\Collection $allListGroups */
 	$allListGroups = $eventMapper->findAllByListGroups(
 		[
 			\EOTC\EventStatusMapper::STATUS_APPROVED,
 			\EOTC\EventStatusMapper::STATUS_REJECTED
 		],
-		\EOTC\EventMapper::INTERVAL_MAX_1MONTH_OLD_AND_FUTURE
+        $dateFrom,
+        $dateTo
 	);
     $timespanType = 'range';
-    $dateFrom     = (Alaress_Date_Format::now()->addMonths(-1)->getLocalShort());
-    $dateTo       = (Alaress_Date_Format::now()->getLocalShort());
 }
 else {
 
@@ -89,8 +91,8 @@ $this->dropDown(
     ]
 );
 $this->setVar('CLASS_REPORT_DATE', $timespanType === 'all' ? 'hide' : '');
-$this->setVar('REPORT_DATE_START', $dateFrom);
-$this->setVar('REPORT_DATE_END', $dateTo);
+$this->setVar('REPORT_DATE_START', ($dateFrom instanceof Alaress_Date_Format ? $dateFrom->getLocalShort() : ''));
+$this->setVar('REPORT_DATE_END',   ($dateTo instanceof Alaress_Date_Format ? $dateTo->getLocalShort() : ''));
 
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated

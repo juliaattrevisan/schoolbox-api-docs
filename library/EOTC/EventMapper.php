@@ -10,6 +10,7 @@
 
 namespace EOTC;
 
+use Alaress_Date_Format;
 use EOTC\ActivityLog\Mapper as ActivityLogMapper;
 use EOTC\ListGroup\Collection as ListGroupCollection;
 use Schoolbox\Calendar\EventMapper as CalendarEventMapper;
@@ -198,29 +199,30 @@ class EventMapper extends CalendarEventMapper
      * over any events)
      *
      * @param array $allowedStatus an array of EOTC\EventStatus ids
-     * @param int $interval a const which determines filtering
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      * @return ListGroup\Collection
      */
-    public function findAllByListGroups($allowedStatus = [], $interval)
+    public function findAllByListGroups($allowedStatus = [], Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
-        /* Choose which hardcoded fragment to use
-         */
-        switch ($interval) {
-            case self::INTERVAL_MAX_1MONTH_OLD_AND_FUTURE:
-                $sql = 'WHERE (e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 1 MONTH)) OR (e.start_datetime >= NOW())';
-                break;
+        // Build a query around from/to dates
+        $queryParts  = [];
+        $queryParams = [];
+        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
+            $queryParts[]        = 'e.start_datetime >= :from';
+            $queryParams['from'] = $from->getDatabaseDate();
+        }
+        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
+            $queryParts[]      = 'e.start_datetime <= :to';
+            $queryParams['to'] = $to->getDatabaseDate();
+        }
 
-            case self::INTERVAL_MAX_6MONTH_OLD:
-                $sql = 'WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)';
-                break;
-
-            default:
-                $sql = '';
-                break;
+        if (!empty($queryParts)) {
+            $sql = 'WHERE ' . implode(' AND ', $queryParts);
         }
 
         /* Looked for a way to convince GROUP BY to group records with
@@ -246,7 +248,7 @@ class EventMapper extends CalendarEventMapper
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute($queryParams);
 
         /* Postprocess this list of events based on status and
          * organise them into a collection of collections
