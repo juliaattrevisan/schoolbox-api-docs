@@ -5,19 +5,20 @@
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use PDO;
 use PDOStatement;
-use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -26,35 +27,24 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('eportfolio_component_blog');
-        $this->hasModel(EportfolioBlogModel::class);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('page_id', self::TYPE_INTEGER);
-        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
+        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
-
-        /** Joins */
-
-        $this->hasJoin(
-            'owner',
-            array(
-                'mapper' => UserMapper::class,
-                'this_key' => 'owner_id',
-                'other_key' => 'id'
-            )
-        );
     }
 
     /**
      * Find all the blog entries posted in a particular users ePortfolio
      *
      * @param User $user
-     * @param $limit
-     * @return GenericCollection
+     * @param int  $limit
+     * @return GenericCollection|Model[]
      */
     public function findForPortfolioOwner(User $user, $limit = 0)
     {
@@ -64,7 +54,7 @@ class Mapper extends BaseMapper
 				{$this->getColumnString('b')},
 				{$this->getJoinColumnString('owner', 'u')}
 			FROM `{$this->getTable()}` AS `b`
-            INNER JOIN {$this->getJoinSql('owner', 'b', 'u',true)}
+            INNER JOIN {$this->getJoinSql('owner', 'b', 'u', true)}
             JOIN `eportfolio_page` p ON p.page_id = b.page_id
 			WHERE `b`.`deleted_at` IS NULL
 				AND `p`.`uid` = :owner_id
@@ -86,19 +76,7 @@ class Mapper extends BaseMapper
             )
         );
 
-        $c = $this->createCollection();
-
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var User $user */
-            $user = $this->hydrateJoin($r, 'owner', 'u');
-
-            /** @var EportfolioBlogModel $blog */
-            $blog = $this->hydrate($r, 'b');
-            $blog->setOwner($user);
-            $c->add($blog);
-        }
-
-        return $c;
+        return $this->hydrateSelect($stmt);
     }
 
     /**
@@ -113,7 +91,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('owner', 'u')}
             FROM {$this->database->quoteIdentifier($this->table)}
-            INNER JOIN {$this->getJoinSql('owner', '', 'u',true)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'u', true)}
         ";
     }
 
@@ -121,20 +99,19 @@ class Mapper extends BaseMapper
      * Hydrate joins added in `getSelectString`.
      *
      * @param  PDOStatement $statement
-     * @return GenericCollection
+     * @return GenericCollection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('owner');
         $collection = $this->createCollection();
-        foreach ($statement as $row) {
-            $model = $this->hydrate($row);
 
-            // set user and division only if retrieved properly
-            $user = $this->hydrateJoin($row, 'owner', 'u');
-            if ($user instanceof User) {
-                $model->setOwner($user);
-            }
-            $collection->add($model);
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $model = $this->hydrate($row);
+            $model->setOwner($userMapper->hydrate($row, 'u'));
+            $collection[$model->getId()] = $model;
         }
         return $collection;
     }
