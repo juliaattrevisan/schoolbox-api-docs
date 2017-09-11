@@ -18,7 +18,6 @@ use Schoolbox\Mapper as BaseMapper;
  *
  * @method Component_Instance createModel($idValue = null)
  * @method Component_Instance findById($id)
- * @method Component_Instance hydrate(array $row, $alias = '', $callback = null)
  */
 class Component_InstanceMapper extends BaseMapper
 {
@@ -58,6 +57,33 @@ class Component_InstanceMapper extends BaseMapper
         $this->uses('identifier', self::TYPE_INTEGER);
         $this->uses('position', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Prior to hydrating the row, check to see if there is a custom implementation of the component instance we
+     * are hydrating, and if so create that model instead of the default Component_Instance one
+     *
+     * @param array $row
+     * @param string $alias
+     * @param null $callback
+     */
+    public function hydrate(array $row, $alias = '', $callback = null)
+    {
+        // Search for an overriding instance class and use that to hydrate the model instead
+
+        $classInstanceOverride = str_replace('Controller', 'Instance', $row['cd.class']);
+
+        if (class_exists($classInstanceOverride)) {
+            $this->hasModel($classInstanceOverride);
+        } else {
+            $this->hasModel(Component_Instance::class);
+        }
+
+        // Hydrate row
+
+        return parent::hydrate($row, $alias, $callback);
     }
 
     /**
