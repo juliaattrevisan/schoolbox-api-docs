@@ -40,9 +40,9 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         } elseif ($_POST['type'] == 'components') {
             // Drag and drop components
             $columns = [
-                'left' => $_POST['column1'],
+                'left'  => $_POST['column1'],
                 'right' => $_POST['column2'],
-                'top' => $_POST['column3']
+                'top'   => $_POST['column3']
             ];
 
             foreach ($columns as $position => $componentString) {
@@ -123,23 +123,27 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             if (is_numeric($_POST['add'])) {
                 $componentInstance       = $component->getInstance();
                 $componentInstanceConfig = $componentInstance->getConfig();
+                $componentDefinition     = $componentClass = $component->getInstance()->getDefinition();
 
-                // Define configuration items to be copied. To be honest I don't know why we don't copy all the
-                // defaults, but I  don't want to screw up school expectations by changing default behaviour,
-                // so I'm only adding the selected survey stuff if the component is the new ePortfolio controller
+                // Define configuration items to be copied
+
+                // Always copy the component name
 
                 $configurationToCopy = [
                     'componentname',
                 ];
 
-                $componentClass = $component->getInstance()->getDefinition()->getClass();
+                // And any other fields in the component definition
 
-                if ($componentClass == 'Custom\Loyola\Survey\Component\Eportfolio\Controller') {
-                    $configurationToCopy = array_merge($configurationToCopy, [
-                        'survey',
-                        'size',
-                        'collapse'
-                    ]);
+                $configCopy = explode(",", $componentDefinition->getConfigCopy());
+
+                if (!empty($configCopy)) {
+                    array_walk($configCopy, 'trim');
+                    $configCopy = array_unique($configCopy);
+
+                    if (count($configCopy) > 0) {
+                        $configurationToCopy = array_merge($configurationToCopy, $configCopy);
+                    }
                 }
 
                 /** @var Component_ConfigDefinition $currentConfig */
@@ -148,7 +152,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                         try {
                             $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList([
                                 'component_config_definition_id' => $currentConfig->getId(),
-                                'component_instance_id' => $_POST['from'],
+                                'component_instance_id'          => $_POST['from'],
                             ]);
 
                             $value = $configInstance->getValue();
@@ -247,7 +251,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                         /** @var Component_Config $confI */
                         $confI = $componentConfigInstanceMapper->findOneByColumnList([
                             'component_config_definition_id' => $confD->getId(),
-                            'component_instance_id' => $instance->getId()
+                            'component_instance_id'          => $instance->getId()
                         ]);
                     } catch (MapperException $e) {
                         $confI = new Component_Config();
