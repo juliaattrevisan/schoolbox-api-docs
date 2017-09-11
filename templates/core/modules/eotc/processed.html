@@ -3,8 +3,29 @@
 <script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript">
     $(function () {
+
+        var inputTimespan  = $('#reportTimespan'),
+            inputStartDate = $('#reportDateStart'),
+            inputEndDate   = $('#reportDateEnd');
+
+        // User searches
+        $(document).on('click', '[data-action]', function (event) {
+            event.preventDefault();
+
+            var timespan = inputTimespan.val(),
+                location = '/modules/eotc/processed';
+            if (timespan === 'all') {
+                location = location + '/all';
+            } else if (timespan === 'range') {
+                // Turn into moments, then translate into URL formats
+                location = location + '/range/' + inputStartDate.val() + '/' + inputEndDate.val();
+            }
+
+            window.location.href = location;
+        });
+
         // User selects a different report period from dropdown
-        $('[name=reportTimespan]').on('change', function() {
+        inputTimespan.on('change', function() {
             $('[data-date-start], [data-date-end]').toggleClass('hide', $(this).val() === 'all');
         });
     });
@@ -34,17 +55,17 @@
 				<fieldset>
 					<legend>Search</legend>
 					<div class="small-12 medium-12 large-2 columns">
-						<select name="reportTimespan">
+						<select id="reportTimespan" name="reportTimespan">
 							<!-- BEGIN report_timespan -->
 							<option value="{REPORT_TIMESPAN_ID}" {REPORT_TIMESPAN_ID_SELECTED}>{REPORT_TIMESPAN_NAME}</option>
 							<!-- END report_timespan -->
 						</select>
 					</div>
 					<div class="small-12 medium-4 columns {CLASS_REPORT_DATE}" data-date-start>
-						<input name="reportDateStart" type="text" value="{REPORT_DATE_START}" data-datepicker data-datepicker-buttontext="">
+						<input id="reportDateStart" name="reportDateStart" type="text" value="{REPORT_DATE_START}" data-datepicker data-datepicker-buttontext="">
 					</div>
 					<div class="small-12 medium-4 columns {CLASS_REPORT_DATE}" data-date-end>
-						<input name="reportDateEnd" type="text" value="{REPORT_DATE_END}" data-datepicker data-datepicker-buttontext="">
+						<input id="reportDateEnd" name="reportDateEnd" type="text" value="{REPORT_DATE_END}" data-datepicker data-datepicker-buttontext="">
 					</div>
 					<div class="small-12 medium-4 large-2 columns">
 						<input type="submit" title="Search" value='Search' data-action="search">
