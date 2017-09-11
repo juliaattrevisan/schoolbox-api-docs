@@ -5,7 +5,6 @@
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Blog\Eportfolio\Post;
@@ -15,7 +14,6 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class Model implements ISoftDeletable
@@ -24,10 +22,6 @@ class Model implements ISoftDeletable
     use CreatedAtDate;
     use UpdatedAtDate;
 	use DeletedAtDate;
-
-
-	/** @var Folder */
-	protected $folder;
 
 	/** @var User */
 	protected $owner;
@@ -57,21 +51,6 @@ class Model implements ISoftDeletable
 		return $this->pageId;
 	}	
 
-	/**
-	 * @param Folder $folder
-	 * @return self
-	 */
-	public function setFolder($folder) {
-		$this->folder = $folder;
-		return $this;
-	}
-
-	/**
-	 * @return Folder
-	 */
-	public function getFolder() {
-		return $this->folder;
-	}
 
 	/**
 	 * @param User $owner
