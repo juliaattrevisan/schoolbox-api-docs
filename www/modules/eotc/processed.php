@@ -24,11 +24,9 @@ $this->setFile(TEMPLATE_content, 'modules/eotc/processed.html');
 $this->setBlock(TEMPLATE_content, 'report_timespan', 'report_timespan_block');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
-$this->setBlock(TEMPLATE_content, 'has_all', 'has_all_block');
 
 $this->setVar(array(
 	'event_list_group_block' => '',
-	'has_all_block' => '',
 ));
 
 $eventMapper = \EOTC\EventMapper::getInstance();
@@ -43,8 +41,6 @@ $timespanType = isset($this->arg[0]) ? $this->arg[0] : 'range';
 $dateFrom     = '';
 $dateTo       = '';
 if ($timespanType === 'range') {
-	$this->parse('has_all_block', 'has_all');
-
     // get from/to date out
     $dateFrom = isset($this->arg[1])
         ? new Alaress_Date_Format($this->arg[1], Alaress_Date_Format::URL_FORMAT)
