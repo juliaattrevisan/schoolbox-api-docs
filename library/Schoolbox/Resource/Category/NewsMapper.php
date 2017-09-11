@@ -125,7 +125,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
             $options['limit'] = $limit;
         }
 
-        $options['order'] = ['datetime_published' => 'ASC'];
+        $options['order'] = ['datetime_published' => 'DESC'];
 
         return $this->findByPredicates($pb, $options);
     }
