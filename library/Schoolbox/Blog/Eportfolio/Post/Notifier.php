@@ -113,7 +113,7 @@ class Notifier extends AbstractModuleNotifier
     /* ASYNC NOTIFICATION METHODS */
 
     /**
-     * Notify staff that someone posted on one of their student's eportfolio blogs
+     * Notify staff that someone posted on one of their student's eportfolio blog
      *
      * @param Model $post
      * @param User  $effector
@@ -205,6 +205,56 @@ class Notifier extends AbstractModuleNotifier
             ->setBody($post->getBody());
 
         $envelope->targetToUser($owner->getId(), $bob->build());
+        return $envelope;
+    }
+
+
+    /**
+     * Notify parents that someone posted on their child's eportfolio blog
+     *
+     * @param Model $post
+     * @param User  $effector
+     * @return Envelope
+     * @throws OutOfBoundsException     If severity is not set
+     * @throws InvalidArgumentException If a required property was not set
+     */
+    public function notifyParentPosted(Model $post, User $effector)
+    {
+        $envelope    = new Envelope();
+        $bob         = new Builder();
+        $page        = $this->pageMapper->findById($post->getPage()->getPageId());
+        $owner       = $this->userMapper->findById($page->getUid());
+        $authorExtId = $effector->getExternalId();
+
+        $params = [];
+
+        // Is author and owner the same?
+        if($effector->getId() === $owner->getId()){
+            $title = ':author posted :title on their eportfolio blog';
+        } else {
+            $title = ":author posted :title on :student's eportfolio blog";
+            $params = [
+                'student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE),
+            ];
+        }
+
+        $bob->setTitle($title)
+            ->setParams(array_merge($params, [
+                'author' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                'title'  => new Param($post->getHeading(), $this->buildBlogUrl($owner, $post)),
+            ]))
+            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
+            ->setHref($this->buildBlogUrl($owner, $post))
+            ->setSeverity(Logger::INFO)
+            ->setNamespace($this->getSlug())
+            ->addTopic("eportfolio.blog.{$post->getId()}." . self::TRIGGER_POSTED)
+            ->setTimestamp($post->getCreatedAt()->getUnixTimeStamp())
+            ->setBody($post->getBody());
+
+        foreach($owner->loadParents()->getParents() as $parent){
+            $envelope->targetToUser($parent->getId(), $bob->build());
+        }
+
         return $envelope;
     }
 
