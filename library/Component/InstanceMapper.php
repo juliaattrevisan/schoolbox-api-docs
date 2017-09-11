@@ -212,7 +212,7 @@ class Component_InstanceMapper extends BaseMapper
 
     /**
      * @param string $module
-     * @param string $identifier
+     * @param int $identifier
      * @param string $class
      * @return Component_Instance[]|GenericCollection
      */
@@ -311,10 +311,11 @@ class Component_InstanceMapper extends BaseMapper
             // Hydrate Component Instance Configuration
 
             if ($configDefId && !$configDefinitionCollection->offsetExists($configDefId)) {
-                $configDefinitionCollection->setOffset($configDefId, $this->componentConfigDefinitionMapper->hydrate($row, 'ccd'));
+                $configDefinition = $this->componentConfigDefinitionMapper->hydrate($row, 'ccd');
+                $configDefinitionCollection->setOffset($configDefId, $configDefinition);
+            } else {
+                $configDefinition = $configDefinitionCollection->getOffset($configDefId);
             }
-
-            $configDefinition = $configDefinitionCollection->getOffset($configDefId);
 
             if ($configId && !$configInstanceCollection->offsetExists($configId)) {
                 $configInstanceCollection->setOffset($configId, $this->componentConfigMapper->hydrate($row, 'cci'));
@@ -353,8 +354,9 @@ class Component_InstanceMapper extends BaseMapper
 
         /* @var Component_Instance $dirtyInstance */
         foreach ($dirtyInstanceCollection as $dirtyInstance) {
-
-            $dirtyInstance->setDefinition($this->componentDefinitionMapper->findById($dirtyInstance->getDefinitionId()));
+            $dirtyInstance->setDefinition(
+                $this->componentDefinitionMapper->findById($dirtyInstance->getDefinitionId())
+            );
 
             // Check for multiple instances with the same definition if disallowed
 
@@ -663,8 +665,11 @@ class Component_InstanceMapper extends BaseMapper
      * @param string $controller
      * @return Component_Instance
      */
-    public function injectNewComponent(Folder $folder, array $config = [], $controller = HomepageOutlineController::class)
-    {
+    public function injectNewComponent(
+        Folder $folder,
+        array $config = [],
+        $controller = HomepageOutlineController::class
+    ) {
         // Doesn't exist. We need that to exist. Make it exist.
         $definition = $this->componentDefinitionMapper->findOneByColumn('class', $controller);
 

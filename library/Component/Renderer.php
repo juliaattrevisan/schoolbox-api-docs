@@ -164,6 +164,5 @@ class Component_Renderer
                 $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
             }
         }
-
     }
 }
