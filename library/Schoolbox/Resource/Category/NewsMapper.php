@@ -119,8 +119,11 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
         $pb = $this->getPredicateBuilder();
         $pb->equals('code', $folderId);
         $pb->greaterThanOrEqualTo('datetime_expires', \Alaress_Date_Format::now());
-        $pb->lessThan('datetime_published', \Alaress_Date_Format::now());
 
+        $subBuilder = $this->getPredicateBuilder();
+        $subBuilder->lessThan('datetime_published', \Alaress_Date_Format::now());
+        $subBuilder->equals('owner', $this->getSessionUser()->getId());
+        $pb->any($subBuilder);
 
         $options = [];
         if (null !== $limit) {
