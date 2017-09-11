@@ -61,14 +61,14 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
 INSERT INTO `msg_source`
 (`namespace`, `key`, `role_type`, `description`)
 VALUES
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'student', 'someone comments on a your eportfolio blog'),
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'staff',   'someone comments on a eportfolio blog post you authored');
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'student', 'someone comments on your eportfolio blog'),
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'staff',   'someone comments on an eportfolio blog post you authored');
 
 -- Receive 'Eportfolio Blog' 'followed' messages when:
 -- * staff/student/parent: someone comments after you on a eportfolio blog post.
 INSERT INTO `msg_source`
 (`namespace`, `key`, `role_type`, `description`)
 VALUES
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'student', 'someone comments after you on a eportfolio blog post'),
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'staff',   'someone comments after you on a eportfolio blog post'),
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'parent',  'someone comments after you on a eportfolio blog post');
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'student', 'someone comments after you on an eportfolio blog post'),
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'staff',   'someone comments after you on an eportfolio blog post'),
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'parent',  'someone comments after you on an eportfolio blog post');
