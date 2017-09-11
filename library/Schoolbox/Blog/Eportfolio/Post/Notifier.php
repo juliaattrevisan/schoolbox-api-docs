@@ -12,6 +12,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Eportfolio\PageMapper;
+use Eportfolio\PermissionMapper;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\IMapper;
@@ -43,6 +44,11 @@ class Notifier extends AbstractModuleNotifier
     private $pageMapper;
 
     /**
+     * @var PermissionMapper
+     */
+    private $permissionMapper;
+
+    /**
      * @var UserMapper
      */
     private $userMapper;
@@ -63,12 +69,13 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null): void
     {
-        $dependencies                  = $dependencies ?: [];
-        $dependencies['mapper']        = $dependencies['mapper'] ?? Mapper::getInstance();
-        $dependencies['pageMapper']    = $dependencies['pageMapper'] ?? PageMapper::getInstance();
-        $dependencies['userMapper']    = $dependencies['userMapper'] ?? UserMapper::getInstance();
-        $dependencies['externalUser']  = $dependencies['externalUser'] ?? new External_User();
-        $dependencies['externalClass'] = $dependencies['externalClass'] ?? new External_Class();
+        $dependencies                     = $dependencies ?: [];
+        $dependencies['mapper']           = $dependencies['mapper'] ?? Mapper::getInstance();
+        $dependencies['pageMapper']       = $dependencies['pageMapper'] ?? PageMapper::getInstance();
+        $dependencies['permissionMapper'] = $dependencies['permissionMapper'] ?? PermissionMapper::getInstance();
+        $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
+        $dependencies['externalUser']     = $dependencies['externalUser'] ?? new External_User();
+        $dependencies['externalClass']    = $dependencies['externalClass'] ?? new External_Class();
         parent::loadDependencies($dependencies);
     }
 
@@ -179,7 +186,20 @@ class Notifier extends AbstractModuleNotifier
             $titleToken = ":student's";
             $titleParam = ['student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE)];
         }
-        $audience = $owner->loadParents()->getParents();
+
+        $parentsCanView = false;
+        foreach($this->permissionMapper->findParentSetting($page->getPageId()) as $permission){
+            if($permission->getValue()){
+                $parentsCanView = true;
+                break;
+            }
+        }
+
+        // Empty audience if parents don't have view permission
+        $audience = $parentsCanView
+            ? $owner->loadParents()->getParents()
+            : $this->userMapper->createCollection();
+
         return $this->notifyPosted($post, $effector, $audience, $titleToken, $titleParam);
     }
 
@@ -247,6 +267,17 @@ class Notifier extends AbstractModuleNotifier
     protected function setPageMapper(PageMapper $pageMapper): self
     {
         $this->pageMapper = $pageMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param PermissionMapper $permissionMapper
+     * @return $this|self
+     */
+    protected function setPermissionMapper(PermissionMapper $permissionMapper): self
+    {
+        $this->permissionMapper = $permissionMapper;
         return $this;
     }
 

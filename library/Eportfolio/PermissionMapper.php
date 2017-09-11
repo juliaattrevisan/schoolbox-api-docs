@@ -145,7 +145,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 	 * Find the Parent permission settings for a particular page
 	 *
 	 * @param $pageId
-	 * @return Bool|Collection
+	 * @return Schoolbox\Collection|Permission[]
 	 */
 	public function findParentSetting($pageId) {
 		return $this->findByColumnList(array(
