@@ -36,7 +36,7 @@ class Instance extends Component_Instance
         $this->surveyMapper = SurveyMapper::getInstance();
 
         try {
-            $this->survey = $this->surveyMapper->findById($this->config['survey']);
+            $this->survey = $this->surveyMapper->findById($this->getConfigByKey('survey')->getValue());
         } catch (MapperException $e) {
             // The survey was not found (or no survey was set in the configuration)
             if (!$this->survey instanceof Survey && $user->getRole()->isStudent()) {
