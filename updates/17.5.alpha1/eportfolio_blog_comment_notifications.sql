@@ -2,6 +2,7 @@
 INSERT INTO msg_namespace (id, slug, label)
 VALUES (NULL, 'eportfolio_blog', 'Eportfolio Blog');
 
+
 -- Receive 'Eportfolio Blog' 'posted' messages when:
 -- * student: someone else creates a blog post on your eportfolio page
 -- * staff:   one of your students posts to their eportfolio blog
@@ -12,6 +13,46 @@ VALUES
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'posted', 'student', 'someone posts to your eportfolio blog'),
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'posted', 'staff',   'your student posts to their eportfolio blog'),
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'posted', 'parent',  'your child posts to their eportfolio blog');
+
+-- Student (Instant + Email)
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+  SELECT
+    src.id           AS `msg_source_id`,
+    g.id             AS `role_id`,
+    'MU,DI,IN,MO,EM' AS `mask`,
+    'IN,EM'          AS `role_default`
+  FROM msg_source src
+  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog')
+  AND src.role_type = 'student'
+  AND src.`key` = 'posted';
+
+-- Staff (Instant + Email)
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+  SELECT
+    src.id           AS `msg_source_id`,
+    g.id             AS `role_id`,
+    'MU,DI,IN,MO,EM' AS `mask`,
+    'IN,EM'          AS `role_default`
+  FROM msg_source src
+  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog')
+  AND src.role_type = 'staff'
+  AND src.`key` = 'posted';
+
+-- Parent (Instant + Email)
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+  SELECT
+    src.id           AS `msg_source_id`,
+    g.id             AS `role_id`,
+    'MU,DI,IN,MO,EM' AS `mask`,
+    'IN,EM'          AS `role_default`
+  FROM msg_source src
+  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog')
+  AND src.role_type = 'parent'
+  AND src.`key` = 'posted';
+
 
 -- Receive 'Eportfolio Blog' 'commented' messages when:
 -- * student: someone comments on a blog on your eportfolio page
