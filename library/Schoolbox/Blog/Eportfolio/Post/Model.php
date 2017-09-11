@@ -11,16 +11,20 @@
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
 	use DeletedAtDate;
 
-	/** @var int */
-	protected $id;
 
 	/** @var Folder */
 	protected $folder;
@@ -31,33 +35,11 @@ class Model implements ISoftDeletable
 	/** @var Integer */
 	protected $pageId;
 
-	/** @var \Alaress_Date_Format */
-	protected $createdAt;
-
-	/** @var \Alaress_Date_Format */
-	protected $updatedAt;
-
 	/** @var string */
 	protected $heading;
 
 	/** @var string */
 	protected $body;
-
-	/**
-	 * @param int $id
-	 * @return self
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
 
 	/**
 	 * @param int $pageId
@@ -107,39 +89,6 @@ class Model implements ISoftDeletable
 		return $this->owner;
 	}
 
-	/**
-	 * @param \Alaress_Date_Format $createdAt
-	 * @return self
-	 */
-	public function setCreatedAt($createdAt) {
-		$this->createdAt = $createdAt;
-		return $this;
-	}
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getCreatedAt() {
-		return $this->createdAt;
-	}
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getUpdatedAt()
-	{
-		return $this->updatedAt;
-	}
-
-	/**
-	 * @param  \Alaress_Date_Format $updatedAt
-	 * @return $this
-	 */
-	public function setUpdatedAt($updatedAt)
-	{
-		$this->updatedAt = $updatedAt;
-		return $this;
-	}
 
 	/**
 	 * @param string $heading
