@@ -41,9 +41,13 @@ class Controller extends Component_Eportfolio_ControllerAbstract
         /** @var User $user */
         $user = $_SESSION["user"];
 
-        // Try to load the survey we are going to render
+        // Setup all of the other properties required for this show to get on the road
 
+        $this->currentUser = $this->getSitePage()->getDi()->get('user');
+        $this->config = $this->getConfig();
         $this->surveyMapper = SurveyMapper::getInstance();
+
+        // Try to load the survey we are going to render
 
         try {
             $this->survey = $this->surveyMapper->findById($this->config['survey']);
@@ -55,18 +59,13 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             }
         }
 
-        // Setup all of the other properties required for this show to get on the road
-
-        $this->config = $this->getConfig();
-        $this->currentUser = $this->getSitePage()->getDi()->get('user');
-
         return true;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)
