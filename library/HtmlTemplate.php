@@ -318,12 +318,9 @@ class HtmlTemplate
     /**
      * Set corresponding substitutions for placeholders
      *
-     * @param string  $varname Name of a variable that is to be defined
-     *                          or an array of variables with value
-     *                          substitution as key/value pairs
-     * @param string  $value   Value of that variable
-     * @param boolean $append  If true, the value is appended to the
-     *                          variable's existing value
+     * @param string|array $varname Name of variable to be defined or key/value pair array
+     * @param string $value Value of that variable
+     * @param boolean $append If true, the value is appended to the variable's existing value
      *
      * @return void
      * @access public
