@@ -39,6 +39,9 @@ $eventMapper = \EOTC\EventMapper::getInstance();
  * /:                  /range/{-1 month}/{now}
  * /all:               show all future events that are approved/rejected
  */
+$timespanType = '';
+$dateFrom     = '';
+$dateTo       = '';
 if (!count($this->arg)) {
 	$this->parse('has_all_block', 'has_all');
 
@@ -50,6 +53,9 @@ if (!count($this->arg)) {
 		],
 		\EOTC\EventMapper::INTERVAL_MAX_1MONTH_OLD_AND_FUTURE
 	);
+    $timespanType = 'range';
+    $dateFrom     = (Alaress_Date_Format::now()->addMonths(-1)->getLocalShort());
+    $dateTo       = (Alaress_Date_Format::now()->getLocalShort());
 }
 else {
 
@@ -64,6 +70,7 @@ else {
 		],
 		null
 	);
+    $timespanType = 'all';
 }
 
 // Output blocks
@@ -74,13 +81,15 @@ $this->dropDown(
         ['id' => 'range', 'type' => 'Date Range'],
         ['id' => 'all',   'type' => 'All'],
     ],
-    'range',
+    $timespanType,
     TEMPLATE_content,
     [
         'id'   => 'REPORT_TIMESPAN_ID',
         'type' => 'REPORT_TIMESPAN_NAME',
     ]
 );
+$this->setVar('REPORT_DATE_START', $dateFrom);
+$this->setVar('REPORT_DATE_END', $dateTo);
 
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
