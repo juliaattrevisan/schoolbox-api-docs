@@ -75,7 +75,8 @@ class Component_InstanceMapper extends BaseMapper
 
         $classInstanceOverride = str_replace('Controller', 'Instance', $row['cd.class']);
 
-        if (class_exists($classInstanceOverride)) {
+        if (class_exists($classInstanceOverride) &&
+            is_subclass_of($classInstanceOverride, Component_Instance::class)) {
             $this->hasModel($classInstanceOverride);
         } else {
             $this->hasModel(Component_Instance::class);
