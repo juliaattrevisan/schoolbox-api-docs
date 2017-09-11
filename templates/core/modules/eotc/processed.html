@@ -26,6 +26,10 @@
                     + (endDate.isValid() ? endDate.format('DD-MM-YYYY') : '');
             }
 
+            // Add selected statuses
+            location = location + '?' + $('input[name="status[]"]').serialize();
+
+            // Redirect
             window.location.href = location;
         });
 
