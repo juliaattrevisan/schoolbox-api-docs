@@ -18,7 +18,11 @@
                 location = location + '/all';
             } else if (timespan === 'range') {
                 // Turn into moments, then translate into URL formats
-                location = location + '/range/' + inputStartDate.val() + '/' + inputEndDate.val();
+                var startDate = moment(inputStartDate.val(), dateDisplayFormats.momentJs),
+                    endDate = moment(inputEndDate.val(), dateDisplayFormats.momentJs);
+                location = location + '/range/'
+                    + (startDate.isValid() ? startDate.format('DD-MM-YYYY'): '') + '/'
+                    + (endDate.isValid() ? endDate.format('DD-MM-YYYY'): '');
             }
 
             window.location.href = location;
