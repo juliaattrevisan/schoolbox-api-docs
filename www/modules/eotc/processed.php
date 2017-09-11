@@ -25,9 +25,9 @@ $this->setBlock(TEMPLATE_content, 'report_timespan', 'report_timespan_block');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
 
-$this->setVar(array(
-	'event_list_group_block' => '',
-));
+$this->setVar([
+    'event_list_group_block' => '',
+]);
 
 $eventMapper = \EOTC\EventMapper::getInstance();
 
@@ -38,39 +38,39 @@ $eventMapper = \EOTC\EventMapper::getInstance();
  * /all:               show all future events that are approved/rejected
  */
 $timespanType = isset($this->arg[0]) ? $this->arg[0] : 'range';
-$dateFrom     = '';
-$dateTo       = '';
+$dateFrom = '';
+$dateTo = '';
 if ($timespanType === 'range') {
     // get from/to date out
     $dateFrom = isset($this->arg[1])
         ? new Alaress_Date_Format($this->arg[1], Alaress_Date_Format::URL_FORMAT)
         : Alaress_Date_Format::now()->addMonths(-1);
-    $dateTo   = isset($this->arg[2])
+    $dateTo = isset($this->arg[2])
         ? new Alaress_Date_Format($this->arg[2], Alaress_Date_Format::URL_FORMAT)
         : null;
 
-	/** @var \EOTC\ListGroup\Collection $allListGroups */
-	$allListGroups = $eventMapper->findAllByListGroups(
-		[
-			\EOTC\EventStatusMapper::STATUS_APPROVED,
-			\EOTC\EventStatusMapper::STATUS_REJECTED
-		],
+    /** @var \EOTC\ListGroup\Collection $allListGroups */
+    $allListGroups = $eventMapper->findAllByListGroups(
+        [
+            \EOTC\EventStatusMapper::STATUS_APPROVED,
+            \EOTC\EventStatusMapper::STATUS_REJECTED,
+        ],
         $dateFrom,
         $dateTo
-	);
+    );
 } elseif ($timespanType === 'all') {
 
-	/* Show paginated events, ordered by datetime, till the
-	 * beginning of history
-	 */
-	/** @var \EOTC\ListGroup\Collection $allListGroups */
-	$allListGroups = $eventMapper->findAllByListGroups(
-		[
-			\EOTC\EventStatusMapper::STATUS_APPROVED,
-			\EOTC\EventStatusMapper::STATUS_REJECTED
-		],
-		null
-	);
+    /* Show paginated events, ordered by datetime, till the
+     * beginning of history
+     */
+    /** @var \EOTC\ListGroup\Collection $allListGroups */
+    $allListGroups = $eventMapper->findAllByListGroups(
+        [
+            \EOTC\EventStatusMapper::STATUS_APPROVED,
+            \EOTC\EventStatusMapper::STATUS_REJECTED,
+        ],
+        null
+    );
 }
 
 // Output blocks
@@ -79,7 +79,7 @@ $this->dropDown(
     'report_timespan',
     [
         ['id' => 'range', 'type' => 'Date Range'],
-        ['id' => 'all',   'type' => 'All'],
+        ['id' => 'all', 'type' => 'All'],
     ],
     $timespanType,
     TEMPLATE_content,
@@ -90,7 +90,7 @@ $this->dropDown(
 );
 $this->setVar('CLASS_REPORT_DATE', $timespanType === 'all' ? 'hide' : '');
 $this->setVar('REPORT_DATE_START', ($dateFrom instanceof Alaress_Date_Format ? $dateFrom->getLocalShort() : ''));
-$this->setVar('REPORT_DATE_END',   ($dateTo instanceof Alaress_Date_Format ? $dateTo->getLocalShort() : ''));
+$this->setVar('REPORT_DATE_END', ($dateTo instanceof Alaress_Date_Format ? $dateTo->getLocalShort() : ''));
 
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
@@ -100,44 +100,45 @@ $this->setVar('REPORT_DATE_END',   ($dateTo instanceof Alaress_Date_Format ? $da
 $l10n = $this->getDi()->get('l10n');
 
 foreach ($allListGroups as $key => $currentListGroup) {
-	if ($currentListGroup->count()) {
-		$this->setVar([
-			'EVENT_LIST_GROUP_NAME' => $l10n->translateSentence($allListGroups->getCurrentName($key)),
-		]);
+    if ($currentListGroup->count()) {
+        $this->setVar([
+            'EVENT_LIST_GROUP_NAME' => $l10n->translateSentence($allListGroups->getCurrentName($key)),
+        ]);
 
-		$i = 0;
+        $i = 0;
 
-		/** @var \EOTC\Event $currentEvent */
-		foreach ($currentListGroup as $currentEvent) {
-			if ($authenticator->isEOTCAdministratorForCampus($sessionUser, $currentEvent) || $sessionUser->isSuperuser()) {
-				$this->setVar([
-					'EVENT_ID'                         => $currentEvent->getId(),
-					'EVENT_STATUS_NAME'                => $currentEvent->getMetadata()->getStatus()->getName(),
-					'EVENT_TITLE'                      => $currentEvent->getTitle(),
-					'EVENT_START_DATETIME'             => $currentEvent->getStartDatetime()->getShort(),
-					'EVENT_TEACHER_IN_CHARGE_ID'       => $currentEvent->getTeacherInCharge()->getId(),
-					'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
-					'EVENT_CREATED_AT'                 => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
-					'EVENT_STUDENTS'                   => $currentEvent->getMetadata()->getStudentAttendees()->count(),
-					'EVENT_RAMS_REQUIRED'              => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
-				]);
+        /** @var \EOTC\Event $currentEvent */
+        foreach ($currentListGroup as $currentEvent) {
+            if ($authenticator->isEOTCAdministratorForCampus($sessionUser,
+                    $currentEvent) || $sessionUser->isSuperuser()) {
+                $this->setVar([
+                    'EVENT_ID'                         => $currentEvent->getId(),
+                    'EVENT_STATUS_NAME'                => $currentEvent->getMetadata()->getStatus()->getName(),
+                    'EVENT_TITLE'                      => $currentEvent->getTitle(),
+                    'EVENT_START_DATETIME'             => $currentEvent->getStartDatetime()->getShort(),
+                    'EVENT_TEACHER_IN_CHARGE_ID'       => $currentEvent->getTeacherInCharge()->getId(),
+                    'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
+                    'EVENT_CREATED_AT'                 => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
+                    'EVENT_STUDENTS'                   => $currentEvent->getMetadata()->getStudentAttendees()->count(),
+                    'EVENT_RAMS_REQUIRED'              => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
+                ]);
 
-				$this->parse('event_block', 'event', true);
+                $this->parse('event_block', 'event', true);
 
-				$i++;
-			}
-		}
+                $i++;
+            }
+        }
 
-		/* Only parse if an event you can manipulate was found
+        /* Only parse if an event you can manipulate was found
          */
-		if ($i) {
-			$this->parse('event_list_group_block', 'event_list_group', true);
-		}
+        if ($i) {
+            $this->parse('event_list_group_block', 'event_list_group', true);
+        }
 
-		/* Clear children after parsing out the parent
+        /* Clear children after parsing out the parent
          */
-		$this->setVar([
-			'event_block' => ''
-		]);
-	}
+        $this->setVar([
+            'event_block' => '',
+        ]);
+    }
 }

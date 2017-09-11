@@ -48,8 +48,8 @@ class EventMapper extends CalendarEventMapper
      */
     protected function getSelectString()
     {
-        $authorMapper          = $this->getJoinMapper('author');
-        $eventTypeMapper       = $this->getJoinMapper('eventType');
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         return "
@@ -80,8 +80,8 @@ class EventMapper extends CalendarEventMapper
      */
     protected function hydrateSelect(\PDOStatement $statement)
     {
-        $authorMapper          = $this->getJoinMapper('author');
-        $eventTypeMapper       = $this->getJoinMapper('eventType');
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         /* Hydrate or die
@@ -160,8 +160,8 @@ class EventMapper extends CalendarEventMapper
                     $eventItem->getMetadata()->getId(),
                     [
                         'order' => [
-                            'created_at' => 'DESC'
-                        ]
+                            'created_at' => 'DESC',
+                        ],
                     ]
                 );
 
@@ -181,26 +181,29 @@ class EventMapper extends CalendarEventMapper
      * will spawn all events regardless of status (it will not skip
      * over any events)
      *
-     * @param array $allowedStatus an array of EOTC\EventStatus ids
+     * @param array               $allowedStatus an array of EOTC\EventStatus ids
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @return ListGroup\Collection
      */
-    public function findAllByListGroups($allowedStatus = [], Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
-    {
-        $authorMapper          = $this->getJoinMapper('author');
-        $eventTypeMapper       = $this->getJoinMapper('eventType');
+    public function findAllByListGroups(
+        $allowedStatus = [],
+        Alaress_Date_Format $from = null,
+        Alaress_Date_Format $to = null
+    ) {
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         // Build a query around from/to dates
-        $queryParts  = [];
+        $queryParts = [];
         $queryParams = [];
         if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
-            $queryParts[]        = 'e.start_datetime >= :from';
+            $queryParts[] = 'e.start_datetime >= :from';
             $queryParams['from'] = $from->getDatabaseDate();
         }
         if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
-            $queryParts[]      = 'e.start_datetime <= :to';
+            $queryParts[] = 'e.start_datetime <= :to';
             $queryParams['to'] = $to->getDatabaseDate();
         }
 
@@ -259,7 +262,8 @@ class EventMapper extends CalendarEventMapper
                 /* Ignore this event, because it's not one of the Status
                  * we've chosen to include
                  */
-                if (count($allowedStatus) && !in_array($eventItem->getMetadata()->getStatus()->getId(), $allowedStatus)) {
+                if (count($allowedStatus) && !in_array($eventItem->getMetadata()->getStatus()->getId(),
+                        $allowedStatus)) {
                     continue;
                 }
 
@@ -303,8 +307,8 @@ class EventMapper extends CalendarEventMapper
      */
     public function findAllByListGroupsForUser($user)
     {
-        $authorMapper          = $this->getJoinMapper('author');
-        $eventTypeMapper       = $this->getJoinMapper('eventType');
+        $authorMapper = $this->getJoinMapper('author');
+        $eventTypeMapper = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         /* Looked for a way to convince GROUP BY to group records with
@@ -333,11 +337,11 @@ class EventMapper extends CalendarEventMapper
         $statement = $this->database->prepare($query);
         $statement->execute(
             [
-                'userId' => $user->getId()
+                'userId' => $user->getId(),
             ]
         );
 
-        $allEvents          = new ListGroupCollection();
+        $allEvents = new ListGroupCollection();
         $processedSeriesIds = [];
 
         /* Hydrate or die
@@ -411,7 +415,7 @@ class EventMapper extends CalendarEventMapper
      * Therefore can't rely on postSave correctly assigning people/relations
      *
      * @param EventMetadata $metadata
-     * @param Event $event
+     * @param Event         $event
      */
     public function updateMetadata($metadata, $event)
     {
@@ -467,7 +471,7 @@ class EventMapper extends CalendarEventMapper
                 'relation' => [
                     'column' => 'metadata_id',
                     'key'    => 'id',
-                    'mapper' => EventMetadataMapper::getInstance()
+                    'mapper' => EventMetadataMapper::getInstance(),
                 ],
             ]
         );
@@ -491,7 +495,7 @@ class EventMapper extends CalendarEventMapper
         $statement = $this->database->prepare($query);
         $statement->execute(
             [
-                'eventId' => $event->getId()
+                'eventId' => $event->getId(),
             ]
         );
     }
@@ -518,7 +522,7 @@ class EventMapper extends CalendarEventMapper
             $statement->execute(
                 [
                     "eventId"  => $event->getId(),
-                    "campusId" => $currentCampus
+                    "campusId" => $currentCampus,
                 ]
             );
         }
@@ -548,7 +552,7 @@ class EventMapper extends CalendarEventMapper
                 'relation' => [
                     'column' => 'campus_id',
                     'key'    => 'id',
-                    'mapper' => CampusMapper::getInstance()
+                    'mapper' => CampusMapper::getInstance(),
                 ],
             ]
         );
@@ -572,7 +576,7 @@ class EventMapper extends CalendarEventMapper
         $statement = $this->database->prepare($query);
         $statement->execute(
             [
-                'eventId' => $event->getId()
+                'eventId' => $event->getId(),
             ]
         );
     }
@@ -599,7 +603,7 @@ class EventMapper extends CalendarEventMapper
             $statement->execute(
                 [
                     "eventId" => $event->getId(),
-                    "roleId"  => $currentRole
+                    "roleId"  => $currentRole,
                 ]
             );
         }
@@ -629,7 +633,7 @@ class EventMapper extends CalendarEventMapper
                 'relation' => [
                     'column' => 'role_id',
                     'key'    => 'id',
-                    'mapper' => RoleMapper::getInstance()
+                    'mapper' => RoleMapper::getInstance(),
                 ],
             ]
         );
@@ -653,7 +657,7 @@ class EventMapper extends CalendarEventMapper
         $statement = $this->database->prepare($query);
         $statement->execute(
             [
-                'eventId' => $event->getId()
+                'eventId' => $event->getId(),
             ]
         );
     }
