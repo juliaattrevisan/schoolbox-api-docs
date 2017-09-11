@@ -49,7 +49,7 @@
                                     {% else %}
                                         <a href="/search/user/{{ owner.id }}">{{ owner.fullName }}</a>
                                     {% endif %}
-                                    <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.postDate.getRelativeTime }}</span>
+                                    <span title="Published on {{ item.publishDate.getLongDateOnly }}">{{ item.publishDate.getRelativeTime }}</span>
                                 </p>
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                                     {% else %}
                                         <a href="/search/user/{{ owner.id }}">{{ owner.firstname }} {{ owner.lastname }}</a>
                                     {% endif %}
-                                    <span title="Published on {{ item.published.getLongDateOnly }}">{{ item.postDate.getRelativeTime }}</span></p>
+                                    <span title="Published on {{ item.publishDate.getLongDateOnly }}">{{ item.publishDate.getRelativeTime }}</span>
                             </div>
                         </div>
                         {% if modify %}
