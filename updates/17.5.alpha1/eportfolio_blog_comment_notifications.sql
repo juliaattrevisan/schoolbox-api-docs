@@ -11,8 +11,8 @@ INSERT INTO `msg_source`
 (`namespace`, `key`, `role_type`, `description`)
 VALUES
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'posted', 'student', 'someone posts to your eportfolio blog'),
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'posted', 'staff',   'your student posts to their eportfolio blog'),
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'posted', 'parent',  'your child posts to their eportfolio blog');
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'posted', 'staff',   'someone posts to your student\'s eportfolio blog'),
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'posted', 'parent',  'someone posts to your child\'s eportfolio blog');
 
 -- Student (Instant + Email)
 INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
@@ -61,7 +61,7 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
 INSERT INTO `msg_source`
 (`namespace`, `key`, `role_type`, `description`)
 VALUES
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'student', 'someone comments on a blog on your Eportfolio'),
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'student', 'someone comments on a your eportfolio blog'),
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'staff',   'someone comments on a eportfolio blog post you authored');
 
 -- Receive 'Eportfolio Blog' 'followed' messages when:
