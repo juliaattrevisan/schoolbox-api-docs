@@ -220,18 +220,18 @@ class EventMapper extends CalendarEventMapper
          * I'll just postprocess them
          */
         $query = "
-			SELECT
-				{$this->getColumnString('e')},
-				{$authorMapper->getColumnString('a')},
-				{$teacherInChargeMapper->getColumnString('c')},
-				{$eventTypeMapper->getColumnString('t')}
-			FROM `{$this->table}` e
-			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			{$sql}
-			ORDER BY e.start_datetime
-		";
+            SELECT
+                {$this->getColumnString('e')},
+                {$authorMapper->getColumnString('a')},
+                {$teacherInChargeMapper->getColumnString('c')},
+                {$eventTypeMapper->getColumnString('t')}
+            FROM `{$this->table}` e
+            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
+            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            {$sql}
+            ORDER BY e.start_datetime
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute($queryParams);
@@ -320,19 +320,19 @@ class EventMapper extends CalendarEventMapper
          * I'll just postprocess them
          */
         $query = "
-			SELECT
-				{$this->getColumnString('e')},
-				{$authorMapper->getColumnString('a')},
-				{$teacherInChargeMapper->getColumnString('c')},
-				{$eventTypeMapper->getColumnString('t')}
-			FROM `{$this->table}` e
-			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			WHERE e.author_id = :userId
-			OR e.teacher_in_charge_id = :userId
-			ORDER BY e.start_datetime
-		";
+            SELECT
+                {$this->getColumnString('e')},
+                {$authorMapper->getColumnString('a')},
+                {$teacherInChargeMapper->getColumnString('c')},
+                {$eventTypeMapper->getColumnString('t')}
+            FROM `{$this->table}` e
+            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
+            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            WHERE e.author_id = :userId
+            OR e.teacher_in_charge_id = :userId
+            ORDER BY e.start_datetime
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(
@@ -383,9 +383,9 @@ class EventMapper extends CalendarEventMapper
 
                     $allEvents->add($eventItem);
                 }
-            } /* Otherwise just add the one-off event
-			 */
-            else {
+            } else {
+                /* Otherwise just add the one-off event
+                 */
                 $allEvents->add($eventItem);
             }
         }
@@ -488,9 +488,9 @@ class EventMapper extends CalendarEventMapper
     public function deleteMetadataRelations($event)
     {
         $query = "
-			DELETE FROM `eotc_event_metadata`
-			WHERE event_id = :eventId
-		";
+            DELETE FROM `eotc_event_metadata`
+            WHERE event_id = :eventId
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(
@@ -508,9 +508,9 @@ class EventMapper extends CalendarEventMapper
     private function createCampus($event)
     {
         $query = "
-			INSERT INTO `eotc_event_campus` (event_id, campus_id)
-			VALUES (:eventId, :campusId)
-		";
+            INSERT INTO `eotc_event_campus` (event_id, campus_id)
+            VALUES (:eventId, :campusId)
+        ";
 
         $statement = $this->database->prepare($query);
 
@@ -569,9 +569,9 @@ class EventMapper extends CalendarEventMapper
     public function deleteCampusRelations($event)
     {
         $query = "
-			DELETE FROM `eotc_event_campus`
-			WHERE event_id = :eventId
-		";
+            DELETE FROM `eotc_event_campus`
+            WHERE event_id = :eventId
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(
@@ -589,9 +589,9 @@ class EventMapper extends CalendarEventMapper
     private function createRole($event)
     {
         $query = "
-			INSERT INTO `eotc_event_role` (event_id, role_id)
-			VALUES (:eventId, :roleId)
-		";
+            INSERT INTO `eotc_event_role` (event_id, role_id)
+            VALUES (:eventId, :roleId)
+        ";
 
         $statement = $this->database->prepare($query);
 
@@ -650,9 +650,9 @@ class EventMapper extends CalendarEventMapper
     public function deleteRoleRelations($event)
     {
         $query = "
-			DELETE FROM `eotc_event_role`
-			WHERE event_id = :eventId
-		";
+            DELETE FROM `eotc_event_role`
+            WHERE event_id = :eventId
+        ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(
