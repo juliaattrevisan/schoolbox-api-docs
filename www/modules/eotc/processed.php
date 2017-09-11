@@ -88,6 +88,7 @@ $this->dropDown(
         'type' => 'REPORT_TIMESPAN_NAME',
     ]
 );
+$this->setVar('CLASS_REPORT_DATE', $timespanType === 'all' ? 'hide' : '');
 $this->setVar('REPORT_DATE_START', $dateFrom);
 $this->setVar('REPORT_DATE_END', $dateTo);
 

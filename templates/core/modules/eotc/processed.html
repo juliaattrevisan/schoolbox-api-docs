@@ -1,3 +1,16 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // User selects a different report period from dropdown
+        $('[name=reportTimespan]').on('change', function() {
+            $('[data-date-start], [data-date-end]').toggleClass('hide', $(this).val() === 'all');
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <ul class="breadcrumb">
 	<li><a href='/modules/eotc/review' title="{TPL_LOCAL_EOTC_PLURAL_PC}">{TPL_LOCAL_EOTC_PLURAL_PC}</a></li>
 	<li><a class="active" title="Processed Events">Processed Events</a></li>
@@ -27,10 +40,10 @@
 							<!-- END report_timespan -->
 						</select>
 					</div>
-					<div class="small-12 medium-4 columns" data-date-start>
+					<div class="small-12 medium-4 columns {CLASS_REPORT_DATE}" data-date-start>
 						<input name="reportDateStart" type="text" value="{REPORT_DATE_START}" data-datepicker data-datepicker-buttontext="">
 					</div>
-					<div class="small-12 medium-4 columns" data-date-end>
+					<div class="small-12 medium-4 columns {CLASS_REPORT_DATE}" data-date-end>
 						<input name="reportDateEnd" type="text" value="{REPORT_DATE_END}" data-datepicker data-datepicker-buttontext="">
 					</div>
 					<div class="small-12 medium-4 large-2 columns">
