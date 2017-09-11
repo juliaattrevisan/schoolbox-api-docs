@@ -306,7 +306,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         $allBlogs = $allBlogs->filter(function($blog) {
             /** @var Schoolbox\Blog\Eportfolio\Post\Model $blog */
-            return $this->canUserViewPage($blog->getPageId());
+            return $this->canUserViewPage($blog->getPage()->getPageId());
         });
 
         if ($allBlogs->count()) {
@@ -317,7 +317,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     'RECENT_BLOG_BLOG_ID' => $currentBlog->getId(),
                     'RECENT_BLOG_TITLE' => $currentBlog->getHeading(),
                     'RECENT_BLOG_CREATED_AT' => $currentBlog->getCreatedAt()->getRelativeTime(),
-                    'RECENT_BLOG_PAGE_ID' => $currentBlog->getPageId(),
+                    'RECENT_BLOG_PAGE_ID' => $currentBlog->getPage()->getPageId(),
                 ));
 
                 $this->getPage()->parse('recent_blog_block', 'recent_blog', true);

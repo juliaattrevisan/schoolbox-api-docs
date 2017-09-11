@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Eportfolio\PageMapper;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -30,13 +31,13 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('page_id', self::TYPE_INTEGER);
+        $this->joins('page_id', PageMapper::class, 'page_id', null, null, 'page', 'page');
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->uses('heading', self::TYPE_STRING);
+        $this->uses('body', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->uses('heading', self::TYPE_STRING);
-        $this->uses('body', self::TYPE_STRING);
     }
 
     /**
@@ -55,7 +56,7 @@ class Mapper extends BaseMapper
 				{$this->getJoinColumnString('owner', 'u')}
 			FROM `{$this->getTable()}` AS `b`
             INNER JOIN {$this->getJoinSql('owner', 'b', 'u', true)}
-            JOIN `eportfolio_page` p ON p.page_id = b.page_id
+            INNER JOIN {$this->getJoinSql('page', 'b', 'p', true)}
 			WHERE `b`.`deleted_at` IS NULL
 				AND `p`.`uid` = :owner_id
 				AND `p`.`deleted_at` IS NULL

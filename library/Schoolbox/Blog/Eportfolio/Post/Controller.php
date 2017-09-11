@@ -86,7 +86,7 @@ class Controller extends Base
         /** @var EportfolioBlogModel $record */
         $record = $this->getEportfolioBlogMapper()->createModel();
         $record->setOwner($this->getUser());
-        $record->setPageId($page->getPageId());
+        $record->setPage($page);
         $this->postModify($page, $record);
     }
 

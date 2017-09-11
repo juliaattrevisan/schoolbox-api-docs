@@ -173,7 +173,7 @@ class Module extends BaseModule
                         $blog              = $this->getEportfolioBlogMapper()->findById($params['id']);
                         $newParams['blog'] = $blog;
                         // Add page in next step
-                        $params['pageId']  = $blog->getPageId();
+                        $params['pageId']  = $blog->getPage()->getPageId();
                     }
                     if (array_key_exists('pageId', $params)) {
                         $newParams['page'] = $this->getEportfolioPageMapper()->findById($params['pageId']);

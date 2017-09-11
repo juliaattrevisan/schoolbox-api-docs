@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
+use Eportfolio\Page;
 
 class Model implements ISoftDeletable
 {
@@ -26,8 +27,8 @@ class Model implements ISoftDeletable
 	/** @var User */
 	protected $owner;
 
-	/** @var Integer */
-	protected $pageId;
+	/** @var Page */
+	protected $page;
 
 	/** @var string */
 	protected $heading;
@@ -36,19 +37,19 @@ class Model implements ISoftDeletable
 	protected $body;
 
 	/**
-	 * @param int $pageId
+	 * @param Page $page
 	 * @return self
 	 */
-	public function setPageId($pageId) {
-		$this->pageId = $pageId;
+	public function setPage(Page $page) {
+		$this->page = $page;
 		return $this;
 	}
 
 	/**
-	 * @return int
+	 * @return Page
 	 */
-	public function getPageId() {
-		return $this->pageId;
+	public function getPage() {
+		return $this->page;
 	}	
 
 
