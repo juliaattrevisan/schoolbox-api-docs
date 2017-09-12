@@ -58,6 +58,56 @@ class Module extends BaseModule
             )
         );
 
+        $canDeleteFeedback = new Rule\IsSuperuser();
+
+        // preloads
+        $preloadParticipant = function ($params) {
+            return [
+                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId'])
+            ];
+        };
+
+        $preloadFeedback = function ($params) {
+            return [
+                'feedback' => $this->preloadFeedback($params['assessmentId'], $params['feedbackId'])
+            ];
+        };
+
+        $preloadParticipantAndResponse = function ($params) {
+            return [
+                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
+                'response'    => $this->preloadResponse($params['assessmentId'], $params['responseId'])
+            ];
+        };
+
+        $assessmentRoute  = 'assessments/{assessmentId:\d+}';
+        $participantRoute = $assessmentRoute . '/{studentId:\d+}';
+        $feedbackRoute    = 'feedback/{feedbackId:\d+}';
+
+        $this->register(
+            'POST',
+            "/{$participantRoute}/feedback",
+            'postParticipantFeedback',
+            $canGiveFeedbackFromParticipant,
+            $preloadParticipant
+        );
+
+        $this->register(
+            'POST',
+            "/{$participantRoute}{/responseId}/feedback",
+            'postResponseFeedback',
+            $canGiveFeedbackFromParticipant,
+            $preloadParticipantAndResponse
+        );
+
+        $this->register(
+            'DELETE',
+            "/{$assessmentRoute}/$feedbackRoute",
+            'deleteAssessmentFeedback',
+            $canDeleteFeedback,
+            $preloadFeedback
+        );
+
         // If multiple feedbacks are passed in the POST['feedback'] array we need to check that the logged in user has
         // write access to each of the folders these assessables are stored in. This is horrible- but I can't find a
         // way to create dynamic permissions based on the contents of POST data any other way
@@ -113,61 +163,11 @@ class Module extends BaseModule
             $canGiveFeedbackFromAllParticipants = new Rule\IsSuperuser();
         }
 
-        $canDeleteFeedback = new Rule\IsSuperuser();
-
-        // preloads
-        $preloadParticipant = function ($params) {
-            return [
-                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId'])
-            ];
-        };
-
-        $preloadFeedback = function ($params) {
-            return [
-                'feedback' => $this->preloadFeedback($params['assessmentId'], $params['feedbackId'])
-            ];
-        };
-
-        $preloadParticipantAndResponse = function ($params) {
-            return [
-                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
-                'response'    => $this->preloadResponse($params['assessmentId'], $params['responseId'])
-            ];
-        };
-
-        $assessmentRoute  = 'assessments/{assessmentId:\d+}';
-        $participantRoute = $assessmentRoute . '/{studentId:\d+}';
-        $feedbackRoute    = 'feedback/{feedbackId:\d+}';
-
-        $this->register(
-            'POST',
-            "/{$participantRoute}/feedback",
-            'postParticipantFeedback',
-            $canGiveFeedbackFromParticipant,
-            $preloadParticipant
-        );
-
         $this->register(
             'POST',
             "/assessments/feedbacks",
             'postParticipantFeedbacks',
             $canGiveFeedbackFromAllParticipants
-        );
-
-        $this->register(
-            'POST',
-            "/{$participantRoute}{/responseId}/feedback",
-            'postResponseFeedback',
-            $canGiveFeedbackFromParticipant,
-            $preloadParticipantAndResponse
-        );
-
-        $this->register(
-            'DELETE',
-            "/{$assessmentRoute}/$feedbackRoute",
-            'deleteAssessmentFeedback',
-            $canDeleteFeedback,
-            $preloadFeedback
         );
     }
 
