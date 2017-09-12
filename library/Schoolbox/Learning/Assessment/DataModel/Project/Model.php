@@ -283,4 +283,20 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
         $this->owner = $owner;
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isSpecificationContext()
+    {
+        return $this->getAssessmentModel()->getAssessmentContext()->isSpecificationContext();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isImplementationContext()
+    {
+        return $this->getAssessmentModel()->getAssessmentContext()->isImplementationContext();
+    }
 }

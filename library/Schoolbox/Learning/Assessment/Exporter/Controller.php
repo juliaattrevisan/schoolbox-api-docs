@@ -179,7 +179,7 @@ class Controller extends BaseController
             ->setCloseAt($end);
 
         // Replicate !
-        $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context);
+        $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser());
 
         // Recursive case
         if($assessmentSpec instanceof Project){

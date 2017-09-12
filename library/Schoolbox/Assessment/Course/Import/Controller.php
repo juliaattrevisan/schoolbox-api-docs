@@ -25,6 +25,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -534,7 +535,7 @@ class Controller extends Base\Base
      * @var int      $post['course_spec_id']
      * @var int|null $post['course_impl_id']
      * @var int|null $post['component_id']
-     * @var string   $post['ownerships']
+     * @var string   $post['ownerships']                                       comma-separated 'classId:userId' pairs
      * @var array    $post['unit']  Indexed by unitSpec.id
      * @var int      $post['unit'][unitSpecId]['unit_spec_id']
      * @var int|null $post['unit'][unitSpecId]['unit_impl_id']
@@ -560,6 +561,13 @@ class Controller extends Base\Base
         $ownerships = trim($post['ownerships']);
         $unitImplData = $post['unit'];
 
+        // Convert class owners to convenient data structure
+        $classOwners = [];
+        foreach (explode(',', $ownerships) as $classAndUser) {
+            list($classFolderId, $userId) = explode(':', $classAndUser);
+            $classOwners[$classFolderId] = $this->userMapper->findById($userId);
+        }
+
         // Algorithm:
         //
         // 1. Create a graph of the CourseImpl that exists in DB
@@ -581,13 +589,11 @@ class Controller extends Base\Base
         $courseImpls = [];
 
         // Are we creating a new import?
-        if ('import' == $action) {
+        if ('import' === $action) {
             $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
-            $ownerships = explode(',', $ownerships);
-            foreach ($ownerships as $ownership) {
+            foreach ($classOwners as $classFolderId => $user) {
                 $courseImpl = $this->getCourseImplementationMapper()->createModel();
                 $courseImpl->setSpecification($courseSpec);
-                $classFolderId = explode(':', $ownership)[0];
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
             }
@@ -676,9 +682,7 @@ class Controller extends Base\Base
                     if (is_array($unitPair['a'])) {
                         // Create/Update AssessmentImpls
                         foreach ($unitPair['a'] as $aData) {
-
-                            $this->parseAssessmentForm($unitImpl, $aData);
-
+                            $this->parseAssessmentForm($unitImpl, $aData, $classOwners[$classFolderId]);
                         }
                     }
                 }
@@ -692,7 +696,7 @@ class Controller extends Base\Base
                  * else
                  *   create a new CourseOutline component (at top of the page)
                  */
-                if ('import' == $action) {
+                if ('import' === $action) {
                     $componentInstance = null;
                     $compInstanceMapper = $this->getComponentInstanceMapper();
                     // Was a componentId supplied?
@@ -725,14 +729,15 @@ class Controller extends Base\Base
      * Recursive method to create/update assessments using form data
      *
      * @param AssessmentContext $context
-     * @param array $data
+     * @param array             $data
+     * @param User              $newOwner
      * @var null|int      $data['spec_id']    Will be null if not imported from a Spec
      * @var null|int      $data['impl_id']    Will be null if not yet imported
      * @var null|1        $data['checked']    Did user check the item?
      * @var null|string[] $data['dates']
      * @var null|mixed[]  $data['a']          If this assessment is a Project, the data for its sub-assessables
      */
-    protected function parseAssessmentForm(AssessmentContext $context, array $data)
+    protected function parseAssessmentForm(AssessmentContext $context, array $data, User $newOwner)
     {
         $specId    = isset($data['spec_id']) ? $data['spec_id'] : null;
         $implId    = isset($data['impl_id']) ? $data['impl_id'] : null;
@@ -771,7 +776,7 @@ class Controller extends Base\Base
 
         if(!$implId){
             // INSERT - Create Impl from Spec
-            $newAssessment = $this->replicator->replicateInNewContext($assessment, $context);
+            $newAssessment = $this->replicator->replicateInNewContext($assessment, $context, $newOwner);
         } else {
             // UPDATE
             $newAssessment = null;
@@ -783,7 +788,7 @@ class Controller extends Base\Base
             foreach($subData as $subDatum){
                 /** @var Project $project */
                 $project = $newAssessment ?: $assessment;
-                $this->parseAssessmentForm($project, $subDatum);
+                $this->parseAssessmentForm($project, $subDatum, $newOwner);
             }
         }
     }
