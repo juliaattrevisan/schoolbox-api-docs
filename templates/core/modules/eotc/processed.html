@@ -1,6 +1,4 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/shared/jquery.artificial-print.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery.tablesorter/js/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript">
     $(function () {
@@ -60,7 +58,7 @@
 
 <div class="row hide-for-print">
     <div class="small-12 island">
-        <form data-form_type="search" id="reportSearchForm">
+        <form id="reportSearchForm">
             <section class="content flex-container">
                 <div class="item">
                     <h4>Timespan</h4>
@@ -97,7 +95,7 @@
                     <label for="reportStatus-{REPORT_STATUS_ID}" class="checkbox-label">{REPORT_STATUS_NAME}</label>
                     <!-- END report_status -->
                 </div>
-                <input type="submit" title="Search" value='Search' data-action="search">
+                <input type="submit" title="Search" value="Search">
             </section>
         </form>
     </div>
