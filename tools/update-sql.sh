@@ -3,7 +3,7 @@
 # Description:
 #       Updates the database schema and values to match the installed version
 #       Completes all the updates between the current and new versions
-#       For each update release, the sql scripts are run first, then the php scripts
+#       For each update release, the update scripts are run in alphanumeric order
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   2012 Alaress Pty Ltd
