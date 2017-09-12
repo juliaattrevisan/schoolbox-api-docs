@@ -57,28 +57,37 @@ class Module extends BaseModule
             )
         );
 
-        // If multiple feedbacks are passed in the POST['feeback'] array we need to check that the logged in user has
+        // If multiple feedbacks are passed in the POST['feedback'] array we need to check that the logged in user has
         // write access to each of the folders these assessables are stored in. This is horrible- but I can't find a
         // way to create dynamic permissions based on the contents of POST data any other way
 
         if (isset($_POST['feedback'])) {
             $ruleArguments = [];
+            $testedAssessmentIds = [];
 
             foreach ($_POST['feedback'] as $feedback) {
-                // Find each assessable
+
+                // Find each assessable and check we can write to it
 
                 /** @var int $assessmentId */
                 $assessmentId = $feedback['assessmentId'];
 
-                $assessment = $this->getAssessmentDataSource()->findById((int)$assessmentId);
+                // Only need to do this once per assessment
 
-                // Make sure the current user has access to write to the folder in which the assessable is located
+                if (!in_array($assessmentId, $testedAssessmentIds)) {
 
-                $ruleArguments[] = new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_WRITE,
-                    $assessment->getContext()->getFolder()->getId(),
-                    Access::getInstance()
-                );
+                    $assessment = $this->getAssessmentDataSource()->findById((int)$assessmentId);
+
+                    // Make sure the current user has access to write to the folder in which the assessable is located
+
+                    $ruleArguments[] = new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        $assessment->getContext()->getFolder()->getId(),
+                        Access::getInstance()
+                    );
+
+                    $testedAssessmentIds[] = $assessmentId;
+                }
             }
 
             if (count($ruleArguments) > 0) {
