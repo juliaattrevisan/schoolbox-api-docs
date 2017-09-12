@@ -1,66 +1,142 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        var searchForm = $('form#reportSearchForm'),
+            inputTimespan = searchForm.find('#reportTimespan'),
+            inputStartDate = searchForm.find('#reportDateStart'),
+            inputEndDate = searchForm.find('#reportDateEnd');
+
+        // User searches
+        searchForm.on('submit', function (event) {
+            event.preventDefault();
+
+            var timespan = inputTimespan.val(),
+                location = '/modules/eotc/processed';
+            if (timespan === 'all') {
+                location = location + '/all';
+            } else if (timespan === 'range') {
+                // Turn into moments, then translate into URL formats
+                var startDate = moment(inputStartDate.val(), dateDisplayFormats.momentJs),
+                    endDate = moment(inputEndDate.val(), dateDisplayFormats.momentJs);
+                location = location + '/range/'
+                    + (startDate.isValid() ? startDate.format('DD-MM-YYYY') : '') + '/'
+                    + (endDate.isValid() ? endDate.format('DD-MM-YYYY') : '');
+            }
+
+            // Add selected statuses
+            location = location + '?' + $('input[name="status[]"]').serialize();
+
+            // Redirect
+            window.location.href = location;
+        });
+
+        // User selects a different report period from dropdown
+        inputTimespan.on('change', function () {
+            $('[data-date-start], [data-date-end]').toggleClass('hide', $(this).val() === 'all');
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <ul class="breadcrumb">
-	<li><a href='/modules/eotc/review' title="{TPL_LOCAL_EOTC_PLURAL_PC}">{TPL_LOCAL_EOTC_PLURAL_PC}</a></li>
-	<li><a class="active" title="Processed Events">Processed Events</a></li>
+    <li><a href='/modules/eotc/review' title="{TPL_LOCAL_EOTC_PLURAL_PC}">{TPL_LOCAL_EOTC_PLURAL_PC}</a></li>
+    <li><a class="active" title="Processed Events">Processed Events</a></li>
 </ul>
 
 <div class="actions-small-1 row">
-	<div class="list-item">
-		<div class="small-12 columns">
-			<h1>Processed {TPL_LOCAL_EOTC_PC} Events</h1>
-		</div>
-	</div>
-	<nav>
-		<a href='/modules/eotc/review' class="icon-list" title="View all Reviewable {TPL_LOCAL_EOTC_PC} Events"></a>
-	</nav>
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Processed {TPL_LOCAL_EOTC_PC} Events</h1>
+        </div>
+    </div>
+    <nav>
+        <a href='/modules/eotc/review' class="icon-list" title="View all Reviewable {TPL_LOCAL_EOTC_PC} Events"></a>
+    </nav>
+</div>
+
+<div class="row hide-for-print">
+    <div class="small-12 island">
+        <form id="reportSearchForm">
+            <section class="content flex-container">
+                <div class="item">
+                    <h4>Timespan</h4>
+                    <select id="reportTimespan" name="reportTimespan">
+                        <!-- BEGIN report_timespan -->
+                        <option value="{REPORT_TIMESPAN_ID}" {REPORT_TIMESPAN_ID_SELECTED}>{REPORT_TIMESPAN_NAME}
+                        </option>
+                        <!-- END report_timespan -->
+                    </select>
+                </div>
+                <div class="item {CLASS_REPORT_DATE}" data-date-start>
+                    <h4>From</h4>
+                    <input id="reportDateStart" name="reportDateStart" type="text" value="{REPORT_DATE_START}"
+                           data-datepicker data-datepicker-buttontext="">
+                </div>
+                <div class="item {CLASS_REPORT_DATE}" data-date-end>
+                    <h4>To</h4>
+                    <input id="reportDateEnd" name="reportDateEnd" type="text" value="{REPORT_DATE_END}"
+                           data-datepicker data-datepicker-buttontext="">
+                </div>
+
+                <div class="item">
+                    <h4>Status</h4>
+                    <input type="checkbox" id="reportStatusAll" value="{}" name="" data-select-all data-select-all-for-group="status"  />
+                    <label for="reportStatusAll" class="checkbox-label">Select all</label>
+
+                    <!-- BEGIN report_status -->
+                    <input type="checkbox"
+                           id="reportStatus-{REPORT_STATUS_ID}"
+                           value="{REPORT_STATUS_ID}"
+                           name="status[]"
+                           {REPORT_STATUS_ID_SELECTED}
+                           data-select-all-group="status" />
+                    <label for="reportStatus-{REPORT_STATUS_ID}" class="checkbox-label">{REPORT_STATUS_NAME}</label>
+                    <!-- END report_status -->
+                </div>
+                <input type="submit" title="Search" value="Search">
+            </section>
+        </form>
+    </div>
 </div>
 
 <!-- BEGIN event_list_group -->
 <div class="row">
     <div class="small-12 columns">
-		<h2 class="subheader">{EVENT_LIST_GROUP_NAME}</h2>
-
-		<div class="scrollable">
-			<table>
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>Title</th>
-						<th>Teacher In Charge</th>
-						<th>Created</th>
-						<th>Students</th>
-						<th>{TPL_LOCAL_EOTCRAMSABBREVIATION} Required</th>
-						<th>Status</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					<!-- BEGIN event -->
-					<tr>
-						<td>{EVENT_START_DATETIME}</td>
-						<td>{EVENT_TITLE}</td>
-						<td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
-						<td>{EVENT_CREATED_AT}</td>
-						<td>{EVENT_STUDENTS}</td>
-						<td>{EVENT_RAMS_REQUIRED}</td>
-						<td>{EVENT_STATUS_NAME}</td>
-						<td class="actions-small-1">
-							<nav>
-								<a href="/modules/eotc/status/modify/{EVENT_ID}" class="icon-view" title="View"></a>
-							</nav>
-						</td>
-					</tr>
-					<!-- END event -->
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
-<!-- END event_list_group -->
-
-<!-- BEGIN has_all -->
-<div class="row">
-    <div class="small-12 columns">
-      	<a href="/modules/eotc/processed/all" class="submit">View All Approved/Cancelled Events</a>
+        <h2 class="subheader">{EVENT_LIST_GROUP_NAME}</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Teacher In Charge</th>
+                <th>Created</th>
+                <th>Students</th>
+                <th>{TPL_LOCAL_EOTCRAMSABBREVIATION} Required</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN event -->
+            <tr>
+                <td>{EVENT_START_DATETIME}</td>
+                <td>{EVENT_TITLE}</td>
+                <td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
+                <td>{EVENT_CREATED_AT}</td>
+                <td>{EVENT_STUDENTS}</td>
+                <td>{EVENT_RAMS_REQUIRED}</td>
+                <td>{EVENT_STATUS_NAME}</td>
+                <td class="actions-small-1">
+                    <nav>
+                        <a href="/modules/eotc/status/modify/{EVENT_ID}" class="icon-view" title="View"></a>
+                    </nav>
+                </td>
+            </tr>
+            <!-- END event -->
+            </tbody>
+        </table>
     </div>
 </div>
-<!-- END has_all -->
+<!-- END event_list_group -->
