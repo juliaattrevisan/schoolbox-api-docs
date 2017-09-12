@@ -117,7 +117,6 @@ class Module extends BaseModule
             $testedAssessmentIds = [];
 
             foreach ($_POST['feedback'] as $feedback) {
-
                 // Find each assessable and check we can write to it
 
                 /** @var int $assessmentId */
@@ -126,7 +125,6 @@ class Module extends BaseModule
                 // Only need to do this once per assessment
 
                 if (!in_array($assessmentId, $testedAssessmentIds)) {
-
                     $assessment = $this->getAssessmentDataSource()->findById((int)$assessmentId);
 
                     // Make sure the current user has access to write to the folder in which the assessable is located

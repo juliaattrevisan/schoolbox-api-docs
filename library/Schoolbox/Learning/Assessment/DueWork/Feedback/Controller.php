@@ -120,7 +120,7 @@ class Controller extends Base
 
             $formData = [
                 'response' => $response,
-                'publish' => 1
+                'publish' => '1'
             ];
 
             foreach ($feedback['formData'] as $data) {
