@@ -156,13 +156,15 @@ The synchronisation requires two items to proceed.
 
 As previously explained, the first is a global setting. The second is a per-event setting. This allows synchronisation to occur on a per-event basis. If both items are switched on, when the event enters Approved status, it'll automatically be uploaded into Synergetic. You can find it in synweb under *Student Maintenance > Excursion Maintenance*.
 
-## 11. Processed Events
-http://192.168.36.10/modules/eotc/processed
-http://192.168.36.10/modules/eotc/processed/all
+## 11. Event Report
+http://192.168.36.10/modules/eotc/report
 
-This is a list of EOTC events that is filtered by status; by default, it shows events that have entered either the
-Approved or Cancelled statuses. By default it only shows events that start in the future, or started one month into the
-past. This is because the event list became extremely long and slow to load so we limited its data set.
+This is a list of EOTC events that is filtered by status. By default, it shows:
+
+* events that have entered either the Approved or Cancelled statuses
+* events that start at earliest one month ago
+
+It does not by default show all events, because the event list became extremely long and slow to load.
 However, you can view the entire unabridged list by selecting *All* as the timespan, and clicking *Search*.
 
 ## 12. Display In Calendar
