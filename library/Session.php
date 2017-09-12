@@ -50,11 +50,11 @@ class Session
      */
     public static function getIP()
     {
-        if ($_SERVER['HTTP_CLIENT_IP']) {
+        if (isset($_SERVER['HTTP_CLIENT_IP']) && !empty($_SERVER['HTTP_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif ($_SERVER['HTTP_X_FORWARDED_FOR']) {
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } elseif ($_SERVER['REMOTE_ADDR']) {
+        } elseif (isset($_SERVER['REMOTE_ADDR']) && !empty($_SERVER['REMOTE_ADDR'])) {
             $ip = $_SERVER['REMOTE_ADDR'];
         } else {
             $ip = "UNKNOWN";
