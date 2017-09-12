@@ -99,6 +99,14 @@ then
     exit;
 fi
 
+# Ensure all required resources are available before update, hard fail if not
+$instdir/tools/notif/syscheck.ph -v;
+if [ $? -ne 0 ];
+then
+    echo "Error: all system dependencies must be available to start the update"
+    exit $?;
+fi
+
 # Only run DB backup if not completed in the last hour
 existingbackup=$(ls -1 $backupdir/$sqlver-`date +%Y-%m-%d_%H-`*.sql 2>/dev/null);
 if [[ (-f $existingbackup) && (! -z $existingbackup) ]];
