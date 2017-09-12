@@ -10,7 +10,6 @@
  * @version     SVN: $Id$
  */
 
-use EOTC\EventMapper;
 use EOTC\EventStatusMapper;
 
 /** @var SitePage $this */
@@ -32,80 +31,3 @@ SitePage::localRedir(
     )
 );
 exit;
-
-/* Only EOTC Administrators can view this page
- */
-$authenticator = new \EOTC\Authenticator($this);
-
-/** @var \Schoolbox\User $sessionUser */
-$sessionUser = $_SESSION['user'];
-
-if (!$authenticator->isEOTCAdministrator($sessionUser)) {
-    error(19);
-}
-
-$this->setFile(TEMPLATE_content, 'modules/eotc/review.html');
-$this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
-$this->setBlock('event_list_group', 'event', 'event_block');
-
-$this->setVar([
-    'event_list_group_block' => '',
-]);
-
-/** @var \EOTC\ListGroup\Collection $allListGroups */
-$allListGroups = EventMapper::getInstance()->findAllByListGroups([
-    EventStatusMapper::STATUS_DRAFT,
-    EventStatusMapper::STATUS_INPRINCIPLE,
-    EventStatusMapper::STATUS_DETAILSCOMPLETED,
-    EventStatusMapper::STATUS_READYFORFINALAPPROVAL,
-    EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
-], Alaress_Date_Format::now()->addMonths(-6));
-
-/** @var Schoolbox\L10n\RosettaStone $l10n */
-$l10n = $this->getDi()->get('l10n');
-
-foreach ($allListGroups as $key => $currentListGroup) {
-    if ($currentListGroup->count()) {
-        $this->setVar([
-            'EVENT_LIST_GROUP_NAME' => $l10n->translateSentence($allListGroups->getCurrentName($key)),
-        ]);
-
-        $i = 0;
-
-        /** @var \EOTC\Event $currentEvent */
-        foreach ($currentListGroup as $currentEvent) {
-
-            /* Only list events you can manipulate
-             */
-            if ($authenticator->isEOTCAdministrator($sessionUser, $currentEvent)) {
-                $this->setVar([
-                    'EVENT_ID'                         => $currentEvent->getId(),
-                    'EVENT_STATUS_NAME'                => $currentEvent->getMetadata()->getStatus()->getName(),
-                    'EVENT_TITLE'                      => $currentEvent->getTitle(),
-                    'EVENT_START_DATETIME'             => $currentEvent->getStartDatetime()->getShort(),
-                    'EVENT_TEACHER_IN_CHARGE_ID'       => $currentEvent->getTeacherInCharge()->getId(),
-                    'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
-                    'EVENT_CREATED_AT'                 => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
-                    'EVENT_STUDENTS'                   => $currentEvent->getMetadata()->getStudentAttendees()->count(),
-                    'EVENT_RAMS_REQUIRED'              => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
-                ]);
-
-                $this->parse('event_block', 'event', true);
-
-                $i++;
-            }
-        }
-
-        /* Only parse if an event you can manipulate was found
-         */
-        if ($i) {
-            $this->parse('event_list_group_block', 'event_list_group', true);
-        }
-
-        /* Clear children after parsing out the parent
-         */
-        $this->setVar([
-            'event_block' => '',
-        ]);
-    }
-}
