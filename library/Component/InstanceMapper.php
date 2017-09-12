@@ -59,7 +59,7 @@ class Component_InstanceMapper extends BaseMapper
         $this->uses('sequence', self::TYPE_INTEGER);
     }
 
-    /**
+    /**'
      * {@inheritdoc}
      *
      * Prior to hydrating the row, check to see if there is a custom implementation of the component instance we
@@ -269,7 +269,7 @@ class Component_InstanceMapper extends BaseMapper
 
         // Hydrate a whole bunch of stuff here.
 
-        $instanceCollection         = $this->createCollection();
+        $instanceCollection         = new GenericCollection(Component_Instance::class);
         $definitionCollection       = $this->componentDefinitionMapper->createCollection();
         $configInstanceCollection   = $this->componentConfigMapper->createCollection();
         $configDefinitionCollection = $this->componentConfigDefinitionMapper->createCollection();
