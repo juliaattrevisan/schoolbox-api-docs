@@ -39,8 +39,8 @@ class Instance extends Component_Instance
             $this->survey = $this->surveyMapper->findById($this->getConfigByKey('survey')->getValue());
         } catch (MapperException $e) {
             // The survey was not found (or no survey was set in the configuration)
-            if (!$this->survey instanceof Survey && $user->getRole()->isStudent()) {
-                // The logged in user is a student, they can't do anything meaningful with the component so hide it
+            if (!$this->survey instanceof Survey && !$user->getRole()->isStaff()) {
+                // The logged in user is not staff, they can't do anything meaningful with the component so hide it
                 return false;
             }
         }
