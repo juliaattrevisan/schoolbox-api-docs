@@ -104,7 +104,7 @@
                                     {% endblock details_studentId %}
 
                                     {% block details_dob %}
-                                        {% if  externalUser.StudentBirthDate|date  %}
+                                        {% if  externalUser.StudentBirthDate is not empty  %}
                                             <dt class="small-12 medium-3">Date of Birth:</dt>
                                             <dd class="small-12 medium-9">{{ externalUser.StudentBirthDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
                                         {% endif %}
