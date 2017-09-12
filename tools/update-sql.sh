@@ -100,7 +100,7 @@ then
 fi
 
 # Ensure all required resources are available before update, hard fail if not
-$instdir/tools/notif/syscheck.ph -v;
+$instdir/tools/notif/syscheck.php -v;
 if [ $? -ne 0 ];
 then
     echo "Error: all system dependencies must be available to start the update"
