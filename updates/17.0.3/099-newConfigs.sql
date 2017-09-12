@@ -1,0 +1,2 @@
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`) VALUES ('site_type', '', 'System Type', 'Whether this system is production or development etc.', '4', 'prod:dev:sandbox-prod:sandbox-dev:vagrant', '1', 'false', 'true', 'false');
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`) VALUES ('site_school_code', '', 'School Code', 'Alaress\' unique identifier for the School', '1', '', '1', 'false', 'false', 'false');
