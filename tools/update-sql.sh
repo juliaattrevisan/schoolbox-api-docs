@@ -83,19 +83,19 @@ end=`grep -n "$newver" $versionlist | cut -d':' -f1`;
 
 if [ -z $start ];
 then
-	echo "SQL version not supported for update, no changes made";
+	echo "Error: SQL version not supported for update, no changes made";
 	exit;
 fi
 
 if [ -z $end ];
 then
-	echo "SQL version greater than update, no changes made";
+	echo "Error: SQL version greater than update, no changes made";
 	exit;
 fi
 
 if [ $start -gt $end ];
 then
-	echo "SQL version greater than update, no changes made";
+	echo "Error: SQL version greater than update, no changes made";
 	exit;
 fi
 
