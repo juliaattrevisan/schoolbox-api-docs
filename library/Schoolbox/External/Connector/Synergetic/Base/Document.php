@@ -242,7 +242,7 @@ class Document extends Base implements IDocument
                     'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 ]);
             }
-        } elseif ($source = 'StudentReportsArchive') {
+        } elseif ($source == 'StudentReportsArchive') {
             // Loading from school reports archive table
 
             $query = "
