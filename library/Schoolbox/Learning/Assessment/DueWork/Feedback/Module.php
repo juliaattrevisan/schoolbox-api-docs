@@ -88,10 +88,8 @@ class Module extends BaseModule
                     );
 
                     $ruleArguments[] = new IsInteractionUnLocked(
-                        new Assessment\LockedChecker(
-                            $this->getTermMapper(),
-                            $assessment
-                        )
+                        new Assessment\LockedChecker($this->getTermMapper()),
+                        $assessment
                     );
 
                     $testedAssessmentIds[] = $assessmentId;
