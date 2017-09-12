@@ -41,19 +41,18 @@ $eventMapper = \EOTC\EventMapper::getInstance();
  * /all:               show all future events that are approved/rejected
  */
 $timespanType = isset($this->arg[0]) ? $this->arg[0] : 'range';
-$dateFrom = '';
-$dateTo = '';
-$statuses = isset($_GET['status'])
+$dateFrom     = '';
+$dateTo       = '';
+$statuses     = isset($_GET['status'])
     ? $_GET['status']
-    : [EventStatusMapper::STATUS_APPROVED, EventStatusMapper::STATUS_REJECTED,]
-;
-$statusList = EventStatusMapper::getInstance()->findAll();
+    : [EventStatusMapper::STATUS_APPROVED, EventStatusMapper::STATUS_REJECTED,];
+$statusList   = EventStatusMapper::getInstance()->findAll();
 if ($timespanType === 'range') {
     // get from/to date out
     $dateFrom = isset($this->arg[1])
         ? new Alaress_Date_Format($this->arg[1], Alaress_Date_Format::URL_FORMAT)
         : Alaress_Date_Format::now()->addMonths(-1);
-    $dateTo = isset($this->arg[2])
+    $dateTo   = isset($this->arg[2])
         ? new Alaress_Date_Format($this->arg[2], Alaress_Date_Format::URL_FORMAT)
         : null;
 
@@ -64,7 +63,6 @@ if ($timespanType === 'range') {
         $dateTo
     );
 } elseif ($timespanType === 'all') {
-
     /* Show paginated events, ordered by datetime, till the
      * beginning of history
      */

@@ -48,8 +48,8 @@ class EventMapper extends CalendarEventMapper
      */
     protected function getSelectString()
     {
-        $authorMapper = $this->getJoinMapper('author');
-        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         return "
@@ -80,8 +80,8 @@ class EventMapper extends CalendarEventMapper
      */
     protected function hydrateSelect(\PDOStatement $statement)
     {
-        $authorMapper = $this->getJoinMapper('author');
-        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         /* Hydrate or die
@@ -191,19 +191,19 @@ class EventMapper extends CalendarEventMapper
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null
     ) {
-        $authorMapper = $this->getJoinMapper('author');
-        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         // Build a query around from/to dates
-        $queryParts = [];
+        $queryParts  = [];
         $queryParams = [];
         if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
-            $queryParts[] = 'e.start_datetime >= :from';
+            $queryParts[]        = 'e.start_datetime >= :from';
             $queryParams['from'] = $from->getDatabaseDate();
         }
         if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
-            $queryParts[] = 'e.start_datetime <= :to';
+            $queryParts[]      = 'e.start_datetime <= :to';
             $queryParams['to'] = $to->getDatabaseDate();
         }
 
@@ -307,8 +307,8 @@ class EventMapper extends CalendarEventMapper
      */
     public function findAllByListGroupsForUser($user)
     {
-        $authorMapper = $this->getJoinMapper('author');
-        $eventTypeMapper = $this->getJoinMapper('eventType');
+        $authorMapper          = $this->getJoinMapper('author');
+        $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         /* Looked for a way to convince GROUP BY to group records with
@@ -341,7 +341,7 @@ class EventMapper extends CalendarEventMapper
             ]
         );
 
-        $allEvents = new ListGroupCollection();
+        $allEvents          = new ListGroupCollection();
         $processedSeriesIds = [];
 
         /* Hydrate or die
