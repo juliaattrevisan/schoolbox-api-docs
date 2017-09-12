@@ -21,7 +21,7 @@ $authenticator = new \EOTC\Authenticator($this);
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
-$this->setFile(TEMPLATE_content, 'modules/eotc/processed.html');
+$this->setFile(TEMPLATE_content, 'modules/eotc/report.html');
 $this->setBlock(TEMPLATE_content, 'report_timespan', 'report_timespan_block');
 $this->setBlock(TEMPLATE_content, 'report_status', 'report_status_block');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
