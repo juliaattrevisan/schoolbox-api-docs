@@ -60,12 +60,12 @@ class ReturnedWork implements ISoftDeletable
     protected $comment;
 
     /**
-     * @var string
+     * @var null|string
      */
     protected $humanReadableMark;
 
     /**
-     * @var float
+     * @var null|float
      */
     protected $normalized_mark;
 
@@ -240,7 +240,7 @@ class ReturnedWork implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getHumanReadableMark()
     {
@@ -248,7 +248,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * @param  string $mark
+     * @param  null|string $mark
      * @return $this
      */
     public function setHumanReadableMark($mark)
@@ -258,7 +258,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * @return float
+     * @return null|float
      */
     public function getNormalizedMark()
     {
@@ -266,7 +266,7 @@ class ReturnedWork implements ISoftDeletable
     }
 
     /**
-     * @param  float $normalized_mark
+     * @param  null|float $normalized_mark
      * @return $this
      */
     public function setNormalizedMark($normalized_mark)
