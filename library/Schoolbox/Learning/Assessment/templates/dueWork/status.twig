@@ -96,7 +96,7 @@
     <div class="small-12 column">
 
         {% if fbUrl %}
-        <form data-feedback-form data-student="{{ participant.user.id }}" data-assessment="{{ participant.assessable.id }}" method="post" action="{{ fbUrl }}">
+        <form data-feedback-form method="post" action="{{ fbUrl }}">
         {% endif %}
 
             <input type="hidden" name="responseId" value="{{ response.id }}" />
@@ -339,7 +339,7 @@
                             $statusLabel = $participant.find('[data-status-label]'),
                             $form        = $participant.find('[data-feedback-form]');
 
-                        buttons[$form.attr('data-student')] = {
+                        buttons[$participant.attr('data-participant')] = {
                             '$button': $button,
                             'buttonText': buttonText,
                             '$actionBar': $actionBar,
@@ -351,8 +351,8 @@
                         {# Throw the necessary data into an array so we can submit in a single AJAX request #}
 
                         feedback.push({
-                            assessmentId: $form.attr('data-assessment'),
-                            studentId: $form.attr('data-student'),
+                            assessmentId: {{ assessment.id }},
+                            studentId: $participant.attr('data-participant'),
                             formData: $form.serializeArray()
                         });
                     });
