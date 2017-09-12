@@ -131,15 +131,18 @@ do
 				# Check script listed in scripts_list actually exists
 				if [ -f $script ];
 				then
+					echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Starting script: $script";
 				    if [[ $scriptcmd == *".sql" ]]
 				    then
                         mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script 2>&1;
                         # Check for and report errors
                         if [ $? -ne 0 ];
                         then
-                            echo "Error running update: $script";
+                            echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
                             errorint=1;
                             errormsg="$errormsg,$script";
+						else
+							echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
                         fi
                     fi
                     if [[ $scriptcmd == *".php" ]]
@@ -153,15 +156,17 @@ do
                         if [ $? -ne 0 ];
                         then
                             cd $curdir;
-                            echo "Error running update: $script";
+                            echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
                             errorint=1;
                             errormsg="$errormsg,$script";
+						else
+							echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
                         fi
                         cd $curdir;
                     fi
 				fi
 			done
-			
+
 			# Update the config table to show current release version
 			mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
 		fi
