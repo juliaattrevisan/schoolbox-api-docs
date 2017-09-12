@@ -11,6 +11,8 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress_Date_Format;
 use DateTime;
+use External_Ping;
+use External_Synergetic_ValidateExternalIdTrait;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
@@ -19,7 +21,7 @@ use Schoolbox\User;
 
 class Document extends Base implements IDocument
 {
-    use \External_Synergetic_ValidateExternalIdTrait;
+    use External_Synergetic_ValidateExternalIdTrait;
 
     /** @var string $schema String indicating the Synergetic DB schema (varies between DB versions) */
     private $schema;
@@ -48,7 +50,7 @@ class Document extends Base implements IDocument
     private function retrieveDocumentSchema()
     {
         // TODO inject ping/diagnostic object
-        $externalPing = new \External_Ping();
+        $externalPing = new External_Ping();
 
         if ($externalPing->getVersion() == "68") {
             return "media";
@@ -97,10 +99,10 @@ class Document extends Base implements IDocument
         $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
         if ($date !== false) {
-            $query .= ' AND sra.CreatedDate >= :createdDate';
+            $query .= ' AND sra.CreatedDate >= :date1';
 
             $params = array_merge($params, [
-                'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                'date1' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
             ]);
         }
 
@@ -131,13 +133,11 @@ class Document extends Base implements IDocument
             WHERE   dr.ID = :id2 
         ";
 
-        $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
-
         if ($date !== false) {
-            $query .= ' AND d.SourceDate >= :createdDate2 ';
+            $query .= ' AND d.SourceDate >= :date2';
 
             $params = array_merge($params, [
-                'createdDate2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
             ]);
         }
 
