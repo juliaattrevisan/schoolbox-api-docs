@@ -536,7 +536,7 @@ class External_Liss_Server
             $log->info("publishDailyData: unable to process request, not implemented");
 
             /* Log data for use */
-            $allData = $message->params[3]->me['array'];
+            $allData = $message->params[1]->me['array'];
             $log->info("publishDailyData: ".json_encode($allData));
 
             return new xmlrpcresp(new xmlrpcval('Daily Data Imported', 'string'));
