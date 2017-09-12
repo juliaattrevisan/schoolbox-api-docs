@@ -160,7 +160,10 @@ As previously explained, the first is a global setting. The second is a per-even
 http://192.168.36.10/modules/eotc/processed
 http://192.168.36.10/modules/eotc/processed/all
 
-This is a list of EOTC events that have entered either the Approved or Cancelled statuses. By default it only shows events that start in the future, or started one month into the past. This is because the event list became extremely long and slow to load so we limited its data set. However, you can view the entire unabridged list by clicking *View All Approved/Cancelled Events*.
+This is a list of EOTC events that is filtered by status; by default, it shows events that have entered either the
+Approved or Cancelled statuses. By default it only shows events that start in the future, or started one month into the
+past. This is because the event list became extremely long and slow to load so we limited its data set.
+However, you can view the entire unabridged list by selecting *All* as the timespan, and clicking *Search*.
 
 ## 12. Display In Calendar
 When you see EOTC Events in the calendar, there'll be a little numeric segment after the event's title. Example: *My EOTC Event (5,2)*.
