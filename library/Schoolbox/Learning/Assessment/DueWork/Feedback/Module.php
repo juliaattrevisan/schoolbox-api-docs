@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Authorizer\Rule\IsAssessmentInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -86,6 +87,13 @@ class Module extends BaseModule
                         Access::getInstance()
                     );
 
+                    $ruleArguments[] = new IsInteractionUnLocked(
+                        new Assessment\LockedChecker(
+                            $this->getTermMapper(),
+                            $assessment
+                        )
+                    );
+
                     $testedAssessmentIds[] = $assessmentId;
                 }
             }
@@ -100,15 +108,11 @@ class Module extends BaseModule
             $canGiveFeedbackFromAllParticipants = new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\All(
-                    $rulesHomepageAccess,
-                    new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+                    $rulesHomepageAccess
                 )
             );
         } else {
-            $canGiveFeedbackFromAllParticipants = new Rule\Any(
-                new Rule\IsSuperuser(),
-                new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
-            );
+            $canGiveFeedbackFromAllParticipants = new Rule\IsSuperuser();
         }
 
         $canDeleteFeedback = new Rule\IsSuperuser();
