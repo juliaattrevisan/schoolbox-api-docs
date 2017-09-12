@@ -1,8 +1,8 @@
 <tr class="sub-row" data-sub-table-row data-hidable-columns>
-    <th>{{ label }}</th>
-    <th>&nbsp;</th>
+    <td>{{ label }}</td>
+    <td>&nbsp;</td>
     {% for assessment in markbook.assessments  %}
-    <th data-assessment="{{ assessment.id }}">
+    <td data-assessment="{{ assessment.id }}">
         {% if markbook.assessmentStatistics[assessment.id][key] %}
             {% if round %}
                 {{ markbook.assessmentStatistics[assessment.id][key] | round(round) }}
@@ -12,6 +12,6 @@
         {% else %}
             –
         {% endif %}
-    </th>
+    </td>
     {% endfor %}
 </tr>

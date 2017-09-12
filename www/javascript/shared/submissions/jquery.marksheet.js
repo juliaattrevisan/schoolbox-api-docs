@@ -8,27 +8,7 @@
 
         var config = init(options, $(this));
 
-        $(this).DataTable({
-            scrollY: '38rem', // Arbitrary height
-            scrollX: true,
-            scrollCollapse: true,
-            paging: false,
-            bFilter: false,
-            bInfo: false,
-            ordering: false,
-            fixedColumns: {
-                leftColumns: 1
-            },
-            initComplete: function() {
-                // Hide the hidden table rows after datatables is initialised
-                // fixedColumns requires the bottom <thead> row to be visible on datatables initialisation
-                // The timeout is a bit hacky, but it needs run it a bit after init
-                setTimeout(function() {
-                    hideTableRows();
-                }, 100);
-            }
-        });
-
+        hideTableRows();
         toggleTableRows();
         updateVisibility();
 

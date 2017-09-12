@@ -22,6 +22,20 @@
         $('[data-mark-sheet]').marksheetAverages();
         $('[data-mark-sheet]').marksheetInputs();
 
+        // Use datatables to do fixed headers and left column
+        $('[data-mark-sheet]').DataTable({
+            scrollY: '38rem', // Arbitrary height
+            scrollX: true,
+            scrollCollapse: true,
+            paging: false,
+            bFilter: false,
+            bInfo: false,
+            ordering: false,
+            fixedColumns: {
+                leftColumns: 1
+            }
+        });
+
         // Enable the download report menu
         $('#report_actions').foundation();
 
@@ -90,6 +104,10 @@
                     {% endfor %}
                 </tr>
 
+            </thead>
+
+            <tbody>
+
                 {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
 
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight'} %}
@@ -108,9 +126,6 @@
 
                 {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
 
-            </thead>
-
-            <tbody>
                 {# Need all students that ever participated in any assessments #}
                 {% for student in markbook.students %}
                 <tr data-student="{{ student.id }}">
