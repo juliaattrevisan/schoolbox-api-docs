@@ -85,12 +85,10 @@ class Document extends Base implements IDocument
             FROM        {$this->schema}.StudentReportsArchiveLink sral
             JOIN        {$this->schema}.StudentReportsArchive sra ON 
                         sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
-            WHERE       ID = :id
+            WHERE       ID = :id1
         ";
 
-        $params = [
-            'id' => $student->getExternalId()
-        ];
+        $params = ['id1' => $student->getExternalId()];
 
         // Add date filter (if we find a parseable date in the config)
 
@@ -133,15 +131,15 @@ class Document extends Base implements IDocument
             WHERE   dr.ID = :id2 
         ";
 
+        $params['id2'] = $student->getExternalId();
+
         if ($date !== false) {
-            $query .= ' AND d.SourceDate >= :date2';
+            $query .= ' AND d.SourceDate >= :date2 ';
 
             $params = array_merge($params, [
                 'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
             ]);
         }
-
-        $params['id2'] = $student->getExternalId();
 
         // Check if we need to apply a classification filter
 
@@ -236,10 +234,10 @@ class Document extends Base implements IDocument
             $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
             if ($date !== false) {
-                $query .= ' AND d.SourceDate >= :createdDate';
+                $query .= ' AND d.SourceDate >= :date';
 
                 $params = array_merge($params, [
-                    'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 ]);
             }
         } elseif ($source == 'StudentReportsArchive') {
@@ -263,10 +261,10 @@ class Document extends Base implements IDocument
             $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
             if ($date !== false) {
-                $query .= ' AND sra.CreatedDate >= :createdDate ';
+                $query .= ' AND sra.CreatedDate >= :date ';
 
                 $params = array_merge($params, [
-                    'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 ]);
             }
         } else {
