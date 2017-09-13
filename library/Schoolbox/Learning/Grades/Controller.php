@@ -484,12 +484,13 @@ class Controller extends Base
             return [];
         }
 
-        // Filter out anything but due work
-        $dueWorks = $assessments->filter(function (IAssessable $assessment) {
-            return $assessment instanceof DueWork\Model;
+        // Filter to dueWork with marks visible to current user
+        $user = $this->getUser();
+        $dueWorksWithVisibleMarks = $assessments->filter(function (IAssessable $assessment) use ($user) {
+            return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($user);
         });
 
-        return $this->rubricMapper->getLongitudinal($dueWorks, $student);
+        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student);
     }
 
 
