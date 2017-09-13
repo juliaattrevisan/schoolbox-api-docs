@@ -79,7 +79,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             } elseif ($this->getSource()
                            ->getFolder()
                            ->getCodes()
-                           ->count() == 0 and !$this->getSource()
+                           ->count() == 0 && !$this->getSource()
                                                     ->getFolder()
                                                     ->isGroup()) {
 
@@ -93,7 +93,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             } elseif ($this->getSource()
                            ->getFolder()
                            ->getCodes()
-                           ->count() == 0 and $this->getSource()
+                           ->count() == 0 && $this->getSource()
                                                    ->getFolder()
                                                    ->isGroup()) {
                 $this->parse('empty_is_group_block', 'empty_is_group');
