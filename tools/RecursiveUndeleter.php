@@ -405,7 +405,7 @@ DESCRIPTION
        {$yellow}-o, --override=OVERRIDE_DATE{$white}
               Format: {$yellow}'{$dateFormat}'{$white}
               If specified, treat specified root objects as having been deleted at this date, regardless of when they
-              were really deleted, or whether they are deleted at all.
+              were really deleted, whether they have a boolean soft-delete field, or whether they are deleted at all.
               Note, this does NOT mean restore root objects deleted around this time!
 
        {$yellow}-w, --window=WINDOW{$white}
