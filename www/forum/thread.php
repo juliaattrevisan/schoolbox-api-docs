@@ -11,7 +11,8 @@ $this->setBlock(TEMPLATE_content, 'post', 'post_block');
 $this->setBlock('post', 'reply_post', 'reply_post_block');
 $this->setBlock('post', 'modify', 'modify_block');
 $this->setBlock('post', 'modified', 'modified_block');
-$this->setBlock('post', 'link', 'link_block');
+$this->setBlock('post', 'link_start', 'link_start_block');
+$this->setBlock('post', 'link_end', 'link_end_block');
 $this->setBlock(TEMPLATE_content, 'reply', 'reply_block');
 $this->setBlock(TEMPLATE_content, 'modify_thread', 'modify_thread_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
@@ -162,9 +163,11 @@ if (is_array($postList)) {
 
         //Remove link for deleted user
         if (!$user->getDeletedAt()->isNull()) {
-            $this->setVar('link_block', '');
+            $this->setVar('link_start_block', '');
+            $this->setVar('link_end_block', '');
         } else {
-            $this->parse('link_block', 'link');
+            $this->parse('link_start_block', 'link_start');
+            $this->parse('link_end_block', 'link_end');
         }
 
         // edit / delete post
