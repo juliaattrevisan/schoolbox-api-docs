@@ -66,13 +66,25 @@
                 </div>
                 <div class="item {CLASS_REPORT_DATE}" data-date-start>
                     <h4>From</h4>
-                    <input id="reportDateStart" name="reportDateStart" type="text" value="{REPORT_DATE_START}"
-                           data-datepicker data-datepicker-buttontext="">
+                    <input id="reportDateStart"
+                           name="reportDateStart"
+                           type="text"
+                           value="{REPORT_DATE_START}"
+                           data-datepicker
+                           data-datepicker-buttontext=""
+                           data-datesync-enddate="#reportDateEnd"
+                    >
                 </div>
                 <div class="item {CLASS_REPORT_DATE}" data-date-end>
                     <h4>To</h4>
-                    <input id="reportDateEnd" name="reportDateEnd" type="text" value="{REPORT_DATE_END}"
-                           data-datepicker data-datepicker-buttontext="">
+                    <input id="reportDateEnd"
+                           name="reportDateEnd"
+                           type="text"
+                           value="{REPORT_DATE_END}"
+                           data-datepicker
+                           data-datepicker-buttontext=""
+                           data-datesync-startdate="#reportDateStart"
+                    >
                 </div>
 
                 <div class="item">
