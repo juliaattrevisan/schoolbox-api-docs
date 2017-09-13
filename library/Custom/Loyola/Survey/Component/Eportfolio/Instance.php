@@ -22,7 +22,7 @@ class Instance extends Component_Instance
     protected $survey;
 
     /**
-     * Hide the component from students palettes if the survey has not been configured
+     * Hide the component from non-staff if the survey has not been configured
      *
      * @return bool
      */
@@ -38,9 +38,12 @@ class Instance extends Component_Instance
         try {
             $this->survey = $this->surveyMapper->findById($this->getConfigByKey('survey')->getValue());
         } catch (MapperException $e) {
-            // The survey was not found (or no survey was set in the configuration)
-            if (!$this->survey instanceof Survey && !$user->getRole()->isStaff()) {
-                // The logged in user is not staff, they can't do anything meaningful with the component so hide it
+            // No survey was set in the components template instance (or the survey no longer exists)
+
+            // Only staff can interact with the component if there is no survey set- so if the logged in
+            // user is not a staff member- they should not see this component
+
+            if (!$user->getRole()->isStaff()) {
                 return false;
             }
         }
