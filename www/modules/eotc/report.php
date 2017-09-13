@@ -59,6 +59,9 @@ if ($timespanType === 'range') {
     $dateTo   = isset($this->arg[2])
         ? new Alaress_Date_Format($this->arg[2], Alaress_Date_Format::URL_FORMAT)
         : Alaress_Date_Format::now();
+    if ($dateTo->lt($dateFrom)) {
+        $dateTo = clone $dateFrom;
+    }
 
     /** @var \EOTC\ListGroup\Collection $allListGroups */
     $allListGroups = $eventMapper->findAllByListGroups(
