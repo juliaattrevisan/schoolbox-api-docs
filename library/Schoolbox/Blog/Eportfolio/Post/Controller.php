@@ -222,7 +222,7 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'eportfolioBlog.getItem',
-                ['pageId' => $blog->getPageId(), 'id' => $blog->getId(),]
+                ['pageId' => $blog->getPage()->getPageId(), 'id' => $blog->getId(),]
             )
         );
     }
