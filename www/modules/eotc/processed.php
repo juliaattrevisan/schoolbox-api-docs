@@ -36,14 +36,6 @@ if ($timespanType === 'range') {
             ])
         )
     );
-    // get from/to date out
-    $dateFrom = isset($this->arg[1])
-        ? new Alaress_Date_Format($this->arg[1], Alaress_Date_Format::URL_FORMAT)
-        : Alaress_Date_Format::now()->addMonths(-1);
-    $dateTo   = isset($this->arg[2])
-        ? new Alaress_Date_Format($this->arg[2], Alaress_Date_Format::URL_FORMAT)
-        : null;
-
 } elseif ($timespanType === 'all') {
     /* Show paginated events, ordered by datetime, till the
      * beginning of history
