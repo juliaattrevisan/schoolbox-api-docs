@@ -56,10 +56,10 @@ if ($timespanType === 'range') {
     // get from/to date out
     $dateFrom = isset($this->arg[1])
         ? new Alaress_Date_Format($this->arg[1], Alaress_Date_Format::URL_FORMAT)
-        : Alaress_Date_Format::now()->addMonths(-1);
+        : Alaress_Date_Format::now();
     $dateTo   = isset($this->arg[2])
         ? new Alaress_Date_Format($this->arg[2], Alaress_Date_Format::URL_FORMAT)
-        : null;
+        : Alaress_Date_Format::now();
 
     /** @var \EOTC\ListGroup\Collection $allListGroups */
     $allListGroups = $eventMapper->findAllByListGroups(
