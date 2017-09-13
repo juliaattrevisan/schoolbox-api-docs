@@ -14,6 +14,12 @@ use Schoolbox\Survey\Model as Survey;
 use Schoolbox\User;
 use Scrub;
 
+/**
+ * {@inheritDoc}
+ *
+ * Class Controller
+ * @package Custom\Loyola\Survey\Component\Eportfolio
+ */
 class Controller extends Component_Eportfolio_ControllerAbstract
 {
     /** @var SurveyMapper $surveyMapper */
@@ -22,8 +28,8 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     /** @var Survey $survey */
     protected $survey;
 
-    /** @var User $currentUser */
-    protected $currentUser;
+    /** @var User $sessionUser */
+    protected $sessionUser;
 
     /** @var array $config */
     protected $config;
@@ -38,12 +44,10 @@ class Controller extends Component_Eportfolio_ControllerAbstract
         // Rather annoyingly at this point the getUser() function returns an unhydrated object, so we're going to
         // read the user straight out of the session variable rather than doing a double hydration
 
-        /** @var User $user */
-        $user = $_SESSION["user"];
+        $this->sessionUser = $_SESSION["user"];
 
         // Setup all of the other properties required for this show to get on the road
 
-        $this->currentUser  = $this->getSitePage()->getDi()->get('user');
         $this->config       = $this->getConfig();
         $this->surveyMapper = SurveyMapper::getInstance();
 
@@ -53,8 +57,8 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             $this->survey = $this->surveyMapper->findById($this->config['survey']);
         } catch (MapperException $e) {
             // The survey was not found (or no survey was set in the configuration)
-            if (!$this->survey instanceof Survey && $user->getRole()->isStudent()) {
-                // The logged in user is a student, they can't do anything meaningful with the component so hide it
+            if (!$this->survey instanceof Survey && !$this->sessionUser->getRole()->isStaff()) {
+                // The logged user is not a staff member, they can't do anything with the component, so dont render it!
                 return false;
             }
         }
@@ -131,21 +135,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             }
         }
 
-        // There is a bit of fudgery going on here. We need to hide the configuration options from students, but
-        // students have write access to ePortfolio pages- so the normal component configuration visible setting
-        // fails miserable on ePortfolio components.
-
-        // Staff and superusers can see the heading
-
-        $showStaffHeading = $this->currentUser->getRole()->isStaff() || $this->currentUser->isSuperuser();
-
-        // Students see a static title bar
-
-        $showStudentHeading = (
-                !$this->currentUser->getRole()->isStaff() &&
-                !$this->currentUser->isSuperuser()
-            ) && $this->config['collapse'];
-
         // Render this mess out
 
         return $this->renderTwigTemplate(
@@ -156,15 +145,52 @@ class Controller extends Component_Eportfolio_ControllerAbstract
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'componentClass'      => $this->getComponentName(),
                 'config'              => $this->config,
-                'showStudentHeading'  => $showStudentHeading,
                 'survey'              => $this->survey,
                 'answers'             => $answersRenderArray,
                 'questionCount'       => $maximumQuestions,
                 'columnWidth'         => $maximumQuestions > 0 ? (90 / $maximumQuestions) . "%" : ""
-            ],
-            true,                       // This does nothing useful on ePortfolio components
-            $showStaffHeading,          // Show configuration from PHPLIB if the user is staff/superuser
-            $showStudentHeading         // We need to raw render if showing the student heading
+            ]
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Override for `Component_ControllerAbstract::parseConfig()` function to cater for this components
+     * stupid visibility shenanigans.
+     *
+     * @param string $targetHandle
+     * @param bool $is_for_template
+     * @return bool
+     */
+    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
+    {
+        // Determine what to display
+
+        $this->setupConfigRendering($targetHandle);
+
+        // Setup component for all non-staff roles
+
+        if (!$this->sessionUser->getRole()->isStaff()) {
+            if ($this->getConfig('collapse') !== '1') {
+                // 'Display Component Heading On Student View' is ticked, remove the title bar entirely
+                $this->getSitePage()->setVar('configTpl', '');
+            } else {
+                // Display the title bar, but remove all of the config elements
+                $this->renderConfigElements(false, $is_for_template);
+                $this->getSitePage()->parse($targetHandle, 'configTpl', false);
+            }
+
+            return false;
+        }
+
+        // Setup component for staff
+
+        $this->renderConfigElements(true, $is_for_template);
+        $this->getSitePage()->parse('settings_link_block', 'settings_link');
+        $this->getSitePage()->parse('settings_close_block', 'settings_close');
+        $this->getSitePage()->parse($targetHandle, 'configTpl', false);
+
+        return true;
     }
 }
