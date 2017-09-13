@@ -122,7 +122,8 @@ $e = new Alaress_Date_Format($article['item_datetime_expires'], Alaress_Date_For
 $output = array(
     'NEWS_ID' => $article['item_id'],
     'NEWS_TITLE' => Scrub::text($article['item_heading']),
-    'NEWS_BODY' => Scrub::html($article['item_body']),
+    'NEWS_BODY' => empty($article['item_body'])
+        ? Scrub::html($article['item_blurb']) : '<p>'.TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300).'</p>',
     'NEWS_IMAGE' => $article['item_image'],
     'POSTER' => $owner->getFullName(),
     'POSTER_EXTERNAL_ID' => $owner->getExternalId(),
