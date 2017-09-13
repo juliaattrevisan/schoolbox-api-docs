@@ -204,6 +204,7 @@ class Controller extends Base
      * @throws ServiceNotFound If unable to fetch the HTML output renderer from the DI
      * @throws DefinitionException If specified mapper join is not defined
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
+     * @throws \Schoolbox\Mapper\Exception If a database column alias is incorrect
      */
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject)
     {
