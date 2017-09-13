@@ -308,6 +308,8 @@
 
             var $userList = $('#assessment-status');
 
+            // Bulk publish assessments
+
             $('#mass-publish').bulky({
                 submitText: function (len, all) {
                     if (!len) {
@@ -335,17 +337,13 @@
                             buttonText   = $button.html(),
                             $actionBar   = $button.closest('[data-action-bar]'),
                             $participant = $actionBar.closest('[data-participant]'),
-                            $statusIcon  = $participant.find('[data-status]'),
-                            $statusLabel = $participant.find('[data-status-label]'),
                             $form        = $participant.find('[data-feedback-form]');
 
                         buttons[$participant.attr('data-participant')] = {
                             '$button': $button,
                             'buttonText': buttonText,
                             '$actionBar': $actionBar,
-                            '$participant': $participant,
-                            '$statusIcon': $statusIcon,
-                            '$statusLabel': $statusLabel,
+                            '$participant': $participant
                         };
 
                         {# Throw the necessary data into an array so we can submit in a single AJAX request #}
@@ -368,30 +366,15 @@
                         'feedback': feedback
                     }).done(function (response) {
                             var toastError = '';
-
                             response.forEach(function(feedback) {
-
                                 var button = buttons[feedback.participantId];
 
                                 if (feedback.success) {
                                     {# Remove the publish button on success #}
-
-                                    soboSuccess(
-                                        button.$participant,
-                                        button.$button,
-                                        button.$actionBar,
-                                        button.$statusIcon,
-                                        button.$statusLabel,
-                                        feedback.submittedLate
-                                    );
+                                    draftPublishSuccess(button.$button, button.$actionBar);
                                 } else {
                                     {# On error concatenate all of the error messages #}
-
-                                    soboFailure(
-                                        button.$button,
-                                        button.buttonText
-                                    );
-
+                                    draftPublishFailure(button.$button, button.buttonText);
                                     toastError += feedback.message;
                                 }
                             });
@@ -407,7 +390,6 @@
                         })
                         .fail(function (response) {
                             {# Something went wrong, display an error toast#}
-
                             $toast.toastTimeout({text: response, css: 'alert'});
                         });
                 }
@@ -478,12 +460,10 @@
              */
             function soboSuccess($participant, $button, $actionBar, $statusIcon, $statusLabel, submittedLate, $toast)
             {
-                if ($toast !== undefined) {
-                    $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
-                }
+                $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
                 $button.fadeOut({done: function(){
                     if(!$actionBar.is('[data-mass-publish]')){
-                         $actionBar.slideUp();
+                        $actionBar.slideUp();
                     }
                     $button.remove();
                 }});
@@ -505,10 +485,37 @@
             {
                 $button.html(buttonText);
                 $button.removeAttr('disabled');
+                $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
+            }
 
-                if ($toast !== undefined) {
-                    $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
-                }
+            /**
+             * Handle a draft submission success
+             *
+             * @param {jQuery} $button
+             * @param {jQuery} $actionBar
+             */
+            function draftPublishSuccess($button, $actionBar)
+            {
+                $button.fadeOut({done: function(){
+                    if(!$actionBar.is('[data-mass-publish]')){
+                        $actionBar.slideUp();
+                    }
+                    $button.remove();
+                }});
+                $actionBar.removeAttr('data-mass-submit');
+            }
+
+            /**
+             * Handle a draft submission failure
+             *
+             * @param {jQuery} $button
+             * @param {string} buttonText
+             * @param {jQuery} $toast
+             */
+            function draftPublishFailure($button, buttonText)
+            {
+                $button.html(buttonText);
+                $button.removeAttr('disabled');
             }
         });
     </script>
