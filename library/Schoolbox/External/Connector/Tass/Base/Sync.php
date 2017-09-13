@@ -109,7 +109,7 @@ class Sync extends Base implements ISync
                     'P' + p.par_code AS student_contact_id,
                     f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
-                    p.f_name         AS student_contact_given_name,
+                    RTRIM(p.f_name)  AS student_contact_given_name,
                     LEFT(p.f_name, CHARINDEX(' ', p.f_name)) AS student_contact_preferred,
                     CASE
                         WHEN
@@ -118,15 +118,15 @@ class Sync extends Base implements ISync
                         ELSE RTRIM(p.surname)
                     END                     AS student_contact_surname,
                     ''               AS student_contact_home_email,
-                    pa.e_mail        AS student_contact_default_email,
+                    RTRIM(pa.e_mail) AS student_contact_default_email,
                     ''               AS student_contact_work_email,
                     sf.sfa_num       AS student_contact_split_family_number,
                     s.year_grp       AS student_year_level,
                     s.campus_code    AS student_campus,
                     s.house          AS student_house,
                     s.sex            AS student_gender,
-                    s.preferred_name AS student_preferred,
-                    s.surname        AS student_surname
+                    RTRIM(s.preferred_name) AS student_preferred,
+                    RTRIM(s.surname) AS student_surname
                 FROM parent AS p
                 INNER JOIN paraddress as pa
                     ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND pa.add_num = '1'
@@ -151,7 +151,7 @@ class Sync extends Base implements ISync
                     'S' + p.par_code AS student_contact_id,
                     f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
-                    p.m_name         AS student_contact_given_name,
+                    RTRIM(p.m_name)  AS student_contact_given_name,
                     LEFT(p.m_name, CHARINDEX(' ', p.m_name)) AS student_contact_preferred,
                     CASE
                         WHEN
@@ -160,15 +160,15 @@ class Sync extends Base implements ISync
                         ELSE RTRIM(p.surname)
                     END                     AS student_contact_surname,
                     ''               AS student_contact_home_email,
-                    pa.e_mail        AS student_contact_default_email,
+                    RTRIM(pa.e_mail) AS student_contact_default_email,
                     ''               AS student_contact_work_email,
                     sf.sfa_num       AS student_contact_split_family_number,
                     s.year_grp       AS student_year_level,
                     s.campus_code    AS student_campus,
                     s.house          AS student_house,
                     s.sex            AS student_gender,
-                    s.preferred_name AS student_preferred,
-                    s.surname        AS student_surname
+                    RTRIM(s.preferred_name) AS student_preferred,
+                    RTRIM(s.surname)        AS student_surname
                 FROM parent AS p
                 INNER JOIN paraddress as pa
                     ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND pa.add_num = '1'
