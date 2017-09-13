@@ -278,6 +278,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         });
 
         if ($allImages->count()) {
+            /** @var \Component\Eportfolio\FileList[] $allImages */
             foreach ($allImages as $currentImage) {
                 $this->getPage()->setVar(array(
                     'RECENT_PHOTO_FILE_ID'   => $currentImage->getFile()->getId(),
