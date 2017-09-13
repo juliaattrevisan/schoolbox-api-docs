@@ -71,14 +71,10 @@ class External_Tass_Timetable implements External_TimetableInterface
         $statement = $this->getDatabase()->query($query);
         $periodCount = 0;
         while ($period = $statement->fetch()) {
-            preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['prd_end'], $TimeToMatches);
-            preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['prd_start'], $TimeFromMatches);
 
             $timetableDef['desc'][]   = $period['prd_desc'];
-            $timetableDef['start'][]  = (int)$TimeFromMatches[1] . ':' . $TimeFromMatches[2]
-                . strtolower($TimeFromMatches[3]);
-            $timetableDef['end'][]    = (int)$TimeToMatches[1] . ':' . $TimeToMatches[2] .
-                strtolower($TimeToMatches[3]);
+            $timetableDef['start'][]  = date("g:ia", strtotime($period['prd_start']));
+            $timetableDef['end'][]    = date("g:ia", strtotime($period['prd_end']));
             $timetableDef['number'][] = $period['prd_code'];
             $periodCount++;
         }
