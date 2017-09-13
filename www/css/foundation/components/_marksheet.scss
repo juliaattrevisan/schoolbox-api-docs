@@ -1,4 +1,14 @@
-// Make room for the final header (with the diagonal style)
-.marksheet thead tr:first-child th:last-child {
-    padding-right: $rotate-span-width !important;
+.marksheet {
+
+    thead {
+        tr:first-child th:last-child {
+            // Make room for the final header (with the diagonal style)
+            padding-right: $rotate-span-width !important;
+        }
+    }
+
+    .progress-tick {
+        // Hack to avoid an unnecessary scrollbar caused by rotated elements
+        margin-bottom: 0.8125rem;
+    }
 }
