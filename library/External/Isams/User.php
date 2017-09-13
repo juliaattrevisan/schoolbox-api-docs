@@ -145,7 +145,7 @@ class External_Isams_User implements External_UserInterface
             SELECT      StudentID               AS StudentID,
                         StudentFirstname        AS StudentGiven1,
                         StudentSurname          AS StudentSurname,
-                        DOB                     AS StudentBirthDate,                
+                        CONVERT(nvarchar(30), DOB, 126 ) AS StudentBirthDate,                
                         ''                      AS StudentTutorName,
                         ''                      AS StudentHeadOfHouse,
                         ''                      AS HeadOfHouseID,

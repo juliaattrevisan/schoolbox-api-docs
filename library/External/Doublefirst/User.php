@@ -356,7 +356,7 @@ class External_Doublefirst_User implements External_UserInterface
                 p.AdmissionNo                                       AS AdmissionNo,
                 ForeName                                            AS StudentGiven1,
                 Surname                                             AS StudentSurname,
-                BirthDate                                           AS StudentBirthDate,                
+                CONVERT(nvarchar(30), BirthDate, 126 )              AS StudentBirthDate,                
                 ''                                                  AS StudentTutorName,
                 ''                                                  AS StudentHeadOfHouse,
                 ''                                                  AS HeadOfHouseID,
@@ -415,10 +415,8 @@ class External_Doublefirst_User implements External_UserInterface
             // fill in student record
             $student = $row;
 
-            if ($student['StudentBirthDate']
-                && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
-            ) {
-                $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+            if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
+                $student['StudentBirthDate'] = $birthDate;
             } else {
                 $student['StudentBirthDate'] = false;
             }

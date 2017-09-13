@@ -124,7 +124,7 @@ class External_Tass_User implements External_UserInterface
 				s.stud_code AS StudentID,
 				s.preferred_name AS StudentGiven1,
 				s.surname AS StudentSurname,
-				s.dob as StudentBirthDate,
+                CONVERT(nvarchar(30), s.dob, 126 )  AS StudentBirthDate,
 				'' AS StudentTutorName,
 				'' AS StudentHeadOfHouse,
 				'' AS HeadOfHouseID,
@@ -164,8 +164,8 @@ class External_Tass_User implements External_UserInterface
 			WHERE stud_code = '$tassID'
 		";
         $student = $this->getDatabase()->trimRow($this->getDatabase()->getRow($query));
-        if (preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
-            $student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
+        if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
+            $student['StudentBirthDate'] = $birthDate;
         } else {
             $student['StudentBirthDate'] = false;
         }
