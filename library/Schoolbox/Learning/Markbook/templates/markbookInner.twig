@@ -17,11 +17,6 @@
 <script type="text/javascript">
     $(function() {
 
-        /* Controls for Averages and Dynamic updates for input fields
-         */
-        $('[data-mark-sheet]').marksheetAverages();
-        $('[data-mark-sheet]').marksheetInputs();
-
         // Use datatables to do fixed headers and left column
         $('[data-mark-sheet]').DataTable({
             scrollY: '38rem', // Arbitrary height
@@ -35,6 +30,11 @@
                 leftColumns: 1
             }
         });
+
+        /* Controls for Averages and Dynamic updates for input fields
+         */
+        $('[data-mark-sheet]').marksheetAverages();
+        $('[data-mark-sheet]').marksheetInputs();
 
         // Enable the download report menu
         $('#report_actions').foundation();
