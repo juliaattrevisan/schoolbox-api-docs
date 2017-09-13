@@ -44,6 +44,8 @@ use \Component_ConfigDefinition;
 use \Component_ConfigDefinitionMapper;
 use \Component_ConfigMapper;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 
 class Controller extends Base\Base
 {
@@ -587,6 +589,22 @@ class Controller extends Base\Base
         // Therefore store in array and index by ClassFolderId
         /** @var CourseImplementation[] $courseImpls */
         $courseImpls = [];
+        $courseSpec = $this->getCourseSpecificationMapper()->findById($courseSpecId);
+
+        // Collect folders for unit and course pages - needed for criteria import
+        $unitSpecs = [];
+        foreach($unitImplData as $unitImp) {
+            $unitSpecs[] = $unitImp['unit_spec_id'];
+        }
+
+        $unitFolders = [];
+        foreach($courseSpec->getUnits() as $unitSpec) {
+            if(in_array($unitSpec->getId(),$unitSpecs)) {
+                $unitFolders[] = $unitSpec->getFolder()->getId();
+            }
+        }
+
+        $courseFolder[] = $courseSpec->getFolder()->getId();
 
         // Are we creating a new import?
         if ('import' === $action) {
@@ -596,6 +614,10 @@ class Controller extends Base\Base
                 $courseImpl->setSpecification($courseSpec);
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
+
+                //Save unit criteria to class page
+                $allFolders = array_merge($courseFolder, $unitFolders);
+                $this->copyCriteria($allFolders, $classFolderId);
             }
         } // Else we are modifying an existing import
         else {
@@ -610,6 +632,10 @@ class Controller extends Base\Base
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 $unitImpl->setAssessables($this->getAssessmentMapperProxy()->findAllByUnitImplementationId($unitImpl->getId()));
             }
+
+            //Save unit criteria to class page
+            $classFolderId = key($classOwners);
+            $this->copyCriteria($unitFolders, $classFolderId);
         }
 
         // Delete de-selected Units and Assessments
@@ -1503,6 +1529,35 @@ class Controller extends Base\Base
     public function setReplicator(Replicator $replicator)
     {
         $this->replicator = $replicator;
+        return $this;
+    }
+
+    /**
+     * @param int[] $sourceIds
+     * @param int $destinationId
+     * @return static
+     */
+    public function copyCriteria(array $sourceIds, $destinationId)
+    {
+        $criteriaMapper = CriterionMapper::getInstance();
+
+        /** @var GenericCollection | Criterion[] $allCriteria */
+        $allCriteria = $criteriaMapper->findByColumnList(
+            array(
+                'parent_id'   => $sourceIds,
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+            )
+        );
+
+        $allCriteria = $allCriteria->deepClone();
+
+        //Save copy of criteria with class page as parent
+        foreach ($allCriteria as  $criteria){
+            $criteria->setParentId($destinationId);
+        }
+
+        $criteriaMapper->create($allCriteria);
+
         return $this;
     }
 }
