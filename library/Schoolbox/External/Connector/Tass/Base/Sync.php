@@ -111,7 +111,12 @@ class Sync extends Base implements ISync
                     ''               AS student_contact_title,
                     p.f_name         AS student_contact_given_name,
                     p.f_name         AS student_contact_preferred,
-                    p.surname        AS student_contact_surname,
+                    CASE
+                        WHEN
+                            LEN(RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))) > 0
+                        THEN RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))
+                        ELSE RTRIM(p.surname)
+                    END                     AS student_contact_surname,
                     ''               AS student_contact_home_email,
                     pa.e_mail        AS student_contact_default_email,
                     ''               AS student_contact_work_email,
@@ -148,7 +153,12 @@ class Sync extends Base implements ISync
                     ''               AS student_contact_title,
                     p.m_name         AS student_contact_given_name,
                     p.m_name         AS student_contact_preferred,
-                    p.surname        AS student_contact_surname,
+                    CASE
+                        WHEN
+                            LEN(RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))) > 0
+                        THEN RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))
+                        ELSE RTRIM(p.surname)
+                    END                     AS student_contact_surname,
                     ''               AS student_contact_home_email,
                     pa.e_mail        AS student_contact_default_email,
                     ''               AS student_contact_work_email,
