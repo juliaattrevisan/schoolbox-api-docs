@@ -27,7 +27,7 @@ if ($timespanType === 'range') {
     SitePage::localRedir(
         sprintf(
             '/modules/eotc/report/range/%s/?%s',
-            Alaress_Date_Format::now()->addMonths(-1)->getURLDate(),
+            Alaress_Date_Format::now()->modify(EventStatusMapper::DEFAULT_FROM_DATE_FOR_PROCESSED)->getURLDate(),
             http_build_query([
                 'status' => [
                     EventStatusMapper::STATUS_APPROVED,

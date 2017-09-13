@@ -34,6 +34,9 @@ class EventStatusMapper extends \Schoolbox\Mapper {
 	const STATUS_APPROVED = 5;
 	const STATUS_REJECTED = 6;
 
+    const DEFAULT_FROM_DATE_FOR_REVIEW = '-6 month';
+    const DEFAULT_FROM_DATE_FOR_PROCESSED = '-1 month';
+
 	/**
 	 * Mapping
 	 */

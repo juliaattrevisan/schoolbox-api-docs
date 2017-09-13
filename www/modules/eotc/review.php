@@ -18,7 +18,7 @@ use EOTC\EventStatusMapper;
 SitePage::localRedir(
     sprintf(
         '/modules/eotc/report/range/%s/?%s',
-        Alaress_Date_Format::now()->addMonths(-6)->getURLDate(),
+        Alaress_Date_Format::now()->modify(EventStatusMapper::DEFAULT_FROM_DATE_FOR_REVIEW)->getURLDate(),
         http_build_query([
             'status' => [
                 EventStatusMapper::STATUS_DRAFT,
