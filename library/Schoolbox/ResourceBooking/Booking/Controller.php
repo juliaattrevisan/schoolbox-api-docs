@@ -61,6 +61,7 @@ class Controller extends Base
      * Creates a booking for an item.
      *
      * @param Item\Model $item
+     * @throws \Exception If cannot parse date interval
      */
     public function book(Item\Model $item)
     {
@@ -104,7 +105,13 @@ class Controller extends Base
             // behave as expected over DST changes.
             if (!($endDate instanceof DateTime)) {
                 $endDate = clone $startDate;
-                $endDate->add($resource->getMinReservationTime()->getAsDateInterval());
+
+                // No min reservation time configured? Default to 30 min.
+                $interval     = $resource->getMinReservationTime();
+                $dateInterval = (int)$interval->getSecondTotal()
+                    ? $interval->getAsDateInterval()
+                    : new \DateInterval('PT30M');
+                $endDate->add($dateInterval);
             }
         }
         if ($endDate instanceof DateTime) {
