@@ -119,8 +119,7 @@ class Controller extends Base
             $mostRecentFeedback = $participant->findMostRecentFeedback();
 
             $formData = [
-                'response' => $response,
-                'publish' => '1'
+                'response' => $response
             ];
 
             foreach ($feedback['formData'] as $data) {

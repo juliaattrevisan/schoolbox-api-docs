@@ -350,16 +350,23 @@
 
                         {# Throw the necessary data into an array so we can submit in a single AJAX request #}
 
+                        var formData = $form.serializeArray();
+
+                        formData.push({
+                            name: 'publish',
+                            value: '1'
+                        });
+
                         feedback.push({
-                            assessmentId: {{ assessment.id }},
+                            assessmentId: '{{ assessment.id }}',
                             studentId: $participant.attr('data-participant'),
-                            formData: $form.serializeArray()
+                            formData: formData
                         });
                     });
 
-
-                    $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks') }}', {'feedback': feedback})
-                        .done(function (response) {
+                    $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks') }}', {
+                        'feedback': feedback
+                    }).done(function (response) {
                             var toastError = '';
 
                             response.forEach(function(feedback) {
