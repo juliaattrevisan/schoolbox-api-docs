@@ -107,7 +107,9 @@ class Controller extends Base
                     'list'         => $list,
                     'categoryId'   => $catId,
                     'category'     => $category,
-                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'categoryList' => $this->getMapper()->getJoinMapper('category')->findAll([
+                        'order' => ['name' => 'asc',]
+                    ]),
                     'search'       => $search,
                     'paginator'    => $this->paginator,
                     'page'         => $page,
@@ -154,7 +156,9 @@ class Controller extends Base
                 'template' => '@resourceItem/edit.twig',
                 'data'     => array(
                     'item'            => new Model(),
-                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll([
+                        'order' => ['name' => 'asc',]
+                    ]),
                     'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                     'moderatorList'   => array(),
                     'relatedItemList' => array(),
@@ -221,7 +225,9 @@ class Controller extends Base
                 'template' => '@resourceItem/edit.twig',
                 'data'     => array(
                     'item'            => $item,
-                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll([
+                        'order' => ['name' => 'asc',]
+                    ]),
                     'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                     'moderatorList'   => $moderatorList,
                     'relatedItemList' => $relatedItemList,
