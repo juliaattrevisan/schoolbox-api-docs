@@ -396,16 +396,6 @@ class Archiver
                 );
 
 
-                // What feedback does this belong in?
-                $feedbackId = $this->findFeedbackId(
-                    (int)$row['responseId'],
-                    (int)$row['studentId'],
-                    (int)$row['boxId'],
-                    $systemUser->getId(),
-                    $dryRun
-                );
-
-
                 // Log where we're at
                 if (!$dryRun) {
                     $this->logToDatabase($fileId, null, $crocodocDocumentId, self::STATUS_PROCESSING, '');
@@ -472,6 +462,16 @@ class Archiver
                     $this->log->info('Crocodoc document would have been successfully archived');
                     continue;
                 }
+
+
+                // Find the feedback that this file belongs in
+                $feedbackId = $this->findFeedbackId(
+                    (int)$row['responseId'],
+                    (int)$row['studentId'],
+                    (int)$row['boxId'],
+                    $systemUser->getId(),
+                    $dryRun
+                );
 
 
                 // Now store it and create a feedback for it
