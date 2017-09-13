@@ -156,7 +156,12 @@ class Controller extends Base
 
         // Send them back to the item detail page
 
-        $this->getResponse()->redirect->afterPost('/eportfolio/blog/' . $page->getPageId() .'/'. $blog->getId());
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'eportfolioBlog.getItem',
+                ['pageId' => $page->getPageId(), 'id' => $blog->getId(),]
+            )
+        );
     }
 
     /**
@@ -214,7 +219,12 @@ class Controller extends Base
         $comment->setCreatedAt(\Alaress_Date_Format::now());
         $this->getEportfolioBlogCommentMapper()->save($comment);
 
-        $this->getResponse()->redirect->afterPost('/eportfolio/blog/' . $blog->getPageId() .'/'. $blog->getId());
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'eportfolioBlog.getItem',
+                ['pageId' => $blog->getPageId(), 'id' => $blog->getId(),]
+            )
+        );
     }
 
 
