@@ -44,7 +44,13 @@ $dateFrom     = '';
 $dateTo       = '';
 $statuses     = isset($_GET['status'])
     ? $_GET['status']
-    : [EventStatusMapper::STATUS_APPROVED, EventStatusMapper::STATUS_REJECTED,];
+    : [
+        EventStatusMapper::STATUS_DRAFT,
+        EventStatusMapper::STATUS_INPRINCIPLE,
+        EventStatusMapper::STATUS_DETAILSCOMPLETED,
+        EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
+        EventStatusMapper::STATUS_APPROVED,
+    ];
 $statusList   = EventStatusMapper::getInstance()->findAll();
 if ($timespanType === 'range') {
     // get from/to date out
