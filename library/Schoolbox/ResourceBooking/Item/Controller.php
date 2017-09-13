@@ -221,7 +221,9 @@ class Controller extends Base
                 'template' => '@resourceItem/edit.twig',
                 'data'     => array(
                     'item'            => $item,
-                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll(),
+                    'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll([
+                        'order' => ['name' => 'asc',]
+                    ]),
                     'moderationList'  => $this->getMapper()->getJoinMapper('moderation_type')->findAll(),
                     'moderatorList'   => $moderatorList,
                     'relatedItemList' => $relatedItemList,
