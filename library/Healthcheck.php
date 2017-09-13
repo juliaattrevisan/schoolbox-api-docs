@@ -132,10 +132,11 @@ class Healthcheck
      * Test a query against each database object in the supplied array
      *
      * @param array $objects
+     * @param string $db If provided, run against this instead of the default DB
      * @param string $schema If provided, run against this instead of the default schema
      * @param string $query If provided, run against this instead of default select first query
      */
-    private function selectTest($objects, $schema = null, $query = "SELECT TOP 1 * FROM :object")
+    private function selectTest($objects, $db = null, $schema = null, $query = "SELECT TOP 1 * FROM :object")
     {
         sort($objects);
 
@@ -266,7 +267,7 @@ class Healthcheck
             'studcommrules',
         ];
 
-        $this->selectTest($tables, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
 
         $db2inst1Tables = [
             'schoolbox_classes',
@@ -281,7 +282,7 @@ class Healthcheck
             'schoolbox_timetable_definition'
         ];
 
-        $this->selectTest($db2inst1Tables, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($db2inst1Tables, null, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -443,13 +444,14 @@ class Healthcheck
                     'tDocuments',
                     'DocumentReferences'
                 ],
+                null,
                 ($externalPing->getVersion() == "68") ? 'media' : 'SynergyOneMedia'
             );
         }
 
         // Community Portal Password Update
 
-        $this->selectTest(['CommunityLogins'], null, "UPDATE :object SET Password = '' WHERE 1 = 0");
+        $this->selectTest(['CommunityLogins'], null, null, "UPDATE :object SET Password = '' WHERE 1 = 0");
 
         // Stored Procedures
 
@@ -696,10 +698,11 @@ class Healthcheck
             "TimetableBlockInstance",
         ];
 
-        $this->selectTest($fcTables, 'fc');
+        $this->selectTest($fcTables, null, 'fc');
 
         $this->selectTest(
             ['periodExpand'],
+            null,
             'fc',
             'SELECT TOP 1 * FROM fc.TimetableBlockInstance tbi CROSS APPLY :object(tbi.TimetablePeriodID, tbi.Consecutive) tpe'
         );
