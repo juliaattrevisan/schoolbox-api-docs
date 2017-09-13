@@ -1,274 +1,284 @@
 <?php
-use Schoolbox\Realtime\Message\NS;
-
 /**
- * 
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
- * 
  */
 
-class Component_Definition {
+use Schoolbox\Realtime\Message\NS;
 
-	const MODULE_DASHBOARD  = 'dashboard';
-	const MODULE_HOMEPAGE   = 'homepage';
-	const MODULE_EPORTFOLIO = 'eportfolio';
+class Component_Definition
+{
+    // Constants defining modules where components are allowed
 
-	/**
-	 * @var int
-	 */
-	protected $id;
+    const MODULE_DASHBOARD = 'dashboard';
+    const MODULE_HOMEPAGE = 'homepage';
+    const MODULE_EPORTFOLIO = 'eportfolio';
 
-	/**
-	 * @var string
-	 */
-	protected $name;
+    /** @var int $id */
+    protected $id;
 
-	/**
-	 * @var string
-	 */
-	protected $class;
+    /** @var string $name */
+    protected $name;
 
-	/**
-	 * @var string
-	 */
-	protected $description;
+    /** @var string $class */
+    protected $class;
 
-	/**
-	 * @var string
-	 */
-	protected $module;
+    /** @var string $description */
+    protected $description;
 
-	/**
-	 * @var string
-	 */
-	protected $visible;
+    /** @var string $module */
+    protected $module;
 
-	/**
-	 * @var string
-	 */
-	protected $multiple;
+    /** @var string $visible */
+    protected $visible;
 
-	/**
-	 * @var string
-	 */
-	protected $componentCategory;
+    /** @var string $multiple */
+    protected $multiple;
+
+    /** @var string $componentCategory */
+    protected $componentCategory;
+
+    /** @var NS|null $namespace Message namespace this component resides in (may be null) */
+    protected $namespace;
+
+    /** @var string $componentCategoryName The name of this component's category (as opposed to its ID) */
+    protected $componentCategoryName;
+
+    /** @var int $instanceCount An unmapped count of instances of this item */
+    protected $instanceCount = 0;
+
+    /** @var string $configCopy CSV list of configurations to copy from template during creation */
+    protected $configCopy;
 
     /**
-     * Message namespace this component resides in (may be null)
-     *
-     * @var NS
+     * @return bool
      */
-	protected $namespace;
-
-	/**
-	 * The name of this component's category (as opposed to its ID)
-	 *
-	 * @var string
-	 */
-	protected $componentCategoryName;
-
-	/**
-	 * An unmapped count of instances of this item.
-	 *
-	 * @var int
-	 */
-	protected $instanceCount = 0;
-
-	/**
-	 * @param  string $class
-	 *
-	 * @return $this
-	 */
-	public function setClass($class) {
-		$this->class = $class;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getClass() {
-		return $this->class;
-	}
-
-	/**
-	 * Gets this component's class, usable as a CSS class.
-	 *
-	 * @return string
-	 */
-	public function getCssClass()
-	{
-		return str_replace('\\', '_', $this->getClass());
-	}
-
-	/**
-	 * @param  string $componentCategory
-	 *
-	 * @return $this
-	 */
-	public function setComponentCategory($componentCategory) {
-		$this->componentCategory = $componentCategory;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getComponentCategory() {
-		return $this->componentCategory;
-	}
-
-	/**
-	 * @param  string $componentCategoryName
-	 *
-	 * @return $this
-	 */
-	public function setComponentCategoryName($componentCategoryName) {
-		$this->componentCategoryName = $componentCategoryName;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getComponentCategoryName() {
-		return $this->componentCategoryName;
-	}
-
-	/**
-	 * @param  string $description
-	 *
-	 * @return $this
-	 */
-	public function setDescription($description) {
-		$this->description = $description;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getDescription() {
-		return $this->description;
-	}
-
-	/**
-	 * @param  int $id
-	 *
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
-	 * @param  string $module
-	 *
-	 * @return $this
-	 */
-	public function setModule($module) {
-		$this->module = $module;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getModule() {
-		return $this->module;
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	public function isHomepageModule()
-	{
-		return $this->getModule() == self::MODULE_HOMEPAGE;
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	public function isDashboardModule()
-	{
-		return $this->getModule() == self::MODULE_DASHBOARD;
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	public function isEportfolioModule()
-	{
-		return $this->getModule() == self::MODULE_EPORTFOLIO;
-	}
-
-	/**
-	 * @param  string $multiple
-	 *
-	 * @return $this
-	 */
-	public function setMultiple($multiple) {
-		$this->multiple = $multiple;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMultiple() {
-		return $this->multiple;
-	}
-
-	/**
-	 * @param  string $name
-	 *
-	 * @return $this
-	 */
-	public function setName($name) {
-		$this->name = $name;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
-
-	/**
-	 * @param  string $visible
-	 *
-	 * @return $this
-	 */
-	public function setVisible($visible) {
-		$this->visible = $visible;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getVisible() {
-		return $this->visible;
-	}
+    public function isHomepageModule()
+    {
+        return $this->getModule() == self::MODULE_HOMEPAGE;
+    }
 
     /**
-     * @return NS
+     * @return bool
+     */
+    public function isDashboardModule()
+    {
+        return $this->getModule() == self::MODULE_DASHBOARD;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEportfolioModule()
+    {
+        return $this->getModule() == self::MODULE_EPORTFOLIO;
+    }
+
+    /**
+     * Increments the instance count for this definition.
+     *
+     * @return void
+     */
+    public function incrementInstanceCount()
+    {
+        $this->instanceCount++;
+    }
+
+    /**
+     * Gets this component's class, usable as a CSS class.
+     *
+     * @return string
+     */
+    public function getCssClass()
+    {
+        return str_replace('\\', '_', $this->getClass());
+    }
+
+    // Getters & Setters
+
+    /**
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    /**
+     * @param string $class
+     * @return self
+     */
+    public function setClass($class)
+    {
+        $this->class = $class;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComponentCategory()
+    {
+        return $this->componentCategory;
+    }
+
+    /**
+     * @param string $componentCategory
+     * @return self
+     */
+    public function setComponentCategory($componentCategory)
+    {
+        $this->componentCategory = $componentCategory;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComponentCategoryName()
+    {
+        return $this->componentCategoryName;
+    }
+
+    /**
+     * @param string $componentCategoryName
+     * @return self
+     */
+    public function setComponentCategoryName($componentCategoryName)
+    {
+        $this->componentCategoryName = $componentCategoryName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return self
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConfigCopy()
+    {
+        return $this->configCopy;
+    }
+
+    /**
+     * @param string $configCopy
+     * @return self
+     */
+    public function setConfigCopy($configCopy)
+    {
+        $this->configCopy = $configCopy;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * @param string $module
+     * @return self
+     */
+    public function setModule($module)
+    {
+        $this->module = $module;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMultiple()
+    {
+        return $this->multiple;
+    }
+
+    /**
+     * @param string $multiple
+     * @return self
+     */
+    public function setMultiple($multiple)
+    {
+        $this->multiple = $multiple;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return self
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param string $visible
+     * @return self
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
+        return $this;
+    }
+
+    /**
+     * @return NS|null
      */
     public function getNamespace()
     {
@@ -276,8 +286,8 @@ class Component_Definition {
     }
 
     /**
-     * @param NS $namespace   null is permissible
-     * @return $this
+     * @param NS|null $namespace
+     * @return self
      */
     public function setNamespace(NS $namespace = null)
     {
@@ -285,29 +295,21 @@ class Component_Definition {
         return $this;
     }
 
-	/**
-	 * @param  int   $instanceCount
-	 * @return $this
-	 */
-	public function setInstanceCount($instanceCount) {
-		$this->instanceCount = $instanceCount;
-		return $this;
-	}
+    /**
+     * @return int
+     */
+    public function getInstanceCount()
+    {
+        return $this->instanceCount;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getInstanceCount() {
-		return $this->instanceCount;
-	}
-
-	/**
-	 * Increments the instance count for this definition.
-	 *
-	 * @return void
-	 */
-	public function incrementInstanceCount() {
-		$this->instanceCount++;
-	}
-
+    /**
+     * @param int $instanceCount
+     * @return self
+     */
+    public function setInstanceCount($instanceCount)
+    {
+        $this->instanceCount = $instanceCount;
+        return $this;
+    }
 }

@@ -1,0 +1,44 @@
+<?php
+/**
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2017, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Custom\Loyola\Survey\Component\Homepage;
+
+use Component_Homepage_ControllerAbstract;
+
+/**
+ * {@inheritDoc}
+ *
+ * Class Controller
+ * @package Custom\Loyola\Survey\Component\Homepage
+ */
+class Controller extends Component_Homepage_ControllerAbstract
+{
+    /**
+     * {@inheritDoc}
+     *
+     * @return bool
+     */
+    public function execute()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param string $templateHandle
+     * @return bool
+     */
+    public function renderTemplate($templateHandle)
+    {
+        // Render this mess out
+
+        return $this->renderTwigTemplate($templateHandle, '@surveyHomepage/component.twig', [
+            'folderId' => $this->getContext()->getId()
+        ]);
+    }
+}

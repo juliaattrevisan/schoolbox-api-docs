@@ -11,6 +11,7 @@ use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Custom\Loyola\Survey\Module as SurveyModule;
 use Custom\Loyola\Survey\Component\Eportfolio\Module as EportfolioModule;
+use Custom\Loyola\Survey\Component\Homepage\Module as HomepageModule;
 use Config\Modules\ModuleConfigInterface;
 
 class Survey extends ModuleLoader implements ModuleConfigInterface
@@ -29,6 +30,7 @@ class Survey extends ModuleLoader implements ModuleConfigInterface
         if ($di->get('config')->get('site_location') == 'loyola') {
             $this->loadModule($kernel, SurveyModule::class, "/{$namespace}");
             $this->loadModule($kernel, EportfolioModule::class, "/{$namespace}");
+            $this->loadModule($kernel, HomepageModule::class, "/{$namespace}");
         }
     }
 }

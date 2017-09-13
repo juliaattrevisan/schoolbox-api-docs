@@ -9,31 +9,31 @@ namespace Schoolbox;
 
 use DomainException;
 use UnexpectedValueException;
-use \ICollection;
 
 /**
- * Member items must be of declared type.
+ * Class GenericCollection
+ *
+ * Member items must be of declared type (or one of its subtypes)
  * Type is declared on construction or insertion of first element.
  * Type may be class or interface - not scalar or array
+ *
+ * @package Schoolbox
  */
 class GenericCollection extends Collection
 {
-    /**
-     * What type the elements in this Collection are allowed to be
-     *
-     * @var string
-     */
+    /** @var string|null $elementType What type the elements in this Collection are allowed to be */
     private $elementType = null;
 
     /**
-     * If type is null, then set the type when first item is inserted
+     * Constructor
      *
      * @param string|object $elementType
      * @param array $stack
-     *
      */
     public function __construct($elementType, array $stack = [])
     {
+        // If type is null, then set the type when first item is inserted
+
         if (is_string($elementType)) {
             $this->elementType = $elementType;
         } elseif (is_object($elementType)) {
@@ -46,16 +46,8 @@ class GenericCollection extends Collection
     }
 
     /**
-     * Returns the class/interface name of elements in this Collection
+     * {@inheritDoc}
      *
-     * @return string
-     */
-    public function getElementClass()
-    {
-        return $this->elementType;
-    }
-
-    /**
      * @return static
      */
     public function emptyClone()
@@ -64,10 +56,10 @@ class GenericCollection extends Collection
     }
 
     /**
-     * Set stack
+     * {@inheritDoc}
      *
-     * @param $stack
-     * @return static
+     * @param array $stack
+     * @return self
      */
     protected function setStack($stack)
     {
@@ -76,6 +68,70 @@ class GenericCollection extends Collection
         }
         parent::setStack($stack);
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param $element
+     * @return static
+     */
+    public function add($element)
+    {
+        $this->checkType($element);
+        parent::add($element);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param $element
+     * @return static
+     */
+    public function prepend($element)
+    {
+        $this->checkType($element);
+        parent::prepend($element);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     * @return static
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->checkType($value);
+        parent::offsetSet($offset, $value);
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param int $index
+     * @param object $value
+     * @return static
+     */
+    public function setOffset($index, $value)
+    {
+        $this->checkType($value);
+        parent::offsetSet($index, $value);
+        return $this;
+    }
+
+    /**
+     * Returns the class/interface name of elements in this Collection
+     *
+     * @return string
+     */
+    public function getElementClass()
+    {
+        return $this->elementType;
     }
 
     /**
@@ -97,80 +153,22 @@ class GenericCollection extends Collection
         }
     }
 
-
     /**
      * Replace the internally held contents with the content of the given collection
      *
      * @param Collection $collection
-     * @return $this
+     * @return static
      */
     public function replaceWith(Collection $collection)
     {
-        // short-circuit via generics if we can
+        // Short-circuit via generics if we can
         if ($collection instanceof static && $this->assertSameItemClass($collection)) {
             parent::setStack($collection->getStack());
-
         } else {
-            // test every item individually
+            // Test every item individually
             parent::replaceWith($collection);
         }
 
-        return $this;
-    }
-
-
-    /**
-     * Add an element ot the end of the stack
-     *
-     * @param $element
-     * @return $this
-     */
-    public function add($element)
-    {
-        $this->checkType($element);
-        parent::add($element);
-        return $this;
-    }
-
-    /**
-     * Prepend an element to the start of the stack
-     *
-     * @param $element
-     * @return static
-     */
-    public function prepend($element)
-    {
-        $this->checkType($element);
-        parent::prepend($element);
-        return $this;
-    }
-
-    /**
-     * Sets key value in collection
-     *
-     * @param  mixed $offset
-     * @param  mixed $value
-     *
-     * @return static
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->checkType($value);
-        parent::offsetSet($offset, $value);
-        return $this;
-    }
-
-    /**
-     * Put an object in a particular place in the stack
-     *
-     * @param int $index
-     * @param object $value
-     * @return static
-     */
-    public function setOffset($index, $value)
-    {
-        $this->checkType($value);
-        parent::offsetSet($index, $value);
         return $this;
     }
 
@@ -182,8 +180,9 @@ class GenericCollection extends Collection
      */
     protected function assertSameItemClass(GenericCollection $newCollection)
     {
-        $thisItemClass = $this->getElementClass();
+        $thisItemClass  = $this->getElementClass();
         $otherItemClass = $newCollection->getElementClass();
+
         if ($thisItemClass != $otherItemClass) {
             throw new DomainException("Collection must be of type '$thisItemClass'. Found: '$otherItemClass'");
         }

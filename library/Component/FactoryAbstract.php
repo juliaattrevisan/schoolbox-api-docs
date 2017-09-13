@@ -1,66 +1,61 @@
 <?php
-
 /**
- * 
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
- * 
  */
-use \Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\GenericCollection;
 
-abstract class Component_FactoryAbstract {
-    /**
-     * @var String
-     */
+use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
+
+abstract class Component_FactoryAbstract
+{
+    /** @var string $module */
     private $module;
 
-    /**
-     * @var Integer
-     */
+    /** @var int $identifier */
     protected $identifier;
 
-    /**
-     * @var array
-     */
+    /** @var array $dependencyList */
     protected $dependencyList;
 
     /**
      * The maximum permission given to components built with this factory.
-     *
      * Used for building read-only views of component lists.
      *
      * @var int
      */
     protected $maximumPermission = UserAccess::ACCESS_FULL;
 
-	/**
-	 * Constructor
-	 *
-	 * @param \Schoolbox\User $user
-	 * @param SitePage $sitepage
-	 */
-	public function __construct (\Schoolbox\User $user, SitePage $sitepage) {
+    /**
+     * Constructor
+     *
+     * @param User $user
+     * @param SitePage $sitepage
+     */
+    public function __construct(User $user, SitePage $sitepage)
+    {
         $this->dependencyList = array($user, $sitepage);
     }
 
     /**
      * @param $identifier
-     * @return Schoolbox\Collection[Component_ControllerAbstract]
+     * @return Collection[Component_ControllerAbstract]
      */
-    public function buildComponentList ($identifier) {
+    public function buildComponentList($identifier)
+    {
         /* Get Component Instances */
         $instanceCollection = $this->getInstanceList($identifier);
 
-        $componentCollection = new Schoolbox\Collection();
+        $componentCollection = new Collection();
 
-        if ( !empty($instanceCollection) ) {
+        if (!empty($instanceCollection)) {
             foreach ($instanceCollection as $instance) {
                 $component = $this->buildComponent($instance);
 
-                if ( !empty($component) ) {
+                if (!empty($component)) {
                     $componentCollection->add($component);
                 }
             }
@@ -70,24 +65,27 @@ abstract class Component_FactoryAbstract {
     }
 
     /**
-     * Builds a component from a component instance or id
+     * Builds a component from a component instance or ID
+     *
      * @param Component_Instance|Integer $instance
      * @return Component_ControllerAbstract|Bool
      */
-    public function buildComponent ($instance) {
-        if ( is_numeric($instance) ) {
+    public function buildComponent($instance)
+    {
+        if (is_numeric($instance)) {
             $instance = $this->getInstance($instance);
         }
 
         /** @var Component_Instance $instance */
         $class = $instance->getDefinition()->getClass();
-        if ( class_exists($class, true) ) {
-            $argumentList = array_merge( array($instance), $this->dependencyList );
+
+        if (class_exists($class, true)) {
+            $argumentList = array_merge(array($instance), $this->dependencyList);
 
             $dependencyList = $this->buildDependencyList($class, 3);
 
-            if ( !empty($dependencyList) ) {
-                $argumentList = array_merge( $argumentList, $dependencyList );
+            if (!empty($dependencyList)) {
+                $argumentList = array_merge($argumentList, $dependencyList);
             }
 
             $controllerReflection = new ReflectionClass($class);
@@ -98,16 +96,16 @@ abstract class Component_FactoryAbstract {
 
             return $controller;
         }
-        else {
-            return false;
-        }
+
+        return false;
     }
 
     /**
      * @param $identifier
      * @return Component_Instance[]|GenericCollection
      */
-    public function getInstanceList ($identifier) {
+    public function getInstanceList($identifier)
+    {
         return Component_InstanceMapper::getInstance()->findByContext($this->module, $identifier);
     }
 
@@ -126,23 +124,27 @@ abstract class Component_FactoryAbstract {
      * @param $instanceId
      * @return Component_Instance
      */
-    public function getInstance ($instanceId) {
+    public function getInstance($instanceId)
+    {
         /* @var $instance Component_Instance */
         $instance = Component_InstanceMapper::getInstance()->findById($instanceId);
+
         /** @var Component_Definition $componentDefinition */
         $componentDefinition = Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId());
+
         $instance->setDefinition($componentDefinition);
 
         return $instance;
     }
 
     /**
-     * @return \Schoolbox\Collection
+     * @param string $sortBy
+     * @return Collection
      */
-    public function getDefinitionList($sortBy = '') {
+    public function getDefinitionList($sortBy = '')
+    {
         return Component_DefinitionMapper::getInstance()->findAllForModule($this->module, $sortBy);
     }
-
 
     /**
      * Builds dependencies from a component controller's constructor.
@@ -151,36 +153,36 @@ abstract class Component_FactoryAbstract {
      * @param Integer $offset
      * @return array
      */
-    protected function buildDependencyList ($class, $offset = 0)
+    protected function buildDependencyList($class, $offset = 0)
     {
-        $dependencyList = array();
-
+        $dependencyList  = [];
         $classReflection = new ReflectionClass($class);
+        $parameterList   = $classReflection->getConstructor()->getParameters();
 
-        $parameterList = $classReflection->getConstructor()->getParameters();
-
-        if ( !empty($parameterList) ) {
-            foreach ( $parameterList as $i => $parameter) {
-                if ( $i >= $offset ) {
+        if (!empty($parameterList)) {
+            foreach ($parameterList as $i => $parameter) {
+                if ($i >= $offset) {
 
                     try {
-                        /* Parses the export of the parameter for the class */
-                        $dependencyClass = preg_replace('/.*?(\w+)\s+\$'.$parameter->name.'.*/', '\\1',  Reflection::export($parameter, true) );
+                        ///Parses the export of the parameter for the class
+                        $dependencyClass = preg_replace('/.*?(\w+)\s+\$' . $parameter->name . '.*/', '\\1', Reflection::export($parameter, true));
 
-                        if ( !empty($dependencyClass) ) {
+                        if (!empty($dependencyClass)) {
                             $dependencyList[] = new $dependencyClass;
                         }
 
                     } catch (Exception $exception) {
                         return $dependencyList;
                     }
-                    
+
                 }
             }
         }
 
         return $dependencyList;
     }
+
+    // Getters & Setters
 
     /**
      * @return int
@@ -191,8 +193,8 @@ abstract class Component_FactoryAbstract {
     }
 
     /**
-     * @param  int   $maximumPermission
-     * @return $this
+     * @param int $maximumPermission
+     * @return self
      */
     public function setMaximumPermission($maximumPermission)
     {
@@ -201,7 +203,7 @@ abstract class Component_FactoryAbstract {
     }
 
     /**
-     * @return String
+     * @return string
      */
     protected function getModule()
     {
@@ -209,8 +211,8 @@ abstract class Component_FactoryAbstract {
     }
 
     /**
-     * @param $module
-     * @return static
+     * @param string $module
+     * @return self
      */
     public function setModule($module)
     {
