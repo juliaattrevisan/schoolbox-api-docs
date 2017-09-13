@@ -110,7 +110,7 @@ class Sync extends Base implements ISync
                     f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
                     p.f_name         AS student_contact_given_name,
-                    p.f_name         AS student_contact_preferred,
+                    LEFT(p.f_name, CHARINDEX(' ', p.f_name)) AS student_contact_preferred,
                     CASE
                         WHEN
                             LEN(RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))) > 0
@@ -152,7 +152,7 @@ class Sync extends Base implements ISync
                     f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
                     p.m_name         AS student_contact_given_name,
-                    p.m_name         AS student_contact_preferred,
+                    LEFT(p.m_name, CHARINDEX(' ', p.m_name)) AS student_contact_preferred,
                     CASE
                         WHEN
                             LEN(RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))) > 0
