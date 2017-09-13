@@ -17,6 +17,7 @@ use Schoolbox\GenericCollection;
 /**
  * @method Page findById($identifierValue)
  * @method Page createModel($idValue = null)
+ * @method Page hydrate(array $row, $alias = '', $callback = null)
  */
 class PageMapper extends Schoolbox\Mapper {
 
