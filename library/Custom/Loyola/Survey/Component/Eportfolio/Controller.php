@@ -112,7 +112,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             $this->survey = $this->surveyMapper->findById($this->config['survey']);
         } catch (MapperException $e) {
             // The survey was not found (or no survey was set in the configuration)
-            if (!$this->survey instanceof Survey && !$this->sessionUser->getRole()->isStaff()) {
+            if (!$this->sessionUser->getRole()->isStaff()) {
                 // The logged user is not a staff member, they can't do anything with the component, so dont render it!
                 return false;
             }
