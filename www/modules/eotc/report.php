@@ -49,7 +49,6 @@ $statuses     = isset($_GET['status'])
         EventStatusMapper::STATUS_INPRINCIPLE,
         EventStatusMapper::STATUS_DETAILSCOMPLETED,
         EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
-        EventStatusMapper::STATUS_APPROVED,
     ];
 $statusList   = EventStatusMapper::getInstance()->findAll();
 if ($timespanType === 'range') {

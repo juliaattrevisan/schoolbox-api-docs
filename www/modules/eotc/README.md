@@ -159,10 +159,14 @@ As previously explained, the first is a global setting. The second is a per-even
 ## 11. Event Report
 http://192.168.36.10/modules/eotc/report
 
-This is a list of EOTC events that is filtered by status. By default, it shows:
+This is a list of EOTC events that is filtered by status. By default, it shows events that:
 
-* events that have entered either the Approved or Cancelled statuses
-* events that start at earliest one month ago
+* start today, and:
+* are in one of these statuses:
+    * Initial Application
+    * Approved In Principle
+    * Details Completed
+    * Ready For Final Approval
 
 It does not by default show all events, because the event list became extremely long and slow to load.
 However, you can view the entire unabridged list by selecting *All* as the timespan, and clicking *Search*.
