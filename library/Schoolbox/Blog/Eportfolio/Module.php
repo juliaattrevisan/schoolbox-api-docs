@@ -45,15 +45,15 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/modify/new/{ownerId}/{pageId}'             => 'getInsert',
-                '/modify/{ownerId}/{pageId}/{id}'            => 'getModify',
-                '/archive/{ownerId}/{pageId}'                => 'getArchiveCurrent',
-                '/archive/{ownerId}/{pageId}/{year}/{month}' => 'getArchive',
-                '/{ownerId}/{pageId}/{id}'                   => 'getItem',
+                '/modify/new/{pageId}'                       => 'getInsert',
+                '/modify/{pageId}/{id}'                      => 'getModify',
+                '/archive/{pageId}'                          => 'getArchiveCurrent',
+                '/archive/{pageId}/{year}/{month}'           => 'getArchive',
+                '/{pageId}/{id}'                             => 'getItem',
             ],
             'POST' => [
                 '/delete/{id}'                               => 'postDelete',
-                '/insert/{ownerId}/{pageId}'                 => 'postInsert',
+                '/insert/{pageId}'                           => 'postInsert',
                 '/modify/{id}'                               => 'postModify',
                 '/comment/insert/{id}'                       => 'postCommentInsert',
                 '/comment/delete/{commentId}'                => 'postCommentDelete',
@@ -161,9 +161,6 @@ class Module extends BaseModule
             function ($params) {
                 $newParams = [];
                 try {
-                    if (array_key_exists('ownerId', $params)) {
-                        $newParams['owner'] = $this->getUserMapper()->findById($params['ownerId']);
-                    }
                     if (array_key_exists('commentId', $params)) {
                         /** @var EportfolioBlogCommentModel $comment */
                         $comment              = $this->getEportfolioBlogCommentMapper()->findById($params['commentId']);

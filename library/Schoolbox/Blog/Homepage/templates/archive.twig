@@ -57,30 +57,23 @@
 
         <div class="small-12 large-9 island">
             <h2 class="subheader">{{ blogs[0].getCreatedAt | date('F Y') }} Blog Posts</h2>
-            <section class="content">
-                <ul class="information-list">
+            <section>
+                <ul class="information-list social-stream">
 
                     {% for blog in blogs %}
 
-                    <li>
+                    <li class="actions-small-1">
                         <a id="{{ blog.getId() }}"></a>
-                        <div class="actions-small-1 row">
-                            <div class="list-item">
-                                <div class="small-12 column">
-                                    <h2><a href="/blog/{{ blog.id }}">{{ blog.getHeading }}</a></h2>
-                                </div>
+                        <div class="list-item">
+                            <div class="card small-12">
+                                {% include '@blog/sub/blogAvatarCard.twig' with {blog: blog} %}
                             </div>
-                            {% if isRouteAuthorized('blog.getModify', { folder: folder }) %}
-                            <nav>
-                                <a class="icon-modify" title="Modify" href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}"></a>
-                            </nav>
-                            {%  endif %}
                         </div>
-
-                        <div class="card small-12">
-                            {% include '@blog/sub/userAvatarCard.twig' with {user: blog.getOwner()} %}
-                            <p class="meta">Posted {{ blog.getCreatedAt.getLong }}</p>
-                        </div>
+                        {% if isRouteAuthorized('blog.getModify', { folder: folder }) %}
+                        <nav>
+                            <a class="icon-modify" title="Modify" href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}"></a>
+                        </nav>
+                        {%  endif %}
 
                         <article>
 
@@ -113,10 +106,12 @@
                         </ul>
 
                         {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
-                        <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}">
-                            <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                            <input type="submit" class="expand" name="comment" value="Add comment"/>
-                        </form>
+                        <div class="editPanel socialstream-new-post">
+                            <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}">
+                                <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                                <input type="submit" class="expand" name="comment" value="Add comment"/>
+                            </form>
+                        </div>
                         {% endif %}
                     </li>
 

@@ -89,7 +89,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             $templateHandle,
             '@eportfolioBlog/component.twig',
             array(
-                'session'               => $_SESSION,
                 'blogs'                 => $blogs,
                 'blogComments'          => $blogComments,
                 'blogImages'            => $blogImages,

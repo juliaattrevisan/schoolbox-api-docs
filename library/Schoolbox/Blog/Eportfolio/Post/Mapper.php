@@ -11,13 +11,10 @@
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use PDO;
+use PDOStatement;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
-use Schoolbox\Collection;
-use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Searchable;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -43,7 +40,7 @@ class Mapper extends BaseMapper
         /** Joins */
 
         $this->hasJoin(
-            'user',
+            'owner',
             array(
                 'mapper' => UserMapper::class,
                 'this_key' => 'owner_id',
@@ -53,24 +50,24 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find all the blog entries for a homepage
+     * Find all the blog entries posted in a particular users ePortfolio
      *
-     * @param User $owner
+     * @param User $user
      * @param $limit
-     * @return Collection
+     * @return GenericCollection
      */
-    public function findForOwner(User $owner, $limit = 0)
+    public function findForPortfolioOwner(User $user, $limit = 0)
     {
         $query =
             "
 			SELECT
 				{$this->getColumnString('b')},
-				{$this->getJoinColumnString('user', 'u')}
+				{$this->getJoinColumnString('owner', 'u')}
 			FROM `{$this->getTable()}` AS `b`
-            LEFT JOIN {$this->getJoinSql('user', 'b', 'u')}
+            INNER JOIN {$this->getJoinSql('owner', 'b', 'u',true)}
             JOIN `eportfolio_page` p ON p.page_id = b.page_id
 			WHERE `b`.`deleted_at` IS NULL
-				AND `b`.`owner_id` = :owner_id
+				AND `p`.`uid` = :owner_id
 				AND `p`.`deleted_at` IS NULL
 			ORDER BY `b`.`created_at` DESC
 		";
@@ -85,7 +82,7 @@ class Mapper extends BaseMapper
 
         $stmt->execute(
             array(
-                'owner_id' => $owner->getId(),
+                'owner_id' => $user->getId(),
             )
         );
 
@@ -93,7 +90,7 @@ class Mapper extends BaseMapper
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var User $user */
-            $user = $this->hydrateJoin($r, 'user', 'u');
+            $user = $this->hydrateJoin($r, 'owner', 'u');
 
             /** @var EportfolioBlogModel $blog */
             $blog = $this->hydrate($r, 'b');
@@ -104,4 +101,41 @@ class Mapper extends BaseMapper
         return $c;
     }
 
+    /**
+     * This mapper's find* methods always hydrate the owner
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('owner', 'u')}
+            FROM {$this->database->quoteIdentifier($this->table)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'u',true)}
+        ";
+    }
+
+    /**
+     * Hydrate joins added in `getSelectString`.
+     *
+     * @param  PDOStatement $statement
+     * @return GenericCollection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            $model = $this->hydrate($row);
+
+            // set user and division only if retrieved properly
+            $user = $this->hydrateJoin($row, 'owner', 'u');
+            if ($user instanceof User) {
+                $model->setOwner($user);
+            }
+            $collection->add($model);
+        }
+        return $collection;
+    }
 }

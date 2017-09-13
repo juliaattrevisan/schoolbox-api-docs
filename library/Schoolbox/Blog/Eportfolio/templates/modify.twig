@@ -29,6 +29,7 @@
 </script>
 
 <ul class="breadcrumb">
+    <li><a href="/eportfolio/{{ page.getUid }}">{{ pageOwner.getFullName }}'s ePortfolio</a></li>
     <li><a href="/eportfolio/{{ page.getUid }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
     <li class="active"><a href="#">{% if record.getId %}Modify{% else %}Post{% endif %} Blog</a></li>
 </ul>
@@ -58,9 +59,8 @@
     <div class="small-12 island">
         <form method="post"
               id="blogForm"
-              action="{{ record.getId ? routeLookup('eportfolioBlog.postModify', {id: record.getId}) : routeLookup('eportfolioBlog.postInsert', {pageId: page.getPageId, ownerId: page.getUid }) }}">
+              action="{{ record.getId ? routeLookup('eportfolioBlog.postModify', {id: record.getId}) : routeLookup('eportfolioBlog.postInsert', {pageId: page.getPageId }) }}">
             <input type="hidden" name="pageId" value="{{ page.getPageId }}" />
-            <input type="hidden" name="ownerId" value="{{ page.getUid }}" />
             <input type="hidden" name="id" value="{{ record.getId }}" />
 
             <section>

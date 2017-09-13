@@ -56,7 +56,7 @@ class Controller extends Base
      * @param Collection $attachments
      * @return array
      */
-    private function getAttachZone($attachments = null)
+    private function getAttachZone($attachments)
     {
         $zone = new Zone('attachment');
         $zone
@@ -68,27 +68,26 @@ class Controller extends Base
             ->setReadOnly(false)
             ->setMulti(true);
 
-        if ($attachments != null)
-            foreach ($attachments as $attachment)
-                $zone->attachFiles(array($attachment->getHash()));
 
+        foreach ($attachments as $attachment) {
+            $zone->attachFiles(array($attachment->getHash()));
+        }
         return $zone->getTwigContext();
     }
 
     /**
      * Insert new record
      *
-     * @param User                $owner
      * @param EportfolioPageModel $page
      */
-    public function postInsert(User $owner, EportfolioPageModel $page)
+    public function postInsert(EportfolioPageModel $page)
     {
         // Inserting new record, create an object and shunt in the required values
         /** @var EportfolioBlogModel $record */
         $record = $this->getEportfolioBlogMapper()->createModel();
-        $record->setOwner($owner);
+        $record->setOwner($this->getUser());
         $record->setPageId($page->getPageId());
-        $this->postModify($record);
+        $this->postModify($page, $record);
     }
 
     /**
@@ -96,7 +95,7 @@ class Controller extends Base
      *
      * @param EportfolioBlogModel $blog
      */
-    public function postModify(EportfolioBlogModel $blog)
+    public function postModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
 
         // Update details and save the record
@@ -157,7 +156,12 @@ class Controller extends Base
 
         // Send them back to the item detail page
 
-        $this->getResponse()->redirect->afterPost('/eportfolio/blog/' . $this->getRequest()->post["ownerId"] . '/' . $this->getRequest()->post["pageId"] .'/'. $blog->getId());
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'eportfolioBlog.getItem',
+                ['pageId' => $page->getPageId(), 'id' => $blog->getId(),]
+            )
+        );
     }
 
     /**
@@ -170,21 +174,8 @@ class Controller extends Base
     {
         try
         {
-            // Hydrate owner details
-
-            /** @var User $user */
-            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
-            $blog->setOwner($user);
-
             // Load any comments and hydrate their owners
             $comments = $this->getEportfolioBlogCommentMapper()->findByColumn("blog_id", $blog->getId());
-
-            /** @var EportfolioBlogCommentModel $comment */
-            foreach ($comments as $comment) {
-                /** @var User $user */
-                $user = $this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId());
-                $comment->setOwner($user);
-            }
 
             // Load any images
             $images = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
@@ -200,11 +191,11 @@ class Controller extends Base
             array(
                 'template' => '@eportfolioBlog/item.twig',
                 'data'     => array(
-                    'session'           => $_SESSION,
                     'record'            => $blog,
                     'comments'          => $comments,
                     'images'            => $images,
-                    'page'              => $page
+                    'page'              => $page,
+                    'pageOwner'         => $this->getUserMapper()->findById($page->getUid()),
                 ),
             )
         );
@@ -228,7 +219,12 @@ class Controller extends Base
         $comment->setCreatedAt(\Alaress_Date_Format::now());
         $this->getEportfolioBlogCommentMapper()->save($comment);
 
-        $this->getResponse()->redirect->afterPost('/eportfolio/blog/' . $this->getRequest()->post['ownerId'] . '/' . $this->getRequest()->post['pageId'] .'/'. $blog->getId());
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'eportfolioBlog.getItem',
+                ['pageId' => $blog->getPageId(), 'id' => $blog->getId(),]
+            )
+        );
     }
 
 
@@ -265,13 +261,13 @@ class Controller extends Base
             array(
                 'template' => '@eportfolioBlog/modify.twig',
                 'data'     => array(
-                    'session'           => $_SESSION,
                     'record'            => $blog,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
                     'READ_ACCESS'       => READ_ACCESS,
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
-                    'page'              => $page
+                    'page'              => $page,
+                    'pageOwner'         => $this->userMapper->findById($page->getUid()),
                 ),
             )
         );
@@ -289,12 +285,12 @@ class Controller extends Base
             array(
                 'template' => '@eportfolioBlog/modify.twig',
                 'data'     => array(
-                    'session'           => $_SESSION,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
                     'READ_ACCESS'       => READ_ACCESS,
                     'FULL_ACCESS'       => FULL_ACCESS,
-                    'attachzone'        => $this->getAttachZone(),
-                    'page'              => $page
+                    'attachzone'        => $this->getAttachZone(new Collection()),
+                    'page'              => $page,
+                    'pageOwner'         => $this->userMapper->findById($page->getUid()),
                 ),
             )
         );
@@ -333,18 +329,11 @@ class Controller extends Base
         /** @var EportfolioBlogModel $blog */
         foreach ($blogs as $blog) {
             $dateSelectorArray[$blog->getCreatedAt()->getYear() . "-" . $blog->getCreatedAt()->getMonth(true)] = $blog->getCreatedAt();
-            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
-            $blog->setOwner($user);
 
             if ($blog->getCreatedAt()->getYear() == $year && $blog->getCreatedAt()->getMonth() == $month) {
 
                 $blogComments[$blog->getId()] = $this->getEportfolioBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
                 $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn('blog_id', $blog->getId());
-
-                /** @var EportfolioBlogCommentModel $comment */
-                foreach ($blogComments[$blog->getId()] as $comment) {
-                    $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
-                }
 
                 $blogsSelectedMonth[] = $blog;
             }
@@ -355,16 +344,12 @@ class Controller extends Base
             array(
                 'template' => '@eportfolioBlog/archive.twig',
                 'data'     => array(
-                    'session'           => $_SESSION,
                     'blogs'             => $blogsSelectedMonth,
-                    'blogImages'      => $blogImages,
+                    'blogImages'        => $blogImages,
                     'blogComments'      => $blogComments,
                     'dateSelectorArray' => $dateSelectorArray,
-                    'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
-                    'FULL_ACCESS'       => FULL_ACCESS,
-                    'attachzone'        => $this->getAttachZone(),
-                    'page'              => $page
+                    'page'              => $page,
+                    'pageOwner'         => $this->userMapper->findById($page->getUid()),
                 ),
             )
         );
