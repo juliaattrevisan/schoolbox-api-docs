@@ -6,7 +6,6 @@
  */
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
@@ -333,7 +332,7 @@ class External_Synergetic_User implements External_UserInterface
             SELECT      vStudents.StudentID,
                         vStudents.StudentGiven1,
                         vStudents.StudentSurname,
-                        vStudents.StudentBirthDate,
+                        CONVERT(nvarchar(30), vStudents.StudentBirthDate, 126 ) as StudentBirthDate,
                         vStudents.StudentTutorName,
                         vStudents.StudentHeadOfHouse,
                         House.HeadOfHouseID,
@@ -404,8 +403,8 @@ class External_Synergetic_User implements External_UserInterface
 
                 $student = $row;
 
-                if ($student['StudentBirthDate'] && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
-                    $student['StudentBirthDate'] = strtotime("{$matches[2]} {$matches[1]} {$matches[3]}");
+                if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
+                    $student['StudentBirthDate'] = $birthDate;
                 } else {
                     $student['StudentBirthDate'] = false;
                 }
