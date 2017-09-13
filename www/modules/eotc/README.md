@@ -108,9 +108,15 @@ http://192.168.36.10/modules/eotc/review
 
 Used by EOTC Administrators.
 
-This screen shows a list of events, grouped by Status, that have not yet been Approved. When certain thresholds are reached, an event may show in either its Status grouping, or in its own unique case, Urgent. This is determined by the Urgent Threshold setting in EOTC Configuration.
+This now redirects to the Event Report, with sensible defaults:
 
-From here you are also given links to another screen which shows all Approved and Cancelled EOTC events. Alternatively you can view an individual event by hitting the eyeball. This takes you to the Status Transition screen.
+* From: 6 months ago
+* To: empty (no limit)
+* Statuses:
+    * Initial Application
+    * Approved In Principle
+    * Details Completed
+    * Ready For Final Approval
 
 ## 9. Status Transition
 http://192.168.36.10/modules/eotc/status/modify/:eventId
@@ -167,6 +173,12 @@ This is a list of EOTC events that is filtered by status. By default, it shows e
     * Approved In Principle
     * Details Completed
     * Ready For Final Approval
+
+This screen shows a list of events, grouped by Status. When certain thresholds are reached, an event may show in either
+its Status grouping, or in its own unique case, Urgent. This is determined by the Urgent Threshold setting in EOTC
+Configuration.
+
+You can view an individual event by hitting the eyeball. This takes you to the Status Transition screen.
 
 It does not by default show all events, because the event list became extremely long and slow to load.
 However, you can view the entire unabridged list by selecting *All* as the timespan, and clicking *Search*.
