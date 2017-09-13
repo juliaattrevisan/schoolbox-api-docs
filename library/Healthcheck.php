@@ -443,6 +443,13 @@ class Healthcheck
 
         if ($this->configMapper->get('external_document_report_enabled')) {
             $externalPing = new \External_Ping();
+            if ($externalPing->getVersion() == "68") {
+                $db     = null;
+                $schema = 'media';
+            } else {
+                $db     = 'SynergyOneMedia';
+                $schema = 'dbo';
+            }
             $this->selectTest(
                 [
                     'StudentReportsArchiveLink',
@@ -450,8 +457,8 @@ class Healthcheck
                     'tDocuments',
                     'DocumentReferences'
                 ],
-                null,
-                ($externalPing->getVersion() == "68") ? 'media' : 'SynergyOneMedia'
+                $db,
+                $schema
             );
         }
 
