@@ -42,6 +42,7 @@ class Controller extends Base {
                 array(
                     'limit'  => $this->paginator->getPageSize(),
                     'offset' => $this->paginator->getOffset($page),
+                    'order'  => ['name' => 'asc',],
                 )
             );
         }
