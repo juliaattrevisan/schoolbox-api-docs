@@ -612,7 +612,6 @@ class Controller extends Base\Base
             foreach ($classOwners as $classFolderId => $user) {
                 $courseImpl = $this->getCourseImplementationMapper()->createModel();
                 $courseImpl->setSpecification($courseSpec);
-                $classFolderId = explode(':', $ownership)[0];
                 $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
                 $courseImpls[$classFolderId] = $courseImpl;
 
@@ -635,7 +634,7 @@ class Controller extends Base\Base
             }
 
             //Save unit criteria to class page
-            $classFolderId = explode(':', $ownerships)[0];
+            $classFolderId = key($classOwners);
             $this->copyCriteria($unitFolders, $classFolderId);
         }
 
