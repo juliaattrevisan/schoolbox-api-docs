@@ -79,7 +79,7 @@ if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
     // noop
 } elseif ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
     // noop
-} elseif ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+} elseif ($quizVisibility->isStaffStudentParent()) {
     // noop
 } else {
     error(129);
