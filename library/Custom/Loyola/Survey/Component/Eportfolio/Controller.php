@@ -8,11 +8,13 @@
 namespace Custom\Loyola\Survey\Component\Eportfolio;
 
 use Component_Eportfolio_ControllerAbstract;
+use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Survey\Model as Survey;
 use Schoolbox\User;
 use Scrub;
+use SitePage;
 
 /**
  * {@inheritDoc}
@@ -37,15 +39,68 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     /**
      * {@inheritDoc}
      *
-     * @return bool
+     * @param Component_Instance $instance
+     * @param User $user
+     * @param SitePage $sitepage
      */
-    public function execute()
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         // Rather annoyingly at this point the getUser() function returns an unhydrated object, so we're going to
         // read the user straight out of the session variable rather than doing a double hydration
 
         $this->sessionUser = $_SESSION["user"];
 
+        parent::__construct($instance, $user, $sitepage);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Override for `Component_ControllerAbstract::parseConfig()` function to cater for this components
+     * stupid visibility shenanigans.
+     *
+     * @param string $targetHandle
+     * @param bool $is_for_template
+     * @return bool
+     */
+    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
+    {
+        // Determine what to display
+
+        $this->setupConfigRendering($targetHandle);
+
+        // Setup component for all non-staff roles
+
+        if (!$this->sessionUser->getRole()->isStaff()) {
+            if ($this->getConfig('collapse') !== '1') {
+                // 'Display Component Heading On Student View' is ticked, remove the title bar entirely
+                $this->getSitePage()->setVar('configTpl', '');
+            } else {
+                // Display the title bar, but remove all of the config elements
+                $this->renderConfigElements(false, $is_for_template);
+                $this->getSitePage()->parse($targetHandle, 'configTpl', false);
+            }
+
+            return false;
+        }
+
+        // Setup component for staff
+
+        $this->renderConfigElements(true, $is_for_template);
+        $this->getSitePage()->parse('settings_link_block', 'settings_link');
+        $this->getSitePage()->parse('settings_close_block', 'settings_close');
+        $this->getSitePage()->parse($targetHandle, 'configTpl', false);
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return bool
+     */
+    public function execute()
+    {
         // Setup all of the other properties required for this show to get on the road
 
         $this->config       = $this->getConfig();
@@ -151,46 +206,5 @@ class Controller extends Component_Eportfolio_ControllerAbstract
                 'columnWidth'         => $maximumQuestions > 0 ? (90 / $maximumQuestions) . "%" : ""
             ]
         );
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Override for `Component_ControllerAbstract::parseConfig()` function to cater for this components
-     * stupid visibility shenanigans.
-     *
-     * @param string $targetHandle
-     * @param bool $is_for_template
-     * @return bool
-     */
-    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false)
-    {
-        // Determine what to display
-
-        $this->setupConfigRendering($targetHandle);
-
-        // Setup component for all non-staff roles
-
-        if (!$this->sessionUser->getRole()->isStaff()) {
-            if ($this->getConfig('collapse') !== '1') {
-                // 'Display Component Heading On Student View' is ticked, remove the title bar entirely
-                $this->getSitePage()->setVar('configTpl', '');
-            } else {
-                // Display the title bar, but remove all of the config elements
-                $this->renderConfigElements(false, $is_for_template);
-                $this->getSitePage()->parse($targetHandle, 'configTpl', false);
-            }
-
-            return false;
-        }
-
-        // Setup component for staff
-
-        $this->renderConfigElements(true, $is_for_template);
-        $this->getSitePage()->parse('settings_link_block', 'settings_link');
-        $this->getSitePage()->parse('settings_close_block', 'settings_close');
-        $this->getSitePage()->parse($targetHandle, 'configTpl', false);
-
-        return true;
     }
 }
