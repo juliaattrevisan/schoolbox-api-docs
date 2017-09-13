@@ -11,6 +11,13 @@ use Schoolbox\User;
 
 class External_Tass_User implements External_UserInterface
 {
+
+    /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
+
     /**
      * @var MSSQL
     */
@@ -124,7 +131,7 @@ class External_Tass_User implements External_UserInterface
             s.stud_code AS StudentID,
             s.preferred_name AS StudentGiven1,
             s.surname AS StudentSurname,
-            CONVERT(nvarchar(30), s.dob, 126 )  AS StudentBirthDate,
+            CONVERT(nvarchar(30), s.dob, ".self::FORMAT_ISO8601." )  AS StudentBirthDate,
             '' AS StudentTutorName,
             '' AS StudentHeadOfHouse,
             '' AS HeadOfHouseID,

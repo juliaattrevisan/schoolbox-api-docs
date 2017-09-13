@@ -14,6 +14,12 @@ class External_Synergetic_User implements External_UserInterface
     use External_Synergetic_ValidateExternalIdTrait;
 
     /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -332,7 +338,7 @@ class External_Synergetic_User implements External_UserInterface
             SELECT      vStudents.StudentID,
                         vStudents.StudentGiven1,
                         vStudents.StudentSurname,
-                        CONVERT(nvarchar(30), vStudents.StudentBirthDate, 126 ) as StudentBirthDate,
+                        CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
                         vStudents.StudentTutorName,
                         vStudents.StudentHeadOfHouse,
                         House.HeadOfHouseID,

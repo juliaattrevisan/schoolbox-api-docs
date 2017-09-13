@@ -23,7 +23,15 @@ use Schoolbox\User;
 
 class External_Isams_User implements External_UserInterface
 {
+
+
     use External_MssqlConnector;
+
+    /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
 
     /** @var Group $groupHandler */
     private $groupHandler;
@@ -145,7 +153,7 @@ class External_Isams_User implements External_UserInterface
             SELECT      StudentID               AS StudentID,
                         StudentFirstname        AS StudentGiven1,
                         StudentSurname          AS StudentSurname,
-                        CONVERT(nvarchar(30), DOB, 126 ) AS StudentBirthDate,                
+                        CONVERT(nvarchar(30), DOB, ".self::FORMAT_ISO8601." ) AS StudentBirthDate,                
                         ''                      AS StudentTutorName,
                         ''                      AS StudentHeadOfHouse,
                         ''                      AS HeadOfHouseID,

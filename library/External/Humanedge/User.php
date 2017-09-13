@@ -49,6 +49,12 @@ class External_Humanedge_User implements External_UserInterface
     )";
 
     /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -67,7 +73,7 @@ class External_Humanedge_User implements External_UserInterface
                 s.Code AS StudentID,
                 s.FirstName AS StudentGiven1,
                 s.LastName AS StudentSurname,
-                CONVERT(nvarchar(30), s.DOB, 126 )  AS StudentBirthDate,
+                CONVERT(nvarchar(30), s.DOB, ".self::FORMAT_ISO8601." )  AS StudentBirthDate,
                 '' AS StudentHouseDescription,
                 s.House AS StudentHouse,
                 '' AS HeadOfHouseID,

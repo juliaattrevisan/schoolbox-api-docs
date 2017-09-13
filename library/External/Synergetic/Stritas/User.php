@@ -8,6 +8,8 @@
  ************************************************************/
 class External_Synergetic_Stritas_User extends External_Synergetic_User
 {
+
+
     /**
      * Get a guy's info from Synergetic
      *
@@ -26,7 +28,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                     vStudents.StudentID,
                     vStudents.StudentGiven1,
                     vStudents.StudentSurname,
-                    CONVERT(nvarchar(30), vStudents.StudentBirthDate, 126 ) as StudentBirthDate,
+                    CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
                     vStudents.StudentTutorName,
                     vStudents.StudentHeadOfHouse,
                     House.HeadOfHouseID,

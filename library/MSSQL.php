@@ -20,6 +20,7 @@ use Schoolbox\IConfigLoader;
  */
 class MSSQL
 {
+
     /** @var Connector $connector */
     protected $connector;
 
