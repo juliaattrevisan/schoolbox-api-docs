@@ -202,7 +202,7 @@ class PageMapper extends Schoolbox\Mapper {
 
 			/* They can be the owner of the page
 			 */
-			$isOwner = ($currentPage->getUid() == $viewerId);
+			$isOwner = ($currentPage->getOwner()->getId() == $viewerId);
 
 			if ($isSuperuser || $isStaff || $isOwner) {
 				$viewablePages->setOffset($currentPage->getPageId(), $currentPage);
