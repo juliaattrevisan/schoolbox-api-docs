@@ -198,6 +198,11 @@ if ($virtualPermission >= WRITE_ACCESS) {
         foreach ($definitionCollection as $component) {
             /** @var Component_Definition $component */
             ++$i;
+
+            if (!$component->renderInPalette()) {
+                continue;
+            }
+
             $class = '';
             if ($component->getMultiple() == 'false') {
                 $class = 'one-only ';

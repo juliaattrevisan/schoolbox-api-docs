@@ -17,7 +17,6 @@ use Schoolbox\Realtime\Message\NSMapper;
  * Class Component_DefinitionMapper
  *
  * @method Component_Definition findOneByColumn($columnName, $columnValue, $order = [], $options = [])
- * @method Component_Definition hydrate(array $row, $alias = '', $callback = null)
  */
 class Component_DefinitionMapper extends Schoolbox\Mapper
 {
@@ -38,6 +37,34 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         $this->uses('multiple', self::TYPE_STRING);
         $this->uses('component_category', self::TYPE_STRING);
         $this->joins('msg_namespace_slug', NSMapper::class, 'slug', null, null, 'namespace', 'namespace');
+    }
+
+    /**'
+     * {@inheritdoc}
+     *
+     * Prior to hydrating the row, check to see if there is a custom implementation of the component definition we
+     * are hydrating, and if so create that model instead of the default Component_Definition one
+     *
+     * @param array $row
+     * @param string $alias
+     * @param null $callback
+     */
+    public function hydrate(array $row, $alias = '', $callback = null)
+    {
+        // Search for an overriding definition class and use that to hydrate the model instead
+
+        $classDefinitionOverride = str_replace('Controller', 'Definition', $row['cd.class']);
+
+        if (class_exists($classDefinitionOverride) &&
+            is_subclass_of($classDefinitionOverride, Component_Definition::class)) {
+            $this->hasModel($classDefinitionOverride);
+        } else {
+            $this->hasModel(Component_Definition::class);
+        }
+
+        // Hydrate row
+
+        return parent::hydrate($row, $alias, $callback);
     }
 
     /**
@@ -71,7 +98,8 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
             SELECT    {$this->getColumnString()}, 
                       `hcc`.`homepageComponentCategoryID` `hcc.id`, 
                       `hcc`.`name` `hcc.name`,
-                      {$this->getJoinColumnString('namespace', 'ns')}
+                      {$this->getJoinColumnString('namespace', 'ns')},
+                      `component_definition`.`class` as `cd.class`
             FROM      {$this->getTable()}
             LEFT JOIN `homepageComponentCategory` `hcc` ON 
                       `component_definition`.`component_category` = `hcc`.`homepageComponentCategoryID`
@@ -86,7 +114,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = $this->createCollection();
+        $c = new GenericCollection(Component_Definition::class);
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $model = $this->hydrate($row);

@@ -52,6 +52,16 @@ class Component_Definition
     protected $configCopy;
 
     /**
+     * Overridable function to hide component from palette
+     *
+     * @return bool
+     */
+    public function renderInPalette()
+    {
+        return true;
+    }
+
+    /**
      * @return bool
      */
     public function isHomepageModule()
