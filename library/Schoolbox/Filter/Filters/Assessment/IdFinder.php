@@ -550,7 +550,7 @@ class IdFinder extends Filter\AbstractIdFinder
         // include a time component. If assessment is due at 11pm on the 10th, and term finishes on the 10th, we want to match
         // all assessments that are due before the end of the 10th, which is the start of the 11th, ie 'YYYY/MM/11 00:00:00'
         $joinClause = "
-        JOIN term $t ON (a.$dateColumn >= $t.start  AND ($t.actual_finish IS NULL OR a.$dateColumn < ($t.actual_finish + 1)))";
+        JOIN term $t ON (a.$dateColumn >= $t.start  AND ($t.actual_finish IS NULL OR a.$dateColumn < DATE_ADD($t.actual_finish, INTERVAL 1 DAY)))";
 
         $builder = $this->getMapper()->getPredicateBuilder();
         $builder->equals("$t.id", $termIds->getAll());
