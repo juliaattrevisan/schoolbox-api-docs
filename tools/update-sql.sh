@@ -3,7 +3,7 @@
 # Description:
 #       Updates the database schema and values to match the installed version
 #       Completes all the updates between the current and new versions
-#       For each update release, the sql scripts are run first, then the php scripts
+#       For each update release, the update scripts are run in alphanumeric order
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   2012 Alaress Pty Ltd
@@ -30,15 +30,15 @@ echo "Starting SQL update process";
 rm -f $versionlist;
 for release in `find $instdir/updates -maxdepth 1 -type d | sort -V | cut -c$baselength-1000`;
 do
-	echo $release >> $versionlist;
-	newver=$release;
+    echo $release >> $versionlist;
+    newver=$release;
 done
 
 if [ ! -f $conffile ];
 then
-	echo "New installation or conf file missing";
-	echo "No cache directories cleaned";
-	exit;
+    echo "New installation or conf file missing";
+    echo "No cache directories cleaned";
+    exit;
 fi
 
 echo "Using db credentials from: "`readlink -f $conffile`;
@@ -56,8 +56,8 @@ sqlver=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM 
 
 if [ -z $sqlver ];
 then
-	echo "Unable to collect current database version. Please check your database credentials.";
-	exit;
+    echo "Unable to collect current database version. Please check your database credentials.";
+    exit;
 fi
 
 backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='file_dir' \G;" | grep 'value' | cut -d' ' -f2`;
@@ -74,8 +74,8 @@ echo "New SQL Version: "$newver;
 
 if [ $sqlver == $newver ];
 then
-	echo "No updates required";
-	exit;
+    echo "No updates required";
+    exit;
 fi
 
 start=`grep -n "$sqlver" $versionlist | cut -d':' -f1`;
@@ -83,32 +83,40 @@ end=`grep -n "$newver" $versionlist | cut -d':' -f1`;
 
 if [ -z $start ];
 then
-	echo "SQL version not supported for update, no changes made";
-	exit;
+    echo "Error: SQL version not supported for update, no changes made";
+    exit;
 fi
 
 if [ -z $end ];
 then
-	echo "SQL version greater than update, no changes made";
-	exit;
+    echo "Error: SQL version greater than update, no changes made";
+    exit;
 fi
 
 if [ $start -gt $end ];
 then
-	echo "SQL version greater than update, no changes made";
-	exit;
+    echo "Error: SQL version greater than update, no changes made";
+    exit;
+fi
+
+# Ensure all required resources are available before update, hard fail if not
+$instdir/tools/notif/syscheck.php -v;
+if [ $? -ne 0 ];
+then
+    echo "Error: all system dependencies must be available to start the update"
+    exit $?;
 fi
 
 # Only run DB backup if not completed in the last hour
 existingbackup=$(ls -1 $backupdir/$sqlver-`date +%Y-%m-%d_%H-`*.sql 2>/dev/null);
 if [[ (-f $existingbackup) && (! -z $existingbackup) ]];
 then
-	echo "Backup already completed";
-	backupfile=$existingbackup;
+    echo "Backup already completed";
+    backupfile=$existingbackup;
 else
-	echo "Backing up database before changes";
-	mkdir -p $backupdir;
-	mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+    echo "Backing up database before changes";
+    mkdir -p $backupdir;
+    mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
 fi
 
 echo "Updating database to new version";
@@ -117,29 +125,32 @@ errormsg='';
 # Run update scripts in release order, SQL first then PHP for each release
 for release in `sed -n "$start","$end"p $versionlist`;
 do
-	# Don't run update if already at that release version
-	if [ $release != $sqlver ];
-	then
-		echo "Running update $release";
-		# Only run release upgrade if the scripts_list actually exists
-		if [ -f $instdir/updates/$release/scripts_list ];
-		then
-			# Run SQL update scripts for this release
-			for scriptcmd in `egrep "\.php|\.sql" $instdir/updates/$release/scripts_list`
-			do
-				script="$instdir/updates/$release/$scriptcmd";
-				# Check script listed in scripts_list actually exists
-				if [ -f $script ];
-				then
-				    if [[ $scriptcmd == *".sql" ]]
-				    then
+    # Don't run update if already at that release version
+    if [ $release != $sqlver ];
+    then
+        echo "Running update $release";
+        # Only run release upgrade if the scripts_list actually exists
+        if [ -f $instdir/updates/$release/scripts_list ];
+        then
+            # Run SQL update scripts for this release
+            for scriptcmd in `egrep "\.php|\.sql" $instdir/updates/$release/scripts_list`
+            do
+                script="$instdir/updates/$release/$scriptcmd";
+                # Check script listed in scripts_list actually exists
+                if [ -f $script ];
+                then
+                    echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Starting script: $script";
+                    if [[ $scriptcmd == *".sql" ]]
+                    then
                         mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script 2>&1;
                         # Check for and report errors
                         if [ $? -ne 0 ];
                         then
-                            echo "Error running update: $script";
+                            echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
                             errorint=1;
                             errormsg="$errormsg,$script";
+                        else
+                            echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
                         fi
                     fi
                     if [[ $scriptcmd == *".php" ]]
@@ -153,19 +164,21 @@ do
                         if [ $? -ne 0 ];
                         then
                             cd $curdir;
-                            echo "Error running update: $script";
+                            echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
                             errorint=1;
                             errormsg="$errormsg,$script";
+                        else
+                            echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
                         fi
                         cd $curdir;
                     fi
-				fi
-			done
-			
-			# Update the config table to show current release version
-			mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
-		fi
-	fi
+                fi
+            done
+
+            # Update the config table to show current release version
+            mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
+        fi
+    fi
 done
 
 echo "Backup of database located at: $backupfile";
@@ -175,11 +188,11 @@ echo "$package""_update_error=0" > /etc/facter/facts.d/"$package"_update.txt;
 
 if [ $errorint -ne 0 ];
 then
-	mkdir -p /etc/facter/facts.d/ >/dev/null 2>&1;
-	errormsg=`echo $errormsg | cut -d',' -f2-100`;
-	echo "$package""_update_error=$errorint" > /etc/facter/facts.d/"$package"_update.txt;
-	echo "$package""_update_errormsg=$errormsg" >> /etc/facter/facts.d/"$package"_update.txt;
-	echo "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup.";
+    mkdir -p /etc/facter/facts.d/ >/dev/null 2>&1;
+    errormsg=`echo $errormsg | cut -d',' -f2-100`;
+    echo "$package""_update_error=$errorint" > /etc/facter/facts.d/"$package"_update.txt;
+    echo "$package""_update_errormsg=$errormsg" >> /etc/facter/facts.d/"$package"_update.txt;
+    echo "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup.";
 else
-	echo "SQL updates completed";
+    echo "SQL updates completed";
 fi
