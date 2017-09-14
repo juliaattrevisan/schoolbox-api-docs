@@ -132,26 +132,33 @@ class Healthcheck
      * Test a query against each database object in the supplied array
      *
      * @param array $objects
+     * @param string $db If provided, run against this instead of the default DB
      * @param string $schema If provided, run against this instead of the default schema
      * @param string $query If provided, run against this instead of default select first query
      */
-    private function selectTest($objects, $schema = null, $query = "SELECT TOP 1 * FROM :object")
+    private function selectTest($objects, $db = null, $schema = null, $query = "SELECT TOP 1 * FROM :object")
     {
         sort($objects);
 
         $methods = (explode(' ', trim($query)));
         $method  = $methods[0];
 
-        foreach ($objects as $object) {
+        // Build an object name
+        $objectNamePrefix  = '';
+        $objectParamPrefix = '';
+        if (isset($db)) {
+            $objectNamePrefix  .= $db . '.';
+            $objectParamPrefix .= $this->connector->quoteIdentifier($db) . '.';
+        }
+        if (isset($schema)) {
+            $objectNamePrefix  .= $schema . '.';
+            $objectParamPrefix .= $this->connector->quoteIdentifier($schema) . '.';
+        }
 
+        foreach ($objects as $object) {
             // Build reporting and escaped object name
-            if (isset($schema)) {
-                $objectName  = "{$schema}.{$object}";
-                $objectParam = "{$this->connector->quoteIdentifier($schema)}.{$this->connector->quoteIdentifier($object)}";
-            } else {
-                $objectName  = $object;
-                $objectParam = $this->connector->quoteIdentifier($object);
-            }
+            $objectName  = $objectNamePrefix . $object;
+            $objectParam = $objectParamPrefix . $this->connector->quoteIdentifier($object);
 
             $this->log .= str_pad(str_pad($method, 15) . $objectName, 50);
 
@@ -266,7 +273,7 @@ class Healthcheck
             'studcommrules',
         ];
 
-        $this->selectTest($tables, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
 
         $db2inst1Tables = [
             'schoolbox_classes',
@@ -281,7 +288,7 @@ class Healthcheck
             'schoolbox_timetable_definition'
         ];
 
-        $this->selectTest($db2inst1Tables, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
+        $this->selectTest($db2inst1Tables, null, 'db2inst1', "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -436,6 +443,13 @@ class Healthcheck
 
         if ($this->configMapper->get('external_document_report_enabled')) {
             $externalPing = new \External_Ping();
+            if ($externalPing->getVersion() == "68") {
+                $db     = null;
+                $schema = 'media';
+            } else {
+                $db     = 'SynergyOneMedia';
+                $schema = 'dbo';
+            }
             $this->selectTest(
                 [
                     'StudentReportsArchiveLink',
@@ -443,13 +457,14 @@ class Healthcheck
                     'tDocuments',
                     'DocumentReferences'
                 ],
-                ($externalPing->getVersion() == "68") ? 'media' : 'SynergyOneMedia'
+                $db,
+                $schema
             );
         }
 
         // Community Portal Password Update
 
-        $this->selectTest(['CommunityLogins'], null, "UPDATE :object SET Password = '' WHERE 1 = 0");
+        $this->selectTest(['CommunityLogins'], null, null, "UPDATE :object SET Password = '' WHERE 1 = 0");
 
         // Stored Procedures
 
@@ -696,10 +711,11 @@ class Healthcheck
             "TimetableBlockInstance",
         ];
 
-        $this->selectTest($fcTables, 'fc');
+        $this->selectTest($fcTables, null, 'fc');
 
         $this->selectTest(
             ['periodExpand'],
+            null,
             'fc',
             'SELECT TOP 1 * FROM fc.TimetableBlockInstance tbi CROSS APPLY :object(tbi.TimetablePeriodID, tbi.Consecutive) tpe'
         );
