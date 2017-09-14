@@ -143,13 +143,9 @@ class Document extends Base implements IDocument
 
         // Check if we need to apply a classification filter
 
-        $classificationCodes = array_filter(
-            explode(",", trim($this->config->get('external_document_docman_categories')))
-        );
-
-        if (count($classificationCodes) > 0) {
-            $bindings = PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode');
-            $query    .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
+        $bindings = $this->buildBindingsForClassifications();
+        if (!empty($bindings)) {
+            $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
 
             $params = array_merge(
                 $params,
@@ -240,6 +236,21 @@ class Document extends Base implements IDocument
                     'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 ]);
             }
+
+            // Check if we need to apply a classification filter
+
+            $bindings = $this->buildBindingsForClassifications();
+            if (!empty($bindings)) {
+                $query .= " AND d.ClassificationCode IN ({$bindings['placeholders']})";
+
+                $params = array_merge(
+                    $params,
+                    array_map(
+                        'trim',
+                        $bindings['bindings']
+                    )
+                );
+            }
         } elseif ($source == 'StudentReportsArchive') {
             // Loading from school reports archive table
 
@@ -267,6 +278,7 @@ class Document extends Base implements IDocument
                     'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 ]);
             }
+
         } else {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
@@ -289,5 +301,25 @@ class Document extends Base implements IDocument
         // If we got here the document could not be located in the database
 
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
+    }
+
+    /**
+     * Builds placeholders and bindings for document classifications.
+     *
+     * @return array Empty if there's no document classifications.
+     *               Otherwise:
+     *               bindings:     the parameters to bind to a query
+     *               placeholders: the IN part of a query
+     */
+    private function buildBindingsForClassifications()
+    {
+        $classificationCodes = array_filter(
+            explode(",", trim($this->config->get('external_document_docman_categories')))
+        );
+
+        if (count($classificationCodes) > 0) {
+            return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode');
+        }
+        return [];
     }
 }
