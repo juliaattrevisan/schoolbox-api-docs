@@ -108,9 +108,15 @@ http://192.168.36.10/modules/eotc/review
 
 Used by EOTC Administrators.
 
-This screen shows a list of events, grouped by Status, that have not yet been Approved. When certain thresholds are reached, an event may show in either its Status grouping, or in its own unique case, Urgent. This is determined by the Urgent Threshold setting in EOTC Configuration.
+This now redirects to the Event Report, with sensible defaults:
 
-From here you are also given links to another screen which shows all Approved and Cancelled EOTC events. Alternatively you can view an individual event by hitting the eyeball. This takes you to the Status Transition screen.
+* From: 6 months ago
+* To: empty (no limit)
+* Statuses:
+    * Initial Application
+    * Approved In Principle
+    * Details Completed
+    * Ready For Final Approval
 
 ## 9. Status Transition
 http://192.168.36.10/modules/eotc/status/modify/:eventId
@@ -156,11 +162,26 @@ The synchronisation requires two items to proceed.
 
 As previously explained, the first is a global setting. The second is a per-event setting. This allows synchronisation to occur on a per-event basis. If both items are switched on, when the event enters Approved status, it'll automatically be uploaded into Synergetic. You can find it in synweb under *Student Maintenance > Excursion Maintenance*.
 
-## 11. Processed Events
-http://192.168.36.10/modules/eotc/processed
-http://192.168.36.10/modules/eotc/processed/all
+## 11. Event Report
+http://192.168.36.10/modules/eotc/report
 
-This is a list of EOTC events that have entered either the Approved or Cancelled statuses. By default it only shows events that start in the future, or started one month into the past. This is because the event list became extremely long and slow to load so we limited its data set. However, you can view the entire unabridged list by clicking *View All Approved/Cancelled Events*.
+This is a list of EOTC events that is filtered by status. By default, it shows events that:
+
+* start today, and:
+* are in one of these statuses:
+    * Initial Application
+    * Approved In Principle
+    * Details Completed
+    * Ready For Final Approval
+
+This screen shows a list of events, grouped by Status. When certain thresholds are reached, an event may show in either
+its Status grouping, or in its own unique case, Urgent. This is determined by the Urgent Threshold setting in EOTC
+Configuration.
+
+You can view an individual event by hitting the eyeball. This takes you to the Status Transition screen.
+
+It does not by default show all events, because the event list became extremely long and slow to load.
+However, you can view the entire unabridged list by selecting *All* as the timespan, and clicking *Search*.
 
 ## 12. Display In Calendar
 When you see EOTC Events in the calendar, there'll be a little numeric segment after the event's title. Example: *My EOTC Event (5,2)*.
