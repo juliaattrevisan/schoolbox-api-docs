@@ -31,7 +31,6 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/ajax' => 'getSelectize',
                 '/class/{folderId}' => 'getClassSnapshotList',
                 '/class/snapshot/{surveyId}' => 'getClassSnapshot',
             ],
