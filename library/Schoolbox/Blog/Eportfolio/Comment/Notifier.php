@@ -21,7 +21,7 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -70,7 +70,7 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param TriggerBundle $bundle
+     * @param TriggerBundleInterface $bundle
      * @return void
      */
     public function bundleTriggers($bundle): void
@@ -83,7 +83,9 @@ class Notifier extends AbstractModuleNotifier
 
             //TODO remove this hack when SA-4400 is merged. (timestamp population)
             $comment = $this->getMapper()->findByColumn(
-                $this->getMapper()->getIdentifierColumn(), $comment->getId(), ['cache' => false]
+                $this->getMapper()->getIdentifierColumn(),
+                $comment->getId(),
+                ['cache' => false]
             )->first();
             $bundle->getEvent()->setObject($comment);
 
@@ -379,7 +381,7 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())
             ->addTopic("eportfolio.blog.comment.{$comment->getId()}.$trigger")
-            ->setTimestamp($comment->getCreatedAt()->getUnixTimeStamp())
+            ->setTimestamp((int)$comment->getCreatedAt()->getUnixTimeStamp())
             ->setBody($comment->getBody());
         return $bob;
     }
