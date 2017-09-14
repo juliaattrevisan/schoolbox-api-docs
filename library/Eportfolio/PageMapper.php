@@ -9,9 +9,15 @@
  */
 
 namespace Eportfolio;
-use Eportfolio;
-use Schoolbox;
 
+use Schoolbox;
+use Schoolbox\UserMapper;
+use Schoolbox\GenericCollection;
+
+/**
+ * @method Page findById($identifierValue)
+ * @method Page createModel($idValue = null)
+ */
 class PageMapper extends Schoolbox\Mapper {
 
 	/**
@@ -35,12 +41,7 @@ class PageMapper extends Schoolbox\Mapper {
 			'property'   => 'pageTitle',
 			'type'       => self::TYPE_STRING,
 		));
-
-		$this->hasMap(array(
-			'column'     => 'uid',
-			'property'   => 'uid',
-			'type'       => self::TYPE_INTEGER,
-		));
+        $this->joins('uid', UserMapper::class, 'id', null, null, 'owner', 'owner');
 
 		$this->hasMap(array(
 			'column'     => 'template',
@@ -165,10 +166,10 @@ class PageMapper extends Schoolbox\Mapper {
 	 *
 	 * @param $viewerId
 	 * @param $ownerId
-	 * @return \Schoolbox\Collection
+     * @return GenericCollection|Page[]
 	 */
 	public function findViewablePages($viewerId, $ownerId) {
-		$viewablePages = new \Schoolbox\Collection();
+        $viewablePages = $this->createCollection();
 
 		/* -_-
 		 */
@@ -182,7 +183,7 @@ class PageMapper extends Schoolbox\Mapper {
 
 		if (is_array($allCategories) && count($allCategories)) {
 			foreach($allCategories as $currentCategory) {
-				$categoryIds[] = $currentCategory['id'];
+                $categoryIds[] = $currentCategory['id'];
 			}
 		}
 		/* Get all the pages with their permissions
@@ -201,7 +202,7 @@ class PageMapper extends Schoolbox\Mapper {
 
 			/* They can be the owner of the page
 			 */
-			$isOwner = ($currentPage->getUid() == $viewerId);
+            $isOwner = ($currentPage->getOwner()->getId() == $viewerId);
 
 			if ($isSuperuser || $isStaff || $isOwner) {
 				$viewablePages->setOffset($currentPage->getPageId(), $currentPage);
@@ -241,7 +242,7 @@ class PageMapper extends Schoolbox\Mapper {
 	 * Finds all the pages owned by $ownerId with associated permissions
 	 *
 	 * @param $ownerId
-	 * @return \Schoolbox\Collection
+     * @return GenericCollection|Page[]
 	 */
 	public function findPagesWithPermissions($ownerId) {
 		$permission_mapper = $this->getJoinMapper('permissions');
@@ -262,7 +263,7 @@ class PageMapper extends Schoolbox\Mapper {
 
 		/* Manually construct hierarchy of blog items and their comments
 		 */
-		$collection = new \Schoolbox\Collection();
+        $collection = $this->createCollection();
 
 		foreach ($statement as $row) {
 			$pageItem = $this->hydrate($row, 'ep');
