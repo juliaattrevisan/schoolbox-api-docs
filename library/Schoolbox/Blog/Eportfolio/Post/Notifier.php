@@ -9,12 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Eportfolio\PageMapper;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -23,6 +23,7 @@ use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use OutOfBoundsException;
@@ -120,29 +121,10 @@ class Notifier extends AbstractModuleNotifier
         $page  = $this->pageMapper->findById($post->getPage()->getPageId());
         $owner = $this->userMapper->findById($page->getOwner()->getId());
 
-        // Is author and owner the same user?
-        if ($effector->getId() === $owner->getId()) {
-            $titleToken = 'their';
-            $titleParam = [];
-        } else {
-            $titleToken = ":student's";
-            $titleParam = ['student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE)];
-        }
-
         // Send it to all their teachers (across all subjects)
-        $audience = $this->userMapper->createCollection();
-        foreach ($this->externalUser->getSubjectList($owner) as $subject) {
-            $externalIds = $this->externalClass->getTeacherName($subject['code']);
-            foreach ($externalIds as $externalId) {
-                try {
-                    $classTeacher                     = $this->userMapper->findByExternalId($externalId);
-                    $audience[$classTeacher->getId()] = $classTeacher;
-                } catch (BaseMapper\Exception $e) {
-                    // no teacher found in Schoolbox - that's ok.
-                }
-            }
-        }
-        return $this->notifyPosted($post, $effector, $audience, $titleToken, $titleParam);
+        $audience = $this->getStudentTeachers($owner);
+
+        return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_STAFF);
     }
 
 
@@ -157,11 +139,11 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentPosted(Model $post, User $effector): Envelope
     {
-        $page       = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner      = $this->userMapper->findById($page->getOwner()->getId());
-        $audience   = $this->userMapper->createCollection([$owner]);
-        $titleToken = 'your';
-        return $this->notifyPosted($post, $effector, $audience, $titleToken);
+        $page     = $this->pageMapper->findById($post->getPage()->getPageId());
+        $owner    = $this->userMapper->findById($page->getOwner()->getId());
+        $audience = $this->userMapper->createCollection([$owner]);
+
+        return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_STUDENT);
     }
 
 
@@ -179,29 +161,12 @@ class Notifier extends AbstractModuleNotifier
         $page  = $this->pageMapper->findById($post->getPage()->getPageId());
         $owner = $this->userMapper->findById($page->getOwner()->getId());
 
-        // Is author and owner the same user?
-        if ($effector->getId() === $owner->getId()) {
-            $titleToken = 'their';
-            $titleParam = [];
-        } else {
-            $titleToken = ":student's";
-            $titleParam = ['student' => new ChildParam($owner, ParameterInterface::STACKING_REPLACE)];
-        }
-
-        $parentsCanView = false;
-        foreach($this->permissionMapper->findParentSetting($page->getPageId()) as $permission){
-            if($permission->getValue()){
-                $parentsCanView = true;
-                break;
-            }
-        }
-
         // Empty audience if parents don't have view permission
-        $audience = $parentsCanView
+        $audience = $this->isPostVisibleToParents($post)
             ? $owner->loadParents()->getParents()
             : $this->userMapper->createCollection();
 
-        return $this->notifyPosted($post, $effector, $audience, $titleToken, $titleParam);
+        return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_PARENT);
     }
 
 
@@ -211,40 +176,77 @@ class Notifier extends AbstractModuleNotifier
      * @param Model      $post
      * @param User       $effector
      * @param Collection $audience
-     * @param string     $titleToken ["their", "your", ":student's"]
-     * @param Param[]    $titleParam
+     * @param string     $roleType
      * @return Envelope
      * @throws OutOfBoundsException     If severity is not set
      * @throws InvalidArgumentException If a required property was not set
      */
-    private function notifyPosted(
-        Model $post,
-        User $effector,
-        Collection $audience,
-        string $titleToken,
-        array $titleParam = []
-    ): Envelope {
-        $envelope    = new Envelope();
-        $bob         = new Builder();
-        $authorExtId = $effector->getExternalId();
+    private function notifyPosted(Model $post, User $effector, Collection $audience, string $roleType): Envelope
+    {
+        $envelope = new Envelope();
+        $page     = $this->pageMapper->findById($post->getPage()->getPageId());
+        $owner    = $this->userMapper->findById($page->getOwner()->getId());
 
-        $bob->setTitle(":author posted :title on {$titleToken} eportfolio blog")
-            ->setParams(array_merge($titleParam, [
-                'author' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                'title'  => new Param($post->getHeading(), $this->buildBlogUrl($post)),
-            ]))
-            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
-            ->setHref($this->buildBlogUrl($post))
-            ->setSeverity(Logger::INFO)
-            ->setNamespace($this->getSlug())
-            ->addTopic("eportfolio.blog.{$post->getId()}." . self::TRIGGER_POSTED)
-            ->setTimestamp($post->getCreatedAt()->getUnixTimeStamp())
-            ->setBody($post->getBody());
+        // Are we targeting parents?
+        if (RoleMapper::ROLE_PARENT === $roleType) {
+            // Load parents so we can display just their child's first name
+            $effector->loadParents();
+            if ($effector->getId() !== $owner->getId()) {
+                $owner->loadParents();
+            }
+        }
 
         foreach ($audience as $target) {
+            // Just first name if advising parent of child's action
+            $effectorParam = RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($effector)
+                ? new ChildParam($effector, ParameterInterface::STACKING_REPLACE)
+                : new UserParam($effector, ParameterInterface::STACKING_REPLACE);
+
+            // Adjust title for effector, owner and recipient role combinations
+            if ((int)$owner->getId() === (int)$target->getId()) {
+                // Are we sending this to post owner?
+                $ownerToken = 'your';
+                $ownerParam = [];
+            } elseif ((int)$owner->getId() === (int)$effector->getId()) {
+                // Did effector comment on their own blog?
+                $ownerToken = 'their';
+                $ownerParam = [];
+            } elseif (RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($owner)) {
+                // Are we sending to post owner's parents?
+                $ownerToken = ":student's";
+                $ownerParam = ['student' => new ChildParam($owner, ParameterInterface::STACKING_REPLACE)];
+            } else {
+                // Effector is not the owner, target is not owner, target is not parent of owner
+                $ownerToken = ":student's";
+                $ownerParam = ['student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE)];
+            }
+
+            $bob = $this->createBuilder($post, $effector, self::TRIGGER_POSTED);
+            $bob->setTitle(":author posted :title on {$ownerToken} eportfolio blog")
+                ->setParams(array_merge(['author' => $effectorParam], $ownerParam));
             $envelope->targetToUser($target->getId(), $bob->build());
         }
         return $envelope;
+    }
+
+
+    /**
+     * @param Model  $post
+     * @param User   $effector
+     * @param string $trigger
+     * @return Builder
+     */
+    private function createBuilder(Model $post, User $effector, string $trigger): Builder
+    {
+        $bob = new Builder();
+        $bob->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->setHref($this->buildBlogUrl($post))
+            ->setSeverity(Logger::INFO)
+            ->setNamespace($this->getSlug())
+            ->addTopic("eportfolio.blog.{$post->getId()}.$trigger")
+            ->setTimestamp($post->getCreatedAt()->getUnixTimeStamp())
+            ->setBody($post->getBody());
+        return $bob;
     }
 
 
@@ -322,5 +324,48 @@ class Notifier extends AbstractModuleNotifier
     private function buildBlogUrl(Model $post): string
     {
         return self::BASE_URI . "{$post->getPage()->getPageId()}/{$post->getId()}";
+    }
+
+
+    /**
+     * Return whether the specified post is visible to parents
+     *
+     * @param Model $post
+     * @return bool
+     */
+    private function isPostVisibleToParents(Model $post): bool
+    {
+        // Can parents view the page where the blog post resides?
+        foreach ($this->permissionMapper->findParentSetting($post->getPage()->getPageId()) as $permission) {
+            if ($permission->getValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * @param User $student
+     * @return GenericCollection|User[]
+     */
+    private function getStudentTeachers(User $student)
+    {
+        $externalIds = [];
+        foreach ($this->externalUser->getSubjectList($student) as $subject) {
+            foreach ($this->externalClass->getTeacherName($subject['code']) as $externalId) {
+                $externalIds[$externalId] = $externalId;
+            }
+        }
+        $teachers = $this->userMapper->createCollection();
+        foreach ($externalIds as $externalId) {
+            try {
+                $classTeacher                     = $this->userMapper->findByExternalId($externalId);
+                $teachers[$classTeacher->getId()] = $classTeacher;
+            } catch (BaseMapper\Exception $e) {
+                // no teacher found in Schoolbox - that's ok.
+            }
+        }
+        return $teachers;
     }
 } 
