@@ -64,7 +64,7 @@ class Eportfolio {
     /**
      * @var UserMapper
      */
-	private $userMapper;
+    private $userMapper;
 
     /**
      * @var PageMapper
@@ -146,10 +146,10 @@ class Eportfolio {
 	 *
 	 * Returns the owner id of a given page
 	 *
-	 * @return bool
+	 * @return int
 	 */
 	public function getSettingsPageOwner() {
-		return $this->getPageInstance()->getOwner()->getId();
+        return $this->getPageInstance()->getOwner()->getId();
 	}
 
 	/**
@@ -160,7 +160,7 @@ class Eportfolio {
 	public function updatePageTitle($value) {
 		$this->getPageInstance()->setPageTitle($value);
 
-		$this->pageMapper->save($this->getPageInstance());
+        $this->pageMapper->save($this->getPageInstance());
 	}
 
 	/**
@@ -445,7 +445,7 @@ class Eportfolio {
 
 		/* Remove the page itself
 		 */
-		$pageInstance = $this->pageMapper->findById($this->getPageId());
+        $pageInstance = $this->pageMapper->findById($this->getPageId());
         $this->pageMapper->delete($pageInstance);
 
 		/* Redirect back to the profile

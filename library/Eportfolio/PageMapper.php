@@ -41,7 +41,7 @@ class PageMapper extends Schoolbox\Mapper {
 			'property'   => 'pageTitle',
 			'type'       => self::TYPE_STRING,
 		));
-       $this->joins('uid', UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->joins('uid', UserMapper::class, 'id', null, null, 'owner', 'owner');
 
 		$this->hasMap(array(
 			'column'     => 'template',
@@ -202,7 +202,7 @@ class PageMapper extends Schoolbox\Mapper {
 
 			/* They can be the owner of the page
 			 */
-			$isOwner = ($currentPage->getOwner()->getId() == $viewerId);
+            $isOwner = ($currentPage->getOwner()->getId() == $viewerId);
 
 			if ($isSuperuser || $isStaff || $isOwner) {
 				$viewablePages->setOffset($currentPage->getPageId(), $currentPage);
