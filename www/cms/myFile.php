@@ -215,12 +215,12 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
         $allPageData = array();
 
         foreach ($availablePages as $currentPage) {
-            /** @var Eportfolio\Page $page */
-            $page = $currentPage['page'];
+            /** @var Eportfolio\Page $ePage */
+            $ePage = $currentPage['page'];
             $pageData = array(
-                'pageId' => $page->getPageId(),
-                'pageTitle' => $page->getPageTitle(),
-                'pageOwnerId' => $page->getOwner()->getId(),
+                'pageId' => $ePage->getPageId(),
+                'pageTitle' => $ePage->getPageTitle(),
+                'pageOwnerId' => $ePage->getOwner()->getId(),
             );
             $allPageData[$pageData['pageId']] = $pageData;
         }
