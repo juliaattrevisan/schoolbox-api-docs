@@ -14,6 +14,7 @@ use Schoolbox\Blog\Eportfolio\Post;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -27,6 +28,10 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use OutOfBoundsException;
 use InvalidArgumentException;
+use External_UserInterface;
+use External_User;
+use External_ClassInterface;
+use External_Class;
 
 /**
  * @method Mapper getMapper()
@@ -34,6 +39,7 @@ use InvalidArgumentException;
 class Notifier extends AbstractModuleNotifier
 {
 
+    const TRIGGER_CREATED = 'created';
     const TRIGGER_COMMENTED = 'commented';
     const TRIGGER_FOLLOWED = 'followed';
 
@@ -54,6 +60,16 @@ class Notifier extends AbstractModuleNotifier
      */
     private $userMapper;
 
+    /**
+     * @var External_UserInterface
+     */
+    private $externalUser;
+
+    /**
+     * @var External_ClassInterface
+     */
+    private $externalClass;
+
 
     /**
      * @param null|IMapper[] $dependencies
@@ -65,6 +81,8 @@ class Notifier extends AbstractModuleNotifier
         $dependencies['postMapper']       = $dependencies['postMapper'] ?? Post\Mapper::getInstance();
         $dependencies['permissionMapper'] = $dependencies['permissionMapper'] ?? PermissionMapper::getInstance();
         $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
+        $dependencies['externalUser']     = $dependencies['externalUser'] ?? new External_User();
+        $dependencies['externalClass']    = $dependencies['externalClass'] ?? new External_Class();
         parent::loadDependencies($dependencies);
     }
 
@@ -89,6 +107,7 @@ class Notifier extends AbstractModuleNotifier
             )->first();
             $bundle->getEvent()->setObject($comment);
 
+            $bundle->attach(self::TRIGGER_CREATED, $comment->getCreatedAt()->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_COMMENTED, $comment->getCreatedAt()->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_FOLLOWED, $comment->getCreatedAt()->getUnixTimeStamp());
         }
@@ -98,8 +117,29 @@ class Notifier extends AbstractModuleNotifier
     /* ASYNC NOTIFICATION METHODS */
 
     /**
-     * Notify a staff member that someone commented on an eportfolio blog post that the
-     * staff member authored
+     * Notify a staff member that someone created a comment on an eportfolio blog
+     * post that the staff member authored
+     *
+     * @param Model $comment
+     * @param User  $effector The user who created the comment
+     * @return Envelope
+     * @throws OutOfBoundsException     If severity is not set
+     * @throws InvalidArgumentException If a required property was not set
+     */
+    public function notifyStaffCreated(Model $comment, User $effector): Envelope
+    {
+        $post     = $this->postMapper->findById($comment->getBlog()->getId());
+        $author   = $this->userMapper->findById($post->getOwner()->getId());
+        $audience = $this->userMapper->createCollection();
+
+        if ($author->getRole()->isStaff()) {
+            $audience->add($author);
+        }
+        return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STAFF, self::TRIGGER_CREATED);
+    }
+
+    /**
+     * Notify a staff member that someone commented on their student's blog post
      *
      * @param Model $comment
      * @param User  $effector The user who created the comment
@@ -109,13 +149,12 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffCommented(Model $comment, User $effector): Envelope
     {
-        $post     = $this->postMapper->findById($comment->getBlog()->getId());
-        $author   = $this->userMapper->findById($post->getOwner()->getId());
-        $audience = $this->userMapper->createCollection();
+        $post  = $this->postMapper->findById($comment->getBlog()->getId());
+        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
 
-        if ($author->getRole()->isStaff()) {
-            $audience->add($author);
-        }
+        // Send it to all their teachers (across all subjects)
+        $audience = $this->getStudentTeachers($owner);
+
         return $this->notifyCommented($comment, $effector, $audience, RoleMapper::ROLE_STAFF);
     }
 
@@ -241,6 +280,28 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * @param External_UserInterface $externalUser
+     * @return $this|self
+     */
+    protected function setExternalUser(External_UserInterface $externalUser): self
+    {
+        $this->externalUser = $externalUser;
+        return $this;
+    }
+
+
+    /**
+     * @param External_ClassInterface $externalClass
+     * @return $this|self
+     */
+    protected function setExternalClass(External_ClassInterface $externalClass): self
+    {
+        $this->externalClass = $externalClass;
+        return $this;
+    }
+
+
+    /**
      * @return string
      */
     protected function getSlug(): string
@@ -292,7 +353,8 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Notify an audience of the specified roleType about the specified trigger occurring.
      *
-     * Intentionally shared between both 'commented' and 'followed'.
+     * Intentionally shared between both 'created', 'commented' and 'followed' as these are all
+     * triggers for the same CRUD method.
      *
      * Consider when a student comments on their own blog post. If another user
      * then comments after them, the owner will receive both a 'commented' and 'followed' notification.
@@ -415,5 +477,29 @@ class Notifier extends AbstractModuleNotifier
             }
         }
         return false;
+    }
+
+    /**
+     * @param User $student
+     * @return GenericCollection|User[]
+     */
+    private function getStudentTeachers(User $student)
+    {
+        $externalIds = [];
+        foreach ($this->externalUser->getSubjectList($student) as $subject) {
+            foreach ($this->externalClass->getTeacherName($subject['code']) as $externalId) {
+                $externalIds[$externalId] = $externalId;
+            }
+        }
+        $teachers = $this->userMapper->createCollection();
+        foreach ($externalIds as $externalId) {
+            try {
+                $classTeacher                     = $this->userMapper->findByExternalId($externalId);
+                $teachers[$classTeacher->getId()] = $classTeacher;
+            } catch (BaseMapper\Exception $e) {
+                // no teacher found in Schoolbox - that's ok.
+            }
+        }
+        return $teachers;
     }
 }
