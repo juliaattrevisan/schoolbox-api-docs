@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Eportfolio\PageMapper;
 use Eportfolio\PermissionMapper;
@@ -221,10 +222,14 @@ class Notifier extends AbstractModuleNotifier
                 $ownerToken = ":student's";
                 $ownerParam = ['student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE)];
             }
+            $params = [
+                'author' => $effectorParam,
+                'title'  => new Param($post->getHeading(), $this->buildBlogUrl($post)),
+            ];
 
             $bob = $this->createBuilder($post, $effector, self::TRIGGER_POSTED);
             $bob->setTitle(":author posted :title on {$ownerToken} eportfolio blog")
-                ->setParams(array_merge(['author' => $effectorParam], $ownerParam));
+                ->setParams(array_merge($ownerParam, $params));
             $envelope->targetToUser($target->getId(), $bob->build());
         }
         return $envelope;
