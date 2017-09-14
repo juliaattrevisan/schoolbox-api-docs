@@ -58,8 +58,21 @@ class Module extends BaseModule
             new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
         );
 
-        $this->register('GET', '/{studentId}', 'getIndex', $permission, $preloader);
-        $this->register('GET', '/{studentId}/download/{documentId}', 'getDownload', $permission, $preloader);
+        $this->register(
+            'GET',
+            '/{studentId}',
+            'getIndex',
+            $permission,
+            $preloader
+        );
+
+        $this->register(
+            'GET',
+            '/{studentId}/download/{documentId}/source/{source}',
+            'getDownload',
+            $permission,
+            $preloader
+        );
     }
 
     /**

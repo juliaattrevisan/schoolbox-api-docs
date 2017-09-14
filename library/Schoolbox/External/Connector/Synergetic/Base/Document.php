@@ -8,8 +8,11 @@
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress_Date_Format;
 use DateTime;
+use External_Ping;
+use External_Synergetic_ValidateExternalIdTrait;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
@@ -18,7 +21,7 @@ use Schoolbox\User;
 
 class Document extends Base implements IDocument
 {
-    use \External_Synergetic_ValidateExternalIdTrait;
+    use External_Synergetic_ValidateExternalIdTrait;
 
     /** @var string $schema String indicating the Synergetic DB schema (varies between DB versions) */
     private $schema;
@@ -29,7 +32,7 @@ class Document extends Base implements IDocument
      * Performs normal setup stuff, and also determines which schema to use
      * based on database version.
      *
-     * @param IConfigLoader    $config
+     * @param IConfigLoader $config
      * @param IConnector|array $databaseExternal
      */
     public function __construct(IConfigLoader $config, $databaseExternal)
@@ -47,7 +50,7 @@ class Document extends Base implements IDocument
     private function retrieveDocumentSchema()
     {
         // TODO inject ping/diagnostic object
-        $externalPing = new \External_Ping();
+        $externalPing = new External_Ping();
 
         if ($externalPing->getVersion() == "68") {
             return "media";
@@ -72,21 +75,20 @@ class Document extends Base implements IDocument
         // Otherwise attempt to find the documents for this user
 
         $query =
-        "
-            SELECT      sral.StudentReportsArchiveLinkSeq,
+            "
+            SELECT      sral.StudentReportsArchiveLinkSeq as ID,
+                        sral.Description,
                         sral.FileYear,
                         sral.FileSemester,
-                        sral.Description,
-                        CONVERT(VARCHAR(20), sra.CreatedDate, 20) AS CreatedDate
+                        CONVERT(VARCHAR(20), sra.CreatedDate, 20) AS CreatedDate,
+                        'StudentReportsArchive' AS Source
             FROM        {$this->schema}.StudentReportsArchiveLink sral
             JOIN        {$this->schema}.StudentReportsArchive sra ON 
                         sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
-            WHERE       ID = :id
+            WHERE       ID = :id1
         ";
 
-        $params = [
-            'id' => $student->getExternalId()
-        ];
+        $params = ['id1' => $student->getExternalId()];
 
         // Add date filter (if we find a parseable date in the config)
 
@@ -95,17 +97,69 @@ class Document extends Base implements IDocument
         $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
 
         if ($date !== false) {
-            $query .= ' AND sra.CreatedDate >= :createdDate';
+            $query .= ' AND sra.CreatedDate >= :date1';
 
             $params = array_merge($params, [
-                'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                'date1' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
             ]);
         }
 
+        // Need to UNION and include reports stored in the generic DocMan tables
+
         $query .= "
-            ORDER BY    sral.FileYear DESC, 
-                        sral.FileSemester DESC, 
-                        sra.CreatedDate DESC
+            UNION
+            
+            SELECT  d.tDocumentsSeq as ID,
+                    d.Description,
+                    COALESCE(
+                        (
+                            SELECT TOP 1 FileYear 
+                            FROM FileSemesters 
+                            WHERE d.SourceDate BETWEEN StartDate AND EndDate
+                        ), YEAR(d.SourceDate)
+                    ) AS FileYear,
+                    (
+                        SELECT TOP 1 FileSemester 
+                        FROM FileSemesters 
+                        WHERE d.SourceDate 
+                        BETWEEN StartDate AND EndDate
+                    ) AS FileSemester,
+                    CONVERT(VARCHAR(20), d.SourceDate, 20) as CreatedDate,
+                    'tDocuments' AS Source
+            FROM    {$this->schema}.tDocuments d
+            JOIN    {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
+            WHERE   dr.ID = :id2 
+        ";
+
+        $params['id2'] = $student->getExternalId();
+
+        if ($date !== false) {
+            $query .= ' AND d.SourceDate >= :date2 ';
+
+            $params = array_merge($params, [
+                'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+            ]);
+        }
+
+        // Check if we need to apply a classification filter
+
+        $bindings = $this->buildBindingsForClassifications();
+        if (!empty($bindings)) {
+            $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
+
+            $params = array_merge(
+                $params,
+                array_map(
+                    'trim',
+                    $bindings['bindings']
+                )
+            );
+        }
+
+        $query .= "
+            ORDER BY    FileYear DESC, 
+                        FileSemester DESC, 
+                        CreatedDate DESC
         ";
 
         // Get all documents for the student
@@ -117,14 +171,16 @@ class Document extends Base implements IDocument
         $reports = [];
 
         foreach ($iterator as $row) {
-            $reportId = $row['StudentReportsArchiveLinkSeq'];
-            $year = $row['FileYear'];
-            $semester = $row['FileSemester'];
+            $reportId    = $row['ID'];
+            $year        = $row['FileYear'];
+            $semester    = $row['FileSemester'];
             $description = $row['Description'];
+            $source      = $row['Source'];
 
             $reports[$year][$semester][$reportId] = [
                 'description' => $description,
                 'date'        => Alaress_Date_Format::newDatabaseDate($row['CreatedDate']),
+                'source'      => $source
             ];
         }
 
@@ -136,9 +192,10 @@ class Document extends Base implements IDocument
      *
      * @param User $student
      * @param string $documentId
+     * @param string $source
      * @return array
      */
-    public function downloadAcademicReportForStudent(User $student, $documentId)
+    public function downloadAcademicReportForStudent(User $student, $documentId, $source)
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 
@@ -146,36 +203,84 @@ class Document extends Base implements IDocument
             return [];
         }
 
-        // Create query to get the document from the database
-
-        $query =
-        "
-            SELECT    Document, 
-                      Description
-            FROM      {$this->schema}.StudentReportsArchive sra
-            JOIN      {$this->schema}.StudentReportsArchiveLink sral ON 
-                      sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
-            WHERE     ID = :id
-            AND       sra.StudentReportsArchiveSeq = :documentId
-        ";
-
         $params = [
-            'id' => $student->getExternalId(),
+            'id'         => $student->getExternalId(),
             'documentId' => $documentId
         ];
 
-        // Add date filter (if we find a parseable date in the config)
+        // Create query to get the document from the database
 
-        $minimumDateString = $this->config->get('external_document_report_minimum_date');
+        if ($source == 'tDocuments') {
+            // Loading from generic DocMan table
 
-        $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+            $query = "
+                SELECT    Document,
+                          DocumentType,
+                          Description
+                FROM      {$this->schema}.tDocuments d
+                JOIN      {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
+                WHERE     dr.ID = :id
+                AND       d.tDocumentsSeq = :documentId
+            ";
 
-        if ($date !== false) {
-            $query .= ' AND sra.CreatedDate >= :createdDate';
+            // Add date filter (if we find a parseable date in the config)
 
-            $params = array_merge($params, [
-                'createdDate' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
-            ]);
+            $minimumDateString = $this->config->get('external_document_report_minimum_date');
+
+            $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+
+            if ($date !== false) {
+                $query .= ' AND d.SourceDate >= :date';
+
+                $params = array_merge($params, [
+                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                ]);
+            }
+
+            // Check if we need to apply a classification filter
+
+            $bindings = $this->buildBindingsForClassifications();
+            if (!empty($bindings)) {
+                $query .= " AND d.ClassificationCode IN ({$bindings['placeholders']})";
+
+                $params = array_merge(
+                    $params,
+                    array_map(
+                        'trim',
+                        $bindings['bindings']
+                    )
+                );
+            }
+        } elseif ($source == 'StudentReportsArchive') {
+            // Loading from school reports archive table
+
+            $query = "
+                SELECT    Document,
+                          'PDF' AS DocumentType,
+                          Description
+                FROM      {$this->schema}.StudentReportsArchive sra
+                JOIN      {$this->schema}.StudentReportsArchiveLink sral ON 
+                          sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
+                WHERE     ID = :id
+                AND       sra.StudentReportsArchiveSeq = :documentId
+            ";
+
+            // Add date filter (if we find a parseable date in the config)
+
+            $minimumDateString = $this->config->get('external_document_report_minimum_date');
+
+            $date = DateTime::createFromFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT, $minimumDateString);
+
+            if ($date !== false) {
+                $query .= ' AND sra.CreatedDate >= :date ';
+
+                $params = array_merge($params, [
+                    'date' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                ]);
+            }
+
+        } else {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
 
         // Get the document from the database
@@ -183,18 +288,38 @@ class Document extends Base implements IDocument
         $result = $this->databaseExternal->executeQuery($query, $params);
 
         if ($row = $result->fetch()) {
-            // If we found a database record, return an array with the details necessary for downloading
-            // using the historical code
+            // If we found a database record, return an array with the details necessary for downloading using
+            // the historical code
 
             return [
-                'filename' => "{$row["Description"]}.pdf",
+                'filename' => "{$row["Description"]}.{$row["DocumentType"]}",
                 'filesize' => strlen($row["Document"]),
-                'blob' => $row["Document"],
+                'blob'     => $row["Document"],
             ];
         }
 
         // If we got here the document could not be located in the database
 
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
+    }
+
+    /**
+     * Builds placeholders and bindings for document classifications.
+     *
+     * @return array Empty if there's no document classifications.
+     *               Otherwise:
+     *               bindings:     the parameters to bind to a query
+     *               placeholders: the IN part of a query
+     */
+    private function buildBindingsForClassifications()
+    {
+        $classificationCodes = array_filter(
+            explode(",", trim($this->config->get('external_document_docman_categories')))
+        );
+
+        if (count($classificationCodes) > 0) {
+            return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode');
+        }
+        return [];
     }
 }

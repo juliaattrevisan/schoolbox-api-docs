@@ -31,10 +31,11 @@ class Document extends Base implements IDocument
      *
      * @param User $student
      * @param string $documentId
+     * @param string $source
      * @return array
      * @throws SchoolboxException
      */
-    public function downloadAcademicReportForStudent(User $student, $documentId)
+    public function downloadAcademicReportForStudent(User $student, $documentId, $source)
     {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
     }

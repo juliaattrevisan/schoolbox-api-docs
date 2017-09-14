@@ -52,10 +52,11 @@ class Controller extends Base
      *
      * @param User   $student
      * @param string $documentId
+     * @param string $source
      */
-    public function getDownload(User $student, $documentId)
+    public function getDownload(User $student, $documentId, $source)
     {
-        $report = $this->externalDocument->downloadAcademicReportForStudent($student, $documentId);
+        $report = $this->externalDocument->downloadAcademicReportForStudent($student, $documentId, $source);
 
         $headers = $this->getResponse()->headers;
         $headers->set("Pragma", " ");
