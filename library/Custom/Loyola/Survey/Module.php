@@ -34,7 +34,6 @@ class Module extends BaseModule
 
         $this->register('GET', '/class/{folderId}', 'getClassSnapshotList', $isStaff);
         $this->register('GET', '/class/snapshot/{surveyId}', 'getClassSnapshot', $isStaff);
-
     }
 
     /**
