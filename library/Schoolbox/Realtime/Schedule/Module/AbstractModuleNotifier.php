@@ -45,10 +45,10 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /** @var NS */
     protected $namespace;
 
-    /** @var Mapper */
+    /** @var NSMapper */
     protected $nsMapper;
 
-    /** @var Mapper */
+    /** @var SourceMapper */
     protected $srcMapper;
 
     /** @var int */

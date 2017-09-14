@@ -5,55 +5,38 @@
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Blog\Eportfolio\Comment;
 
+use PDO;
 use PDOStatement;
-use Schoolbox\Blog\Eportfolio\Comment\Model as EportfolioBlogCommentModel;
-use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
+use Schoolbox\Blog\Eportfolio;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
+
     /**
      * Setup mapper
      */
     protected function mapping()
     {
         $this->hasTable('eportfolio_component_blog_comment');
-        $this->hasModel(EportfolioBlogCommentModel::class);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('blog_id', EportfolioBlogMapper::class, 'id', null, null, 'blog');
-        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
+        $this->joins('blog_id', Eportfolio\Post\Mapper::class, 'id', null, null, 'blog', 'blog');
+        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->uses('body', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->hasSoftDeleteDateField('deleted_at');
-
-        $this->hasJoin(
-            'owner',
-            array(
-                'mapper' => UserMapper::class,
-                'this_key' => 'owner_id',
-                'other_key' => 'id'
-            )
-        );
-
-        $this->hasJoin(
-            'blog',
-            array(
-                'mapper' => EportfolioBlogMapper::class,
-                'this_key' => 'blog',
-                'other_key' => 'id'
-            )
-        );
     }
 
 
@@ -69,7 +52,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('owner', 'u')}
             FROM {$this->database->quoteIdentifier($this->table)}
-            INNER JOIN {$this->getJoinSql('owner', '', 'u',true)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'u', true)}
         ";
     }
 
@@ -77,20 +60,19 @@ class Mapper extends BaseMapper
      * Hydrate joins added in `getSelectString`.
      *
      * @param  PDOStatement $statement
-     * @return GenericCollection
+     * @return GenericCollection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('owner');
         $collection = $this->createCollection();
-        foreach ($statement as $row) {
-            $model = $this->hydrate($row);
 
-            // set user and division only if retrieved properly
-            $user = $this->hydrateJoin($row, 'owner', 'u');
-            if ($user instanceof User) {
-                $model->setOwner($user);
-            }
-            $collection->add($model);
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $model = $this->hydrate($row);
+            $model->setOwner($userMapper->hydrate($row, 'u'));
+            $collection[$model->getId()] = $model;
         }
         return $collection;
     }

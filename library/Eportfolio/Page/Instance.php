@@ -1,4 +1,6 @@
 <?php
+use Eportfolio\Permission;
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -411,7 +413,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     {
         $selectedParents = EportfolioPermissionMapper::getInstance()->findByColumnList([
             'page_id' => $this->getPageId(),
-            'type'    => 'parent',
+            'type'    => Permission::TYPE_PARENT,
             'value'   => 1
         ]);
 

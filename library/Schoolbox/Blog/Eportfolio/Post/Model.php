@@ -5,37 +5,30 @@
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
+use Eportfolio\Page;
 
 class Model implements ISoftDeletable
 {
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
 	use DeletedAtDate;
-
-	/** @var int */
-	protected $id;
-
-	/** @var Folder */
-	protected $folder;
 
 	/** @var User */
 	protected $owner;
 
-	/** @var Integer */
-	protected $pageId;
-
-	/** @var \Alaress_Date_Format */
-	protected $createdAt;
-
-	/** @var \Alaress_Date_Format */
-	protected $updatedAt;
+    /** @var Page */
+    protected $page;
 
 	/** @var string */
 	protected $heading;
@@ -44,52 +37,23 @@ class Model implements ISoftDeletable
 	protected $body;
 
 	/**
-	 * @param int $id
+     * @param Page $page
 	 * @return self
 	 */
-	public function setId($id) {
-		$this->id = $id;
+    public function setPage(Page $page)
+    {
+        $this->page = $page;
 		return $this;
 	}
 
 	/**
-	 * @return int
+     * @return Page
 	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
-	 * @param int $pageId
-	 * @return self
-	 */
-	public function setPageId($pageId) {
-		$this->pageId = $pageId;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getPageId() {
-		return $this->pageId;
+    public function getPage()
+    {
+        return $this->page;
 	}	
 
-	/**
-	 * @param Folder $folder
-	 * @return self
-	 */
-	public function setFolder($folder) {
-		$this->folder = $folder;
-		return $this;
-	}
-
-	/**
-	 * @return Folder
-	 */
-	public function getFolder() {
-		return $this->folder;
-	}
 
 	/**
 	 * @param User $owner
@@ -107,39 +71,6 @@ class Model implements ISoftDeletable
 		return $this->owner;
 	}
 
-	/**
-	 * @param \Alaress_Date_Format $createdAt
-	 * @return self
-	 */
-	public function setCreatedAt($createdAt) {
-		$this->createdAt = $createdAt;
-		return $this;
-	}
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getCreatedAt() {
-		return $this->createdAt;
-	}
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getUpdatedAt()
-	{
-		return $this->updatedAt;
-	}
-
-	/**
-	 * @param  \Alaress_Date_Format $updatedAt
-	 * @return $this
-	 */
-	public function setUpdatedAt($updatedAt)
-	{
-		$this->updatedAt = $updatedAt;
-		return $this;
-	}
 
 	/**
 	 * @param string $heading
