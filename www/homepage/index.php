@@ -205,7 +205,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
                 $folderId = null;
             }
 
-            if (!$component->renderInPalette($component->getModule(), $folder->getId())) {
+            if (!$component->renderInPalette($component->getModule(), $folderId)) {
                 continue;
             }
 
