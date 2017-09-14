@@ -37,7 +37,7 @@ class Notifier extends AbstractModuleNotifier
 {
 
     const TRIGGER_POSTED = 'posted';
-    const BASE_URI = '/eportfolio/';
+    const BASE_URI = '/eportfolio/blog/';
 
     /**
      * @var PageMapper
@@ -226,17 +226,15 @@ class Notifier extends AbstractModuleNotifier
     ): Envelope {
         $envelope    = new Envelope();
         $bob         = new Builder();
-        $page        = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner       = $this->userMapper->findById($page->getOwner()->getId());
         $authorExtId = $effector->getExternalId();
 
         $bob->setTitle(":author posted :title on {$titleToken} eportfolio blog")
             ->setParams(array_merge($titleParam, [
                 'author' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                'title'  => new Param($post->getHeading(), $this->buildBlogUrl($owner, $post)),
+                'title'  => new Param($post->getHeading(), $this->buildBlogUrl($post)),
             ]))
             ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
-            ->setHref($this->buildBlogUrl($owner, $post))
+            ->setHref($this->buildBlogUrl($post))
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())
             ->addTopic("eportfolio.blog.{$post->getId()}." . self::TRIGGER_POSTED)
@@ -315,12 +313,14 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param User  $student
+     * Generate a URL to send users to see a specific eportfolio blog post
+     * (not the blog thread in the component)
+     *
      * @param Model $post
      * @return string
      */
-    private function buildBlogUrl(User $student, Model $post): string
+    private function buildBlogUrl(Model $post): string
     {
-        return self::BASE_URI . "{$student->getId()}/{$post->getPage()->getPageId()}#blog_{$post->getId()}";
+        return self::BASE_URI . "{$post->getPage()->getPageId()}/{$post->getId()}";
     }
 } 
