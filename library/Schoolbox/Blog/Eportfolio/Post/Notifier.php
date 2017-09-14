@@ -19,6 +19,7 @@ use Schoolbox\IMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -184,7 +185,7 @@ class Notifier extends AbstractModuleNotifier
             $titleParam = [];
         } else {
             $titleToken = ":student's";
-            $titleParam = ['student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE)];
+            $titleParam = ['student' => new ChildParam($owner, ParameterInterface::STACKING_REPLACE)];
         }
 
         $parentsCanView = false;
