@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -136,11 +137,15 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 		foreach($wikis as $wiki) {
             // Wiki creator is the author of first (not latest) revision
-            $first = $this->revisionMapper->findOneByColumn('wikiID', $wiki->getId(), [ 'created' => 'asc' ]);
-            $user = $first->getUser();
-			$c = $c->merge(
-				new Collection($this->notifyCreated($roletype, $wiki, $user)->getAll($wiki->getCreated()->getUnixTimestamp()))
-			);
+            try {
+                $first = $this->revisionMapper->findOneByColumn('wikiID', $wiki->getId(), [ 'created' => 'asc' ]);
+                $user = $first->getUser();
+                $c = $c->merge(
+                    new Collection($this->notifyCreated($roletype, $wiki, $user)->getAll($wiki->getCreated()->getUnixTimestamp()))
+                );
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                //noop 
+            }
 		}
 
 		return $c;
