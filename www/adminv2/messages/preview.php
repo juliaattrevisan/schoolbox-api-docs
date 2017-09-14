@@ -178,7 +178,7 @@ switch ($this->arg[0]) {
                 'subj'  => new param('Uluru')
             ))
             ->setHref('#')
-            ->setNamespace(NSMapper::NS_BLOG);
+            ->setNamespace(NSMapper::NS_HOMEPAGE_BLOG);
 
         $time = time();
 

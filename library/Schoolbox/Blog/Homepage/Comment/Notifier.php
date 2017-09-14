@@ -57,7 +57,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @return string
 	 */
 	protected function getSlug() {
-		return NSMapper::NS_BLOG;
+        return NSMapper::NS_HOMEPAGE_BLOG;
 	}
 
 	/**
@@ -164,7 +164,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$bob = $this->createBuilder($comment, $author)
 					->setTitle(':author commented on :title in :catname')
-					->addTopic("blog.$commentId.commented");
+                    ->addTopic("{$this->getSlug()}.$commentId.commented");
 
 		// send this to the blog post author
 		$envelope->targetToUser($blogOwnerId, $bob->build());
@@ -185,7 +185,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$bob = $this->createBuilder($comment, $author)
 		            ->setTitle(':author also commented on :title in :catname')
-		            ->addTopic("blog.$commentId.followed");
+                    ->addTopic("{$this->getSlug()}.$commentId.followed");
 
 		/** @var Comment[]|Collection $commentCollection */
 		$commentCollection = $this->mapper->findByColumn('blog_id', $blog->getId());

@@ -40,7 +40,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @return string
 	 */
 	protected function getSlug() {
-		return NSMapper::NS_BLOG;
+        return NSMapper::NS_HOMEPAGE_BLOG;
 	}
 
 
@@ -127,7 +127,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 			->setHref("/blog/$blogId")
 			->setSeverity(Logger::INFO)
 			->setNamespace($this->getSlug())
-			->addTopic("blog.$blogId.posted")
+            ->addTopic("{$this->getSlug()}.$blogId.posted")
 			->setTimestamp($blog->getCreatedAt()->getUnixTimeStamp())
 			->addFilter('roletype', $roletype)
 			->setBody($blog->getBody());
