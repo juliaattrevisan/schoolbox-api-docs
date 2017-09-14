@@ -45,98 +45,114 @@ class Sync extends BaseSync
             $studentjoin .= "
                 LEFT JOIN student as s
                     ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-                    OR (scr.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
+                    OR (scr.stud_code = s.stud_code AND p.cmpy_code = s.cmpy_code)";
         } else {
             $studentjoin = "LEFT JOIN student as s
                     ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)";
         }
 
         // Single Tuple contains data for [P]arent and [S]pouse
-        $query = "
-            SELECT DISTINCT
-                CASE
-                    WHEN
-                        (sf.sfa_num) IS NULL
-                    THEN 'P' + RTRIM(p.par_code)
-                    ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
-                END                 AS student_contact_id,
-                f.person_num        AS student_contact_network_login,
-                LEFT(pa.salutation, CHARINDEX(' ', pa.salutation))    AS student_contact_title,
-                RTRIM(p.f_name)         AS student_contact_given_name,
-                RTRIM(p.f_name)         AS student_contact_preferred,
-                RTRIM(p.surname)        AS student_contact_surname,
-                RTRIM(pa.e_mail)        AS student_contact_default_email,
-                s.year_grp              AS student_year_level,
-                s.campus_code           AS student_campus,
-                s.house                 AS student_house,
-                s.sex                   AS student_gender,
-                RTRIM(s.preferred_name) AS student_preferred,
-                RTRIM(s.surname)        AS student_surname,
-                pa.add_num              AS tass_addnum
-            FROM parent AS p
-            INNER JOIN paraddress as pa
-                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND (pa.add_num = '1' OR pa.add_num='5')
-            LEFT JOIN pia_sfaccess AS sf
-                ON p.par_code = sf.par_code
-                AND p.cmpy_code = sf.cmpy_code
-            $studentjoin
-            LEFT JOIN family f
-                ON f.entity_code = p.par_code AND f.entity_gender = 'M'
-            LEFT JOIN persondefs pd
-                ON pd.person_num = f.person_num
-            WHERE p.cmpy_code = :companyCode
-            AND   p.f_name IS NOT NULL
-            AND   s.given_name IS NOT NULL
-            AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
-            AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
-            AND ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
-            OR  (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
+        $iterator = $this->databaseExternal->executeQueryIterator
+        (
+            "
+                SELECT DISTINCT
+                    CASE
+                        WHEN
+                            (sf.sfa_num) IS NULL
+                        THEN 'P' + RTRIM(p.par_code)
+                        ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
+                    END                 AS student_contact_id,
+                    f.person_num        AS student_contact_network_login,
+                    LEFT(pa.salutation, CHARINDEX(' ', pa.salutation))    AS student_contact_title,
+                    RTRIM(p.f_name)         AS student_contact_given_name,
+                    LEFT(p.f_name, CHARINDEX(' ', p.f_name)) AS student_contact_preferred,
+                    CASE
+                        WHEN
+                            LEN(RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))) > 0
+                        THEN RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))
+                        ELSE RTRIM(p.surname)
+                    END                     AS student_contact_surname,
+                    RTRIM(pa.e_mail)        AS student_contact_default_email,
+                    s.year_grp              AS student_year_level,
+                    s.campus_code           AS student_campus,
+                    s.house                 AS student_house,
+                    s.sex                   AS student_gender,
+                    RTRIM(s.preferred_name) AS student_preferred,
+                    RTRIM(s.surname)        AS student_surname,
+                    pa.add_num              AS tass_addnum
+                FROM parent AS p
+                INNER JOIN paraddress as pa
+                    ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND (pa.add_num = '1' OR pa.add_num='5')
+                LEFT JOIN pia_sfaccess AS sf
+                    ON p.par_code = sf.par_code
+                    AND p.cmpy_code = sf.cmpy_code
+                $studentjoin
+                LEFT JOIN family f
+                    ON f.entity_code = p.par_code AND f.entity_gender = 'M'
+                LEFT JOIN persondefs pd
+                    ON pd.person_num = f.person_num
+                WHERE p.cmpy_code = :companyCode
+                AND   p.f_name IS NOT NULL
+                AND   s.given_name IS NOT NULL
+                AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
+                AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
+                AND ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
+                OR  (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
 
-            UNION ALL
+                UNION ALL
 
-            SELECT DISTINCT
-                CASE
-                    WHEN
-                        (sf.sfa_num) IS NULL
-                    THEN 'S' + RTRIM(p.par_code)
-                    ELSE 'S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
-                END                     AS student_contact_id,
-                f.person_num            AS student_contact_network_login,
-                LEFT(pa.salutation, CHARINDEX(' ', pa.salutation))    AS student_contact_title,
-                RTRIM(p.m_name)         AS student_contact_given_name,
-                RTRIM(p.m_name)         AS student_contact_preferred,
-                RTRIM(p.surname)        AS student_contact_surname,
-                RTRIM(pa.e_mail)        AS student_contact_default_email,
-                s.year_grp              AS student_year_level,
-                s.campus_code           AS student_campus,
-                s.house                 AS student_house,
-                s.sex                   AS student_gender,
-                RTRIM(s.preferred_name) AS student_preferred,
-                RTRIM(s.surname)        AS student_surname,
-                pa.add_num              AS tass_addnum
-            FROM parent AS p
-            INNER JOIN paraddress as pa
-                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND (pa.add_num = '1' OR pa.add_num='4')
-            LEFT JOIN pia_sfaccess AS sf
-                ON p.par_code = sf.par_code
-                AND p.cmpy_code = sf.cmpy_code
-            $studentjoin
-            LEFT JOIN family f
-                ON f.entity_code = p.par_code AND f.entity_gender = 'F'
-            LEFT JOIN persondefs pd
-                ON pd.person_num = f.person_num
-            WHERE p.cmpy_code = :companyCode
-            AND   p.m_name IS NOT NULL
-            AND   s.given_name IS NOT NULL
-            AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
-            AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
-            AND ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
-            OR  (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
+                SELECT DISTINCT
+                    CASE
+                        WHEN
+                            (sf.sfa_num) IS NULL
+                        THEN 'S' + RTRIM(p.par_code)
+                        ELSE 'S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
+                    END                     AS student_contact_id,
+                    f.person_num            AS student_contact_network_login,
+                    LEFT(pa.salutation, CHARINDEX(' ', pa.salutation))    AS student_contact_title,
+                    RTRIM(p.m_name)         AS student_contact_given_name,
+                    LEFT(p.m_name, CHARINDEX(' ', p.m_name)) AS student_contact_preferred,
+                    CASE
+                        WHEN
+                            LEN(RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))) > 0
+                        THEN RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))
+                        ELSE RTRIM(p.surname)
+                    END                     AS student_contact_surname,
+                    RTRIM(pa.e_mail)        AS student_contact_default_email,
+                    s.year_grp              AS student_year_level,
+                    s.campus_code           AS student_campus,
+                    s.house                 AS student_house,
+                    s.sex                   AS student_gender,
+                    RTRIM(s.preferred_name) AS student_preferred,
+                    RTRIM(s.surname)        AS student_surname,
+                    pa.add_num              AS tass_addnum
+                FROM parent AS p
+                INNER JOIN paraddress as pa
+                    ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND (pa.add_num = '1' OR pa.add_num='4')
+                LEFT JOIN pia_sfaccess AS sf
+                    ON p.par_code = sf.par_code
+                    AND p.cmpy_code = sf.cmpy_code
+                $studentjoin
+                LEFT JOIN family f
+                    ON f.entity_code = p.par_code AND f.entity_gender = 'F'
+                LEFT JOIN persondefs pd
+                    ON pd.person_num = f.person_num
+                WHERE p.cmpy_code = :companyCode2
+                AND   p.m_name IS NOT NULL
+                AND   s.given_name IS NOT NULL
+                AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
+                AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
+                AND ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
+                OR  (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
 
-            ORDER BY student_contact_id ASC, tass_addnum DESC
-        ";
+                ORDER BY student_contact_id ASC, tass_addnum DESC
+            ",
+            [
+                'companyCode' => $this->companyCode,
+                'companyCode2' => $this->companyCode
+            ]
+        );
 
-        $iterator = $this->databaseExternal->executeQueryIterator($query, ['companyCode' => $this->companyCode,]);
         return new Iterator\Guardian($iterator);
     }
 

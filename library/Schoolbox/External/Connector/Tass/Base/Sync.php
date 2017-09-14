@@ -106,28 +106,36 @@ class Sync extends Base implements ISync
         (
             "
                 SELECT DISTINCT
-                    'P' + p.par_code AS student_contact_id,
+                    CASE
+                        WHEN
+                            (sf.sfa_num) IS NULL
+                        THEN 'P' + RTRIM(p.par_code)
+                        ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
+                    END              AS student_contact_id,
                     f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
-                    p.f_name         AS student_contact_given_name,
-                    p.f_name         AS student_contact_preferred,
-                    p.surname        AS student_contact_surname,
+                    RTRIM(p.f_name)  AS student_contact_given_name,
+                    LEFT(p.f_name, CHARINDEX(' ', p.f_name)) AS student_contact_preferred,
+                    CASE
+                        WHEN
+                            LEN(RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))) > 0
+                        THEN RTRIM(SUBSTRING(p.f_name, CHARINDEX(' ', p.f_name), 255))
+                        ELSE RTRIM(p.surname)
+                    END              AS student_contact_surname,
                     ''               AS student_contact_home_email,
-                    pa.e_mail        AS student_contact_default_email,
+                    RTRIM(pa.e_mail) AS student_contact_default_email,
                     ''               AS student_contact_work_email,
-                    sf.sfa_num       AS student_contact_split_family_number,
                     s.year_grp       AS student_year_level,
                     s.campus_code    AS student_campus,
                     s.house          AS student_house,
                     s.sex            AS student_gender,
-                    s.preferred_name AS student_preferred,
-                    s.surname        AS student_surname
+                    RTRIM(s.preferred_name) AS student_preferred,
+                    RTRIM(s.surname) AS student_surname
                 FROM parent AS p
                 INNER JOIN paraddress as pa
                     ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND pa.add_num = '1'
                 LEFT JOIN pia_sfaccess AS sf
                     ON p.par_code = sf.par_code
-                    AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentjoin}
                 LEFT JOIN family f
@@ -139,32 +147,42 @@ class Sync extends Base implements ISync
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
                 AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
+                AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
+                OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
     
                 UNION ALL
     
                 SELECT DISTINCT
-                    'S' + p.par_code AS student_contact_id,
+                    CASE
+                        WHEN
+                            (sf.sfa_num) IS NULL
+                        THEN 'S' + RTRIM(p.par_code)
+                        ELSE 'S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
+                    END              AS student_contact_id,
                     f.person_num     AS student_contact_network_login,
                     ''               AS student_contact_title,
-                    p.m_name         AS student_contact_given_name,
-                    p.m_name         AS student_contact_preferred,
-                    p.surname        AS student_contact_surname,
+                    RTRIM(p.m_name)  AS student_contact_given_name,
+                    LEFT(p.m_name, CHARINDEX(' ', p.m_name)) AS student_contact_preferred,
+                    CASE
+                        WHEN
+                            LEN(RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))) > 0
+                        THEN RTRIM(SUBSTRING(p.m_name, CHARINDEX(' ', p.f_name), 255))
+                        ELSE RTRIM(p.surname)
+                    END              AS student_contact_surname,
                     ''               AS student_contact_home_email,
-                    pa.e_mail        AS student_contact_default_email,
+                    RTRIM(pa.e_mail) AS student_contact_default_email,
                     ''               AS student_contact_work_email,
-                    sf.sfa_num       AS student_contact_split_family_number,
                     s.year_grp       AS student_year_level,
                     s.campus_code    AS student_campus,
                     s.house          AS student_house,
                     s.sex            AS student_gender,
-                    s.preferred_name AS student_preferred,
-                    s.surname        AS student_surname
+                    RTRIM(s.preferred_name) AS student_preferred,
+                    RTRIM(s.surname)        AS student_surname
                 FROM parent AS p
                 INNER JOIN paraddress as pa
                     ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND pa.add_num = '1'
                 LEFT JOIN pia_sfaccess AS sf
                     ON p.par_code = sf.par_code
-                    AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
                     AND p.cmpy_code = sf.cmpy_code
                 {$studentjoin}
                 LEFT JOIN family f
@@ -176,6 +194,8 @@ class Sync extends Base implements ISync
                 AND   s.given_name IS NOT NULL
                 AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
                 AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
+                AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
+                OR    (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0))
     
                 ORDER BY student_contact_id ASC
             ",
