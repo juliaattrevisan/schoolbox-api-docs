@@ -23,7 +23,7 @@ class Module extends BaseModule
     /**
      * @var string $basename Module basename
      */
-    protected $basename = 'survey';
+    protected $basename = 'surveySnapshot';
 
     /**
      * {@inheritdoc}
