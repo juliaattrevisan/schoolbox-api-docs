@@ -249,7 +249,7 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($this->buildBlogUrl($post))
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())
-            ->addTopic("eportfolio.blog.{$post->getId()}.$trigger")
+            ->addTopic("{$this->getSlug()}.{$post->getId()}.$trigger")
             ->setTimestamp((int)$post->getCreatedAt()->getUnixTimeStamp())
             ->setBody($post->getBody());
         return $bob;
