@@ -24,7 +24,13 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
 	use DeletedAtDate;
 
-	/** @var User */
+    /**
+     * Misnomer. This represents the **author** of this post.
+     *
+     * (The real owner is the user who owns the page where this post resides)
+     *
+     * @var User
+     */
 	protected $owner;
 
     /** @var Page */
