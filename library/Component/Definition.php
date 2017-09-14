@@ -54,9 +54,11 @@ class Component_Definition
     /**
      * Overridable function to hide component from palette
      *
+     * @param string $context The component context we are in (homepage, eportfolio, dashboard)
+     * @param int $contextId The context ID we are current in (folderId, pageId, dashboardId)
      * @return bool
      */
-    public function renderInPalette()
+    public function renderInPalette($context, $contextId)
     {
         return true;
     }

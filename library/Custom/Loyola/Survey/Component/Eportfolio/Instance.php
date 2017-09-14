@@ -22,11 +22,15 @@ class Instance extends Component_Instance
     protected $survey;
 
     /**
+     * {@inheritDoc}
+     *
      * Hide the component from non-staff if the survey has not been configured
      *
+     * @param string $context The component context we are in (homepage, eportfolio, dashboard)
+     * @param int $contextId The context ID we are current in (folderId, pageId, dashboardId)
      * @return bool
      */
-    public function renderInPalette()
+    public function renderInPalette($context, $contextId)
     {
         /** @var User $user */
         $user = $_SESSION["user"];

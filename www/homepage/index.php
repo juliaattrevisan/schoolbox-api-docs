@@ -199,7 +199,13 @@ if ($virtualPermission >= WRITE_ACCESS) {
             /** @var Component_Definition $component */
             ++$i;
 
-            if (!$component->renderInPalette()) {
+            if ($folder instanceof Schoolbox\Resource\Folder\Model) {
+                $folderId = $folder->getId();
+            } else {
+                $folderId = null;
+            }
+
+            if (!$component->renderInPalette($component->getModule(), $folder->getId())) {
                 continue;
             }
 
