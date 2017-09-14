@@ -24,6 +24,10 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
+        if (!$this->getUser()->getRole()->isStaff()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -35,6 +39,10 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        if (!$this->getUser()->getRole()->isStaff()) {
+            return false;
+        }
+
         // Render this mess out
 
         return $this->renderTwigTemplate($templateHandle, '@surveyHomepage/component.twig', [

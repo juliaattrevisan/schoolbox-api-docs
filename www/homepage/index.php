@@ -198,6 +198,17 @@ if ($virtualPermission >= WRITE_ACCESS) {
         foreach ($definitionCollection as $component) {
             /** @var Component_Definition $component */
             ++$i;
+
+            if ($folder instanceof Schoolbox\Resource\Folder\Model) {
+                $folderId = $folder->getId();
+            } else {
+                $folderId = null;
+            }
+
+            if (!$component->renderInPalette($component->getModule(), $folderId)) {
+                continue;
+            }
+
             $class = '';
             if ($component->getMultiple() == 'false') {
                 $class = 'one-only ';

@@ -19,7 +19,7 @@
                     <li>
                         <div class="card small-12">
                             <h3>
-                                <a href="{{ routeLookup('survey.getClassSnapshot', {surveyId: survey.id}) }}">
+                                <a href="{{ routeLookup('surveySnapshot.getClassSnapshot', {surveyId: survey.id}) }}">
                                     {% if survey.assessment.title is not empty %}
                                         {{ survey.assessment.title }} -
                                     {% endif %}

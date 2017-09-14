@@ -75,9 +75,11 @@ class Component_Instance
     /**
      * Overridable function that determines if the component should be rendered in the component palette
      *
+     * @param string $context The component context we are in (homepage, eportfolio, dashboard)
+     * @param int $contextId The context ID we are current in (folderId, pageId, dashboardId)
      * @return bool
      */
-    public function renderInPalette()
+    public function renderInPalette($context, $contextId)
     {
         return true;
     }

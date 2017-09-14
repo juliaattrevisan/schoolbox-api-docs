@@ -159,7 +159,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             foreach ($instanceCollection as $component) {
                 // Make sure the component is allowed to be rendered in the palette
 
-                if (!$component->renderInPalette()) {
+                if (!$component->renderInPalette($component->getDefinition()->getModule(), $this->getPageId())) {
                     continue;
                 }
 

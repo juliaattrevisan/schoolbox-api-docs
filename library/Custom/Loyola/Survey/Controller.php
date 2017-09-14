@@ -67,20 +67,6 @@ class Controller extends Base
     }
 
     /**
-     * Perform an AJAX search for surveys
-     *
-     * @return string
-     */
-    public function getSelectize()
-    {
-        return $this->getResponse()->content->set($this->buildJsonOutput(
-            $this->surveyMapper->findByKeyword(
-                $this->getRequest()->query['query']
-            )
-        ));
-    }
-
-    /**
      * Display a list of all surveys the students in the chosen folder have completed and link to the
      * classroom learning snapshot
      *
@@ -133,7 +119,7 @@ class Controller extends Base
         $surveys = $this->surveyMapper->findAttemptedSurveysForUsers($userIds);
 
         $this->getResponse()->content->set([
-            'template' => '@survey/classSnapshot.twig',
+            'template' => '@surveySnapshot/classSnapshot.twig',
             'data' => [
                 'folder' => $folder,
                 'surveys' => $surveys
