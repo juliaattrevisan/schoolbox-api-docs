@@ -12,6 +12,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\Access;
+use \Schoolbox\Permission\Access\UserAccess;
 
 $factory         = new Assess_Factory();
 $assessHandler   = new Assess_Main();
@@ -79,7 +81,7 @@ if ($quizVisibility->isStaff() && $groupHandler->isStaff()) {
     // noop
 } elseif ($quizVisibility->isStaffStudent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
     // noop
-} elseif ($quizVisibility->isStaffStudentParent() && ($groupHandler->isStaff() || $groupHandler->isStudent())) {
+} elseif ($quizVisibility->isStaffStudentParent()) {
     // noop
 } else {
     error(129);
@@ -99,6 +101,8 @@ $this->setFile(TEMPLATE_content, 'assess/studentReview.html');
 $this->setBlock(TEMPLATE_content, 'attemptFinished', 'attemptFinished_block');
 $this->setBlock(TEMPLATE_content, 'attemptNotYetFinished', 'attemptNotYetFinished_block');
 $this->setBlock(TEMPLATE_content, 'attemptUnfinished', 'attemptUnfinished_block');
+$this->setBlock(TEMPLATE_content, 'homepageLinkOpen', 'homepageLinkOpen_block');
+$this->setBlock(TEMPLATE_content, 'homepageLinkClose', 'homepageLinkClose_block');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
@@ -152,6 +156,16 @@ $this->setVar(
         'attemptUnfinished_block'       => '',
     )
 );
+
+// Display homepage link for user who have permission to view it
+if (Access::getInstance()->getFolderAccess($_SESSION['user'], $folder->getId()) >= UserAccess::ACCESS_READ) {
+    $this->parse('homepageLinkOpen_block', 'homepageLinkOpen');
+    $this->parse('homepageLinkClose_block', 'homepageLinkClose');
+}
+else {
+    $this->setVar('homepageLinkOpen_block', '');
+    $this->setVar('homepageLinkClose_block', '');
+}
 
 // Parse finished/unfinished/not finished yet blockage
 if (!isset($attempt['finish'])) {
