@@ -117,7 +117,7 @@ class Notifier extends AbstractModuleNotifier
     public function notifyStaffPosted(Model $post, User $effector): Envelope
     {
         $page  = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner = $this->userMapper->findById($page->getUid());
+        $owner = $this->userMapper->findById($page->getOwner()->getId());
 
         // Is author and owner the same user?
         if ($effector->getId() === $owner->getId()) {
@@ -157,7 +157,7 @@ class Notifier extends AbstractModuleNotifier
     public function notifyStudentPosted(Model $post, User $effector): Envelope
     {
         $page       = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner      = $this->userMapper->findById($page->getUid());
+        $owner      = $this->userMapper->findById($page->getOwner()->getId());
         $audience   = $this->userMapper->createCollection([$owner]);
         $titleToken = 'your';
         return $this->notifyPosted($post, $effector, $audience, $titleToken);
@@ -176,7 +176,7 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentPosted(Model $post, User $effector): Envelope
     {
         $page  = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner = $this->userMapper->findById($page->getUid());
+        $owner = $this->userMapper->findById($page->getOwner()->getId());
 
         // Is author and owner the same user?
         if ($effector->getId() === $owner->getId()) {
@@ -226,7 +226,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope    = new Envelope();
         $bob         = new Builder();
         $page        = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner       = $this->userMapper->findById($page->getUid());
+        $owner       = $this->userMapper->findById($page->getOwner()->getId());
         $authorExtId = $effector->getExternalId();
 
         $bob->setTitle(":author posted :title on {$titleToken} eportfolio blog")

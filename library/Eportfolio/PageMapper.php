@@ -30,136 +30,34 @@ class PageMapper extends Schoolbox\Mapper {
 		$this->hasTable('eportfolio_page');
 		$this->hasModel(Page::class);
 
-		$this->hasMap(array(
-			'column'     => 'page_id',
-			'property'   => 'pageId',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'page_title',
-			'property'   => 'pageTitle',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->uses('page_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('page_title', self::TYPE_STRING);
         $this->joins('uid', UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->uses('template', self::TYPE_INTEGER);
+        $this->uses('left_column_width', self::TYPE_STRING);
+        $this->uses('left_head_font', self::TYPE_STRING);
+        $this->uses('left_head_bg', self::TYPE_STRING);
+        $this->uses('left_font', self::TYPE_STRING);
+        $this->uses('left_bg_primary', self::TYPE_STRING);
+        $this->uses('right_column_width', self::TYPE_STRING);
+        $this->uses('right_head_font', self::TYPE_STRING);
+        $this->uses('right_head_bg', self::TYPE_STRING);
+        $this->uses('right_font', self::TYPE_STRING);
+        $this->uses('right_bg_primary', self::TYPE_STRING);
+        $this->uses('top_head_font', self::TYPE_STRING);
+        $this->uses('top_head_bg', self::TYPE_STRING);
+        $this->uses('top_font', self::TYPE_STRING);
+        $this->uses('top_bg_primary', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-		$this->hasMap(array(
-			'column'     => 'template',
-			'property'   => 'template',
-			'type'       => self::TYPE_INTEGER,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'left_column_width',
-			'property'   => 'leftColumnWidth',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'left_head_font',
-			'property'   => 'leftHeadFont',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'left_head_bg',
-			'property'   => 'leftHeadBg',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'left_font',
-			'property'   => 'leftFont',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'left_bg_primary',
-			'property'   => 'leftBgPrimary',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'right_column_width',
-			'property'   => 'rightColumnWidth',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'right_head_font',
-			'property'   => 'rightHeadFont',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'right_head_bg',
-			'property'   => 'rightHeadBg',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'right_font',
-			'property'   => 'rightFont',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'right_bg_primary',
-			'property'   => 'rightBgPrimary',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'top_head_font',
-			'property'   => 'topHeadFont',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'top_head_bg',
-			'property'   => 'topHeadBg',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'top_font',
-			'property'   => 'topFont',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'top_bg_primary',
-			'property'   => 'topBgPrimary',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'created_at',
-			'property'   => 'createdAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'updated_at',
-			'property'   => 'updatedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'deleted_at',
-			'property'   => 'deletedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
-
-		$this->hasJoin('permissions', array(
-			'multiple'  => true,
-			'mapper'    => '\\Eportfolio\\PermissionMapper',
-			'this_key'  => 'page_id',
-			'other_key' => 'page_id',
-		));
-
-		$this->hasSoftDeleteDateField('deleted_at');
+        $this->hasJoin('permissions', [
+            'multiple'  => true,
+            'mapper'    => PermissionMapper::class,
+            'this_key'  => 'page_id',
+            'other_key' => 'page_id',
+        ]);
 	}
 
 	/**
