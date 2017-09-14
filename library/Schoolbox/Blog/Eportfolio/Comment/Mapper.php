@@ -41,6 +41,19 @@ class Mapper extends BaseMapper
 
 
     /**
+     * @param Model $comment
+     * @return GenericCollection|Model[]
+     */
+    public function findSiblings(Model $comment): GenericCollection
+    {
+        $pb = $this->getPredicateBuilder();
+        $pb->equals('blog_id', $comment->getBlog()->getId())
+           ->notEquals($this->getIdentifierColumn(), $comment->getId());
+        return $this->findByPredicates($pb);
+    }
+
+
+    /**
      * This mapper's find* methods always hydrate the owner
      *
      * @return string
