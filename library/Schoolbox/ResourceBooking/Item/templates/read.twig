@@ -65,6 +65,7 @@
                 scrollTime: '08:00',
                 defaultDate: calendarDate,
                 defaultView: calendarView,
+                defaultTimedEventDuration: '00:05:00',
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
                 firstDay: Number({{ config.calendar_start_day }}),
                 events: function(start, end, timezone, callback) {
@@ -113,7 +114,7 @@
                     }
                     element.attr({
                         'data-start':  event.start.format(),
-                        'data-end':    event.end.format(),
+                        'data-end':    (event.end || event.start).format(),
                         'data-allday': event.allDay ? 1 : 0
                     })
 

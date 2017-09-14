@@ -76,6 +76,7 @@
                 firstDay: Number({{ config.calendar_start_day }}),
                 schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
                 defaultView: 'timelineDay',
+                defaultTimedEventDuration: '00:05:00',
                 header: {
                     left: 'prev,today,next',
                     center: 'title',
