@@ -2887,14 +2887,14 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Hydrates a row from the database into a model.
      *
-     * @param array    $row      The row from the database.
-     * @param string   $alias    The prefix of this mapper's table cells in $row
-     * @param callable $callback If supplied and callable, this method is
-     *                           applied to the model once it's retrieved.
-     *                           It takes the following parameters:
-     *                           $mapper: this object
-     *                           $model:  the model that has been hydrated
-     *                           $row:    the row from the database
+     * @param array         $row      The row from the database.
+     * @param string        $alias    The prefix of this mapper's table cells in $row
+     * @param callable|null $callback If supplied and callable, this method is
+     *                                applied to the model once it's retrieved.
+     *                                It takes the following parameters:
+     *                                $mapper: this object
+     *                                $model:  the model that has been hydrated
+     *                                $row:    the row from the database
      *
      * @throws Exception
      * @return null|object

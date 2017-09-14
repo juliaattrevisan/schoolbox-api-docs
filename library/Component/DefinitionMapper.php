@@ -39,15 +39,8 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         $this->joins('msg_namespace_slug', NSMapper::class, 'slug', null, null, 'namespace', 'namespace');
     }
 
-    /**'
+    /**
      * {@inheritdoc}
-     *
-     * Prior to hydrating the row, check to see if there is a custom implementation of the component definition we
-     * are hydrating, and if so create that model instead of the default Component_Definition one
-     *
-     * @param array $row
-     * @param string $alias
-     * @param null $callback
      */
     public function hydrate(array $row, $alias = '', $callback = null)
     {
