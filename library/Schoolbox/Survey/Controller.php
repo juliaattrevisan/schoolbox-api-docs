@@ -20,7 +20,8 @@ class Controller extends Base
      *
      * @param SurveyMapper $surveyMapper
      */
-    public function __construct(SurveyMapper $surveyMapper) {
+    public function __construct(SurveyMapper $surveyMapper)
+    {
         $this->surveyMapper = $surveyMapper;
     }
 
