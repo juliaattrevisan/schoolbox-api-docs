@@ -18,8 +18,11 @@ use \Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
 /**
+ * UPCOMING DUE WORK COMPONENT
  * Displays a list of upcoming Quiz + DueWork (but not task) for students only
  */
+
+
 class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
 {
     // Should match the DB value
