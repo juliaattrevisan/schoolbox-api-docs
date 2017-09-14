@@ -15,9 +15,11 @@ class Definition extends Component_Definition
     /**
      * Hide the component from non-staff
      *
+     * @param string $context
+     * @param int    $contextId
      * @return bool
      */
-    public function renderInPalette()
+    public function renderInPalette($context, $contextId)
     {
         /** @var User $user */
         $user = $_SESSION["user"];
