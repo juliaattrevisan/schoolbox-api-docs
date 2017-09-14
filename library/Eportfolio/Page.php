@@ -166,7 +166,7 @@ class Page implements ISoftDeletable{
 	/**
 	 * A collection of permissions
 	 *
-	 * @var Collection|Permission[]
+     * @var Collection|Permission[]
 	 */
 	private $permissions;
 
@@ -563,7 +563,7 @@ class Page implements ISoftDeletable{
 	/**
 	 * Set permissions
 	 *
-	 * @param Collection|Permission[] $permissions
+     * @param Collection|Permission[] $permissions
 	 */
 	public function setPermissions($permissions) {
 		$this->permissions = $permissions;
@@ -572,7 +572,7 @@ class Page implements ISoftDeletable{
 	/**
 	 * Get permissions
 	 *
-	 * @return Collection|Permission[]
+     * @return Collection|Permission[]
 	 */
 	public function getPermissions() {
 		return $this->permissions;

@@ -27,8 +27,8 @@ class Model implements ISoftDeletable
 	/** @var User */
 	protected $owner;
 
-	/** @var Page */
-	protected $page;
+    /** @var Page */
+    protected $page;
 
 	/** @var string */
 	protected $heading;
@@ -37,19 +37,21 @@ class Model implements ISoftDeletable
 	protected $body;
 
 	/**
-	 * @param Page $page
+     * @param Page $page
 	 * @return self
 	 */
-	public function setPage(Page $page) {
-		$this->page = $page;
+    public function setPage(Page $page)
+    {
+        $this->page = $page;
 		return $this;
 	}
 
 	/**
-	 * @return Page
+     * @return Page
 	 */
-	public function getPage() {
-		return $this->page;
+    public function getPage()
+    {
+        return $this->page;
 	}	
 
 

@@ -22,7 +22,7 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -32,7 +32,6 @@ use External_UserInterface;
 use External_User;
 use External_ClassInterface;
 use External_Class;
-
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -83,7 +82,7 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param TriggerBundle $bundle
+     * @param TriggerBundleInterface $bundle
      * @return void
      */
     public function bundleTriggers($bundle): void
@@ -96,7 +95,9 @@ class Notifier extends AbstractModuleNotifier
 
             //TODO remove this hack when SA-4400 is merged.
             $blog = $this->getMapper()->findByColumn(
-                $this->getMapper()->getIdentifierColumn(), $blog->getId(), ['cache' => false]
+                $this->getMapper()->getIdentifierColumn(),
+                $blog->getId(),
+                ['cache' => false]
             )->first();
             $bundle->getEvent()->setObject($blog);
 
@@ -244,7 +245,7 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())
             ->addTopic("eportfolio.blog.{$post->getId()}.$trigger")
-            ->setTimestamp($post->getCreatedAt()->getUnixTimeStamp())
+            ->setTimestamp((int)$post->getCreatedAt()->getUnixTimeStamp())
             ->setBody($post->getBody());
         return $bob;
     }
@@ -368,4 +369,4 @@ class Notifier extends AbstractModuleNotifier
         }
         return $teachers;
     }
-} 
+}

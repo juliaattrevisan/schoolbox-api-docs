@@ -92,7 +92,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 		if (is_numeric($parent)) {
 			$permission = new Permission();
 			$permission->setPageId($pageId);
-			$permission->setType(Permission::TYPE_PARENT);
+            $permission->setType(Permission::TYPE_PARENT);
 			$permission->setValue($parent);
 
 			$this->save($permission);
@@ -111,7 +111,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 				if (is_numeric($currentGroup)) {
 					$permission = new Permission();
 					$permission->setPageId($pageId);
-					$permission->setType(Permission::TYPE_GROUP);
+                    $permission->setType(Permission::TYPE_GROUP);
 					$permission->setValue($currentGroup);
 
 					$this->save($permission);
@@ -132,7 +132,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 				if (is_numeric($currentIndividual)) {
 					$permission = new Permission();
 					$permission->setPageId($pageId);
-					$permission->setType(Permission::TYPE_STUDENT);
+                    $permission->setType(Permission::TYPE_STUDENT);
 					$permission->setValue($currentIndividual);
 
 					$this->save($permission);
@@ -145,12 +145,12 @@ class PermissionMapper extends Schoolbox\Mapper {
 	 * Find the Parent permission settings for a particular page
 	 *
 	 * @param $pageId
-	 * @return Schoolbox\Collection|Permission[]
+     * @return Schoolbox\Collection|Permission[]
 	 */
 	public function findParentSetting($pageId) {
 		return $this->findByColumnList(array(
 			'page_id' => $pageId,
-			'type' => Permission::TYPE_PARENT,
+            'type' => Permission::TYPE_PARENT,
 		));
 	}
 
