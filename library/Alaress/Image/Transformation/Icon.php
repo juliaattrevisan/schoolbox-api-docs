@@ -32,7 +32,7 @@ class Icon extends BaseTransformation
         $namespaceMap = array(
             NSMapper::NS_DUEWORK            => 'work',
             NSMapper::NS_ONLINE_ASSESS      => 'work',
-            NSMapper::NS_BLOG               => 'chat',
+            NSMapper::NS_HOMEPAGE_BLOG      => 'chat',
             NSMapper::NS_FORUM              => 'chat',
             NSMapper::NS_NEWS               => 'pin',
             NSMapper::NS_CALENDAR           => 'clock',
