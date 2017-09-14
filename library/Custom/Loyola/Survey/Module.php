@@ -12,6 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -29,20 +30,11 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $routes = [
-            'GET' => [
-                '/class/{folderId}' => 'getClassSnapshotList',
-                '/class/snapshot/{surveyId}' => 'getClassSnapshot',
-            ],
-            'POST' => [
-            ]
-        ];
+        $isStaff = new Rule\HasRole(Role::STAFF);
 
-        foreach ($routes as $httpMethod => $route) {
-            foreach ($route as $path => $controllerMethod) {
-                $this->register($httpMethod, $path, $controllerMethod);
-            }
-        }
+        $this->register('GET', '/class/{folderId}', 'getClassSnapshotList', $isStaff);
+        $this->register('GET', '/class/snapshot/{surveyId}', 'getClassSnapshot', $isStaff);
+
     }
 
     /**
