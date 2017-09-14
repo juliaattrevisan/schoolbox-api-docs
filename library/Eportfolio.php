@@ -1,4 +1,7 @@
 <?php
+use Eportfolio\PageMapper;
+use Schoolbox\UserMapper;
+
 /**
  * Eportfolio
  *
@@ -58,6 +61,16 @@ class Eportfolio {
 	 */
 	private $allTemplates = array();
 
+    /**
+     * @var UserMapper
+     */
+	private $userMapper;
+
+    /**
+     * @var PageMapper
+     */
+    private $pageMapper;
+
 	/**
 	 * Constructor
 	 *
@@ -69,13 +82,17 @@ class Eportfolio {
 		$this->setUserId($userId);
 		$this->setPageId($pageId);
 
+        // TODO inject these mappers for testability
+        $this->userMapper = UserMapper::getInstance();
+        $this->pageMapper = PageMapper::getInstance();
+
 		/* Preload settings for user-built pages
 		 *
 		 * Otherwise they are hardcoded pages and we don't need
 		 * this extra information
 		 */
 		if (is_numeric($pageId)) {
-			$pageInstance = \Eportfolio\PageMapper::getInstance()->findById($pageId);
+            $pageInstance = $this->pageMapper->findById($pageId);
 
 			$this->setPageInstance($pageInstance);
 			$this->setAllTemplates($this->fetchAllTemplates());
@@ -84,7 +101,10 @@ class Eportfolio {
 		 * (was easier, but dirtier, to use an empty array)
 		 */
 		else {
-			$this->setPageInstance(new \Eportfolio\Page());
+            $user = $this->userMapper->createModel($userId);
+            $page = $this->pageMapper->createModel($pageId);
+            $page->setOwner($user);
+            $this->pageInstance = $page;
 		}
 	}
 
@@ -140,7 +160,7 @@ class Eportfolio {
 	public function updatePageTitle($value) {
 		$this->getPageInstance()->setPageTitle($value);
 
-		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
+		$this->pageMapper->save($this->getPageInstance());
 	}
 
 	/**
@@ -149,7 +169,7 @@ class Eportfolio {
 	public function softdelete() {
 		$this->getPageInstance()->setDeletedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
 
-		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
+        $this->pageMapper->save($this->getPageInstance());
 	}
 
 	/**
@@ -219,7 +239,7 @@ class Eportfolio {
 		$this->getPageInstance()->setLeftColumnWidth($left);
 		$this->getPageInstance()->setRightColumnWidth($right);
 
-		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
+        $this->pageMapper->save($this->getPageInstance());
 	}
 
     /**
@@ -425,8 +445,8 @@ class Eportfolio {
 
 		/* Remove the page itself
 		 */
-		$pageInstance = Eportfolio\PageMapper::getInstance()->findById($this->getPageId());
-		Eportfolio\PageMapper::getInstance()->delete($pageInstance);
+		$pageInstance = $this->pageMapper->findById($this->getPageId());
+        $this->pageMapper->delete($pageInstance);
 
 		/* Redirect back to the profile
 		 */

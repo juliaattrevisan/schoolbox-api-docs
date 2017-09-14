@@ -14,6 +14,10 @@ use Schoolbox;
 use Schoolbox\UserMapper;
 use Schoolbox\GenericCollection;
 
+/**
+ * @method Page findById($identifierValue)
+ * @method Page createModel($idValue = null)
+ */
 class PageMapper extends Schoolbox\Mapper {
 
 	/**
