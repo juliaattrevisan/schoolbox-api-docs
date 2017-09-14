@@ -25,8 +25,8 @@
 </script>
 
 <ul class="breadcrumb">
-    <li><a href="/eportfolio/{{ page.getUid }}">{{ pageOwner.getFullName }}'s ePortfolio</a></li>
-    <li><a href="/eportfolio/{{ page.getUid }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
+    <li><a href="/eportfolio/{{ pageOwner.id }}">{{ pageOwner.getFullName }}'s ePortfolio</a></li>
+    <li><a href="/eportfolio/{{ pageOwner.id }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
     <li class="active"><a href="#">{{ record.getHeading }}</a></li>
 </ul>
 

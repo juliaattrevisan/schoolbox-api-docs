@@ -195,7 +195,7 @@ class Controller extends Base
                     'comments'          => $comments,
                     'images'            => $images,
                     'page'              => $page,
-                    'pageOwner'         => $this->getUserMapper()->findById($page->getUid()),
+                    'pageOwner'         => $this->getUserMapper()->findById($page->getOwner()->getId()),
                 ),
             )
         );
@@ -267,7 +267,7 @@ class Controller extends Base
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
                     'page'              => $page,
-                    'pageOwner'         => $this->userMapper->findById($page->getUid()),
+                    'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
                 ),
             )
         );
@@ -290,7 +290,7 @@ class Controller extends Base
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone(new Collection()),
                     'page'              => $page,
-                    'pageOwner'         => $this->userMapper->findById($page->getUid()),
+                    'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
                 ),
             )
         );
@@ -349,7 +349,7 @@ class Controller extends Base
                     'blogComments'      => $blogComments,
                     'dateSelectorArray' => $dateSelectorArray,
                     'page'              => $page,
-                    'pageOwner'         => $this->userMapper->findById($page->getUid()),
+                    'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
                 ),
             )
         );

@@ -177,7 +177,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
             $eportfolioPage = new Eportfolio_Page_Instance(
                 $page,
-                $eportfolioHandler->getPageInstance()->getUid(),
+                $eportfolioHandler->getPageInstance()->getOwner()->getId(),
                 $eportfolioHandler->getPageId(),
                 FULL_ACCESS
             );
@@ -193,12 +193,11 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
             EportfolioPermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
             $eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
-            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
+            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/{$eportfolioHandler->getPageId()}");
         } elseif (isset($_POST['deletePage'])) {
             // Softdelete this page and redirect back to profile
-
             $eportfolioHandler->softdelete();
-            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/profile");
+            SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/profile");
         } elseif (($_POST['type'] == 'config') && $_POST['component']) {
             // Update config options from homepage
             $config = $_POST;
@@ -281,14 +280,14 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
                 $eportfolioPage = new Eportfolio_Page_Instance(
                     $page,
-                    $eportfolioHandler->getPageInstance()->getUid(),
+                    $eportfolioHandler->getPageInstance()->getOwner()->getId(),
                     $eportfolioHandler->getPageId(),
                     FULL_ACCESS
                 );
 
                 $renderer->renderEportfolioComponent($eportfolioPage, $component);
             } else {
-                SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getUid()}/{$eportfolioHandler->getPageId()}");
+                SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/{$eportfolioHandler->getPageId()}");
             }
         }
     } else {

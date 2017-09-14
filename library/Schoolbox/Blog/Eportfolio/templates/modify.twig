@@ -19,7 +19,7 @@
                         .done(function() {
                             // Remove from list after AJAX returns
 
-                            window.location.href = '/eportfolio/{{ page.getUid }}/{{ page.getPageId }}';
+                            window.location.href = '/eportfolio/{{ pageOwner.id }}/{{ page.getPageId }}';
                         });
                     }
                 });
@@ -29,8 +29,8 @@
 </script>
 
 <ul class="breadcrumb">
-    <li><a href="/eportfolio/{{ page.getUid }}">{{ pageOwner.getFullName }}'s ePortfolio</a></li>
-    <li><a href="/eportfolio/{{ page.getUid }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
+    <li><a href="/eportfolio/{{ pageOwner.id }}">{{ pageOwner.getFullName }}'s ePortfolio</a></li>
+    <li><a href="/eportfolio/{{ pageOwner.id }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
     <li class="active"><a href="#">{% if record.getId %}Modify{% else %}Post{% endif %} Blog</a></li>
 </ul>
 

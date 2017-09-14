@@ -339,7 +339,7 @@ class Controller extends Base
                     // Does this user already have a page of this name? Skip unless prompted otherwise
 
                     $newPage = clone $page;
-                    $newPage->setUid($destUserId);
+                    $newPage->setOwner($this->userMapper->createModel($destUserId));
                     $this->eportfolioPageMapper->create($newPage);
 
                     // copy each component and its config to the new page.

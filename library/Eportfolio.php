@@ -129,7 +129,7 @@ class Eportfolio {
 	 * @return bool
 	 */
 	public function getSettingsPageOwner() {
-		return $this->getPageInstance()->getUid();
+		return $this->getPageInstance()->getOwner()->getId();
 	}
 
 	/**

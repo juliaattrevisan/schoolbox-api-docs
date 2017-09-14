@@ -210,7 +210,7 @@ HELP;
                 // Create a new ePortfolio page.
                 // Does this user already have a page of this name? Skip unless prompted otherwise
                 $newPage = clone $page;
-                $newPage->setUid($destUserId);
+                $newPage->setOwner(UserMapper::getInstance()->createModel($destUserId));
                 Eportfolio\PageMapper::getInstance()->create($newPage);
 
                 // copy each component and its config to the new page.

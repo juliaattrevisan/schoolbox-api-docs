@@ -10,6 +10,7 @@
 namespace Eportfolio;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\User;
 
 class Page implements ISoftDeletable{
 
@@ -27,12 +28,13 @@ class Page implements ISoftDeletable{
 	 */
 	private $page_title;
 
-	/**
-	 * The owner of the page
-	 *
-	 * @var
-	 */
-	private $uid;
+    /**
+     * The owner of the page
+     *
+     * @var User
+     */
+    private $owner;
+
 
 	/**
 	 * The template the page is using
@@ -483,23 +485,25 @@ class Page implements ISoftDeletable{
 		return $this->top_head_font;
 	}
 
-	/**
-	 * Set uid
-	 *
-	 * @param $uid
-	 */
-	public function setUid($uid) {
-		$this->uid = $uid;
-	}
 
-	/**
-	 * Get uid
-	 *
-	 * @return mixed
-	 */
-	public function getUid() {
-		return $this->uid;
-	}
+    /**
+     * @return User
+     */
+    public function getOwner(): User
+    {
+        return $this->owner;
+    }
+
+
+    /**
+     * @param User $owner
+     * @return $this|self
+     */
+    public function setOwner(User $owner): self
+    {
+        $this->owner = $owner;
+        return $this;
+    }
 
 	/**
 	 * Set created at
