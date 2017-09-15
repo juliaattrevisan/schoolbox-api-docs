@@ -56,15 +56,6 @@ interface IConnector extends IQuoter
      */
     public function disableMultipleActiveResultSets();
 
-    /**
-     * Attempt to set the connection's timezone.
-     *
-     * @param string $timezone A valid timezone.
-     * @return bool
-     * @throws PDOException if the timezone can't be set
-     */
-    public function setTimezone($timezone);
-
     // ----------------------------------------------------------------------------------------------------------------
     // Query preparation functions
     // ----------------------------------------------------------------------------------------------------------------
