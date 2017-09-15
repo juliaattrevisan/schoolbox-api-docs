@@ -209,6 +209,14 @@ class Document extends Base implements IDocument
         // Create query to get the document from the database
 
         if ($source == 'tDocuments') {
+            $bindings = $this->buildBindingsForClassifications();
+
+            // If there's no classifications in config - error out because they shouldn't be getting anything
+            // from DocMan
+            if (empty($bindings)) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
+            }
+
             // Loading from generic DocMan table
 
             $query = "
@@ -235,20 +243,19 @@ class Document extends Base implements IDocument
                 ]);
             }
 
-            // Check if we need to apply a classification filter
+            // Check this document is in one of the classifications in config
 
-            $bindings = $this->buildBindingsForClassifications();
-            if (!empty($bindings)) {
-                $query .= " AND d.ClassificationCode IN ({$bindings['placeholders']})";
 
-                $params = array_merge(
-                    $params,
-                    array_map(
-                        'trim',
-                        $bindings['bindings']
-                    )
-                );
-            }
+            $query .= " AND d.ClassificationCode IN ({$bindings['placeholders']})";
+
+            $params = array_merge(
+                $params,
+                array_map(
+                    'trim',
+                    $bindings['bindings']
+                )
+            );
+
         } elseif ($source == 'StudentReportsArchive') {
             // Loading from school reports archive table
 
