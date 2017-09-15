@@ -1097,3 +1097,137 @@ Twig-based locations are a bit more advanced - it does some stuff for you. Howev
 * Never `scrub` on input.
 
 You can read more in `scrub.md`
+
+# Boss Fight
+At this point you will have completed quests in both Handler and Aura Paradigms and recognised how both of them fundamentally operate. Let's apply all that learned knowledge in a more realistic scenario. You'll draw on previous knowledge of html, css and javascript in addition to the php concepts you've acquired thus far in this guide.
+
+Create a view in your schoolbox vagrant so that I can display the information listed below. As usual we'll recycle a familiar theme. 
+
+* There are three Kingdoms. 
+* Each Kingdom has a Monarch. 
+* A Monarch has zero or more Heirs to the throne.
+* Heirs are ordered by succession (sequence). They are sorted in ascending order; the lowest sequence is the successor to the Monarch.
+* Heirs can die (get deleted)
+
+I've assembled some sample data for you to start with. It follows the ideas listed above.
+
+```php
+$allKingdoms = [
+    [
+        'id' => 2597,
+        'title' => 'Kingdom of Yee',
+        'monarch' => [
+            'id' => 5789,
+            'title' => 'Duke',
+            'name' => 'Thrifty of Discounts',
+            'description' => 'I thought of the 900 men and women - sons and daughters, husbands and wives, friends and neighbors, who won\'t be returning to their own hometowns. Now let me be clear. I wanted to be part of something larger. I learned that my sins could be redeemed. But what my former pastor too often failed to understand is that embarking on a program of self-help also requires a belief that society can change.',
+            'heirs' => [
+                [
+                    'id' => 92357,
+                    'name' => 'Joseph',
+                    'sequence' => 1,
+                    'created_at' => '2001-01-01 01:01:01',
+                    'updated_at' => '2001-02-02 02:02:02',
+                    'deleted_at' => null
+                ],
+                [
+                    'id' => 892,
+                    'name' => 'Frances DancePants',
+                    'sequence' => 2,
+                    'created_at' => '2002-07-04 00:00:00',
+                    'updated_at' => '2002-07-04 00:00:00',
+                    'deleted_at' => null
+                ],
+                [
+                    'id' => 3458,
+                    'name' => 'Wulff Helmut',
+                    'sequence' => 3,
+                    'created_at' => '2001-01-01 19:14:13',
+                    'updated_at' => '2001-02-02 20:19:01',
+                    'deleted_at' => '2003-03-03 09:10:11',
+                ],
+                [
+                    'id' => 4589811,
+                    'name' => 'Anonymous Baby',
+                    'sequence' => 4,
+                    'created_at' => '2001-07-08 23:22:21',
+                    'updated_at' => '2001-09-10 20:19:18',
+                    'deleted_at' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'id' => 7895,
+        'title' => 'The Lawless Lands',
+        'monarch' => null
+    ],
+    [
+        'id' => 19457,
+        'title' => 'Dominion of Rumbleguts',
+        'monarch' => [
+            'id' => 948,
+            'title' => '',
+            'name' => 'This Cat Walks Alone',
+            'description' => 'There are patriots who opposed the war in Iraq and there are patriots who supported the war in Iraq. Some are eager to stoke the flames of division, and to stand in the way of progress. <script type="text/javascript">window.alert("Fake news!");</script> It is easier to start wars than to end them.</p>',
+            'heirs' => null
+        ],
+    ],
+    [
+        'id' => 474747,
+        'title' => 'Shampoo Land',
+        'monarch' => [
+            'id' => 4981,
+            'title' => 'Eileen',
+            'name' => 'McCleanHair<input type="text"/>',
+            'description' => 'I believe we can provide jobs to the jobless, homes to the homeless, and reclaim young people in cities across America from violence and despair. Throughout the first year of this campaign, against all predictions to the contrary, we saw how hungry the American people were for this message of unity. For some, nagging questions remain.',
+            'heirs' => [
+                [
+                    'id' => 3459,
+                    'name' => 'AbstractPrinceling I',
+                    'sequence' => 1,
+                    'created_at' => '2011-01-01 19:13:13',
+                    'updated_at' => '2011-02-02 20:18:01',
+                    'deleted_at' => '2011-02-02 20:18:01',
+                ],
+
+                [
+                    'id' => 3460,
+                    'name' => 'AbstractPrinceling II',
+                    'sequence' => 1,
+                    'created_at' => '2011-01-01 19:14:13',
+                    'updated_at' => '2011-02-02 20:19:01',
+                    'deleted_at' => null,
+                ],
+                [
+                    'id' => 3461,
+                    'name' => 'AbstractPrinceling III',
+                    'sequence' => 2,
+                    'created_at' => '2011-01-01 19:15:13',
+                    'updated_at' => '2011-02-02 20:20:01',
+                    'deleted_at' => null,
+                ],
+            ]
+        ],
+    ],
+];
+
+```
+
+Build a report which shows this information:
+* Display a list of Kingdoms, their Monarchs and their Heirs in a series of nested lists.
+* If the Kingdom has a Monarch, display their title, name and description. 
+** The Kingdom's title should link to a fictitious url, http://kingdoms.schoolbox.com.au/kingdom/$kingdomId
+** Description is an html field; all others are non-html fields
+* Below each Monarch, display their Heirs in a list. This list should have its own subheading.
+* Heirs do not exist without a corresponding Monarch.
+* The Heir next in line for the Monarchy should be displayed differently than all other Heirs.
+* Deceased (deleted) heirs should display with the italicised suffix "(Deceased on xxxx)" e.g. "Jon Snow (Deceased 2015-06-01 00:00:00)". 
+* Deceased Heirs do not disrupt their previously-established sequence in line to the throne.
+* If there is no Monarch, display a grey empty state (http://192.168.36.10/pantry#empty-states) with a meaningful message. 
+* If a Monarch has no Heirs, hide the corresponding subheading and don't show any list html for the heirs.
+
+
+
+
+
