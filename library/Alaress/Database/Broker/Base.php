@@ -11,7 +11,6 @@
 
 namespace Alaress\Database\Broker;
 
-use Alaress\Cache;
 use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
@@ -19,10 +18,8 @@ use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\Query\Base as Query;
 use Alaress\DebugBar\Instance as DebugBar;
 use DebugBar\DataCollector\DataCollectorInterface;
-use DebugBar\DataCollector\PDO as DebugPDO;
 use PDO;
 use PDOException;
-use PDOStatement;
 
 abstract class Base implements IBroker
 {

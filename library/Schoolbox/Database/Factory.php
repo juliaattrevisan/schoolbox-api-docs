@@ -67,6 +67,7 @@ class Factory
 
     /**
      * Retrieve a connection to Schoolbox database
+     * @return IConnector
      */
     public function getInternalDatabase()
     {
