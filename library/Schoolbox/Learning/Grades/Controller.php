@@ -204,6 +204,7 @@ class Controller extends Base
      * @throws ServiceNotFound If unable to fetch the HTML output renderer from the DI
      * @throws DefinitionException If specified mapper join is not defined
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
+     * @throws \Schoolbox\Mapper\Exception If a database column alias is incorrect
      */
     public function getGradesForSubject(User $viewee, Term\Model $term, Folder\Model $subject)
     {
@@ -483,12 +484,13 @@ class Controller extends Base
             return [];
         }
 
-        // Filter out anything but due work
-        $dueWorks = $assessments->filter(function (IAssessable $assessment) {
-            return $assessment instanceof DueWork\Model;
+        // Filter to dueWork with marks visible to current user
+        $user = $this->getUser();
+        $dueWorksWithVisibleMarks = $assessments->filter(function (IAssessable $assessment) use ($user) {
+            return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($user);
         });
 
-        return $this->rubricMapper->getLongitudinal($dueWorks, $student);
+        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student);
     }
 
 
