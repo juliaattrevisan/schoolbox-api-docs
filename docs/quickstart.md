@@ -1226,7 +1226,7 @@ Build a report which shows this information:
 * Deceased Heirs do not disrupt their previously-established sequence in line to the throne.
 * If there is no Monarch, display a grey empty state (http://192.168.36.10/pantry#empty-states) with a meaningful message. 
 * If a Monarch has no Heirs, hide the corresponding subheading and don't show any list html for the heirs.
-
+* Bonus points if you manufacture Mappers and Models for Kingdoms, Monarchs, and Heirs.
 
 
 
