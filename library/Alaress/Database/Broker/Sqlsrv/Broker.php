@@ -146,4 +146,15 @@ class Broker extends Base implements IBroker
             "LoginTimeout=" . self::LOGIN_TIMEOUT . ";" .                // Give the connector 5 seconds to login- so we can default back to Offline connector
             "MultipleActiveResultSets={$multipleActiveResultsSets};";    // Disable Multiple Active Result Sets (aka. MARS) for performance reasons
     }
+
+    /**
+     * Attempt to set the connection's timezone.
+     *
+     * @param string $timezone A valid timezone.
+     * @return bool
+     */
+    public function setTimezone($timezone)
+    {
+        return true;
+    }
 }

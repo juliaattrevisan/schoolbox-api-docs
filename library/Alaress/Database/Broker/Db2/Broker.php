@@ -132,4 +132,16 @@ class Broker extends Base implements IBroker
 
         return true;
     }
+
+    /**
+     * Attempt to set the connection's timezone.
+     *
+     * @param string $timezone A valid timezone.
+     * @return bool
+     */
+    public function setTimezone($timezone)
+    {
+        return true;
+    }
+
 }

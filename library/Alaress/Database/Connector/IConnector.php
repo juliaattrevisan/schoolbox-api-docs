@@ -56,6 +56,11 @@ interface IConnector extends IQuoter
      */
     public function disableMultipleActiveResultSets();
 
+    /**
+     * @inheritdoc
+     */
+    public function setTimezone($timezone);
+
     // ----------------------------------------------------------------------------------------------------------------
     // Query preparation functions
     // ----------------------------------------------------------------------------------------------------------------

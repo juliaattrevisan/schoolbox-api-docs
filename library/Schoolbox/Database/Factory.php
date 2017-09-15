@@ -73,9 +73,11 @@ class Factory
     {
         $connectorInternal = $this->factory->createMysql();
 
-        if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd, ['timezone'=>$this->fetchTimezone($connectorInternal)])) {
+        if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd)) {
             throw new DatabaseException("Unable to connect to Schoolbox database.");
         }
+
+        $connectorInternal->setTimezone($this->fetchTimezone($connectorInternal));
         return $connectorInternal;
     }
 
