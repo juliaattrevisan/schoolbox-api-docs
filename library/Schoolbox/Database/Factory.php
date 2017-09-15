@@ -143,7 +143,7 @@ class Factory
      */
     private function fetchTimezone(IConnector $connectorInternal)
     {
-        $statement = $connectorInternal->prepare("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
+        $statement = $connectorInternal->prepareQuery("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
         $statement->execute();
         $result = $statement->fetchColumn();
         return $result;
