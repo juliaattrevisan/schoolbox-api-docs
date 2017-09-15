@@ -104,47 +104,45 @@ class Document extends Base implements IDocument
             ]);
         }
 
-        // Need to UNION and include reports stored in the generic DocMan tables
-
-        $query .= "
-            UNION
-            
-            SELECT  d.tDocumentsSeq as ID,
-                    d.Description,
-                    COALESCE(
-                        (
-                            SELECT TOP 1 FileYear 
-                            FROM FileSemesters 
-                            WHERE d.SourceDate BETWEEN StartDate AND EndDate
-                        ), YEAR(d.SourceDate)
-                    ) AS FileYear,
-                    (
-                        SELECT TOP 1 FileSemester 
-                        FROM FileSemesters 
-                        WHERE d.SourceDate 
-                        BETWEEN StartDate AND EndDate
-                    ) AS FileSemester,
-                    CONVERT(VARCHAR(20), d.SourceDate, 20) as CreatedDate,
-                    'tDocuments' AS Source
-            FROM    {$this->schema}.tDocuments d
-            JOIN    {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
-            WHERE   dr.ID = :id2 
-        ";
-
-        $params['id2'] = $student->getExternalId();
-
-        if ($date !== false) {
-            $query .= ' AND d.SourceDate >= :date2 ';
-
-            $params = array_merge($params, [
-                'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
-            ]);
-        }
-
-        // Check if we need to apply a classification filter
-
+        // If there's any DocMan classifications entered into the config - union docman docs on
         $bindings = $this->buildBindingsForClassifications();
+
         if (!empty($bindings)) {
+            $query .= "
+                UNION
+                
+                SELECT  d.tDocumentsSeq as ID,
+                        d.Description,
+                        COALESCE(
+                            (
+                                SELECT TOP 1 FileYear 
+                                FROM FileSemesters 
+                                WHERE d.SourceDate BETWEEN StartDate AND EndDate
+                            ), YEAR(d.SourceDate)
+                        ) AS FileYear,
+                        (
+                            SELECT TOP 1 FileSemester 
+                            FROM FileSemesters 
+                            WHERE d.SourceDate 
+                            BETWEEN StartDate AND EndDate
+                        ) AS FileSemester,
+                        CONVERT(VARCHAR(20), d.SourceDate, 20) as CreatedDate,
+                        'tDocuments' AS Source
+                FROM    {$this->schema}.tDocuments d
+                JOIN    {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
+                WHERE   dr.ID = :id2 
+            ";
+
+            $params['id2'] = $student->getExternalId();
+
+            if ($date !== false) {
+                $query .= ' AND d.SourceDate >= :date2 ';
+
+                $params = array_merge($params, [
+                    'date2' => $date->format(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                ]);
+            }
+
             $query .= "AND d.ClassificationCode IN ({$bindings['placeholders']})";
 
             $params = array_merge(
