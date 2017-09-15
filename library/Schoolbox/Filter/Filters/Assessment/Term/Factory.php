@@ -86,7 +86,7 @@ abstract class Factory extends AbstractFactory
     /**
      * @return GenericCollection|Term\Model[]
      */
-    private function getSortedTerms()
+    protected function getSortedTerms(): GenericCollection
     {
         /** @var GenericCollection|Term\Model[] $terms */
         $terms = $this->termMapper->findAll(['order' => ['start' => 'DESC']])->indexBy('id');
@@ -96,9 +96,9 @@ abstract class Factory extends AbstractFactory
 
     /**
      * @param GenericCollection|Term\Model[] $terms
-     * @return Term\Model|null
+     * @return null|Term\Model
      */
-    private function getCurrentTerm(GenericCollection $terms)
+    protected function getCurrentTerm(GenericCollection $terms): ?Term\Model
     {
         $now = \Alaress_Date_Format::now();
         foreach ($terms as $term) {
@@ -118,7 +118,7 @@ abstract class Factory extends AbstractFactory
      * @param GenericCollection|Term\Model[] $terms
      * @return null|Term\Model
      */
-    private function getPreviousTerm(GenericCollection $terms)
+    protected function getPreviousTerm(GenericCollection $terms): ?Term\Model
     {
         /** @var GenericCollection|Term\Model[] $sortedTerms */
         $currentTerm = $this->getCurrentTerm($terms);

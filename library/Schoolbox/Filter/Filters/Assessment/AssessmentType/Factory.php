@@ -8,7 +8,6 @@
 namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
 use Schoolbox\Collection;
-use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
 
@@ -17,6 +16,21 @@ use Schoolbox\Filter;
  */
 class Factory extends Filter\AbstractFactory
 {
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
+     */
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper(),
+            $this->getAssessmentTypes()
+        );
+    }
 
     /**
      * @inheritdoc

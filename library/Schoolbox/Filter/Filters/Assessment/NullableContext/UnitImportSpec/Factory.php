@@ -57,6 +57,21 @@ class Factory extends NullableContext\Factory
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
+     */
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+
+
+    /**
+     * @inheritdoc
      * @throws \InvalidArgumentException If $viewee is NULL
      */
     protected function buildExtraComponentArgs(

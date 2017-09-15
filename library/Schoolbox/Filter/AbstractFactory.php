@@ -16,13 +16,13 @@ use Schoolbox\User;
 abstract class AbstractFactory implements IFactory
 {
     /** @var Page\Option\Mapper */
-    private $filterOptionMapper;
+    private $optionMapper;
 
     /** @var Page\Option\Defaults\Mapper */
-    private $filterDefaultMapper;
+    private $defaultsMapper;
 
     /** @var Selection\Mapper */
-    private $filterSelectionMapper;
+    private $selectionMapper;
 
 
     public function __construct(
@@ -30,25 +30,9 @@ abstract class AbstractFactory implements IFactory
         Page\Option\Defaults\Mapper $defaultMapper,
         Selection\Mapper $selectionMapper
     ) {
-        $this->filterOptionMapper    = $optionMapper;
-        $this->filterDefaultMapper   = $defaultMapper;
-        $this->filterSelectionMapper = $selectionMapper;
-    }
-
-
-    /**
-     * Build a filter definition, ready to use in the admin pages
-     *
-     * No dynamic options or user-selections relevant.
-     *
-     * @param Model $filter
-     * @return IDefinition|object
-     * @throws \ReflectionException If unable to create an instance of the reflected class
-     */
-    public function buildDefinition(Model $filter)
-    {
-        $definitionReflector = new \ReflectionClass($filter->getClass());
-        return $definitionReflector->newInstanceArgs($this->buildDefinitionArgs($filter));
+        $this->optionMapper    = $optionMapper;
+        $this->defaultsMapper  = $defaultMapper;
+        $this->selectionMapper = $selectionMapper;
     }
 
 
@@ -66,7 +50,7 @@ abstract class AbstractFactory implements IFactory
         Collection $overrides
     ) {
         $filterId = $definition->getFilter()->getId();
-        $filterSelections = $selections[$filterId] ?: $this->filterSelectionMapper->createCollection();
+        $filterSelections = $selections[$filterId] ?: $this->selectionMapper->createCollection();
 
         // Did controller or URL request to override saved user-selections ?
         $filterOverrides = $overrides[$filterId] ?: null;
@@ -77,7 +61,7 @@ abstract class AbstractFactory implements IFactory
             'user'                  => $user,
             'pageFilter'            => $pageFilter,
             'selections'            => $filterOverrides ?: $filterSelections,
-            'filterSelectionMapper' => $this->filterSelectionMapper,
+            'filterSelectionMapper' => $this->selectionMapper,
         ];
 
         $extraArgs = $this->buildExtraComponentArgs($user, $pageFilter, $definition, $overrides, $viewee);
@@ -108,8 +92,8 @@ abstract class AbstractFactory implements IFactory
     {
         return [
             'filter'              => $filter,
-            'filterOptionMapper'  => $this->filterOptionMapper,
-            'filterDefaultMapper' => $this->filterDefaultMapper,
+            'filterOptionMapper'  => $this->optionMapper,
+            'filterDefaultMapper' => $this->defaultsMapper,
         ];
     }
 
@@ -142,6 +126,24 @@ abstract class AbstractFactory implements IFactory
         return [
             'filter' => $filter,
         ];
+    }
+
+
+    /**
+     * @return Page\Option\Mapper
+     */
+    protected function getOptionMapper(): Page\Option\Mapper
+    {
+        return $this->optionMapper;
+    }
+
+
+    /**
+     * @return Page\Option\Defaults\Mapper
+     */
+    protected function getDefaultsMapper(): Page\Option\Defaults\Mapper
+    {
+        return $this->defaultsMapper;
     }
 
 

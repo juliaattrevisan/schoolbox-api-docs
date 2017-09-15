@@ -15,10 +15,25 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
 
 /**
- * A factory for building 'Folder' filter objects
+ * A factory for building Teacher 'Folder' filter objects
  */
 class Factory extends FolderFilter\Factory
 {
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
+     */
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+
 
     /**
      * @inheritdoc

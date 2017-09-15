@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term\Due;
 
+use \Schoolbox\Filter;
 use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
 
 /**
@@ -15,4 +16,22 @@ use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
 class Factory extends AssessmentTermFilter\Factory
 {
 
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
+     */
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        $sortedTerms = $this->getSortedTerms();
+
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper(),
+            $sortedTerms,
+            $this->getCurrentTerm($sortedTerms),
+            $this->getPreviousTerm($sortedTerms)
+        );
+    }
 }

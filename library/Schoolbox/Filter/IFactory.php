@@ -29,7 +29,7 @@ interface IFactory
      * @param Filter\Model $filter
      * @return IDefinition
      */
-    public function buildDefinition(Filter\Model $filter);
+    public function buildDefinition(Filter\Model $filter): IDefinition;
 
 
     /**

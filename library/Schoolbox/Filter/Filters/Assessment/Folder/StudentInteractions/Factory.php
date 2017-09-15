@@ -22,6 +22,21 @@ class Factory extends FolderFilter\Factory
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Definition|Filter\IDefinition
+     */
+    public function buildDefinition(Filter\Model $filter): Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+
+
+    /**
+     * @inheritdoc
      * @throws DefinitionException If join not defined
      */
     protected function buildExtraComponentArgs(
