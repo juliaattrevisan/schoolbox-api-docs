@@ -36,6 +36,17 @@ class Factory extends AbstractFactory
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        return new KeyConverter($filter, $this->getTemporalStates());
+    }
+
+
+    /**
+     * @inheritdoc
      */
     protected function buildDefinitionArgs(Filter\Model $filter)
     {
@@ -56,17 +67,6 @@ class Factory extends AbstractFactory
         User $viewee = null
     ) {
         return [];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'temporalStates' => $this->getTemporalStates(),
-        ]);
     }
 
 

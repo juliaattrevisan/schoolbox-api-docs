@@ -32,6 +32,18 @@ class Factory extends Filter\AbstractFactory
         );
     }
 
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        return new KeyConverter($filter, $this->getAssessmentTypes());
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -58,17 +70,6 @@ class Factory extends Filter\AbstractFactory
 
 
     /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'assessmentTypes' => $this->getAssessmentTypes(),
-        ]);
-    }
-
-
-    /**
      * @return Collection|string[]
      */
     private function getAssessmentTypes()
@@ -80,6 +81,4 @@ class Factory extends Filter\AbstractFactory
             Definition::KEY_TASK,
         ]);
     }
-
-
 }

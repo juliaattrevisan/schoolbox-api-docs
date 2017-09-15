@@ -57,6 +57,21 @@ class Factory extends NullableContext\Factory
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $unitImplIds = (new Collection($this->unitImplMapper->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($unitImplId) {
+                return $unitImplId;
+            });
+        return new KeyConverter($filter, $unitImplIds);
+    }
+
+
+    /**
+     * @inheritdoc
      */
     protected function buildExtraComponentArgs(
         User $user,
@@ -67,20 +82,4 @@ class Factory extends NullableContext\Factory
     ) {
         return [];
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        $unitImplIds = (new Collection($this->unitImplMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($unitImplId) {
-            return $unitImplId;
-        });
-
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'unitImplIds' => $unitImplIds,
-        ]);
-    }
-
 }

@@ -7,11 +7,9 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
-
 
 /**
  * A factory for building 'Folder' filter objects
@@ -44,7 +42,7 @@ abstract class Factory extends Filter\AbstractFactory
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->folderMapper = $folderMapper;
-        $this->access = $access;
+        $this->access       = $access;
     }
 
 
@@ -58,17 +56,10 @@ abstract class Factory extends Filter\AbstractFactory
 
 
     /**
-     * @inheritdoc
+     * @return Access
      */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
+    protected function getAccess(): Access
     {
-        $folderIds = (new Collection($this->folderMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($folderId) {
-            return $folderId;
-        });
-
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'folderIds' => $folderIds,
-            'access'    => $this->access,
-        ]);
+        return $this->access;
     }
 }

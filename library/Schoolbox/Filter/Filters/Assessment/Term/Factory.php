@@ -73,17 +73,6 @@ abstract class Factory extends AbstractFactory
 
 
     /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'terms' => new Collection($this->getSortedTerms()->getColumnValues('id')),
-        ]);
-    }
-
-
-    /**
      * @return GenericCollection|Term\Model[]
      */
     protected function getSortedTerms(): GenericCollection

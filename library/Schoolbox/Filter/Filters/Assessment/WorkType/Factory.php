@@ -60,6 +60,18 @@ class Factory extends Filter\AbstractFactory
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $workTypeIds = $this->getWorkTypes()->getColumnValues('id');
+        return new KeyConverter($filter, new Collection(array_combine($workTypeIds, $workTypeIds)));
+    }
+
+
+    /**
+     * @inheritdoc
      */
     protected function buildDefinitionArgs(Filter\Model $filter)
     {
@@ -80,19 +92,6 @@ class Factory extends Filter\AbstractFactory
         User $viewee = null
     ) {
         return [];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        $workTypeIds = $this->getWorkTypes()->getColumnValues('id');
-
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'workTypes' => new Collection(array_combine($workTypeIds, $workTypeIds)),
-        ]);
     }
 
 

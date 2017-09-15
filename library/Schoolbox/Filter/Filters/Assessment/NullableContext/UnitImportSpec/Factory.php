@@ -72,6 +72,21 @@ class Factory extends NullableContext\Factory
 
     /**
      * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $unitSpecIds = (new Collection($this->unitSpecMapper->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($unitSpecId) {
+                return $unitSpecId;
+            });
+        return new KeyConverter($filter, $unitSpecIds);
+    }
+
+
+    /**
+     * @inheritdoc
      * @throws \InvalidArgumentException If $viewee is NULL
      */
     protected function buildExtraComponentArgs(
@@ -171,20 +186,4 @@ class Factory extends NullableContext\Factory
             'unitSpecsImportedToGroups'  => $unitSpecsImportedToGroups,
         ];
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        $unitSpecIds = (new Collection($this->unitSpecMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($unitSpecId) {
-            return $unitSpecId;
-        });
-
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'unitSpecIds' => $unitSpecIds,
-        ]);
-    }
-
 }

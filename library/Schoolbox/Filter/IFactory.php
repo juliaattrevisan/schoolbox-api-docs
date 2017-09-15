@@ -67,5 +67,5 @@ interface IFactory
      * @param Filter\Model $filter
      * @return IKeyConverter
      */
-    public function buildKeyConverter(Filter\Model $filter);
+    public function buildKeyConverter(Filter\Model $filter): IKeyConverter;
 }

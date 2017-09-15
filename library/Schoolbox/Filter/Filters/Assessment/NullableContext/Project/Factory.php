@@ -79,6 +79,21 @@ class Factory extends NullableContext\Factory
 
 
     /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $projectIds = (new Collection($this->projectMapper->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($projectId) {
+                return $projectId;
+            });
+        return new KeyConverter($filter, $projectIds);
+    }
+
+
+    /**
      * Return the set of projects that both:
      * * reside in the contexts set by admin
      * * are linked to folders taught by the $viewee
@@ -320,20 +335,5 @@ class Factory extends NullableContext\Factory
             }
         }
         return $projects;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildKeyConverterArgs(Filter\Model $filter)
-    {
-        $projectIds = (new Collection($this->projectMapper->findAllIds(['deleted' => true])))->indexByCallback(function ($projectId) {
-            return $projectId;
-        });
-
-        return array_merge(parent::buildKeyConverterArgs($filter), [
-            'projectIds' => $projectIds,
-        ]);
     }
 }

@@ -74,17 +74,6 @@ abstract class AbstractFactory implements IFactory
 
 
     /**
-     * @inheritdoc
-     * @throws \ReflectionException
-     */
-    public function buildKeyConverter(Model $filter)
-    {
-        $keyConverterReflector = new \ReflectionClass($this->getAdjacentClass($filter->getClass(), 'KeyConverter'));
-        return $keyConverterReflector->newInstanceArgs($this->buildKeyConverterArgs($filter));
-    }
-
-
-    /**
      * @param Model $filter
      * @return mixed[]
      */
@@ -113,20 +102,6 @@ abstract class AbstractFactory implements IFactory
         Collection $overrides,
         User $viewee = null
     );
-
-
-    /**
-     * Builds constructor arguments for KeyConverter
-     *
-     * @param Model $filter
-     * @return mixed[]
-     */
-    protected function buildKeyConverterArgs(Model $filter)
-    {
-        return [
-            'filter' => $filter,
-        ];
-    }
 
 
     /**

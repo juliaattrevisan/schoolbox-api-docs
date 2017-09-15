@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term\Due;
 
+use Schoolbox\Collection;
 use \Schoolbox\Filter;
 use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
 
@@ -33,5 +34,16 @@ class Factory extends AssessmentTermFilter\Factory
             $this->getCurrentTerm($sortedTerms),
             $this->getPreviousTerm($sortedTerms)
         );
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        return new KeyConverter($filter, new Collection($this->getSortedTerms()->getColumnValues('id')));
     }
 }
