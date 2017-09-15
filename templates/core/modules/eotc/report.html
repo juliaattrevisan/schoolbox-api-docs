@@ -8,33 +8,46 @@
             inputStartDate = searchForm.find('#reportDateStart'),
             inputEndDate = searchForm.find('#reportDateEnd');
 
-        // User searches
-        searchForm.on('submit', function (event) {
-            event.preventDefault();
-
-            var timespan = inputTimespan.val(),
-                location = '/modules/eotc/report';
-            if (timespan === 'all') {
-                location = location + '/all';
-            } else if (timespan === 'range') {
-                // Turn into moments, then translate into URL formats
-                var startDate = moment(inputStartDate.val(), dateDisplayFormats.momentJs),
-                    endDate = moment(inputEndDate.val(), dateDisplayFormats.momentJs);
-                location = location + '/range/'
-                    + (startDate.isValid() ? startDate.format('DD-MM-YYYY') : '') + '/'
-                    + (endDate.isValid() ? endDate.format('DD-MM-YYYY') : '');
-            }
-
-            // Add selected statuses
-            location = location + '?' + $('input[name="status[]"]').serialize();
-
-            // Redirect
-            window.location.href = location;
-        });
-
         // User selects a different report period from dropdown
         inputTimespan.on('change', function () {
             $('[data-date-start], [data-date-end]').toggleClass('hide', $(this).val() === 'all');
+        });
+
+        // Validation
+        searchForm.alaressValidate({
+            rules: {
+                reportDateStart: {
+                    required: true,
+                    datepickerDate: true
+                },
+                reportDateEnd: {
+                    datepickerDate: {
+                        depends: function (element) {
+                            return $(element).val().length > 0;
+                        }
+                    }
+                }
+            },
+            submitHandler: function() {
+                var timespan = inputTimespan.val(),
+                        location = '/modules/eotc/report';
+                if (timespan === 'all') {
+                    location = location + '/all';
+                } else if (timespan === 'range') {
+                    // Turn into moments, then translate into URL formats
+                    var startDate = moment(inputStartDate.val(), dateDisplayFormats.momentJs),
+                            endDate = moment(inputEndDate.val(), dateDisplayFormats.momentJs);
+                    location = location + '/range/'
+                            + (startDate.isValid() ? startDate.format('DD-MM-YYYY') : '') + '/'
+                            + (endDate.isValid() ? endDate.format('DD-MM-YYYY') : '');
+                }
+
+                // Add selected statuses
+                location = location + '?' + $('input[name="status[]"]').serialize();
+
+                // Redirect
+                window.location.href = location;
+            }
         });
     });
 </script>
