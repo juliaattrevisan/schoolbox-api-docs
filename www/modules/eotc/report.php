@@ -60,10 +60,9 @@ if ($timespanType === 'range') {
         ? new Alaress_Date_Format($this->arg[2], Alaress_Date_Format::URL_FORMAT)
         : null;
 
-    // No dates at all: show today
+    // No dates at all: set defaults. 'From' will use the review default, 'to' will be blank
     if (!isset($dateFrom) && !isset($dateTo)) {
-        $dateFrom = Alaress_Date_Format::now();
-        $dateTo   = Alaress_Date_Format::now();
+        $dateFrom = Alaress_Date_Format::now()->modify(EventStatusMapper::DEFAULT_FROM_DATE_FOR_REVIEW);
     }
 
     // To can't be before from
