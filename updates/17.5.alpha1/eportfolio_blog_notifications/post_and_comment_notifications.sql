@@ -54,15 +54,79 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
   AND src.`key` = 'posted';
 
 
--- Receive 'Eportfolio Blog' 'commented' messages when:
--- * student: someone comments on a blog on your eportfolio page
+-- Receive 'Eportfolio Blog' 'created' messages when:
 -- * staff:   someone comments on a eportfolio post you authored
--- (Intentionally does not distinguish for students between posts they authored, and authored by staff)
+INSERT INTO `msg_source`
+(`namespace`, `key`, `role_type`, `description`)
+VALUES
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'created', 'staff', 'someone comments on an eportfolio blog post you authored');
+
+-- Staff (Instant + Email)
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+  SELECT
+    src.id           AS `msg_source_id`,
+    g.id             AS `role_id`,
+    'MU,DI,IN,MO,EM' AS `mask`,
+    'IN,EM'          AS `role_default`
+  FROM msg_source src
+    LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog')
+        AND src.role_type = 'staff'
+        AND src.`key` = 'created';
+
+
+-- Receive 'Eportfolio Blog' 'commented' messages when:
+-- * student: someone comments on your eportfolio blog post
+-- * staff:   someone comments on your students's eportfolio blog post
+-- * parent:  someone comments on your child's eportfolio blog post
+-- (Intentionally does not distinguish for students between posts the student authored,
+-- and posts authored by staff on the student's portfolio page)
 INSERT INTO `msg_source`
 (`namespace`, `key`, `role_type`, `description`)
 VALUES
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'student', 'someone comments on your eportfolio blog'),
-  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'staff',   'someone comments on an eportfolio blog post you authored');
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'staff',   'someone comments on your students\'s eportfolio blog'),
+  ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'commented', 'parent',  'someone comments on your child\'s eportfolio blog');
+
+-- Student (Instant + Email)
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+  SELECT
+    src.id           AS `msg_source_id`,
+    g.id             AS `role_id`,
+    'MU,DI,IN,MO,EM' AS `mask`,
+    'IN,EM'          AS `role_default`
+  FROM msg_source src
+  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog')
+  AND src.role_type = 'student'
+  AND src.`key` = 'commented';
+
+-- Staff (Mute)
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+  SELECT
+    src.id           AS `msg_source_id`,
+    g.id             AS `role_id`,
+    'MU,DI,IN,MO,EM' AS `mask`,
+    'MU'             AS `role_default`
+  FROM msg_source src
+  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog')
+  AND src.role_type = 'staff'
+  AND src.`key` = 'commented';
+
+-- Parent (Instant + Email)
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+  SELECT
+    src.id           AS `msg_source_id`,
+    g.id             AS `role_id`,
+    'MU,DI,IN,MO,EM' AS `mask`,
+    'IN,EM'          AS `role_default`
+  FROM msg_source src
+  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog')
+  AND src.role_type = 'parent'
+  AND src.`key` = 'commented';
+
 
 -- Receive 'Eportfolio Blog' 'followed' messages when:
 -- * staff/student/parent: someone comments after you on a eportfolio blog post.
@@ -72,3 +136,16 @@ VALUES
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'student', 'someone comments after you on an eportfolio blog post'),
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'staff',   'someone comments after you on an eportfolio blog post'),
   ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog'), 'followed', 'parent',  'someone comments after you on an eportfolio blog post');
+
+-- Staff/Student/Parent (Instant + Email)
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+  SELECT
+    src.id           AS `msg_source_id`,
+    g.id             AS `role_id`,
+    'MU,DI,IN,MO,EM' AS `mask`,
+    'IN,EM'          AS `role_default`
+  FROM msg_source src
+  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'eportfolio_blog')
+  AND src.role_type IN ('staff', 'student', 'parent')
+  AND src.`key` = 'followed';

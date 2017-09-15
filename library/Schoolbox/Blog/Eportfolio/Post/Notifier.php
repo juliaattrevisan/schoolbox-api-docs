@@ -15,7 +15,6 @@ use Eportfolio\PageMapper;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
 use Schoolbox\Collection;
-use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -55,16 +54,6 @@ class Notifier extends AbstractModuleNotifier
      */
     private $userMapper;
 
-    /**
-     * @var External_UserInterface
-     */
-    private $externalUser;
-
-    /**
-     * @var External_ClassInterface
-     */
-    private $externalClass;
-
 
     /**
      * @param null|IMapper[] $dependencies
@@ -76,8 +65,6 @@ class Notifier extends AbstractModuleNotifier
         $dependencies['pageMapper']       = $dependencies['pageMapper'] ?? PageMapper::getInstance();
         $dependencies['permissionMapper'] = $dependencies['permissionMapper'] ?? PermissionMapper::getInstance();
         $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
-        $dependencies['externalUser']     = $dependencies['externalUser'] ?? new External_User();
-        $dependencies['externalClass']    = $dependencies['externalClass'] ?? new External_Class();
         parent::loadDependencies($dependencies);
     }
 
@@ -124,7 +111,7 @@ class Notifier extends AbstractModuleNotifier
         $owner = $this->userMapper->findById($page->getOwner()->getId());
 
         // Send it to all their teachers (across all subjects)
-        $audience = $this->getStudentTeachers($owner);
+        $audience = $owner->loadTeachers()->getTeacherCollection();
 
         return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_STAFF);
     }
@@ -290,28 +277,6 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param External_UserInterface $externalUser
-     * @return $this|self
-     */
-    protected function setExternalUser(External_UserInterface $externalUser): self
-    {
-        $this->externalUser = $externalUser;
-        return $this;
-    }
-
-
-    /**
-     * @param External_ClassInterface $externalClass
-     * @return $this|self
-     */
-    protected function setExternalClass(External_ClassInterface $externalClass): self
-    {
-        $this->externalClass = $externalClass;
-        return $this;
-    }
-
-
-    /**
      * @return string
      */
     protected function getSlug(): string
@@ -348,30 +313,5 @@ class Notifier extends AbstractModuleNotifier
             }
         }
         return false;
-    }
-
-
-    /**
-     * @param User $student
-     * @return GenericCollection|User[]
-     */
-    private function getStudentTeachers(User $student)
-    {
-        $externalIds = [];
-        foreach ($this->externalUser->getSubjectList($student) as $subject) {
-            foreach ($this->externalClass->getTeacherName($subject['code']) as $externalId) {
-                $externalIds[$externalId] = $externalId;
-            }
-        }
-        $teachers = $this->userMapper->createCollection();
-        foreach ($externalIds as $externalId) {
-            try {
-                $classTeacher                     = $this->userMapper->findByExternalId($externalId);
-                $teachers[$classTeacher->getId()] = $classTeacher;
-            } catch (BaseMapper\Exception $e) {
-                // no teacher found in Schoolbox - that's ok.
-            }
-        }
-        return $teachers;
     }
 }

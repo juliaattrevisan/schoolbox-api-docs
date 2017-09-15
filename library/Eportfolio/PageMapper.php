@@ -82,7 +82,7 @@ class PageMapper extends Schoolbox\Mapper {
 
 		if (is_array($allCategories) && count($allCategories)) {
 			foreach($allCategories as $currentCategory) {
-                $categoryIds[] = $currentCategory['id'];
+                $categoryIds[] = (int)$currentCategory['id'];
 			}
 		}
 		/* Get all the pages with their permissions
@@ -113,15 +113,18 @@ class PageMapper extends Schoolbox\Mapper {
 
 					/* They can be a parent (the getValue() here is a binary 1 or 0)
 					 */
-					$isParent = (($currentPermission->getType() == 'parent') && $currentPermission->getValue());
+                    $isParent = (($currentPermission->getType() === Permission::TYPE_PARENT)
+                        && $currentPermission->getValue());
 
 					/* They can be in a group
 					 */
-					$isInGroup = (($currentPermission->getType() == 'group') && in_array($currentPermission->getValue(), $categoryIds));
+                    $isInGroup = (($currentPermission->getType() === Permission::TYPE_GROUP)
+                        && in_array((int)$currentPermission->getValue(), $categoryIds, true));
 
 					/* They can be allowed specifically
 					 */
-					$isStudent = (($currentPermission->getType() == 'student') && ($currentPermission->getValue() == $viewerId));
+                    $isStudent = (($currentPermission->getType() === Permission::TYPE_STUDENT)
+                        && ((int)$currentPermission->getValue() === (int)$viewerId));
 
 					if ($isParent || $isInGroup || $isStudent) {
 						$viewablePages->setOffset($currentPage->getPageId(), $currentPage);

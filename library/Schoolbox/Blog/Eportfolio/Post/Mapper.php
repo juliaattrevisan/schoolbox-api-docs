@@ -19,6 +19,7 @@ use Eportfolio\PageMapper;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {
