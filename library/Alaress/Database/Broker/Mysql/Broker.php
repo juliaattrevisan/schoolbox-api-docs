@@ -83,10 +83,18 @@ class Broker extends Base implements IBroker
         // Enable persistent connection if not in debug mode
 
         /** @noinspection PhpUndefinedClassConstantInspection */
+        if($options['timezone']) {
+            $initCommand = "SET time_zone = '".$options['timezone']."',NAMES utf8mb4";
+        }
+        else {
+            $initCommand = 'SET NAMES utf8mb4';
+        }
 
         $this->databaseAttributes = [PDO::ATTR_PERSISTENT         => isset($options['debug']) ? $options['debug'] : false,
-                                     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'];
+                                     PDO::MYSQL_ATTR_INIT_COMMAND => $initCommand];
 
         return parent::connect($options);
     }
+
+
 }

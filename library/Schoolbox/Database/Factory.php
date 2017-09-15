@@ -73,24 +73,10 @@ class Factory
     {
         $connectorInternal = $this->factory->createMysql();
 
-        if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd)) {
+        if (!$connectorInternal->connect(SQL_host, SQL_db, SQL_user, SQL_passwd, ['timezone'=>$this->fetchTimezone($connectorInternal)])) {
             throw new DatabaseException("Unable to connect to Schoolbox database.");
         }
-        $connectorInternal->setTimezone($this->fetchTimezone($connectorInternal));
         return $connectorInternal;
-    }
-
-
-    /** Fetch the timezone from the database we are connecting to
-     *
-     * @param IConnector $connectorInternal
-     * @return string Timezone
-     */
-    public function fetchTimezone(IConnector $connectorInternal) {
-        $statement = $connectorInternal->prepare("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
-        $statement->execute();
-        $result = $statement->fetchColumn();
-        return $result;
     }
 
     /**
@@ -145,5 +131,17 @@ class Factory
             $config['external_db_passwd']);
 
         return $connectorExternal;
+    }
+
+    /** Fetch the timezone from the database we are connecting to
+     *
+     * @param IConnector $connectorInternal
+     * @return string Timezone
+     */
+    private function fetchTimezone(IConnector $connectorInternal) {
+        $statement = $connectorInternal->prepare("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
+        $statement->execute();
+        $result = $statement->fetchColumn();
+        return $result;
     }
 }
