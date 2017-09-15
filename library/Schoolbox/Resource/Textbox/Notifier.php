@@ -45,14 +45,17 @@ class Notifier extends ResourceNotifier {
 
 		$bob = new Builder();
 
+		$heading = $this->getResourceName($resource);
+		$href = "/homepage/".$category->getId()."/#textbox".$resourceId;
+
 		$bob->setTitle(":author $action content in :homepage: \":heading\"")
 		    ->setParams(array(
 			    'author'   => new UserParam($effector),
 			    'homepage' => new CategoryParam($category),
-			    'heading'  => new Param($resource->getHeading())
+			    'heading'  => new Param($heading, $href)
 		    ))
 		    ->setIcon("/portrait.php?size={$this->iconSize}&userId=".$effector->getExternalId())
-		    ->setHref("/homepage/".$category->getId())
+		    ->setHref($href)
 			->setNamespace($this->getSlug())
 		    ->setSeverity(Logger::INFO)
 		    ->addTopic("cms.textbox.$resourceId.$action")
@@ -119,7 +122,11 @@ class Notifier extends ResourceNotifier {
 	 * @return string
 	 */
 	protected function getResourceName($resource) {
-		return $resource->getHeading();
+        if (empty($resource->getHeading())) {
+            return "New text box";
+        } else {
+            return $resource->getHeading();
+        }
 	}
 
 
