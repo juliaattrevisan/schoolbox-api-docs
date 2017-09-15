@@ -130,7 +130,8 @@ class Factory
             $config['external_db_host'],
             $config['external_db_db'],
             $config['external_db_user'],
-            $config['external_db_passwd']);
+            $config['external_db_passwd']
+        );
 
         return $connectorExternal;
     }
@@ -140,7 +141,8 @@ class Factory
      * @param IConnector $connectorInternal
      * @return string Timezone
      */
-    private function fetchTimezone(IConnector $connectorInternal) {
+    private function fetchTimezone(IConnector $connectorInternal)
+    {
         $statement = $connectorInternal->prepare("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
         $statement->execute();
         $result = $statement->fetchColumn();

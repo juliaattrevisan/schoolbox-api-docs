@@ -77,7 +77,8 @@ class Database implements IDatabase, Serializable, IQuoter
      * @static
      * @return Database
      */
-    static public function getInstance() {
+    static public function getInstance()
+    {
         if (!self::$instance) {
             self::$instance = new self();
         }
@@ -85,36 +86,40 @@ class Database implements IDatabase, Serializable, IQuoter
         return self::$instance;
     }
 
-	/**
-	 * Explicitly dis- and re-connect the singleton database connection
-	 */
-	static public function reinitialise() {
-		self::$instance->reconnect();
-	}
+    /**
+     * Explicitly dis- and re-connect the singleton database connection
+     */
+    static public function reinitialise()
+    {
+        self::$instance->reconnect();
+    }
 
 
     /**
      */
     public function __construct()
     {
-        $this->qCache = new Cache(function ($statement, array $driverOptions = []) {
-            return $this->connection->prepare($statement, $driverOptions);
-        });
+        $this->qCache = new Cache(
+            function ($statement, array $driverOptions = []) {
+                return $this->connection->prepare($statement, $driverOptions);
+            }
+        );
         $this->quoter = new MysqlQuoter();
     }
 
 
     /**
-	 * Establishes the database connection
-	 *
-	 * @param string $dsn
-	 * @param string $username
-	 * @param string $password
-	 * @param array  $options
-	 * @throws Schoolbox\External\Exception
-	 * @return Bool
-	 */
-    public function connect($dsn, $username, $password, $options = array()) {
+     * Establishes the database connection
+     *
+     * @param string $dsn
+     * @param string $username
+     * @param string $password
+     * @param array $options
+     * @throws Schoolbox\External\Exception
+     * @return Bool
+     */
+    public function connect($dsn, $username, $password, $options = array())
+    {
         if (empty($dsn) || !is_string($dsn)) {
             return false;
         }
@@ -127,36 +132,37 @@ class Database implements IDatabase, Serializable, IQuoter
 
         /* Create PDO connection */
         try {
-            $this->connection = new PDO($dsn, $username, $password, array(
-                PDO::ATTR_PERSISTENT => empty($options['debug']),
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4")
+            $this->connection = new PDO(
+                $dsn, $username, $password, array(
+                    PDO::ATTR_PERSISTENT         => empty($options['debug']),
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
+                )
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
             $this->setTimezone($this->fetchTimezone());
-
         } catch (PDOException $exception) {
-            if(isset($options['throw']) && $options['throw']) {
-		        throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);
-	        }
+            if (isset($options['throw']) && $options['throw']) {
+                throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);
+            }
             $this->error($exception);
         }
 
         return true;
     }
 
-	/**
-	 * Re-establishes a lost database connection if the reason supplied by $e is acceptable.
-	 *
-	 * @throws PDOException
-	 * @return bool
-	 */
-	public function reconnect() {
-		// try to call some sort of PDO destructor
-		$this->connection = null;
-		unset($this->connection);
-		return $this->connect($this->dsn, $this->username, $this->password, $this->options);
-	}
+    /**
+     * Re-establishes a lost database connection if the reason supplied by $e is acceptable.
+     *
+     * @throws PDOException
+     * @return bool
+     */
+    public function reconnect()
+    {
+        // try to call some sort of PDO destructor
+        $this->connection = null;
+        unset($this->connection);
+        return $this->connect($this->dsn, $this->username, $this->password, $this->options);
+    }
 
     /**
      * Attempt to set the connection's timezone.
@@ -169,14 +175,14 @@ class Database implements IDatabase, Serializable, IQuoter
     {
         return $this->connection
             ->prepare("SET time_zone = ?")
-            ->execute([$timezone])
-        ;
+            ->execute([$timezone]);
     }
 
     /** Fetch the timezone from the database we are connecting to
      * @return string Timezone
      */
-    public function fetchTimezone() {
+    public function fetchTimezone()
+    {
         $statement = $this->connection->prepare("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
         $statement->execute();
         $result = $statement->fetchColumn();
@@ -190,7 +196,8 @@ class Database implements IDatabase, Serializable, IQuoter
      *
      * @return \DebugBar\DataCollector\PDO\PDOCollector
      */
-    public function getCollector() {
+    public function getCollector()
+    {
         $this->connection = new DebugPDO\TraceablePDO($this->connection);
         return new DebugPDO\PDOCollector($this->connection);
     }
@@ -215,12 +222,12 @@ class Database implements IDatabase, Serializable, IQuoter
      * PDO::prepare prepares a statement for execution and returns a PDOStatement object.
      *
      * @param string $statement
-     * @param array  $driverOptions
+     * @param array $driverOptions
      * @return PDOStatement
      */
     public function prepare($statement, array $driverOptions = array())
     {
-        return $this->qCache->get(sha1($statement), [ $statement, $driverOptions ]);
+        return $this->qCache->get(sha1($statement), [$statement, $driverOptions]);
     }
 
     /**
@@ -229,7 +236,7 @@ class Database implements IDatabase, Serializable, IQuoter
      * returned by the statement as a PDOStatement object.
      *
      * @param string $statement
-     * @param array  $args
+     * @param array $args
      * @return PDOStatement
      */
     public function query($statement, array $args = null)
@@ -247,10 +254,11 @@ class Database implements IDatabase, Serializable, IQuoter
      * Wrapper for PDO::quote
      *
      * @param string $string
-     * @param int    $parameter_type
+     * @param int $parameter_type
      * @return string
      */
-    public function quote($string, $parameter_type = PDO::PARAM_STR) {
+    public function quote($string, $parameter_type = PDO::PARAM_STR)
+    {
         return $this->connection->quote($string, $parameter_type);
     }
 
@@ -285,16 +293,17 @@ class Database implements IDatabase, Serializable, IQuoter
     /**
      * Tries to create a unique parameter name
      *
-     * @param string $param_name      The base name to attempt to add
-     * @param array  $existing_params The existing list of parameters to add to
+     * @param string $param_name The base name to attempt to add
+     * @param array $existing_params The existing list of parameters to add to
      *                                a query
      *
      * @return string The param name, or null if it couldn't be created after
      *                100 attempts.
      */
-    public function createUniqueParameterName($param_name, $existing_params) {
+    public function createUniqueParameterName($param_name, $existing_params)
+    {
         $new_name = $param_name;
-        $count    = 0;
+        $count = 0;
         while ($count < 100) {
             if (!array_key_exists($new_name, $existing_params)) {
                 return $new_name;
@@ -314,7 +323,8 @@ class Database implements IDatabase, Serializable, IQuoter
      * @param null $name
      * @return string
      */
-    public function lastInsertId($name = null) {
+    public function lastInsertId($name = null)
+    {
 
         return $this->connection->lastInsertId($name);
 
@@ -326,7 +336,8 @@ class Database implements IDatabase, Serializable, IQuoter
      *
      * @return bool true on success or false on failure.
      */
-    public function beginTransaction() {
+    public function beginTransaction()
+    {
         return $this->connection->beginTransaction();
     }
 
@@ -337,7 +348,8 @@ class Database implements IDatabase, Serializable, IQuoter
      *
      * @return bool true on success or false on failure.
      */
-    public function commit() {
+    public function commit()
+    {
         return $this->connection->commit();
 
     }
@@ -349,7 +361,8 @@ class Database implements IDatabase, Serializable, IQuoter
      *
      * @return bool true on success or false on failure.
      */
-    public function rollBack() {
+    public function rollBack()
+    {
         return $this->connection->rollBack();
     }
 
@@ -360,7 +373,8 @@ class Database implements IDatabase, Serializable, IQuoter
      *
      * @return bool true if a transaction is currently active, and false if not.
      */
-    public function inTransaction() {
+    public function inTransaction()
+    {
         return $this->connection->inTransaction();
     }
 
@@ -369,7 +383,8 @@ class Database implements IDatabase, Serializable, IQuoter
      *
      * @return bool
      */
-    public function isConnected() {
+    public function isConnected()
+    {
         if (isset($this->connection) && !empty($this->connection)) {
             return true;
         } else {
@@ -383,26 +398,29 @@ class Database implements IDatabase, Serializable, IQuoter
      * @param PDOException $exception
      * @return void
      */
-    private function error(PDOException $exception) {
+    private function error(PDOException $exception)
+    {
         die("Database Error: {$exception->getMessage()}");
     }
 
-	/**
-	 * String representation of object
-	 *
-	 * @return string
-	 */
-	public function serialize() {
-		return null;
-	}
+    /**
+     * String representation of object
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        return null;
+    }
 
-	/**
-	 * Constructs the object
-	 *
-	 * @param string $serialized
-	 * @return void
-	 */
-	public function unserialize($serialized) {
-		$this->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => DebugBar::isEnabled()));
-	}
+    /**
+     * Constructs the object
+     *
+     * @param string $serialized
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $this->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => DebugBar::isEnabled()));
+    }
 }
