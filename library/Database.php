@@ -132,6 +132,9 @@ class Database implements IDatabase, Serializable, IQuoter
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4")
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $this->setTimezone($this->fetchTimezone());
+
         } catch (PDOException $exception) {
             if(isset($options['throw']) && $options['throw']) {
 		        throw new \Schoolbox\External\Exception($exception->getMessage(), $exception->getCode(), $exception);
@@ -168,6 +171,16 @@ class Database implements IDatabase, Serializable, IQuoter
             ->prepare("SET time_zone = ?")
             ->execute([$timezone])
         ;
+    }
+
+    /** Fetch the timezone from the database we are connecting to
+     * @return string Timezone
+     */
+    public function fetchTimezone() {
+        $statement = $this->connection->prepare("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
+        $statement->execute();
+        $result = $statement->fetchColumn();
+        return $result;
     }
 
     /**
@@ -391,6 +404,5 @@ class Database implements IDatabase, Serializable, IQuoter
 	 */
 	public function unserialize($serialized) {
 		$this->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => DebugBar::isEnabled()));
-		$this->setTimezone(\Schoolbox\Config\ConfigMapper::getInstance()->get('date_timezone'));
 	}
 }

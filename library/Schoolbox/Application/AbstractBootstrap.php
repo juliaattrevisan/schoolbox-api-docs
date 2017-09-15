@@ -172,9 +172,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             function() use ($di) {
                 /** @var SchoolboxDatabaseFactory $factory */
                 $factory = $di->get('databaseFactory');
-                $db = $factory->getInternalDatabase();
-                $db->setTimezone($di->get('config')->get('date_timezone'));
-                return $db;
+                return $factory->getInternalDatabase();
             }
         );
 

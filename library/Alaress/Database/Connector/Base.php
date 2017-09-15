@@ -105,10 +105,7 @@ class Base implements Serializable, IConnector
      */
     public function setTimezone($timezone)
     {
-        return $this->broker
-            ->prepare("SET time_zone = ?")
-            ->execute([$timezone])
-            ;
+        return $this->broker->setTimezone($timezone);
     }
 
     // ----------------------------------------------------------------------------------------------------------------
