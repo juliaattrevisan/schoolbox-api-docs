@@ -79,14 +79,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $block = 'empty_read_members';
-            } elseif ($this->getSource()
-                           ->getFolder()
-                           ->getCodes()
-                           ->count()) {
+            } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
-            } elseif (!$this->getSource()
-                            ->getFolder()
-                            ->isGroup()) {
+            } elseif (!$this->getSource()->getFolder()->isGroup()) {
                 $block = 'empty_not_group_members';
             } else {
                 $block = 'empty_members';
@@ -101,9 +96,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('has_members', "member_email", "member_email_block");
             $this->setBlock('has_members', "person", "person_block");
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
-
             $this->setBlock('person', 'student_photo_visible', 'student_photo_visible_block');
-
             $this->setBlock('student_photo_visible', 'has_thumbnail', 'has_thumbnail_block');
             $this->setBlock('student_photo_visible', 'has_icon', 'has_icon_block');
 
@@ -149,8 +142,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
             // Get admin
             $userAccessMapper = new UserAccessMapper();
-            $admin            = $userAccessMapper->findAdminsInCategory($this->getContext())
-                                                 ->first();
+            $admin            = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
 
             $emailObj = new Email();
             $emailall = [];
@@ -205,16 +197,11 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                             $this->parse('has_icon_block', 'has_icon');
                         }
 
-                        if ($_SESSION['user']->getRole()
-                                             ->isStudent()) {
-                            //Don't display images for students if config hides student photo
-                            $hideStudentPhoto = \Schoolbox\Config\ConfigMapper::getInstance()
-                                                                              ->get('protect_student_photo');
-                        } else {
-                            $hideStudentPhoto = false;
-                        }
-                        if ($hideStudentPhoto && $user->getRole()
-                                                      ->isStudent()) {
+                        $hideStudentPhoto = $this->getUser()->getRole()->isStudent()
+                            ? $this->getConfigMapper()->get('protect_student_photo')
+                            : false;
+
+                        if ($hideStudentPhoto && $user->getRole()->isStudent()) {
                             $this->setVar('student_photo_visible_block', '');
                         } else {
                             $this->parse('student_photo_visible_block', 'student_photo_visible');
