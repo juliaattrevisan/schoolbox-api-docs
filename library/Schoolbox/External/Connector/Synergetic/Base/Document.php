@@ -76,7 +76,7 @@ class Document extends Base implements IDocument
 
         $query =
             "
-            SELECT      sral.StudentReportsArchiveLinkSeq as ID,
+            SELECT      sral.StudentReportsArchiveSeq as ID,
                         sral.Description,
                         sral.FileYear,
                         sral.FileSemester,
