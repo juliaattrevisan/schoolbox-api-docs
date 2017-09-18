@@ -10,6 +10,8 @@
 namespace Eportfolio;
 use Eportfolio;
 use Schoolbox;
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
 
 class PermissionMapper extends Schoolbox\Mapper {
 
@@ -185,4 +187,22 @@ class PermissionMapper extends Schoolbox\Mapper {
 
 		return $this->hydrateList($rowset);
 	}
+
+
+    /**
+     * Get the specified student's permissions to the specified page
+     *
+     * @param Page $page
+     * @param User $student
+     * @return GenericCollection|Permission[]
+     * @throws Schoolbox\Mapper\Exception If invalid column name specified
+     */
+    public function findStudentPermissions(Page $page, User $student): GenericCollection
+    {
+        return $this->findByColumnList([
+            'page_id' => $page->getPageId(),
+            'type'    => Permission::TYPE_STUDENT,
+            'value'   => $student->getId(),
+        ]);
+    }
 }
