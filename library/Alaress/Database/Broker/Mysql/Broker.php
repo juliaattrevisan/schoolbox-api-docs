@@ -97,7 +97,7 @@ class Broker extends Base implements IBroker
      */
     public function setTimezone($timezone)
     {
-        return $this->connection
+        return $this->pdo
             ->prepare("SET time_zone = ?")
             ->execute([$timezone])
             ;
