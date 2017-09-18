@@ -35,6 +35,7 @@
 use \Alaress\Lumberjack\Logger;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
 use Schoolbox\UserMapper;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -46,6 +47,7 @@ use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -490,7 +492,6 @@ class External_Liss_Server
     {
         $log = self::log();
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
-        $ttStructure = $message->params[1];
 
         if ($authenticator->isAuthenticated()) {
             $log->info("publishBellTimes: processing request");
@@ -499,17 +500,18 @@ class External_Liss_Server
             $allData = $message->params[2]->me['array'];
 
             /* Truncate everything before re-adding */
-            $timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+            $timetablePeriodMapper = new TimetablePeriodMapper();
             $timetablePeriodMapper->truncate();
 
-            $collection = new \Schoolbox\Collection();
+            $collection = new Collection();
 
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
 
                 $dayNumber = (string)$struct['DayNumber']->me['i4'];
 
-                $timetablePeriod = new \Schoolbox\External\TimetablePeriod();
+                /** @var TimetablePeriod $timetablePeriod */
+                $timetablePeriod = new TimetablePeriod();
                 $timetablePeriod->setCycle($cycle->getId());
                 $timetablePeriod->setTitle((string)$struct['Period']->me['string']);
                 $timetablePeriod->setDay($dayNumber);
@@ -522,8 +524,8 @@ class External_Liss_Server
 
                 /* Start a collection for a day, if it's not already a collection
                  */
-                if (!($collection->getOffset($dayNumber) instanceof \Schoolbox\Collection)) {
-                    $collection->setOffset($dayNumber, new \Schoolbox\Collection());
+                if (!($collection->getOffset($dayNumber) instanceof Collection)) {
+                    $collection->setOffset($dayNumber, new Collection());
                 }
 
                 $collection->getOffset($dayNumber)->add($timetablePeriod);
@@ -531,8 +533,7 @@ class External_Liss_Server
 
             $collection->reindex();
 
-            $log->info(sprintf("publishBellTimes: Collated %d days and %d periods into timetable structure",$collection->count(), $collection->first()->count()));
-
+            $log->info(sprintf("publishBellTimes: Collated %d days and %d periods into timetable structure", $collection->count(), $collection->first()->count()));
 
             foreach ($collection as $dayCollection) {
                 $i = 0;
@@ -544,7 +545,7 @@ class External_Liss_Server
                     $i++;
                 }
             }
-            $log->info(sprintf("publishBellTimes: Saved timetable periods, process completed",$collection->count()));
+            $log->info(sprintf("publishBellTimes: Saved timetable periods, process completed", $collection->count()));
 
             return new xmlrpcresp(new xmlrpcval('BellTimes Imported', 'string'));
         }
