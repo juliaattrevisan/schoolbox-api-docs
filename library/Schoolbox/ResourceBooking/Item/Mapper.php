@@ -102,6 +102,13 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_TIMESPAN,
             )
         );
+        $this->hasMap(
+            array(
+                'column'   => 'current_term_restriction',
+                'property' => 'currentTermRestriction',
+                'type'     => self::TYPE_BOOLEAN,
+            )
+        );
 
         // Created/Modified/Deleted
         $this->hasMap(
