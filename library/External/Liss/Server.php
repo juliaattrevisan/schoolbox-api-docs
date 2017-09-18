@@ -29,7 +29,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 use \Alaress\Lumberjack\Logger;
@@ -37,6 +36,7 @@ use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
@@ -49,7 +49,10 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class External_Liss_Server
 {
-
+    /**
+     * Default logging message when attempting to use liss with a non-schoolbox connector
+     */
+    const WRONG_CONNECTOR_MESSAGE = 'Not using the schoolbox connector - exiting';
 
     /**
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
@@ -63,6 +66,14 @@ class External_Liss_Server
     static public function getCycle()
     {
         $log = self::log();
+
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
+
         $cycleMapper = new TimetableCycleMapper();
 
         try {
@@ -178,7 +189,16 @@ class External_Liss_Server
     static public function getRooms(xmlrpcmsg $message)
     {
         $log = self::log();
+
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
+
         $log->info("getRooms: unable to process request, not implemented");
+
         return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
     }
 
@@ -193,6 +213,13 @@ class External_Liss_Server
     static public function publishClassMemberships(xmlrpcmsg $message)
     {
         $log = self::log();
+
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
@@ -241,6 +268,13 @@ class External_Liss_Server
     {
         $log = self::log();
 
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
+
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
         if ($authenticator->isAuthenticated()) {
@@ -266,6 +300,13 @@ class External_Liss_Server
     static public function publishStudents(xmlrpcmsg $message)
     {
         $log = self::log();
+
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
@@ -294,6 +335,13 @@ class External_Liss_Server
     {
         $log = self::log();
 
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
+
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
         if ($authenticator->isAuthenticated()) {
@@ -319,6 +367,13 @@ class External_Liss_Server
     static public function publishRooms(xmlrpcmsg $message)
     {
         $log = self::log();
+
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
@@ -349,6 +404,13 @@ class External_Liss_Server
     static public function publishClasses(xmlrpcmsg $message)
     {
         $log = self::log();
+
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
@@ -395,6 +457,13 @@ class External_Liss_Server
     static public function publishTimetable(xmlrpcmsg $message)
     {
         $log = self::log();
+
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
@@ -490,6 +559,14 @@ class External_Liss_Server
     static public function publishBellTimes(xmlrpcmsg $message)
     {
         $log = self::log();
+
+        /* Requires schoolbox connector
+         */
+        if (!self::isSchoolboxConnector()) {
+            $log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+        }
+
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
         if ($authenticator->isAuthenticated()) {
@@ -576,5 +653,18 @@ class External_Liss_Server
         }
 
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
+
+    /**
+     * This installation is currently using the schoolbox connector
+     *
+     * @return bool
+     */
+    static private function isSchoolboxConnector()
+    {
+        $config = new ConfigLoader();
+        $connector = $config->get('external_type');
+
+        return $connector == 'schoolbox';
     }
 }
