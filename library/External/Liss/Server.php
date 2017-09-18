@@ -35,6 +35,11 @@
 use \Alaress\Lumberjack\Logger;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\UserMapper;
+use Schoolbox\External\ClassEntry;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvement;
+use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
@@ -190,9 +195,9 @@ class External_Liss_Server
 
         if ($authenticator->isAuthenticated()) {
             $log->info("publishClassMemberships: processing request");
-            $classInvolvementMapper = new \Schoolbox\External\ClassInvolvementMapper();
-            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
-            $userMapper = new \Schoolbox\UserMapper();
+            $classInvolvementMapper = new ClassInvolvementMapper();
+            $classEntryMapper = new ClassEntryMapper();
+            $userMapper = new UserMapper();
 
             $classInvolvementMapper->truncate();
 
@@ -203,9 +208,11 @@ class External_Liss_Server
 
                 try {
                     $user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
+
+                    /** @var ClassEntry $class */
                     $class = $classEntryMapper->findOneByColumn('code', trim((string)$struct['ClassCode']->me['string']));
 
-                    $classInvolvement = new \Schoolbox\External\ClassInvolvement();
+                    $classInvolvement = new ClassInvolvement();
                     $classInvolvement->setClass($class);
                     $classInvolvement->setUser($user);
                     $classInvolvementMapper->save($classInvolvement);
@@ -215,6 +222,7 @@ class External_Liss_Server
             }
 
             $log->info("publishClassMemberships: completed request");
+
             return new xmlrpcresp(new xmlrpcval('Class Memberships imported', 'string'));
         }
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
