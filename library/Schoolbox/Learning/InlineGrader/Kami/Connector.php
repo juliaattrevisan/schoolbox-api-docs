@@ -4,6 +4,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
@@ -45,7 +46,7 @@ class Connector
      *
      * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         // Any non-empty value is considered 'enabled', regardless of whether it is 'valid'
         return (bool)$this->getApiKey();
@@ -57,7 +58,7 @@ class Connector
      *
      * @return bool
      */
-    public function isOnline()
+    public function isOnline(): bool
     {
         if (!$this->isEnabled()) {
             return false;
@@ -91,7 +92,7 @@ class Connector
      * @param IStorage $storage
      * @return string
      */
-    public function uploadDocument(IStorage $storage)
+    public function uploadDocument(IStorage $storage): string
     {
         // TODO upload a storage into Kami and return the Kami Document ID
         $path = $this->getPathUploadDocument();
@@ -103,7 +104,7 @@ class Connector
      * @param string $documentId
      * @return Document
      */
-    public function getDocument($documentId)
+    public function getDocument(string $documentId): Document
     {
         $path = $this->getPathGetDocument($documentId);
         // TODO make GuzzleHttp request to Kami API
@@ -116,7 +117,7 @@ class Connector
      *
      * @return null|string
      */
-    private function getApiKey()
+    private function getApiKey(): ?string
     {
         return $this->config->get('kami_api_key');
     }
@@ -127,7 +128,7 @@ class Connector
      *
      * @return string[]
      */
-    private function getAuthorisationHeader()
+    private function getAuthorisationHeader(): array
     {
         return ['Authorization' => "Token {$this->getApiKey()}"];
     }
@@ -139,7 +140,7 @@ class Connector
      * @param string $documentId
      * @return string
      */
-    private function getPathGetDocument($documentId)
+    private function getPathGetDocument(string $documentId): string
     {
         return self::PATH_GET_DOCUMENT . $documentId;
     }
@@ -150,7 +151,7 @@ class Connector
      *
      * @return string
      */
-    private function getPathUploadDocument()
+    private function getPathUploadDocument(): string
     {
         return self::PATH_UPLOAD_DOCUMENT_MULTIPART;
     }
@@ -159,7 +160,7 @@ class Connector
     /**
      * @return Client
      */
-    private function buildClient()
+    private function buildClient(): Client
     {
         return new Client(['base_uri' => self::BASE_URI]);
     }
