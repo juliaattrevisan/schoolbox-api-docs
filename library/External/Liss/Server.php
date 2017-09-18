@@ -511,8 +511,8 @@ class External_Liss_Server
                 $timetablePeriod->setCycle($cycle->getId());
                 $timetablePeriod->setTitle((string)$struct['Period']->me['string']);
                 $timetablePeriod->setDay($dayNumber);
-                $timetablePeriod->setStart((string)$struct['StartTime']->me['string']);
-                $timetablePeriod->setFinish((string)$struct['EndTime']->me['string']);
+                $timetablePeriod->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'h:i'));
+                $timetablePeriod->setFinish(new \Alaress_Date_Format((string)$struct['EndTime']->me['string'], 'h:i'));
 
                 /* TODO: Undo these hardcoded values at some point
                   */
