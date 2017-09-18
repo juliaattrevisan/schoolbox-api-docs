@@ -2,13 +2,14 @@
 
 use Alaress\Lumberjack\Logger;
 
+use Schoolbox\Config\Loader as ConfigLoader;
+
 /**
  * Authenticator
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class External_Liss_Authenticator
 {
@@ -48,6 +49,11 @@ class External_Liss_Authenticator
     private $log;
 
     /**
+     * @var ConfigLoader
+     */
+    private $configLoader;
+
+    /**
      * Constructor
      *
      * @param $dataObject
@@ -57,6 +63,8 @@ class External_Liss_Authenticator
     {
         $this->setDataObject($dataObject);
         $this->setLog($log);
+        $this->setConfigLoader(new \Schoolbox\Config\Loader());
+
         $this->setup();
     }
 
@@ -65,9 +73,9 @@ class External_Liss_Authenticator
      */
     protected function setup()
     {
-        $this->setUsername(\Cfg::get('external_liss_username'));
-        $this->setPassword(\Cfg::get('external_liss_password'));
-        $this->setSchoolCode(\Cfg::get('external_liss_schoolcode'));
+        $this->setUsername($this->getConfigLoader()->get('external_liss_username'));
+        $this->setPassword($this->getConfigLoader()->get('external_liss_password'));
+        $this->setSchoolCode($this->getConfigLoader()->get('external_liss_schoolcode'));
     }
 
     /**
@@ -80,13 +88,14 @@ class External_Liss_Authenticator
 
         $isUsernameCorrect = (string)$struct['UserName']->me['string'] == $this->getUsername();
         $isPasswordCorrect = (string)$struct['Password']->me['string'] == $this->getPassword();
-        $isSchoolCorrect = (string)$struct['School']->me['string'] == $this->getSchoolCode();
 
-        if ($isUsernameCorrect && $isPasswordCorrect && $isSchoolCorrect) {
+        if ($isUsernameCorrect && $isPasswordCorrect) {
             $this->getLog()->info(sprintf('User \'%s\' at school \'%s\' has been authenticated', (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
 			return true;
 		}
+
         $this->getLog()->error(sprintf('User \'%s\' at school \'%s\' has failed to authenticate',  (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
+
         return false;
     }
 
@@ -189,5 +198,21 @@ class External_Liss_Authenticator
         $this->log = $log;
     }
 
+    /**
+     * @return ConfigLoader
+     */
+    public function getConfigLoader()
+    {
+        return $this->configLoader;
+    }
 
+    /**
+     * @param ConfigLoader $configLoader
+     * @return $this
+     */
+    public function setConfigLoader($configLoader)
+    {
+        $this->configLoader = $configLoader;
+        return $this;
+    }
 }
