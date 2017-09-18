@@ -33,6 +33,13 @@
  */
 
 use \Alaress\Lumberjack\Logger;
+use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
+use Schoolbox\External\TimetableCampus;
+use Schoolbox\External\TimetableCampusMapper;
+use Schoolbox\External\TimetableCycle;
+use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class External_Liss_Server
 {
@@ -44,22 +51,24 @@ class External_Liss_Server
      * which is not accessible to us)
      * @return object|\Schoolbox\External\TimetableCycle
      * @throws PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     static public function getCycle()
     {
         $log = self::log();
-        $cycleMapper = new \Schoolbox\External\TimetableCycleMapper();
+        $cycleMapper = new TimetableCycleMapper();
 
         try {
             /* TODO: Assume a particular cycle
              */
             $cycle = $cycleMapper->findById(1);
+
             $log->info("publishBellTimes: Defaulting to using first existing timetable cycle");
-        } catch (\Exception $e) {
+        } catch (MapperException $e) {
             $log->warning("publishBellTimes: Failed to find existing cycle, automatically creating one");
-            $cycle = new \Schoolbox\External\TimetableCycle();
+
+            $cycle = new TimetableCycle();
             $cycle->setTitle('Main Timetable');
 
             /* TODO: Undo these hardcoded values at some point
@@ -72,12 +81,15 @@ class External_Liss_Server
 
             /* Force a timetable_campus record
              */
-            $timetableCampusMapper = new \Schoolbox\External\TimetableCampusMapper();
-            $timetableCampus = new \Schoolbox\External\TimetableCampus();
-            $timetableCampus->setCycle($cycle->getId());
+            $timetableCampusMapper = new TimetableCampusMapper();
+            $timetableCampus = new TimetableCampus();
+            $timetableCampus->setCycle($cycle);
+
+            /** @var Campus $campus */
+            $campus = CampusMapper::getInstance()->findById(1);
 
             $now = new Alaress_Date_Format();
-            $timetableCampus->setCampus(\Schoolbox\CampusMapper::getInstance()->findById(1));
+            $timetableCampus->setCampus($campus);
             $timetableCampus->setStart($now->startOfYear());
             $timetableCampus->setReset(null);
             $timetableCampus->setFinish($now->endOfYear());
