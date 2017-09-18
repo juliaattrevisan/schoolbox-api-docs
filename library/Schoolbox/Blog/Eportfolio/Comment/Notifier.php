@@ -27,10 +27,6 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use OutOfBoundsException;
 use InvalidArgumentException;
-use External_UserInterface;
-use External_User;
-use External_ClassInterface;
-use External_Class;
 
 /**
  * @method Mapper getMapper()
@@ -124,6 +120,7 @@ class Notifier extends AbstractModuleNotifier
         }
         return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STAFF, self::TRIGGER_CREATED);
     }
+
 
     /**
      * Notify a staff member that someone commented on their student's blog post
