@@ -42,8 +42,10 @@ class External_Liss_Server
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
-     *
      * @return object|\Schoolbox\External\TimetableCycle
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     static public function getCycle()
     {
@@ -312,11 +314,13 @@ class External_Liss_Server
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
 
+
     /**
      * Publish classes to the Schoolbox
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws PDOException
      */
     static public function publishClasses(xmlrpcmsg $message)
     {
@@ -357,11 +361,14 @@ class External_Liss_Server
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
 
+
     /**
      * Publish timetable to the Schoolbox
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\Exception
      */
     static public function publishTimetable(xmlrpcmsg $message)
     {
@@ -444,11 +451,15 @@ class External_Liss_Server
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
 
+
     /**
      * Publish timetable to the Schoolbox
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     static public function publishBellTimes(xmlrpcmsg $message)
     {
