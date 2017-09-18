@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\WorkType;
 
@@ -59,6 +60,27 @@ class Factory extends Filter\AbstractFactory
 
 
     /**
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
+        User $user,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): Filter\IComponent {
+        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
+    }
+
+
+    /**
      * @inheritdoc
      * @param Filter\Model $filter
      * @return Filter\IKeyConverter|KeyConverter
@@ -71,34 +93,9 @@ class Factory extends Filter\AbstractFactory
 
 
     /**
-     * @inheritdoc
-     */
-    protected function buildDefinitionArgs(Filter\Model $filter)
-    {
-        return array_merge(parent::buildDefinitionArgs($filter), [
-            'workTypes' => $this->getWorkTypes(),
-        ]);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildExtraComponentArgs(
-        User $user,
-        Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [];
-    }
-
-
-    /**
      * Includes a NULL for when an assessment has no WorkType
      *
-     * @return Collection|WorkType\Model[]
+     * @return Collection|WorkType\Model[]|null[]
      */
     private function getWorkTypes()
     {
@@ -110,5 +107,4 @@ class Factory extends Filter\AbstractFactory
         }
         return $collection;
     }
-
 }

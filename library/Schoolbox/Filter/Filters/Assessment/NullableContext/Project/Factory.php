@@ -77,6 +77,35 @@ class Factory extends NullableContext\Factory
         );
     }
 
+    /**
+     * Includes the set of projects that both:
+     * * reside in the contexts set by admin
+     * * are linked to folders taught by the $viewee
+     *
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
+     * @throws DefinitionException If unable to find a joined mapper
+     * @throws Mapper\Exception If unable to hydrate a row
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
+        User $user,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): Filter\IComponent {
+        $userSelections  = $overrides ?: $selections;
+        $selectionMapper = $this->getSelectionMapper();
+        $projects        = $this->getProjects($pageFilter, $viewee, $overrides);
+        return new Component($definition, $user, $pageFilter, $userSelections, $selectionMapper, $projects);
+    }
+
 
     /**
      * @inheritdoc
@@ -90,28 +119,6 @@ class Factory extends NullableContext\Factory
                 return $projectId;
             });
         return new KeyConverter($filter, $projectIds);
-    }
-
-
-    /**
-     * Return the set of projects that both:
-     * * reside in the contexts set by admin
-     * * are linked to folders taught by the $viewee
-     *
-     * @inheritdoc
-     * @throws DefinitionException If unable to find a joined mapper
-     * @throws Mapper\Exception If unable to hydrate a row
-     */
-    protected function buildExtraComponentArgs(
-        User $user,
-        Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [
-            'projects' => $this->getProjects($pageFilter, $viewee, $overrides),
-        ];
     }
 
 

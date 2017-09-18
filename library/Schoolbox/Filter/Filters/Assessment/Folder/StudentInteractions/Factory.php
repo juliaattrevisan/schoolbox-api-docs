@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
@@ -36,33 +37,31 @@ class Factory extends FolderFilter\Factory
 
 
     /**
-     * @inheritdoc
-     * @param Filter\Model $filter
-     * @return Filter\IKeyConverter|KeyConverter
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
+     * @throws DefinitionException if join $name isn't on this mapper
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
-    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
-    {
-        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
-            ->indexByCallback(function ($folderId) {
-                return $folderId;
-            });
-        return new KeyConverter($filter, $folderIds, $this->getAccess());
-    }
-
-
-    /**
-     * @inheritdoc
-     * @throws DefinitionException If join not defined
-     */
-    protected function buildExtraComponentArgs(
+    public function buildComponent(
+        Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): Filter\IComponent {
         $options = $pageFilter->getOptions();
         $folders = $this->getFolderMapper()->createCollection();
+
+        if(!$viewee){
+            throw new \InvalidArgumentException('$viewee cannot be null for StudentInteraction filter');
+        }
 
         if($options[Definition::KEY_CLASSES]->getAvailable()){
             // TODO insert enrolled classes
@@ -76,10 +75,30 @@ class Factory extends FolderFilter\Factory
         if($options[Definition::KEY_FEEDBACK]->getAvailable()){
             $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithFeedbackToStudent($viewee), 'id');
         }
-        $folders->sortBy('name', 'ASC');
 
-        return [
-            'folders' => $folders,
-        ];
+        return new Component(
+            $definition,
+            $user,
+            $pageFilter,
+            $overrides ?: $selections,
+            $this->getSelectionMapper(),
+            $folders->sortBy('name', 'ASC')
+        );
+    }
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $folderIds = (new Collection($this->getFolderMapper()->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($folderId) {
+                return $folderId;
+            });
+//        TODO resolve merge conflict remnant. Should we perm check client-supplied folder ids?
+//        return new KeyConverter($filter, $folderIds, $this->getAccess());
+        return new KeyConverter($filter, $folderIds);
     }
 }

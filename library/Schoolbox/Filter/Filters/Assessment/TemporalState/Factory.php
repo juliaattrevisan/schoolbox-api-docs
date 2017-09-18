@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
 
@@ -33,6 +34,26 @@ class Factory extends AbstractFactory
         );
     }
 
+    /**
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
+        User $user,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): Filter\IComponent {
+        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
+    }
+
 
     /**
      * @inheritdoc
@@ -42,31 +63,6 @@ class Factory extends AbstractFactory
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
         return new KeyConverter($filter, $this->getTemporalStates());
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildDefinitionArgs(Filter\Model $filter)
-    {
-        return array_merge(parent::buildDefinitionArgs($filter), [
-            'temporalStates' => $this->getTemporalStates(),
-        ]);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildExtraComponentArgs(
-        User $user,
-        Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [];
     }
 
 

@@ -35,30 +35,31 @@ interface IFactory
     /**
      * Build a filter component, ready to inject into a filter panel
      *
-     * $selections[filterId]:
+     * $selections:
+     * * the user's saved selections fetched from database
      * * cannot insert items
      * * ignored if $overrides are present, or if $pageFilter is not user-configurable
      *
-     * $overrides[filterId]:
-     * * can insert items
+     * $overrides:
+     * * may insert items (so long as logic - eg permissions - permit)
      * * if non-null, ignore $selections
      *
-     * @param IDefinition                                      $definition They type of filter we are building
-     * @param User                                             $user
-     * @param Page\Model                                       $pageFilter
-     * @param null|User                                        $viewee
-     * @param Collection|GenericCollection|Selection\Model[][] $selections Indexed by filter.id, selection.key
-     * @param Collection|GenericCollection|Selection\Model[][] $overrides  Indexed by filter.id, selection.key
-     * @return IComponent|null
+     * @param IDefinition                              $definition They type of filter we are building
+     * @param User                                     $user
+     * @param Page\Model                               $pageFilter
+     * @param GenericCollection|Selection\Model[]      $selections Indexed selection.key
+     * @param null|User                                $viewee
+     * @param null|GenericCollection|Selection\Model[] $overrides  Indexed selection.key
+     * @return IComponent
      */
     public function buildComponent(
         IDefinition $definition,
         User $user,
         Page\Model $pageFilter,
+        GenericCollection $selections,
         User $viewee = null,
-        Collection $selections,
-        Collection $overrides
-    );
+        GenericCollection $overrides = null
+    ): IComponent;
 
 
     /**

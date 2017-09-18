@@ -8,10 +8,8 @@
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
 use Schoolbox\Assessment\Term;
-use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
 use Schoolbox\Filter;
 
 /**
@@ -40,35 +38,6 @@ abstract class Factory extends AbstractFactory
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->termMapper = $termMapper;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildDefinitionArgs(Filter\Model $filter)
-    {
-        $sortedTerms = $this->getSortedTerms();
-
-        return array_merge(parent::buildDefinitionArgs($filter), [
-            'terms'        => $sortedTerms,
-            'currentTerm'  => $this->getCurrentTerm($sortedTerms),
-            'previousTerm' => $this->getPreviousTerm($sortedTerms),
-        ]);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildExtraComponentArgs(
-        User $user,
-        Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [];
     }
 
 

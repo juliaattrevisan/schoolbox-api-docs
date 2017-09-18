@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
@@ -56,6 +57,27 @@ class Factory extends NullableContext\Factory
 
 
     /**
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
+        User $user,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): Filter\IComponent {
+        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
+    }
+
+
+    /**
      * @inheritdoc
      * @param Filter\Model $filter
      * @return Filter\IKeyConverter|KeyConverter
@@ -67,19 +89,5 @@ class Factory extends NullableContext\Factory
                 return $unitSpecId;
             });
         return new KeyConverter($filter, $unitSpecIds);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildExtraComponentArgs(
-        User $user,
-        Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        return [];
     }
 }

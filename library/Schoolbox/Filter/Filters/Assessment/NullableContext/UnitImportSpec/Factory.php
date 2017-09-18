@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
@@ -71,33 +72,26 @@ class Factory extends NullableContext\Factory
 
 
     /**
-     * @inheritdoc
-     * @param Filter\Model $filter
-     * @return Filter\IKeyConverter|KeyConverter
-     */
-    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
-    {
-        $unitSpecIds = (new Collection($this->unitSpecMapper->findAllIds(['deleted' => true])))
-            ->indexByCallback(function ($unitSpecId) {
-                return $unitSpecId;
-            });
-        return new KeyConverter($filter, $unitSpecIds);
-    }
-
-
-    /**
-     * @inheritdoc
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent
      * @throws \InvalidArgumentException If $viewee is NULL
+     * @throws \UnexpectedValueException
      */
-    protected function buildExtraComponentArgs(
+    public function buildComponent(
+        Filter\IDefinition $definition,
         User $user,
         Filter\Page\Model $pageFilter,
-        Filter\IDefinition $definition,
-        Collection $overrides,
-        User $viewee = null
-    ) {
-        if(null === $viewee){
-            throw new \InvalidArgumentException('Viewee cannot be null');
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): Filter\IComponent {
+        if (null === $viewee) {
+            throw new \InvalidArgumentException('Viewee cannot be null for UnitImportSpec filter');
         }
 
         // Should this role type see classes for this page?
@@ -106,7 +100,7 @@ class Factory extends NullableContext\Factory
         $classOption = $options[Definition::KEY_IMPORTED_TO_CLASS];
         $groupOption = $options[Definition::KEY_IMPORTED_TO_GROUP];
 
-        if($pageFilter->getUserConfigurable()){
+        if ($pageFilter->getUserConfigurable()) {
             $getClasses = $classOption->getAvailable();
             $getGroups  = $groupOption->getAvailable();
         } else {
@@ -116,7 +110,7 @@ class Factory extends NullableContext\Factory
             $getGroups  = $groupOption->getDefaults()[$roleType]->getSelected();
 
             // Are all available options unchecked ?
-            if(!$getNone && !$getClasses && !$getGroups){
+            if (!$getNone && !$getClasses && !$getGroups) {
                 // For consistency, this must logically equate to the filter not reducing the full set.
                 $getClasses = $getGroups = true;
             }
@@ -130,7 +124,7 @@ class Factory extends NullableContext\Factory
         /* If we inserted an extra folder/s, we need to also insert any units imported to that folder,
          * otherwise any assessments inside units imported to the extra folder will never be visible.
          */
-        $extraFolderIds = $this->parseFolderIds($overrides);
+        $extraFolderIds = $overrides ? $this->parseFolderIds($overrides) : [];
         if (count($extraFolderIds)) {
             $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
             $folders      = $folders->mergeUnique($extraFolders, 'id');
@@ -179,11 +173,30 @@ class Factory extends NullableContext\Factory
                 $unitSpecsImportedToGroups->setOffset($unitSpec->getId(), $unitSpec);
             }
         }
+        return new Component(
+            $definition,
+            $user,
+            $pageFilter,
+            $overrides ?: $selections,
+            $this->getSelectionMapper(),
+            $unitSpecsImportedToFolders,
+            $unitSpecsImportedToClasses,
+            $unitSpecsImportedToGroups
+        );
+    }
 
-        return [
-            'unitSpecsImportedToFolders' => $unitSpecsImportedToFolders,
-            'unitSpecsImportedToClasses' => $unitSpecsImportedToClasses,
-            'unitSpecsImportedToGroups'  => $unitSpecsImportedToGroups,
-        ];
+
+    /**
+     * @inheritdoc
+     * @param Filter\Model $filter
+     * @return Filter\IKeyConverter|KeyConverter
+     */
+    public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
+    {
+        $unitSpecIds = (new Collection($this->unitSpecMapper->findAllIds(['deleted' => true])))
+            ->indexByCallback(function ($unitSpecId) {
+                return $unitSpecId;
+            });
+        return new KeyConverter($filter, $unitSpecIds);
     }
 }

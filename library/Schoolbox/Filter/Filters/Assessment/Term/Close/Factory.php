@@ -10,6 +10,8 @@ namespace Schoolbox\Filter\Filters\Assessment\Term\Close;
 use Schoolbox\Collection;
 use \Schoolbox\Filter;
 use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
 
 /**
  * A factory for building 'Term Close' filter objects
@@ -34,6 +36,27 @@ class Factory extends AssessmentTermFilter\Factory
             $this->getCurrentTerm($sortedTerms),
             $this->getPreviousTerm($sortedTerms)
         );
+    }
+
+
+    /**
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
+        User $user,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): Filter\IComponent {
+        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
     }
 
 
