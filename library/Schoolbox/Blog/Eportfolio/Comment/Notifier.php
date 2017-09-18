@@ -14,6 +14,7 @@ use Schoolbox\Blog\Eportfolio\Post;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -27,10 +28,6 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use OutOfBoundsException;
 use InvalidArgumentException;
-use External_UserInterface;
-use External_User;
-use External_ClassInterface;
-use External_Class;
 
 /**
  * @method Mapper getMapper()
@@ -125,6 +122,7 @@ class Notifier extends AbstractModuleNotifier
         return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STAFF, self::TRIGGER_CREATED);
     }
 
+
     /**
      * Notify a staff member that someone commented on their student's blog post
      *
@@ -199,7 +197,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffFollowed(Model $comment, User $effector): Envelope
     {
-        return $this->notifyFollowed($comment, $effector, RoleMapper::ROLE_STAFF);
+        $audience = $this->getOtherCommentAuthors($comment, RoleMapper::ROLE_STAFF);
+        return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STAFF, self::TRIGGER_FOLLOWED);
     }
 
 
@@ -211,10 +210,18 @@ class Notifier extends AbstractModuleNotifier
      * @return Envelope
      * @throws OutOfBoundsException     If severity is not set
      * @throws InvalidArgumentException If a required property was not set
+     * @throws BaseMapper\Exception     If invalid column name specified
      */
     public function notifyStudentFollowed(Model $comment, User $effector): Envelope
     {
-        return $this->notifyFollowed($comment, $effector, RoleMapper::ROLE_STUDENT);
+        $post     = $this->postMapper->findById($comment->getBlog()->getId());
+        $audience = $this->userMapper->createCollection();
+        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_STUDENT) as $commentator) {
+            if ($this->isPostVisibleToStudent($post, $commentator)) {
+                $audience[$commentator->getId()] = $commentator;
+            }
+        }
+        return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STUDENT, self::TRIGGER_FOLLOWED);
     }
 
 
@@ -229,7 +236,10 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentFollowed(Model $comment, User $effector): Envelope
     {
-        return $this->notifyFollowed($comment, $effector, RoleMapper::ROLE_PARENT);
+        $audience = $this->isPostVisibleToParents($comment->getBlog())
+            ? $this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT)
+            : $this->userMapper->createCollection();
+        return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_PARENT, self::TRIGGER_FOLLOWED);
     }
 
 
@@ -289,29 +299,6 @@ class Notifier extends AbstractModuleNotifier
     private function notifyCommented(Model $comment, User $effector, Collection $audience, string $roleType): Envelope
     {
         return $this->notify($comment, $effector, $audience, $roleType, self::TRIGGER_COMMENTED);
-    }
-
-
-    /**
-     * Common logic for the 'notify{RoleType}Followed()' public methods
-     *
-     * @param Model  $comment
-     * @param User   $effector
-     * @param string $roleType
-     * @return Envelope
-     * @throws OutOfBoundsException     If severity is not set
-     * @throws InvalidArgumentException If a required property was not set
-     */
-    private function notifyFollowed(Model $comment, User $effector, string $roleType): Envelope
-    {
-        $otherComments = $this->getMapper()->findSiblings($comment);
-        $audience      = $this->userMapper->createCollection();
-        foreach ($otherComments as $otherComment) {
-            $target                     = $otherComment->getOwner();
-            $audience[$target->getId()] = $target;
-        }
-
-        return $this->notify($comment, $effector, $audience, $roleType, self::TRIGGER_FOLLOWED);
     }
 
 
@@ -428,7 +415,7 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * Return whether the specified is visible to parents
+     * Return whether the specified post is visible to parents
      *
      * @param Post\Model $post
      * @return bool
@@ -442,5 +429,46 @@ class Notifier extends AbstractModuleNotifier
             }
         }
         return false;
+    }
+
+
+    /**
+     * Return whether the specified post is visible to the specified student
+     *
+     * @param Post\Model $post
+     * @param User       $student
+     * @return bool
+     * @throws BaseMapper\Exception If invalid column name specified
+     */
+    private function isPostVisibleToStudent(Post\Model $post, User $student): bool
+    {
+        foreach ($this->permissionMapper->findStudentPermissions($post->getPage(), $student) as $permission) {
+            if ($permission->getValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Return a list of users of the specified type if have created adjacent comments
+     *
+     * @param Model  $comment
+     * @param string $roleType
+     * @return GenericCollection|User[]
+     */
+    private function getOtherCommentAuthors(Model $comment, string $roleType): GenericCollection
+    {
+        $otherComments = $this->getMapper()->findSiblings($comment);
+        $audience      = $this->userMapper->createCollection();
+        foreach ($otherComments as $otherComment) {
+            $target = $otherComment->getOwner();
+            if ($target->getRole()->getType() !== $roleType) {
+                continue;
+            }
+            $audience[$target->getId()] = $target;
+        }
+        return $audience;
     }
 }
