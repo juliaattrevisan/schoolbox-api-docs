@@ -54,16 +54,17 @@ class External_Liss_Authenticator
     private $configLoader;
 
     /**
-     * Constructor
+     * External_Liss_Authenticator constructor.
      *
-     * @param $dataObject
-     * @param Logger $log
+     * @param xmlrpcval    $dataObject
+     * @param Logger       $log
+     * @param ConfigLoader $configLoader
      */
-    public function __construct(xmlrpcval $dataObject, Logger $log)
+    public function __construct(xmlrpcval $dataObject, Logger $log, ConfigLoader $configLoader)
     {
         $this->setDataObject($dataObject);
         $this->setLog($log);
-        $this->setConfigLoader(new \Schoolbox\Config\Loader());
+        $this->setConfigLoader($configLoader);
 
         $this->setup();
     }

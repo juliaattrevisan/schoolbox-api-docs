@@ -226,7 +226,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             $log->info("publishClassMemberships: processing request");
@@ -281,7 +281,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -315,7 +315,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -349,7 +349,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -383,7 +383,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -421,7 +421,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
 
@@ -474,7 +474,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
 
@@ -576,7 +576,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             $log->info("publishBellTimes: processing request");
@@ -652,7 +652,7 @@ class External_Liss_Server
     {
         $log = self::log();
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             $allData = $message->params[3]->me['array'];
