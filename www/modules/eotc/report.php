@@ -51,25 +51,26 @@ $statuses     = isset($_GET['status'])
         EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
     ];
 $statusList   = EventStatusMapper::getInstance()->findAll();
+
+// get from/to date out
+$dateFrom = (isset($this->arg[1]) && $this->arg[1] != '')
+    ? new Alaress_Date_Format($this->arg[1], Alaress_Date_Format::URL_FORMAT)
+    : null;
+$dateTo   = (isset($this->arg[2]) && $this->arg[2] != '')
+    ? new Alaress_Date_Format($this->arg[2], Alaress_Date_Format::URL_FORMAT)
+    : null;
+
+// No dates at all: set defaults. 'From' will use the review default, 'to' will be blank
+if (!isset($dateFrom) && !isset($dateTo)) {
+    $dateFrom = Alaress_Date_Format::now()->modify(EventStatusMapper::DEFAULT_FROM_DATE_FOR_REVIEW);
+}
+
+// To can't be before from
+if (isset($dateFrom, $dateTo) && $dateTo->lt($dateFrom)) {
+    $dateTo = clone $dateFrom;
+}
+
 if ($timespanType === 'range') {
-    // get from/to date out
-    $dateFrom = (isset($this->arg[1]) && $this->arg[1] != '')
-        ? new Alaress_Date_Format($this->arg[1], Alaress_Date_Format::URL_FORMAT)
-        : null;
-    $dateTo   = (isset($this->arg[2]) && $this->arg[2] != '')
-        ? new Alaress_Date_Format($this->arg[2], Alaress_Date_Format::URL_FORMAT)
-        : null;
-
-    // No dates at all: set defaults. 'From' will use the review default, 'to' will be blank
-    if (!isset($dateFrom) && !isset($dateTo)) {
-        $dateFrom = Alaress_Date_Format::now()->modify(EventStatusMapper::DEFAULT_FROM_DATE_FOR_REVIEW);
-    }
-
-    // To can't be before from
-    if (isset($dateFrom, $dateTo) && $dateTo->lt($dateFrom)) {
-        $dateTo = clone $dateFrom;
-    }
-
     /** @var \EOTC\ListGroup\Collection $allListGroups */
     $allListGroups = $eventMapper->findAllByListGroups(
         $statuses,
