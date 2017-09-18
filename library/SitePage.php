@@ -414,10 +414,23 @@ class SitePage extends Page
             $this->setVar('INSTANTMESSAGE_BLOCK', '');
         }
 
+        $config = new \Schoolbox\Config\Loader();
+
+        /**
+         * Alaress Google Analytics
+         */
+        $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
+        $optIn = $config->get('google_analytics_opt_in');
+
+        if ($optIn) {
+            $this->parse('google_analytics_block', 'google_analytics');
+        } else {
+            $this->setVar('google_analytics_block', '');
+        }
+
         /**
          * Support and Feedback custom link
          */
-        $config = new \Schoolbox\Config\Loader();
         $this->setBlock('footerTpl', 'feedback_link', 'feedback_link_block');
 
         $feedbackText = $config->get('feedback_text');
