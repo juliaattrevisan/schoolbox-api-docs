@@ -370,7 +370,7 @@
                         <span class='hint has-tip tip-top' data-tooltip title="If this is set, the users will only be able to create bookings for this item within the current term.">?</span>
                     </legend>
                     <div class="small-12 columns">
-                        <input type="checkbox" value="{{ item.currentTermRestriction }}" name="current_term_restriction">
+                        <input type="checkbox" value="1" {% if item.currentTermRestriction %}checked{% endif %} id="current_term_restriction" name="current_term_restriction">
                         <label for="current_term_restriction" class="checkbox-label">This item can only be booked during the current term</label>
                     </div>
                 </fieldset>

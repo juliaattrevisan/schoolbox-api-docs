@@ -106,7 +106,7 @@ class Mapper extends BaseMapper
             array(
                 'column'   => 'current_term_restriction',
                 'property' => 'currentTermRestriction',
-                'type'     => self::TYPE_BOOLEAN,
+                'type'     => self::TYPE_INTEGER,
             )
         );
 
