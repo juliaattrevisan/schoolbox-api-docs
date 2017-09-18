@@ -10,6 +10,7 @@
 namespace Schoolbox\ResourceBooking\Item;
 
 use Schoolbox\Collection;
+use Schoolbox\Column\Boolean;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ISoftDeletable;
@@ -72,6 +73,11 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @var Interval
      */
     protected $maxReservationTime;
+
+    /**
+     * @var Boolean
+     */
+    protected $currentTermRestriction;
 
     /**
      * @var Alaress_Date_Format
@@ -207,6 +213,22 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     public function getMaxReservationTime() {
         return $this->maxReservationTime;
+    }
+
+    /**
+     * @param  Boolean $currentTermRestriction
+     * @return $this
+     */
+    public function setCurrentTermRestriction($currentTermRestriction) {
+        $this->currentTermRestriction = $currentTermRestriction;
+        return $this;
+    }
+
+    /**
+     * @return Boolean
+     */
+    public function getCurrentTermRestriction() {
+        return $this->currentTermRestriction;
     }
 
     /**
@@ -451,6 +473,7 @@ class Model implements ISoftDeletable, JsonSerializable {
             'description'          => $this->getDescription(),
             'max_reservation_time' => $this->getMaxReservationTime(),
             'min_reservation_time' => $this->getMinReservationTime(),
+            'currentTermRestriction' => $this->getCurrentTermRestriction(),
             'min_lead_time'        => $this->getMinLeadTime(),
             'moderation_type'      => $this->getModerationType(),
             'moderator_list'       => $this->getModeratorList(),
