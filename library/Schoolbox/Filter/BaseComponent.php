@@ -13,7 +13,7 @@ use Schoolbox\User;
 /**
  * Common logic for Filter Components
  */
-abstract class AbstractComponent implements IComponent
+class BaseComponent implements IComponent
 {
 
     /** @var IDefinition */

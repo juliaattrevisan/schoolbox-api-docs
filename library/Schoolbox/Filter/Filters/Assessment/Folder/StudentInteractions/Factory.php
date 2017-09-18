@@ -43,7 +43,7 @@ class Factory extends FolderFilter\Factory
      * @param GenericCollection      $selections
      * @param null|User              $viewee
      * @param null|GenericCollection $overrides
-     * @return Filter\IComponent|Component
+     * @return Filter\IComponent|FolderFilter\Component
      * @throws DefinitionException if join $name isn't on this mapper
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
@@ -63,9 +63,13 @@ class Factory extends FolderFilter\Factory
             throw new \InvalidArgumentException('$viewee cannot be null for StudentInteraction filter');
         }
 
+        /** @noinspection PhpStatementHasEmptyBodyInspection */
+        /** @noinspection MissingOrEmptyGroupStatementInspection */
         if($options[Definition::KEY_CLASSES]->getAvailable()){
             // TODO insert enrolled classes
         }
+        /** @noinspection PhpStatementHasEmptyBodyInspection */
+        /** @noinspection MissingOrEmptyGroupStatementInspection */
         if($options[Definition::KEY_GROUPS]->getAvailable()){
             // TODO insert enrolled groups
         }
@@ -76,7 +80,7 @@ class Factory extends FolderFilter\Factory
             $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithFeedbackToStudent($viewee), 'id');
         }
 
-        return new Component(
+        return new FolderFilter\Component(
             $definition,
             $user,
             $pageFilter,

@@ -8,6 +8,9 @@
 namespace Schoolbox\Filter;
 
 
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
+
 abstract class AbstractFactory implements IFactory
 {
     /** @var Page\Option\Mapper */
@@ -28,6 +31,26 @@ abstract class AbstractFactory implements IFactory
         $this->optionMapper    = $optionMapper;
         $this->defaultsMapper  = $defaultMapper;
         $this->selectionMapper = $selectionMapper;
+    }
+
+    /**
+     * @param IDefinition     $definition
+     * @param User                   $user
+     * @param Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return IComponent
+     */
+    public function buildComponent(
+        IDefinition $definition,
+        User $user,
+        Page\Model $pageFilter,
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): IComponent {
+        return new BaseComponent($definition, $user, $pageFilter, $overrides ?: $selections, $this->selectionMapper);
     }
 
 

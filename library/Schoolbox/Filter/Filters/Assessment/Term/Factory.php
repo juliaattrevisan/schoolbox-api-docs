@@ -11,6 +11,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\Filter;
+use Schoolbox\User;
 
 /**
  * A factory for building 'Term' filter objects
@@ -38,6 +39,26 @@ abstract class Factory extends AbstractFactory
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->termMapper = $termMapper;
+    }
+
+    /**
+     * @param Filter\IDefinition     $definition
+     * @param User                   $user
+     * @param Filter\Page\Model      $pageFilter
+     * @param GenericCollection      $selections
+     * @param null|User              $viewee
+     * @param null|GenericCollection $overrides
+     * @return Filter\IComponent|Component
+     */
+    public function buildComponent(
+        Filter\IDefinition $definition,
+        User $user,
+        Filter\Page\Model $pageFilter,
+        GenericCollection $selections,
+        User $viewee = null,
+        GenericCollection $overrides = null
+    ): Filter\IComponent {
+        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
     }
 
 

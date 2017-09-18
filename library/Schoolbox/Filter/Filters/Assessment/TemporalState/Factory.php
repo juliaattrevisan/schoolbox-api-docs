@@ -34,26 +34,6 @@ class Factory extends AbstractFactory
         );
     }
 
-    /**
-     * @param Filter\IDefinition     $definition
-     * @param User                   $user
-     * @param Filter\Page\Model      $pageFilter
-     * @param GenericCollection      $selections
-     * @param null|User              $viewee
-     * @param null|GenericCollection $overrides
-     * @return Filter\IComponent|Component
-     */
-    public function buildComponent(
-        Filter\IDefinition $definition,
-        User $user,
-        Filter\Page\Model $pageFilter,
-        GenericCollection $selections,
-        User $viewee = null,
-        GenericCollection $overrides = null
-    ): Filter\IComponent {
-        return new Component($definition, $user, $pageFilter, $overrides ?: $selections, $this->getSelectionMapper());
-    }
-
 
     /**
      * @inheritdoc

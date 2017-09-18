@@ -14,7 +14,7 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 
 
-abstract class Component extends Filter\AbstractComponent
+class Component extends Filter\BaseComponent
 {
 
     /**

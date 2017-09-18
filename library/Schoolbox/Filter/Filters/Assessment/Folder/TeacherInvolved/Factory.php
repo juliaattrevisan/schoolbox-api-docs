@@ -43,7 +43,7 @@ class Factory extends FolderFilter\Factory
      * @param GenericCollection      $selections
      * @param null|User              $viewee
      * @param null|GenericCollection $overrides
-     * @return Filter\IComponent|Component
+     * @return Filter\IComponent|FolderFilter\Component
      * @throws \InvalidArgumentException If $viewee is null
      */
     public function buildComponent(
@@ -92,7 +92,7 @@ class Factory extends FolderFilter\Factory
             }
         }
 
-        return new Component(
+        return new FolderFilter\Component(
             $definition,
             $user,
             $pageFilter,

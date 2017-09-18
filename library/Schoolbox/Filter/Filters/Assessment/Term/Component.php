@@ -15,7 +15,7 @@ use Schoolbox\Assessment\Term;
 /**
  * @method Definition getDefinition()
  */
-abstract class Component extends Filter\AbstractComponent
+class Component extends Filter\BaseComponent
 {
 
     /**
