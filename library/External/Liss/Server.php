@@ -531,16 +531,14 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
         if ($authenticator->isAuthenticated()) {
-            /* Respond without doing anything to avoid errors
-             */
-            $log->info("publishDailyData: unable to process request, not implemented");
+            $allData = $message->params[3]->me['array'];
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
             $log->info("publishDailyData: ".json_encode($allData));
 
             return new xmlrpcresp(new xmlrpcval('Daily Data Imported', 'string'));
         }
+
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
 }
