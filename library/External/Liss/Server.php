@@ -33,6 +33,19 @@
  */
 
 use \Alaress\Lumberjack\Logger;
+use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
+use Schoolbox\UserMapper;
+use Schoolbox\External\ClassEntry;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\TimetableCampusMapper;
+use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetablePeriod;
+use Schoolbox\External\TimetablePeriodMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class External_Liss_Server
 {
@@ -42,22 +55,26 @@ class External_Liss_Server
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
-     *
      * @return object|\Schoolbox\External\TimetableCycle
+     * @throws PDOException
+     * @throws MapperException
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     static public function getCycle()
     {
         $log = self::log();
-        $cycleMapper = new \Schoolbox\External\TimetableCycleMapper();
+        $cycleMapper = new TimetableCycleMapper();
 
         try {
             /* TODO: Assume a particular cycle
              */
             $cycle = $cycleMapper->findById(1);
+
             $log->info("publishBellTimes: Defaulting to using first existing timetable cycle");
-        } catch (\Exception $e) {
+        } catch (MapperException $e) {
             $log->warning("publishBellTimes: Failed to find existing cycle, automatically creating one");
-            $cycle = new \Schoolbox\External\TimetableCycle();
+
+            $cycle = $cycleMapper->createModel();
             $cycle->setTitle('Main Timetable');
 
             /* TODO: Undo these hardcoded values at some point
@@ -70,12 +87,15 @@ class External_Liss_Server
 
             /* Force a timetable_campus record
              */
-            $timetableCampusMapper = new \Schoolbox\External\TimetableCampusMapper();
-            $timetableCampus = new \Schoolbox\External\TimetableCampus();
-            $timetableCampus->setCycle($cycle->getId());
+            $timetableCampusMapper = new TimetableCampusMapper();
+            $timetableCampus = $timetableCampusMapper->createModel();
+            $timetableCampus->setCycle($cycle);
+
+            /** @var Campus $campus */
+            $campus = CampusMapper::getInstance()->findById(1);
 
             $now = new Alaress_Date_Format();
-            $timetableCampus->setCampus(\Schoolbox\CampusMapper::getInstance()->findById(1));
+            $timetableCampus->setCampus($campus);
             $timetableCampus->setStart($now->startOfYear());
             $timetableCampus->setReset(null);
             $timetableCampus->setFinish($now->endOfYear());
@@ -94,41 +114,41 @@ class External_Liss_Server
     public function start()
     {
         new xmlrpc_server(
-            array(
-                'liss.getRooms'                => array(
+            [
+                'liss.getRooms'                => [
                     'function' => 'External_Liss_Server::getRooms'
-                ),
-                'liss.getHello'                => array(
+                ],
+                'liss.getHello'                => [
                     'function' => 'External_Liss_Server::getRooms'
-                ),
-                'liss.publishStudents'         => array(
+                ],
+                'liss.publishStudents'         => [
                     'function' => 'External_Liss_Server::publishStudents',
-                ),
-                'liss.publishTeachers'         => array(
+                ],
+                'liss.publishTeachers'         => [
                     'function' => 'External_Liss_Server::publishTeachers',
-                ),
-                'liss.publishCalendar'         => array(
+                ],
+                'liss.publishCalendar'         => [
                     'function' => 'External_Liss_Server::publishCalendar',
-                ),
-                'liss.publishRooms'         => array(
+                ],
+                'liss.publishRooms'         => [
                     'function' => 'External_Liss_Server::publishRooms',
-                ),
-                'liss.publishBellTimes'        => array(
+                ],
+                'liss.publishBellTimes'        => [
                     'function' => 'External_Liss_Server::publishBellTimes',
-                ),
-                'liss.publishClasses'          => array(
+                ],
+                'liss.publishClasses'          => [
                     'function' => 'External_Liss_Server::publishClasses',
-                ),
-                'liss.publishClassMemberships' => array(
+                ],
+                'liss.publishClassMemberships' => [
                     'function' => 'External_Liss_Server::publishClassMemberships',
-                ),
-                'liss.publishTimetable'        => array(
+                ],
+                'liss.publishTimetable'        => [
                     'function' => 'External_Liss_Server::publishTimetable',
-                ),
-                'liss.publishDailyData'        => array(
+                ],
+                'liss.publishDailyData'        => [
                     'function' => 'External_Liss_Server::publishDailyData'
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -162,11 +182,13 @@ class External_Liss_Server
         return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
     }
 
+
     /**
      * Publish students to the Schoolbox
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws PDOException
      */
     static public function publishClassMemberships(xmlrpcmsg $message)
     {
@@ -176,9 +198,9 @@ class External_Liss_Server
 
         if ($authenticator->isAuthenticated()) {
             $log->info("publishClassMemberships: processing request");
-            $classInvolvementMapper = new \Schoolbox\External\ClassInvolvementMapper();
-            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
-            $userMapper = new \Schoolbox\UserMapper();
+            $classInvolvementMapper = new ClassInvolvementMapper();
+            $classEntryMapper = new ClassEntryMapper();
+            $userMapper = new UserMapper();
 
             $classInvolvementMapper->truncate();
 
@@ -189,18 +211,21 @@ class External_Liss_Server
 
                 try {
                     $user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
+
+                    /** @var ClassEntry $class */
                     $class = $classEntryMapper->findOneByColumn('code', trim((string)$struct['ClassCode']->me['string']));
 
-                    $classInvolvement = new \Schoolbox\External\ClassInvolvement();
+                    $classInvolvement = $classInvolvementMapper->createModel();
                     $classInvolvement->setClass($class);
                     $classInvolvement->setUser($user);
                     $classInvolvementMapper->save($classInvolvement);
-                } catch (\Exception $e) {
+                } catch (MapperException $e) {
                     $log->warning(sprintf("publishClassMemberships: Failed to put student %d in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
                 }
             }
 
             $log->info("publishClassMemberships: completed request");
+
             return new xmlrpcresp(new xmlrpcval('Class Memberships imported', 'string'));
         }
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
@@ -312,11 +337,14 @@ class External_Liss_Server
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
 
+
     /**
      * Publish classes to the Schoolbox
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws MapperException
+     * @throws PDOException
      */
     static public function publishClasses(xmlrpcmsg $message)
     {
@@ -328,11 +356,9 @@ class External_Liss_Server
 
             $log->info("publishClasses: processing request");
 
-            $academicYear = $message->params[1];
-
             /* Truncate everything before re-adding
              */
-            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+            $classEntryMapper = new ClassEntryMapper();
             $classEntryMapper->truncate();
 
             $allData = $message->params[2]->me['array'];
@@ -341,7 +367,7 @@ class External_Liss_Server
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
 
-                $classEntry = new \Schoolbox\External\ClassEntry();
+                $classEntry = $classEntryMapper->createModel();
                 $classEntry->setName((string)$struct['CourseName']->me['string']);
                 $classEntry->setCode(trim((string)$struct['ClassCode']->me['string']));
                 $classEntry->setDescription('');
@@ -357,11 +383,14 @@ class External_Liss_Server
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
 
+
     /**
      * Publish timetable to the Schoolbox
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\Exception
      */
     static public function publishTimetable(xmlrpcmsg $message)
     {
@@ -373,13 +402,13 @@ class External_Liss_Server
 
             $log->info("publishTimetable: processing request");
 
-            $timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
-            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
-            $userMapper = new \Schoolbox\UserMapper();
+            $timetablePeriodMapper = new TimetablePeriodMapper();
+            $classEntryMapper = new ClassEntryMapper();
+            $userMapper = new UserMapper();
 
             /* Truncate everything before re-adding
              */
-            $classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
+            $classPeriodMapper = new ClassPeriodMapper();
             $classPeriodMapper->truncate();
 
             /* TODO: Default user for testing
@@ -393,12 +422,10 @@ class External_Liss_Server
 
                 /* Find the Period data
                  */
-                $allPeriods = $timetablePeriodMapper->findByColumnList(
-                    array(
-                        'day'   => trim((string)$struct['DayNumber']->me['i4']),
-                        'title' => trim((string)$struct['Period']->me['string'])
-                    )
-                );
+                $allPeriods = $timetablePeriodMapper->findByColumnList([
+                    'day'   => trim((string)$struct['DayNumber']->me['i4']),
+                    'title' => trim((string)$struct['Period']->me['string'])
+                ]);
 
                 /* Find the Class
                  */
@@ -418,43 +445,52 @@ class External_Liss_Server
                  * Save it!
                  */
                 if ($allPeriods->count() && $allClasses->count() && $allTeachers->count()) {
-                    $classPeriod = new \Schoolbox\External\ClassPeriod();
+                    $classPeriod = $classPeriodMapper->createModel();
                     $classPeriod->setClass($allClasses->first()->getId());
                     $classPeriod->setPeriod($allPeriods->first()->getId());
                     $classPeriod->setTeacher($allTeachers->first()->getId());
                     $classPeriod->setRoom((string)$struct['RoomCode']->me['string']);
                     $classPeriodMapper->save($classPeriod);
-                } /* These ones are broken */
+                }
                 else {
+
+                    /* These ones are broken */
                     if ($allPeriods->count() == 0) {
                         $log->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
                     }
+
                     if ($allClasses->count() == 0) {
                         $log->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
                     }
+
                     if ($allTeachers->count() == 0) {
                         $log->warning(sprintf("publishTimetable: Failed to find teacher %s", trim($struct['TeacherCode']->me['string'])));
                     }
                 }
             }
+
             $log->info("publishTimetable: completed request");
 
             return new xmlrpcresp(new xmlrpcval('Timetable Imported', 'string'));
         }
+
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
+
 
     /**
      * Publish timetable to the Schoolbox
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     static public function publishBellTimes(xmlrpcmsg $message)
     {
         $log = self::log();
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
-        $ttStructure = $message->params[1];
 
         if ($authenticator->isAuthenticated()) {
             $log->info("publishBellTimes: processing request");
@@ -463,22 +499,23 @@ class External_Liss_Server
             $allData = $message->params[2]->me['array'];
 
             /* Truncate everything before re-adding */
-            $timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+            $timetablePeriodMapper = new TimetablePeriodMapper();
             $timetablePeriodMapper->truncate();
 
-            $collection = new \Schoolbox\Collection();
+            $collection = new Collection();
 
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
 
                 $dayNumber = (string)$struct['DayNumber']->me['i4'];
 
-                $timetablePeriod = new \Schoolbox\External\TimetablePeriod();
+                /** @var TimetablePeriod $timetablePeriod */
+                $timetablePeriod = $timetablePeriodMapper->createModel();
                 $timetablePeriod->setCycle($cycle->getId());
                 $timetablePeriod->setTitle((string)$struct['Period']->me['string']);
                 $timetablePeriod->setDay($dayNumber);
-                $timetablePeriod->setStart((string)$struct['StartTime']->me['string']);
-                $timetablePeriod->setFinish((string)$struct['EndTime']->me['string']);
+                $timetablePeriod->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'h:i'));
+                $timetablePeriod->setFinish(new \Alaress_Date_Format((string)$struct['EndTime']->me['string'], 'h:i'));
 
                 /* TODO: Undo these hardcoded values at some point
                   */
@@ -486,8 +523,8 @@ class External_Liss_Server
 
                 /* Start a collection for a day, if it's not already a collection
                  */
-                if (!($collection->getOffset($dayNumber) instanceof \Schoolbox\Collection)) {
-                    $collection->setOffset($dayNumber, new \Schoolbox\Collection());
+                if (!($collection->getOffset($dayNumber) instanceof Collection)) {
+                    $collection->setOffset($dayNumber, new Collection());
                 }
 
                 $collection->getOffset($dayNumber)->add($timetablePeriod);
@@ -495,8 +532,7 @@ class External_Liss_Server
 
             $collection->reindex();
 
-            $log->info(sprintf("publishBellTimes: Collated %d days and %d periods into timetable structure",$collection->count(), $collection->first()->count()));
-
+            $log->info(sprintf("publishBellTimes: Collated %d days and %d periods into timetable structure", $collection->count(), $collection->first()->count()));
 
             foreach ($collection as $dayCollection) {
                 $i = 0;
@@ -508,7 +544,7 @@ class External_Liss_Server
                     $i++;
                 }
             }
-            $log->info(sprintf("publishBellTimes: Saved timetable periods, process completed",$collection->count()));
+            $log->info(sprintf("publishBellTimes: Saved timetable periods, process completed", $collection->count()));
 
             return new xmlrpcresp(new xmlrpcval('BellTimes Imported', 'string'));
         }
@@ -531,16 +567,14 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
         if ($authenticator->isAuthenticated()) {
-            /* Respond without doing anything to avoid errors
-             */
-            $log->info("publishDailyData: unable to process request, not implemented");
+            $allData = $message->params[3]->me['array'];
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
             $log->info("publishDailyData: ".json_encode($allData));
 
             return new xmlrpcresp(new xmlrpcval('Daily Data Imported', 'string'));
         }
+
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
 }
