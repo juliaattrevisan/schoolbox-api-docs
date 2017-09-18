@@ -40,10 +40,13 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriod;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class External_Liss_Server
@@ -398,13 +401,13 @@ class External_Liss_Server
 
             $log->info("publishTimetable: processing request");
 
-            $timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
-            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
-            $userMapper = new \Schoolbox\UserMapper();
+            $timetablePeriodMapper = new TimetablePeriodMapper();
+            $classEntryMapper = new ClassEntryMapper();
+            $userMapper = new UserMapper();
 
             /* Truncate everything before re-adding
              */
-            $classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
+            $classPeriodMapper = new ClassPeriodMapper();
             $classPeriodMapper->truncate();
 
             /* TODO: Default user for testing
@@ -418,12 +421,10 @@ class External_Liss_Server
 
                 /* Find the Period data
                  */
-                $allPeriods = $timetablePeriodMapper->findByColumnList(
-                    array(
-                        'day'   => trim((string)$struct['DayNumber']->me['i4']),
-                        'title' => trim((string)$struct['Period']->me['string'])
-                    )
-                );
+                $allPeriods = $timetablePeriodMapper->findByColumnList([
+                    'day'   => trim((string)$struct['DayNumber']->me['i4']),
+                    'title' => trim((string)$struct['Period']->me['string'])
+                ]);
 
                 /* Find the Class
                  */
@@ -443,29 +444,35 @@ class External_Liss_Server
                  * Save it!
                  */
                 if ($allPeriods->count() && $allClasses->count() && $allTeachers->count()) {
-                    $classPeriod = new \Schoolbox\External\ClassPeriod();
+                    $classPeriod = new ClassPeriod();
                     $classPeriod->setClass($allClasses->first()->getId());
                     $classPeriod->setPeriod($allPeriods->first()->getId());
                     $classPeriod->setTeacher($allTeachers->first()->getId());
                     $classPeriod->setRoom((string)$struct['RoomCode']->me['string']);
                     $classPeriodMapper->save($classPeriod);
-                } /* These ones are broken */
+                }
                 else {
+
+                    /* These ones are broken */
                     if ($allPeriods->count() == 0) {
                         $log->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
                     }
+
                     if ($allClasses->count() == 0) {
                         $log->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
                     }
+
                     if ($allTeachers->count() == 0) {
                         $log->warning(sprintf("publishTimetable: Failed to find teacher %s", trim($struct['TeacherCode']->me['string'])));
                     }
                 }
             }
+
             $log->info("publishTimetable: completed request");
 
             return new xmlrpcresp(new xmlrpcval('Timetable Imported', 'string'));
         }
+
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
 
