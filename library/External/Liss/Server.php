@@ -114,41 +114,41 @@ class External_Liss_Server
     public function start()
     {
         new xmlrpc_server(
-            array(
-                'liss.getRooms'                => array(
+            [
+                'liss.getRooms'                => [
                     'function' => 'External_Liss_Server::getRooms'
-                ),
-                'liss.getHello'                => array(
+                ],
+                'liss.getHello'                => [
                     'function' => 'External_Liss_Server::getRooms'
-                ),
-                'liss.publishStudents'         => array(
+                ],
+                'liss.publishStudents'         => [
                     'function' => 'External_Liss_Server::publishStudents',
-                ),
-                'liss.publishTeachers'         => array(
+                ],
+                'liss.publishTeachers'         => [
                     'function' => 'External_Liss_Server::publishTeachers',
-                ),
-                'liss.publishCalendar'         => array(
+                ],
+                'liss.publishCalendar'         => [
                     'function' => 'External_Liss_Server::publishCalendar',
-                ),
-                'liss.publishRooms'         => array(
+                ],
+                'liss.publishRooms'         => [
                     'function' => 'External_Liss_Server::publishRooms',
-                ),
-                'liss.publishBellTimes'        => array(
+                ],
+                'liss.publishBellTimes'        => [
                     'function' => 'External_Liss_Server::publishBellTimes',
-                ),
-                'liss.publishClasses'          => array(
+                ],
+                'liss.publishClasses'          => [
                     'function' => 'External_Liss_Server::publishClasses',
-                ),
-                'liss.publishClassMemberships' => array(
+                ],
+                'liss.publishClassMemberships' => [
                     'function' => 'External_Liss_Server::publishClassMemberships',
-                ),
-                'liss.publishTimetable'        => array(
+                ],
+                'liss.publishTimetable'        => [
                     'function' => 'External_Liss_Server::publishTimetable',
-                ),
-                'liss.publishDailyData'        => array(
+                ],
+                'liss.publishDailyData'        => [
                     'function' => 'External_Liss_Server::publishDailyData'
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -182,11 +182,13 @@ class External_Liss_Server
         return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
     }
 
+
     /**
      * Publish students to the Schoolbox
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws PDOException
      */
     static public function publishClassMemberships(xmlrpcmsg $message)
     {
@@ -217,7 +219,7 @@ class External_Liss_Server
                     $classInvolvement->setClass($class);
                     $classInvolvement->setUser($user);
                     $classInvolvementMapper->save($classInvolvement);
-                } catch (\Exception $e) {
+                } catch (MapperException $e) {
                     $log->warning(sprintf("publishClassMemberships: Failed to put student %d in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
                 }
             }
@@ -341,6 +343,7 @@ class External_Liss_Server
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws MapperException
      * @throws PDOException
      */
     static public function publishClasses(xmlrpcmsg $message)
