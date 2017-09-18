@@ -126,10 +126,12 @@ class External_Liss_Authenticator
      * Set password
      *
      * @param string $password
+     * @return $this
      */
     private function setPassword($password)
     {
         $this->password = $password;
+        return $this;
     }
 
     /**
@@ -146,10 +148,12 @@ class External_Liss_Authenticator
      * Set username
      *
      * @param string $username
+     * @return $this
      */
     private function setUsername($username)
     {
         $this->username = $username;
+        return $this;
     }
 
     /**
@@ -166,10 +170,12 @@ class External_Liss_Authenticator
      * Set school code
      *
      * @param string $schoolCode
+     * @return $this
      */
     private function setSchoolCode($schoolCode)
     {
         $this->schoolCode = $schoolCode;
+        return $this;
     }
 
     /**
@@ -192,10 +198,12 @@ class External_Liss_Authenticator
 
     /**
      * @param Logger $log
+     * @return $this
      */
     public function setLog(Logger $log)
     {
         $this->log = $log;
+        return $this;
     }
 
     /**
