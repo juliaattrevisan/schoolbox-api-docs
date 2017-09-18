@@ -352,8 +352,6 @@ class External_Liss_Server
 
             $log->info("publishClasses: processing request");
 
-            $academicYear = $message->params[1];
-
             /* Truncate everything before re-adding
              */
             $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
