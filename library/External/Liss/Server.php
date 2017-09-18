@@ -78,7 +78,7 @@ class External_Liss_Server
         } catch (MapperException $e) {
             $log->warning("publishBellTimes: Failed to find existing cycle, automatically creating one");
 
-            $cycle = new TimetableCycle();
+            $cycle = $cycleMapper->createModel();
             $cycle->setTitle('Main Timetable');
 
             /* TODO: Undo these hardcoded values at some point
@@ -92,7 +92,7 @@ class External_Liss_Server
             /* Force a timetable_campus record
              */
             $timetableCampusMapper = new TimetableCampusMapper();
-            $timetableCampus = new TimetableCampus();
+            $timetableCampus = $timetableCampusMapper->createModel();
             $timetableCampus->setCycle($cycle);
 
             /** @var Campus $campus */
@@ -217,7 +217,7 @@ class External_Liss_Server
                     /** @var ClassEntry $class */
                     $class = $classEntryMapper->findOneByColumn('code', trim((string)$struct['ClassCode']->me['string']));
 
-                    $classInvolvement = new ClassInvolvement();
+                    $classInvolvement = $classInvolvementMapper->createModel();
                     $classInvolvement->setClass($class);
                     $classInvolvement->setUser($user);
                     $classInvolvementMapper->save($classInvolvement);
@@ -359,7 +359,7 @@ class External_Liss_Server
 
             /* Truncate everything before re-adding
              */
-            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+            $classEntryMapper = new ClassEntryMapper();
             $classEntryMapper->truncate();
 
             $allData = $message->params[2]->me['array'];
@@ -368,7 +368,7 @@ class External_Liss_Server
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
 
-                $classEntry = new \Schoolbox\External\ClassEntry();
+                $classEntry = $classEntryMapper->createModel();
                 $classEntry->setName((string)$struct['CourseName']->me['string']);
                 $classEntry->setCode(trim((string)$struct['ClassCode']->me['string']));
                 $classEntry->setDescription('');
@@ -446,7 +446,7 @@ class External_Liss_Server
                  * Save it!
                  */
                 if ($allPeriods->count() && $allClasses->count() && $allTeachers->count()) {
-                    $classPeriod = new ClassPeriod();
+                    $classPeriod = $classPeriodMapper->createModel();
                     $classPeriod->setClass($allClasses->first()->getId());
                     $classPeriod->setPeriod($allPeriods->first()->getId());
                     $classPeriod->setTeacher($allTeachers->first()->getId());
@@ -511,7 +511,7 @@ class External_Liss_Server
                 $dayNumber = (string)$struct['DayNumber']->me['i4'];
 
                 /** @var TimetablePeriod $timetablePeriod */
-                $timetablePeriod = new TimetablePeriod();
+                $timetablePeriod = $timetablePeriodMapper->createModel();
                 $timetablePeriod->setCycle($cycle->getId());
                 $timetablePeriod->setTitle((string)$struct['Period']->me['string']);
                 $timetablePeriod->setDay($dayNumber);
