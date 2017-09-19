@@ -92,10 +92,10 @@ class Factory extends NullableContext\Factory
             }
         }
 
-        // Note: '-1' is a hack to mean 'INVALID', to force no group folders to be matched.
-        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : -1;
+        // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
+        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_FULL + 1;
 
-        $folders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, true);
+        $folders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, false);
 
         /* If we inserted an extra folder/s, we need to also insert any units imported to that folder,
          * otherwise any assessments inside units imported to the extra folder will never be visible.
