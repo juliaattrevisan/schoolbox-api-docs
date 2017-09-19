@@ -48,7 +48,7 @@ class Notifier extends ResourceNotifier {
 		$heading = $this->getResourceName($resource);
 		$href = "/homepage/".$category->getId()."/#textbox".$resourceId;
 
-		$bob->setTitle(":author $action content in :homepage: \":heading\"")
+		$bob->setTitle(":author $action content in :homepage \":heading\"")
 		    ->setParams(array(
 			    'author'   => new UserParam($effector),
 			    'homepage' => new CategoryParam($category),
@@ -123,7 +123,7 @@ class Notifier extends ResourceNotifier {
 	 */
 	protected function getResourceName($resource) {
         if (empty($resource->getHeading())) {
-            return "New text box";
+            return "Text Box";
         } else {
             return $resource->getHeading();
         }
