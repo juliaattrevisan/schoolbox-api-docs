@@ -83,6 +83,14 @@ interface IBroker extends IQuoter
      */
     public function disconnect();
 
+    /**
+     * Set the timezone on the DB connection
+     * @param string $timezone
+     * @return bool
+     */
+    public function setTimezone($timezone);
+
+
     // ----------------------------------------------------------------------------------------------------------------
     // Database query execution
     // ----------------------------------------------------------------------------------------------------------------

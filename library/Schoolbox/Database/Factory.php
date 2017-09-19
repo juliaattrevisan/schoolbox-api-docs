@@ -67,6 +67,7 @@ class Factory
 
     /**
      * Retrieve a connection to Schoolbox database
+     * @return IConnector
      */
     public function getInternalDatabase()
     {
@@ -76,6 +77,7 @@ class Factory
             throw new DatabaseException("Unable to connect to Schoolbox database.");
         }
 
+        $connectorInternal->setTimezone($this->fetchTimezone($connectorInternal));
         return $connectorInternal;
     }
 
@@ -128,8 +130,23 @@ class Factory
             $config['external_db_host'],
             $config['external_db_db'],
             $config['external_db_user'],
-            $config['external_db_passwd']);
+            $config['external_db_passwd']
+        );
 
         return $connectorExternal;
+    }
+
+    /**
+     * Fetch the timezone from the database we are connecting to
+     *
+     * @param IConnector $connectorInternal
+     * @return string Timezone
+     */
+    private function fetchTimezone(IConnector $connectorInternal)
+    {
+        $statement = $connectorInternal->prepareQuery("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
+        $statement->execute();
+        $result = $statement->fetchColumn();
+        return $result;
     }
 }

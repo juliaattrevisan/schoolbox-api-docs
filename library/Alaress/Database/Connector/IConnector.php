@@ -56,6 +56,13 @@ interface IConnector extends IQuoter
      */
     public function disableMultipleActiveResultSets();
 
+    /**
+     * Set the timezone on the connection (Note this is only appplicable on MySQL connections)
+     *
+     * @param string $timezone A valid timezone
+     */
+    public function setTimezone($timezone);
+
     // ----------------------------------------------------------------------------------------------------------------
     // Query preparation functions
     // ----------------------------------------------------------------------------------------------------------------

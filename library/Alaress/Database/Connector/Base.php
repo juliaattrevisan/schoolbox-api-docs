@@ -96,6 +96,17 @@ class Base implements Serializable, IConnector
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     *
+     * @param string $timezone A valid timezone
+     */
+    public function setTimezone($timezone)
+    {
+        $this->broker->setTimezone($timezone);
+        return $this;
+    }
+
     // ----------------------------------------------------------------------------------------------------------------
     // Getters for the immutable properties
     // ----------------------------------------------------------------------------------------------------------------

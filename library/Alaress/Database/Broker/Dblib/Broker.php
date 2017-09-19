@@ -62,6 +62,18 @@ class Broker extends Base implements IBroker
         return parent::connect($options);
     }
 
+    /**
+     * Attempt to set the connection's timezone.
+     *
+     * @param string $timezone A valid timezone.
+     * @return bool
+     */
+    public function setTimezone($timezone)
+    {
+        return true;
+    }
+
+
     // These return MSSQL specific statement objects
 
     /**
