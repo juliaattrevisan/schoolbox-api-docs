@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as StudentSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
+use Schoolbox\GenericCollection;
 
 /**
  * Class ReturnedWorkMapper
@@ -30,6 +31,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as 
  * @method ReturnedWork findById($id)
  * @method ReturnedWork hydrate(array $row, $alias = '', $callback = null)
  * @method ReturnedWork createModel($idValue = null)
+ * @method GenericCollection|ReturnedWork[] createCollection($contents = [])
  */
 class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessment\IActivityMapper
 {
@@ -130,7 +132,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|ReturnedWork[]
      * @throws Schoolbox\Mapper\Exception
      */
     protected function hydrateSelect(\PDOStatement $statement)
@@ -138,8 +140,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $markerMapper = $this->getJoinMapper('marker');
         $submissionMapper = $this->getJoinMapper('submission');
 
-        /** @var ReturnedWork[] $collection */
-        $collection = new Collection();
+        $collection = $this->createCollection();
         $ids        = [];
 
         foreach ($statement as $row) {
