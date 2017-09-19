@@ -334,25 +334,17 @@ class Controller extends Base
          *
          * Find out if plagscan is up
          */
-        if (strlen($plagscan->getInteractiveUrl())) {
-            $client = new Client([
-                "base_uri"    => '',
-                "timeout"     => 20.0,
-                "http_errors" => false
-            ]);
 
-            try {
-                $client->get($plagscan->getInteractiveUrl());
+        try {
+            $mapper = PlagscanMapper::getInstance();
+            $interactiveUrl = $mapper->getConnector()->fetchInteractiveReportUrl($plagscan->getPlagscanId());
+            if (strlen($interactiveUrl)) {
+                $plagscan->setInteractiveUrl($interactiveUrl);
                 $interactiveAvailable = true;
             }
-            catch (TransferException $e) {
 
-                /* Could log this as an error?
-                 * Plagscan interactive report url not available
-                 *
-                 * noop
-                 */
-            }
+        } catch (Exception $e) {
+            //noop
         }
 
         $data = [
