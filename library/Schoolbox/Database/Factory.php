@@ -136,7 +136,8 @@ class Factory
         return $connectorExternal;
     }
 
-    /** Fetch the timezone from the database we are connecting to
+    /**
+     * Fetch the timezone from the database we are connecting to
      *
      * @param IConnector $connectorInternal
      * @return string Timezone

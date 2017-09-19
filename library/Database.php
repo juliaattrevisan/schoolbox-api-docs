@@ -167,7 +167,7 @@ class Database implements IDatabase, Serializable, IQuoter
     /**
      * Attempt to set the connection's timezone.
      *
-     * @param string $timezone A valid timezone.
+     * @param string $timezone A valid timezone
      * @return bool
      * @throws PDOException if the timezone can't be set
      */
@@ -178,10 +178,12 @@ class Database implements IDatabase, Serializable, IQuoter
             ->execute([$timezone]);
     }
 
-    /** Fetch the timezone from the database we are connecting to
+    /**
+     * Fetch the timezone from the database we are connecting to
+     *
      * @return string Timezone
      */
-    public function fetchTimezone()
+    private function fetchTimezone()
     {
         $statement = $this->connection->prepare("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
         $statement->execute();

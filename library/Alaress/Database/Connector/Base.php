@@ -98,6 +98,8 @@ class Base implements Serializable, IConnector
 
     /**
      * @inheritdoc
+     *
+     * @param string $timezone A valid timezone
      */
     public function setTimezone($timezone)
     {
