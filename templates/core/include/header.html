@@ -134,5 +134,9 @@
             'dimension5': 'year_level'
         }
     });
+
+    // Send custom dimension events
+    gtag('event', 'site_school_code_dimension', {'site_school_code': '{SITE_SCHOOL_CODE}'});
+    gtag('event', 'site_type_dimension', {'site_type': '{SITE_TYPE}'});
 </script>
 <!-- END google_analytics -->

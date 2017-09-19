@@ -422,6 +422,11 @@ class SitePage extends Page
         $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
         $optIn = $config->get('google_analytics_opt_in');
 
+        $this->setVar([
+            'SITE_SCHOOL_CODE' => $config->get('site_school_code'),
+            'SITE_TYPE' => $config->get('site_type'),
+        ]);
+
         if ($optIn) {
             $this->parse('google_analytics_block', 'google_analytics');
         } else {
