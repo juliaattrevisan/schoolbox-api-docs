@@ -104,9 +104,6 @@ class Module extends BaseModule
                 if ($params['assessment'] instanceof IAssessable) {
                     return $params['assessment']->getContext()->getFolder()->getId();
                 }
-                if ($params['contextId']) {
-                    return $params['contextId'];
-                }
                 throw new Unauthorized();
             },
             Access::getInstance()
