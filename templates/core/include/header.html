@@ -131,13 +131,15 @@
             'dimension2': 'site_type',
             'dimension3': 'role_name',
             'dimension4': 'role_type',
-            'dimension5': 'user_year'
+            'dimension5': 'user_year',
+            'dimension6': 'site_version'
         }
     });
 
     // Send custom dimension events
     gtag('event', 'site_school_code_dimension', {'site_school_code': '{SITE_SCHOOL_CODE}'});
     gtag('event', 'site_type_dimension', {'site_type': '{SITE_TYPE}'});
+    gtag('event', 'site_version_dimension', {'site_version': '{SITE_VERSION}'});
     gtag('event', 'role_name_dimension', {'role_name': '{ROLE_NAME}'});
     gtag('event', 'role_type_dimension', {'role_type': '{ROLE_TYPE}'});
     <!-- BEGIN ga_year_event -->
