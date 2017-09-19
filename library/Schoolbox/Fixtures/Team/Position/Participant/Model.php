@@ -9,8 +9,9 @@
  */
 namespace Schoolbox\Fixtures\Team\Position\Participant;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use \Schoolbox\User as User;
+use \Schoolbox\User;
 use \Schoolbox\Fixtures\Match\Model as Match;
 use \Schoolbox\Fixtures\Team\Model as Team;
 
@@ -19,7 +20,7 @@ use \Schoolbox\Fixtures\Team\Model as Team;
  *
  * @package Schoolbox\Fixtures\Team\Player\Participant
  */
-class Model
+class Model implements ISoftDeletable
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;

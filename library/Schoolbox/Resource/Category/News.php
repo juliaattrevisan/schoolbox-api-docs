@@ -10,10 +10,11 @@
 namespace Schoolbox\Resource\Category;
 
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
-class News {
+class News implements ISoftDeletable {
 
 	/** @var int */
 	protected $id;
@@ -169,7 +170,16 @@ class News {
 	}
 
 
-	/**
+    /**
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return (bool)$this->getDeleted();
+    }
+
+
+    /**
 	 * @param Folder $category
 	 * @return self
 	 */

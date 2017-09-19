@@ -10,12 +10,13 @@
 
 namespace Schoolbox\File;
 use Config;
+use Schoolbox\ISoftDeletable;
 
 /**
  * Class Mimetype
  * @package Schoolbox\File
  */
-class Mimetype {
+class Mimetype implements ISoftDeletable {
 
 	/**
 	 * Allowed File id

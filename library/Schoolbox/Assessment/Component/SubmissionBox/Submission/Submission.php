@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -31,7 +32,7 @@ use Schoolbox\User;
  *
  * TODO remove IStorage once all uses are found and removed
  */
-class Submission implements IStorage
+class Submission implements IStorage, ISoftDeletable
 {
     use Id;
     use CreatedAtDate;

@@ -9,13 +9,14 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\GenericCollection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 
-class Task implements IAssessableDataModel
+class Task implements IAssessableDataModel, ISoftDeletable
 {
     use AssessmentModelTrait;
     use Id;

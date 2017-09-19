@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Fixtures\Coach;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\User;
 
@@ -14,7 +15,7 @@ use Schoolbox\User;
  * Class Model
  * @package Schoolbox\Fixtures\Coach
  */
-class Model implements \JsonSerializable
+class Model implements \JsonSerializable, ISoftDeletable
 {
     const PREFIX_EXISTING_TAG   = 'existing';
     const PREFIX_NEW_FROM_USER  = 'newFromUser';

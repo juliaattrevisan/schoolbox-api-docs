@@ -97,7 +97,6 @@ class UserMapper extends Mapper
         $this->uses('hide_notifications_tray', self::TYPE_BOOLEAN);
         $this->uses('display_grade_graph', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->hasSoftDeleteDateField('deleted_at');
 
         $this->joins('house', HouseMapper::class, 'id', null, null, 'schoolHouse', 'schoolHouse');
         $this->joins('residential_house_id', HouseResidentialMapper::class, 'id', null, null, 'residentialHouse', 'residentialHouse');
