@@ -338,7 +338,7 @@ class Controller extends Base
                 $interactiveAvailable = true;
             }
 
-        } catch (\Exception $e) {
+        } catch (\LogicException $e) {
             //noop
         }
 
