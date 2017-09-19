@@ -47,6 +47,7 @@ use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
+
 class External_Liss_Server
 {
     /**
@@ -123,6 +124,7 @@ class External_Liss_Server
         return $cycle;
     }
 
+
     /**
      * Start the Liss server with the list of available methods
      * and signatures here
@@ -131,42 +133,43 @@ class External_Liss_Server
     {
         new xmlrpc_server(
             [
-                'liss.getRooms'                => [
+                'liss.getRooms' => [
                     'function' => 'External_Liss_Server::getRooms'
                 ],
-                'liss.getHello'                => [
+                'liss.getHello' => [
                     'function' => 'External_Liss_Server::getRooms'
                 ],
-                'liss.publishStudents'         => [
+                'liss.publishStudents' => [
                     'function' => 'External_Liss_Server::publishStudents',
                 ],
-                'liss.publishTeachers'         => [
+                'liss.publishTeachers' => [
                     'function' => 'External_Liss_Server::publishTeachers',
                 ],
-                'liss.publishCalendar'         => [
+                'liss.publishCalendar' => [
                     'function' => 'External_Liss_Server::publishCalendar',
                 ],
-                'liss.publishRooms'         => [
+                'liss.publishRooms' => [
                     'function' => 'External_Liss_Server::publishRooms',
                 ],
-                'liss.publishBellTimes'        => [
+                'liss.publishBellTimes' => [
                     'function' => 'External_Liss_Server::publishBellTimes',
                 ],
-                'liss.publishClasses'          => [
+                'liss.publishClasses' => [
                     'function' => 'External_Liss_Server::publishClasses',
                 ],
                 'liss.publishClassMemberships' => [
                     'function' => 'External_Liss_Server::publishClassMemberships',
                 ],
-                'liss.publishTimetable'        => [
+                'liss.publishTimetable' => [
                     'function' => 'External_Liss_Server::publishTimetable',
                 ],
-                'liss.publishDailyData'        => [
+                'liss.publishDailyData' => [
                     'function' => 'External_Liss_Server::publishDailyData'
                 ],
             ]
         );
     }
+
 
     /**
      * Spawn a log message
@@ -177,6 +180,7 @@ class External_Liss_Server
         $logFile = fopen(Cfg::get('logs_dir') . '/liss.log', 'a');
         return $log = new Logger($logFile, $logFile, Monolog\Logger::INFO, [], true);
     }
+
 
     /**
      * getRooms() is required to connect to the LissTester from
@@ -226,7 +230,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             $log->info("publishClassMemberships: processing request");
@@ -281,7 +285,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -290,7 +294,7 @@ class External_Liss_Server
 
             /* Log data for use */
             $allData = $message->params[1]->me['array'];
-            $log->info("publishTeachers: ".json_encode($allData));
+            $log->info("publishTeachers: " . json_encode($allData));
 
             return self::generateResponse('Teachers Imported');
         }
@@ -315,7 +319,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -324,7 +328,7 @@ class External_Liss_Server
 
             /* Log data for use */
             $allData = $message->params[1]->me['array'];
-            $log->info("publishStudents: ".json_encode($allData));
+            $log->info("publishStudents: " . json_encode($allData));
 
             return self::generateResponse('Students Imported');
         }
@@ -349,7 +353,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -358,7 +362,7 @@ class External_Liss_Server
 
             /* Log data for use */
             $allData = $message->params[1]->me['array'];
-            $log->info("publishCalendar: ".json_encode($allData));
+            $log->info("publishCalendar: " . json_encode($allData));
 
             return self::generateResponse('Calendar Imported');
         }
@@ -383,7 +387,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -393,7 +397,7 @@ class External_Liss_Server
 
             /* Log data for use */
             $allData = $message->params[1]->me['array'];
-            $log->info("publishRooms: ".json_encode($allData));
+            $log->info("publishRooms: " . json_encode($allData));
 
             return self::generateResponse('Rooms Imported');
         }
@@ -421,7 +425,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
 
@@ -474,7 +478,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
 
@@ -501,7 +505,7 @@ class External_Liss_Server
                 /* Find the Period data
                  */
                 $allPeriods = $timetablePeriodMapper->findByColumnList([
-                    'day'   => trim((string)$struct['DayNumber']->me['i4']),
+                    'day' => trim((string)$struct['DayNumber']->me['i4']),
                     'title' => trim((string)$struct['Period']->me['string'])
                 ]);
 
@@ -529,8 +533,7 @@ class External_Liss_Server
                     $classPeriod->setTeacher($allTeachers->first()->getId());
                     $classPeriod->setRoom((string)$struct['RoomCode']->me['string']);
                     $classPeriodMapper->save($classPeriod);
-                }
-                else {
+                } else {
 
                     /* These ones are broken */
                     if ($allPeriods->count() == 0) {
@@ -576,7 +579,7 @@ class External_Liss_Server
             return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             $log->info("publishBellTimes: processing request");
@@ -652,13 +655,13 @@ class External_Liss_Server
     {
         $log = self::log();
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             $allData = $message->params[3]->me['array'];
 
             /* Log data for use */
-            $log->info("publishDailyData: ".json_encode($allData));
+            $log->info("publishDailyData: " . json_encode($allData));
 
             return self::generateResponse('Daily Data Imported');
         }

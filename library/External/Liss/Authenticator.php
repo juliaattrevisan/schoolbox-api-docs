@@ -2,13 +2,14 @@
 
 use Alaress\Lumberjack\Logger;
 
+use Schoolbox\Config\Loader as ConfigLoader;
+
 /**
  * Authenticator
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class External_Liss_Authenticator
 {
@@ -48,15 +49,23 @@ class External_Liss_Authenticator
     private $log;
 
     /**
-     * Constructor
-     *
-     * @param $dataObject
-     * @param Logger $log
+     * @var ConfigLoader
      */
-    public function __construct(xmlrpcval $dataObject, Logger $log)
+    private $configLoader;
+
+    /**
+     * External_Liss_Authenticator constructor.
+     *
+     * @param xmlrpcval    $dataObject
+     * @param Logger       $log
+     * @param ConfigLoader $configLoader
+     */
+    public function __construct(xmlrpcval $dataObject, Logger $log, ConfigLoader $configLoader)
     {
         $this->setDataObject($dataObject);
         $this->setLog($log);
+        $this->setConfigLoader($configLoader);
+
         $this->setup();
     }
 
@@ -65,9 +74,9 @@ class External_Liss_Authenticator
      */
     protected function setup()
     {
-        $this->setUsername(\Cfg::get('external_liss_username'));
-        $this->setPassword(\Cfg::get('external_liss_password'));
-        $this->setSchoolCode(\Cfg::get('external_liss_schoolcode'));
+        $this->setUsername($this->getConfigLoader()->get('external_liss_username'));
+        $this->setPassword($this->getConfigLoader()->get('external_liss_password'));
+        $this->setSchoolCode($this->getConfigLoader()->get('external_liss_schoolcode'));
     }
 
     /**
@@ -80,13 +89,14 @@ class External_Liss_Authenticator
 
         $isUsernameCorrect = (string)$struct['UserName']->me['string'] == $this->getUsername();
         $isPasswordCorrect = (string)$struct['Password']->me['string'] == $this->getPassword();
-        $isSchoolCorrect = (string)$struct['School']->me['string'] == $this->getSchoolCode();
 
-        if ($isUsernameCorrect && $isPasswordCorrect && $isSchoolCorrect) {
+        if ($isUsernameCorrect && $isPasswordCorrect) {
             $this->getLog()->info(sprintf('User \'%s\' at school \'%s\' has been authenticated', (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
 			return true;
 		}
+
         $this->getLog()->error(sprintf('User \'%s\' at school \'%s\' has failed to authenticate',  (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
+
         return false;
     }
 
@@ -117,10 +127,12 @@ class External_Liss_Authenticator
      * Set password
      *
      * @param string $password
+     * @return $this
      */
     private function setPassword($password)
     {
         $this->password = $password;
+        return $this;
     }
 
     /**
@@ -137,10 +149,12 @@ class External_Liss_Authenticator
      * Set username
      *
      * @param string $username
+     * @return $this
      */
     private function setUsername($username)
     {
         $this->username = $username;
+        return $this;
     }
 
     /**
@@ -157,10 +171,12 @@ class External_Liss_Authenticator
      * Set school code
      *
      * @param string $schoolCode
+     * @return $this
      */
     private function setSchoolCode($schoolCode)
     {
         $this->schoolCode = $schoolCode;
+        return $this;
     }
 
     /**
@@ -183,11 +199,29 @@ class External_Liss_Authenticator
 
     /**
      * @param Logger $log
+     * @return $this
      */
     public function setLog(Logger $log)
     {
         $this->log = $log;
+        return $this;
     }
 
+    /**
+     * @return ConfigLoader
+     */
+    public function getConfigLoader()
+    {
+        return $this->configLoader;
+    }
 
+    /**
+     * @param ConfigLoader $configLoader
+     * @return $this
+     */
+    public function setConfigLoader($configLoader)
+    {
+        $this->configLoader = $configLoader;
+        return $this;
+    }
 }
