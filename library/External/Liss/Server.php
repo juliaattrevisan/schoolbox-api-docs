@@ -55,6 +55,11 @@ class External_Liss_Server
     const WRONG_CONNECTOR_MESSAGE = 'Not using the schoolbox connector - exiting';
 
     /**
+     * Log message when authentication fails
+     */
+    const AUTHENTICATION_FAILED = 'Authentication Failed';
+
+    /**
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
@@ -71,7 +76,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $cycleMapper = new TimetableCycleMapper();
@@ -194,12 +199,12 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $log->info("getRooms: unable to process request, not implemented");
 
-        return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
+        return self::generateResponse('got rooms');
     }
 
 
@@ -218,7 +223,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
@@ -253,9 +258,10 @@ class External_Liss_Server
 
             $log->info("publishClassMemberships: completed request");
 
-            return new xmlrpcresp(new xmlrpcval('Class Memberships imported', 'string'));
+            return self::generateResponse('Class Memberships imported');
         }
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -272,7 +278,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
@@ -286,9 +292,10 @@ class External_Liss_Server
             $allData = $message->params[1]->me['array'];
             $log->info("publishTeachers: ".json_encode($allData));
 
-            return new xmlrpcresp(new xmlrpcval('Teachers Imported', 'string'));
+            return self::generateResponse('Teachers Imported');
         }
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -305,7 +312,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
@@ -319,10 +326,10 @@ class External_Liss_Server
             $allData = $message->params[1]->me['array'];
             $log->info("publishStudents: ".json_encode($allData));
 
-
-            return new xmlrpcresp(new xmlrpcval('Students Imported', 'string'));
+            return self::generateResponse('Students Imported');
         }
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -339,7 +346,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
@@ -353,9 +360,10 @@ class External_Liss_Server
             $allData = $message->params[1]->me['array'];
             $log->info("publishCalendar: ".json_encode($allData));
 
-            return new xmlrpcresp(new xmlrpcval('Calendar Imported', 'string'));
+            return self::generateResponse('Calendar Imported');
         }
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -372,7 +380,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
@@ -387,9 +395,10 @@ class External_Liss_Server
             $allData = $message->params[1]->me['array'];
             $log->info("publishRooms: ".json_encode($allData));
 
-            return new xmlrpcresp(new xmlrpcval('Rooms Imported', 'string'));
+            return self::generateResponse('Rooms Imported');
         }
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
 
@@ -409,7 +418,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
@@ -440,11 +449,11 @@ class External_Liss_Server
 
             $log->info(sprintf("publishClasses: completed adding %d classes", $classCount));
 
-            return new xmlrpcresp(new xmlrpcval('Classes Imported', 'string'));
+            return self::generateResponse('Classes Imported');
         }
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
-    }
 
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
+    }
 
     /**
      * Publish timetable to the Schoolbox
@@ -462,7 +471,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
@@ -540,10 +549,10 @@ class External_Liss_Server
 
             $log->info("publishTimetable: completed request");
 
-            return new xmlrpcresp(new xmlrpcval('Timetable Imported', 'string'));
+            return self::generateResponse('Timetable Imported');
         }
 
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
 
@@ -564,7 +573,7 @@ class External_Liss_Server
          */
         if (!self::isSchoolboxConnector()) {
             $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return new xmlrpcresp(new xmlrpcval(self::WRONG_CONNECTOR_MESSAGE, 'string'));
+            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $authenticator = new External_Liss_Authenticator($message->params[0], $log);
@@ -621,11 +630,13 @@ class External_Liss_Server
                     $i++;
                 }
             }
+
             $log->info(sprintf("publishBellTimes: Saved timetable periods, process completed", $collection->count()));
 
-            return new xmlrpcresp(new xmlrpcval('BellTimes Imported', 'string'));
+            return self::generateResponse('BellTimes Imported');
         }
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -649,10 +660,10 @@ class External_Liss_Server
             /* Log data for use */
             $log->info("publishDailyData: ".json_encode($allData));
 
-            return new xmlrpcresp(new xmlrpcval('Daily Data Imported', 'string'));
+            return self::generateResponse('Daily Data Imported');
         }
 
-        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+        return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -666,5 +677,16 @@ class External_Liss_Server
         $connector = $config->get('external_type');
 
         return $connector == 'schoolbox';
+    }
+
+    /**
+     * A xmlrpcresp factory
+     *
+     * @param $message
+     * @return xmlrpcresp
+     */
+    static private function generateResponse($message)
+    {
+        return new xmlrpcresp(new xmlrpcval($message, 'string'));
     }
 }
