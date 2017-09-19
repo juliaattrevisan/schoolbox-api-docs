@@ -1,0 +1,2 @@
+-- This is the schoolbox user who "owns" all the events imported from edval daily
+INSERT INTO `config` (`name`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`) VALUES ('external_liss_calendar_owner', 'External Liss Calendar Owner', 'This user will be the owner of all Edval Daily events imported into Schoolbox', '1', '7', 'true', 'false', 'false');
