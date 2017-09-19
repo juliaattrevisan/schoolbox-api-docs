@@ -330,7 +330,7 @@ $(function() {
 <div class="row">
     <div class="small-12 island">
         <div class="alert-box">
-            {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
+            {% include '@resourceItem/sub/rules.twig' with {item: item.resource, currentTerm: currentTerm} %}
         </div>
         <form id="resource-booking-form" action="{{ saveAction }}" method="post" name="form">
             <input type="hidden" name="id" value="{{ item.id }}"/>

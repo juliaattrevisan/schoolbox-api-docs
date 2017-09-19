@@ -143,6 +143,7 @@ class Controller extends Base
                     'campusList'    => $this->getCampusList(),
                     'callbackUrl'   => $this->getRequest()->query['callbackUrl'],
                     'allowOverride' => $item->getResource()->canUserModerateThisItem($this->getUser()),
+                    'currentTerm'       => $this->getTermMapper()->findForToday(),
                 ],
             ]
         );
@@ -1042,6 +1043,7 @@ class Controller extends Base
                     'recurrence'        => $recurrence,
                     'campusList'        => $this->getCampusList(),
                     'cancelCallbackUrl' => $this->session->getHistory(),
+                    'currentTerm'       => $this->getTermMapper()->findForToday(),
                 ],
             ]
         );
