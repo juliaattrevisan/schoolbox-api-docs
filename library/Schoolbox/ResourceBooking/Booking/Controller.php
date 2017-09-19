@@ -853,20 +853,19 @@ class Controller extends Base
     /**
      * Validates is booking needs to be within the current term
      *
-     * @param Item\Model $resource
-     * @param DateTime   $startDate
-     * @param DateTime   $endDate
+     * @param DateTime $endDate
      */
-    protected function validateCurrentTermRestriction(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    protected function validateCurrentTermRestriction(DateTime $endDate)
     {
+        $errors = array();
 
         $currentTerm = $this->getTermMapper()->findForToday();
-        var_dump($currentTerm);
         // TODO display or actual finish?
-        $currentTermFinishDate = new \Alaress_Date_Format($currentTerm->getActualFinish());
-
-        $errors = array();
-        return $errors;
+        $currentTermFinishDate = $currentTerm->getActualFinish()->getDateTimeObject();
+        if ($endDate > $currentTermFinishDate) {
+            $errors['end_datetime'][] = 'current_term';
+        }
+        return  $errors;
     }
 
     /**
