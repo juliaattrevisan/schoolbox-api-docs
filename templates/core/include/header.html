@@ -132,7 +132,8 @@
             'dimension3': 'role_name',
             'dimension4': 'role_type',
             'dimension5': 'user_year',
-            'dimension6': 'site_version'
+            'dimension6': 'site_version',
+            'dimension7': 'impersonated'
         }
     });
 
@@ -145,5 +146,8 @@
     <!-- BEGIN ga_year_event -->
     gtag('event', 'user_year_dimension', {'user_year': '{USER_YEAR}'});
     <!-- END ga_year_event -->
+    <!-- BEGIN ga_impersonated -->
+    gtag('event', 'impersonated_dimension', {'impersonated': 1});
+    <!-- END ga_impersonated -->
 </script>
 <!-- END google_analytics -->

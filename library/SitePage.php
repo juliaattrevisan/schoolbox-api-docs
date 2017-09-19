@@ -421,6 +421,7 @@ class SitePage extends Page
          */
         $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
         $this->setBlock('google_analytics', 'ga_year_event', 'ga_year_event_block');
+        $this->setBlock('google_analytics', 'ga_impersonated', 'ga_impersonated_block');
         $optIn = $config->get('google_analytics_opt_in');
 
         $this->setVar([
@@ -437,6 +438,23 @@ class SitePage extends Page
             $this->parse('ga_year_event_block', 'ga_year_event');
         } else {
             $this->setVar('ga_year_event_block', '');
+        }
+
+        // If the user has come from a previous session and is a superuser: we're going to log this
+        // as impersonated. All others will be considered a legitimate switch and logged normally.
+        $impersonated = false;
+        if (isset($_SESSION['previous']['user'])) {
+            /** @var User $previousUser */
+            $previousUser = $_SESSION['previous']['user'];
+            if ($previousUser->isSuperuser()) {
+                $impersonated = true;
+            }
+        }
+
+        if ($impersonated) {
+            $this->parse('ga_impersonated_block', 'ga_impersonated');
+        } else {
+            $this->setVar('ga_impersonated_block', '');
         }
 
         if ($optIn) {
