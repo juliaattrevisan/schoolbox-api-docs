@@ -425,6 +425,8 @@ class SitePage extends Page
         $this->setVar([
             'SITE_SCHOOL_CODE' => $config->get('site_school_code'),
             'SITE_TYPE' => $config->get('site_type'),
+            'ROLE_NAME' => $this->user->getRole()->getName(),
+            'ROLE_TYPE' => $this->user->getRole()->getType(),
         ]);
 
         if ($optIn) {
