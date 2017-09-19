@@ -123,6 +123,16 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments)};
     gtag('js', new Date());
-    gtag('config', 'UA-97642429-1');
+
+    // Set tracking ID and map custom dimensions
+    gtag('config', 'UA-97642429-1', {
+        'custom_map': {
+            'dimension1': 'site_school_code',
+            'dimension2': 'site_type',
+            'dimension3': 'role_name',
+            'dimension4': 'role_type',
+            'dimension5': 'year_level'
+        }
+    });
 </script>
 <!-- END google_analytics -->
