@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
 
@@ -59,6 +60,10 @@ class Controller extends Base
      */
     protected $externalTimetableHandler;
 
+    /** @var TermMapper */
+
+    private $termMapper;
+
     /**
      * @var StatusMapper
      */
@@ -75,6 +80,7 @@ class Controller extends Base
     {
         /** @var Model $item */
         /** @var Item\Model $resource */
+
         $resource = $item;
         $item     = $this->getBookingMapper()->createModel();
         $item
@@ -625,6 +631,19 @@ class Controller extends Base
                 $this->validateTooLong($resource, $startDate, $endDate)
             );
 
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
+            );
+
+            // Validate for matching the current term
+            if ($resource->getCurrentTermRestriction() == 1) {
+                $errors = array_merge_recursive(
+                    $errors,
+                    $this->validateCurrentTermRestriction($resource, $startDate, $endDate)
+                );
+            }
+
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
                 $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
@@ -827,6 +846,26 @@ class Controller extends Base
             }
         }
 
+        return $errors;
+    }
+
+
+    /**
+     * Validates is booking needs to be within the current term
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     */
+    protected function validateCurrentTermRestriction(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    {
+
+        $currentTerm = $this->getTermMapper()->findForToday();
+        var_dump($currentTerm);
+        // TODO display or actual finish?
+        $currentTermFinishDate = new \Alaress_Date_Format($currentTerm->getActualFinish());
+
+        $errors = array();
         return $errors;
     }
 
@@ -1353,6 +1392,27 @@ class Controller extends Base
 
         return $this;
     }
+
+    /**
+     * @return TermMapper
+     */
+    public function getTermMapper()
+    {
+        return $this->termMapper;
+    }
+
+    /**
+     * @param  TermMapper $termMapper
+     *
+     * @return $this
+     */
+    public function setTermMapper($termMapper)
+    {
+        $this->termMapper = $termMapper;
+        return $this;
+    }
+
+
 
     /**
      * Gets a series for update, adjusting their start and end dates.
