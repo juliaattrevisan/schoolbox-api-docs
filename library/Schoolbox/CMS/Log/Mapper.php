@@ -8,7 +8,7 @@
 namespace Schoolbox\CMS\Log;
 
 use PDOStatement;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -91,11 +91,11 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $records = new Collection();
+        $records = $this->createCollection();
 
         foreach ($statement as $row) {
             /** @var Model $record */

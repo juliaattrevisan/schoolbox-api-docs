@@ -11,13 +11,12 @@
 namespace Schoolbox\Fixtures\Coach\Participant;
 
 use PDOStatement;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\User as User;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use Schoolbox\Fixtures\Coach\Participant\Model as ParticipantCoach;
 use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
 
 class Mapper extends BaseMapper
@@ -28,7 +27,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_team_participantcoach');
-        $this->hasModel(ParticipantCoach::class);
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
@@ -59,11 +58,11 @@ class Mapper extends BaseMapper
      * Hydrate joins added in `getSelectString`.
      *
      * @param  PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
             $coach = CoachMapper::getInstance()->createModel();

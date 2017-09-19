@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 
 class FileListMapper extends Schoolbox\Mapper
 {
@@ -183,7 +184,7 @@ class FileListMapper extends Schoolbox\Mapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|FileList[]
      * @throws Schoolbox\Mapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -192,7 +193,7 @@ class FileListMapper extends Schoolbox\Mapper
         $storageMapper = $myFileMapper->getJoinMapper($this->storageJoin);
         $mimeMapper    = $storageMapper->getJoinMapper($this->mimeJoin);
 
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
             /** @var FileList $fileListItem */

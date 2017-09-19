@@ -20,6 +20,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\GenericCollection;
 
 /**
  * Class EventMapper
@@ -167,6 +168,11 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         ";
     }
 
+
+    /**
+     * @param \PDOStatement $statement
+     * @return GenericCollection|Event[]
+     */
     protected function hydrateSelect(\PDOStatement $statement)
     {
         $ownerMapper = $this->getJoinMapper('owner');
@@ -250,7 +256,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             }
         }
 
-        return new Collection($allEvents);
+        return $this->createCollection($allEvents);
     }
 
     /**

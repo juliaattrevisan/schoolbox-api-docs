@@ -9,9 +9,8 @@ namespace Schoolbox\WebDav;
 
 use PDOStatement;
 use Schoolbox\Campus;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
@@ -54,11 +53,11 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         foreach ($statement as $row) {
 

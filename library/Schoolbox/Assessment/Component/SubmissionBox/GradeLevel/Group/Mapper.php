@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeModel;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
 
@@ -71,7 +72,7 @@ class Mapper extends BaseMapper
     }
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      */
     public function hydrateSelect(PDOStatement $statement)
     {
@@ -93,7 +94,7 @@ class Mapper extends BaseMapper
         foreach ($groups as $group) {
             $group->getGradeLevels()->sortBy('lowerBound', 'asc');
         }
-        return new Collection(array_values($groups));
+        return $this->createCollection(array_values($groups));
     }
     /**
      * Loads all groups, along with their constituent grade levels.

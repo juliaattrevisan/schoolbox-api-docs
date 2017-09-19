@@ -7,16 +7,16 @@
 
 namespace Schoolbox\Fixtures\Coach;
 
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use Schoolbox\User as User;
+use Schoolbox\User;
 
 /**
  * The mapper for a sports fixtures coach.
  *
- * @method Model createModel()
+ * @method Model createModel($idValue = null)
  * @package Schoolbox\Fixtures\Coach
  */
 class Mapper extends BaseMapper
@@ -52,12 +52,12 @@ class Mapper extends BaseMapper
      * Hydrate user as well by default.
      *
      * @param \PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      * @throws BaseMapper\Exception
      */
     public function hydrateSelect(\PDOStatement $statement)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
             if (isset($row['u.id'])) {

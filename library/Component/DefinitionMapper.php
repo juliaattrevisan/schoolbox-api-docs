@@ -107,7 +107,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $c = new GenericCollection(Component_Definition::class);
+        $c = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $model = $this->hydrate($row);

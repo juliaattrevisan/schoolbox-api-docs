@@ -10,7 +10,7 @@
 namespace Schoolbox\Pastoral\UploadQueue;
 
 use PDOStatement;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
@@ -66,12 +66,14 @@ class Mapper extends BaseMapper
         ";
     }
 
+
     /**
-     * @inheritdoc
+     * @param PDOStatement $statement
+     * @return GenericCollection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         /** @var MimetypeMapper $mimeMapper */
         $mimeMapper = $this->getJoinMapper('storage')->getJoinMapper('allowedFileExtension');

@@ -8,7 +8,7 @@
 namespace Schoolbox\Fixtures\Division\User;
 
 use PDOStatement;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Role as Role;
 use Schoolbox\User as User;
@@ -20,7 +20,7 @@ use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 /**
  * Mapper for the relation between divisions and users.
  *
- * @method Model createModel()
+ * @method Model createModel($idValue = null)
  * @method Model findById($id)
  * @package Schoolbox\Fixtures\Division\User
  */
@@ -64,11 +64,11 @@ class Mapper extends BaseMapper
      * Hydrate joins added in `getSelectString`.
      *
      * @param  PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
         foreach ($statement as $row) {
             $model = $this->createModel()
                 ->setId($row['id'])
