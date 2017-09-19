@@ -236,7 +236,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentFollowed(Model $comment, User $effector): Envelope
     {
-        $audience = $this->isPostVisibleToParents($comment->getBlog())
+        $post     = $this->postMapper->findById($comment->getBlog()->getId());
+        $audience = $this->isPostVisibleToParents($post)
             ? $this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT)
             : $this->userMapper->createCollection();
         return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_PARENT, self::TRIGGER_FOLLOWED);
@@ -463,7 +464,7 @@ class Notifier extends AbstractModuleNotifier
         $otherComments = $this->getMapper()->findSiblings($comment);
         $audience      = $this->userMapper->createCollection();
         foreach ($otherComments as $otherComment) {
-            $target = $otherComment->getOwner();
+            $target = $this->userMapper->findById($otherComment->getOwner()->getId());
             if ($target->getRole()->getType() !== $roleType) {
                 continue;
             }
