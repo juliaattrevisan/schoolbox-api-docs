@@ -131,7 +131,7 @@
             'dimension2': 'site_type',
             'dimension3': 'role_name',
             'dimension4': 'role_type',
-            'dimension5': 'year_level'
+            'dimension5': 'user_year'
         }
     });
 
@@ -140,5 +140,8 @@
     gtag('event', 'site_type_dimension', {'site_type': '{SITE_TYPE}'});
     gtag('event', 'role_name_dimension', {'role_name': '{ROLE_NAME}'});
     gtag('event', 'role_type_dimension', {'role_type': '{ROLE_TYPE}'});
+    <!-- BEGIN ga_year_event -->
+    gtag('event', 'user_year_dimension', {'user_year': '{USER_YEAR}'});
+    <!-- END ga_year_event -->
 </script>
 <!-- END google_analytics -->

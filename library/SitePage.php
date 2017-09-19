@@ -420,6 +420,7 @@ class SitePage extends Page
          * Alaress Google Analytics
          */
         $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
+        $this->setBlock('google_analytics', 'ga_year_event', 'ga_year_event_block');
         $optIn = $config->get('google_analytics_opt_in');
 
         $this->setVar([
@@ -428,6 +429,14 @@ class SitePage extends Page
             'ROLE_NAME' => $this->user->getRole()->getName(),
             'ROLE_TYPE' => $this->user->getRole()->getType(),
         ]);
+
+        // Show year level event block if user is a student
+        if ($this->user->getRole()->getType() == Schoolbox\Role::STUDENT) {
+            $this->setVar('USER_YEAR', $this->user->getYear());
+            $this->parse('ga_year_event_block', 'ga_year_event');
+        } else {
+            $this->setVar('ga_year_event_block', '');
+        }
 
         if ($optIn) {
             $this->parse('google_analytics_block', 'google_analytics');
