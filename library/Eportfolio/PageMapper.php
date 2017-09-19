@@ -74,6 +74,8 @@ class PageMapper extends Schoolbox\Mapper {
 		 */
 		$groupHandler = new \Group();
 
+		$isViewerParent = $groupHandler->isParentOfChild($ownerId);
+
 		/* The categories the viewer is involved in
 		 */
 		$allCategories = $groupHandler->involvedInCategoryList($viewerId);
@@ -114,7 +116,7 @@ class PageMapper extends Schoolbox\Mapper {
 					/* They can be a parent (the getValue() here is a binary 1 or 0)
 					 */
                     $isParent = (($currentPermission->getType() === Permission::TYPE_PARENT)
-                        && $currentPermission->getValue());
+                        && $currentPermission->getValue() && $isViewerParent);
 
 					/* They can be in a group
 					 */
