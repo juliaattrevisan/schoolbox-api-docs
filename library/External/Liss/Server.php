@@ -697,7 +697,7 @@ class External_Liss_Server
                  */
                 $restructured = [
                     'rooms' => trim($currentEvent->me['struct']['Rooms']->me['string']),
-                    'classCode' => '',//trim($currentEvent->me['struct']['ClassCode']->me['string']),
+                    'classCode' => trim($currentEvent->me['struct']['ClassCode']->me['string']),
                     'className' => trim($currentEvent->me['struct']['ClassName']->me['string']),
                     'type' => trim($currentEvent->me['struct']['Type']->me['string']),
                     'startDateTime' => new \Alaress_Date_Format($startDateTime, 'Y-m-d H:i:s'),
@@ -705,6 +705,8 @@ class External_Liss_Server
                     'period' => trim($currentEvent->me['struct']['Period']->me['string']),
                     'guid' => trim($currentEvent->me['struct']['Guid']->me['string']),
                     'detail' => '',
+                    'students' => [],
+                    'teacherIds' => [],
                 ];
 
                 /* Assemble Students
@@ -807,39 +809,22 @@ class External_Liss_Server
                     }
                     elseif (!strlen($currentEvent['classCode'])) {
                         $event->setAccess(Event::ACCESS_PERSONAL);
-                        $eventMapper->save($event);
 
-                        foreach ($currentEvent['students'] as $currentStudent) {
+                        /* Teachers and Students can be treated synonymously
+                         */
+                        $combined = array_merge($currentEvent['students'], $currentEvent['teacherIds']);
+
+                        foreach ($combined as $currentExternalId) {
                             try {
+                                $user = UserMapper::getInstance()->findByExternalId($currentExternalId);
+                                $event->setOwner($user);
+                                $eventMapper->save($event);
 
-                                /* Assign a personal event and ownership
-                                 */
-                                $student = UserMapper::getInstance()->findByExternalId($currentStudent);
-                                $event->setOwner($student);
-
-                                /* Save it specifically for this user without mass reset
-                                 * which is what EventRelations normally does
-                                 */
-                                $eventRelations = new EventRelations(null, null, null);
-                                $eventRelations->savePersonalRelation($event);
-
-                                /* Save a corresponding eventSource so we know from whence this event came
-                                 */
-                                $eventSourceMapper = EventSourceMapper::getInstance();
-
-                                /** @var EventSource $eventSource */
-                                $eventSource = EventSourceMapper::getInstance()->createModel();
-                                $eventSource->setEvent($event);
-                                $eventSource->setSourceName(self::generateSourceName($configLoader));
-                                $eventSource->setGuid($currentEvent['guid']);
-                                $eventSourceMapper->save($eventSource);
+                                self::savePersonalEvent($event, $currentEvent['guid'], self::generateSourceName($configLoader));
                             }
                             catch (MapperException $e) {
-                                $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}) for student {$currentStudent}: no schoolbox account found");
+                                $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}) for user {$currentExternalId}: no schoolbox account found");
                             }
-                        }
-
-                        foreach ($currentEvent['teacherIds'] as $currentTeacher) {
                         }
                     }
                     else {
@@ -860,6 +845,36 @@ class External_Liss_Server
         }
 
         return self::generateResponse(self::AUTHENTICATION_FAILED);
+    }
+
+
+    /**
+     * Save a personal event for a particular person
+     *
+     * @param Event  $event
+     * @param string $guid
+     * @param string $sourceName
+     * @throws MapperException
+     * @throws PDOException
+     */
+    static private function savePersonalEvent(Event $event, $guid, $sourceName)
+    {
+        /* Save it specifically for this user without mass reset
+         * which is what EventRelations normally does
+         */
+        $eventRelations = new EventRelations(null, null, null);
+        $eventRelations->savePersonalRelation($event);
+
+        /* Save a corresponding eventSource so we know from whence this event came
+         */
+        $eventSourceMapper = EventSourceMapper::getInstance();
+
+        /** @var EventSource $eventSource */
+        $eventSource = EventSourceMapper::getInstance()->createModel();
+        $eventSource->setEvent($event);
+        $eventSource->setSourceName($sourceName);
+        $eventSource->setGuid($guid);
+        $eventSourceMapper->save($eventSource);
     }
 
     /**
