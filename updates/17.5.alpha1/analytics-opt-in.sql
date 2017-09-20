@@ -11,7 +11,7 @@ INSERT INTO `config` (
   'google_analytics_opt_in',
   'Allow Schoolbox to track anonymous usage data',
   0,
-  'If turned on, Schoolbox will be able to see how you navigate your instance, using Google Analytics. This will help the team make product improvements for future use. All data will remain anonymous.',
+  'If turned on, Schoolbox will be able to see how you navigate your instance, using Google Analytics. This will help the team make product improvements for future use, and all data will remain anonymous. Please check the privacy policy on our website, located under the ''Legal'' tab in our footer, for more information.',
   3,
   (SELECT `id` FROM lu_config_type WHERE `type` = 'Site'),
   true,
