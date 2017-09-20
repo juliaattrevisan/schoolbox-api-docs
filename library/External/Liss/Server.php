@@ -679,8 +679,6 @@ class External_Liss_Server
                  */
                 $restructured = [
                     'rooms' => $currentEvent->me['struct']['Rooms']->me['string'],
-                    'teacherCodes' => $currentEvent->me['struct']['TeacherCodes']->me['string'],
-                    'teacherIds' => $currentEvent->me['struct']['TeacherIds']->me['string'],
                     'classCode' => $currentEvent->me['struct']['ClassCode']->me['string'],
                     'className' => $currentEvent->me['struct']['ClassName']->me['string'],
                     'type' => $currentEvent->me['struct']['Type']->me['string'],
@@ -692,16 +690,14 @@ class External_Liss_Server
 
                 /* Assemble Students
                  */
-                if ($restructured['rooms'] == 'DINE') {
-                    foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
-                        $restructured['students'][] = $currentStudent->me['string'];
-                    }
-
-                    $log->info(json_encode($currentEvent));
-                    $log->info(json_encode($restructured));
-
-                    die();
+                foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
+                    $restructured['students'][] = $currentStudent->me['string'];
                 }
+
+                /* Assemble Teachers
+                 * No idea why this has to be a csv, but students is an array...wevs
+                 */
+                $restructured['teacherIds'] = explode(',', $currentEvent->me['struct']['TeacherIds']->me['string']);
 
                 $allEvents[] = $restructured;
             }
