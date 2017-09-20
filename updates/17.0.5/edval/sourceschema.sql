@@ -1,0 +1,5 @@
+-- A table which identifies a source from which an event was imported
+CREATE TABLE `event_source`( `id` INT(11) NOT NULL AUTO_INCREMENT, `event_id` INT(6) UNSIGNED NOT NULL, `source_name` VARCHAR(255), `guid` VARCHAR(255), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) );
+
+-- Add foreign key
+ALTER TABLE `event_source` CHANGE `event_id` `event_id` INT(6) UNSIGNED NOT NULL, ADD CONSTRAINT `fk_event_source_event_id_event_event_id` FOREIGN KEY (`event_id`) REFERENCES `event`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION;
