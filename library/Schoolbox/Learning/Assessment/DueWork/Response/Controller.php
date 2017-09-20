@@ -329,7 +329,6 @@ class Controller extends Base
          *
          * Find out if plagscan is up
          */
-
         try {
             $mapper = PlagscanMapper::getInstance();
             $interactiveUrl = $mapper->getConnector()->fetchInteractiveReportUrl($plagscan->getPlagscanId());
@@ -337,9 +336,10 @@ class Controller extends Base
                 $plagscan->setInteractiveUrl($interactiveUrl);
                 $interactiveAvailable = true;
             }
-
         } catch (\LogicException $e) {
-            //noop
+            //Api failed to return a valid response - Fall back to old report
+        } catch (\RuntimeException $e) {
+            //could not connect - Fall back to old report
         }
 
         $data = [

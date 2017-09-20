@@ -268,6 +268,7 @@ class Connector
      * @return string
      * @throws \InvalidArgumentException if Plagscan changed their API on us
      * @throws \DomainException if some other unexpected thing went wrong
+     * @throws \RuntimeException if Plagscan is unavailable
      */
     public function fetchInteractiveReportUrl($plagscanId)
     {
