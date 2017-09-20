@@ -422,7 +422,7 @@ class SitePage extends Page
         $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
         $this->setBlock('google_analytics', 'ga_year_event', 'ga_year_event_block');
         $this->setBlock('google_analytics', 'ga_impersonated', 'ga_impersonated_block');
-        $optIn = $config->get('google_analytics_opt_in');
+        $optIn = $config->get('site_usage_tracking');
 
         $this->setVar([
             'SITE_SCHOOL_CODE' => $config->get('site_school_code'),
@@ -1161,7 +1161,7 @@ class SitePage extends Page
          * Alaress Google Analytics
          */
         $this->setBlock(TEMPLATE_body, 'google_analytics', 'google_analytics_block');
-        $optIn = $config->get('google_analytics_opt_in');
+        $optIn = $config->get('site_usage_tracking');
 
         $this->setVar([
             'SITE_SCHOOL_CODE' => $config->get('site_school_code'),
