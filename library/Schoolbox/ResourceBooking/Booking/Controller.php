@@ -283,9 +283,11 @@ class Controller extends Base
                 //If item is moderated, already approved, and time changed, set item to need approval again
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId = $booking->getStatus()->getId();
+                
                 if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
                     $statusId == Status\Model::STATUS_APPROVED && $isTimeChanged) {
-                    $booking->getStatus()->setId(Status\Model::STATUS_PENDING);
+                    $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
+                    $booking->setStatus($status);
                 }
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
