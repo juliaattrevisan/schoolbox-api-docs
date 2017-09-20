@@ -40,6 +40,29 @@ $(function() {
     }
 });
 </script>
+<!-- BEGIN google_analytics -->
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-97642429-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments)};
+    gtag('js', new Date());
+
+    // Set tracking ID and map custom dimensions
+    gtag('config', 'UA-97642429-1', {
+        'custom_map': {
+            'dimension1': 'site_school_code',
+            'dimension2': 'site_type',
+            'dimension6': 'site_version'
+        }
+    });
+
+    // Send custom dimension events
+    gtag('event', 'site_school_code_dimension', {'site_school_code': '{SITE_SCHOOL_CODE}'});
+    gtag('event', 'site_type_dimension', {'site_type': '{SITE_TYPE}'});
+    gtag('event', 'site_version_dimension', {'site_version': '{SITE_VERSION}'});
+</script>
+<!-- END google_analytics -->
 </head>
 <body class="login {SIDE}">
 <div id="container">

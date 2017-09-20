@@ -1157,6 +1157,24 @@ class SitePage extends Page
             $this->setVar('feedback_link_block', '');
         }
 
+        /**
+         * Alaress Google Analytics
+         */
+        $this->setBlock(TEMPLATE_body, 'google_analytics', 'google_analytics_block');
+        $optIn = $config->get('google_analytics_opt_in');
+
+        $this->setVar([
+            'SITE_SCHOOL_CODE' => $config->get('site_school_code'),
+            'SITE_TYPE' => $config->get('site_type'),
+            'SITE_VERSION' => $config->get('site_version'),
+        ]);
+
+        if ($optIn) {
+            $this->parse('google_analytics_block', 'google_analytics');
+        } else {
+            $this->setVar('google_analytics_block', '');
+        }
+
         // Shove GET params (samlAuth and page at least) into the form
         $getParams = array_intersect_key($_GET, array('page' => true, 'samlAuth' => true));
         $this->setVar('GET_PARAMS', htmlspecialchars(http_build_query($getParams), ENT_QUOTES));
