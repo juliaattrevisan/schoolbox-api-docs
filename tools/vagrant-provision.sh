@@ -7,6 +7,7 @@ cd $cachedir;
 external_db="synergetic";
 external_db_host="172.31.15.10";
 external_db_db="Synergetic_AUVIC_ALARESS_PRD";
+enable_xdebug="true";
 
 # Get options
 if [ ! -z $1 ]; then data_source=$1; else echo "Please provide data_source"; exit 1; fi;
@@ -21,6 +22,7 @@ fi;
 if [ ! -z $3 ]; then external_db=$3; fi;
 if [ ! -z $4 ]; then external_db_host=$4; fi;
 if [ ! -z $5 ]; then external_db_db=$5; fi;
+if [ ! -z $6 ]; then enable_xdebug=$6; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Provision Script: vagrant-provision-1404-php55.sh";
@@ -538,6 +540,39 @@ then
     echo "[SB][`date +%Y-%m-%d\ %X`] Apache is v2.4.x, changing access config to match";
     sed -i 's/Order\ allow,deny//g' /etc/apache2/sites-available/*.conf;
     sed -i 's/Allow\ from\ all/Require\ all\ granted/g' /etc/apache2/sites-available/*.conf;
+fi
+
+if [ "$enable_xdebug" == "true" ];
+then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
+    echo "xdebug.remote_enable=1
+xdebug.remote_connect_back=1
+xdebug.var_display_max_data=-1
+xdebug.var_display_max_depth=10
+xdebug.collect_params=3
+xdebug.profiler_enable=0
+xdebug.profiler_enable_trigger=1
+xdebug.profiler_output_dir=/vagrant/data" > /etc/php/7.1/mods-available/xdebug.ini;
+    if [ -d /etc/php/7.1/apache2/conf.d ];
+    then
+        ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/apache2/conf.d/20-xdebug.ini >/dev/null 2>&1;
+        ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/apache2/conf.d/20-tideways.ini >/dev/null 2>&1;
+    fi
+    if [ -d /etc/php/7.1/fpm/conf.d ];
+    then
+        ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/fpm/conf.d/20-xdebug.ini >/dev/null 2>&1;
+        ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/fpm/conf.d/20-tideways.ini >/dev/null 2>&1;
+    fi
+    ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/cli/conf.d/20-xdebug.ini >/dev/null 2>&1;
+    ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
+else
+    echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
+    rm -f /etc/php/7.1/apache2/conf.d/20-xdebug.ini;
+    rm -f /etc/php/7.1/apache2/conf.d/20-tideways.ini;
+    rm -f /etc/php/7.1/cli/conf.d/20-xdebug.ini;
+    rm -f /etc/php/7.1/cli/conf.d/20-tideways.ini;
+    rm -f /etc/php/7.1/fpm/conf.d/20-xdebug.ini;
+    rm -f /etc/php/7.1/fpm/conf.d/20-tideways.ini;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
