@@ -124,6 +124,42 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @return bool
+     */
+    public function isUploading(): bool
+    {
+        return self::STATUS_UPLOADING === $this->status;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isProcessing(): bool
+    {
+        return self::STATUS_PROCESSING === $this->status;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isDone(): bool
+    {
+        return self::STATUS_DONE === $this->status;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isError(): bool
+    {
+        return self::STATUS_ERROR === $this->status;
+    }
+
+
+    /**
      * @return null|string
      */
     public function getErrorMessage(): ?string
