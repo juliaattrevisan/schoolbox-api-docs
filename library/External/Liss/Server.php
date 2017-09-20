@@ -671,9 +671,9 @@ class External_Liss_Server
                 /* Only need the first 8 chars
                  * Assemble startDateTime and endDateTime
                  */
-                $date = substr($currentEvent->me['struct']['Date']->me['dateTime.iso8601'], 0, 8);
-                $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}";
-                $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}";
+                $date = substr($currentEvent->me['struct']['Date']->me['dateTime.iso8601'], 0, 4) . '-' . substr($currentEvent->me['struct']['Date']->me['dateTime.iso8601'], 4, 2) . '-' . substr($currentEvent->me['struct']['Date']->me['dateTime.iso8601'], 6, 2);
+                $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
+                $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
 
                 /* Recompile everything
                  */
@@ -705,15 +705,19 @@ class External_Liss_Server
 
             /* Now do it in a way that makes sense
              */
+            /** @var \Schoolbox\Calendar\EventType $eventType */
+            $eventType = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findById(1);
+
             foreach ($allEvents as $currentEvent) {
 
                 /** @var \Schoolbox\Calendar\Event $event */
                 $event = $eventMapper->createModel();
+                $event->setType($eventType);
                 $event->setLocation($currentEvent['rooms']);
                 $event->setTitle($currentEvent['className']);
                 $event->setDetail($currentEvent['detail']);
                 $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
-                $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
+                $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['endDateTime'], 'Y-m-d H:i:s'));
 
                 $eventMapper->save($event);
             }
