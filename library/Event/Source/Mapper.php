@@ -9,6 +9,7 @@
 
 namespace Event\Source;
 
+use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
@@ -22,7 +23,7 @@ class Mapper extends BaseMapper
         $this->hasTable('event_source');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('event_id', self::TYPE_INTEGER);
+        $this->joins('event_id', EventMapper::class, 'id', null, null, 'event', 'event');
         $this->uses('source_name', self::TYPE_STRING);
         $this->uses('guid', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

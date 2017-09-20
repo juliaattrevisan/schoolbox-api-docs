@@ -9,6 +9,7 @@
 
 namespace Event\Source;
 
+use Schoolbox\Calendar\Event;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
@@ -21,11 +22,11 @@ class Model implements ISoftDeletable
 
 
     /**
-     * An eventId found in our event table
+     * An event found in our event table
      *
-     * @var int
+     * @var Event
      */
-    private $eventId;
+    private $event;
 
     /**
      * An identifier string that identifies the source of an event e.g. "liss"
@@ -43,21 +44,21 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return Event
      */
-    public function getEventId()
+    public function getEvent()
     {
-        return $this->eventId;
+        return $this->event;
     }
 
 
     /**
-     * @param int $eventId
+     * @param Event $event
      * @return $this
      */
-    public function setEventId($eventId)
+    public function setEvent($event)
     {
-        $this->eventId = $eventId;
+        $this->event = $event;
         return $this;
     }
 
