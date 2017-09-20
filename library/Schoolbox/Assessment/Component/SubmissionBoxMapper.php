@@ -19,6 +19,7 @@ use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
+use Eportfolio\ShowcaseMapper;
 use Schoolbox\User;
 use External_Markbook;
 use Schoolbox\GenericCollection;
@@ -83,6 +84,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             'this_key'  => 'id',
             'other_key' => 'box_id',
         ));
+        $this->hasJoin('showcase', array(
+            'multiple'  => true,
+            'mapper'    => ShowcaseMapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'box_id',
+        ));
+
 
         $this->hasSoftDeleteBooleanField('deleted');
 
@@ -94,6 +102,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturns'));
     }
@@ -137,6 +146,17 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $returnMapper->delete($returns);
     }
 
+
+    /**
+     * Soft deletes all students showcase work for the specified DueWork
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function softDeleteShowcase(SubmissionBox $dueWork)
+    {
+        $showcaseMapper = $this->getJoinMapper('showcase');
+        $showcaseMapper->deleteByColumn('submission_box_id', $dueWork->getId());
+    }
 
     /**
      * Restores all deleted Student Submissions for the specified DueWork
