@@ -698,8 +698,8 @@ class External_Liss_Server
                     'classCode' => trim($currentEvent->me['struct']['ClassCode']->me['string']),
                     'className' => trim($currentEvent->me['struct']['ClassName']->me['string']),
                     'type' => trim($currentEvent->me['struct']['Type']->me['string']),
-                    'startDateTime' => trim($startDateTime),
-                    'endDateTime' => trim($endDateTime),
+                    'startDateTime' => new \Alaress_Date_Format($startDateTime, 'Y-m-d H:i:s'),
+                    'endDateTime' => new \Alaress_Date_Format($endDateTime, 'Y-m-d H:i:s'),
                     'period' => trim($currentEvent->me['struct']['Period']->me['string']),
                     'guid' => trim($currentEvent->me['struct']['Guid']->me['string']),
                     'detail' => '',
@@ -757,8 +757,8 @@ class External_Liss_Server
                     $event->setLocation($currentEvent['rooms']);
                     $event->setTitle($currentEvent['className']);
                     $event->setDetail($currentEvent['detail']);
-                    $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
-                    $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['endDateTime'], 'Y-m-d H:i:s'));
+                    $event->setStartDateTime($currentEvent['startDateTime']);
+                    $event->setEndDateTime($currentEvent['endDateTime']);
 
                     /* Decide between homepage events and personal events
                      * Determine which one based on the presence/content of classCode
