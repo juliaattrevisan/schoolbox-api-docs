@@ -694,14 +694,14 @@ class External_Liss_Server
                 /* Recompile everything
                  */
                 $restructured = [
-                    'rooms' => $currentEvent->me['struct']['Rooms']->me['string'],
-                    'classCode' => $currentEvent->me['struct']['ClassCode']->me['string'],
-                    'className' => $currentEvent->me['struct']['ClassName']->me['string'],
-                    'type' => $currentEvent->me['struct']['Type']->me['string'],
-                    'startDateTime' => $startDateTime,
-                    'endDateTime' => $endDateTime,
-                    'period' => $currentEvent->me['struct']['Period']->me['string'],
-                    'guid' => $currentEvent->me['struct']['Guid']->me['string'],
+                    'rooms' => trim($currentEvent->me['struct']['Rooms']->me['string']),
+                    'classCode' => trim($currentEvent->me['struct']['ClassCode']->me['string']),
+                    'className' => trim($currentEvent->me['struct']['ClassName']->me['string']),
+                    'type' => trim($currentEvent->me['struct']['Type']->me['string']),
+                    'startDateTime' => trim($startDateTime),
+                    'endDateTime' => trim($endDateTime),
+                    'period' => trim($currentEvent->me['struct']['Period']->me['string']),
+                    'guid' => trim($currentEvent->me['struct']['Guid']->me['string']),
                     'detail' => '',
                 ];
 
