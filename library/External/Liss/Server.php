@@ -742,6 +742,13 @@ class External_Liss_Server
              */
             foreach ($allEvents as $currentEvent) {
 
+                /* Skip events that don't have a type
+                 */
+                if (!strlen($currentEvent['type'])) {
+                    $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): no type");
+                    continue;
+                }
+
                 /** @var Event $event */
                 $event = $eventMapper->createModel();
                 $event->setAuthor($author);
