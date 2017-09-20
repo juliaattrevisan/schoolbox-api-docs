@@ -74,7 +74,7 @@
                 {% endif %}
                 {% if event.isEditable %}
                 <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
-                <a class="button icon-delete" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{  returnStr }}" onclick="return(confirm('Are you sure you wish to delete this event?'))">Delete</a>
+                <a class="button icon-delete" data-reveal-id="confirm">Delete</a>
                 {% endif %}
             </div>
             {% endblock eventBubbleButtons %}
@@ -83,3 +83,14 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
 </li>
+
+<div data-reveal id="confirm" class="reveal-modal">
+    <h2>Are you sure you wish to delete this event?</h2>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    <div class="reveal-action">
+        <section>
+            <a class="button icon-delete" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{  returnStr }}">Yes</a>
+            <a class="button close-reveal-modal">No</a>
+        </section>
+    </div>
+</div>
