@@ -32,6 +32,8 @@
  */
 
 use \Alaress\Lumberjack\Logger;
+use Event\Source\Model as EventSource;
+use Event\Source\Mapper as EventSourceMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -68,6 +70,11 @@ class External_Liss_Server
      * Log message when owner can't be found
      */
     const MISSING_CALENDAR_OWNER = 'External Liss Calendar Owner not found';
+
+//    /**
+//     * Source Name
+//     */
+//    const EVENT_SOURCE_NAME = 'liss';
 
     /**
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
@@ -745,7 +752,22 @@ class External_Liss_Server
                 $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
                 $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['endDateTime'], 'Y-m-d H:i:s'));
 
+                /* TODO: Replace with actual student/teacher
+                 */
+                $event->setOwner($author);
+
                 $eventMapper->save($event);
+
+//                /* Save a corresponding eventSource so we know from whence this event came
+//                 */
+//                $eventSourceMapper = EventSourceMapper::getInstance();
+//
+//                /** @var EventSource $eventSource */
+//                $eventSource = EventSourceMapper::getInstance()->createModel();
+//                $eventSource->setEvent($event);
+//                $eventSource->setSourceName(self::generateSourceName($configLoader));
+//                $eventSource->setGuid($currentEvent['guid']);
+//                $eventSourceMapper->save($eventSource);
             }
 
             return self::generateResponse('Daily Data Imported');
@@ -754,6 +776,18 @@ class External_Liss_Server
         return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
+//
+//    /**
+//     * Generate a source name for LISS connectivity
+//     *
+//     * @param ConfigLoader $configLoader
+//     * @return string
+//     */
+//    static private function generateSourceName(ConfigLoader $configLoader)
+//    {
+//        return self::EVENT_SOURCE_NAME . '_' . $configLoader->get('external_liss_schoolcode');
+//    }
+    
     /**
      * This installation is currently using the schoolbox connector
      *
