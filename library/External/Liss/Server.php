@@ -660,6 +660,7 @@ class External_Liss_Server
         return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
+
     /**
      * publish daily timetable and room changes to schoolbox
      *
@@ -668,6 +669,9 @@ class External_Liss_Server
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws PDOException
      */
     static public function publishDailyData(xmlrpcmsg $message)
     {
