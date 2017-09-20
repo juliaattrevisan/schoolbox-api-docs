@@ -686,6 +686,7 @@ class External_Liss_Server
                     'endDateTime' => $endDateTime,
                     'period' => $currentEvent->me['struct']['Period']->me['string'],
                     'guid' => $currentEvent->me['struct']['Guid']->me['string'],
+                    'detail' => '',
                 ];
 
                 /* Assemble Students
@@ -710,12 +711,9 @@ class External_Liss_Server
                 $event = $eventMapper->createModel();
                 $event->setLocation($currentEvent['rooms']);
                 $event->setTitle($currentEvent['className']);
+                $event->setDetail($currentEvent['detail']);
                 $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
                 $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
-
-                /* Where is this?
-                 */
-                $event->setDetail('');
 
                 $eventMapper->save($event);
             }
