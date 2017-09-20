@@ -3,7 +3,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
@@ -21,7 +20,6 @@ use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -83,7 +81,7 @@ class Module extends BaseModule
         $this->register('GET', $crocodocPattern . '/annotated', 'getCrocodocView',     $canAccessCrocodoc, $preloadResponse); // a || r
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
-        $this->register('GET', $plagscanPattern . '/{contextId:\d+}/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
+        $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
     }
 
 
@@ -103,9 +101,6 @@ class Module extends BaseModule
                 }
                 if ($params['assessment'] instanceof IAssessable) {
                     return $params['assessment']->getContext()->getFolder()->getId();
-                }
-                if ($params['contextId']) {
-                    return $params['contextId'];
                 }
                 throw new Unauthorized();
             },
@@ -373,22 +368,6 @@ class Module extends BaseModule
     protected function getConfigLoader()
     {
         return $this->injector->get('config');
-    }
-
-    /**
-     * @return Mapper|UserMapper
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
-    }
-
-    /**
-     * @return Mapper|ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 
     /**
