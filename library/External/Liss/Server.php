@@ -748,33 +748,37 @@ class External_Liss_Server
                     $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): no type");
                     continue;
                 }
+                else {
+                    /** @var Event $event */
+                    $event = $eventMapper->createModel();
+                    $event->setAuthor($author);
+                    $event->setType($eventType);
+                    $event->setLocation($currentEvent['rooms']);
+                    $event->setTitle($currentEvent['className']);
+                    $event->setDetail($currentEvent['detail']);
+                    $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
+                    $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['endDateTime'], 'Y-m-d H:i:s'));
 
-                /** @var Event $event */
-                $event = $eventMapper->createModel();
-                $event->setAuthor($author);
-                $event->setType($eventType);
-                $event->setLocation($currentEvent['rooms']);
-                $event->setTitle($currentEvent['className']);
-                $event->setDetail($currentEvent['detail']);
-                $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
-                $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['endDateTime'], 'Y-m-d H:i:s'));
+                    /* TODO: Spawn Homepage Event
+                     * TODO: Spawn Personal Event for each Student and for each Teacher
+                     */
+                    $event->setOwner($author);
 
-                /* TODO: Replace with actual student/teacher
-                 */
-                $event->setOwner($author);
+                    /* Persist and continue
+                     */
+                    $eventMapper->save($event);
 
-                $eventMapper->save($event);
+                    /* Save a corresponding eventSource so we know from whence this event came
+                     */
+                    $eventSourceMapper = EventSourceMapper::getInstance();
 
-                /* Save a corresponding eventSource so we know from whence this event came
-                 */
-                $eventSourceMapper = EventSourceMapper::getInstance();
-
-                /** @var EventSource $eventSource */
-                $eventSource = EventSourceMapper::getInstance()->createModel();
-                $eventSource->setEvent($event);
-                $eventSource->setSourceName(self::generateSourceName($configLoader));
-                $eventSource->setGuid($currentEvent['guid']);
-                $eventSourceMapper->save($eventSource);
+                    /** @var EventSource $eventSource */
+                    $eventSource = EventSourceMapper::getInstance()->createModel();
+                    $eventSource->setEvent($event);
+                    $eventSource->setSourceName(self::generateSourceName($configLoader));
+                    $eventSource->setGuid($currentEvent['guid']);
+                    $eventSourceMapper->save($eventSource);
+                }
             }
 
             return self::generateResponse('Daily Data Imported');
