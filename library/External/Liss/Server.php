@@ -658,28 +658,46 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
+            $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
+
+            $allEvents = [];
             $allData = $message->params[3]->me['array'];
 
             /* Preprocess all this stuff
              * Make it easier to understand because their data structure is blasphemously terrible
              */
             foreach ($allData as $currentEvent) {
+
+                /* Only need the first 8 chars
+                 * Assemble startDateTime and endDateTime
+                 */
+                $date = substr($currentEvent->me['struct']['Date']->me['dateTime.iso8601'], 0, 8);
+                $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}";
+                $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}";
+
+                /* Recompile everything
+                 */
                 $restructured = [
                     'rooms' => $currentEvent->me['struct']['Rooms']->me['string'],
                     'teacherCodes' => $currentEvent->me['struct']['TeacherCodes']->me['string'],
                     'teacherIds' => $currentEvent->me['struct']['TeacherIds']->me['string'],
-                    'date' => $currentEvent->me['struct']['Date']->me['string'],
                     'classCode' => $currentEvent->me['struct']['ClassCode']->me['string'],
                     'edvalClassCode' => $currentEvent->me['struct']['EdvalClassCode']->me['string'],
                     'className' => $currentEvent->me['struct']['ClassName']->me['string'],
                     'type' => $currentEvent->me['struct']['Type']->me['string'],
-                    'startTime' => $currentEvent->me['struct']['StartTime']->me['string'],
-                    'endTime' => $currentEvent->me['struct']['EndTime']->me['string'],
+                    'startDateTime' => $startDateTime,
+                    'endDateTime' => $endDateTime,
                     'period' => $currentEvent->me['struct']['Period']->me['string'],
                     'guid' => $currentEvent->me['struct']['Guid']->me['string'],
                 ];
 
                 $allEvents[] = $restructured;
+            }
+
+            /* Now do it in a way that makes sense
+             */
+            foreach ($allEvents as $currentEvent) {
+                $event = $eventMapper->createModel();
             }
 
             return self::generateResponse('Daily Data Imported');
