@@ -710,7 +710,11 @@ class External_Liss_Server
                     'guid' => trim($currentEvent->me['struct']['Guid']->me['string']),
                     'detail' => '',
                     'students' => [],
-                    'teacherIds' => [],
+
+                    /* Assemble Teachers
+                     * No idea why this has to be a csv, but students is an array...wevs
+                     */
+                    'teacherIds' => explode(',', $currentEvent->me['struct']['TeacherIds']->me['string']),
                 ];
 
                 /* Assemble Students
@@ -718,11 +722,6 @@ class External_Liss_Server
                 foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
                     $restructured['students'][] = $currentStudent->me['string'];
                 }
-
-                /* Assemble Teachers
-                 * No idea why this has to be a csv, but students is an array...wevs
-                 */
-                $restructured['teacherIds'] = explode(',', $currentEvent->me['struct']['TeacherIds']->me['string']);
 
                 $allEvents[] = $restructured;
             }
