@@ -80,7 +80,9 @@
                                                 });
 
                                                 if (!valid) {
-                                                    alert('Please select an option.');
+                                                    event.preventDefault();
+                                                    var $toast = $('[data-toast]');
+                                                    $toast.toastActivate({text: 'Please select an option.', duration: 3000, css: 'alert'});
                                                 }
 
                                                 return valid;
@@ -167,3 +169,5 @@
         </div>
     </div>
 </div>
+
+<div id='toaster' class="toast" data-toast></div>
