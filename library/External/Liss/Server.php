@@ -660,8 +660,27 @@ class External_Liss_Server
         if ($authenticator->isAuthenticated()) {
             $allData = $message->params[3]->me['array'];
 
-            /* Log data for use */
-            $log->info("publishDailyData: " . json_encode($allData));
+            /* Preprocess all this stuff
+             * Make it easier to understand because their data structure is blasphemously terrible
+             */
+            foreach ($allData as $currentEvent) {
+                $restructured = [
+                    'rooms' => $currentEvent->me['struct']['Rooms']->me['string'],
+                    'teacherCodes' => $currentEvent->me['struct']['TeacherCodes']->me['string'],
+                    'teacherIds' => $currentEvent->me['struct']['TeacherIds']->me['string'],
+                    'date' => $currentEvent->me['struct']['Date']->me['string'],
+                    'classCode' => $currentEvent->me['struct']['ClassCode']->me['string'],
+                    'edvalClassCode' => $currentEvent->me['struct']['EdvalClassCode']->me['string'],
+                    'className' => $currentEvent->me['struct']['ClassName']->me['string'],
+                    'type' => $currentEvent->me['struct']['Type']->me['string'],
+                    'startTime' => $currentEvent->me['struct']['StartTime']->me['string'],
+                    'endTime' => $currentEvent->me['struct']['EndTime']->me['string'],
+                    'period' => $currentEvent->me['struct']['Period']->me['string'],
+                    'guid' => $currentEvent->me['struct']['Guid']->me['string'],
+                ];
+
+                $allEvents[] = $restructured;
+            }
 
             return self::generateResponse('Daily Data Imported');
         }
