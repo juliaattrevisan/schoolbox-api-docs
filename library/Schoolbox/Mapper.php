@@ -1320,6 +1320,8 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Soft deletes one or more models.
      *
+     * Does not re-delete an already deleted item, nor call pre/post softDelete hooks, or trigger delete notifications.
+     *
      * @param object|Collection $object Model or collection of models to delete
      *
      * @return bool
@@ -1330,8 +1332,11 @@ abstract class Mapper implements IMapper, Serializable
             return false;
         }
         $collection = $this->getModelAsCollection($object);
+        $notDeleted = $collection->filter(function (ISoftDeletable $model) {
+            return !$model->isDeleted();
+        });
         return $this->updateAll(
-            $collection,
+            $notDeleted,
             $this->soft_delete_column,
             $this->soft_delete_deleted_value,
             self::CALLBACK_PRESOFTDELETE,
