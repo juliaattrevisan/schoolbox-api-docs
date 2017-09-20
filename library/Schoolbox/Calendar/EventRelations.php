@@ -104,10 +104,7 @@ class EventRelations {
                 /* Access Type 1 (Personal)
                  */
                 case EventMapper::ACCESS_PERSONAL:
-                    $userRelation = new Personal();
-                    $userRelation->setEventId($this->getEvent()->getId());
-                    $userRelation->setUserId($this->getEvent()->getOwner()->getId());
-                    $this->getPersonalMapper()->save($userRelation);
+                    $this->savePersonalRelation($this->getEvent());
                     break;
 
                 /* Access Type 2 (Category)
@@ -136,6 +133,21 @@ class EventRelations {
                     break;
             }
         }
+    }
+
+
+    /**
+     * Save a specific personal relation
+     *
+     * @param Event $event
+     * @throws \PDOException
+     */
+    public function savePersonalRelation(Event $event)
+    {
+        $userRelation = new Personal();
+        $userRelation->setEventId($event->getId());
+        $userRelation->setUserId($event->getOwner()->getId());
+        $this->getPersonalMapper()->save($userRelation);
     }
 
     /**

@@ -697,7 +697,7 @@ class External_Liss_Server
                  */
                 $restructured = [
                     'rooms' => trim($currentEvent->me['struct']['Rooms']->me['string']),
-                    'classCode' => trim($currentEvent->me['struct']['ClassCode']->me['string']),
+                    'classCode' => '',//trim($currentEvent->me['struct']['ClassCode']->me['string']),
                     'className' => trim($currentEvent->me['struct']['ClassName']->me['string']),
                     'type' => trim($currentEvent->me['struct']['Type']->me['string']),
                     'startDateTime' => new \Alaress_Date_Format($startDateTime, 'Y-m-d H:i:s'),
@@ -806,9 +806,41 @@ class External_Liss_Server
                         $eventSourceMapper->save($eventSource);
                     }
                     elseif (!strlen($currentEvent['classCode'])) {
+                        $event->setAccess(Event::ACCESS_PERSONAL);
+                        $eventMapper->save($event);
 
-                        /* TODO: Spawn Personal Event for each Student and for each Teacher
-                         */
+                        foreach ($currentEvent['students'] as $currentStudent) {
+                            try {
+
+                                /* Assign a personal event and ownership
+                                 */
+                                $student = UserMapper::getInstance()->findByExternalId($currentStudent);
+                                $event->setOwner($student);
+
+                                /* Save it specifically for this user without mass reset
+                                 * which is what EventRelations normally does
+                                 */
+                                $eventRelations = new EventRelations(null, null, null);
+                                $eventRelations->savePersonalRelation($event);
+
+                                /* Save a corresponding eventSource so we know from whence this event came
+                                 */
+                                $eventSourceMapper = EventSourceMapper::getInstance();
+
+                                /** @var EventSource $eventSource */
+                                $eventSource = EventSourceMapper::getInstance()->createModel();
+                                $eventSource->setEvent($event);
+                                $eventSource->setSourceName(self::generateSourceName($configLoader));
+                                $eventSource->setGuid($currentEvent['guid']);
+                                $eventSourceMapper->save($eventSource);
+                            }
+                            catch (MapperException $e) {
+                                $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}) for student {$currentStudent}: no schoolbox account found");
+                            }
+                        }
+
+                        foreach ($currentEvent['teacherIds'] as $currentTeacher) {
+                        }
                     }
                     else {
                         $skipCount++;
