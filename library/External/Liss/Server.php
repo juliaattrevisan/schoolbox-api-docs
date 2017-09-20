@@ -690,30 +690,41 @@ class External_Liss_Server
                     'guid' => $currentEvent->me['struct']['Guid']->me['string'],
                 ];
 
-                $allEvents[] = $restructured;
-
-                $log->info(json_encode($currentEvent));
-            }
-
-            /* Now do it in a way that makes sense
-             */
-            foreach ($allEvents as $currentEvent) {
-
-                /** @var \Schoolbox\Calendar\Event $event */
-                $event = $eventMapper->createModel();
-                $event->setLocation($currentEvent['rooms']);
-                $event->setTitle($currentEvent['className']);
-                $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
-                $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
-
-                /* Where is this?
+                /* Assemble Students
                  */
-                $event->setDetail('');
+                if ($restructured['rooms'] == 'DINE') {
+                    foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
+                        $restructured['students'][] = $currentStudent->me['string'];
+                    }
 
-                $eventMapper->save($event);
+                    $log->info(json_encode($currentEvent));
+                    $log->info(json_encode($restructured));
+
+                    die();
+                }
+
+                $allEvents[] = $restructured;
             }
 
-            return self::generateResponse('Daily Data Imported');
+//            /* Now do it in a way that makes sense
+//             */
+//            foreach ($allEvents as $currentEvent) {
+//
+//                /** @var \Schoolbox\Calendar\Event $event */
+//                $event = $eventMapper->createModel();
+//                $event->setLocation($currentEvent['rooms']);
+//                $event->setTitle($currentEvent['className']);
+//                $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
+//                $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
+//
+//                /* Where is this?
+//                 */
+//                $event->setDetail('');
+//
+//                $eventMapper->save($event);
+//            }
+//
+//            return self::generateResponse('Daily Data Imported');
         }
 
         return self::generateResponse(self::AUTHENTICATION_FAILED);
