@@ -40,6 +40,7 @@ use Schoolbox\Collection;
 use Schoolbox\UserMapper;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventRelations;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -51,6 +52,7 @@ use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 
@@ -740,18 +742,23 @@ class External_Liss_Server
             /* Now do it in a way that makes sense
              * Map everything together and persist it to the db
              */
+            $skipCount = 0;
+            $total = count($allEvents);
+
             foreach ($allEvents as $currentEvent) {
 
                 /* Skip events that don't have a type
                  */
                 if (!strlen($currentEvent['type'])) {
                     $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): no type");
+                    $skipCount++;
+
                     continue;
                 }
                 else {
                     /** @var Event $event */
                     $event = $eventMapper->createModel();
-
+                    $event->setOwner($author);
                     $event->setAuthor($author);
                     $event->setType($eventType);
                     $event->setLocation($currentEvent['rooms']);
@@ -767,32 +774,55 @@ class External_Liss_Server
                      */
                     if (strlen($currentEvent['classCode'])) {
 
-                        /* TODO: Spawn Homepage Event
+                        /* Skip if we can't find a corresponding folder
                          */
-                        $event->setOwner($author);
+                        try {
+                            $folder = FolderMapper::getInstance()->findByCode($currentEvent['classCode']);
+                        }
+                        catch (MapperException $e) {
+                            $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
+                            $skipCount++;
+
+                            continue;
+                        }
+
+                        $event->setAccess(Event::ACCESS_GROUP);
+                        $eventMapper->save($event);
+
+                        /* Save relations
+                         */
+                        $eventRelations = new EventRelations(Event::ACCESS_GROUP, [$folder->getId()], []);
+                        $eventRelations->resetRelations($event);
+
+                        /* Save a corresponding eventSource so we know from whence this event came
+                         */
+                        $eventSourceMapper = EventSourceMapper::getInstance();
+
+                        /** @var EventSource $eventSource */
+                        $eventSource = EventSourceMapper::getInstance()->createModel();
+                        $eventSource->setEvent($event);
+                        $eventSource->setSourceName(self::generateSourceName($configLoader));
+                        $eventSource->setGuid($currentEvent['guid']);
+                        $eventSourceMapper->save($eventSource);
                     }
                     elseif (!strlen($currentEvent['classCode'])) {
 
                         /* TODO: Spawn Personal Event for each Student and for each Teacher
                          */
                     }
-
-                    /* Persist and continue
-                     */
-                    $eventMapper->save($event);
-
-                    /* Save a corresponding eventSource so we know from whence this event came
-                     */
-                    $eventSourceMapper = EventSourceMapper::getInstance();
-
-                    /** @var EventSource $eventSource */
-                    $eventSource = EventSourceMapper::getInstance()->createModel();
-                    $eventSource->setEvent($event);
-                    $eventSource->setSourceName(self::generateSourceName($configLoader));
-                    $eventSource->setGuid($currentEvent['guid']);
-                    $eventSourceMapper->save($eventSource);
+                    else {
+                        $skipCount++;
+                    }
                 }
             }
+
+            /* Log diagnostics
+             */
+            $processed = $total-$skipCount;
+
+            $log->info("Total events: {$total}");
+            $log->info("Processed: {$processed}");
+            $log->info("Skipped: {$skipCount}");
 
             return self::generateResponse('Daily Data Imported');
         }
