@@ -751,6 +751,7 @@ class External_Liss_Server
                 else {
                     /** @var Event $event */
                     $event = $eventMapper->createModel();
+
                     $event->setAuthor($author);
                     $event->setType($eventType);
                     $event->setLocation($currentEvent['rooms']);
@@ -759,10 +760,22 @@ class External_Liss_Server
                     $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
                     $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['endDateTime'], 'Y-m-d H:i:s'));
 
-                    /* TODO: Spawn Homepage Event
-                     * TODO: Spawn Personal Event for each Student and for each Teacher
+                    /* Decide between homepage events and personal events
+                     * Determine which one based on the presence/content of classCode
+                     *
+                     * We don't do Campus events in Edval (no way to identify)
                      */
-                    $event->setOwner($author);
+                    if (strlen($currentEvent['classCode'])) {
+
+                        /* TODO: Spawn Homepage Event
+                         */
+                        $event->setOwner($author);
+                    }
+                    elseif (!strlen($currentEvent['classCode'])) {
+
+                        /* TODO: Spawn Personal Event for each Student and for each Teacher
+                         */
+                    }
 
                     /* Persist and continue
                      */
