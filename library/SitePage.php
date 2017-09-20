@@ -420,42 +420,57 @@ class SitePage extends Page
          * Alaress Google Analytics
          */
         $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
-        $this->setBlock('google_analytics', 'ga_year_event', 'ga_year_event_block');
-        $this->setBlock('google_analytics', 'ga_impersonated', 'ga_impersonated_block');
+        $this->setBlock('google_analytics', 'ga_user_events', 'ga_user_events_block');
+        $this->setBlock('ga_user_events', 'ga_year_event', 'ga_year_event_block');
+        $this->setBlock('ga_user_events', 'ga_impersonated', 'ga_impersonated_block');
         $optIn = $config->get('site_usage_tracking');
 
         $this->setVar([
             'SITE_SCHOOL_CODE' => $config->get('site_school_code'),
             'SITE_TYPE' => $config->get('site_type'),
             'SITE_VERSION' => $config->get('site_version'),
-            'ROLE_NAME' => $this->user->getRole()->getName(),
-            'ROLE_TYPE' => $this->user->getRole()->getType(),
         ]);
 
-        // Show year level event block if user is a student
-        if ($this->user->getRole()->getType() == Schoolbox\Role::STUDENT) {
-            $this->setVar('USER_YEAR', $this->user->getYear());
-            $this->parse('ga_year_event_block', 'ga_year_event');
-        } else {
-            $this->setVar('ga_year_event_block', '');
-        }
+        if ($this->user instanceof User) {
+            $this->setVar([
+                'ROLE_NAME' => $this->user->getRole()->getName(),
+                'ROLE_TYPE' => $this->user->getRole()->getType(),
+            ]);
 
-        // If the user has come from a previous session and is a superuser: we're going to log this
-        // as impersonated. All others will be considered a legitimate switch and logged normally.
-        $impersonated = false;
-        if (isset($_SESSION['previous']['user'])) {
-            /** @var User $previousUser */
-            $previousUser = $_SESSION['previous']['user'];
-            if ($previousUser->isSuperuser()) {
-                $impersonated = true;
+            // Show year level event block if user is a student
+            if ($this->user->getRole()->getType() == Schoolbox\Role::STUDENT) {
+                $this->setVar('USER_YEAR', $this->user->getYear());
+                $this->parse('ga_year_event_block', 'ga_year_event');
+            } else {
+                $this->setVar('ga_year_event_block', '');
             }
+
+            // If the user has come from a previous session and is a superuser: we're going to log this
+            // as impersonated. All others will be considered a legitimate switch and logged normally.
+            $impersonated = false;
+            if (isset($_SESSION['previous']['user'])) {
+                /** @var User $previousUser */
+                $previousUser = $_SESSION['previous']['user'];
+                if ($previousUser->isSuperuser()) {
+                    $impersonated = true;
+                }
+            }
+
+            if ($impersonated) {
+                $this->parse('ga_impersonated_block', 'ga_impersonated');
+            } else {
+                $this->setVar('ga_impersonated_block', '');
+            }
+
+            $this->parse('ga_user_events_block', 'ga_user_events');
+
+        } else {
+            $this->setVar('ga_user_events_block', '');
         }
 
-        if ($impersonated) {
-            $this->parse('ga_impersonated_block', 'ga_impersonated');
-        } else {
-            $this->setVar('ga_impersonated_block', '');
-        }
+
+
+
 
         if ($optIn) {
             $this->parse('google_analytics_block', 'google_analytics');
