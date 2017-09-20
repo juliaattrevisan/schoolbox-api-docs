@@ -123,7 +123,7 @@ $output = array(
     'NEWS_ID' => $article['item_id'],
     'NEWS_TITLE' => Scrub::text($article['item_heading']),
     'NEWS_BODY' => empty($article['item_body'])
-        ? Scrub::html($article['item_blurb']) : '<p>'.TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300).'</p>',
+        ? Scrub::html($article['item_blurb']) : '<p>'.Scrub::html2text($article['item_body']).'</p>',
     'NEWS_IMAGE' => $article['item_image'],
     'POSTER' => $owner->getFullName(),
     'POSTER_EXTERNAL_ID' => $owner->getExternalId(),
