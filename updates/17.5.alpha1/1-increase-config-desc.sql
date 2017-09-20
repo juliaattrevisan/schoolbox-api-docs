@@ -1,0 +1,1 @@
+ALTER TABLE `config` MODIFY `description` VARCHAR(500);
