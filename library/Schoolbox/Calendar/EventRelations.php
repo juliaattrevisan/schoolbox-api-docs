@@ -110,12 +110,7 @@ class EventRelations {
                 /* Access Type 2 (Category)
                  */
                 case EventMapper::ACCESS_GROUP:
-                    foreach ($this->getGroup() as $currentGroup) {
-                        $categoryRelation = new Category();
-                        $categoryRelation->setEventId($this->getEvent()->getId());
-                        $categoryRelation->setCategoryId($currentGroup);
-                        $this->getCategoryMapper()->save($categoryRelation);
-                    }
+                    $this->saveFolderRelation($this->getEvent(), $this->getGroup());
                     break;
 
                 /* Access Type 3 (Campus)
@@ -148,6 +143,24 @@ class EventRelations {
         $userRelation->setEventId($event->getId());
         $userRelation->setUserId($event->getOwner()->getId());
         $this->getPersonalMapper()->save($userRelation);
+    }
+
+
+    /**
+     * Save a specific folder relation
+     *
+     * @param Event $event
+     * @param array $folderIds
+     * @throws \PDOException
+     */
+    public function saveFolderRelation(Event $event, $folderIds)
+    {
+        foreach ($folderIds as $currentGroup) {
+            $categoryRelation = new Category();
+            $categoryRelation->setEventId($event->getId());
+            $categoryRelation->setCategoryId($currentGroup);
+            $this->getCategoryMapper()->save($categoryRelation);
+        }
     }
 
     /**

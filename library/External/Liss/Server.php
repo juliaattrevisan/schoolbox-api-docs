@@ -793,8 +793,8 @@ class External_Liss_Server
 
                         /* Save relations
                          */
-                        $eventRelations = new EventRelations(Event::ACCESS_GROUP, [$folder->getId()], []);
-                        $eventRelations->resetRelations($event);
+                        $eventRelations = new EventRelations(null, null, null);
+                        $eventRelations->saveFolderRelation($event, [$folder->getId()]);
 
                         /* Save a corresponding eventSource so we know from whence this event came
                          */
