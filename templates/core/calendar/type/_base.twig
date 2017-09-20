@@ -73,8 +73,8 @@
                     {% endif %}
                 {% endif %}
                 {% if event.isEditable %}
-                <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
-                <a class="button icon-delete" data-reveal-id="confirm">Delete</a>
+                    <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
+                    <a class="button icon-delete" id="delete{{ event.eventId }}">Delete</a>
                 {% endif %}
             </div>
             {% endblock eventBubbleButtons %}
@@ -84,13 +84,16 @@
     </div>
 </li>
 
-<div data-reveal id="confirm" class="reveal-modal">
-    <h2>Are you sure you wish to delete this event?</h2>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    <div class="reveal-action">
-        <section>
-            <a class="button icon-delete" href="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{  returnStr }}">Yes</a>
-            <a class="button close-reveal-modal">No</a>
-        </section>
-    </div>
-</div>
+<script type="text/javascript">
+    $(function() {
+        $('#delete{{ event.eventId }}').on('click', function () {
+            $('[data-reveal]').hide();
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete this event?',
+                confirmEvent: function() {
+                    window.location.href = "/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}";
+                }
+            });
+        });
+    });
+</script>

@@ -244,6 +244,7 @@ switch ($_REQUEST['action']) {
         } else {
             $eventMapper->delete($event);
         }
+
         SitePage::localRedir($event->setupRedirect(
             urldecode($_GET['returnTo']),
             ($_GET['returnDate']?$_GET['returnDate']:$event->getStartDateTime()->getURLDate()),
