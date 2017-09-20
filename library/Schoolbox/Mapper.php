@@ -1443,10 +1443,12 @@ abstract class Mapper implements IMapper, Serializable
             return 0;
         }
 
-        // Don't re-delete already deleted rows
+        $preCallback  = self::CALLBACK_PREDELETE;
         $postCallback = self::CALLBACK_POSTDELETE;
         if (isset($this->soft_delete_column)) {
+            $preCallback  = self::CALLBACK_PRESOFTDELETE;
             $postCallback = self::CALLBACK_POSTSOFTDELETE;
+            // Don't re-delete already deleted rows
             $columnList[$this->soft_delete_column] = $this->soft_delete_undeleted_value;
         }
 
@@ -1461,7 +1463,7 @@ abstract class Mapper implements IMapper, Serializable
         // Call pre-delete hooks
         $deletedItems = $this->findByPredicates($predicate, $options);
         foreach ($deletedItems as $model) {
-            if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
+            if (!$this->triggerCallbacks($preCallback, $model)) {
                 return 0;
             }
         }
