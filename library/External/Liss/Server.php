@@ -677,7 +677,21 @@ class External_Liss_Server
     {
         $log = self::log();
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        /* Owner set in config
+         */
+        $configLoader = new ConfigLoader();
+
+        try {
+            $author = UserMapper::getInstance()->findById($configLoader->get('external_liss_calendar_owner'));
+        }
+        catch (MapperException $e) {
+            $log->critical(self::MISSING_CALENDAR_OWNER);
+            return self::generateResponse(self::MISSING_CALENDAR_OWNER);
+        }
+
+        /* Have an owner - continue normally
+         */
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, $configLoader);
 
         if ($authenticator->isAuthenticated()) {
             $eventMapper = EventMapper::getInstance();
@@ -731,18 +745,6 @@ class External_Liss_Server
              */
             /** @var EventType $eventType */
             $eventType = EventTypeMapper::getInstance()->findById(1);
-
-            /* Owner set in config
-             */
-            $configLoader = new ConfigLoader();
-
-            try {
-                $author = UserMapper::getInstance()->findById($configLoader->get('external_liss_calendar_owner'));
-            }
-            catch (MapperException $e) {
-                $log->critical(self::MISSING_CALENDAR_OWNER);
-                return self::generateResponse(self::MISSING_CALENDAR_OWNER);
-            }
 
             /* Now do it in a way that makes sense
              * Map everything together and persist it to the db
