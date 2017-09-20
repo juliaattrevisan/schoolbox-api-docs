@@ -682,7 +682,6 @@ class External_Liss_Server
                     'teacherCodes' => $currentEvent->me['struct']['TeacherCodes']->me['string'],
                     'teacherIds' => $currentEvent->me['struct']['TeacherIds']->me['string'],
                     'classCode' => $currentEvent->me['struct']['ClassCode']->me['string'],
-                    'edvalClassCode' => $currentEvent->me['struct']['EdvalClassCode']->me['string'],
                     'className' => $currentEvent->me['struct']['ClassName']->me['string'],
                     'type' => $currentEvent->me['struct']['Type']->me['string'],
                     'startDateTime' => $startDateTime,
@@ -692,12 +691,26 @@ class External_Liss_Server
                 ];
 
                 $allEvents[] = $restructured;
+
+                $log->info(json_encode($currentEvent));
             }
 
             /* Now do it in a way that makes sense
              */
             foreach ($allEvents as $currentEvent) {
+
+                /** @var \Schoolbox\Calendar\Event $event */
                 $event = $eventMapper->createModel();
+                $event->setLocation($currentEvent['rooms']);
+                $event->setTitle($currentEvent['className']);
+                $event->setStartDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
+                $event->setEndDateTime(new \Alaress_Date_Format($currentEvent['startDateTime'], 'Y-m-d H:i:s'));
+
+                /* Where is this?
+                 */
+                $event->setDetail('');
+
+                $eventMapper->save($event);
             }
 
             return self::generateResponse('Daily Data Imported');
