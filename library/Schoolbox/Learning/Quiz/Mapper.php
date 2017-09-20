@@ -89,8 +89,6 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         // SoftDelete/Restore weak entities
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSections'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAttempts'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSections'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAttempts'));
     }
 
     /**
@@ -123,35 +121,6 @@ class Mapper extends BaseMapper implements IActivityMapper, FeedableMapperInterf
         return true;
     }
 
-
-    /**
-     * Soft deletes all Attempts for the specified Quiz
-     *
-     * @param Model $quiz
-     * @return true
-     */
-    public function restoreSections(Model $quiz)
-    {
-        $quizSectionMapper = $this->getJoinMapper('sections');
-        // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
-        $sections = $quizSectionMapper->findByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
-        $quizSectionMapper->restoreSoftDeleted($sections);
-        return true;
-    }
-
-    /**
-     * Soft deletes all Attempts for the specified Quiz
-     *
-     * @param Model $quiz
-     * @return true
-     */
-    public function restoreAttempts(Model $quiz)
-    {
-        $quizAttemptMapper = $this->getJoinMapper('attempt');
-        // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
-        $quizAttemptMapper->deleteByColumn('assess_id', $quiz->getId(), ['deleted' => true]);
-        return true;
-    }
 
     /**
      * Pre-save callback.

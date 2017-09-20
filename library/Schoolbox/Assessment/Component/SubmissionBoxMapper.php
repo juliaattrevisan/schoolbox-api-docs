@@ -106,8 +106,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSubmissions'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreReturns'));
     }
 
 
@@ -178,29 +176,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $showcaseMapper->deleteByColumn('submission_box_id', $dueWork->getId());
     }
 
-    /**
-     * Restores all deleted Student Submissions for the specified DueWork
-     *
-     * @param SubmissionBox $dueWork
-     */
-    public function restoreSubmissions(SubmissionBox $dueWork)
-    {
-        $submissionMapper = $this->getJoinMapper('submission');
-        $submissions = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
-        $submissionMapper->restoreSoftDeleted($submissions);
-    }
-
-    /**
-     * Restores all deleted Teacher Returns for the specified DueWork
-     *
-     * @param SubmissionBox $dueWork
-     */
-    public function restoreReturns(SubmissionBox $dueWork)
-    {
-        $returnMapper = $this->getJoinMapper('return');
-        $returns = $returnMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
-        $returnMapper->restoreSoftDeleted($returns);
-    }
 
     /**
      * Find all the years containing a submission box

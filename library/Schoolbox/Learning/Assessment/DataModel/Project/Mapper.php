@@ -40,7 +40,6 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAssessables']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAssessables']);
     }
 
     /**
@@ -52,17 +51,5 @@ class Mapper extends BaseMapper
         $assessmentMapper = $this->getJoinMapper('assessment');
         $assessments = $assessmentMapper->findByColumn('v_pa.project_id', $project->getId(), ['deleted' => true]);
         return $assessmentMapper->delete($assessments);
-    }
-
-    /**
-     * @param Model $project
-     * @return bool
-     */
-    protected function restoreAssessables(Model $project)
-    {
-        $assessmentMapper = $this->getJoinMapper('assessment');
-        $assessments = $assessmentMapper->findByColumn('v_pa.project_id', $project->getId(), ['deleted' => true]);
-        $assessmentMapper->restoreSoftDeleted($assessments);
-        return true;
     }
 }

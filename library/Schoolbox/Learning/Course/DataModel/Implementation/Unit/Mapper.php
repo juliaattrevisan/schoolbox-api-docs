@@ -51,7 +51,6 @@ class Mapper extends AbstractUnitMapper
 
         // SoftDelete/Restore Assessments in UnitImplementation
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteAssessments'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreAssessments'));
     }
 
     /**
@@ -66,17 +65,6 @@ class Mapper extends AbstractUnitMapper
         $assessmentMapper->delete($assessments);
     }
 
-    /**
-     * Soft deletes all Assessments for the specified UnitImplementation
-     *
-     * @param Model $unitImpl
-     */
-    public function restoreAssessments(Model $unitImpl)
-    {
-        $assessmentMapper = AssessmentMapper::getInstance();
-        $assessments = $assessmentMapper->findByColumn('v_ui.course_unit_implementation_id', $unitImpl->getId(), ['deleted' => true]);
-        $assessmentMapper->restoreSoftDeleted($assessments);
-    }
 
     /**
      * Finds all unit implementations for this course implementation.

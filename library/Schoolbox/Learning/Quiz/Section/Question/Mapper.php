@@ -39,7 +39,6 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('question_id', QuizSolutionMapper::class, 'solution', 'solution');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSolution'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreSolution'));
     }
 
     /**
@@ -102,18 +101,5 @@ class Mapper extends BaseMapper
         $quizSolutionMapper = QuizSolutionMapper::getInstance();
         // Don't re-delete deleted leaf-nodes. Unlike non-leaf nodes, these will retain original deletion date.
         $quizSolutionMapper->deleteByColumn('question_id', $question->getId());
-    }
-
-    /**
-     * Restores all soft-deleted Answers for the specified Attempt
-     *
-     * @param QuizQuestion $question
-     */
-    public function restoreSolution(QuizQuestion $question)
-    {
-        $quizSolutionMapper = QuizSolutionMapper::getInstance();
-        // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
-        $solution = $quizSolutionMapper->findByColumn('question_id', $question->getId(), ['deleted' => true]);
-        $quizSolutionMapper->restoreSoftDeleted($solution);
     }
 }

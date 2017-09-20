@@ -31,7 +31,6 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuestions'));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restoreQuestions'));
     }
 
     /**
@@ -44,18 +43,5 @@ class Mapper extends BaseMapper
         $quizQuestionMapper = QuizQuestionMapper::getInstance();
         // Force cascade. However this will also updated the 'deleted_at' field for already deleted items.
         $quizQuestionMapper->deleteByColumn('section_id', $section->getId(), ['deleted' => true]);
-    }
-
-    /**
-     * Restores all soft-deleted Questions for the specified Section
-     *
-     * @param QuizSection $section
-     */
-    public function restoreQuestions(QuizSection $section)
-    {
-        $quizQuestionMapper = QuizQuestionMapper::getInstance();
-        // TODO SA-1277 - should only restore items that were part of the parent's cascade delete
-        $questions = $quizQuestionMapper->findByColumn('section_id', $section->getId(), ['deleted' => true]);
-        $quizQuestionMapper->restoreSoftDeleted($questions);
     }
 }
