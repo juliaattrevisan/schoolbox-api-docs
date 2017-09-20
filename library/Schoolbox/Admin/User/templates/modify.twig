@@ -665,17 +665,6 @@
                 });
             });
 
-            {# Impersonate user #}
-
-            $('[data-assimilator]').click(function (event) {
-                {% if user.enabled %}
-                    event.preventDefault();
-                $('[data-assimilator-form]').submit();
-                {% else %}
-                    alert('You can not impersonate a user while their account is disabled.');
-                {% endif %}
-            });
-
             {# Setup service and group form validation #}
 
             $('form[data-validatable-as="addService"]').alaressValidate();
