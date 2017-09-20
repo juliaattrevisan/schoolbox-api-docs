@@ -65,7 +65,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseMulti('pastoral_id', Revision\Mapper::class, 'revisions', 'revisions');
 
         $this->registerCallback(Mapper::CALLBACK_POSTSAVE, [$this, 'saveRevision']);
-        $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteReferences']);
+        $this->registerCallback(Mapper::CALLBACK_PRESOFTDELETE, [$this, 'deleteReferences']);
     }
 
     /**

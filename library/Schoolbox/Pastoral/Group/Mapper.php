@@ -34,7 +34,7 @@ class Mapper extends BaseMapper
 
         $this->joinsReverseMulti('group_id', GroupMember\Mapper::class, 'members', 'members');
 
-        $this->registerCallback(Mapper::CALLBACK_PREDELETE, [$this, 'deleteGroupMembers']);
+        $this->registerCallback(Mapper::CALLBACK_PRESOFTDELETE, [$this, 'deleteGroupMembers']);
     }
 
     /**
