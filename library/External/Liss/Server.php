@@ -36,6 +36,10 @@ use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -59,6 +63,11 @@ class External_Liss_Server
      * Log message when authentication fails
      */
     const AUTHENTICATION_FAILED = 'Authentication Failed';
+
+    /**
+     * Log message when owner can't be found
+     */
+    const MISSING_CALENDAR_OWNER = 'External Liss Calendar Owner not found';
 
     /**
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
@@ -658,7 +667,7 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
-            $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
+            $eventMapper = EventMapper::getInstance();
 
             $allEvents = [];
             $allData = $message->params[3]->me['array'];
@@ -703,15 +712,32 @@ class External_Liss_Server
                 $allEvents[] = $restructured;
             }
 
-            /* Now do it in a way that makes sense
+            /* Set a default event type for now
+             * TODO: Replace with something smarter
              */
-            /** @var \Schoolbox\Calendar\EventType $eventType */
-            $eventType = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findById(1);
+            /** @var EventType $eventType */
+            $eventType = EventTypeMapper::getInstance()->findById(1);
 
+            /* Owner set in config
+             */
+            $configLoader = new ConfigLoader();
+
+            try {
+                $author = UserMapper::getInstance()->findById($configLoader->get('external_liss_calendar_owner'));
+            }
+            catch (MapperException $e) {
+                $log->critical(self::MISSING_CALENDAR_OWNER);
+                return self::generateResponse(self::MISSING_CALENDAR_OWNER);
+            }
+
+            /* Now do it in a way that makes sense
+             * Map everything together and persist it to the db
+             */
             foreach ($allEvents as $currentEvent) {
 
-                /** @var \Schoolbox\Calendar\Event $event */
+                /** @var Event $event */
                 $event = $eventMapper->createModel();
+                $event->setAuthor($author);
                 $event->setType($eventType);
                 $event->setLocation($currentEvent['rooms']);
                 $event->setTitle($currentEvent['className']);
