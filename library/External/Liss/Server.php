@@ -71,10 +71,10 @@ class External_Liss_Server
      */
     const MISSING_CALENDAR_OWNER = 'External Liss Calendar Owner not found';
 
-//    /**
-//     * Source Name
-//     */
-//    const EVENT_SOURCE_NAME = 'liss';
+    /**
+     * Source Name
+     */
+    const EVENT_SOURCE_NAME = 'liss';
 
     /**
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
@@ -758,16 +758,16 @@ class External_Liss_Server
 
                 $eventMapper->save($event);
 
-//                /* Save a corresponding eventSource so we know from whence this event came
-//                 */
-//                $eventSourceMapper = EventSourceMapper::getInstance();
-//
-//                /** @var EventSource $eventSource */
-//                $eventSource = EventSourceMapper::getInstance()->createModel();
-//                $eventSource->setEvent($event);
-//                $eventSource->setSourceName(self::generateSourceName($configLoader));
-//                $eventSource->setGuid($currentEvent['guid']);
-//                $eventSourceMapper->save($eventSource);
+                /* Save a corresponding eventSource so we know from whence this event came
+                 */
+                $eventSourceMapper = EventSourceMapper::getInstance();
+
+                /** @var EventSource $eventSource */
+                $eventSource = EventSourceMapper::getInstance()->createModel();
+                $eventSource->setEvent($event);
+                $eventSource->setSourceName(self::generateSourceName($configLoader));
+                $eventSource->setGuid($currentEvent['guid']);
+                $eventSourceMapper->save($eventSource);
             }
 
             return self::generateResponse('Daily Data Imported');
@@ -776,17 +776,16 @@ class External_Liss_Server
         return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
-//
-//    /**
-//     * Generate a source name for LISS connectivity
-//     *
-//     * @param ConfigLoader $configLoader
-//     * @return string
-//     */
-//    static private function generateSourceName(ConfigLoader $configLoader)
-//    {
-//        return self::EVENT_SOURCE_NAME . '_' . $configLoader->get('external_liss_schoolcode');
-//    }
+    /**
+     * Generate a source name for LISS connectivity
+     *
+     * @param ConfigLoader $configLoader
+     * @return string
+     */
+    static private function generateSourceName(ConfigLoader $configLoader)
+    {
+        return self::EVENT_SOURCE_NAME . '_' . $configLoader->get('external_liss_schoolcode');
+    }
     
     /**
      * This installation is currently using the schoolbox connector
