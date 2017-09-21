@@ -41,10 +41,28 @@ class PublishDailyData
      * Preprocess all this stuff
      * Make it easier to understand because their data structure is blasphemously terrible
      *
+     * @param $allData
+     * @return array
+     */
+    public function reformatAllEvents($allData)
+    {
+        $allEvents = [];
+
+        foreach ($allData as $currentEvent) {
+            $allEvents[] = $this->reformatEvent($currentEvent);
+        }
+
+        return $allEvents;
+    }
+
+    /**
+     * Preprocess all this stuff
+     * Make it easier to understand because their data structure is blasphemously terrible
+     *
      * @param $currentEvent
      * @return array
      */
-    public function reformatEvent($currentEvent)
+    private function reformatEvent($currentEvent)
     {
         /* Only need the first 8 chars
          * Assemble startDateTime and endDateTime

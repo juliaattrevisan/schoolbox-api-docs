@@ -692,14 +692,7 @@ class External_Liss_Server
         if ($authenticator->isAuthenticated()) {
             $eventMapper = EventMapper::getInstance();
 
-            $allEvents = [];
-            $allData = $message->params[3]->me['array'];
-
-            /* Preprocess all this stuff
-             */
-            foreach ($allData as $currentEvent) {
-                $allEvents[] = $helper->reformatEvent($currentEvent);
-            }
+            $allEvents = $helper->reformatAllEvents($message->params[3]->me['array']);
 
             /* Set a default event type for now
              * TODO: Replace with something smarter
