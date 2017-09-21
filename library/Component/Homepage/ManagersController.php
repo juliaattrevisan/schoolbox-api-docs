@@ -189,7 +189,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
                     //Hide Staff Photo
                     //Hide Student Photo
-                    if($user->getRole()->isStaff()) {
+                    if($manager->getRole()->isStaff()) {
                         if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
                             $this->setVar('photo_block', '');
                         } else if ($staffPhotoVisibilty == 1 && !$veiwer->getRole()->isStaff()) {
