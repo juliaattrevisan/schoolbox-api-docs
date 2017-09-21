@@ -81,7 +81,13 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     // set attributes
 
     $file->setFilename($file->getStorage()->getFilename());
-    $file->setOwner($_SESSION['user']);
+
+    if (!$modifyExisting) {
+        /* Only set the ownership to the current user if it's a new upload -
+         * prevents ownership being overwritten if another user modifies the file
+         */
+        $file->setOwner($_SESSION['user']);
+    }
     $file->setTitle($_POST['description']);
     $file->setDescription($_POST['comment']);
     // If not set default to visible
