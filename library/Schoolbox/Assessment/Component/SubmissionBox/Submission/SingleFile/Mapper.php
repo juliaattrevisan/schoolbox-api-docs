@@ -38,7 +38,6 @@ class Mapper extends BaseMapper
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
         $this->uses('editable_inline', self::TYPE_BOOLEAN);
         $this->uses('uuid', self::TYPE_STRING);
-        $this->uses('kami_document_id', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

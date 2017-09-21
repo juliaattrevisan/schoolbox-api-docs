@@ -37,12 +37,6 @@ class Model implements IFile, ISoftDeletable
      */
     protected $uuid;
 
-    /**
-     * Identifier for the Kami document for this file, if there is one.
-     *
-     * @var string
-     */
-    protected $kamiDocumentId;
 
     /**
      * @var bool
@@ -84,23 +78,6 @@ class Model implements IFile, ISoftDeletable
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getKamiDocumentId()
-    {
-        return $this->kamiDocumentId;
-    }
-
-    /**
-     * @param string $kamiDocumentId
-     * @return static
-     */
-    public function setKamiDocumentId($kamiDocumentId)
-    {
-        $this->kamiDocumentId = $kamiDocumentId;
-        return $this;
-    }
 
     /**
      * @return boolean
