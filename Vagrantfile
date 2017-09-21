@@ -37,7 +37,7 @@ if File.file?('vagrant.yaml')
   if !conf["external_db_host"].nil?
     external_db_host = conf["external_db_host"]
   end
-  if !conf["external_db_host"].nil?
+  if !conf["external_db_db"].nil?
     external_db_db = conf["external_db_db"]
   end
   if !conf["demo_data_version"].nil?
