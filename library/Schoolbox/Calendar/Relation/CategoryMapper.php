@@ -53,24 +53,6 @@ class CategoryMapper extends Schoolbox\Mapper
     }
 
     /**
-     * Purge existing sid assignations
-     *
-     * @param Schoolbox\Calendar\Event $event
-     */
-    public function cleanse(Schoolbox\Calendar\Event $event)
-    {
-        $statement = $this->database->prepare(
-            "
-			DELETE FROM `{$this->table}`
-			WHERE `event_id` = :identifierValue
-		"
-        );
-
-        $statement->bindValue(':identifierValue', $event->getId());
-        $statement->execute();
-    }
-
-    /**
      * Find all the categories belonging to an event
      *
      * @param Schoolbox\Calendar\Event $event

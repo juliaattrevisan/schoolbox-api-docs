@@ -167,9 +167,9 @@ class EventRelations {
      * Purge existing sids, before inserting new ones
      */
     private function purgeAllRelations() {
-        $this->getPersonalMapper()->cleanse($this->getEvent());
-        $this->getCategoryMapper()->cleanse($this->getEvent());
-        $this->getRoleMapper()->cleanse($this->getEvent());
+        $this->getPersonalMapper()->deleteByColumn('event_id', [$this->getEvent()->getId()]);
+        $this->getCategoryMapper()->deleteByColumn('event_id', [$this->getEvent()->getId()]);
+        $this->getRoleMapper()->deleteByColumn('event_id', [$this->getEvent()->getId()]);
     }
 
     /* Getters/Setters
