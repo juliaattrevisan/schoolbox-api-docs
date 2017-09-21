@@ -82,14 +82,12 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
 
             // gets teachers involved in subject, outputs links to their addressbook page
             $this->setBlock('has_teachers', "person", "person_block");
-            $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
-            $this->setBlock('person', 'has_icon', 'has_icon_block');
+            $this->setBlock('person', 'photo', 'photo_block');
 
             $this->setVar([
                 'empty_state_block' => '',
                 'has_thumbnail_block' => '',
-                'has_icon_block' => '',
-                'person_block' => '',
+                'photo_block' => '',
             ]);
 
             $displayOptions = array(
@@ -114,6 +112,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
                 $externalClassHandler = new External_Class();
                 $userMapper = \Schoolbox\UserMapper::getInstance();
+                $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
 
                 $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
 
@@ -135,24 +134,27 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                                 $this->setVar([
                                     'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
                                 ]);
-
-                                $this->parse('has_thumbnail_block', 'has_thumbnail');
-                                $this->setVar('has_icon_block', '');
                             } else {
                                 $this->setVar([
                                     'GRID_VIEW_CLASSES' => ''
                                 ]);
+                            }
 
-                                $this->setVar('has_thumbnail_block', '');
-                                $this->parse('has_icon_block', 'has_icon');
+                            if ($teacher->getRole()->isStaff()) {
+                                if ($staffPhotoVisibilty == 2 && $this->getUser()->getRole()->isStudent()) {
+                                    $this->setVar('photo_block', '');
+                                } else if ($staffPhotoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
+                                    $this->setVar('photo_block', '');
+                                } else {
+                                    $this->parse('photo_block', 'photo');
+                                }
                             }
 
                             $this->parse('person_block', 'person', true);
 
                             /* Clear children after parsing out the parent
                              */
-                            $this->setVar('has_thumbnail_block', '');
-                            $this->setVar('has_icon_block', '');
+                            $this->setVar('photo_block', '');
 
                         } catch (\Schoolbox\Mapper\Exception $e) {
 
