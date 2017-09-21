@@ -90,6 +90,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setBlock('has_members', "member_email", "member_email_block");
             $this->setBlock('has_members', "person", "person_block");
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
+            $this->setBlock('person', 'photo', 'photo_block');
 
             $this->setVar([
                 'empty_state_block' => '',
@@ -132,6 +133,8 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             // Get admin
             $userAccessMapper = new UserAccessMapper();
             $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
+
+            $photoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
 
             $i = 0;
             foreach ($managerList as $manager) {
@@ -181,6 +184,15 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                         $this->setVar([
                             'GRID_VIEW_CLASSES' => '',
                         ]);
+                    }
+
+                    //Hide Staff Photo
+                    if ($photoVisibility == 2 && $this->getUser()->getRole()->isStudent()) {
+                        $this->setVar('photo_block', '');
+                    } else if ($photoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
+                        $this->setVar('photo_block', '');
+                    } else {
+                        $this->parse('photo_block', 'photo');
                     }
 
                     $this->parse('person_block', 'person', true);
