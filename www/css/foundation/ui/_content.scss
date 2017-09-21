@@ -638,6 +638,7 @@ $rotate-span-width: 11rem;
 
 %content {
     padding: rem-calc(($base-font-size - 4));
+    overflow-x: auto;
 
     p:last-child{
         margin: 0;
