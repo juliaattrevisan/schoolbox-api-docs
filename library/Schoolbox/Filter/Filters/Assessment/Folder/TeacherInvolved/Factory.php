@@ -55,10 +55,10 @@ class Factory extends FolderFilter\Factory
             }
         }
 
-        // Note: '-1' is a hack to mean 'INVALID', to force no group folders to be matched.
-        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : -1;
+        // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
+        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_FULL + 1;
 
-        $folders = $this->getFolderMapper()->findForUser($viewee, $getClasses, $groupAccessLevel, true)->indexBy('id');
+        $folders = $this->getFolderMapper()->findForUser($viewee, $getClasses, $groupAccessLevel, false)->indexBy('id');
 
         // Did caller specify they wish to insert some custom folders in the list?
         // (Note that perm check was already performed by key-converter)

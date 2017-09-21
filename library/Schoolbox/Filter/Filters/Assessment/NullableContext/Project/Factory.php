@@ -135,10 +135,10 @@ class Factory extends NullableContext\Factory
             return $projects;
         }
 
-        // Note: '-1' is a hack to mean 'INVALID', to force no group folders to be matched.
-        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : -1;
+        // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
+        $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_FULL + 1;
 
-        $involvedFolders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, true);
+        $involvedFolders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, false);
 
         /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
          * otherwise any assessments inside projects in the extra folder will never be visible.
