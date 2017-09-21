@@ -137,6 +137,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $allStudentEmails     = [];
 
             $studentPhotoHidden = $this->getConfigMapper()->get('protect_student_photo');
+            $veiwer = $this->getUser();
 
             if (is_array($allStudents)) {
                 foreach ($allStudents as $currentStudent) {
@@ -177,7 +178,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                         //Hide Student Photo
                         if($user->getRole()->isStudent()) {
-                            if ($this->getUser()->getRole()->isStudent() && $studentPhotoHidden) {
+                            if ($veiwer->getRole()->isStudent() && $studentPhotoHidden) {
+                                $this->setVar('photo_block', '');
+                            } else if ($veiwer->getRole()->isParent() && !$veiwer->isParentOf($user->loadParents())) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');

@@ -144,7 +144,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $emailall = [];
 
             $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
-            $studentPhotoHidden = $this->getConfigMapper()->get('protect_student_photo');
+            $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
+            $veiwer = $this->getUser();
 
             if ($userListCount > 0) {
                 $i = 0;
@@ -191,8 +192,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                         }
 
                         //Hide Student Photo
-                        if($this->getUser()->getRole()->isStudent()) {
-                            if ($user->getRole()->isStudent() && $studentPhotoHidden) {
+                        if($user->getRole()->isStudent()) {
+                            if ($veiwer->getRole()->isStudent() && $studentPhotoHidden) {
+                                $this->setVar('photo_block', '');
+                            } else if ($veiwer->getRole()->isParent() && !$veiwer->isParentOf($user->loadParents())) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
@@ -201,9 +204,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                         //Hide Staff Photo
                         if($user->getRole()->isStaff()) {
-                            if ($staffPhotoVisibilty == 2 && $this->getUser()->getRole()->isStudent()) {
+                            if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
                                 $this->setVar('photo_block', '');
-                            } else if ($staffPhotoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
+                            } else if ($staffPhotoVisibilty == 1 && !$veiwer->getRole()->isStaff()) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
