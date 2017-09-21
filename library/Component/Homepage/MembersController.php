@@ -97,13 +97,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('has_members', "person", "person_block");
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
             $this->setBlock('person', 'student_photo_visible', 'student_photo_visible_block');
-            $this->setBlock('student_photo_visible', 'has_thumbnail', 'has_thumbnail_block');
-            $this->setBlock('student_photo_visible', 'has_icon', 'has_icon_block');
 
             $this->setVar([
                 'empty_state_block'   => '',
-                'has_thumbnail_block' => '',
-                'has_icon_block'      => '',
                 'person_block'        => '',
                 'people_hidden_block' => '',
                 'MAX_MEMBERS'         => self::MAX_MEMBERS,
@@ -185,16 +181,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                             $this->setVar([
                                 'GRID_VIEW_CLASSES' => 'medium-block-grid-2',
                             ]);
-
-                            $this->parse('has_thumbnail_block', 'has_thumbnail');
-                            $this->setVar('has_icon_block', '');
                         } else {
                             $this->setVar([
                                 'GRID_VIEW_CLASSES' => '',
                             ]);
-
-                            $this->setVar('has_thumbnail_block', '');
-                            $this->parse('has_icon_block', 'has_icon');
                         }
 
                         $hideStudentPhoto = $this->getUser()->getRole()->isStudent()
@@ -209,10 +199,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                         $this->parse('person_block', 'person', true);
 
-                        /* Clear children after parsing out the parent
-                         */
-                        $this->setVar('has_thumbnail_block', '');
-                        $this->setVar('has_icon_block', '');
                     }
 
                     $i++;

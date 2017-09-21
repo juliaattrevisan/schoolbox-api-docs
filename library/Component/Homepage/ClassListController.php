@@ -102,13 +102,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $this->setBlock('has_students', 'parent', 'parent_block');
             $this->setBlock('has_students', 'parent_email', 'parent_email_block');
             $this->setBlock('person', 'student_photo_visible', 'student_photo_visible_block');
-            $this->setBlock('student_photo_visible', 'has_thumbnail', 'has_thumbnail_block');
-            $this->setBlock('student_photo_visible', 'has_icon', 'has_icon_block');
 
             $this->setVar([
                 'empty_state_block'   => '',
-                'has_thumbnail_block' => '',
-                'has_icon_block'      => '',
                 'person_block'        => '',
                 'student_email_block' => '',
                 'parent_email_block'  => '',
@@ -171,16 +167,10 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             $this->setVar([
                                 'GRID_VIEW_CLASSES' => 'medium-block-grid-2',
                             ]);
-
-                            $this->parse('has_thumbnail_block', 'has_thumbnail');
-                            $this->setVar('has_icon_block', '');
                         } else {
                             $this->setVar([
                                 'GRID_VIEW_CLASSES' => '',
                             ]);
-
-                            $this->setVar('has_thumbnail_block', '');
-                            $this->parse('has_icon_block', 'has_icon');
                         }
 
                         $hideStudentPhoto = $this->getUser()->getRole()->isStudent()
@@ -195,12 +185,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                         $this->parse('person_block', 'person', true);
 
-                        /* Clear children after parsing out the parent
-                            */
-                        $this->setVar([
-                            'has_thumbnail_block' => '',
-                            'has_icon_block'      => '',
-                        ]);
                     } catch (MapperException $e) {
                         //noop
                     }
