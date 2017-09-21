@@ -25,6 +25,14 @@ class Component extends Filter\AbstractComponent
     private $courseSpecs;
 
     /**
+     * UnitSpecs imported to folders
+     * (we need this because injected folders may be neither classes or groups)
+     *
+     * @var GenericCollection|UnitSpec\Model[]
+     */
+    private $unitSpecsImportedToFolders;
+
+    /**
      * UnitSpecs imported to classes
      *
      * @var GenericCollection|UnitSpec\Model[]
@@ -40,13 +48,18 @@ class Component extends Filter\AbstractComponent
 
 
     /**
+     * Note that it is possible to inject a folder that is neither a class not group.
+     * In this case, it will most likely clobber user-selections, so don't select the units
+     * imported to that injected folder so the unit filter can be nulled.
+     *
      * @param Filter\IDefinition                         $definition
      * @param User                                       $user
      * @param Filter\Page\Model                          $pageFilter
      * @param GenericCollection|Filter\Selection\Model[] $userSelections
      * @param Filter\Selection\Mapper                    $filterSelectionMapper
-     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToClasses
-     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToGroups
+     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToFolders - the full set
+     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToClasses - to classes
+     * @param GenericCollection|UnitSpec\Model[]         $unitSpecsImportedToGroups  - to groups
      */
     public function __construct(
         Filter\IDefinition $definition,
@@ -54,19 +67,19 @@ class Component extends Filter\AbstractComponent
         Filter\Page\Model $pageFilter,
         GenericCollection $userSelections,
         Filter\Selection\Mapper $filterSelectionMapper,
+        GenericCollection $unitSpecsImportedToFolders,
         GenericCollection $unitSpecsImportedToClasses,
         GenericCollection $unitSpecsImportedToGroups
     ) {
         parent::__construct($definition, $user, $pageFilter, $userSelections, $filterSelectionMapper);
+        // (for injected folders that are neither classes or groups)
+        $this->unitSpecsImportedToFolders = $unitSpecsImportedToFolders;
         $this->unitSpecsImportedToClasses = $unitSpecsImportedToClasses;
         $this->unitSpecsImportedToGroups  = $unitSpecsImportedToGroups;
-
-        /** @var UnitSpec\Model[] $unitSpecs */
-        $unitSpecs         = $unitSpecsImportedToClasses->mergeUnique($unitSpecsImportedToGroups, 'id');
-        $this->courseSpecs = CourseSpec\Mapper::getInstance()->createCollection();
+        $this->courseSpecs                = CourseSpec\Mapper::getInstance()->createCollection();
 
         // Build indexed collection of course specs
-        foreach ($unitSpecs as $unitSpec) {
+        foreach ($unitSpecsImportedToFolders as $unitSpec) {
             $courseSpec = $unitSpec->getCourse();
             if (!$this->courseSpecs->offsetExists($courseSpec->getId())) {
                 $this->courseSpecs->setOffset($courseSpec->getId(), $courseSpec);
@@ -79,7 +92,7 @@ class Component extends Filter\AbstractComponent
         }
 
         // Add unitSpecs to courseSpecs
-        foreach ($unitSpecs as $unitSpec) {
+        foreach ($unitSpecsImportedToFolders as $unitSpec) {
             $unitSpec->getCourse()->getUnits()->setOffset($unitSpec->getId(), $unitSpec);
         }
 
@@ -104,38 +117,40 @@ class Component extends Filter\AbstractComponent
         $roleType            = $this->getUser()->getRole()->getType();
         $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
-        foreach ($abstractOptions as $option) {
+        // The '(none)' abstract-option maps to a single '(none)' concrete-option. Should it be available?
+        if ($abstractOptions[Definition::KEY_NONE]->getAvailable()) {
+            $selected                                  = $abstractOptions[Definition::KEY_NONE]->getDefaults()[$roleType]->getSelected();
+            $availableSelections[Definition::KEY_NONE] = $this->createSelection(Definition::KEY_NONE, $selected);
+        }
 
-            if($isUserConfigurable && !$option->getAvailable()){
+        // Should units imported to classes be available?
+        if (!$isUserConfigurable || $abstractOptions[Definition::KEY_IMPORTED_TO_CLASS]->getAvailable()) {
+            $availableSelections = $this->insertSelections(
+                $availableSelections,
+                $this->unitSpecsImportedToClasses,
+                $abstractOptions[Definition::KEY_IMPORTED_TO_CLASS]->getDefaults()[$roleType]->getSelected()
+            );
+        }
+
+        // Should units imported to groups be available?
+        if (!$isUserConfigurable || $abstractOptions[Definition::KEY_IMPORTED_TO_GROUP]->getAvailable()) {
+            $availableSelections = $this->insertSelections(
+                $availableSelections,
+                $this->unitSpecsImportedToGroups,
+                $abstractOptions[Definition::KEY_IMPORTED_TO_GROUP]->getDefaults()[$roleType]->getSelected()
+            );
+        }
+
+        // The system may have injected folders into the filter panel that are neither classes nor groups.
+        // In this case any units imported to these folders will be added yet. We can also safely assume in
+        // this scenario that no options should be selected because overrides will take care of it for us.
+        foreach ($this->unitSpecsImportedToFolders as $unitSpecId => $unitSpec) {
+            // Already processed?
+            if ($this->unitSpecsImportedToClasses[$unitSpecId] || $this->unitSpecsImportedToGroups[$unitSpecId]) {
                 continue;
             }
-
-            $selected = $option->getDefaults()[$roleType]->getSelected();
-
-            // Is this the '(none)' abstract option?
-            if (Definition::KEY_NONE === $option->getKey()) {
-                $key                       = $option->getKey();
-                $availableSelections[$key] = $this->createSelection($key, $selected);
-            } elseif (Definition::KEY_IMPORTED_TO_CLASS === $option->getKey()) {
-                foreach ($this->unitSpecsImportedToClasses as $unitSpec) {
-                    $key                       = (string)$unitSpec->getId();
-                    $availableSelections[$key] = $this->createSelection($key, $selected);
-                }
-            } elseif (Definition::KEY_IMPORTED_TO_GROUP === $option->getKey()) {
-                foreach ($this->unitSpecsImportedToGroups as $unitSpec) {
-                    $key = (string)$unitSpec->getId();
-
-                    if (!$availableSelections->offsetExists($key)) {
-                        // Does the unit spec not yet exist in selections ?
-                        $availableSelections[$key] = $this->createSelection($key, $selected);
-                    } elseif ($selected) {
-                        // Does it exist, ensure it is selected if abstract option is selected
-                        $availableSelections[$key]->setSelected(true);
-                    }
-                }
-            } else {
-                throw new \InvalidArgumentException("Unknown option key: {$option->getKey()}");
-            }
+            // Unit's folder must have been injected, so ensure this unit is available.
+            $availableSelections[$unitSpecId] = $this->createSelection($unitSpecId, false);
         }
         return $availableSelections;
     }
@@ -152,4 +167,30 @@ class Component extends Filter\AbstractComponent
         ]);
     }
 
+
+    /**
+     * Convert the unitSpecs into selections, and insert into available selection collection.
+     *
+     * @param GenericCollection|Filter\Selection\Model[] $availableSelections
+     * @param GenericCollection|UnitSpec\Model[]         $unitSpecs
+     * @param bool                                       $selected
+     * @return GenericCollection
+     */
+    private function insertSelections(
+        GenericCollection $availableSelections,
+        GenericCollection $unitSpecs,
+        bool $selected
+    ): GenericCollection {
+        foreach ($unitSpecs as $unitSpec) {
+            $key = (string)$unitSpec->getId();
+            if (!$availableSelections->keyExists($key)) {
+                // Doesn't exist?
+                $availableSelections[$key] = $this->createSelection($key, $selected);
+            } elseif ($selected) {
+                // exists and should be selected?
+                $availableSelections[$key]->setSelected(true);
+            }
+        }
+        return $availableSelections;
+    }
 }
