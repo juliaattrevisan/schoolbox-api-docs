@@ -555,7 +555,14 @@ class Controller extends Base
         $override = !empty($this->getRequest()->post['override_validation'])
             && $resource->canUserModerateThisItem($this->getUser());
 
-        // Bypass any validation if overriding
+
+        // Having a power to override doesn't make you a God. Start comes always before End.
+        $errors = array_merge_recursive(
+            $errors,
+            $this->validateLeadTime($resource, $startDate)
+        );
+
+        // Bypass any other validation if overriding
         if ($override) {
             return $errors;
         }
@@ -593,12 +600,6 @@ class Controller extends Base
 
         // Validate any new booking or existing booking if dates have been modified
         if ($isNewBooking || $isTimeChanged) {
-
-            // As long as I have startTime, I can check leadtime.
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validateLeadTime($resource, $startDate)
-            );
 
             $errors = array_merge_recursive(
                 $errors,
