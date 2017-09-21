@@ -96,7 +96,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('has_members', "member_email", "member_email_block");
             $this->setBlock('has_members', "person", "person_block");
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
-            $this->setBlock('person', 'student_photo_visible', 'student_photo_visible_block');
+            $this->setBlock('person', 'photo', 'photo_block');
 
             $this->setVar([
                 'empty_state_block'   => '',
@@ -187,18 +187,29 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                             ]);
                         }
 
-                        $hideStudentPhoto = $this->getUser()->getRole()->isStudent()
-                            ? $this->getConfigMapper()->get('protect_student_photo')
-                            : false;
+                        //Hide Student Photo
+                        if($this->getUser()->getRole()->isStudent()) {
+                            if ($user->getRole()->isStudent() && $this->getConfigMapper()->get('protect_student_photo')) {
+                                $this->setVar('photo_block', '');
+                            } else {
+                                $this->parse('photo_block', 'photo');
+                            }
+                        }
 
-                        if ($hideStudentPhoto && $user->getRole()->isStudent()) {
-                            $this->setVar('student_photo_visible_block', '');
-                        } else {
-                            $this->parse('student_photo_visible_block', 'student_photo_visible');
+                        //Hide Staff Photo
+                        if($user->getRole()->isStaff()) {
+                            $photoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+
+                            if ($photoVisibility == 2 && $this->getUser()->getRole()->isStudent()) {
+                                $this->setVar('photo_block', '');
+                            } else if ($photoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
+                                $this->setVar('photo_block', '');
+                            } else {
+                                $this->parse('photo_block', 'photo');
+                            }
                         }
 
                         $this->parse('person_block', 'person', true);
-
                     }
 
                     $i++;

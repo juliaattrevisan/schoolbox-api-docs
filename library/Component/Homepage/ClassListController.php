@@ -101,7 +101,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $this->setBlock('has_students', 'student_email', 'student_email_block');
             $this->setBlock('has_students', 'parent', 'parent_block');
             $this->setBlock('has_students', 'parent_email', 'parent_email_block');
-            $this->setBlock('person', 'student_photo_visible', 'student_photo_visible_block');
+            $this->setBlock('person', 'photo', 'photo_block');
 
             $this->setVar([
                 'empty_state_block'   => '',
@@ -173,14 +173,13 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             ]);
                         }
 
-                        $hideStudentPhoto = $this->getUser()->getRole()->isStudent()
-                            ? $this->getConfigMapper()->get('protect_student_photo')
-                            : false;
-
-                        if ($hideStudentPhoto && $user->getRole()->isStudent()) {
-                            $this->setVar('student_photo_visible_block', '');
-                        } else {
-                            $this->parse('student_photo_visible_block', 'student_photo_visible');
+                        //Hide Student Photo
+                        if($user->getRole()->isStudent()) {
+                            if ($this->getUser()->getRole()->isStudent() && $this->getConfigMapper()->get('protect_student_photo')) {
+                                $this->setVar('photo_block', '');
+                            } else {
+                                $this->parse('photo_block', 'photo');
+                            }
                         }
 
                         $this->parse('person_block', 'person', true);
