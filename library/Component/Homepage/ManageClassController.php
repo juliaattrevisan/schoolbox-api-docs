@@ -55,6 +55,13 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $isGroupPage = $this->getContext()->isGroup();
         $isClassPage = $this->getContext()->isClass();
 
+        /* This boolean is a hack to make the Class Actions heading
+         * render only when needed.
+         * It gets set to true whenever content that should fall under
+         * this heading is parsed
+         */
+        $hasClassActions = false;
+
         // If context is not a group or class, render nothing
         if (!$isGroupPage && !$isClassPage) {
             return false;
@@ -81,6 +88,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         /* Output student grades link to students (other users with READ access may be able to see this page) */
         if (($involvedInGroup || $involvedInClass) && UserAccess::ACCESS_READ === $this->getContentPermission()) {
             $this->parse('student_grades_block', 'student_grades');
+            $hasClassActions = true;
         } else {
             $this->setVar('student_grades_block', '');
         }
@@ -90,15 +98,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('class_list_block', '');
         } else {
             $this->parse('class_list_block', 'class_list');
+            $hasClassActions = true;
         }
 
         // Render link to markbook if user is staff and has WRITE+ perm
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getUser()->getRole()->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
+            $hasClassActions = true;
         } else {
             $this->setVar('class_mark_block', '');
         }
 
-        return true; // everything went according to plan
+        return $hasClassActions;
     }
 }
