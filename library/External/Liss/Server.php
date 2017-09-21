@@ -673,7 +673,7 @@ class External_Liss_Server
         $log = self::log();
 
         $configLoader = new ConfigLoader();
-        $helper = new External\Liss\Helper($configLoader);
+        $helper = new External\Liss\Helper\PublishDailyData($configLoader);
 
         /* Owner set in config
          */

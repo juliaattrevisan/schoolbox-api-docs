@@ -9,14 +9,14 @@
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace External\Liss;
+namespace External\Liss\Helper;
 use Event\Source\Model as EventSource;
 use Event\Source\Mapper as EventSourceMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Mapper\Exception as MapperException;
 
-class Helper
+class PublishDailyData
 {
     /**
      * Source Name
