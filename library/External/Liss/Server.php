@@ -32,7 +32,7 @@
  */
 
 use \Alaress\Lumberjack\Logger;
-use Event\Source\Mapper as EventSourceMapper;
+use External\Liss\Helper\PublishDailyData as PublishDailyDataHelper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -673,7 +673,7 @@ class External_Liss_Server
         $log = self::log();
 
         $configLoader = new ConfigLoader();
-        $helper = new External\Liss\Helper\PublishDailyData($configLoader);
+        $helper = new PublishDailyDataHelper($configLoader);
         $eventMapper = EventMapper::getInstance();
         $eventTypeMapper = EventTypeMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();
