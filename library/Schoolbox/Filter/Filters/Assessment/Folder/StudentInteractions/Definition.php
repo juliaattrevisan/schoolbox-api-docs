@@ -24,6 +24,9 @@ class Definition extends FolderFilter\Definition
     // The name to expose in the UI
     const NAME = 'Student Folders';
 
+    const KEY_RESPONSE = 'response';
+    const KEY_FEEDBACK = 'feedback';
+
 
     /**
      * @inheritdoc
@@ -35,6 +38,19 @@ class Definition extends FolderFilter\Definition
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function getCustomKeys()
+    {
+        return [
+            self::KEY_CLASSES,
+            self::KEY_GROUPS,
+            self::KEY_RESPONSE,
+            self::KEY_FEEDBACK,
+        ];
+    }
+
 
     /**
      * @inheritdoc
@@ -42,5 +58,23 @@ class Definition extends FolderFilter\Definition
     protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/Folder/StudentInteractions/templates';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLabel($key)
+    {
+        switch ($key) {
+            case self::KEY_CLASSES:
+                return 'Currently enrolled classes';
+            case self::KEY_GROUPS:
+                return 'Current group members';
+            case self::KEY_RESPONSE:
+                return 'Folders where student responded';
+            case self::KEY_FEEDBACK:
+                return 'Folders where student given feedback';
+        }
+        throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
     }
 }

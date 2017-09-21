@@ -11,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
 
@@ -72,21 +71,8 @@ class Factory extends FolderFilter\Factory
             }
         }
 
-        // Divide folders into Classes and Groups (not mutually exclusive!)
-
-        // Does the folder have class codes ?
-        $classes = $folders->filter(function (Folder\Model $folder) {
-            return $folder->getCodes()->count();
-        })->indexBy('id');
-
-        // Does the folder have a group ?
-        $groups = $folders->filter(function (Folder\Model $folder) {
-            return $folder->getGroup();
-        })->indexBy('id');
-
         return [
-            'classes' => $classes,
-            'groups'  => $groups,
+            'folders' => $folders->sortBy('name', 'ASC'),
         ];
     }
 }

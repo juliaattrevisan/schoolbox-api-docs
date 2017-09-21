@@ -11,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
 
@@ -32,34 +31,25 @@ class Factory extends FolderFilter\Factory
         Collection $overrides,
         User $viewee = null
     ) {
-        $folders = $this->getFolderMapper()->createCollection()
-                        ->mergeUnique($this->getFolderMapper()->findFoldersWithFeedbackToStudent($viewee), 'id')
-                        ->mergeUnique($this->getFolderMapper()->findFoldersWithResponses($viewee), 'id')
-                        ->sortBy('name', 'ASC');
-
-
-        // Should this role type see classes for this page?
         $options = $pageFilter->getOptions();
+        $folders = $this->getFolderMapper()->createCollection();
 
-        $showClasses = $options[Definition::KEY_CLASSES]->getAvailable();
-        $showGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
-
-
-        // Divide folders into Classes and Groups (not mutually exclusive!)
-
-        // Does the folder have class codes ?
-        $classes = $folders->filter(function (Folder\Model $folder) use ($showClasses) {
-            return $showClasses && $folder->getCodes()->count();
-        })->indexBy('id');
-
-        // Does the folder have a group ?
-        $groups = $folders->filter(function (Folder\Model $folder) use ($showGroups) {
-            return $showGroups && $folder->getGroup();
-        })->indexBy('id');
+        if($options[Definition::KEY_CLASSES]->getAvailable()){
+            // TODO insert enrolled classes
+        }
+        if($options[Definition::KEY_GROUPS]->getAvailable()){
+            // TODO insert enrolled groups
+        }
+        if($options[Definition::KEY_RESPONSE]->getAvailable()){
+            $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithResponses($viewee), 'id');
+        }
+        if($options[Definition::KEY_FEEDBACK]->getAvailable()){
+            $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithFeedbackToStudent($viewee), 'id');
+        }
+        $folders->sortBy('name', 'ASC');
 
         return [
-            'classes' => $classes,
-            'groups'  => $groups,
+            'folders' => $folders,
         ];
     }
 }
