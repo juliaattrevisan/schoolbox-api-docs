@@ -187,6 +187,17 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                             }
                         }
 
+                        //Hide Staff Photo
+                        if($user->getRole()->isStaff()) {
+                            if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
+                                $this->setVar('photo_block', '');
+                            } else if ($staffPhotoVisibilty == 1 && !$veiwer->getRole()->isStaff()) {
+                                $this->setVar('photo_block', '');
+                            } else {
+                                $this->parse('photo_block', 'photo');
+                            }
+                        }
+
                         $this->parse('person_block', 'person', true);
 
                     } catch (MapperException $e) {

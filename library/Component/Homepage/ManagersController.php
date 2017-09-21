@@ -187,6 +187,17 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                         ]);
                     }
 
+                    //Hide Student Photo
+                    if($manager->getRole()->isStudent()) {
+                        if ($veiwer->getRole()->isStudent() && $studentPhotoHidden) {
+                            $this->setVar('photo_block', '');
+                        } else if ($veiwer->getRole()->isParent() && !$veiwer->isParentOf($user->loadParents())) {
+                            $this->setVar('photo_block', '');
+                        } else {
+                            $this->parse('photo_block', 'photo');
+                        }
+                    }
+
                     //Hide Staff Photo
                     if($manager->getRole()->isStaff()) {
                         if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
