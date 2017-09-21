@@ -674,11 +674,15 @@ class External_Liss_Server
 
         $configLoader = new ConfigLoader();
         $helper = new External\Liss\Helper\PublishDailyData($configLoader);
+        $eventMapper = EventMapper::getInstance();
+        $eventTypeMapper = EventTypeMapper::getInstance();
+        $folderMapper = FolderMapper::getInstance();
+        $userMapper = UserMapper::getInstance();
 
         /* Owner set in config
          */
         try {
-            $author = UserMapper::getInstance()->findById($configLoader->get('external_liss_calendar_owner'));
+            $author = $userMapper->findById($configLoader->get('external_liss_calendar_owner'));
         }
         catch (MapperException $e) {
             $log->critical(self::MISSING_CALENDAR_OWNER);
@@ -690,15 +694,22 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $log, $configLoader);
 
         if ($authenticator->isAuthenticated()) {
-            $eventMapper = EventMapper::getInstance();
 
+            /* Save it specifically for this user without mass reset which
+             * is what EventRelations normally does - we only need access
+             * to specific operations for saving personal/folder events
+             */
+            $eventRelations = new EventRelations(null, null, null);
+
+            /* Set up all events in a nicer format
+             */
             $allEvents = $helper->reformatAllEvents($message->params[3]->me['array']);
 
             /* Set a default event type for now
              * TODO: Replace with something smarter
              */
             /** @var EventType $eventType */
-            $eventType = EventTypeMapper::getInstance()->findById(1);
+            $eventType = $eventTypeMapper->findById(1);
 
             /* Now do it in a way that makes sense
              * Map everything together and persist it to the db
@@ -732,12 +743,6 @@ class External_Liss_Server
                 $event->setStartDateTime($currentEvent['startDateTime']);
                 $event->setEndDateTime($currentEvent['endDateTime']);
 
-                /* Save it specifically for this user without mass reset which
-                 * is what EventRelations normally does - we only need access
-                 * to specific operations for saving personal/folder events
-                 */
-                $eventRelations = new EventRelations(null, null, null);
-
                 /* Decide between homepage events and personal events
                  * Determine which one based on the presence/content of classCode
                  *
@@ -748,7 +753,7 @@ class External_Liss_Server
                     /* Skip if we can't find a corresponding folder
                      */
                     try {
-                        $folder = FolderMapper::getInstance()->findByCode($currentEvent['classCode']);
+                        $folder = $folderMapper->findByCode($currentEvent['classCode']);
                     }
                     catch (MapperException $e) {
                         $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
@@ -772,7 +777,7 @@ class External_Liss_Server
 
                     foreach ($combined as $currentExternalId) {
                         try {
-                            $user = UserMapper::getInstance()->findByExternalId($currentExternalId);
+                            $user = $userMapper->findByExternalId($currentExternalId);
                             $event->setOwner($user);
                             $eventMapper->save($event);
 
