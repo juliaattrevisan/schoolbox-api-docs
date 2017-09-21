@@ -735,6 +735,10 @@ class External_Liss_Server
                     $event->setStartDateTime($currentEvent['startDateTime']);
                     $event->setEndDateTime($currentEvent['endDateTime']);
 
+                    /* Save it specifically for this user without mass reset which
+                     * is what EventRelations normally does - we only need access
+                     * to specific operations for saving personal/folder events
+                     */
                     $eventRelations = new EventRelations(null, null, null);
 
                     /* Decide between homepage events and personal events
@@ -759,11 +763,6 @@ class External_Liss_Server
                         $event->setAccess(Event::ACCESS_GROUP);
                         $eventMapper->save($event);
 
-                        /* Save it specifically for this folder without mass reset
-                         * which is what EventRelations normally does
-                         *
-                         * Save a corresponding eventSource so we know from whence this event came
-                         */
                         $eventRelations->saveFolderRelation($event, [$folder->getId()]);
                         $helper->saveEventSource($event, $currentEvent['guid']);
                     }
@@ -780,11 +779,6 @@ class External_Liss_Server
                                 $event->setOwner($user);
                                 $eventMapper->save($event);
 
-                                /* Save it specifically for this user without mass reset
-                                 * which is what EventRelations normally does
-                                 *
-                                 * Save a corresponding eventSource so we know from whence this event came
-                                 */
                                 $eventRelations->savePersonalRelation($event);
                                 $helper->saveEventSource($event, $currentEvent['guid']);
                             }
