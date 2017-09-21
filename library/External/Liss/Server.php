@@ -806,7 +806,7 @@ class External_Liss_Server
                          */
                         self::saveEventSource($event, self::generateSourceName($configLoader), $currentEvent['guid']);
                     }
-                    elseif (!strlen($currentEvent['classCode'])) {
+                    else {
                         $event->setAccess(Event::ACCESS_PERSONAL);
 
                         /* Teachers and Students can be treated synonymously
@@ -833,9 +833,6 @@ class External_Liss_Server
                                 $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}) for user {$currentExternalId}: no schoolbox account found");
                             }
                         }
-                    }
-                    else {
-                        $skipCount++;
                     }
                 }
             }
