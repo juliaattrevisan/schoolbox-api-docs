@@ -23,6 +23,7 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
     $this->setFile(TEMPLATE_content, 'class/classList.html');
     $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
+    $this->setBlock(TEMPLATE_content, 'housemaster_email', 'housemaster_email_block');
     $this->setBlock(TEMPLATE_content, 'select_all', 'select_all_block');
     $this->setBlock('student_list', 'select_student', 'select_student_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
@@ -91,6 +92,11 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
 
     if ($canEmail) {
         $this->parse('select_all_block', 'select_all');
+        $this->parse('housemaster_email_block', 'housemaster_email');
+    } else {
+        $this->setVar([
+            'housemaster_email_block' => ''
+        ]);
     }
 
     $classList = $synergeticClass->getStudents($code);
