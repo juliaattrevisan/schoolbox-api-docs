@@ -135,6 +135,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
 
             $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+            $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
             $veiwer = $this->getUser();
 
             $i = 0;
