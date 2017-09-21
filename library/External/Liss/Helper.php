@@ -10,7 +10,11 @@
  * @link        http://www.alaress.com.au/
  */
 namespace External\Liss;
+use Event\Source\Model as EventSource;
+use Event\Source\Mapper as EventSourceMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Calendar\Event;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Helper
 {
@@ -23,7 +27,6 @@ class Helper
      * @var ConfigLoader
      */
     private $configLoader;
-
 
     /**
      * Helper constructor.
@@ -42,6 +45,28 @@ class Helper
     public function generateSourceName()
     {
         return self::EVENT_SOURCE_NAME . '_' . $this->getConfigLoader()->get('external_liss_schoolcode');
+    }
+
+    /**
+     * Save an event source
+     *
+     * @param Event  $event
+     * @param string $guid
+     * @throws MapperException
+     * @throws \PDOException
+     */
+    public function saveEventSource(Event $event, $guid)
+    {
+        /* Save a corresponding eventSource so we know from whence this event came
+         */
+        $eventSourceMapper = EventSourceMapper::getInstance();
+
+        /** @var EventSource $eventSource */
+        $eventSource = EventSourceMapper::getInstance()->createModel();
+        $eventSource->setEvent($event);
+        $eventSource->setSourceName($this->generateSourceName());
+        $eventSource->setGuid($guid);
+        $eventSourceMapper->save($eventSource);
     }
 
     /* Getters/Setters

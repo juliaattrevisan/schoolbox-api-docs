@@ -32,8 +32,6 @@
  */
 
 use \Alaress\Lumberjack\Logger;
-use Event\Source\Model as EventSource;
-use Event\Source\Mapper as EventSourceMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -802,7 +800,7 @@ class External_Liss_Server
 
                         /* Save a corresponding eventSource so we know from whence this event came
                          */
-                        self::saveEventSource($event, $helper->generateSourceName(), $currentEvent['guid']);
+                        $helper->saveEventSource($event, $currentEvent['guid']);
                     }
                     else {
                         $event->setAccess(Event::ACCESS_PERSONAL);
@@ -825,7 +823,7 @@ class External_Liss_Server
 
                                 /* Save a corresponding eventSource so we know from whence this event came
                                  */
-                                self::saveEventSource($event, $helper->generateSourceName(), $currentEvent['guid']);
+                                $helper->saveEventSource($event, $currentEvent['guid']);
                             }
                             catch (MapperException $e) {
                                 $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}) for user {$currentExternalId}: no schoolbox account found");
@@ -847,29 +845,6 @@ class External_Liss_Server
         }
 
         return self::generateResponse(self::AUTHENTICATION_FAILED);
-    }
-
-    /**
-     * Save an event source
-     *
-     * @param Event $event
-     * @param string $sourceName
-     * @param string $guid
-     * @throws MapperException
-     * @throws PDOException
-     */
-    static private function saveEventSource(Event $event, $sourceName, $guid)
-    {
-        /* Save a corresponding eventSource so we know from whence this event came
-         */
-        $eventSourceMapper = EventSourceMapper::getInstance();
-
-        /** @var EventSource $eventSource */
-        $eventSource = EventSourceMapper::getInstance()->createModel();
-        $eventSource->setEvent($event);
-        $eventSource->setSourceName($sourceName);
-        $eventSource->setGuid($guid);
-        $eventSourceMapper->save($eventSource);
     }
 
     /**
