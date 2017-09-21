@@ -134,7 +134,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $userAccessMapper = new UserAccessMapper();
             $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
 
-            $photoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+            $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
 
             $i = 0;
             foreach ($managerList as $manager) {
@@ -187,9 +187,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     }
 
                     //Hide Staff Photo
-                    if ($photoVisibility == 2 && $this->getUser()->getRole()->isStudent()) {
+                    if ($staffPhotoVisibilty == 2 && $this->getUser()->getRole()->isStudent()) {
                         $this->setVar('photo_block', '');
-                    } else if ($photoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
+                    } else if ($staffPhotoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
                         $this->setVar('photo_block', '');
                     } else {
                         $this->parse('photo_block', 'photo');

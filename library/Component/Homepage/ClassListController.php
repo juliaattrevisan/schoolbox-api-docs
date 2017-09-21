@@ -136,6 +136,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $userMapper           = \Schoolbox\UserMapper::getInstance();
             $allStudentEmails     = [];
 
+            $studentPhotoHidden = $this->getConfigMapper()->get('protect_student_photo');
+
             if (is_array($allStudents)) {
                 foreach ($allStudents as $currentStudent) {
 
@@ -175,7 +177,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                         //Hide Student Photo
                         if($user->getRole()->isStudent()) {
-                            if ($this->getUser()->getRole()->isStudent() && $this->getConfigMapper()->get('protect_student_photo')) {
+                            if ($this->getUser()->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');

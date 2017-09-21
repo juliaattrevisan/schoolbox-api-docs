@@ -143,6 +143,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $emailObj = new Email();
             $emailall = [];
 
+            $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+            $studentPhotoHidden = $this->getConfigMapper()->get('protect_student_photo');
+
             if ($userListCount > 0) {
                 $i = 0;
                 foreach ($userList as $user) {
@@ -189,7 +192,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                         //Hide Student Photo
                         if($this->getUser()->getRole()->isStudent()) {
-                            if ($user->getRole()->isStudent() && $this->getConfigMapper()->get('protect_student_photo')) {
+                            if ($user->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
@@ -198,11 +201,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                         //Hide Staff Photo
                         if($user->getRole()->isStaff()) {
-                            $photoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
-
-                            if ($photoVisibility == 2 && $this->getUser()->getRole()->isStudent()) {
+                            if ($staffPhotoVisibilty == 2 && $this->getUser()->getRole()->isStudent()) {
                                 $this->setVar('photo_block', '');
-                            } else if ($photoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
+                            } else if ($staffPhotoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
