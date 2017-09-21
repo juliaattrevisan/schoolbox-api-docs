@@ -545,14 +545,14 @@ fi
 if [ "$enable_xdebug" == "true" ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
-    echo "xdebug.remote_enable=1
-xdebug.remote_connect_back=1
-xdebug.var_display_max_data=-1
-xdebug.var_display_max_depth=10
-xdebug.collect_params=3
-xdebug.profiler_enable=0
-xdebug.profiler_enable_trigger=1
-xdebug.profiler_output_dir=/vagrant/data" > /etc/php/7.1/mods-available/xdebug.ini;
+    if [ -f /vagrant/tools/xdebug.ini ];
+    then
+        echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
+        cp -f /vagrant/tools/xdebug.ini /etc/php/7.1/mods-available/xdebug.ini;
+    else
+        echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
+        cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.1/mods-available/xdebug.ini;
+    fi
     if [ -d /etc/php/7.1/apache2/conf.d ];
     then
         ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/apache2/conf.d/20-xdebug.ini >/dev/null 2>&1;
