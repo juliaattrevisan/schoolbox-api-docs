@@ -38,6 +38,14 @@ class PublishDailyData
     }
 
     /**
+     * Remove all events using this source
+     */
+    public function cleanse()
+    {
+        EventSourceMapper::getInstance()->deleteEventsFromSource($this->generateSourceName());
+    }
+
+    /**
      * Preprocess all this stuff
      * Make it easier to understand because their data structure is blasphemously terrible
      *

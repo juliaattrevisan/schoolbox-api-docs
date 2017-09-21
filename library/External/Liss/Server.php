@@ -32,10 +32,10 @@
  */
 
 use \Alaress\Lumberjack\Logger;
+use Event\Source\Mapper as EventSourceMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\UserMapper;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRelations;
@@ -52,7 +52,7 @@ use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-
+use Schoolbox\UserMapper;
 
 class External_Liss_Server
 {
@@ -695,6 +695,16 @@ class External_Liss_Server
 
         if ($authenticator->isAuthenticated()) {
 
+            /* Cleanse all previous versions of events using the same source
+             */
+            $helper->cleanse();
+
+            /* Set a default event type for now
+             * TODO: Replace with something smarter
+             */
+            /** @var EventType $eventType */
+            $eventType = $eventTypeMapper->findById(1);
+
             /* Save it specifically for this user without mass reset which
              * is what EventRelations normally does - we only need access
              * to specific operations for saving personal/folder events
@@ -704,12 +714,6 @@ class External_Liss_Server
             /* Set up all events in a nicer format
              */
             $allEvents = $helper->reformatAllEvents($message->params[3]->me['array']);
-
-            /* Set a default event type for now
-             * TODO: Replace with something smarter
-             */
-            /** @var EventType $eventType */
-            $eventType = $eventTypeMapper->findById(1);
 
             /* Now do it in a way that makes sense
              * Map everything together and persist it to the db
