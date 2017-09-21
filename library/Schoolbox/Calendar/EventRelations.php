@@ -183,17 +183,19 @@ class EventRelations {
     /**
      * Set event
      *
-     * @param null $event
+     * @param Event $event
+     * @return $this
      */
     private function setEvent($event)
     {
         $this->event = $event;
+        return $this;
     }
 
     /**
      * Get event
      *
-     * @return null
+     * @return Event
      */
     private function getEvent()
     {
@@ -204,10 +206,12 @@ class EventRelations {
      * Set group
      *
      * @param array $group
+     * @return $this
      */
     private function setGroup($group)
     {
         $this->group = $group;
+        return $this;
     }
 
     /**
@@ -224,10 +228,12 @@ class EventRelations {
      * Set level
      *
      * @param int $level
+     * @return $this
      */
     private function setLevel($level)
     {
         $this->level = $level;
+        return $this;
     }
 
     /**
@@ -244,10 +250,12 @@ class EventRelations {
      * Set roles
      *
      * @param array $roles
+     * @return $this
      */
     private function setRoles($roles)
     {
         $this->roles = $roles;
+        return $this;
     }
 
     /**
@@ -264,10 +272,12 @@ class EventRelations {
      * Set CategoryMapper
      *
      * @param \Schoolbox\Calendar\Relation\CategoryMapper $categoryMapper
+     * @return $this
      */
     private function setCategoryMapper($categoryMapper)
     {
         $this->categoryMapper = $categoryMapper;
+        return $this;
     }
 
     /**
@@ -284,10 +294,12 @@ class EventRelations {
      * Set PersonalMapper
      *
      * @param \Schoolbox\Calendar\Relation\PersonalMapper $personalMapper
+     * @return $this
      */
     private function setPersonalMapper($personalMapper)
     {
         $this->personalMapper = $personalMapper;
+        return $this;
     }
 
     /**
@@ -304,10 +316,12 @@ class EventRelations {
      * Set RoleMapper
      *
      * @param \Schoolbox\Calendar\Relation\RoleMapper $roleMapper
+     * @return $this
      */
     private function setRoleMapper($roleMapper)
     {
         $this->roleMapper = $roleMapper;
+        return $this;
     }
 
     /**
