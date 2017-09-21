@@ -54,10 +54,10 @@ class Model implements ISoftDeletable, JsonSerializable
 
 
     /**
-     * @param PastoralType\Model $pastoralType
+     * @param $pastoralType
      * @return $this
      */
-    public function setPastoralType(PastoralType\Model $pastoralType)
+    public function setPastoralType($pastoralType)
     {
         $this->pastoralType = $pastoralType;
         return $this;
