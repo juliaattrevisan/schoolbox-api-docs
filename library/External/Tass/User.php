@@ -11,6 +11,13 @@ use Schoolbox\User;
 
 class External_Tass_User implements External_UserInterface
 {
+
+    /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
+
     /**
      * @var MSSQL
     */
@@ -120,52 +127,52 @@ class External_Tass_User implements External_UserInterface
     function getStudent($tassID)
     {
         $query = "
-			SELECT
-				s.stud_code AS StudentID,
-				s.preferred_name AS StudentGiven1,
-				s.surname AS StudentSurname,
-				s.dob as StudentBirthDate,
-				'' AS StudentTutorName,
-				'' AS StudentHeadOfHouse,
-				'' AS HeadOfHouseID,
-				t.tch_name AS StudentFormStaffName,
-				'' AS StudentTutorDescription,
-				'' AS TeacherFormID,
-				s.form_cls AS StudentForm,
-				t.tch_code AS TeacherTutorID,
-				'' AS StudentTutor,
-				'' AS FormDescription,
-				h.hse_name AS StudentHouseDescription,
-				s.house AS StudentHouse,
-				s.year_grp AS StudentYearLevel,
-				'' AS StudentYearLevelCoordinator,
-				'' AS YearLevelCoordID,
-				'' AS StudentLockerBook,
-				'' AS StudentEmergencyName,
-				'' AS StudentEmergencyPhone,
-				'' AS StudentEmergencyPhoneAlt,
-				'' AS StudentEmergency2Name,
-				'' AS StudentEmergency2Phone,
-				'' AS StudentEmergency2PhoneAlt,
-				'' AS StudentEmergency3Name,
-				'' AS StudentEmergency3Phone,
-				'' AS StudentEmergency3PhoneAlt,
-				'' AS StudentMedicalAlert,
-				'' AS StudentSpecialNeedsFlag,
-				'' AS StudentStudiesCode,
-				'' AS AlertMessage,
-				boarder AS StudentBoarder,
-				'' AS Comment,
-				0 AS countIndividualEducationPlans
-			FROM student AS s
-			LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
-			-- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
-			LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND s.cmpy_code=t.cmpy_code
-			WHERE stud_code = '$tassID'
-		";
+        SELECT
+            s.stud_code AS StudentID,
+            s.preferred_name AS StudentGiven1,
+            s.surname AS StudentSurname,
+            CONVERT(nvarchar(30), s.dob, ".self::FORMAT_ISO8601." )  AS StudentBirthDate,
+            '' AS StudentTutorName,
+            '' AS StudentHeadOfHouse,
+            '' AS HeadOfHouseID,
+            t.tch_name AS StudentFormStaffName,
+            '' AS StudentTutorDescription,
+            '' AS TeacherFormID,
+            s.form_cls AS StudentForm,
+            t.tch_code AS TeacherTutorID,
+            '' AS StudentTutor,
+            '' AS FormDescription,
+            h.hse_name AS StudentHouseDescription,
+            s.house AS StudentHouse,
+            s.year_grp AS StudentYearLevel,
+            '' AS StudentYearLevelCoordinator,
+            '' AS YearLevelCoordID,
+            '' AS StudentLockerBook,
+            '' AS StudentEmergencyName,
+            '' AS StudentEmergencyPhone,
+            '' AS StudentEmergencyPhoneAlt,
+            '' AS StudentEmergency2Name,
+            '' AS StudentEmergency2Phone,
+            '' AS StudentEmergency2PhoneAlt,
+            '' AS StudentEmergency3Name,
+            '' AS StudentEmergency3Phone,
+            '' AS StudentEmergency3PhoneAlt,
+            '' AS StudentMedicalAlert,
+            '' AS StudentSpecialNeedsFlag,
+            '' AS StudentStudiesCode,
+            '' AS AlertMessage,
+            boarder AS StudentBoarder,
+            '' AS Comment,
+            0 AS countIndividualEducationPlans
+        FROM student AS s
+        LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
+        -- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
+        LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND s.cmpy_code=t.cmpy_code
+        WHERE stud_code = '$tassID'
+        ";
         $student = $this->getDatabase()->trimRow($this->getDatabase()->getRow($query));
-        if (preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
-            $student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
+        if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
+            $student['StudentBirthDate'] = $birthDate;
         } else {
             $student['StudentBirthDate'] = false;
         }

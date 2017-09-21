@@ -6,13 +6,18 @@
  */
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
 {
     use External_MssqlConnector;
     use External_Synergetic_ValidateExternalIdTrait;
+
+    /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
 
     /**
      * Constructor
@@ -333,7 +338,7 @@ class External_Synergetic_User implements External_UserInterface
             SELECT      vStudents.StudentID,
                         vStudents.StudentGiven1,
                         vStudents.StudentSurname,
-                        vStudents.StudentBirthDate,
+                        CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
                         vStudents.StudentTutorName,
                         vStudents.StudentHeadOfHouse,
                         House.HeadOfHouseID,
@@ -404,8 +409,8 @@ class External_Synergetic_User implements External_UserInterface
 
                 $student = $row;
 
-                if ($student['StudentBirthDate'] && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)) {
-                    $student['StudentBirthDate'] = strtotime("{$matches[2]} {$matches[1]} {$matches[3]}");
+                if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
+                    $student['StudentBirthDate'] = $birthDate;
                 } else {
                     $student['StudentBirthDate'] = false;
                 }

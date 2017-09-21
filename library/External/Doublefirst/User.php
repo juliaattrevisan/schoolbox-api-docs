@@ -19,6 +19,13 @@ use Schoolbox\User;
 
 class External_Doublefirst_User implements External_UserInterface
 {
+
+    /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
+
     /**
      * @var MSSQL
      */
@@ -29,6 +36,7 @@ class External_Doublefirst_User implements External_UserInterface
 
     /** @var External_Doublefirst_Helper */
     private $helper;
+
 
     /** Constructor */
     public function __construct()
@@ -356,7 +364,7 @@ class External_Doublefirst_User implements External_UserInterface
                 p.AdmissionNo                                       AS AdmissionNo,
                 ForeName                                            AS StudentGiven1,
                 Surname                                             AS StudentSurname,
-                BirthDate                                           AS StudentBirthDate,                
+                CONVERT(nvarchar(30), BirthDate, ".self::FORMAT_ISO8601." )              AS StudentBirthDate,                
                 ''                                                  AS StudentTutorName,
                 ''                                                  AS StudentHeadOfHouse,
                 ''                                                  AS HeadOfHouseID,
@@ -415,10 +423,8 @@ class External_Doublefirst_User implements External_UserInterface
             // fill in student record
             $student = $row;
 
-            if ($student['StudentBirthDate']
-                && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
-            ) {
-                $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+            if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
+                $student['StudentBirthDate'] = $birthDate;
             } else {
                 $student['StudentBirthDate'] = false;
             }

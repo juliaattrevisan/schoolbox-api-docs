@@ -8,6 +8,8 @@
  ************************************************************/
 class External_Synergetic_Stritas_User extends External_Synergetic_User
 {
+
+
     /**
      * Get a guy's info from Synergetic
      *
@@ -26,7 +28,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                     vStudents.StudentID,
                     vStudents.StudentGiven1,
                     vStudents.StudentSurname,
-                    vStudents.StudentBirthDate,
+                    CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
                     vStudents.StudentTutorName,
                     vStudents.StudentHeadOfHouse,
                     House.HeadOfHouseID,
@@ -93,10 +95,8 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 // fill in student record
                 $student = $row;
 
-                if ($student['StudentBirthDate']
-                    && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
-                ) {
-                    $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+                if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
+                    $student['StudentBirthDate'] = $birthDate;
                 } else {
                     $student['StudentBirthDate'] = false;
                 }

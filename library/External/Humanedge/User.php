@@ -49,6 +49,12 @@ class External_Humanedge_User implements External_UserInterface
     )";
 
     /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -67,7 +73,7 @@ class External_Humanedge_User implements External_UserInterface
                 s.Code AS StudentID,
                 s.FirstName AS StudentGiven1,
                 s.LastName AS StudentSurname,
-                s.DOB AS StudentBirthDate,
+                CONVERT(nvarchar(30), s.DOB, ".self::FORMAT_ISO8601." )  AS StudentBirthDate,
                 '' AS StudentHouseDescription,
                 s.House AS StudentHouse,
                 '' AS HeadOfHouseID,
@@ -103,12 +109,19 @@ class External_Humanedge_User implements External_UserInterface
         $i = 1;
         foreach ($this->getDatabase()->getAll($query) as $row) {
             if (empty($result)) {
+                if ($row['StudentBirthDate'] && $birthDate = strtotime($row['StudentBirthDate'])) {
+                    $row['StudentBirthDate'] = $birthDate;
+                } else {
+                    $row['StudentBirthDate'] = false;
+                }
+
                 $result = $row;
             } else {
                 $result["StudentEmergency{$i}Name"]     = $row['StudentEmergencyName'];
                 $result["StudentEmergency{$i}PhoneAlt"] = $row['StudentEmergencyPhoneAlt'];
                 $result["StudentEmergency{$i}Phone"]    = $row['StudentEmergencyPhone'];
             }
+
             $i++;
         }
         return $result;

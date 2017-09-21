@@ -14,6 +14,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 {
     use External_Synergetic_ValidateExternalIdTrait;
 
+    /**
+     * This identifies the CONVERT/CAST format for ISO8601 date
+     * yyyy-mm-ddThh:mi:ss.mmm
+     */
+    const FORMAT_ISO8601 = 126;
+
     /** @var MSSQL $database */
     private $database;
 
@@ -441,8 +447,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             AND t.FileYear = '%s'
             AND t.TimetableGroup = '%s'
             AND t.DayNumber = '%d'
-            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, 126), 10), t.TimeFrom) < '%d'
-            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeTo, 126), 10), t.TimeTo) > '%d'
+            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, ".self::FORMAT_ISO8601."), 10), t.TimeFrom) < '%d'
+            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeTo, ".self::FORMAT_ISO8601."), 10), t.TimeTo) > '%d'
         ";
 
         return $this->getDatabase()->getRow(
