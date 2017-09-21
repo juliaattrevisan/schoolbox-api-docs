@@ -1,4 +1,24 @@
 #!/bin/bash
+# Ensure running an appropriate era vagrant box
+if [ `cat /home/vagrant/.vagrant.buildtimestamp` -gt 1505952659 ];
+then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Vagrant box meets minimum requirements: 1505952660 Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
+else
+    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (> 1505952660). Current: "`cat /home/vagrant/.vagrant.buildtimestamp` >2;
+    echo "To fix this:";
+    echo "  vagrant destroy;";
+    echo "  vagrant box remove ubuntu-1404-php55;";
+    echo "  vagrant box remove ubuntu-1404-php71;";
+    if [ -f /vagrant/vagrant.yaml ] && [ `grep vagrant_box /vagrant/vagrant.yaml | grep -v '#' | wc -l` -gt 0 ];
+    then
+        echo "then:";
+        echo "  remove the 'vagrant_box' line from your vagrant.yaml file";
+    fi
+    echo "then:";
+    echo "  vagrant up;";
+    exit 1;
+fi;
+
 cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 cd $cachedir;
@@ -25,21 +45,11 @@ if [ ! -z $5 ]; then external_db_db=$5; fi;
 if [ ! -z $6 ]; then enable_xdebug=$6; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
-echo "[SB][`date +%Y-%m-%d\ %X`] Provision Script: vagrant-provision-1404-php55.sh";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
-
-# Ensure running an appropriate era vagrant box
-if [ `cat /home/vagrant/.vagrant.buildtimestamp` -gt 1505868373 ];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Vagrant box meets minimum requirements: 1505868374 Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
-else
-    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (> 1505868374). Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
-    exit 1;
-fi;
 
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
