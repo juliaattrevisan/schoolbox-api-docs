@@ -90,13 +90,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setBlock('has_members', "member_email", "member_email_block");
             $this->setBlock('has_members', "person", "person_block");
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
-            $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
-            $this->setBlock('person', 'has_icon', 'has_icon_block');
 
             $this->setVar([
                 'empty_state_block' => '',
-                'has_thumbnail_block' => '',
-                'has_icon_block' => '',
                 'person_block' => '',
                 'people_hidden_block' => '',
                 'MAX_MEMBERS' => self::MAX_MANAGERS,
@@ -181,26 +177,13 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                         $this->setVar([
                             'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
                         ]);
-
-                        $this->parse('has_thumbnail_block', 'has_thumbnail');
-                        $this->setVar('has_icon_block', '');
                     } else {
                         $this->setVar([
                             'GRID_VIEW_CLASSES' => '',
-                            'has_thumbnail_block' => '',
                         ]);
-
-                        $this->parse('has_icon_block', 'has_icon');
                     }
 
                     $this->parse('person_block', 'person', true);
-
-                    /* Clear children after parsing out the parent
-                     */
-                    $this->setVar([
-                        'has_thumbnail_block' => '',
-                        'has_icon_block' => '',
-                    ]);
                 }
 
                 $i++;
