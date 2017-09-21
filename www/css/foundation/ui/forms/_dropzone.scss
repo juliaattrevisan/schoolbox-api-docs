@@ -461,6 +461,8 @@ ul.az-error-list {
         text-align: center;
     }
     .dz-remove {
+        position: relative;
+        top: 1rem;
     }
     .dz-error .dz-error-mark,
     .dz-success .dz-success-mark {
@@ -473,6 +475,7 @@ ul.az-error-list {
         border: solid 1px $monsoon;
         box-sizing: border-box;
         float: left;
+        padding-bottom: 1rem;
     }
     img[data-dz-thumbnail] {
         margin: 9px;
@@ -664,7 +667,7 @@ ul.az-error-list {
 .dz-preview .dz-progress,
 .dropzone-previews .dz-preview .dz-progress {
     position: absolute;
-    top: 108px;
+    bottom: 6px;
     left: 6px;
     right: 6px;
     height: 6px;
