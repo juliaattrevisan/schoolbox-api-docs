@@ -578,16 +578,13 @@ class Controller extends Base
         // Updated booking
         else {
 
-            $existingStart = clone $existingBooking->getEvent()->getStartDateTime()->getDateTimeObject();
-            $existingEnd = clone $existingBooking->getEvent()->getEndDateTime()->getDateTimeObject();
-
             // Get the date and time changes from original booking
             $startDelta = Interval::createFromDateTimeDifference(
-                $existingStart,
+                clone $existingBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
                 $startDate
             );
             $endDelta = Interval::createFromDateTimeDifference(
-                $existingEnd,
+                clone $existingBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
                 $endDate
             );
 
@@ -623,9 +620,8 @@ class Controller extends Base
                 $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
             );
 
-            // Validate related and recurrent bookings of a new booking
             if ($isNewBooking) {
-
+                // Validate related and recurrent bookings of a new booking
                 if ($this->getRequest()->post['repeat_until']) {
                     foreach ($this->getAllRecurrenceDates($resource, $startDate, $endDate) as $check) {
                         list($resource, $thisStart, $thisEnd) = $check;
@@ -636,31 +632,13 @@ class Controller extends Base
                     }
                 }
             }
-
-
             else {
                 // Validating an existing booking?
                 // Check each item in the series, adjusting its dates.
                 // Work with a fresh copy of the booking, because it can get
                 // messed with.
-                $isTimeChanged = false;
-                $series = $this->getUpdatedSeries(
-                    $this->bookingMapper->findById($existingBooking->getId()),
-                    $startDate,
-                    $endDate,
-                    $this->getRelatedItemsFromForm(),
-                    $this->request->post['efficacy'],
-                    $isTimeChanged
-                );
 
-                $dateParts = array();
-                foreach ($series as $thisBooking) {
-                    if (!($thisBooking->isDeleted())) {
-                        $dateParts[] = array( $thisBooking->getResource(), $startDate, $endDate, $thisBooking );
-                    }
-                }
-
-                foreach ($dateParts as $check) {
+                foreach ($this->getAllRelatedBookingDates($existingBooking, $startDate, $endDate) as $check) {
                     list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
                     $errors = array_merge_recursive(
                         $errors,
@@ -1491,6 +1469,28 @@ class Controller extends Base
                     // Check all of $occurenceStart and $occurenceEnd
                     $dateParts[] = array( $resource, $occurenceStart, $occurenceEnd );
                 }
+            }
+        }
+
+        return $dateParts;
+    }
+
+    protected function getAllRelatedBookingDates (Model $existingBooking, Datetime $startDate, Datetime $endDate)
+    {
+        $isTimeChanged = false;
+        $series = $this->getUpdatedSeries(
+            $this->bookingMapper->findById($existingBooking->getId()),
+            $startDate,
+            $endDate,
+            $this->getRelatedItemsFromForm(),
+            $this->request->post['efficacy'],
+            $isTimeChanged
+        );
+
+        $dateParts = array();
+        foreach ($series as $thisBooking) {
+            if (!($thisBooking->isDeleted())) {
+                $dateParts[] = array( $thisBooking->getResource(), $startDate, $endDate, $thisBooking );
             }
         }
 
