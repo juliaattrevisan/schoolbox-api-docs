@@ -236,6 +236,8 @@ class Controller extends Base
     public function update(Model $item)
     {
         $bookingList = null;
+        $originalStart =  clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
+        $originalEnd = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
 
         // Perform validation, but leave this booking out of calculations.
         $code   = 200;
@@ -256,6 +258,18 @@ class Controller extends Base
                 $isTimeChanged
             );
 
+            // Get the date and time changes from original booking
+            $startDelta = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getStartDateTime()->getDateTimeObject(),
+                $originalStart
+            );
+            $endDelta = Interval::createFromDateTimeDifference(
+                $item->getEvent()->getEndDateTime()->getDateTimeObject(),
+                $originalEnd
+            );
+
+            $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
+            
             // Save the whole series
             $bookingList = new Collection();
             foreach ($series as $booking) {
@@ -265,6 +279,16 @@ class Controller extends Base
                 $event->setCampusCollection(new Collection());
                 $event->setDetail($booking->getNotes());
                 $this->eventMapper->save($event);
+
+                //If item is moderated, already approved, and time changed, set item to need approval again
+                $moderationId = $booking->getResource()->getModerationType()->getId();
+                $statusId = $booking->getStatus()->getId();
+                
+                if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
+                    $statusId == Status\Model::STATUS_APPROVED && $isTimeChanged) {
+                    $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
+                    $booking->setStatus($status);
+                }
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
                 // the sequence.
@@ -1302,6 +1326,7 @@ class Controller extends Base
             $item->getEvent()->getEndDateTime()->getDateTimeObject(),
             $endDate
         );
+
         $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
 
         /** @var Collection|Model[] $series */
