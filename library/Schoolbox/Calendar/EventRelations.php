@@ -88,8 +88,11 @@ class EventRelations {
         $this->setRoleMapper(new RoleMapper());
     }
 
+
     /**
      * Reset and reassign relations
+     * @param Event $event
+     * @throws \PDOException
      */
     public function resetRelations($event) {
         $this->setEvent($event);
@@ -98,7 +101,7 @@ class EventRelations {
          * Skip this entirely if no level is specified/detected
          */
         if (is_numeric($this->getLevel())) {
-            $this->purgeAllRelations();
+            $this->purgeAllRelations([$event->getId()]);
 
             switch ($this->getLevel()) {
                 /* Access Type 1 (Personal)
@@ -163,13 +166,15 @@ class EventRelations {
         }
     }
 
+
     /**
      * Purge existing sids, before inserting new ones
+     * @param array $eventIds
      */
-    private function purgeAllRelations() {
-        $this->getPersonalMapper()->deleteByColumn('event_id', [$this->getEvent()->getId()]);
-        $this->getCategoryMapper()->deleteByColumn('event_id', [$this->getEvent()->getId()]);
-        $this->getRoleMapper()->deleteByColumn('event_id', [$this->getEvent()->getId()]);
+    public function purgeAllRelations($eventIds) {
+        $this->getPersonalMapper()->deleteByColumn('event_id', $eventIds);
+        $this->getCategoryMapper()->deleteByColumn('event_id', $eventIds);
+        $this->getRoleMapper()->deleteByColumn('event_id', $eventIds);
     }
 
     /* Getters/Setters
