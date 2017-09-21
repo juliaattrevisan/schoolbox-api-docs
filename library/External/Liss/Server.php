@@ -716,68 +716,71 @@ class External_Liss_Server
 
                     continue;
                 }
+
+                /* Otherwise continue to process under the guise that it will be either a
+                 * homepage (folder) event, or a personal event
+                 */
+
+                /** @var Event $event */
+                $event = $eventMapper->createModel();
+                $event->setOwner($author);
+                $event->setAuthor($author);
+                $event->setType($eventType);
+                $event->setLocation($currentEvent['rooms']);
+                $event->setTitle($currentEvent['className']);
+                $event->setDetail($currentEvent['detail']);
+                $event->setStartDateTime($currentEvent['startDateTime']);
+                $event->setEndDateTime($currentEvent['endDateTime']);
+
+                /* Save it specifically for this user without mass reset which
+                 * is what EventRelations normally does - we only need access
+                 * to specific operations for saving personal/folder events
+                 */
+                $eventRelations = new EventRelations(null, null, null);
+
+                /* Decide between homepage events and personal events
+                 * Determine which one based on the presence/content of classCode
+                 *
+                 * We don't do Campus events in Edval (no way to identify)
+                 */
+                if (strlen($currentEvent['classCode'])) {
+
+                    /* Skip if we can't find a corresponding folder
+                     */
+                    try {
+                        $folder = FolderMapper::getInstance()->findByCode($currentEvent['classCode']);
+                    }
+                    catch (MapperException $e) {
+                        $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
+                        $skipCount++;
+
+                        continue;
+                    }
+
+                    $event->setAccess(Event::ACCESS_GROUP);
+                    $eventMapper->save($event);
+
+                    $eventRelations->saveFolderRelation($event, [$folder->getId()]);
+                    $helper->saveEventSource($event, $currentEvent['guid']);
+                }
                 else {
-                    /** @var Event $event */
-                    $event = $eventMapper->createModel();
-                    $event->setOwner($author);
-                    $event->setAuthor($author);
-                    $event->setType($eventType);
-                    $event->setLocation($currentEvent['rooms']);
-                    $event->setTitle($currentEvent['className']);
-                    $event->setDetail($currentEvent['detail']);
-                    $event->setStartDateTime($currentEvent['startDateTime']);
-                    $event->setEndDateTime($currentEvent['endDateTime']);
+                    $event->setAccess(Event::ACCESS_PERSONAL);
 
-                    /* Save it specifically for this user without mass reset which
-                     * is what EventRelations normally does - we only need access
-                     * to specific operations for saving personal/folder events
+                    /* Teachers and Students can be treated synonymously
                      */
-                    $eventRelations = new EventRelations(null, null, null);
+                    $combined = array_merge($currentEvent['students'], $currentEvent['teacherIds']);
 
-                    /* Decide between homepage events and personal events
-                     * Determine which one based on the presence/content of classCode
-                     *
-                     * We don't do Campus events in Edval (no way to identify)
-                     */
-                    if (strlen($currentEvent['classCode'])) {
-
-                        /* Skip if we can't find a corresponding folder
-                         */
+                    foreach ($combined as $currentExternalId) {
                         try {
-                            $folder = FolderMapper::getInstance()->findByCode($currentEvent['classCode']);
+                            $user = UserMapper::getInstance()->findByExternalId($currentExternalId);
+                            $event->setOwner($user);
+                            $eventMapper->save($event);
+
+                            $eventRelations->savePersonalRelation($event);
+                            $helper->saveEventSource($event, $currentEvent['guid']);
                         }
                         catch (MapperException $e) {
-                            $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
-                            $skipCount++;
-
-                            continue;
-                        }
-
-                        $event->setAccess(Event::ACCESS_GROUP);
-                        $eventMapper->save($event);
-
-                        $eventRelations->saveFolderRelation($event, [$folder->getId()]);
-                        $helper->saveEventSource($event, $currentEvent['guid']);
-                    }
-                    else {
-                        $event->setAccess(Event::ACCESS_PERSONAL);
-
-                        /* Teachers and Students can be treated synonymously
-                         */
-                        $combined = array_merge($currentEvent['students'], $currentEvent['teacherIds']);
-
-                        foreach ($combined as $currentExternalId) {
-                            try {
-                                $user = UserMapper::getInstance()->findByExternalId($currentExternalId);
-                                $event->setOwner($user);
-                                $eventMapper->save($event);
-
-                                $eventRelations->savePersonalRelation($event);
-                                $helper->saveEventSource($event, $currentEvent['guid']);
-                            }
-                            catch (MapperException $e) {
-                                $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}) for user {$currentExternalId}: no schoolbox account found");
-                            }
+                            $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}) for user {$currentExternalId}: no schoolbox account found");
                         }
                     }
                 }
