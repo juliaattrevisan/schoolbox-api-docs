@@ -140,15 +140,6 @@ class Factory extends NullableContext\Factory
 
         $involvedFolders = $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, false);
 
-        /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
-         * otherwise any assessments inside projects in the extra folder will never be visible.
-         */
-        $extraFolderIds = $this->parseFolderIds($overrides);
-        if (count($extraFolderIds)) {
-            $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
-            $involvedFolders      = $involvedFolders->mergeUnique($extraFolders, 'id');
-        }
-
         // Divide folders into immediate contexts, and indirect contexts via a unit-impl
         /** @var GenericCollection $directFolders */
         $directFolders = $involvedFolders->filter(function (Folder\Model $folder) use ($inClass, $inGroup) {
@@ -164,22 +155,32 @@ class Factory extends NullableContext\Factory
             return $isClass && $inUnitImplImportedToClass || $isGroup && $inUnitImplImportedToGroup;
         })->indexBy('id');
 
-        $this->fetchProjects($projects, $directFolders, $indirectFolders);
+        /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
+         * otherwise any assessments inside projects in the extra folder will never be visible.
+         */
+        $extraFolderIds = $this->parseFolderIds($overrides);
+        if (count($extraFolderIds)) {
+            // An inserted folder may be neither a class or group, so look for project
+            // on it directly, and via an unitImpl.
+            $extraFolders    = $this->folderMapper->findByColumn('id', $extraFolderIds);
+            $directFolders   = $directFolders->mergeUnique($extraFolders, 'id');
+            $indirectFolders = $indirectFolders->mergeUnique($extraFolders, 'id');
+        }
 
-        return $projects;
+        return $this->fetchProjects($directFolders, $indirectFolders);
     }
 
 
     /**
-     * @param GenericCollection|Project\Model[] $projects
      * @param GenericCollection|Folder\Model[]  $directFolders
      * @param GenericCollection|Folder\Model[]  $indirectFolders
      * @return GenericCollection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      */
-    private function fetchProjects(GenericCollection $projects, GenericCollection $directFolders, GenericCollection $indirectFolders)
+    private function fetchProjects(GenericCollection $directFolders, GenericCollection $indirectFolders)
     {
+        $projects = $this->projectMapper->createCollection();
         // Did we not find any relevant folder contexts ?
         if (0 === $directFolders->count() && 0 === $indirectFolders->count()) {
             // Bug out early.
