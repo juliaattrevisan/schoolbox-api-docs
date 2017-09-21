@@ -117,9 +117,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $this->setBlock("campus_timetable", "timetable_header", "timetable_header_block");
         $this->setBlock('timetable_period', 'period_class_link', 'period_class_link_block');
         $this->setBlock('timetable_period', 'period_class', 'period_class_block');
-        $this->setBlock('period_class_link', 'period_class_link_attendance', "period_class_link_attendance_block");
-        $this->setBlock('period_class', 'period_class_attendance', "period_class_attendance_block");
-        
+        $this->setBlock('period_class_link', 'period_class_link_attendance_synergetic', "period_class_link_attendance_synergetic_block");
+        $this->setBlock('period_class_link', 'period_class_link_attendance_tass', "period_class_link_attendance_tass_block");
+        $this->setBlock('period_class', 'period_class_attendance_synergetic', "period_class_attendance_synergetic_block");
+        $this->setBlock('period_class', 'period_class_attendance_tass', "period_class_attendance_tass_block");
+
+
         foreach ($this->timetable as $timetable) {
             if (is_array($timetable) && !empty($timetable)) {
                 $timetableCount++;
@@ -178,8 +181,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         
                         $this->setVar('period_class_block', '');
                         $this->setVar('period_class_link_block', '');
-                        $this->setVar('period_class_attendance_block', '');
-                        $this->setVar('period_class_link_attendance_block', '');
+                        $this->setVar('period_class_attendance_synergetic_block', '');
+                        $this->setVar('period_class_link_attendance_synergetic_block', '');
+                        $this->setVar('period_class_attendance_tass_block', '');
+                        $this->setVar('period_class_link_attendance_tass_block', '');
                         $this->setVar("PERIOD_NAME", $period['periodName']);
                         $this->setVar("PERIOD_START", $period['periodStart']);
                         $this->setVar("PERIOD_END", $period['periodEnd']);
@@ -253,12 +258,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 // Link to Attendance Records
                                 
                                 if (strlen($class['code']) && $this->configMapper->get('external_attendance') && $this->getUser()->getRole()->isStaff()) {
-                                    
-                                    $showAttendance = false;
-                                    
+
                                     if ($this->configMapper->get('external_type') == 'synergetic' && $class['AttendanceEnabled']) {
-                                        
-                                        $showAttendance = true;
 
                                         $encodedClass = urlencode(urlencode(urlencode($class['code'])));
                                         $classLink = $class['campus'] ? $class['campus'] . '/' . $encodedClass : '0/' . $encodedClass;
@@ -270,9 +271,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                             'ATTENDANCE_TIMETABLE_CODE' => $campusList[$campusId]->getExtTimetableCode(),
                                             'ATTENDANCE_ICON' => $class['AttendanceMarked'] ? 'icon-approve' : 'icon-class-list',
                                         ]);
+
+                                        if ($hasLink) {
+                                            $this->parse('period_class_link_attendance_synergetic_block', 'period_class_link_attendance_synergetic');
+                                        } else {
+                                            $this->parse('period_class_attendance_synergetic_block', 'period_class_attendance_synergetic');
+                                        }
                                         
                                     } elseif ($this->configMapper->get('external_type') == 'tass') {
-                                        $showAttendance = true;
 
                                         /** @noinspection PhpUnusedLocalVariableInspection */
                                         list($year, $subject, $class) = explode('-', $class['code']);
@@ -289,13 +295,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                             'ATTENDANCE_TIMETABLE_CODE' => $timetableCode,
                                             'ATTENDANCE_ICON' => 'icon-class-list',
                                         ]);
-                                    }
-                                    
-                                    if ($showAttendance) {
+
                                         if ($hasLink) {
-                                            $this->parse('period_class_link_attendance_block', 'period_class_link_attendance');
+                                            $this->parse('period_class_link_attendance_tass_block', 'period_class_link_attendance_tass');
                                         } else {
-                                            $this->parse('period_class_attendance_block', 'period_class_attendance');
+                                            $this->parse('period_class_attendance_tass_block', 'period_class_attendance_tass');
                                         }
                                     }
                                 }
