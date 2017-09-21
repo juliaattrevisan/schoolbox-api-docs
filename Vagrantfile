@@ -19,6 +19,7 @@ private_network_ip = default["private_network_ip"]
 provision_script = default["provision_script"]
 data_source = default["data_source"]
 data_filename = default["data_filename"]
+enable_xdebug = default["enable_xdebug"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -36,7 +37,7 @@ if File.file?('vagrant.yaml')
   if !conf["external_db_host"].nil?
     external_db_host = conf["external_db_host"]
   end
-  if !conf["external_db_host"].nil?
+  if !conf["external_db_db"].nil?
     external_db_db = conf["external_db_db"]
   end
   if !conf["demo_data_version"].nil?
@@ -56,6 +57,9 @@ if File.file?('vagrant.yaml')
   end
   if !conf["data_filename"].nil?
     data_filename = conf["data_filename"]
+  end
+  if !conf["enable_xdebug"].nil?
+    enable_xdebug = conf["enable_xdebug"]
   end
 
 end
@@ -83,7 +87,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "#{provision_script}"
-    s.args = "#{data_source} \"#{data_filename}\" #{external_db} #{external_db_host} #{external_db_db}"
+    s.args = "#{data_source} \"#{data_filename}\" #{external_db} #{external_db_host} #{external_db_db} #{enable_xdebug}"
   end
 
 end

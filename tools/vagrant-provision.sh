@@ -1,4 +1,24 @@
 #!/bin/bash
+# Ensure running an appropriate era vagrant box
+if [ `cat /home/vagrant/.vagrant.buildtimestamp` -gt 1505952659 ];
+then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Vagrant box meets minimum requirements: 1505952660 Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
+else
+    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (> 1505952660). Current: "`cat /home/vagrant/.vagrant.buildtimestamp` >2;
+    echo "To fix this:";
+    echo "  vagrant destroy;";
+    echo "  vagrant box remove ubuntu-1404-php55;";
+    echo "  vagrant box remove ubuntu-1404-php71;";
+    if [ -f /vagrant/vagrant.yaml ] && [ `grep vagrant_box /vagrant/vagrant.yaml | grep -v '#' | wc -l` -gt 0 ];
+    then
+        echo "then:";
+        echo "  remove the 'vagrant_box' line from your vagrant.yaml file";
+    fi
+    echo "then:";
+    echo "  vagrant up;";
+    exit 1;
+fi;
+
 cachedir='/vagrant/vagrantcache';
 mkdir -p $cachedir;
 cd $cachedir;
@@ -7,6 +27,7 @@ cd $cachedir;
 external_db="synergetic";
 external_db_host="172.31.15.10";
 external_db_db="Synergetic_AUVIC_ALARESS_PRD";
+enable_xdebug="true";
 
 # Get options
 if [ ! -z $1 ]; then data_source=$1; else echo "Please provide data_source"; exit 1; fi;
@@ -21,55 +42,21 @@ fi;
 if [ ! -z $3 ]; then external_db=$3; fi;
 if [ ! -z $4 ]; then external_db_host=$4; fi;
 if [ ! -z $5 ]; then external_db_db=$5; fi;
+if [ ! -z $6 ]; then enable_xdebug=$6; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
-echo "[SB][`date +%Y-%m-%d\ %X`] Provision Script: vagrant-provision-1404-php55.sh";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB: $external_db";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
-# Remove old repo
-rm /etc/apt/sources.list.d/ondrej-php5-trusty.list*;
-
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
 if [ "$phpversion" != "7.1" ];
 then
-    add-apt-repository ppa:ondrej/php;
-    apt-get update 2>&1 >/dev/null;
-    apt-get install -y php7.1 php7.1-cli php7.1-dev php7.1-opcache php7.1-bcmath php7.1-bz2 php7.1-common php7.1-curl php7.1-dba php7.1-enchant php7.1-gd php7.1-imap php7.1-json php7.1-ldap php7.1-mbstring php7.1-mcrypt php7.1-pspell php7.1-readline php7.1-soap php7.1-xml php7.1-zip php7.1-mysql libapache2-mod-php7.1 php-apcu php-imagick php-redis php7.1-sybase;
-    apt-get install -y php-xdebug;
-    a2dismod php5;
-    a2enmod php7.1;
+    /usr/bin/update-alternatives --set php /usr/bin/php7.1;
 fi
-
-echo "# This file is managed by Puppet. DO NOT EDIT.
-# schoolbox-deps
-deb http://schoolbox:4verrm9z@deb.alaress.com.au/ubuntu trustybackports main
-deb-src http://schoolbox:4verrm9z@deb.alaress.com.au/ubuntu trustybackports main" > /etc/apt/sources.list.d/schoolbox-deps2.list;
-
-# Install chrome for headless tests
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing Google Chrome for headless tests";
-wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-
-apt-get update;
-
-apt-get install -y libgss3 gcc-6-base libstdc++6;
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing PDO_SQLSRV";
-apt-get install -y php7.1-pdosqlsrv;
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing Tideways (PHP 7.1 fork of XHprof)";
-apt-get install php-tideways
-phpenmod pdo_sqlsrv;
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing IBM_DB2";
-apt-get install -u php7.1-ibmdb2;
-phpenmod ibm_db2;
-# Install Chromedriver reqs too:
-# unzip for extracting it, libgconf-2-4 for running it.
-# Absence of libnss3 causes complaints from Chrome as well.
-apt-get install -y google-chrome-stable unzip libgconf-2-4 libnss3
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
@@ -563,6 +550,39 @@ then
     echo "[SB][`date +%Y-%m-%d\ %X`] Apache is v2.4.x, changing access config to match";
     sed -i 's/Order\ allow,deny//g' /etc/apache2/sites-available/*.conf;
     sed -i 's/Allow\ from\ all/Require\ all\ granted/g' /etc/apache2/sites-available/*.conf;
+fi
+
+if [ "$enable_xdebug" == "true" ];
+then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
+    if [ -f /vagrant/tools/xdebug.ini ];
+    then
+        echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
+        cp -f /vagrant/tools/xdebug.ini /etc/php/7.1/mods-available/xdebug.ini;
+    else
+        echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
+        cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.1/mods-available/xdebug.ini;
+    fi
+    if [ -d /etc/php/7.1/apache2/conf.d ];
+    then
+        ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/apache2/conf.d/20-xdebug.ini >/dev/null 2>&1;
+        ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/apache2/conf.d/20-tideways.ini >/dev/null 2>&1;
+    fi
+    if [ -d /etc/php/7.1/fpm/conf.d ];
+    then
+        ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/fpm/conf.d/20-xdebug.ini >/dev/null 2>&1;
+        ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/fpm/conf.d/20-tideways.ini >/dev/null 2>&1;
+    fi
+    ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/cli/conf.d/20-xdebug.ini >/dev/null 2>&1;
+    ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
+else
+    echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
+    rm -f /etc/php/7.1/apache2/conf.d/20-xdebug.ini;
+    rm -f /etc/php/7.1/apache2/conf.d/20-tideways.ini;
+    rm -f /etc/php/7.1/cli/conf.d/20-xdebug.ini;
+    rm -f /etc/php/7.1/cli/conf.d/20-tideways.ini;
+    rm -f /etc/php/7.1/fpm/conf.d/20-xdebug.ini;
+    rm -f /etc/php/7.1/fpm/conf.d/20-tideways.ini;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
