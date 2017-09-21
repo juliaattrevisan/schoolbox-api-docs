@@ -10,6 +10,8 @@
 namespace Event\Source;
 
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
@@ -29,5 +31,49 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Delete events using a given $sourceName
+     *
+     * @param string $sourceName
+     */
+    public function deleteEventsFromSource($sourceName)
+    {
+        $query = "
+            SELECT 
+            {$this->getTable()}.`event_id`
+            FROM {$this->getTable()} 
+            INNER JOIN `event` ON {$this->getTable()}.`event_id` = event.`id`
+            WHERE {$this->getTable()}.`source_name` = :sourceName
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'sourceName' => $sourceName
+        ]);
+
+        $eventIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
+        /* Delete relations
+         */
+        PersonalMapper::getInstance()->deleteByColumn('event_id', $eventIds);
+        CategoryMapper::getInstance()->deleteByColumn('event_id', $eventIds);
+
+        /* Delete the events themselves
+         */
+        EventMapper::getInstance()->deleteByColumn('id', $eventIds);
+
+        /* Delete the event_source records
+         */
+        $query = "
+            DELETE FROM {$this->getTable()}
+            WHERE source_name = :sourceName
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'sourceName' => $sourceName
+        ]);
     }
 }
