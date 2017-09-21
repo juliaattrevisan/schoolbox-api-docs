@@ -98,8 +98,10 @@ class PublishDailyData
 
         /* Assemble Students
          */
-        foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
-            $restructured['students'][] = $currentStudent->me['string'];
+        if (isset($currentEvent->me['struct']['Students'])) {
+            foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
+                $restructured['students'][] = $currentStudent->me['string'];
+            }
         }
 
         return $restructured;
