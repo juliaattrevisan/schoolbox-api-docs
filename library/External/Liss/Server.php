@@ -770,6 +770,8 @@ class External_Liss_Server
                     $event->setStartDateTime($currentEvent['startDateTime']);
                     $event->setEndDateTime($currentEvent['endDateTime']);
 
+                    $eventRelations = new EventRelations(null, null, null);
+
                     /* Decide between homepage events and personal events
                      * Determine which one based on the presence/content of classCode
                      *
@@ -794,12 +796,10 @@ class External_Liss_Server
 
                         /* Save it specifically for this folder without mass reset
                          * which is what EventRelations normally does
+                         *
+                         * Save a corresponding eventSource so we know from whence this event came
                          */
-                        $eventRelations = new EventRelations(null, null, null);
                         $eventRelations->saveFolderRelation($event, [$folder->getId()]);
-
-                        /* Save a corresponding eventSource so we know from whence this event came
-                         */
                         $helper->saveEventSource($event, $currentEvent['guid']);
                     }
                     else {
@@ -817,12 +817,10 @@ class External_Liss_Server
 
                                 /* Save it specifically for this user without mass reset
                                  * which is what EventRelations normally does
+                                 *
+                                 * Save a corresponding eventSource so we know from whence this event came
                                  */
-                                $eventRelations = new EventRelations(null, null, null);
                                 $eventRelations->savePersonalRelation($event);
-
-                                /* Save a corresponding eventSource so we know from whence this event came
-                                 */
                                 $helper->saveEventSource($event, $currentEvent['guid']);
                             }
                             catch (MapperException $e) {
