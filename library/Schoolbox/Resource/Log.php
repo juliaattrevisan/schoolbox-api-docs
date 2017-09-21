@@ -113,13 +113,13 @@ class Log {
 	public function getObject() {
 		switch($this->objectKind) {
 			case LogMapper::KIND_LINK:
-				return LinkMapper::getInstance()->findById($this->objectId);
+				return LinkMapper::getInstance()->findByIdWithFallback($this->objectId);
 			case LogMapper::KIND_FILE:
-				return File\Mapper::getInstance()->findById($this->objectId);
+				return File\Mapper::getInstance()->findByIdWithFallback($this->objectId);
 			case LogMapper::KIND_FOLDER:
-				return Folder\Mapper::getInstance()->findById($this->objectId);
+				return Folder\Mapper::getInstance()->findByIdWithFallback($this->objectId);
 			case LogMapper::KIND_CONTENT:
-				return Textbox\Mapper::getInstance()->findById($this->objectId);
+				return Textbox\Mapper::getInstance()->findByIdWithFallback($this->objectId);
 		}
 		return null;
 	}

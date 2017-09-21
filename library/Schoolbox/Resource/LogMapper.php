@@ -152,22 +152,22 @@ class LogMapper extends Mapper {
 
 		$joins = array(
 			self::KIND_LINK   => "
-				LEFT JOIN {$this->getJoinSql('link', 'log', 'l')}
+				LEFT JOIN {$this->getJoinSql('link', 'log', 'l', true)}
 				AND object = 'link'
 				AND l.category = :ctxt
 			",
 			self::KIND_FILE   => "
-				LEFT JOIN {$this->getJoinSql('file', 'log', 'f')}
+				LEFT JOIN {$this->getJoinSql('file', 'log', 'f', true)}
 				AND object = 'file'
 				AND f.category = :ctxt
 			",
 			self::KIND_FOLDER => "
-				LEFT JOIN {$this->getJoinSql('cat',  'log', 'c')}
+				LEFT JOIN {$this->getJoinSql('cat',  'log', 'c', true)}
 				AND object = 'folder'
 				AND c.parent = :ctxt
 			",
 			self::KIND_CONTENT => "
-				LEFT JOIN {$this->getJoinSql('text', 'log', 't')}
+				LEFT JOIN {$this->getJoinSql('text', 'log', 't', true)}
 				AND object = 'content'
 				AND t.categoryID = :ctxt
 			"
