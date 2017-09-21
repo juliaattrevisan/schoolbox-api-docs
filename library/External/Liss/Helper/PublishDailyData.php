@@ -64,10 +64,7 @@ class PublishDailyData
      */
     private function reformatEvent($currentEvent)
     {
-        /* Only need the first 8 chars
-         * Assemble startDateTime and endDateTime
-         */
-        $date = substr($currentEvent->me['struct']['Date']->me['dateTime.iso8601'], 0, 4) . '-' . substr($currentEvent->me['struct']['Date']->me['dateTime.iso8601'], 4, 2) . '-' . substr($currentEvent->me['struct']['Date']->me['dateTime.iso8601'], 6, 2);
+        $date = date('Y-m-d', strtotime($currentEvent->me['struct']['Date']->me['dateTime.iso8601']));
         $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
         $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
 
