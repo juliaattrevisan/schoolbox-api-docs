@@ -200,42 +200,6 @@ class Queue extends ResourceVideo
             );
         }
 
-        // Get rotation information, for ipad and iphones that record upside down and use metadata to rotate
-        $rotation = 0;
-        $rotate   = '';
-        exec('which exiftool', $unused, $errorcode);
-        if (!$errorcode) {
-            $rotationCmd = 'exiftool -Rotation ' . escapeshellarg($sourceFile) . "|sed 's/^[^:]*: //'";
-            exec($rotationCmd, $rotationOut, $return);
-            if (!$return && isset($rotationOut[0])) {
-                $rotation = $rotationOut[0];
-            }
-
-            if ($rotation) {
-                switch ($rotation) {
-                    case 90:
-                        $rotate = 'transpose=1 -metadata:s:v rotate=0';
-                        break;
-                    case 180:
-                        $rotate = 'transpose=1,transpose=1 -metadata:s:v rotate=0';
-                        break;
-                    case 270:
-                        $rotate = 'transpose=2 -metadata:s:v rotate=0';
-                        break;
-                    default:
-                        $rotate = '';
-                }
-
-                if ($scale && $rotate) {
-                    $scale .= ',' . $rotate;
-                } else {
-                    $scale = $rotate;
-                }
-
-            }
-        }
-
-
         /* Process video to 512kb in libx264 format for mobile and html5 streaming */
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             " -c:v libx264 $scale -preset slow -b:v {$this->videoBitrate}k -pix_fmt yuv420p -b:a {$this->audioBitrate}k -r 24 -ar:a 44100" .
@@ -271,12 +235,12 @@ class Queue extends ResourceVideo
         $thumbnailSeconds = $this->getDuration() > 0 ? round(($this->getDuration() / 3), 2) : 10;
         $thumbnailString  = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             ' -f image2 -ss ' . $thumbnailSeconds .
-            ' -vf '.$thumbScale.'crop=64:64' . (($rotate) ? ',' . $rotate : '') .
+            ' -vf '.$thumbScale.'crop=64:64'.
             ' -frames:v 1 ' .
             escapeshellarg($this->getThumbnailLocation()) . ' 2>&1';
         $posterString     = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             ' -f image2 -ss ' . $thumbnailSeconds .
-            ' -frames:v 1 ' . (($rotate) ? '-vf ' . $rotate : '') . ' ' .
+            ' -frames:v 1 ' .
             escapeshellarg($this->getPosterLocation()) . ' 2>&1';
 
         if ($return == 0) {
