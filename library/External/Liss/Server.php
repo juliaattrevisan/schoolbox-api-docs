@@ -796,7 +796,8 @@ class External_Liss_Server
                         $event->setAccess(Event::ACCESS_GROUP);
                         $eventMapper->save($event);
 
-                        /* Save relations
+                        /* Save it specifically for this folder without mass reset
+                         * which is what EventRelations normally does
                          */
                         $eventRelations = new EventRelations(null, null, null);
                         $eventRelations->saveFolderRelation($event, [$folder->getId()]);
