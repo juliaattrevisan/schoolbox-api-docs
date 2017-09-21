@@ -14,6 +14,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * Maximum number of members to display
      * If the collection exceeds this it will truncate the list and leave a message
@@ -27,8 +28,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      */
     const TYPE_NAME = 'members';
 
+
     /**
      * Renders the data into the SitePage. Presentation logic.
+     *
      * @param String $templateHandle
      * @return boolean
      */
@@ -44,7 +47,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         // Get collection of members
         $userMapper = new UserMapper();
-        $userList = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ, $this->getContext()->getId(), Array('lastname' => 'asc'));
+        $userList   = $userMapper->findByAccess(UserAccess::SERVICE_HOMEPAGE, UserAccess::ACCESS_READ, $this->getContext()
+                                                                                                            ->getId(), ['lastname' => 'asc']);
 
         if (count($userList) == 0) {
 
@@ -57,18 +61,20 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('empty_state', 'empty_managers', 'empty_managers_block');
 
             $this->setVar([
-                'has_members_block' => '',
-                'empty_read_members_block' => '',
-                'empty_read_managers_block' => '',
-                'empty_class_block' => '',
-                'empty_not_group_members_block' => '',
+                'has_members_block'              => '',
+                'empty_read_members_block'       => '',
+                'empty_read_managers_block'      => '',
+                'empty_class_block'              => '',
+                'empty_not_group_members_block'  => '',
                 'empty_not_group_managers_block' => '',
-                'empty_members_block' => '',
-                'empty_managers_block' => '',
-                'TYPE_NAME' => self::TYPE_NAME,
-                'COMPONENT_ICON' => 'group',
-                'ALT_COMPONENT' => 'class list',
-                'FOLDER_ID' => $this->getSource()->getFolder()->getId(),
+                'empty_members_block'            => '',
+                'empty_managers_block'           => '',
+                'TYPE_NAME'                      => self::TYPE_NAME,
+                'COMPONENT_ICON'                 => 'group',
+                'ALT_COMPONENT'                  => 'class list',
+                'FOLDER_ID'                      => $this->getSource()
+                                                         ->getFolder()
+                                                         ->getId(),
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -90,38 +96,35 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('has_members', "member_email", "member_email_block");
             $this->setBlock('has_members', "person", "person_block");
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
-            $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
-            $this->setBlock('person', 'has_icon', 'has_icon_block');
+            $this->setBlock('person', 'photo', 'photo_block');
 
             $this->setVar([
-                'empty_state_block' => '',
-                'has_thumbnail_block' => '',
-                'has_icon_block' => '',
-                'person_block' => '',
+                'empty_state_block'   => '',
+                'person_block'        => '',
                 'people_hidden_block' => '',
-                'MAX_MEMBERS' => self::MAX_MEMBERS,
+                'MAX_MEMBERS'         => self::MAX_MEMBERS,
             ]);
 
             /* Display options
              */
-            $displayOptions = array(
-                'grid' => array(
-                    'name' => 'Grid',
+            $displayOptions = [
+                'grid' => [
+                    'name'  => 'Grid',
                     'value' => 'grid',
-                    'css' => 'grid',
-                ),
-                'list' => array(
-                    'name' => 'List',
+                    'css'   => 'grid',
+                ],
+                'list' => [
+                    'name'  => 'List',
                     'value' => 'list',
-                    'css' => '',
-                ),
-            );
+                    'css'   => '',
+                ],
+            ];
 
             $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
             $this->setVar(
-                array(
+                [
                     'LIST_STYLE' => $displayOptions[$display]['css'],
-                )
+                ]
             );
 
             $userListCount = $userList->count();
@@ -135,10 +138,14 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
             // Get admin
             $userAccessMapper = new UserAccessMapper();
-            $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
+            $admin            = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
 
             $emailObj = new Email();
-            $emailall = array();
+            $emailall = [];
+
+            $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+            $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
+            $veiwer = $this->getUser();
 
             if ($userListCount > 0) {
                 $i = 0;
@@ -162,40 +169,51 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                             $name .= " (Group Admin)";
                         }
 
-                    $this->setVar(
-                        array(
-                            'PERSON_UID'         => $user->getId(),
-                            'PERSON_NAME'        => \Scrub::text($name),
-                            'PERSON_EXTERNAL_ID' => \Scrub::text($user->getExternalId()),
-                            'PERSON_GROUP'       => \Scrub::text($user->getPreferredTitle()),
-                            'LIST_STYLE'         => $displayOptions[$display]['css'],
-                        )
-                    );
+                        $this->setVar(
+                            [
+                                'PERSON_UID'         => $user->getId(),
+                                'PERSON_NAME'        => \Scrub::text($name),
+                                'PERSON_EXTERNAL_ID' => \Scrub::text($user->getExternalId()),
+                                'PERSON_GROUP'       => \Scrub::text($user->getPreferredTitle()),
+                                'LIST_STYLE'         => $displayOptions[$display]['css'],
+                            ]
+                        );
 
                         /* Don't display images in list view
                          */
                         if ($this->getConfig('displayPortraits') == 'grid') {
-                            $this->setVar(array(
-                                'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                            ));
-
-                            $this->parse('has_thumbnail_block', 'has_thumbnail');
-                            $this->setVar('has_icon_block', '');
+                            $this->setVar([
+                                'GRID_VIEW_CLASSES' => 'medium-block-grid-2',
+                            ]);
                         } else {
-                            $this->setVar(array(
-                                'GRID_VIEW_CLASSES' => ''
-                            ));
+                            $this->setVar([
+                                'GRID_VIEW_CLASSES' => '',
+                            ]);
+                        }
 
-                            $this->setVar('has_thumbnail_block', '');
-                            $this->parse('has_icon_block', 'has_icon');
+                        //Hide Student Photo
+                        if($user->getRole()->isStudent()) {
+                            if ($veiwer->getRole()->isStudent() && $studentPhotoHidden) {
+                                $this->setVar('photo_block', '');
+                            } else if ($veiwer->getRole()->isParent() && !$veiwer->isParentOf($user->loadParents())) {
+                                $this->setVar('photo_block', '');
+                            } else {
+                                $this->parse('photo_block', 'photo');
+                            }
+                        }
+
+                        //Hide Staff Photo
+                        if($user->getRole()->isStaff()) {
+                            if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
+                                $this->setVar('photo_block', '');
+                            } else if ($staffPhotoVisibilty == 1 && !$veiwer->getRole()->isStaff()) {
+                                $this->setVar('photo_block', '');
+                            } else {
+                                $this->parse('photo_block', 'photo');
+                            }
                         }
 
                         $this->parse('person_block', 'person', true);
-
-                        /* Clear children after parsing out the parent
-                         */
-                        $this->setVar('has_thumbnail_block', '');
-                        $this->setVar('has_icon_block', '');
                     }
 
                     $i++;

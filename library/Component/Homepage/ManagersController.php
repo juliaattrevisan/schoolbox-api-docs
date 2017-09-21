@@ -90,13 +90,10 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $this->setBlock('has_members', "member_email", "member_email_block");
             $this->setBlock('has_members', "person", "person_block");
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
-            $this->setBlock('person', 'has_thumbnail', 'has_thumbnail_block');
-            $this->setBlock('person', 'has_icon', 'has_icon_block');
+            $this->setBlock('person', 'photo', 'photo_block');
 
             $this->setVar([
                 'empty_state_block' => '',
-                'has_thumbnail_block' => '',
-                'has_icon_block' => '',
                 'person_block' => '',
                 'people_hidden_block' => '',
                 'MAX_MEMBERS' => self::MAX_MANAGERS,
@@ -136,6 +133,10 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             // Get admin
             $userAccessMapper = new UserAccessMapper();
             $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
+
+            $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+            $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
+            $veiwer = $this->getUser();
 
             $i = 0;
             foreach ($managerList as $manager) {
@@ -181,26 +182,35 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                         $this->setVar([
                             'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
                         ]);
-
-                        $this->parse('has_thumbnail_block', 'has_thumbnail');
-                        $this->setVar('has_icon_block', '');
                     } else {
                         $this->setVar([
                             'GRID_VIEW_CLASSES' => '',
-                            'has_thumbnail_block' => '',
                         ]);
+                    }
 
-                        $this->parse('has_icon_block', 'has_icon');
+                    //Hide Student Photo
+                    if($manager->getRole()->isStudent()) {
+                        if ($veiwer->getRole()->isStudent() && $studentPhotoHidden) {
+                            $this->setVar('photo_block', '');
+                        } else if ($veiwer->getRole()->isParent() && !$veiwer->isParentOf($user->loadParents())) {
+                            $this->setVar('photo_block', '');
+                        } else {
+                            $this->parse('photo_block', 'photo');
+                        }
+                    }
+
+                    //Hide Staff Photo
+                    if($manager->getRole()->isStaff()) {
+                        if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
+                            $this->setVar('photo_block', '');
+                        } else if ($staffPhotoVisibilty == 1 && !$veiwer->getRole()->isStaff()) {
+                            $this->setVar('photo_block', '');
+                        } else {
+                            $this->parse('photo_block', 'photo');
+                        }
                     }
 
                     $this->parse('person_block', 'person', true);
-
-                    /* Clear children after parsing out the parent
-                     */
-                    $this->setVar([
-                        'has_thumbnail_block' => '',
-                        'has_icon_block' => '',
-                    ]);
                 }
 
                 $i++;
