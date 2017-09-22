@@ -8,6 +8,7 @@
 
 namespace Schoolbox\API\Help;
 
+use Alaress\Authorizer\Rule\IsAlaressAdmin;
 use Alaress\Module\Module;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
@@ -15,6 +16,8 @@ use Schoolbox\API\Help\Token;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Twig_Error_Loader;
+use Twig_Loader_Chain;
 
 
 class CourseParticipationModule extends Module
@@ -30,6 +33,9 @@ class CourseParticipationModule extends Module
      */
     protected function registerRoutes()
     {
+        $alaressOnly = new IsAlaressAdmin();
+
+        $this->register('GET', '/apitest', 'getApiTest', $alaressOnly);
         $this->register('GET', '/{schoolCode:\w+}/courses', 'getCourseList');
     }
 
@@ -66,7 +72,16 @@ class CourseParticipationModule extends Module
             'tokenMapper'      => $mapperFactory->getLazy(Token\Mapper::class),
             'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),
         ];
+    }
 
+
+    /**
+     * @param Twig_Loader_Chain $templateLoader
+     * @throws Twig_Error_Loader
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 }
