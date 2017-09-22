@@ -64,8 +64,9 @@ class Mapper extends BaseMapper
          */
         EventMapper::getInstance()->deleteByColumn('id', $eventIds);
 
-        /* Delete the event_source records
+        /* Hard-delete the event_source records
          */
+        $this->deleteByColumn('source_name', $sourceName);
         $query = "
             DELETE FROM {$this->getTable()}
             WHERE source_name = :sourceName
