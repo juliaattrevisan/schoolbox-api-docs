@@ -59,6 +59,33 @@ class CourseParticipationController extends Base
 
 
     /**
+     * @api   /api/courseParticipation/apitest
+     * @level 170
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getApiTest()
+    {
+        /** @var Token\Model[] $codes */
+        $codes = $this->tokenMapper->findAll();
+
+        $now = Alaress_Date_Format::now();
+
+        $data = [
+            'codes'  => $codes,
+            'ts'     => $now->getUnixTimeStamp(),
+            'hashes' => []
+        ];
+
+        foreach ($codes as $code) {
+            $school = $code->getSiteSchoolCode();
+            $data['hashes'][$school] = $this->computeAccessToken($now, $school, $code->getAccessToken());
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
+    }
+
+    /**
      * @param string $schoolCode
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\Exception
