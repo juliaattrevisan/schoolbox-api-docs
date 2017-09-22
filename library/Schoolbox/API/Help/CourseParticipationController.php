@@ -8,12 +8,12 @@
 
 namespace Schoolbox\API\Help;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Schoolbox\API\Help\Token;
+use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\User;
 
 
 class CourseParticipationController extends Base
@@ -27,8 +27,6 @@ class CourseParticipationController extends Base
      */
     public function getCourseList($schoolCode)
     {
-        /** @var IConnector $db */
-        $db = $this->getDi()->get('databaseInternal');
         $uam = UserAccessMapper::getInstance();
 
         $rq = $this->getRequest();
@@ -49,10 +47,9 @@ class CourseParticipationController extends Base
 
         $authDigest = $rq->query->get('token', '');
 
-        $privateKey = $db->executeQuery('SELECT access_token FROM site_access WHERE site_school_code = ?', [ $schoolCode ])->fetchColumn();
-
-        if (empty($privateKey)) {
-            $rs->status->set(400);
+        try {
+            $privateKey = Token\Mapper::getInstance()->findById($schoolCode)->getAccessToken();
+        } catch (Mapper\Exception $e) {
 
             // TODO replace with error message
             $rs->content->set($this->buildJsonOutput('Try ecc'));
@@ -83,8 +80,7 @@ class CourseParticipationController extends Base
                 Folder\Code\Mapper::getInstance()->findOneByColumn('code', $schoolCode)->getFolder()->getId()
             );
 
-        } catch (\Schoolbox\Mapper\Exception $e) {
-
+        } catch (Mapper\Exception $e) {
             // TODO replace with error message
             $rs->content->set($this->buildJsonOutput('No folder with synergy code of '.$schoolCode));
             return;
