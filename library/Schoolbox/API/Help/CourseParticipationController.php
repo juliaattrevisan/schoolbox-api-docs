@@ -10,6 +10,7 @@ namespace Schoolbox\API\Help;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use GuzzleHttp\Psr7\Response;
 use Schoolbox\API\Help\Token;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -74,11 +75,8 @@ class CourseParticipationController extends Base
         $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
 
         // permit a window of +/- 10 seconds to guard against replay
-        if ($deltaTimestamp > 100) { // TODO change back to 10 seconds
-            $rs->status->set(400);
-
-            // TODO replace with error message
-            $rs->content->set($this->buildJsonOutput(Alaress_Date_Format::now()->getUnixTimeStamp()));
+        if ($deltaTimestamp > 10) {
+            $this->sendGenericStatus(400);
             return;
         }
 
@@ -87,9 +85,7 @@ class CourseParticipationController extends Base
         try {
             $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
         } catch (Mapper\Exception $e) {
-
-            // TODO replace with error message
-            $rs->content->set($this->buildJsonOutput('Try ecc'));
+            $this->sendGenericStatus(401);
             return;
         }
 
@@ -100,13 +96,7 @@ class CourseParticipationController extends Base
         );
 
         if ($expectedToken !== $authDigest) {
-            $rs->status->set(403);
-
-            // TODO replace with error message
-            $rs->content->set($this->buildJsonOutput([
-                Alaress_Date_Format::now()->getUnixTimeStamp(),
-                $expectedToken
-            ]));
+            $this->sendGenericStatus(403);
             return;
         }
 
@@ -118,8 +108,7 @@ class CourseParticipationController extends Base
             );
 
         } catch (Mapper\Exception $e) {
-            // TODO replace with error message
-            $rs->content->set($this->buildJsonOutput('No folder with synergy code of '.$schoolCode));
+            $this->sendGenericStatus(404);
             return;
         }
 
@@ -140,15 +129,6 @@ class CourseParticipationController extends Base
         }
 
         $rs->content->set($this->buildJsonOutput($payload));
-
-//        $rs->content->set($this->buildJsonOutput([
-//            'rqTime'    => (int)$requestTimestamp->getUnixTimeStamp(),
-//            'timestamp' => (int)Alaress_Date_Format::now()->getUnixTimeStamp(),
-//            'delta'     => (int)$deltaTimestamp,
-//            'expected'  => $expectedToken,
-//            'actual'    => $authDigest,
-//            'match'     => $expectedToken === $authDigest
-//        ]));
     }
 
 
@@ -162,4 +142,18 @@ class CourseParticipationController extends Base
     {
         return sha1(sprintf(':%s-%s-%s:', $timestamp, $schoolCode, $accessToken));
     }
+
+
+    /**
+     * @param $code
+     * @return void
+     */
+    private function sendGenericStatus($code)
+    {
+        $r = new Response($code);
+
+        $this->getResponse()->status->set($r->getStatusCode());
+        $this->getResponse()->content->set($this->buildJsonOutput($r->getReasonPhrase()));
+    }
+
 }
