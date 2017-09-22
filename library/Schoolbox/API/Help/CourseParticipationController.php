@@ -24,10 +24,14 @@ class CourseParticipationController extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getCourseList($schoolCode)
     {
-        $uam = UserAccessMapper::getInstance();
+        $userAccessMapper = UserAccessMapper::getInstance();
+        $tokenMapper = Token\Mapper::getInstance();
+        $folderMapper = Folder\Mapper::getInstance();
+        $codeMapper = $folderMapper->getJoinMapper('codes');
 
         $rq = $this->getRequest();
         $rs = $this->getResponse();
@@ -48,7 +52,7 @@ class CourseParticipationController extends Base
         $authDigest = $rq->query->get('token', '');
 
         try {
-            $privateKey = Token\Mapper::getInstance()->findById($schoolCode)->getAccessToken();
+            $privateKey = $tokenMapper->findById($schoolCode)->getAccessToken();
         } catch (Mapper\Exception $e) {
 
             // TODO replace with error message
@@ -76,8 +80,8 @@ class CourseParticipationController extends Base
 
         // ok, if you're here, you can see the thing.
         try {
-            $folder = Folder\Mapper::getInstance()->findById(
-                Folder\Code\Mapper::getInstance()->findOneByColumn('code', $schoolCode)->getFolder()->getId()
+            $folder = $folderMapper->findById(
+                $codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
             );
 
         } catch (Mapper\Exception $e) {
@@ -89,11 +93,11 @@ class CourseParticipationController extends Base
         $payload = [];
 
         // obtain all direct descendants of this folder
-        $courses = Folder\Mapper::getInstance()->findByParentId($folder->getId());
+        $courses = $folderMapper->findByParentId($folder->getId());
 
 
         foreach ($courses as $course) {
-            $participants = $uam->findUsersInCategory($course)->getColumnValues('email');
+            $participants = $userAccessMapper->findUsersInCategory($course)->getColumnValues('email');
 
             $payload[] = [
                 'name'         => $course->getName(),
