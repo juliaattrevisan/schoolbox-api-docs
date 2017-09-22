@@ -288,16 +288,15 @@ class Controller extends Base
                 $event->setDetail($booking->getNotes());
                 $this->eventMapper->save($event);
 
-                //If item is moderated, already approved, and time changed, set item to need approval again
+                //If item is moderated, already approved and time changed, set item to need approval again
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                    if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
-                        $statusId == Status\Model::STATUS_APPROVED &&
-                        $isTimeChanged) {
-                        $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
-                        $booking->setStatus($status);
-                    }
+                if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
+                    $statusId == Status\Model::STATUS_APPROVED &&
+                    $isTimeChanged) {
+                    $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
+                    $booking->setStatus($status);
                 }
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
@@ -1357,6 +1356,7 @@ class Controller extends Base
     public function setStatusMapper($statusMapper)
     {
         $this->statusMapper = $statusMapper;
+
         return $this;
     }
 
