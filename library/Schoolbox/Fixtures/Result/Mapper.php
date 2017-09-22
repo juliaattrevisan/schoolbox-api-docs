@@ -8,20 +8,18 @@
 namespace Schoolbox\Fixtures\Result;
 
 use PDOStatement;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Result\Model as Result;
 use Schoolbox\Fixtures\Status\Model as Status;
 use Schoolbox\Fixtures\Status\Mapper as StatusMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Collection;
 
 /**
  * Class Mapper
- * @method Result createModel(int $idValue = null)
+ * @method Model createModel($idValue = null)
  * @package Schoolbox\Fixtures\Result
  */
 class Mapper extends BaseMapper
@@ -33,7 +31,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_result');
-        $this->hasModel(Result::class);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
@@ -78,15 +76,15 @@ class Mapper extends BaseMapper
      * {@inheritdoc}
      *
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      * @throws Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = new Collection();
+        $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            /** @var Result $result */
+            /** @var Model $result */
             $result = $this->hydrate($row);
 
             /** @var Team $team */

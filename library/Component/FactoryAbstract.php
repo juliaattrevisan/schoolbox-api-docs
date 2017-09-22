@@ -42,7 +42,7 @@ abstract class Component_FactoryAbstract
 
     /**
      * @param $identifier
-     * @return Collection[Component_ControllerAbstract]
+     * @return Collection|Component_ControllerAbstract[]
      */
     public function buildComponentList($identifier)
     {

@@ -14,6 +14,7 @@ namespace Schoolbox\Fixtures\Match;
 use OutOfBoundsException;
 use PDO;
 use PDOStatement;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Fixtures\Match\Model as Match;
@@ -175,13 +176,13 @@ class Mapper extends BaseMapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      * @throws Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var Collection|Match[] $matches */
-        $matches = new Collection();
+        $matches = $this->createCollection();
 
         /** @var Collection|Division[] $divisions */
         $divisions = new Collection();

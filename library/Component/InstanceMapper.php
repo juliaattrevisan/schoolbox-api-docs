@@ -269,7 +269,7 @@ class Component_InstanceMapper extends BaseMapper
 
         // Hydrate a whole bunch of stuff here.
 
-        $instanceCollection         = new GenericCollection(Component_Instance::class);
+        $instanceCollection         = $this->createCollection();
         $definitionCollection       = $this->componentDefinitionMapper->createCollection();
         $configInstanceCollection   = $this->componentConfigMapper->createCollection();
         $configDefinitionCollection = $this->componentConfigDefinitionMapper->createCollection();

@@ -12,6 +12,7 @@ namespace Schoolbox\Fixtures\Division;
 
 use \PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
@@ -19,13 +20,12 @@ use Schoolbox\Fixtures\Sport\Model as Sport;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\Fixtures\Season\Model as Season;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use Schoolbox\Fixtures\Division\Model as Division;
 
 /**
  * Class Mapper
- * @method Division createModel($idValue = null)
- * @method Division findById($id)
- * @method Collection|Division[] findByColumn($columnName, $columnValue, $options = array())
+ * @method Model createModel($idValue = null)
+ * @method Model findById($id)
+ * @method Collection|Model[] findByColumn($columnName, $columnValue, $options = array())
  *
  * @package Schoolbox\Fixtures\Division
  */
@@ -37,7 +37,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_division');
-        $this->hasModel(Division::class);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('sport_id', SportMapper::class, 'id', null, null, 'sport', 'sport');
@@ -55,9 +55,9 @@ class Mapper extends BaseMapper
      * Delete all Teams associated with this Division
      * when it's being deleted
      *
-     * @param Division $division
+     * @param Model $division
      */
-    public function deleteTeams(Division $division)
+    public function deleteTeams(Model $division)
     {
         $allTeams = TeamMapper::getInstance()->findByColumn('division_id', $division->getId());
 
@@ -104,12 +104,12 @@ class Mapper extends BaseMapper
      * Hydrates the division, along with its sport and season
      *
      * @param PDOStatement $statement
-     * @return Collection
+     * @return GenericCollection|Model[]
      * @throws MapperException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $divisions = new Collection();
+        $divisions = $this->createCollection();
         $sports    = new Collection();
         $seasons   = new Collection();
 

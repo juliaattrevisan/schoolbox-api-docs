@@ -13,6 +13,7 @@ namespace EOTC;
 
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -88,7 +89,7 @@ class EventPermissionMapper extends BaseMapper
      * Find all the permissions for a particular user
      *
      * @param User $user
-     * @return Collection|EventPermission[]
+     * @return GenericCollection|EventPermission[]
      */
     public function findByUser(User $user)
     {
@@ -114,7 +115,7 @@ class EventPermissionMapper extends BaseMapper
      * Find all the subscriptions for a particular user.
      *
      * @param User $user
-     * @return Collection|EventPermission[]
+     * @return GenericCollection|EventPermission[]
      */
     public function findSubscriptionsByUser(User $user)
     {
@@ -141,11 +142,11 @@ class EventPermissionMapper extends BaseMapper
      * with attached campus and status.
      *
      * @param \Traversable $statement
-     * @return Collection|EventPermission[]
+     * @return GenericCollection|EventPermission[]
      */
     protected function hydrateWithCampusAndStatus($statement)
     {
-        $allPermissions = new Collection();
+        $allPermissions = $this->createCollection();
         foreach ($statement as $row) {
             $permissionItem = $this->hydrate($row, 'p');
 
