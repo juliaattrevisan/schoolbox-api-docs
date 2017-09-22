@@ -293,9 +293,10 @@ class Controller extends Base
                 $statusId     = $booking->getStatus()->getId();
 
                     if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
-                        $statusId == Status\Model::STATUS_APPROVED && $isTimeChanged) {
+                        $statusId == Status\Model::STATUS_APPROVED &&
+                        $isTimeChanged) {
                         $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
-                        $booking->setStatus($this->getStatusMapper()->createModel($status));
+                        $booking->setStatus($status);
                     }
                 }
 
@@ -930,7 +931,7 @@ class Controller extends Base
         );
         $source
             ->setResourceId($item->getId())
-            ->setStatus($this->getStatusMapper()->createModel($this->getRequest()->query['status']));
+            ->setStatus($this->getRequest()->query['status']);
 
         $calendar = new Renderer(
             $source,

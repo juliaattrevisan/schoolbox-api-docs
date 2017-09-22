@@ -21,7 +21,7 @@ use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
-use Schoolbox\ResourceBooking\Booking\Status as StatusMapper;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 
 class Module extends BaseModule
 {
