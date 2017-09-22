@@ -71,7 +71,10 @@ class External_Liss_Server
      */
     const MISSING_CALENDAR_OWNER = 'External Liss Calendar Owner not found';
 
-
+    /**
+     * Log message when no event types can be found
+     */
+    const NO_EVENT_TYPES = 'Cannot find a default event type';
 
     /**
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
@@ -699,11 +702,18 @@ class External_Liss_Server
              */
             $helper->cleanse();
 
-            /* Set a default event type for now
-             * TODO: Replace with something smarter
+            /* Set a default event type for now - use the first one in the list
              */
             /** @var EventType $eventType */
-            $eventType = $eventTypeMapper->findById(1);
+            $allEventTypes = $eventTypeMapper->findAll();
+
+            if ($allEventTypes->count()) {
+                $eventType = $allEventTypes->first();
+            }
+            else {
+                $log->critical(self::NO_EVENT_TYPES);
+                return self::generateResponse(self::NO_EVENT_TYPES);
+            }
 
             /* Save it specifically for this user without mass reset which
              * is what EventRelations normally does - we only need access
