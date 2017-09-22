@@ -19,12 +19,11 @@ use Alaress_Date_Format;
 class Model implements ISoftDeletable
 {
 
-    // 'uploading' is before accepted by Kami.
-    // The other states are the state most recently reported by Kami.
-    const STATUS_UPLOADING = 'uploading';
-    const STATUS_PROCESSING = 'processing';
-    const STATUS_DONE = 'done';
-    const STATUS_ERROR = 'error';
+    const STATUS_UPLOADING = 'uploading';    // As soon as we attempt to upload it. Transient state.
+    const STATUS_FAILED = 'failed';          // Unable to be uploaded to Kami. May be permanent or transient
+    const STATUS_PROCESSING = 'processing';  // Accepted by Kami. Transient state.
+    const STATUS_DONE = 'done';              // As reported by Kami. End state.
+    const STATUS_ERROR = 'error';            // As reported by Kami. Probably an end state.
 
     use Id;
     use CreatedAtDate;
@@ -129,6 +128,15 @@ class Model implements ISoftDeletable
     public function isUploading(): bool
     {
         return self::STATUS_UPLOADING === $this->status;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isFailed(): bool
+    {
+        return self::STATUS_FAILED === $this->status;
     }
 
 
