@@ -9,7 +9,12 @@
 namespace Schoolbox\API\Help;
 
 use Alaress\Module\Module;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\API\Help\Token;
+use Schoolbox\MapperFactory;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
 
 class CourseParticipationModule extends Module
@@ -38,6 +43,29 @@ class CourseParticipationModule extends Module
             'controller:'.$this->basename,
             $injector->lazyNew(CourseParticipationController::class)
         );
+    }
+
+
+    /**
+     * Override with any steps required for a controller and its routes
+     *
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws \InvalidArgumentException
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $injector->get('mapperFactory');
+
+        $injector->params[CourseParticipationController::class] = [
+            'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
+            'tokenMapper'      => $mapperFactory->getLazy(Token\Mapper::class),
+            'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),
+        ];
 
     }
 

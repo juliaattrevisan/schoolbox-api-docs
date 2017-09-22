@@ -18,6 +18,44 @@ use Schoolbox\Resource\Folder;
 
 class CourseParticipationController extends Base
 {
+    /**
+     * @var UserAccessMapper
+     */
+    private $userAccessMapper;
+
+    /**
+     * @var Token\Mapper
+     */
+    private $tokenMapper;
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
+     * @var Folder\Code\Mapper
+     */
+    private $codeMapper;
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @param Token\Mapper     $tokenMapper
+     * @param Folder\Mapper    $folderMapper
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    public function __construct(
+        UserAccessMapper $userAccessMapper,
+        Token\Mapper $tokenMapper,
+        Folder\Mapper $folderMapper
+    ) {
+        $this->userAccessMapper = $userAccessMapper;
+        $this->tokenMapper      = $tokenMapper;
+        $this->folderMapper     = $folderMapper;
+        $this->codeMapper       = $folderMapper->getJoinMapper('codes');
+    }
+
 
     /**
      * @param string $schoolCode
@@ -28,11 +66,6 @@ class CourseParticipationController extends Base
      */
     public function getCourseList($schoolCode)
     {
-        $userAccessMapper = UserAccessMapper::getInstance();
-        $tokenMapper = Token\Mapper::getInstance();
-        $folderMapper = Folder\Mapper::getInstance();
-        $codeMapper = $folderMapper->getJoinMapper('codes');
-
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
@@ -52,7 +85,7 @@ class CourseParticipationController extends Base
         $authDigest = $rq->query->get('token', '');
 
         try {
-            $privateKey = $tokenMapper->findById($schoolCode)->getAccessToken();
+            $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
         } catch (Mapper\Exception $e) {
 
             // TODO replace with error message
@@ -80,8 +113,8 @@ class CourseParticipationController extends Base
 
         // ok, if you're here, you can see the thing.
         try {
-            $folder = $folderMapper->findById(
-                $codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
+            $folder = $this->folderMapper->findById(
+                $this->codeMapper->findOneByColumn('code', $schoolCode)->getFolder()->getId()
             );
 
         } catch (Mapper\Exception $e) {
@@ -93,11 +126,11 @@ class CourseParticipationController extends Base
         $payload = [];
 
         // obtain all direct descendants of this folder
-        $courses = $folderMapper->findByParentId($folder->getId());
+        $courses = $this->folderMapper->findByParentId($folder->getId());
 
 
         foreach ($courses as $course) {
-            $participants = $userAccessMapper->findUsersInCategory($course)->getColumnValues('email');
+            $participants = $this->userAccessMapper->findUsersInCategory($course)->getColumnValues('email');
 
             $payload[] = [
                 'name'         => $course->getName(),
