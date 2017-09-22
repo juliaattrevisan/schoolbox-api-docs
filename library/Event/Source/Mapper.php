@@ -62,18 +62,6 @@ class Mapper extends BaseMapper
             PersonalMapper::getInstance()->deleteByColumn('event_id', $eventIds);
             CategoryMapper::getInstance()->deleteByColumn('event_id', $eventIds);
 
-            /* Hard-delete the events themselves
-             */
-            $query = "
-                DELETE FROM `event` 
-                WHERE `event`.id IN (:eventIds)
-            ";
-
-            $statement = $this->database->prepare($query);
-            $statement->execute([
-                'eventIds' => $eventIds
-            ]);
-
             /* Hard-delete the event_source records
              */
             $query = "
@@ -84,6 +72,18 @@ class Mapper extends BaseMapper
             $statement = $this->database->prepare($query);
             $statement->execute([
                 'sourceName' => $sourceName
+            ]);
+
+            /* Hard-delete the events themselves
+             */
+            $query = "
+                DELETE FROM `event` 
+                WHERE `event`.id IN (:eventIds)
+            ";
+
+            $statement = $this->database->prepare($query);
+            $statement->execute([
+                'eventIds' => implode(',', $eventIds)
             ]);
         }
     }
