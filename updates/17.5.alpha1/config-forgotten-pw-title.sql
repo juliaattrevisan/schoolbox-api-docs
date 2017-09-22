@@ -23,7 +23,7 @@ INSERT INTO `config` (
 SELECT @sitelocation := `value` FROM `config` WHERE `name` = 'site_location';
 
 UPDATE  `config`
-SET     `value` = IF(@sitelocation = 'ss', 'To Create or Change your Password please enter you email address below.', value)
+SET     `value` = IF(@sitelocation = 'ss', 'To Create or Change your Password please enter your email address below.', value)
 WHERE   `name` = 'forgotten_password_title';
 
 UPDATE  `config`
