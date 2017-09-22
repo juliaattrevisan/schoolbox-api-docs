@@ -55,26 +55,36 @@ class Mapper extends BaseMapper
 
         $eventIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
-        /* Delete relations
-         */
-        PersonalMapper::getInstance()->deleteByColumn('event_id', $eventIds);
-        CategoryMapper::getInstance()->deleteByColumn('event_id', $eventIds);
+        if (count($eventIds)) {
 
-        /* Delete the events themselves
-         */
-        EventMapper::getInstance()->deleteByColumn('id', $eventIds);
+            /* Delete relations
+             */
+            PersonalMapper::getInstance()->deleteByColumn('event_id', $eventIds);
+            CategoryMapper::getInstance()->deleteByColumn('event_id', $eventIds);
 
-        /* Hard-delete the event_source records
-         */
-        $this->deleteByColumn('source_name', $sourceName);
-        $query = "
-            DELETE FROM {$this->getTable()}
-            WHERE source_name = :sourceName
-        ";
+            /* Hard-delete the events themselves
+             */
+            $query = "
+                DELETE FROM `event` 
+                WHERE `event`.id IN (:eventIds)
+            ";
 
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'sourceName' => $sourceName
-        ]);
+            $statement = $this->database->prepare($query);
+            $statement->execute([
+                'eventIds' => $eventIds
+            ]);
+
+            /* Hard-delete the event_source records
+             */
+            $query = "
+                DELETE FROM {$this->getTable()}
+                WHERE source_name = :sourceName
+            ";
+
+            $statement = $this->database->prepare($query);
+            $statement->execute([
+                'sourceName' => $sourceName
+            ]);
+        }
     }
 }
