@@ -61,6 +61,7 @@ class Controller extends Base
      * Creates a booking for an item.
      *
      * @param Item\Model $item
+     *
      * @throws \Exception If cannot parse date interval
      */
     public function book(Item\Model $item)
@@ -83,8 +84,10 @@ class Controller extends Base
                     $dateObject->modify('+1 hour');
                     $dateObject->setTime($dateObject->format('H'), 0);
                 }
+
                 return $dateObject;
             }
+
             return null;
         };
 
@@ -119,16 +122,16 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@resourceBooking/book.twig',
-                'data'     => array(
+                'data'     => [
                     'item'          => $item,
                     'select'        => 'radio',
                     'campusList'    => $this->getCampusList(),
                     'callbackUrl'   => $this->getRequest()->query['callbackUrl'],
-                    'allowOverride' => $item->getResource()->canUserModerateThisItem($this->getUser())
-                ),
-            )
+                    'allowOverride' => $item->getResource()->canUserModerateThisItem($this->getUser()),
+                ],
+            ]
         );
     }
 
@@ -156,8 +159,7 @@ class Controller extends Base
             $booking = $this->getBookingFromEvent($item, $event);
             $booking
                 ->setName($this->request->post['name'])
-                ->setNotes($this->request->post['notes'])
-            ;
+                ->setNotes($this->request->post['notes']);
             $bookingList = new Collection();
             $bookingList->add($booking);
 
@@ -212,14 +214,14 @@ class Controller extends Base
             }
 
             $this->getResponse()->content->set(
-                array(
+                [
                     'format' => 'json',
-                    'data'   => array(
+                    'data'   => [
                         'item'        => $bookingList,
                         'errors'      => $errors,
-                        'callbackUrl' => $callbackUrl
-                    ),
-                )
+                        'callbackUrl' => $callbackUrl,
+                    ],
+                ]
             );
         } else {
             // Redirect back to previous page, or read page if not set.
@@ -235,9 +237,9 @@ class Controller extends Base
      */
     public function update(Model $item)
     {
-        $bookingList = null;
-        $originalStart =  clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
-        $originalEnd = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
+        $bookingList   = null;
+        $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
+        $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
 
         // Perform validation, but leave this booking out of calculations.
         $code   = 200;
@@ -247,8 +249,7 @@ class Controller extends Base
             $isTimeChanged = false;
             $item
                 ->setName($this->request->post['name'])
-                ->setNotes($this->request->post['notes'])
-            ;
+                ->setNotes($this->request->post['notes']);
             $series = $this->getUpdatedSeries(
                 $item,
                 Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
@@ -263,13 +264,13 @@ class Controller extends Base
                 $item->getEvent()->getStartDateTime()->getDateTimeObject(),
                 $originalStart
             );
-            $endDelta = Interval::createFromDateTimeDifference(
+            $endDelta   = Interval::createFromDateTimeDifference(
                 $item->getEvent()->getEndDateTime()->getDateTimeObject(),
                 $originalEnd
             );
 
             $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
-            
+
             // Save the whole series
             $bookingList = new Collection();
             foreach ($series as $booking) {
@@ -282,8 +283,8 @@ class Controller extends Base
 
                 //If item is moderated, already approved, and time changed, set item to need approval again
                 $moderationId = $booking->getResource()->getModerationType()->getId();
-                $statusId = $booking->getStatus()->getId();
-                
+                $statusId     = $booking->getStatus()->getId();
+
                 if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
                     $statusId == Status\Model::STATUS_APPROVED && $isTimeChanged) {
                     $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
@@ -319,14 +320,14 @@ class Controller extends Base
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
             $this->getResponse()->content->set(
-                array(
+                [
                     'format' => 'json',
-                    'data'   => array(
+                    'data'   => [
                         'item'        => $item,
                         'errors'      => $errors,
-                        'callbackUrl' => $callbackUrl
-                    ),
-                )
+                        'callbackUrl' => $callbackUrl,
+                    ],
+                ]
             );
         } else {
             // Redirect back to previous page, or read page if not set.
@@ -354,14 +355,13 @@ class Controller extends Base
             foreach ($booking->getResource()->getRelatedResourceList() as $relatedResource) {
                 if (array_key_exists($relatedResource->getId(), $relatedItems)) {
                     $relatedItemInputs = $relatedItems[$relatedResource->getId()];
-                    $relatedBooking = $this->getBookingFromEvent(
+                    $relatedBooking    = $this->getBookingFromEvent(
                         $relatedResource,
                         $booking->getEvent()
                     );
                     $relatedBooking
                         ->setName($relatedItemInputs['name'])
-                        ->setNotes($relatedItemInputs['notes'])
-                    ;
+                        ->setNotes($relatedItemInputs['notes']);
                     // Add related booking relation in both directions
                     $booking->addRelatedBooking($relatedBooking);
                     $relatedBooking->addRelatedBooking($booking);
@@ -370,6 +370,7 @@ class Controller extends Base
             }
             $newList->add($booking);
         }
+
         return $newList;
     }
 
@@ -387,6 +388,7 @@ class Controller extends Base
     {
         $newList = $this->getBookingsForRelatedItems($bookingList, $relatedItems);
         $this->bookingMapper->save($newList);
+
         return $newList;
     }
 
@@ -454,13 +456,14 @@ class Controller extends Base
                         $campus
                     );
                 } catch (MapperException $e) {
-                    $period = array();
+                    $period = [];
                 }
                 break;
             default:
-                $period = array();
+                $period = [];
                 break;
         }
+
         return $period;
     }
 
@@ -506,8 +509,8 @@ class Controller extends Base
                         $period,
                         new Calendar\EventRelations(
                             Calendar\EventMapper::ACCESS_PERSONAL,
-                            array(),
-                            array()
+                            [],
+                            []
                         )
                     );
                 }
@@ -525,6 +528,7 @@ class Controller extends Base
                 $newList->add($booking);
             }
         }
+
         return $newList;
     }
 
@@ -540,13 +544,21 @@ class Controller extends Base
      */
     protected function validateBookingFromPostData(Item\Model $resource, Model $existingBooking = null)
     {
+
         // Check:
         // Beginning and end of booking are valid datetime
         // (These checks can't be overridden.)
         // TODO rewrite start/end checks to use Alaress_Date_Format directly
-        $errors    = array();
-        $startDate = null;
-        $endDate   = null;
+        $errors        = [];
+        $startDate     = null;
+        $endDate       = null;
+        $isNewBooking  = false;
+        $isTimeChanged = false;
+
+        // Only moderators of this booking may override validation
+        $override = !empty($this->getRequest()->post['override_validation'])
+            && $resource->canUserModerateThisItem($this->getUser());
+
         try {
             $startDate = Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject();
         } catch (\Exception $e) {
@@ -558,169 +570,178 @@ class Controller extends Base
             $errors['end_datetime'][] = 'invalid';
         }
 
-        // Only moderators of this booking may override validation
-        $override = !empty($this->getRequest()->post['override_validation'])
-            && $resource->canUserModerateThisItem($this->getUser());
+        // Having a power to override doesn't make you a God. Start comes always before End.
+        $errors = array_merge_recursive(
+            $errors,
+            $this->validateBeforeTime($startDate, $endDate)
+        );
 
-        // As long as I have startTime, I can check leadtime.
-        if (isset($startDate) && !$override) {
-            // Start date before present gets covered by too_early
-            // Start time before earliest possible time
-            $now = new DateTime();
-            $now->setTimestamp($this->request->server['REQUEST_TIME']);
-            if ($startDate < $now) {
-                $errors['start_datetime'][] = 'in_past';
-            } else {
-                $earliest = new DateTime();
-                $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
-                if ($startDate < $earliest) {
-                    $errors['start_datetime'][] = 'too_early';
-                }
-            }
+        // Bypass any other validation if overriding
+        if ($override) {
+            return $errors;
         }
 
-        // I need both start and end to check reservation span.
-        if (isset($startDate, $endDate)) {
-            // Obviously start must be before end (gets covered by too_short too)
-            // (This can't be overridden)
-            if ($startDate > $endDate) {
-                $errors['end_datetime'][] = 'before_start';
-            }
+        // New booking
+        if (!($existingBooking instanceof Model)) {
+            $isNewBooking = true;
+        } // Updated booking
+        else {
 
-            // Am I overriding? Perform no other validation if so
-            if (!$override) {
-                // End date before earliest possible end
-                $earliestEnd = clone $startDate;
-                $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
-                if ($endDate < $earliestEnd) {
-                    $errors['end_datetime'][] = 'too_short';
-                }
-                // End date after latest possible end (Only if there is an actual max time)
-                if ($resource->getMaxReservationTime()->getSecondTotal() > 0) {
-                    $latestEnd = clone $startDate;
-                    $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
-                    if ($endDate > $latestEnd) {
-                        $errors['end_datetime'][] = 'too_long';
-                    }
-                }
+            // Get the date and time changes from original booking
+            $startDelta = Interval::createFromDateTimeDifference(
+                clone $existingBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                $startDate
+            );
+            $endDelta   = Interval::createFromDateTimeDifference(
+                clone $existingBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                $endDate
+            );
 
-                // Check conflicting bookings as well for this item.
-                // Only check approved bookings. Wow, the calendar population method
-                // can do exactly that!
-                // I do however want to allow a booking to start at the same time
-                // that the previous booking ended.
-                // (We may need to implement a down time between bookings.)
-                $errors = array_merge_recursive(
-                    $errors,
-                    $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
-                );
-                if (!($existingBooking instanceof Model)) {
-                    // Validating a new booking?
-                    // Expand this single booking out to a list of related items,
-                    // and validate them all.
-                    $dateParts = array(
-                        array($resource, $startDate, $endDate),
-                    );
+            $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
+        }
 
-                    // Check each in series (if there is one)
-                    $series = array();
-                    try {
-                        $repeatUntil = Alaress_Date_Format::newLocalShort(
-                            $this->getRequest()->post['repeat_until']
-                        );
-                    } catch (\Exception $e) {
-                        $repeatUntil = null;
-                    }
-                    if ($repeatUntil instanceof Alaress_Date_Format) {
-                        $series = $this->getRecurrencePeriod(
-                            $startDate,
-                            $this->request->post['repeat'],
-                            $repeatUntil->getDateTimeObject(),
-                            $this->request->post['timetable']['campus']
+        // Validate any new booking or existing booking if dates have been modified
+        if ($isNewBooking || $isTimeChanged) {
+
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateLeadTime($resource, $startDate)
+            );
+
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateTooShort($resource, $startDate, $endDate)
+            );
+
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateTooLong($resource, $startDate, $endDate)
+            );
+
+            $errors = array_merge_recursive(
+                $errors,
+                $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
+            );
+
+            if ($isNewBooking) {
+                // Validate related and recurrent bookings of a new booking
+                if ($this->getRequest()->post['repeat_until']) {
+                    foreach ($this->getAllRecurrenceDates($resource, $startDate, $endDate) as $check) {
+                        list($resource, $thisStart, $thisEnd) = $check;
+                        $errors = array_merge_recursive(
+                            $errors,
+                            $this->validateForConflicts($resource, $thisStart, $thisEnd)
                         );
                     }
-                    $difference = $startDate->diff($endDate);
-                    foreach ($series as $occurenceStart) {
-                        $occurenceEnd = clone $occurenceStart;
-                        $occurenceEnd->add($difference);
-                        // Check all of $occurenceStart and $occurenceEnd
-                        $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
-                    }
-
-                $relatedItems = $this->getRelatedItemsFromForm();
-                foreach ($resource->getRelatedResourceList() as $relatedResource) {
-                    if (array_key_exists($relatedResource->getId(), $relatedItems)) {
-                        $dateParts[] = array($relatedResource, $startDate, $endDate);
-
-                            foreach ($series as $occurenceStart) {
-                                $occurenceEnd = clone $occurenceStart;
-                                $occurenceEnd->add($difference);
-
-                                // Check all of $occurenceStart and $occurenceEnd
-                                $dateParts[] = array($resource, $occurenceStart, $occurenceEnd);
-                            }
-                        }
-                    }
-
-                foreach ($dateParts as $check) {
-                    list($resource, $thisStart, $thisEnd) = $check;
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateForConflicts($resource, $thisStart, $thisEnd)
-                    );
                 }
             } else {
                 // Validating an existing booking?
                 // Check each item in the series, adjusting its dates.
                 // Work with a fresh copy of the booking, because it can get
                 // messed with.
-                $isTimeChanged = false;
-                $series = $this->getUpdatedSeries(
-                    $this->bookingMapper->findById($existingBooking->getId()),
-                    $startDate,
-                    $endDate,
-                    $this->getRelatedItemsFromForm(),
-                    $this->request->post['efficacy'],
-                    $isTimeChanged
-                );
 
-                    $dateParts = array();
-                    foreach ($series as $thisBooking) {
-                        if (!($thisBooking->isDeleted())) {
-                            $dateParts[] = array($thisBooking->getResource(), $startDate, $endDate, $thisBooking);
-                        }
-                    }
-
-                    foreach ($dateParts as $check) {
-                        list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
-                        $errors = array_merge_recursive(
-                            $errors,
-                            $this->validateForConflicts($resource, $thisStart, $thisEnd, $thisBooking)
-                        );
-                    }
+                foreach ($this->getAllRelatedBookingDates($existingBooking, $startDate, $endDate) as $check) {
+                    list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateForConflicts($resource, $thisStart, $thisEnd, $thisBooking)
+                    );
                 }
             }
+
         }
 
-        // If updating a booking and its timespan hasn't changed:
-        // unset all timespan related errors.
-        // This allows someone to change its notes.
-        if ($existingBooking instanceof Model) {
-            $existingStart = $existingBooking->getEvent()->getStartDateTime()->getDateTimeObject();
-            $existingEnd   =  $existingBooking->getEvent()->getEndDateTime()->getDateTimeObject();
-            if ($startDate == $existingStart && $endDate == $existingEnd) {
-                unset($errors['start_datetime'], $errors['end_datetime']);
+        return $errors;
+
+    }
+
+    /**
+     * Validate start before end
+     *
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     *
+     * @return array
+     */
+    protected function validateBeforeTime(DateTime $startDate, DateTime $endDate)
+    {
+        $errors = [];
+        if ($startDate > $endDate) {
+            $errors['end_datetime'][] = 'before_start';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate start date not in the past or not too early
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     *
+     * @return array
+     */
+    protected function validateLeadTime(Item\Model $resource, DateTime $startDate)
+    {
+        $errors = [];
+        $now    = new DateTime();
+        $now->setTimestamp($this->request->server['REQUEST_TIME']);
+        if ($startDate < $now) {
+            $errors['start_datetime'][] = 'in_past';
+        } else {
+            $earliest = new DateTime();
+            $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
+            if ($startDate < $earliest) {
+                $errors['start_datetime'][] = 'too_early';
             }
         }
 
-        // Validate for recurrences? Any recurrences should be warnings (and the
-        // booking should not be made) instead of anything else?
+        return $errors;
+    }
 
-        // Timetable-based recurrences as well?
+    /**
+     * Validate the minimum length of the booking
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     *
+     * @return array
+     */
+    protected function validateTooShort(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    {
+        $errors = [];
+        // End date before earliest possible end
+        $earliestEnd = clone $startDate;
+        $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
+        if ($endDate < $earliestEnd) {
+            $errors['end_datetime'][] = 'too_short';
+        }
 
-        // If there's any related resources: validate for those too.
-        // Ensure that the user has the right to book this page
-        // (though that's an authentication issue, not a data integrity one)
+        return $errors;
+    }
+
+    /**
+     * Validate the maximum length of the booking
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     *
+     * @return array
+     */
+    protected function validateTooLong(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    {
+        $errors = [];
+        // End date after latest possible end (Only if there is an actual max time)
+        if ($resource->getMaxReservationTime()->getSecondTotal() > 0) {
+            $latestEnd = clone $startDate;
+            $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
+            if ($endDate > $latestEnd) {
+                $errors['end_datetime'][] = 'too_long';
+            }
+        }
+
         return $errors;
     }
 
@@ -732,6 +753,7 @@ class Controller extends Base
      * @param  DateTime   $startDate
      * @param  DateTime   $endDate
      * @param  Model      $existingBooking
+     *
      * @return array
      */
     protected function validateForConflicts(
@@ -740,7 +762,7 @@ class Controller extends Base
         DateTime $endDate,
         Model $existingBooking = null
     ) {
-        $errors = array();
+        $errors = [];
 
         // Only check approved bookings. Wow, the calendar population method
         // can do exactly that!
@@ -752,7 +774,7 @@ class Controller extends Base
             $resource->getId(),
             $startDate->getTimestamp() + 1,
             $endDate->getTimestamp() - 1,
-            array(Status\Model::STATUS_APPROVED)
+            [Status\Model::STATUS_APPROVED]
         );
 
         // Conflicting bookings could include the existing booking.
@@ -766,9 +788,9 @@ class Controller extends Base
         if ($existingBooking instanceof Model) {
             $existingId = $existingBooking->getId();
             if ($existingId) {
-                $existingSeries = $existingBooking->getEvent()->getSeriesId();
+                $existingSeries      = $existingBooking->getEvent()->getSeriesId();
                 $conflictingBookings = $conflictingBookings->filter(
-                    function($item) use ($existingId, $existingSeries) {
+                    function ($item) use ($existingId, $existingSeries) {
                         /** @var Model $item */
                         if ($item->getId() == $existingId) {
                             return false;
@@ -776,6 +798,7 @@ class Controller extends Base
                         if (!empty($existingSeries) && $item->getEvent()->getSeriesId() == $existingSeries) {
                             return false;
                         }
+
                         return true;
                     }
                 );
@@ -789,7 +812,7 @@ class Controller extends Base
             // Check if there's a timetabled class here, too.
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
                 $this->getUser(),
-                array(),
+                [],
                 [$roomCode => $resource->getId()]
             );
 //            $roomSource->setRoomCodes($roomCode);
@@ -812,12 +835,13 @@ class Controller extends Base
      */
     protected function getRelatedItemsFromForm()
     {
-        $relatedItems = array();
-        foreach ($this->request->post['related_item'] ?: array() as $relatedItem) {
+        $relatedItems = [];
+        foreach ($this->request->post['related_item'] ?: [] as $relatedItem) {
             if ($relatedItem['resource_id']) {
                 $relatedItems[$relatedItem['resource_id']] = $relatedItem;
             }
         }
+
         return $relatedItems;
     }
 
@@ -849,6 +873,7 @@ class Controller extends Base
         $event->setCampusCollection(new Collection());
 
         $event->setPublishDateTime(new Alaress_Date_Format(new DateTime()));
+
         return $event;
     }
 
@@ -868,13 +893,13 @@ class Controller extends Base
             ->setResource($resource)
             ->setStatus(Status\Model::STATUS_PENDING)
             ->setName($this->getRequest()->post['name'])
-            ->setNotes($this->getRequest()->post['notes'])
-        ;
+            ->setNotes($this->getRequest()->post['notes']);
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
             $booking->setStatus(Status\Model::STATUS_APPROVED);
         }
+
         return $booking;
     }
 
@@ -892,7 +917,7 @@ class Controller extends Base
         /** @var Model[] $bookings */
         $source = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
             $this->getUser(),
-            array()
+            []
         );
         $source
             ->setResourceId($item->getId())
@@ -914,11 +939,11 @@ class Controller extends Base
         if (strlen($roomCode)) {
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
                 $this->getUser(),
-                array(),
+                [],
                 [$item->getRoomCode() => $item->getId()]
             );
 //            $roomSource->setRoomCodes($item->getRoomCode());
-            $roomEvents   = $roomSource->getEvents(
+            $roomEvents = $roomSource->getEvents(
                 $this->getRequest()->query['start'],
                 $this->getRequest()->query['end']
             );
@@ -932,17 +957,17 @@ class Controller extends Base
                     new \Calendar(),
                     $this->getUser()
                 );
-                $output .= $renderer->render();
+                $output   .= $renderer->render();
             }
         }
 
         $output = json_decode('[' . $output . '{}]');
 
         $this->getResponse()->content->set(
-            array(
+            [
                 'format' => 'json',
                 'data'   => $output,
-            )
+            ]
         );
     }
 
@@ -957,27 +982,27 @@ class Controller extends Base
         // Set start and end date
         $event = $item->getEvent();
         // Show event's recurrence
-        $recurrence = array();
+        $recurrence = [];
         if ($event->getSeriesId()) {
             $recurrence = $this->getEventRecurrenceMapper()->getSeriesRecurrence($event);
         }
 
         // Retrieve resource category details for display in breadcrumb
-        $resId = $item->getResource()->getId();
+        $resId    = $item->getResource()->getId();
         $category = ($this->getResourceMapper()->findById($resId)->getCategory());
         $item->getResource()->setCategory($category);
 
         // Cancel callback URL: point to the last page if it wasn't set.
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@resourceBooking/book.twig',
-                'data'     => array(
+                'data'     => [
                     'item'              => $item,
                     'recurrence'        => $recurrence,
                     'campusList'        => $this->getCampusList(),
                     'cancelCallbackUrl' => $this->session->getHistory(),
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -989,6 +1014,7 @@ class Controller extends Base
     protected function getCampusList()
     {
         $listGenerator = new TimetableArrayExporter($this->externalTimetableHandler);
+
         return $listGenerator->export($this->getUser());
     }
 
@@ -1011,7 +1037,7 @@ class Controller extends Base
                     $booking
                 );
             default:
-                return array();
+                return [];
         }
     }
 
@@ -1054,6 +1080,7 @@ class Controller extends Base
         if (empty($errors)) {
             $this->getBookingMapper()->save($collection);
         }
+
         return $errors;
     }
 
@@ -1065,7 +1092,7 @@ class Controller extends Base
      */
     protected function getStatusChangeCallbackUrl()
     {
-        return $this->request->post['callbackUrl'] ? : $this->getSession()->getHistory();
+        return $this->request->post['callbackUrl'] ?: $this->getSession()->getHistory();
     }
 
     /**
@@ -1125,10 +1152,10 @@ class Controller extends Base
         // The callback URL might point to the edit page for this booking.
         // Until I implement redirects in route preloads, I'll have to check for
         // that case here.
-        if ($callbackUrl === $this->router->generate('resourceBooking.edit', array('id' => $item->getId()))) {
+        if ($callbackUrl === $this->router->generate('resourceBooking.edit', ['id' => $item->getId()])) {
             $callbackUrl = $this->router->generate(
                 'resourceItem.read',
-                array('id' => $item->getResource()->getId())
+                ['id' => $item->getResource()->getId()]
             );
         }
         $this->setUpdateStatusResponse($item, $callbackUrl);
@@ -1151,6 +1178,7 @@ class Controller extends Base
                 return $this->getBookingMapper()->findSeriesBookings($booking->getId(), $seriesId);
             }
         }
+
         return new Collection();
     }
 
@@ -1159,26 +1187,26 @@ class Controller extends Base
      *
      * @param Model  $booking
      * @param string $callbackUrl
-     * @param array  $errors      If not empty, this contains the errors for this change.
+     * @param array  $errors If not empty, this contains the errors for this change.
      */
-    protected function setUpdateStatusResponse(Model $booking, $callbackUrl, $errors = array())
+    protected function setUpdateStatusResponse(Model $booking, $callbackUrl, $errors = [])
     {
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode(empty($errors) ? 200 : 400);
             $this->getResponse()->content->set(
-                array(
+                [
                     'format' => 'json',
-                    'data'   => array(
+                    'data'   => [
                         'item'        => $booking,
                         'callbackUrl' => $callbackUrl,
                         'errors'      => $errors,
-                    ),
-                )
+                    ],
+                ]
             );
         } else {
             // Is there a previous location to redirect to? if so use that.
             $this->getResponse()->redirect->afterPost(
-                $callbackUrl ? : $this->getSession()->getHistory()
+                $callbackUrl ?: $this->getSession()->getHistory()
             );
         }
     }
@@ -1191,6 +1219,7 @@ class Controller extends Base
     public function setBookingMapper($bookingMapper)
     {
         $this->bookingMapper = $bookingMapper;
+
         return $this;
     }
 
@@ -1210,6 +1239,7 @@ class Controller extends Base
     public function setEventMapper($eventMapper)
     {
         $this->eventMapper = $eventMapper;
+
         return $this;
     }
 
@@ -1229,6 +1259,7 @@ class Controller extends Base
     public function setEventRecurrenceMapper($eventRecurrenceMapper)
     {
         $this->eventRecurrenceMapper = $eventRecurrenceMapper;
+
         return $this;
     }
 
@@ -1248,6 +1279,7 @@ class Controller extends Base
     public function setResourceMapper($resourceMapper)
     {
         $this->resourceMapper = $resourceMapper;
+
         return $this;
     }
 
@@ -1267,6 +1299,7 @@ class Controller extends Base
     public function setExternalTimetableHandler($externalTimetableHandler)
     {
         $this->externalTimetableHandler = $externalTimetableHandler;
+
         return $this;
     }
 
@@ -1294,6 +1327,7 @@ class Controller extends Base
     public function setCampusMapper($campusMapper)
     {
         $this->campusMapper = $campusMapper;
+
         return $this;
     }
 
@@ -1305,7 +1339,7 @@ class Controller extends Base
      * @param DateTime $endDate
      * @param array    $relatedItems
      * @param string   $efficacy
-     * @param bool&    $isTimeChanged Were any bookings changed?
+     * @param bool     &    $isTimeChanged Were any bookings changed?
      *
      * @return Collection|Model[]
      */
@@ -1322,7 +1356,7 @@ class Controller extends Base
             $item->getEvent()->getStartDateTime()->getDateTimeObject(),
             $startDate
         );
-        $endDelta = Interval::createFromDateTimeDifference(
+        $endDelta   = Interval::createFromDateTimeDifference(
             $item->getEvent()->getEndDateTime()->getDateTimeObject(),
             $endDate
         );
@@ -1352,7 +1386,7 @@ class Controller extends Base
                 ->setName($item->getName())
                 ->setNotes($item->getNotes());
 
-            $event = $booking->getEvent();
+            $event    = $booking->getEvent();
             $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
                 $startDelta->getAsDateInterval()
             );
@@ -1394,8 +1428,7 @@ class Controller extends Base
                     }
                     $relatedBooking
                         ->setName($relatedItems[$relatedResource->getId()]['name'])
-                        ->setNotes($relatedItems[$relatedResource->getId()]['notes'])
-                    ;
+                        ->setNotes($relatedItems[$relatedResource->getId()]['notes']);
 
                     // Open resource: automatically confirm
                     if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
@@ -1414,5 +1447,95 @@ class Controller extends Base
         }
 
         return $bookingList;
+    }
+
+    /**
+     * Get all recursive booking dates
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     *
+     * @return array
+     */
+    protected function getAllRecurrenceDates(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    {
+        $dateParts = [];
+
+        // Check each in series (if there is one)
+        $series = [];
+
+        try {
+            $repeatUntil = Alaress_Date_Format::newLocalShort(
+                $this->getRequest()->post['repeat_until']
+            );
+        } catch (\Exception $e) {
+            $repeatUntil = null;
+        }
+        if ($repeatUntil instanceof Alaress_Date_Format) {
+            $series = $this->getRecurrencePeriod(
+                $startDate,
+                $this->request->post['repeat'],
+                $repeatUntil->getDateTimeObject(),
+                $this->request->post['timetable']['campus']
+            );
+        }
+        $difference = $startDate->diff($endDate);
+        foreach ($series as $occurenceStart) {
+            $occurenceEnd = clone $occurenceStart;
+            $occurenceEnd->add($difference);
+            // Check all of $occurenceStart and $occurenceEnd
+            $dateParts[] = [$resource, $occurenceStart, $occurenceEnd];
+        }
+
+        // Get dates for related items too
+        $relatedItems = $this->getRelatedItemsFromForm();
+        foreach ($resource->getRelatedResourceList() as $relatedResource) {
+            if (array_key_exists($relatedResource->getId(), $relatedItems)) {
+                $dateParts[] = [$relatedResource, $startDate, $endDate];
+
+                foreach ($series as $occurenceStart) {
+                    $occurenceEnd = clone $occurenceStart;
+                    $occurenceEnd->add($difference);
+
+                    // Check all of $occurenceStart and $occurenceEnd
+                    $dateParts[] = [$resource, $occurenceStart, $occurenceEnd];
+                }
+            }
+        }
+
+        return $dateParts;
+    }
+
+    /**
+     * Get all related booking dates
+     *
+     * @param Model    $existingBooking
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     *
+     * @return array
+     * @throws MapperException
+     */
+    protected function getAllRelatedBookingDates(Model $existingBooking, DateTime $startDate, DateTime $endDate)
+    {
+        $isTimeChanged = false;
+        $series        = $this->getUpdatedSeries(
+            $this->bookingMapper->findById($existingBooking->getId()),
+            $startDate,
+            $endDate,
+            $this->getRelatedItemsFromForm(),
+            $this->request->post['efficacy'],
+            $isTimeChanged
+        );
+
+        $dateParts = [];
+        foreach ($series as $thisBooking) {
+            if (!($thisBooking->isDeleted())) {
+                $dateParts[] = [$thisBooking->getResource(), $startDate, $endDate, $thisBooking];
+            }
+        }
+
+        return $dateParts;
     }
 }
