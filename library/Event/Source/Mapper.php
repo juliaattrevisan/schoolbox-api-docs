@@ -33,12 +33,14 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
+
     /**
-     * Delete events using a given $sourceName
+     * Find a list of eventIds that originated from $sourceName
      *
-     * @param string $sourceName
+     * @param $sourceName
+     * @return array
      */
-    public function deleteEventsFromSource($sourceName)
+    private function findEventIdsUsingSource($sourceName)
     {
         $query = "
             SELECT 
@@ -53,7 +55,17 @@ class Mapper extends BaseMapper
             'sourceName' => $sourceName
         ]);
 
-        $eventIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Delete events using a given $sourceName
+     *
+     * @param string $sourceName
+     */
+    public function deleteEventsFromSource($sourceName)
+    {
+        $eventIds = $this->findEventIdsUsingSource($sourceName);
 
         if (count($eventIds)) {
 
