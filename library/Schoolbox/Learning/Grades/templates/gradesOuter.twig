@@ -119,8 +119,7 @@
 
     {% set comments   = conversation.getVisibleComments(USER) %}
     {% set canComment = conversation.canComment(USER) %}
-
-
+    
     {% if comments|length or canComment %}
         <div class="row">
             <div class="small-12 island">
