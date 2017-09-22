@@ -21,6 +21,7 @@ use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\ResourceBooking\Booking\Status as StatusMapper;
 
 class Module extends BaseModule
 {
@@ -140,6 +141,8 @@ class Module extends BaseModule
             = $injector->get('externalTimetable');
         $injector->setters[Controller::class]['setCampusMapper']
             = $this->getMapperFactory()->getLazy(CampusMapper::class);
+        $injector->setters[Controller::class]['setStatusMapper']
+            = $this->getMapperFactory()->getLazy(StatusMapper::class);
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)

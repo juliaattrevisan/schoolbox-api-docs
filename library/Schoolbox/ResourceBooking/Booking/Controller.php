@@ -23,6 +23,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
+use Schoolbox\ResourceBooking\Booking\Status;
 
 class Controller extends Base
 {
@@ -56,6 +58,11 @@ class Controller extends Base
      * @var External_Timetable
      */
     protected $externalTimetableHandler;
+
+    /**
+     * @var StatusMapper
+     */
+    protected $statusMapper;
 
     /**
      * Creates a booking for an item.
@@ -285,10 +292,11 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
-                    $statusId == Status\Model::STATUS_APPROVED && $isTimeChanged) {
-                    $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
-                    $booking->setStatus($status);
+                    if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
+                        $statusId == Status\Model::STATUS_APPROVED && $isTimeChanged) {
+                        $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
+                        $booking->setStatus($this->getStatusMapper()->createModel($status));
+                    }
                 }
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
@@ -884,6 +892,7 @@ class Controller extends Base
      * @param  Calendar\Event $event
      *
      * @return Model
+     * @throws \Schoolbox\Mapper\Exception
      */
     protected function getBookingFromEvent(Item\Model $resource, Calendar\Event $event)
     {
@@ -891,13 +900,13 @@ class Controller extends Base
         $booking
             ->setEvent($event)
             ->setResource($resource)
-            ->setStatus(Status\Model::STATUS_PENDING)
+            ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
             ->setName($this->getRequest()->post['name'])
             ->setNotes($this->getRequest()->post['notes']);
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-            $booking->setStatus(Status\Model::STATUS_APPROVED);
+            $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
         }
 
         return $booking;
@@ -921,7 +930,7 @@ class Controller extends Base
         );
         $source
             ->setResourceId($item->getId())
-            ->setStatus($this->getRequest()->query['status']);
+            ->setStatus($this->getStatusMapper()->createModel($this->getRequest()->query['status']));
 
         $calendar = new Renderer(
             $source,
@@ -1058,7 +1067,7 @@ class Controller extends Base
 
         // validate this booking
         $booking
-            ->setStatus($status)
+            ->setStatus($this->getStatusMapper()->createModel($status))
             ->setReviewer($currentUser);
         $errors = $this->validateChangeStatus($booking, $status);
         $collection->add($booking);
@@ -1068,7 +1077,7 @@ class Controller extends Base
         if (count($series)) {
             foreach ($series as $relatedBooking) {
                 $relatedBooking
-                    ->setStatus($status)
+                    ->setStatus($this->getStatusMapper()->createModel($status))
                     ->setReviewer($currentUser);
                 $errors = array_merge_recursive(
                     $errors,
@@ -1332,6 +1341,25 @@ class Controller extends Base
     }
 
     /**
+     * @return StatusMapper
+     */
+    public function getStatusMapper()
+    {
+        return $this->statusMapper;
+    }
+
+    /**
+     * @param  CampusMapper $campusMapper
+     *
+     * @return $this
+     */
+    public function setStatusMapper($statusMapper)
+    {
+        $this->statusMapper = $statusMapper;
+        return $this;
+    }
+
+    /**
      * Gets a series for update, adjusting their start and end dates.
      *
      * @param Model    $item
@@ -1417,14 +1445,14 @@ class Controller extends Base
                         // Has the booking time changed?
                         // That invalidates existing bookings
                         if ($isTimeChanged) {
-                            $relatedBooking->setStatus(Status\Model::STATUS_PENDING);
+                            $relatedBooking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
                         }
                     } else {
                         // create
                         $relatedBooking = new Model();
                         $relatedBooking
                             ->setResource($relatedResource)
-                            ->setStatus(Status\Model::STATUS_PENDING);
+                            ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
                     }
                     $relatedBooking
                         ->setName($relatedItems[$relatedResource->getId()]['name'])
@@ -1432,7 +1460,7 @@ class Controller extends Base
 
                     // Open resource: automatically confirm
                     if ($relatedResource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-                        $relatedBooking->setStatus(Status\Model::STATUS_APPROVED);
+                        $relatedBooking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
                     }
                 } elseif ($relatedBooking instanceof Model) {
                     // delete or don't add. Maybe mark as deleted?
