@@ -555,18 +555,6 @@ class Controller extends Base
         $override = !empty($this->getRequest()->post['override_validation'])
             && $resource->canUserModerateThisItem($this->getUser());
 
-
-        // Having a power to override doesn't make you a God. Start comes always before End.
-        $errors = array_merge_recursive(
-            $errors,
-            $this->validateLeadTime($resource, $startDate)
-        );
-
-        // Bypass any other validation if overriding
-        if ($override) {
-            return $errors;
-        }
-
         try {
             $startDate = Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject();
         } catch (\Exception $e) {
@@ -576,6 +564,17 @@ class Controller extends Base
             $endDate = Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject();
         } catch (\Exception $e) {
             $errors['end_datetime'][] = 'invalid';
+        }
+
+        // Having a power to override doesn't make you a God. Start comes always before End.
+        $errors = array_merge_recursive(
+            $errors,
+            $this->validateBeforeTime($startDate, $endDate)
+        );
+
+        // Bypass any other validation if overriding
+        if ($override) {
+            return $errors;
         }
 
         // New booking
@@ -603,7 +602,7 @@ class Controller extends Base
 
             $errors = array_merge_recursive(
                 $errors,
-                $this->validateBeforeTime($startDate, $endDate)
+                $this->validateLeadTime($resource, $startDate)
             );
 
             $errors = array_merge_recursive(
@@ -650,29 +649,36 @@ class Controller extends Base
 
         }
 
-        // If updating a booking and its timespan hasn't changed:
-        // unset all timespan related errors.
-        // This allows someone to change its notes.
-//        else {
-//            unset($errors['start_datetime'], $errors['end_datetime']);
-//        }
-
-        // Validate for recurrences? Any recurrences should be warnings (and the
-        // booking should not be made) instead of anything else?
-
-        // Timetable-based recurrences as well?
-
-        // If there's any related resources: validate for those too.
-        // Ensure that the user has the right to book this page
-        // (though that's an authentication issue, not a data integrity one)
         return $errors;
 
     }
 
+    /**
+     * Validate start before end
+     *
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @return array
+     */
+    protected function validateBeforeTime (Datetime $startDate, Datetime $endDate)
+    {
+        $errors = [];
+        if ($startDate > $endDate) {
+            $errors['end_datetime'][] = 'before_start';
+        }
+        return $errors;
+    }
+
+    /**
+     * Validate start date not in the past or not too early
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @return array
+     */
     protected function validateLeadTime (Item\Model $resource, Datetime $startDate)
     {
         $errors = [];
-
         $now = new DateTime();
         $now->setTimestamp($this->request->server['REQUEST_TIME']);
         if ($startDate < $now) {
@@ -684,43 +690,40 @@ class Controller extends Base
                 $errors['start_datetime'][] = 'too_early';
             }
         }
-
         return $errors;
     }
 
-    protected function validateBeforeTime (Datetime $startDate, Datetime $endDate)
-    {
-        $errors = [];
-
-        if ($startDate > $endDate) {
-            $errors['end_datetime'][] = 'before_start';
-
-        }
-
-        return $errors;
-
-    }
-
+    /**
+     * Validate the minimum length of the booking
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @return array
+     */
     protected function validateTooShort (Item\Model $resource, Datetime $startDate, Datetime $endDate)
     {
         $errors = [];
-
         // End date before earliest possible end
         $earliestEnd = clone $startDate;
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
             $errors['end_datetime'][] = 'too_short';
         }
-
         return $errors;
-
     }
 
+    /**
+     * Validate the maximum length of the booking
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @return array
+     */
     protected function validateTooLong (Item\Model $resource, Datetime $startDate, Datetime $endDate)
     {
-
         $errors = [];
-
         // End date after latest possible end (Only if there is an actual max time)
         if ($resource->getMaxReservationTime()->getSecondTotal() > 0) {
             $latestEnd = clone $startDate;
@@ -729,11 +732,8 @@ class Controller extends Base
                 $errors['end_datetime'][] = 'too_long';
             }
         }
-
         return $errors;
-
     }
-
 
     /**
      * Validates whether a booking for this resource conflicts with any
@@ -1427,6 +1427,14 @@ class Controller extends Base
         return $bookingList;
     }
 
+    /**
+     * Get all recursive booking dates
+     *
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @return array
+     */
     protected function getAllRecurrenceDates (Item\Model $resource, Datetime $startDate, Datetime $endDate)
     {
         $dateParts = array();
@@ -1476,6 +1484,15 @@ class Controller extends Base
         return $dateParts;
     }
 
+    /**
+     * Get all related booking dates
+     *
+     * @param Model    $existingBooking
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @return array
+     * @throws MapperException
+     */
     protected function getAllRelatedBookingDates (Model $existingBooking, Datetime $startDate, Datetime $endDate)
     {
         $isTimeChanged = false;
