@@ -10,6 +10,7 @@ namespace Schoolbox\Blog\Eportfolio\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Blog\Eportfolio\Post;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
@@ -47,6 +48,11 @@ class Notifier extends AbstractModuleNotifier
     private $postMapper;
 
     /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+    /**
      * @var PermissionMapper
      */
     private $permissionMapper;
@@ -65,6 +71,7 @@ class Notifier extends AbstractModuleNotifier
         $dependencies                     = $dependencies ?: [];
         $dependencies['mapper']           = $dependencies['mapper'] ?? Mapper::getInstance();
         $dependencies['postMapper']       = $dependencies['postMapper'] ?? Post\Mapper::getInstance();
+        $dependencies['folderMapper']     = $dependencies['folderMapper'] ?? Folder\Mapper::getInstance();
         $dependencies['permissionMapper'] = $dependencies['permissionMapper'] ?? PermissionMapper::getInstance();
         $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
         parent::loadDependencies($dependencies);
@@ -175,13 +182,20 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentCommented(Model $comment, User $effector): Envelope
     {
         $post  = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
+        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
 
-        // Empty audience if parents don't have view permission
-        $audience = $this->isPostVisibleToParents($post)
-            ? $owner->loadParents()->getParents()
-            : $this->userMapper->createCollection();
-
+        // Parents can view if page is visible to them
+        if ($this->isPostVisibleToParents($post)) {
+            $audience = $owner->getParents();
+        } else {
+            // Parents can also view by virtue of group permissions
+            $audience = $this->userMapper->createCollection();
+            foreach ($owner->getParents() as $parent) {
+                if ($this->hasGroupViewPermission($post, $parent)) {
+                    $audience[$parent->getId()] = $parent;
+                }
+            }
+        }
         return $this->notifyCommented($comment, $effector, $audience, RoleMapper::ROLE_PARENT);
     }
 
@@ -216,9 +230,11 @@ class Notifier extends AbstractModuleNotifier
     {
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
         $audience = $this->userMapper->createCollection();
-        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_STUDENT) as $commentator) {
-            if ($this->isPostVisibleToStudent($post, $commentator)) {
-                $audience[$commentator->getId()] = $commentator;
+        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_STUDENT) as $student) {
+            if ($this->isPostOwner($post, $student) || $this->isPostVisibleToStudent($post, $student)
+                || $this->hasGroupViewPermission($post, $student)
+            ) {
+                $audience[$student->getId()] = $student;
             }
         }
         return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STUDENT, self::TRIGGER_FOLLOWED);
@@ -236,10 +252,17 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentFollowed(Model $comment, User $effector): Envelope
     {
-        $post     = $this->postMapper->findById($comment->getBlog()->getId());
-        $audience = $this->isPostVisibleToParents($post)
-            ? $this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT)
-            : $this->userMapper->createCollection();
+        $post           = $this->postMapper->findById($comment->getBlog()->getId());
+        $owner          = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
+        $parentsCanView = $this->isPostVisibleToParents($post);
+        $audience       = $this->userMapper->createCollection();
+
+        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT) as $parent) {
+            // Post owner's parents can view if parent perm on, or can view by virtue of group perms
+            if (($parentsCanView && $parent->isParentOf($owner)) || $this->hasGroupViewPermission($post, $parent)) {
+                $audience[$parent->getId()] = $parent;
+            }
+        }
         return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_PARENT, self::TRIGGER_FOLLOWED);
     }
 
@@ -251,6 +274,17 @@ class Notifier extends AbstractModuleNotifier
     protected function setPostMapper(Post\Mapper $postMapper): self
     {
         $this->postMapper = $postMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param Folder\Mapper $folderMapper
+     * @return $this|self
+     */
+    protected function setFolderMapper(Folder\Mapper $folderMapper): self
+    {
+        $this->folderMapper = $folderMapper;
         return $this;
     }
 
@@ -434,6 +468,28 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * Returns whether the specified user can view the specified post by virtue of group permissions.
+     *
+     * @param Post\Model $post
+     * @param User       $user
+     * @return bool
+     */
+    private function hasGroupViewPermission(Post\Model $post, User $user): bool
+    {
+        $groupPerms = $this->permissionMapper->findGroupPermissions($post->getPage());
+        $userGroups = $this->folderMapper->findForUser($user, false);
+        foreach ($groupPerms as $groupPerm) {
+            foreach ($userGroups as $group) {
+                if ((int)$groupPerm->getValue() === (int)$group->getId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Return whether the specified post is visible to the specified student
      *
      * @param Post\Model $post
@@ -471,5 +527,19 @@ class Notifier extends AbstractModuleNotifier
             $audience[$target->getId()] = $target;
         }
         return $audience;
+    }
+
+
+    /**
+     * Returns whether the specified user is the specified post's owner
+     *
+     * @param Post\Model $post
+     * @param User       $user
+     * @return bool
+     */
+    private function isPostOwner(Post\Model $post, User $user): bool
+    {
+        // TODO remove explicit type-coercion once model hydration is fixed SA-4539
+        return (int)$post->getPage()->getOwner()->getId() === (int)$user->getId();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+use Eportfolio\Permission;
 
 /**
  * Eportfolio_Authenticator
@@ -284,7 +285,7 @@ class Eportfolio_Authenticator
 
                         $groupSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues(
                             $this->getPageId(),
-                            'group',
+                            Permission::TYPE_GROUP,
                             $permittedGroups
                         );
 
@@ -302,7 +303,7 @@ class Eportfolio_Authenticator
 
                     $individualSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues(
                         $this->getPageId(),
-                        'student',
+                        Permission::TYPE_STUDENT,
                         $permittedIndividuals
                     );
 
