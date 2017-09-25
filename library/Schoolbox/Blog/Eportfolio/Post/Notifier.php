@@ -28,10 +28,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use OutOfBoundsException;
 use InvalidArgumentException;
-use External_UserInterface;
-use External_User;
-use External_ClassInterface;
-use External_Class;
+use Schoolbox\Resource\Folder;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -54,6 +51,11 @@ class Notifier extends AbstractModuleNotifier
      */
     private $userMapper;
 
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
 
     /**
      * @param null|IMapper[] $dependencies
@@ -65,6 +67,7 @@ class Notifier extends AbstractModuleNotifier
         $dependencies['pageMapper']       = $dependencies['pageMapper'] ?? PageMapper::getInstance();
         $dependencies['permissionMapper'] = $dependencies['permissionMapper'] ?? PermissionMapper::getInstance();
         $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
+        $dependencies['folderMapper']     = $dependencies['folderMapper'] ?? Folder\Mapper::getInstance();
         parent::loadDependencies($dependencies);
     }
 
@@ -148,13 +151,20 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentPosted(Model $post, User $effector): Envelope
     {
         $page  = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner = $this->userMapper->findById($page->getOwner()->getId());
+        $owner = $this->userMapper->findById($page->getOwner()->getId())->loadParents();
 
-        // Empty audience if parents don't have view permission
-        $audience = $this->isPostVisibleToParents($post)
-            ? $owner->loadParents()->getParents()
-            : $this->userMapper->createCollection();
-
+        // Parents can view if page is visible to them
+        if ($this->isPostVisibleToParents($post)) {
+            $audience = $owner->getParents();
+        } else {
+            // Parents can also view by virtue of group permissions
+            $audience = $this->userMapper->createCollection();
+            foreach ($owner->getParents() as $parent) {
+                if ($this->hasGroupViewPermission($post, $parent)) {
+                    $audience[$parent->getId()] = $parent;
+                }
+            }
+        }
         return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_PARENT);
     }
 
@@ -277,6 +287,17 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * @param Folder\Mapper $folderMapper
+     * @return $this|self
+     */
+    protected function setFolderMapper(Folder\Mapper $folderMapper): self
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
      * @return string
      */
     protected function getSlug(): string
@@ -310,6 +331,28 @@ class Notifier extends AbstractModuleNotifier
         foreach ($this->permissionMapper->findParentSetting($post->getPage()->getPageId()) as $permission) {
             if ($permission->getValue()) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Returns whether the specified user can view the specified post by virtue of group permissions.
+     *
+     * @param Model $post
+     * @param User  $user
+     * @return bool
+     */
+    private function hasGroupViewPermission(Model $post, User $user): bool
+    {
+        $groupPerms = $this->permissionMapper->findGroupPermissions($post->getPage());
+        $userGroups = $this->folderMapper->findForUser($user, false);
+        foreach ($groupPerms as $groupPerm) {
+            foreach ($userGroups as $group) {
+                if ((int)$groupPerm->getValue() === (int)$group->getId()) {
+                    return true;
+                }
             }
         }
         return false;
