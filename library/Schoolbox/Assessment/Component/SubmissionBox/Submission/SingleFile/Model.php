@@ -56,6 +56,13 @@ class Model implements IFile, ISoftDeletable
     protected $plagscan;
 
 
+    public function __clone()
+    {
+        $this->setCreatedAt(clone $this->getCreatedAt());
+        $this->setUpdatedAt(clone $this->getUpdatedAt());
+        $this->setDeletedAt(clone $this->getDeletedAt());
+    }
+
 
     /**
      * Owner is inferred from the submission's owner.
