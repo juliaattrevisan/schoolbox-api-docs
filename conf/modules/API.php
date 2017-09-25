@@ -11,9 +11,10 @@ namespace Config\Modules;
 
 
 use Alaress\Application\Kernel;
+use Config\ModuleLoader;
 use Schoolbox;
 
-class API implements ModuleConfigInterface {
+class API extends ModuleLoader {
 
     /**
      * Run configuration for the given module
@@ -23,10 +24,8 @@ class API implements ModuleConfigInterface {
      */
     public function configure($kernel)
     {
-        $di = $kernel->getDependencyInjector();
-
-        (new Schoolbox\API\Module($di))->init('/api');
-        (new Schoolbox\API\Help\CourseParticipationModule($di))->init('/api/courseParticipation');
+        $this->loadModule($kernel, Schoolbox\API\Module::class, '/api');
+        $this->loadModule($kernel, Schoolbox\API\Help\CourseParticipationModule::class, '/api/courseParticipation');
     }
 
 }
