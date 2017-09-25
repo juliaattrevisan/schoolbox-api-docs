@@ -92,7 +92,7 @@ class CourseParticipationController extends Base
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getCourseList($schoolCode)
+    public function getFolderAccessBySchool($schoolCode)
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();

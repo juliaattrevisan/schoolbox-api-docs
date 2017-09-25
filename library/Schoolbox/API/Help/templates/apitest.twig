@@ -9,7 +9,7 @@
                     {% set school = code.siteSchoolCode %}
                     {% set token  = hashes[school] %}
                     <li>
-                        <a class="link-row content" href="{{ routeLookup('helpCourseParticipation.getCourseList', { schoolCode: school }) }}?ts={{ ts }}&token={{ token }}">{{ school }}</a>
+                        <a class="link-row content" href="{{ routeLookup('helpCourseParticipation.getFolderAccessBySchool', { schoolCode: school }) }}?ts={{ ts }}&token={{ token }}">{{ school }}</a>
                     </li>
                 {% endfor %}
             </ul>

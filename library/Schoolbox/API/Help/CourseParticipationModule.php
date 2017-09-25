@@ -36,7 +36,7 @@ class CourseParticipationModule extends Module
         $alaressOnly = new IsAlaressAdmin();
 
         $this->register('GET', '/apitest', 'getApiTest', $alaressOnly);
-        $this->register('GET', '/{schoolCode:\w+}/courses', 'getCourseList');
+        $this->register('GET', '/{schoolCode:\w+}/courses', 'getFolderAccessBySchool');
     }
 
 
