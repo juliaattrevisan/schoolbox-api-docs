@@ -86,7 +86,7 @@ class ResponseFile
                 'strategy' => 'image.twig',
             ];
         }
-        elseif ($mimetype->isAudio()) {
+        if ($mimetype->isAudio()) {
 
             /* Load from the ResourceVideoMapper to get extra stuff
              * about the media file. Bundle it into a struct
@@ -106,7 +106,7 @@ class ResponseFile
                 ]
             ];
         }
-        elseif ($mimetype->isVideo()) {
+        if ($mimetype->isVideo()) {
 
             /* Load from the ResourceVideoMapper to get extra stuff
              * about the media file. Bundle it into a struct
@@ -126,7 +126,7 @@ class ResponseFile
                 ]
             ];
         }
-        elseif ($this->getFile()->getEditableInline()) {
+        if ($this->getFile()->getEditableInline()) {
 
             /* Load purified html into a random div or suchlike
              */
@@ -134,7 +134,7 @@ class ResponseFile
                 'strategy' => 'html.twig'
             ];
         }
-        elseif ($this->isCrocodocable()) {
+        if ($this->isCrocodocable()) {
 
             /* Figger out a crocodoc url
              * \RangeException Use Download File prompt if crocodoc api key is nonexistent on our end
@@ -184,7 +184,7 @@ class ResponseFile
     {
         $ext = $this->getFile()->getStorage()->getExtension();
 
-        return strlen(\Cfg::get('crocodoc_api_token')) && in_array($ext, $this->getAllowedFileTypes());
+        return strlen(\Cfg::get('crocodoc_api_token')) && in_array($ext, self::getAllowedFileTypes());
     }
 
     /* Getters/Setters
