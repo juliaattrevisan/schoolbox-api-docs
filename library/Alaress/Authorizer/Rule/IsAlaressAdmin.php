@@ -37,6 +37,10 @@ class IsAlaressAdmin implements IAuthorizationRule
             throw new Forbidden();
         }
 
+        if ($user->getUsername() !== 'alaress') {
+            throw new Forbidden();
+        }
+
         $nameCorrect = $user->getFirstname() === 'Alaress' && $user->getLastname() === 'Admin';
 
         if (!$nameCorrect) {
