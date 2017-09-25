@@ -155,45 +155,108 @@ class Model implements ISoftDeletable
     /**
      * @return bool
      */
-    public function isUploading(): bool
+    public function isStatusPending(): bool
+    {
+        return self::STATUS_PENDING === $this->status;
+    }
+
+
+    /**
+     * @return $this|self
+     */
+    public function setStatusPending(): self
+    {
+        return $this->setStatus(self::STATUS_PENDING);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isStatusUploading(): bool
     {
         return self::STATUS_UPLOADING === $this->status;
     }
 
 
     /**
+     * @return $this|self
+     */
+    public function setStatusUploading(): self
+    {
+        return $this->setStatus(self::STATUS_UPLOADING);
+    }
+
+
+    /**
      * @return bool
      */
-    public function isFailed(): bool
+    public function isStatusFailed(): bool
     {
         return self::STATUS_FAILED === $this->status;
     }
 
 
     /**
+     * @return $this|self
+     */
+    public function setStatusFailed(): self
+    {
+        return $this->setStatus(self::STATUS_FAILED);
+    }
+
+
+    /**
      * @return bool
      */
-    public function isProcessing(): bool
+    public function isStatusProcessing(): bool
     {
         return self::STATUS_PROCESSING === $this->status;
     }
 
 
     /**
-     * @return bool
+     * @return $this|self
      */
-    public function isDone(): bool
+    public function setStatusProcessing(): self
     {
-        return self::STATUS_DONE === $this->status;
+        return $this->setStatus(self::STATUS_PROCESSING);
     }
 
 
     /**
      * @return bool
      */
-    public function isError(): bool
+    public function isStatusDone(): bool
+    {
+        return self::STATUS_DONE === $this->status;
+    }
+
+
+    /**
+     * @return $this|self
+     */
+    public function setStatusDone(): self
+    {
+        return $this->setStatus(self::STATUS_DONE);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isStatusError(): bool
     {
         return self::STATUS_ERROR === $this->status;
+    }
+
+
+    /**
+     * @return $this|self
+     */
+    public function setStatusError(): self
+    {
+        return $this->setStatus(self::STATUS_ERROR);
     }
 
 

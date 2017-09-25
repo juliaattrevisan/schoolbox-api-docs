@@ -23,6 +23,7 @@ use \Schoolbox\Learning\InlineGrader\Facade;
 use \Schoolbox\User;
 use \Schoolbox\Video\ResourceVideoMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Learning\InlineGrader\Kami;
 
 class ResponseFile
 {
@@ -39,44 +40,56 @@ class ResponseFile
     );
 
     /**
-     * @var Submission
+     * @var Kami\Mapper
      */
-    private $submission;
+    private $kamiMapper;
 
     /**
-     * @var SubmissionFile
+     * @var Kami\Connector
      */
-    private $file;
+    private $kamiConnector;
 
-    /**
-     * @var User
-     */
-    private $user;
 
     /**
      * ResponseFile constructor.
      *
-     * @param Submission $submission
-     * @param SubmissionFile $file
-     * @param User $user
+     * @param Kami\Mapper    $kamiMapper
+     * @param Kami\Connector $kamiConnector
      */
-    public function __construct(Submission $submission, SubmissionFile $file, User $user)
+    public function __construct(Kami\Mapper $kamiMapper, Kami\Connector $kamiConnector)
     {
-        $this->setSubmission($submission);
-        $this->setFile($file);
-        $this->setUser($user);
+        $this->kamiMapper    = $kamiMapper;
+        $this->kamiConnector = $kamiConnector;
     }
+
 
     /**
      * Figure out which fragment to load
+     * @param Submission     $submission
+     * @param SubmissionFile $file
+     * @param User           $user
+     * @return array
+     * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Kami\Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      */
-    public function produce()
+    public function produce(Submission $submission, SubmissionFile $file, User $user): array
     {
+        $kamiViewSession = $this->getKamiViewSession($file, $user);
+        if ($kamiViewSession) {
+            return [
+                'strategy' => 'kami.twig',
+                'data'     => [
+                    'session' => $kamiViewSession,
+                ],
+            ];
+        }
+
+
         /* TODO: Check that file exists and that you can access it
          * If it doesn't exist, 404 File Not Found
          * If you're not allowed, 403 Forbidden
          */
-        $mimetype = $this->getFile()->getStorage()->getMimetype();
+        $mimetype = $file->getStorage()->getMimetype();
 
         if ($mimetype->isImage()) {
 
@@ -92,7 +105,7 @@ class ResponseFile
              * about the media file. Bundle it into a struct
              */
             try {
-                $audio = ResourceVideoMapper::getInstance()->findByStorageHash($this->getFile()->getHash());
+                $audio = ResourceVideoMapper::getInstance()->findByStorageHash($file->getHash());
             }
             catch (MapperException $e) {
                 $audio = null;
@@ -101,7 +114,7 @@ class ResponseFile
             return [
                 'strategy' => 'audio.twig',
                 'data' => [
-                    'hash' => $this->getFile()->getHash(),
+                    'hash' => $file->getHash(),
                     'audio' => $audio,
                 ]
             ];
@@ -112,7 +125,7 @@ class ResponseFile
              * about the media file. Bundle it into a struct
              */
             try {
-                $video = ResourceVideoMapper::getInstance()->findByStorageHash($this->getFile()->getHash());
+                $video = ResourceVideoMapper::getInstance()->findByStorageHash($file->getHash());
             }
             catch (MapperException $e) {
                 $video = null;
@@ -121,12 +134,12 @@ class ResponseFile
             return [
                 'strategy' => 'video.twig',
                 'data' => [
-                    'hash' => $this->getFile()->getHash(),
+                    'hash' => $file->getHash(),
                     'video' => $video,
                 ]
             ];
         }
-        if ($this->getFile()->getEditableInline()) {
+        if ($file->getEditableInline()) {
 
             /* Load purified html into a random div or suchlike
              */
@@ -134,7 +147,7 @@ class ResponseFile
                 'strategy' => 'html.twig'
             ];
         }
-        if ($this->isCrocodocable()) {
+        if ($this->isCrocodocable($file)) {
 
             /* Figger out a crocodoc url
              * \RangeException Use Download File prompt if crocodoc api key is nonexistent on our end
@@ -152,7 +165,7 @@ class ResponseFile
             /* Dock this doc into the crocodoc dock
              */
             try {
-                $url = (new Facade($authenticator, $this->getSubmission(), $this->getFile(), $this->getUser()))->start();
+                $url = (new Facade($authenticator, $submission, $file, $user))->start();
 
                 return [
                     'strategy' => 'crocodoc.twig',
@@ -178,53 +191,67 @@ class ResponseFile
     }
 
     /**
+     * @param SubmissionFile $file
      * @return bool
      */
-    private function isCrocodocable()
+    private function isCrocodocable(SubmissionFile $file)
     {
-        $ext = $this->getFile()->getStorage()->getExtension();
+        $ext = $file->getStorage()->getExtension();
 
         return strlen(\Cfg::get('crocodoc_api_token')) && in_array($ext, self::getAllowedFileTypes());
     }
 
+
+    /**
+     * Fetch a Kami View Session if one is available
+     *
+     * @param SubmissionFile $file
+     * @param User $user
+     * @return null|Kami\Session
+     * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Kami\Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
+     */
+    private function getKamiViewSession(SubmissionFile $file, User $user): ?Kami\Session
+    {
+        // Short-circuit if not enabled
+        if (!$this->kamiConnector->isEnabled()) {
+            return null;
+        }
+        // Has this file been uploaded to kami?
+        $kamiModel = $this->kamiMapper->findForSubmissionFile($file);
+        if (!$kamiModel) {
+            return null;
+        }
+
+        try {
+            // Was it still being processed by Kami last time we checked?
+            if ($kamiModel->isStatusProcessing()) {
+                $kamiDoc = $this->kamiConnector->getDocument($kamiModel->getKamiDocumentId());
+                if (!$kamiDoc) {
+                    // Not found in Kami
+                    return null;
+                }
+                // Update Schoolbox if a change detected in status
+                if ($kamiDoc->isDone()) {
+                    $kamiModel->setStatusDone();
+                } elseif ($kamiDoc->isError()) {
+                    $kamiModel->setStatusError();
+                    $kamiModel->setErrorMessage($kamiDoc->getFileErrorMessage());
+                }
+                $this->kamiMapper->save($kamiModel);
+            }
+            if (!$kamiModel->isStatusDone()) {
+                return null;
+            }
+            return $this->kamiConnector->viewSession($kamiModel->getKamiDocumentId(), $user);
+        } catch (Kami\Exception\EmptyApiKeyException $e) {
+            // Should be impossible here due to short-circuit at start of method.
+            return null;
+        }
+    }
+
     /* Getters/Setters
      */
-
-    /**
-     * @return Submission
-     */
-    protected function getSubmission()
-    {
-        return $this->submission;
-    }
-
-    /**
-     * @param Submission $submission
-     * @return $this
-     */
-    protected function setSubmission($submission)
-    {
-        $this->submission = $submission;
-        return $this;
-    }
-
-    /**
-     * @return SubmissionFile
-     */
-    protected function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
-     * @param SubmissionFile $file
-     * @return $this
-     */
-    protected function setFile($file)
-    {
-        $this->file = $file;
-        return $this;
-    }
 
     /**
      * @return array
@@ -232,33 +259,5 @@ class ResponseFile
     public static function getAllowedFileTypes()
     {
         return self::$allowedFileTypes;
-    }
-
-    /**
-     * @param array $allowedFileTypes
-     * @return $this
-     */
-    protected function setAllowedFileTypes($allowedFileTypes)
-    {
-        $this->allowedFileTypes = $allowedFileTypes;
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    protected function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param User $user
-     * @return $this
-     */
-    protected function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
     }
 }

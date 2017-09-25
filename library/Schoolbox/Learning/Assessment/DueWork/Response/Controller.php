@@ -13,7 +13,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -30,12 +29,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as 
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\InlineGrader\Facade as InlineGraderFacade;
 use \Schoolbox\Learning\InlineGrader\Authenticator as InlineGraderAuthenticator;
-use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFileFactory;
+use \Schoolbox\Learning\InlineGrader\Factory;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use DueWork_ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Application\Exception as ApplicationException;
+use Schoolbox\Learning\InlineGrader\Kami;
 
 class Controller extends Base
 {
@@ -54,6 +54,12 @@ class Controller extends Base
     /** @var Term\Mapper */
     private $termMapper;
 
+    /** @var Kami\Mapper */
+    private $kamiMapper;
+
+    /** @var Kami\Connector */
+    private $kamiConnector;
+
 
     /**
      * Controller constructor.
@@ -62,14 +68,23 @@ class Controller extends Base
      * @param DataSource  $responseDataSource
      * @param BreadcrumbFactory $bakery
      * @param Term\Mapper $termMapper
+     * @param Kami\Mapper $kamiMapper
+     * @param Kami\Connector $kamiConnector
      */
-    public function __construct(ErrorMapper $errorMapper, DataSource $responseDataSource, BreadcrumbFactory $bakery, Term\Mapper $termMapper)
-    {
-        $this->setErrorMapper($errorMapper);
+    public function __construct(
+        ErrorMapper $errorMapper,
+        DataSource $responseDataSource,
+        BreadcrumbFactory $bakery,
+        Term\Mapper $termMapper,
+        Kami\Mapper $kamiMapper,
+        Kami\Connector $kamiConnector
+    ) {
+        $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
-        $this->bakery = $bakery;
-        $this->termMapper = $termMapper;
-
+        $this->bakery             = $bakery;
+        $this->termMapper         = $termMapper;
+        $this->kamiMapper         = $kamiMapper;
+        $this->kamiConnector      = $kamiConnector;
     }
 
     /**
@@ -84,8 +99,7 @@ class Controller extends Base
      * @param DueWork $assessment
      * @param Participant $participant
      * @param Submission $response
-     * @throws \RangeException Cannot authenticate at crocodoc
-     * @throws \DomainException Some kind of curl error between us and crocodoc
+     * @throws ApplicationException\Exception Cannot authenticate crocodoc or a curl error between us and crocodoc
      * @throws \InvalidArgumentException If assessment due date is null.
      */
     public function getParticularResponse(DueWork $assessment, Participant $participant, Submission $response = null): void
@@ -111,26 +125,9 @@ class Controller extends Base
             }
         }
 
-        /* ResponseFileFactory figures out which fragment is required
-         */
-        $file = null;
-
-        if ($response && $response->getAllFiles()->count()) {
-
-            /* Sort files alphabetically
-             */
-            $response->getAllFiles()->sortBy('filename', 'asc');
-
-            try {
-                $file = $response->findFileByHash($this->getRequest()->query['hash']);
-            }
-            catch (\OutOfBoundsException $e) {
-                $file = $response->getAllFiles()->first();
-            }
-        }
+        $file = $response ? $this->getFile($response, $this->getRequest()->query['hash']) : null;
 
         // The zone which contains the files
-        /** @var IFeedback $latestFeedback */
         $latestFeedback    = $participant->findMostRecentFeedback();
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback($latestFeedback);
@@ -138,66 +135,102 @@ class Controller extends Base
         // Is the page being displayed in readonly mode?
         $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
 
-        /* ResponseFile Factory might throw exceptions if you're viewing
-         * crocodocable files that somehow die
-         */
-        try {
+        $data = [
+            'assessment' => $assessment,
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
+                ->add(['Inline Grader', '']),
+            'response' => $response,
+            'latestFeedback' => $latestFeedback,
+            'attachzone' => $attachZone->getTwigContext(),
+            'selectedFileHash' => $this->getRequest()->query['hash'],
+            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
+            'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment))->produce(),
+            'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
 
-            $data = [
-                'assessment' => $assessment,
-                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                    ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
-                    ->add(['Inline Grader', '']),
-                'response' => $response,
-                'latestFeedback' => $latestFeedback,
-                'attachzone' => $attachZone->getTwigContext(),
-                'selectedFileHash' => $this->getRequest()->query['hash'],
-                'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
-                'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment))->produce(),
-                'submissionStates' => \DueWork_ErrorMapper::getInstance()->findAll(),
+            /* A list of all the Responses that the participant has spawned
+             */
+            'responseList' => (new ResponsesOnly($participant))->getForTeacher(),
 
-                /* A list of all the Responses that the participant has spawned
-                 */
-                'responseList' => (new ResponsesOnly($participant))->getForTeacher(),
+            /* This is now conditional depending on the presence of a $response
+             */
+            'file' => $file,
+            'subfragment' => $file ? $this->getSubFragment($response, $file) : null,
 
-                /* This is now conditional depending on the presence of a $response
-                 */
-                'file' => $file,
-                'subfragment' => $file ? (new ResponseFileFactory($response, $file, $this->getUser()))->produce() : null,
+            /* For saving feedbacks
+             */
+            'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
+            'participant' => $participant,
 
-                /* For saving feedbacks
-                 */
-                'errors' => DueWork_ErrorMapper::getInstance()->listDisplayValues(),
-                'participant' => $participant,
+            /* Plagscan status
+             */
+            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
+            'interactionLocked' => $isInteractionLocked,
+        ];
 
-                /* Plagscan status
-                 */
-                'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-                'interactionLocked' => $isInteractionLocked,
-            ];
+        /* Rubrics data
+        */
+        $rubricMapper = RubricMapper::getInstance();
+        if($assessment->getUseRubric()){
+            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+        }
+        $rubricContext = new RubricContext($rubricMapper);
 
-            /* Rubrics data
-            */
-            $rubricMapper = RubricMapper::getInstance();
-            if($assessment->getUseRubric()){
-                $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+        // Should rubric be readonly or markable?
+        $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
+            ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
+            : $rubricContext->generateMarkable($assessment, $participant->getUser());
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/response.twig', $data));
+    }
+
+
+    /**
+     * Get which file the user is likely to wish to see details for
+     *
+     * @param Submission  $response
+     * @param null|string $hash
+     * @return null|SubmissionFile
+     */
+    private function getFile(Submission $response, ?string $hash): ?SubmissionFile
+    {
+        // Use hash if possible
+        if ($hash) {
+            try {
+                return $response->findFileByHash($hash);
+            } catch (\OutOfBoundsException $e) {
+                // no op. Silently fall back to first file if invalid hash given
             }
-            $rubricContext = new RubricContext($rubricMapper);
-
-            // Should rubric be readonly or markable?
-            $data['rubricContext'] = $isInteractionLocked && !$this->getUser()->isSuperuser()
-                ? $rubricContext->generate($assessment, $participant->getUser(), $this->getUser(), Access::getInstance(), false)
-                : $rubricContext->generateMarkable($assessment, $participant->getUser());
-
-            $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/response.twig', $data));
         }
-        catch (\RangeException $e) {
+        // Sort files alphabetically
+        return $response->getAllFiles()->sortBy('filename', 'asc')->first();
+    }
+
+
+    /**
+     * ResponseFile Factory might throw exceptions if you're viewing crocodocable files that somehow die
+     *
+     * @param Submission $response
+     * @param            $file
+     * @return array
+     * @throws ApplicationException\Exception If a Crocodoc or Kami exception occurs
+     */
+    private function getSubFragment(Submission $response, SubmissionFile $file): array
+    {
+        try {
+            return (new Factory\ResponseFile(
+                $this->kamiMapper,
+                $this->kamiConnector
+            ))->produce($response, $file, $this->getUser());
+        } catch (\RangeException|\DomainException $e) {
+            // Crocodoc exceptions
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-        }
-        catch (\DomainException $e) {
+        } catch (Kami\Exception\ResponseDecodeException|Kami\Exception\ApiException $e){
+            // Kami Exceptions
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
     }
+
 
     /**
      * @param IMarkScheme $scheme
@@ -380,15 +413,6 @@ class Controller extends Base
         return $this->errorMapper;
     }
 
-    /**
-     * @param ErrorMapper $errorMapper
-     * @return $this
-     */
-    protected function setErrorMapper(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
-    }
 
 
     /**

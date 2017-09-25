@@ -86,4 +86,17 @@ class Mapper extends BaseMapper
         }
         return $collection;
     }
+
+
+    /**
+     * Returns the kami model for the specified file if one exists
+     *
+     * @param SingleFile\Model $file
+     * @param array            $options
+     * @return null|Model
+     */
+    public function findForSubmissionFile(SingleFile\Model $file, array $options = []): ?Model
+    {
+        return $this->findByColumnList(['student_submission_file_id' => $file->getId()], $options)->first();
+    }
 }

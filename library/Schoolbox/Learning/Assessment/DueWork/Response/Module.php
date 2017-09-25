@@ -17,13 +17,11 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Submission;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -32,6 +30,8 @@ use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\IMapper;
 
 class Module extends BaseModule
 {
@@ -145,7 +145,7 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
         }
         catch (\Schoolbox\Mapper\Exception $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         $participant = null;
@@ -158,7 +158,7 @@ class Module extends BaseModule
                 $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
                 $participant = $assessment->getParticipant($response->getSubmittedOnBehalfOf());
             } catch (OutOfBoundsException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
         /* Otherwise spawn a floating feedback instead
@@ -170,7 +170,7 @@ class Module extends BaseModule
                 $participant = $assessment->getParticipant($student);
             }
             catch (\Schoolbox\Mapper\Exception $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
 
@@ -194,7 +194,7 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
         }
         catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Get all the feedbacks associated with $assessment, then find the requested Feedback
@@ -212,7 +212,7 @@ class Module extends BaseModule
             }
 
             if (!$feedback) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
 
             $responses = $this->getResponseMapperProxy()->findForAssessment($assessment);
@@ -246,12 +246,12 @@ class Module extends BaseModule
                 /* Still didn't find it? Then it really didn't exist
                  */
                 if (!$response) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                    throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
                 }
             }
         }
         catch (OutOfBoundsException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Factory to figure out which fragment is required
@@ -269,7 +269,7 @@ class Module extends BaseModule
         /* Die early when requested crocodocked File doesn't exist
          */
         if (!$file) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Spawn participant(s)
@@ -298,7 +298,7 @@ class Module extends BaseModule
             // Need to cache HTML value as the cache will clear it if this model is used in a different context
             $html = $plagscanDocument->getHtml();
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Die early when requested Assessment doesn't exist
@@ -306,7 +306,7 @@ class Module extends BaseModule
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Die early when requested Response doesn't exist in $assessment
@@ -314,7 +314,7 @@ class Module extends BaseModule
         try {
             $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
         } catch (OutOfBoundsException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Die early when participant isn't found
@@ -322,7 +322,7 @@ class Module extends BaseModule
         try {
             $participant = $assessment->getParticipant($response->getSubmittedOnBehalfOf());
         } catch (OutOfBoundsException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
@@ -349,14 +349,24 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'errorMapper' => $this->getMapperFactory()->getLazy(Error\Mapper::class),
                 'responseDataSource' => $injector->lazyGet('responseDataSource'),
                 'bakery' => $injector->lazyNew(BreadcrumbFactory::class, [
                     'router' => $injector->lazyGet('router')
                 ]),
                 'termMapper' => $this->getMapperFactory()->getLazy(Term\Mapper::class),
+                'kamiMapper' => $this->getMapperFactory()->getLazy(Kami\Mapper::class),
+                'kamiConnector' => $injector->lazyGet('kamiConnector'),
             ])
         );
+    }
+
+    /**
+     * @return IMapper|Error\Mapper
+     */
+    private function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(Error\Mapper::class);
     }
 
     /* Getters / Setters

@@ -1096,7 +1096,7 @@ class Controller extends Assessment\Controller
             // File is eligible, and not yet queued.
             $kamiModel = $this->kamiMapper->createModel()
                                           ->setStudentSubmissionFile($file)
-                                          ->setStatus(Kami\Model::STATUS_PENDING);
+                                          ->setStatusPending();
             $this->kamiMapper->save($kamiModel);
             $kamiModels[$kamiModel->getId()] = $kamiModel;
         }

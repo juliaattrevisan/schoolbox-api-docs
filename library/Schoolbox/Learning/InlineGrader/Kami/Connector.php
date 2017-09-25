@@ -46,6 +46,10 @@ class Connector implements IConnector
     // How long should view sessions last for by default?
     const DEFAULT_SESSION_EXPIRY_HOURS = 1;
 
+    // Session options
+    const SESSION_THEME_DARK = 'dark';
+    const SESSION_THEME_LIGHT = 'light';
+
     /**
      * @var IConfigLoader
      */
@@ -257,6 +261,11 @@ class Connector implements IConnector
                     'user_id' => $user->getId(),
                 ],
                 'expires_at'          => $expires->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
+                'theme'               => $theme,
+                'show_save'           => $showSave,
+                'show_print'          => $showPrint,
+                'show_help'           => $showHelp,
+                'show_menu'           => $showMenu,
             ]),
         ];
         $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
