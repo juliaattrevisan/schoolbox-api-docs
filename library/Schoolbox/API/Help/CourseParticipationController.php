@@ -149,8 +149,8 @@ class CourseParticipationController extends Base
             $participants = $this->userAccessMapper->findUsersInCategory($course)->getColumnValues('email');
 
             $payload[] = [
-                'name'         => $course->getName(),
-                'id'           => $course->getId(),
+                'folderName'   => $course->getName(),
+                'folderId'     => $course->getId(),
                 'participants' => $participants
             ];
         }
