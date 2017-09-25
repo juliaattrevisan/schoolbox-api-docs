@@ -179,7 +179,10 @@ class Controller extends Base
                 'userGroups' => $this->folderMapper->findForUser($user, false, UserAccess::ACCESS_READ),
                 'userGroupPermissions' => $groupPermissions,
                 'userPermissions' => $userPermissions,
-                'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), ['limit' => 10])->sortBy('date', 'desc'),
+                'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(),[
+                    'order' => ['date' => 'desc'],
+                    'limit' => 10
+                ]),
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
                     'order' => ['time' => 'desc'],
                     'limit' => 10
