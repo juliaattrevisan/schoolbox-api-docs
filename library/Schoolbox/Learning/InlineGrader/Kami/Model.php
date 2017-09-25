@@ -77,6 +77,9 @@ class Model implements ISoftDeletable
     /**
      * The most recent errors reported by kami
      *
+     * Even if a previously failed document is later accepted, we retain the most recent error
+     * message.
+     *
      * @var null|string
      */
     private $errorMessage;

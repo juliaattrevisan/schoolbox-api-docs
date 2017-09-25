@@ -103,14 +103,16 @@ class Uploader
         $pb->equals('status', Model::STATUS_UPLOADING);
         $uploadingModels = $this->kamiMapper->findByPredicates($pb);
 
-        $this->log->warning("Upload has timed out. Finding 'uploading' documents...");
+        $this->log->warning(sprintf("Upload has timed out. Finding '%s' documents.", Model::STATUS_UPLOADING));
         if (!$uploadingModels->count()) {
-            $this->log->warning("No 'uploading' documents found");
+            $this->log->warning(sprintf("No '%s' documents found", Model::STATUS_UPLOADING));
         }
         foreach ($uploadingModels as $kamiModel) {
             $kamiModel->setStatus(Model::STATUS_FAILED);
             $kamiModel->setErrorMessage('Uploading timed out');
-            $this->log->warning(sprintf("Uploading kami (id: %d) status set to 'failed'", $kamiModel->getId()));
+            $this->log->warning(sprintf(
+                "Uploading kami (id: %d) status set to '%s'", $kamiModel->getId(), Model::STATUS_FAILED
+            ));
         }
         return $this->saveKamiModelCollection($uploadingModels);
     }
@@ -144,19 +146,30 @@ class Uploader
             foreach ($kamiModels as $kamiModel) {
                 $this->logStartingUpload($results, $kamiCount, $kamiModel);
                 $kamiModel->setStatus(Model::STATUS_UPLOADING);
+                $this->log->info(sprintf(
+                    "Setting kami document (id: %d) status to '%s'", $kamiModel->getId(), Model::STATUS_UPLOADING
+                ));
                 $this->saveKamiModel($kamiModel);
 
                 try {
                     $kamiDoc            = $this->uploadToKami($kamiModel);
                     $successiveFailures = 0;
                     $results->incrementSuccessCount();
-                    $this->log->notice(sprintf("Upload successful. documentId: '%s'", $kamiDoc->getId()));
+                    $this->log->notice(sprintf(
+                        "Upload successful. documentId: '%s'. status: '%s'",
+                        $kamiDoc->getId(),
+                        $kamiDoc->getFileStatus()
+                    ));
                 } catch (\Throwable $lastException) {
                     $successiveFailures++;
                     $kamiModel->setStatus(Model::STATUS_FAILED);
                     $kamiModel->setErrorMessage($lastException->getMessage());
+                    $this->saveKamiModel($kamiModel);
                     $results->incrementFailureCount();
                     $this->logUploadFailure($kamiModel, $lastException);
+                    $this->log->error(sprintf(
+                        "Setting kami document (id: %d) status to '%s'", $kamiModel->getId(), Model::STATUS_FAILED
+                    ));
 
                     if ($successiveFailures > $maxSkips) {
                         $this->log->error('Too many sequential failures: aborting!');
@@ -275,9 +288,9 @@ class Uploader
         $pb->equals('status', $retryFailed ? Model::STATUS_FAILED : Model::STATUS_PENDING);
         $kamiCount = $this->kamiMapper->countByPredicates($pb);
         if ($retryFailed) {
-            $this->log->notice(sprintf('Retrying %d failed uploads', $kamiCount));
+            $this->log->notice(sprintf("Retrying %d '%s' uploads", $kamiCount, Model::STATUS_FAILED));
         } else {
-            $this->log->notice(sprintf('Uploading %d pending documents', $kamiCount));
+            $this->log->notice(sprintf("Uploading %d '%s' documents", $kamiCount, Model::STATUS_PENDING));
         }
         return $kamiCount;
     }
@@ -289,6 +302,7 @@ class Uploader
      * @param Model    $kamiModel
      * @param Document $kamiDoc
      * @return Model
+     * @throws \LogicException If status is not recognised
      */
     private function updateKamiModelState(Model $kamiModel, Document $kamiDoc): Model
     {
