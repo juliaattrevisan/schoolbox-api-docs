@@ -8,10 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
 use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
@@ -25,9 +22,7 @@ use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\Timeline\ResponsesOnly;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Attachzone;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
@@ -334,25 +329,17 @@ class Controller extends Base
          *
          * Find out if plagscan is up
          */
-        if (strlen($plagscan->getInteractiveUrl())) {
-            $client = new Client([
-                "base_uri"    => '',
-                "timeout"     => 20.0,
-                "http_errors" => false
-            ]);
-
-            try {
-                $client->get($plagscan->getInteractiveUrl());
+        try {
+            $mapper = PlagscanMapper::getInstance();
+            $interactiveUrl = $mapper->getConnector()->fetchInteractiveReportUrl($plagscan->getPlagscanId());
+            if (strlen($interactiveUrl)) {
+                $plagscan->setInteractiveUrl($interactiveUrl);
                 $interactiveAvailable = true;
             }
-            catch (TransferException $e) {
-
-                /* Could log this as an error?
-                 * Plagscan interactive report url not available
-                 *
-                 * noop
-                 */
-            }
+        } catch (\LogicException $e) {
+            //Api failed to return a valid response - Fall back to old report
+        } catch (\RuntimeException $e) {
+            //could not connect - Fall back to old report
         }
 
         $data = [
