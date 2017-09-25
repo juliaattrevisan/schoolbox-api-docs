@@ -13,6 +13,11 @@
 namespace Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * Class Mapper
+ * @package Schoolbox\ResourceBooking\Booking\Status
+ * @method Model createModel($idValue = null)
+ */
 class Mapper extends BaseMapper {
 
     public function mapping() {
