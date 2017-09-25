@@ -1348,7 +1348,7 @@ class Controller extends Base
     }
 
     /**
-     * @param  CampusMapper $campusMapper
+     * @param  StatusMapper $statusMapper
      *
      * @return $this
      */
