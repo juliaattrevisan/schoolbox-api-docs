@@ -8,14 +8,12 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DomainObject;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
 use Schoolbox\Mapper;
 
 
@@ -114,14 +112,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             foreach ($studentSubmission->getFiles() as $file) {
                 // Translate the file subobject
-                $responseFile = (new DueWorkSubmissionFile())
-                    ->setId($file->getId())
-                    ->setStorage($file->getStorage())
-                    ->setEditableInline($file->getEditableInline())
-                    ->setCrocodocId($file->getUuid())
-                    ->setFilename($file->getFilename())
-                    ->setPlagscan($file->getPlagscan());
-
+                $responseFile = clone $file;
+                $responseFile->setSubmission($response);
                 $response->getAllFiles()->add($responseFile);
             }
             $dueWorkResponses->add($response);
@@ -178,14 +170,8 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
                 // The post-save of a file will have to handle saving of plagscan
                 // (due to the new Plagscan object not holding a file ID)
-                $dataModelFile = (new StudentSubmissionFile())
-                    ->setId($file->getId())
-                    ->setSubmission($dataModel)
-                    ->setStorage($file->getStorage())
-                    ->setEditableInline($file->getEditableInline())
-                    ->setUuid($file->getCrocodocId())
-                    ->setFilename($file->getFilename());
-
+                $dataModelFile = clone $file;
+                $dataModelFile->setSubmission($dataModel);
                 $dataModel->getFiles()->add($dataModelFile);
             }
 

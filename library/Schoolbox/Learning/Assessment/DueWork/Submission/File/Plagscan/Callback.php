@@ -17,9 +17,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
 
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class Callback
@@ -56,15 +53,6 @@ class Callback
         try {
             /* @var $document Plagscan */
             $currentDocument = $this->getMapper()->findOneByColumn('plagscan_id', $plagscanId);
-
-            /** @var StudentSubmissionFile $studentSubmissionFile */
-            $studentSubmissionFile = StudentSubmissionFileMapper::getInstance()->findById($currentDocument->getStudentSubmissionFileId());
-
-            /* Convert to new format
-             */
-            $submissionFile = new SubmissionFile();
-            $submissionFile->setId($studentSubmissionFile->getId());
-            $submissionFile->setStorage($studentSubmissionFile->getStorage());
 
             /* Make a somewhat infamous assumption that plagscan completed its stuff
              * which is the only reason we'd be running this Callback

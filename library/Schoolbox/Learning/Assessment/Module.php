@@ -49,6 +49,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 class Module extends BaseModule
 {
@@ -304,6 +305,7 @@ class Module extends BaseModule
             ['mapper' => $this->getMapperFactory()->getLazy(StudentSubmissionMapper::class)]
         );
         $dc['participantMapper'] = $injector->lazyNew(ParticipantDataSource::class);
+        $dc['submissionFileMapper'] = $injector->lazyNew(SingleFile\Mapper::class);
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];

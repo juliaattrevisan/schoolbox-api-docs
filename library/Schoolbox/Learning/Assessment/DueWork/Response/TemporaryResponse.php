@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as FeedbackFile;

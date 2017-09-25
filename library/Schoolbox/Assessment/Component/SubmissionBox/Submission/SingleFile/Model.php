@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
+use Schoolbox\Learning\Assessment\DueWork;
 
 /**
  * A single file within a student's submission to a due work.
@@ -31,7 +32,10 @@ class Model implements IFile, ISoftDeletable
     use DeletedAtDate;
 
     /**
-     * @var Submission
+     * Because this object is used in both the domain and data graphs,
+     * it will point to either the domain or data version of the Student Submission
+     *
+     * @var Submission|DueWork\Submission\Model
      */
     protected $submission;
 
@@ -138,7 +142,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @return Submission
+     * @return Submission|DueWork\Submission\Model
      */
     public function getSubmission()
     {
@@ -175,7 +179,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @param Submission $submission
+     * @param Submission|DueWork\Submission\Model $submission DO NOT DECLARE TYPE (unless common interface)
      * @return static
      */
     public function setSubmission($submission)

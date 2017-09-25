@@ -12,7 +12,6 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 
@@ -51,26 +50,20 @@ foreach ($allDocuments as $currentDocument) {
         /** @var StudentSubmissionFile $studentSubmissionFile */
         $studentSubmissionFile = StudentSubmissionFileMapper::getInstance()->findById($currentDocument->getStudentSubmissionFileId());
 
-        /* Convert to new format
-         */
-        $submissionFile = new SubmissionFile();
-        $submissionFile->setId($studentSubmissionFile->getId());
-        $submissionFile->setStorage($studentSubmissionFile->getStorage());
-
         /* This returns a plagscan id upon transmission
          */
         $log->info("{$prefix}: transmitting student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
         /* Figure out what the filename will be
          */
-        $filename = $mapper->plagscanFilename($submissionFile);
+        $filename = $mapper->plagscanFilename($studentSubmissionFile);
 
         if ($filename !== null) {
 
             /* Privatise all previous incarnations of this (assessment, student) tuple to
              * prevent documents from being scanned against older versions of themselves
              */
-            $previousPlagscans = $mapper->findPreviousIncarnationsOf($submissionFile->getId());
+            $previousPlagscans = $mapper->findPreviousIncarnationsOf($studentSubmissionFile->getId());
 
             /** @var Plagscan $currentPlagscan */
             foreach ($previousPlagscans as $currentPlagscan) {
@@ -80,7 +73,7 @@ foreach ($allDocuments as $currentDocument) {
 
             /* Transmit the new file
              */
-            $plagscanId = $mapper->getConnector()->transmit($submissionFile, $filename);
+            $plagscanId = $mapper->getConnector()->transmit($studentSubmissionFile, $filename);
 
             /* Update the db with this new plagscan id
              */

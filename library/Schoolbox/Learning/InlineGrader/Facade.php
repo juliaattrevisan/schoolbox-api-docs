@@ -13,7 +13,7 @@ use \Schoolbox\User;
 use \Schoolbox\Assessment\Term\Model as Term;
 use \Schoolbox\Assessment\Term\Mapper as TermMapper;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use \Schoolbox\Learning\InlineGrader\Document;
 use Zend\Stdlib\Exception\DomainException;
 
