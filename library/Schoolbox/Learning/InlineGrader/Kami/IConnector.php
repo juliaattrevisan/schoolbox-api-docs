@@ -8,20 +8,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
-use GuzzleHttp\Exception\ClientException;
-use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Storage\IStorage;
-use Schoolbox\User;
-use Alaress_Date_Format;
-
 /**
  * Kami Connector interface
  */
 interface IConnector
 {
+
     // Session options
     const SESSION_THEME_LIGHT = 'light';
     const SESSION_THEME_DARK = 'dark';
+
 
     /**
      * Is Kami enabled for this school? (Controlled by Puppet)
@@ -120,4 +116,37 @@ interface IConnector
         bool $showHelp = true,
         bool $showMenu = true
     ): Session;
+
+
+    /**
+     * Request generation of a PDF export with annotations embedded as PDF annotations
+     *
+     * @param string $documentId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     */
+    public function createAnnotatedExport(string $documentId): Export;
+
+
+    /**
+     * Request generation of a PDF export suitable for printing
+     *
+     * @param string $documentId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     */
+    public function createInlineExport(string $documentId): Export;
+
+
+    /**
+     * Get the current status of a previously requested document export.
+     *
+     * @param string $exportId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     */
+    public function getExport(string $exportId): Export;
 }
