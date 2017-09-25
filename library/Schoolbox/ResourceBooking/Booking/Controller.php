@@ -850,7 +850,6 @@ class Controller extends Base
         return $errors;
     }
 
-
     /**
      * Validates is booking needs to be within the current term
      *
@@ -858,7 +857,7 @@ class Controller extends Base
      */
     protected function validateCurrentTermRestriction(DateTime $endDate)
     {
-        $errors = array();
+        $errors = [];
 
         $currentTerm = $this->getTermMapper()->findForToday();
         // TODO display or actual finish?
@@ -866,7 +865,8 @@ class Controller extends Base
         if ($endDate > $currentTermFinishDate) {
             $errors['end_datetime'][] = 'current_term';
         }
-        return  $errors;
+
+        return $errors;
     }
 
     /**
@@ -1410,10 +1410,9 @@ class Controller extends Base
     public function setTermMapper($termMapper)
     {
         $this->termMapper = $termMapper;
+
         return $this;
     }
-
-
 
     /**
      * Gets a series for update, adjusting their start and end dates.
