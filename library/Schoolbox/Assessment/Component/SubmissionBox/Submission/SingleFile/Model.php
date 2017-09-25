@@ -20,6 +20,7 @@ use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\InlineGrader\Kami;
 use Alaress_Date_Format;
 
 /**
@@ -56,6 +57,8 @@ class Model implements IFile, ISoftDeletable
      */
     protected $plagscan;
 
+    /** @var Kami\Model */
+    private $kami;
 
     public function __clone()
     {
@@ -200,6 +203,26 @@ class Model implements IFile, ISoftDeletable
     public function setSubmission($submission)
     {
         $this->submission = $submission;
+        return $this;
+    }
+
+
+    /**
+     * @return null|Kami\Model
+     */
+    public function getKami(): ?Kami\Model
+    {
+        return $this->kami;
+    }
+
+
+    /**
+     * @param null|Kami\Model $kami
+     * @return $this|self
+     */
+    public function setKami(?Kami\Model $kami): self
+    {
+        $this->kami = $kami;
         return $this;
     }
 }
