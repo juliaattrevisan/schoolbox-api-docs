@@ -80,9 +80,36 @@ class Export
 
 
     /**
+     * @return bool
+     */
+    public function isStatusPending(): bool
+    {
+        return self::STATUS_PENDING === $this->status;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isStatusDone(): bool
+    {
+        return self::STATUS_DONE === $this->status;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isStatusError(): bool
+    {
+        return self::STATUS_ERROR === $this->status;
+    }
+
+
+    /**
      * @return null|string
      */
-    public function getFileUrl()
+    public function getFileUrl(): ?string
     {
         return $this->fileUrl;
     }
