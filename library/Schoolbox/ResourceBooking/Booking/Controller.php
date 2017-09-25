@@ -634,10 +634,10 @@ class Controller extends Base
                 // Validate related and recurrent bookings of a new booking
                 $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
                 foreach ($dateParts as $check) {
-                    list($resource, $thisStart, $thisEnd) = $check;
+                    list($thisResource, $thisStart, $thisEnd) = $check;
                     $errors = array_merge_recursive(
                         $errors,
-                        $this->validateForConflicts($resource, $thisStart, $thisEnd)
+                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
                     );
                 }
 
@@ -648,10 +648,10 @@ class Controller extends Base
                 // messed with.
 
                 foreach ($this->getExistingSeries($existingBooking, $startDate, $endDate) as $check) {
-                    list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
+                    list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
                     $errors = array_merge_recursive(
                         $errors,
-                        $this->validateForConflicts($resource, $thisStart, $thisEnd, $thisBooking)
+                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
                     );
                 }
             }
