@@ -145,7 +145,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
     $client        = $failureRate === 0.0
         ? new GuzzleHttp\Client()
-        : new Kami\Test\UnreliableClient([], $failureRate);
+        : new Kami\Test\UnreliableClient($failureRate);
 
     $uploader = new Kami\Uploader(
         $dryRun,

@@ -17,7 +17,6 @@ use Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException;
 use Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException;
 use Schoolbox\Learning\InlineGrader\Kami\Exception\SimulatedNetworkFailureException;
 
-
 /**
  * Uploads eligible student submission files into Kami and inserts the
  * document's upload status into the schoolbox database.
@@ -111,7 +110,9 @@ class Uploader
             $kamiModel->setStatus(Model::STATUS_FAILED);
             $kamiModel->setErrorMessage('Uploading timed out');
             $this->log->warning(sprintf(
-                "Uploading kami (id: %d) status set to '%s'", $kamiModel->getId(), Model::STATUS_FAILED
+                "Uploading kami (id: %d) status set to '%s'",
+                $kamiModel->getId(),
+                Model::STATUS_FAILED
             ));
         }
         return $this->saveKamiModelCollection($uploadingModels);
@@ -147,7 +148,9 @@ class Uploader
                 $this->logStartingUpload($results, $kamiCount, $kamiModel);
                 $kamiModel->setStatus(Model::STATUS_UPLOADING);
                 $this->log->info(sprintf(
-                    "Setting kami document (id: %d) status to '%s'", $kamiModel->getId(), Model::STATUS_UPLOADING
+                    "Setting kami document (id: %d) status to '%s'",
+                    $kamiModel->getId(),
+                    Model::STATUS_UPLOADING
                 ));
                 $this->saveKamiModel($kamiModel);
 
@@ -168,7 +171,9 @@ class Uploader
                     $results->incrementFailureCount();
                     $this->logUploadFailure($kamiModel, $lastException);
                     $this->log->error(sprintf(
-                        "Setting kami document (id: %d) status to '%s'", $kamiModel->getId(), Model::STATUS_FAILED
+                        "Setting kami document (id: %d) status to '%s'",
+                        $kamiModel->getId(),
+                        Model::STATUS_FAILED
                     ));
 
                     if ($successiveFailures > $maxSkips) {

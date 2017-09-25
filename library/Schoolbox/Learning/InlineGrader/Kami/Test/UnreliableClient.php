@@ -28,7 +28,7 @@ class UnreliableClient extends Client
      * @param array $config
      * @param float $failureRate
      */
-    public function __construct(array $config = [], float $failureRate)
+    public function __construct(float $failureRate, array $config = [])
     {
         parent::__construct($config);
         if ($failureRate < 0 || $failureRate > 1.0) {

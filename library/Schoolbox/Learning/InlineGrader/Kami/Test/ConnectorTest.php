@@ -15,7 +15,6 @@ use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\Kami\MockConnector;
 use Schoolbox\Resource\Storage;
 
-
 class ConnectorTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -77,7 +76,8 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
         /* TODO - Kami mock route is currently broken. I'll write to them:
          * * mock route fails if trailing slash. prod route tolerates trailing slash
-         * * mock route returns array of documents, prod route returns object with single key 'documents', which is array of documents
+         * * mock route returns array of documents, prod route returns object with
+         *   single key 'documents', which is array of documents
          */
         $this->assertTrue(true);
 //        $documents = $connector->listDocuments();
