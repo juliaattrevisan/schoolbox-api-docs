@@ -233,6 +233,46 @@ class Controller extends Base
 
 
     /**
+     * @param Kami\Model $kami
+     * @throws Kami\Exception\EmptyApiKeyException
+     * @throws Kami\Exception\ResponseDecodeException
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     */
+    public function getKamiExportUrl(Kami\Model $kami): void
+    {
+        // TODO consider caching the fileUrl in redis for even a few minutes?
+
+        // I figure there's less overhead in sleeping the server process, than spinning it up per client poll.
+        // Total timeout before failure = $sleep * $exponent^$maxPolls - $sleep
+        $maxPolls  = 10;
+        $exponent  = 2;
+        $sleep     = 500000; // 0.5 seconds initially
+        $pollCount = 0; // TODO remove testing
+        $export    = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
+        while ($export->isStatusPending()) {
+            if($pollCount >= $maxPolls){
+                break;
+            }
+            usleep($sleep);
+            $sleep  *= $exponent; // exponential back-off.
+            $export = $this->kamiConnector->getExport($export->getId());
+            $pollCount++;
+
+        }
+        $response = $this->getResponse();
+        if ($export->isStatusError()) {
+            $response->status->setCode(400);
+        } else {
+            $response->status->setCode(200);
+        }
+        $response->content->set($this->buildJsonOutput([
+            'fileUrl'   => $export->getFileUrl(),
+            'pollCount' => $pollCount,
+        ]));
+    }
+
+
+    /**
      * Get which file the user is likely to wish to see details for
      *
      * @param Model       $response

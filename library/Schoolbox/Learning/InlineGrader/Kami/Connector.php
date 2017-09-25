@@ -519,6 +519,7 @@ class Connector implements IConnector
         );
     }
 
+
     /**
      * Convert a response body into a view session object
      *

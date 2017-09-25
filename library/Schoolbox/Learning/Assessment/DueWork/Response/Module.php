@@ -90,7 +90,8 @@ class Module extends BaseModule
 
         // For now, same auth rules as crocodoc.
         $canAccessKami = $canAccessCrocodoc;
-        $this->register('GET', '/kami/{kamiId:\d+}' . '', 'getKamiView', $canAccessKami, $preloadKami);
+        $this->register('GET', '/kami/{kamiId:\d+}' . '',        'getKamiView',      $canAccessKami, $preloadKami);
+        $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExportUrl', $canAccessKami, $preloadKami);
     }
 
 
