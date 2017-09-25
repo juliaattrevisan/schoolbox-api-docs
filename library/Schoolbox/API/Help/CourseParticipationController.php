@@ -142,6 +142,7 @@ class CourseParticipationController extends Base
         $payload = [];
 
         // obtain all direct descendants of this folder
+        // the scope of implementation is immediate children only, rather than attempting to gather all descendants
         $courses = $this->folderMapper->findByParentId($folder->getId());
 
 
