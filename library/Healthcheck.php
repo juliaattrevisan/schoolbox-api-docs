@@ -74,7 +74,7 @@ class Healthcheck
         if (!$this->connector->beginTransaction()) {
             // Transactions not supported
 
-            $this->log .= 'ERROR: Database ({$connector->getDatabase()}) does not support transactions';
+            $this->log .= "ERROR: Database ({$connector->getDatabase()}) does not support transactions";
             $transactionsSupported = false;
         }
 
