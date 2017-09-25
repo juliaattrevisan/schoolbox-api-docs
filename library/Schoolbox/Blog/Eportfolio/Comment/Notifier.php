@@ -380,8 +380,8 @@ class Notifier extends AbstractModuleNotifier
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
             $effectorParam = RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($effector)
-                ? new ChildParam($effector, ParameterInterface::STACKING_REPLACE)
-                : new UserParam($effector, ParameterInterface::STACKING_REPLACE);
+                ? new ChildParam($effector)
+                : new UserParam($effector);
 
             // Adjust title for effector, owner and recipient role combinations
             if ((int)$owner->getId() === (int)$target->getId()) {
@@ -395,11 +395,11 @@ class Notifier extends AbstractModuleNotifier
             } elseif (RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
-                $ownerParam = ['student' => new ChildParam($owner, ParameterInterface::STACKING_REPLACE)];
+                $ownerParam = ['student' => new ChildParam($owner)];
             } else {
                 // Effector is not the owner, target is not owner, target is not parent of owner
                 $ownerToken = ":student's";
-                $ownerParam = ['student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE)];
+                $ownerParam = ['student' => new UserParam($owner)];
             }
 
             $bob = $this->createBuilder($post, $effector, $comment, $trigger);
