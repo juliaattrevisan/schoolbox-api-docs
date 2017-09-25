@@ -12,7 +12,7 @@ use Alaress\Authorizer\Rule\IsAlaressAdmin;
 use Alaress;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\API\Help\Token;
+use Schoolbox\Permission\SiteAccess;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
@@ -69,7 +69,7 @@ class Module extends Alaress\Module\Module
 
         $injector->params[Controller::class] = [
             'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
-            'tokenMapper'      => $mapperFactory->getLazy(Token\Mapper::class),
+            'tokenMapper'      => $mapperFactory->getLazy(SiteAccess\Mapper::class),
             'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),
         ];
     }

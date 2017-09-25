@@ -11,7 +11,7 @@ namespace Custom\Help\CourseParticipation;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use GuzzleHttp\Psr7\Response;
-use Schoolbox\API\Help\Token;
+use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
@@ -25,7 +25,7 @@ class Controller extends Base
     private $userAccessMapper;
 
     /**
-     * @var Token\Mapper
+     * @var SiteAccess\Mapper
      */
     private $tokenMapper;
 
@@ -42,13 +42,13 @@ class Controller extends Base
 
     /**
      * @param UserAccessMapper $userAccessMapper
-     * @param Token\Mapper     $tokenMapper
+     * @param SiteAccess\Mapper     $tokenMapper
      * @param Folder\Mapper    $folderMapper
      * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
-        Token\Mapper $tokenMapper,
+        SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper
     ) {
         $this->userAccessMapper = $userAccessMapper;
@@ -66,7 +66,7 @@ class Controller extends Base
      */
     public function getApiTest()
     {
-        /** @var Token\Model[] $codes */
+        /** @var SiteAccess\Model[] $codes */
         $codes = $this->tokenMapper->findAll();
 
         $now = Alaress_Date_Format::now();

@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\API\Help\Token;
+namespace Schoolbox\Permission\SiteAccess;
 
 class Model
 {
