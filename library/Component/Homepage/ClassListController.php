@@ -135,9 +135,12 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
             $userMapper           = \Schoolbox\UserMapper::getInstance();
             $allStudentEmails     = [];
+            $synergyIds           = [];
 
             $studentPhotoHidden = $this->getConfigMapper()->get('protect_student_photo');
-            $veiwer = $this->getUser();
+            $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
+
+            $viewer = $this->getUser();
 
             if (is_array($allStudents)) {
                 foreach ($allStudents as $currentStudent) {
@@ -178,9 +181,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                         //Hide Student Photo
                         if($user->getRole()->isStudent()) {
-                            if ($veiwer->getRole()->isStudent() && $studentPhotoHidden) {
+                            if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
-                            } else if ($veiwer->getRole()->isParent() && !$veiwer->isParentOf($user->loadParents())) {
+                            } else if ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
@@ -189,9 +192,9 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                         //Hide Staff Photo
                         if($user->getRole()->isStaff()) {
-                            if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
+                            if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
                                 $this->setVar('photo_block', '');
-                            } else if ($staffPhotoVisibilty == 1 && !$veiwer->getRole()->isStaff()) {
+                            } else if ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
@@ -210,7 +213,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                 /* Student bulk email
                   */
-                if ($this->getContentPermission() > UserAccess::ACCESS_READ && \Cfg::get('mail_enable')) {
+                if ($this->getContentPermission() > UserAccess::ACCESS_READ &&  $this->getConfigMapper()->get('mail_enable')) {
                     $this->setVar([
                         'REPLY_TO'           => $this->getUser()->getEmail(),
                         'EMAIL_ALL_STUDENTS' => $emailAllStudents,
@@ -225,8 +228,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                   */
                 if (count($synergyIds)
                     && $this->getContentPermission() > UserAccess::ACCESS_READ
-                    && (Cfg::get('email_all_parents') == 1)
-                    && \Cfg::get('mail_enable')
+                    && ($this->getConfigMapper()->get('email_all_parents') == 1)
+                    && $this->getConfigMapper()->get('mail_enable')
                 ) {
                     $externalHandler = new External_User();
                     $allParents      = $externalHandler->getParentEmails($synergyIds);

@@ -112,7 +112,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
                 $externalClassHandler = new External_Class();
                 $userMapper = \Schoolbox\UserMapper::getInstance();
-                $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+                $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
 
                 $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
 
@@ -141,9 +141,9 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             }
 
                             if ($teacher->getRole()->isStaff()) {
-                                if ($staffPhotoVisibilty == 2 && $this->getUser()->getRole()->isStudent()) {
+                                if ($staffPhotoVisibility == 2 && $this->getUser()->getRole()->isStudent()) {
                                     $this->setVar('photo_block', '');
-                                } else if ($staffPhotoVisibilty == 1 && !$this->getUser()->getRole()->isStaff()) {
+                                } else if ($staffPhotoVisibility == 1 && !$this->getUser()->getRole()->isStaff()) {
                                     $this->setVar('photo_block', '');
                                 } else {
                                     $this->parse('photo_block', 'photo');

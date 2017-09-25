@@ -143,9 +143,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $emailObj = new Email();
             $emailall = [];
 
-            $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+            $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
             $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
-            $veiwer = $this->getUser();
+            $viewer = $this->getUser();
 
             if ($userListCount > 0) {
                 $i = 0;
@@ -193,9 +193,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                         //Hide Student Photo
                         if($user->getRole()->isStudent()) {
-                            if ($veiwer->getRole()->isStudent() && $studentPhotoHidden) {
+                            if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
-                            } else if ($veiwer->getRole()->isParent() && !$veiwer->isParentOf($user->loadParents())) {
+                            } else if ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
@@ -204,9 +204,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
                         //Hide Staff Photo
                         if($user->getRole()->isStaff()) {
-                            if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
+                            if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
                                 $this->setVar('photo_block', '');
-                            } else if ($staffPhotoVisibilty == 1 && !$veiwer->getRole()->isStaff()) {
+                            } else if ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
@@ -222,7 +222,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
                 $this->setVar("EMAILALL", implode(',', $emailall));
 
-                if (\Cfg::get('mail_enable')) {
+                if ($this->getConfigMapper()->get('mail_enable')) {
                     $this->parse("member_email_block", "member_email");
                 } else {
                     $this->setVar([
