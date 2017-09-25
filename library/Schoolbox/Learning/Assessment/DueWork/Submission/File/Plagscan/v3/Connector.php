@@ -243,7 +243,9 @@ class Connector
             if ($content['error']['message'] == 'The document is already checked') {
                 return true;
             }
-
+            if ($content['error']['message'] == 'This document has a report already') {
+                return true;
+            }
             /* Otherwise document is one of the following and we don't need
              * to take any further action at the moment
              *
