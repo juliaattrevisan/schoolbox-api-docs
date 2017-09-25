@@ -616,7 +616,7 @@ class External_Liss_Server
 
                 /** @var TimetablePeriod $timetablePeriod */
                 $timetablePeriod = $timetablePeriodMapper->createModel();
-                $timetablePeriod->setCycle($cycle->getId());
+                $timetablePeriod->setCycle($cycle);
                 $timetablePeriod->setTitle((string)$struct['Period']->me['string']);
                 $timetablePeriod->setDay($dayNumber);
                 $timetablePeriod->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'h:i'));
