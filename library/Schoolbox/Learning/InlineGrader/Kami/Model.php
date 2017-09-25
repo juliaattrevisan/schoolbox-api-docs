@@ -19,11 +19,38 @@ use Alaress_Date_Format;
 class Model implements ISoftDeletable
 {
 
+    const STATUS_PENDING = 'pending';        // Initial state. Inserted when we save a eligible submission file
     const STATUS_UPLOADING = 'uploading';    // As soon as we attempt to upload it. Transient state.
     const STATUS_FAILED = 'failed';          // Unable to be uploaded to Kami. May be permanent or transient
     const STATUS_PROCESSING = 'processing';  // Accepted by Kami. Transient state.
     const STATUS_DONE = 'done';              // As reported by Kami. End state.
     const STATUS_ERROR = 'error';            // As reported by Kami. Probably an end state.
+
+    /**
+     * Supported mime types
+     *
+     * @var string[]
+     */
+    const ALLOWED_FILE_TYPES = [
+        'doc'     => true,
+        'docx'    => true,
+        'ppt'     => true,
+        'pptx'    => true,
+        'xls'     => true,
+        'xlsx'    => true,
+        'odt'     => true,
+        'odp'     => true,
+        'ods'     => true,
+        'jpg'     => true,
+        'jpeg'    => true,
+        'gif'     => true,
+        'tiff'    => true,
+        'png'     => true,
+        'pages'   => true,
+        'key'     => true,
+        'numbers' => true,
+        'pdf'     => true,
+    ];
 
     use Id;
     use CreatedAtDate;
@@ -190,17 +217,17 @@ class Model implements ISoftDeletable
     /**
      * @return Alaress_Date_Format
      */
-    public function getKamiCreatedAt(): Alaress_Date_Format
+    public function getKamiCreatedAt(): ?Alaress_Date_Format
     {
         return $this->kamiCreatedAt;
     }
 
 
     /**
-     * @param Alaress_Date_Format $kamiCreatedAt
+     * @param null|Alaress_Date_Format $kamiCreatedAt
      * @return $this|self
      */
-    public function setKamiCreatedAt(Alaress_Date_Format $kamiCreatedAt): self
+    public function setKamiCreatedAt(?Alaress_Date_Format $kamiCreatedAt): self
     {
         $this->kamiCreatedAt = $kamiCreatedAt;
         return $this;

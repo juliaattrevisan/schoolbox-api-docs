@@ -9,35 +9,60 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException;
 use Schoolbox\Resource\Storage\IStorage;
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
+use Schoolbox\User;
+use stdClass;
 
 /**
  * Gateway between Schoolbox and Kami
  */
-class Connector
+class Connector implements IConnector
 {
 
-    // Intentional trailing slash (@see https://github.com/guzzle/guzzle)
+    // Intentional trailing slash (@see http://docs.guzzlephp.org/en/stable/quickstart.html#creating-a-client)
+    // Correspond to API paths. @see http://docs.kamiembeddingapi.apiary.io
     const BASE_URI = 'https://api.notablepdf.com/';
 
-    // Correspond to API paths. @see http://docs.kamiembeddingapi.apiary.io
     const PATH_UPLOAD_DOCUMENT_MULTIPART = 'upload/embed/documents';
+    const PATH_LIST_DOCUMENTS = 'embed/documents';
     const PATH_GET_DOCUMENT = 'embed/documents/';
+    const PATH_DELETE_DOCUMENT = 'embed/documents/';
+
+    const CONFIG_KEY_KAMI_API_KEY = 'kami_api_key';
+
+    // How long should view sessions last for by default?
+    const DEFAULT_SESSION_EXPIRY_HOURS = 1;
 
     /**
      * @var IConfigLoader
      */
     private $config;
 
+    /** @var Client */
+    private $client;
+
 
     /**
-     * @param IConfigLoader $config
+     * @param IConfigLoader   $config
+     * @param ClientInterface $client
      */
-    public function __construct(IConfigLoader $config)
+    public function __construct(IConfigLoader $config, ClientInterface $client)
     {
         $this->config = $config;
+        $this->client = $client;
     }
 
 
@@ -57,58 +82,168 @@ class Connector
      * Is Kami online?
      *
      * @return bool
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
      */
     public function isOnline(): bool
     {
         if (!$this->isEnabled()) {
             return false;
         }
-
-        $fakeDocId = 'TEST_DOC_ID';
-        $path      = $this->getPathGetDocument($fakeDocId);
-        $options   = [
-            'headers' => $this->getAuthorisationHeader(),
-        ];
-
-        $client = $this->buildClient();
-        try {
-            $client->request('GET', $path, $options);
-        } catch (ClientException $e) {
-            // We expect to get a 404 'Not Found' because the requested document has an invalid ID
-            $response = $e->getResponse();
-            if (404 === $response->getStatusCode() && 'Not Found' === $response->getReasonPhrase()) {
-                return true;
-            }
-        } catch (\Exception $e) {
-            // Any thing else is considered a failure
-        }
-        return false;
+        $request  = new Request('GET', $this->getPathGetDocument('FAKE_DOC_ID'));
+        $response = $this->client->send($request, $this->getOptions());
+        return $this->isValidNotFound($response);
     }
 
 
     /**
      * Upload a file into Kami and return the newly assigned Kami Document Identifier
      *
+     * Note that this method cost 4c each time you hit the production or proxy server
+     *
      * @param IStorage $storage
-     * @return string
+     * @return Document
+     * @throws Exception\EmptyApiKeyException If no Kami API key configured
+     * @throws Exception\ResponseDecodeException If cannot decode the Kami response
      */
-    public function uploadDocument(IStorage $storage): string
+    public function uploadDocument(IStorage $storage): Document
     {
-        // TODO upload a storage into Kami and return the Kami Document ID
-        $path = $this->getPathUploadDocument();
-        return 'exampleId';
+        $this->assertEnabled();
+
+        // The 'name' and 'document' fields are required.
+        $options = [
+            RequestOptions::MULTIPART => [
+                [
+                    'name'     => 'name',
+                    'contents' => $storage->getBasename(),
+                ],
+                [
+                    'name'     => 'document',
+                    'contents' => $storage->readStream(),
+                    'filename' => $storage->getFilename(),
+                ],
+            ],
+        ];
+        $request  = new Request('POST', $this->getPathUploadDocument());
+        $response = $this->client->send($request, $this->getOptions($options));
+        $decoded  = $this->decodeResponseContent($response->getBody());
+        return $this->buildDocument($decoded);
     }
 
 
     /**
-     * @param string $documentId
-     * @return Document
+     * Get a list of all documents uploaded to Kami
+     *
+     * @return GenericCollection|Document[]
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws ClientException If cannot fetch documents for reasons other than simply not existing.
      */
-    public function getDocument(string $documentId): Document
+    public function listDocuments(): GenericCollection
     {
-        $path = $this->getPathGetDocument($documentId);
-        // TODO make GuzzleHttp request to Kami API
-        return new Document('exampleId', 'exampleName', Document::FILE_STATUS_DONE, null, new \Alaress_Date_NullDate());
+        $this->assertEnabled();
+        $documents = new GenericCollection(Document::class);
+
+        $request  = new Request('GET', self::PATH_LIST_DOCUMENTS);
+        $response = $this->client->send($request, $this->getOptions());
+        $decoded  = $this->decodeResponseContent($response->getBody())->documents;
+
+        /** @var \stdClass[] $decoded */
+        foreach ($decoded as $obj) {
+            $document                      = $this->buildDocument($obj);
+            $documents[$document->getId()] = $document;
+        }
+        return $documents;
+    }
+
+
+    /**
+     * Return the specified document from Kami if it exists there. Null otherwise.
+     *
+     * @param string $documentId
+     * @return null|Document
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws ApiException If cannot fetch a document for reasons other than simply not existing.
+     */
+    public function getDocument(string $documentId): ?Document
+    {
+        $this->assertEnabled();
+        $request  = new Request('GET', $this->getPathGetDocument($documentId));
+        $response = $this->client->send($request, $this->getOptions());
+
+        if (200 === $response->getStatusCode()) {
+            $decoded = $this->decodeResponseContent($response->getBody());
+            return $this->buildDocument($decoded);
+        }
+
+        // Bad response, but not a simple 'not found'?
+        if (!$this->isValidNotFound($response)) {
+            $this->generateApiException($request, $response);
+        }
+        return null;
+    }
+
+
+    /**
+     * Delete an uploaded document. This will remove the file from Kami's cloud storage.
+     *
+     * @param string $documentId
+     * @return bool Whether a mutation occurred. (will return false if doc not found)
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws ApiException If cannot fetch a document for reasons other than simply not existing.
+     */
+    public function deleteDocument(string $documentId): bool
+    {
+        $this->assertEnabled();
+
+        $request  = new Request('DELETE', $this->getPathDeleteDocument($documentId));
+        $response = $this->client->send($request, $this->getOptions());
+
+        if ($this->isValidNotFound($response)) {
+            return false;
+        }
+        // TODO confirm with Kami. The docs state 200, but testing indicates 204 from prod Kami API
+        if (!in_array($response->getStatusCode(), [200, 204], true)) {
+            $this->generateApiException($request, $response);
+        }
+        return true;
+    }
+
+
+    /**
+     * Create a time-limited session and returns a URL you can embed in your page.
+     *
+     * Note that this implementation does not permit creation of a session that does not expire.
+     *
+     * @param string                   $documentId
+     * @param User                     $user
+     * @param null|Alaress_Date_Format $expires
+     * @return Session
+     * @throws  Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     */
+    public function viewSession(string $documentId, User $user, Alaress_Date_Format $expires = null): Session
+    {
+        $this->assertEnabled();
+        // When should the view session expire?
+        if (!$expires) {
+            $expires = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
+        }
+        $options  = [
+            RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
+            RequestOptions::BODY    => \GuzzleHttp\json_encode([
+                'document_identifier' => $documentId,
+                'user'                => [
+                    'name'    => $user->getFullName(),
+                    'user_id' => $user->getId(),
+                ],
+                'expires_at'          => $expires->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
+            ]),
+        ];
+        $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
+        $response = $this->client->send($request, $this->getOptions($options));
+        return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
     }
 
 
@@ -119,7 +254,7 @@ class Connector
      */
     private function getApiKey(): ?string
     {
-        return $this->config->get('kami_api_key');
+        return $this->config->get(self::CONFIG_KEY_KAMI_API_KEY);
     }
 
 
@@ -128,7 +263,7 @@ class Connector
      *
      * @return string[]
      */
-    private function getAuthorisationHeader(): array
+    private function getHeaderAuthorisation(): array
     {
         return ['Authorization' => "Token {$this->getApiKey()}"];
     }
@@ -147,6 +282,18 @@ class Connector
 
 
     /**
+     * Build the path for the 'Delete Document' call
+     *
+     * @param string $documentId
+     * @return string
+     */
+    private function getPathDeleteDocument(string $documentId): string
+    {
+        return self::PATH_DELETE_DOCUMENT . $documentId;
+    }
+
+
+    /**
      * Build the path for the 'Upload Document' call
      *
      * @return string
@@ -158,11 +305,132 @@ class Connector
 
 
     /**
-     * @return Client
+     * Decode Kami server response
+     *
+     * @param StreamInterface $response
+     * @return stdClass
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
      */
-    private function buildClient(): Client
+    private function decodeResponseContent(StreamInterface $response): stdClass
     {
-        return new Client(['base_uri' => self::BASE_URI]);
+        try {
+            return json_decode($response->getContents());
+        } catch (\RuntimeException $e) {
+            throw new Exception\ResponseDecodeException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e->getFile(),
+                $e->getLine());
+        }
     }
 
+
+    /**
+     * Ensure Kami is enabled before attempting API calls
+     *
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     */
+    private function assertEnabled(): void
+    {
+        if (!$this->isEnabled()) {
+            throw new Exception\EmptyApiKeyException('Kami is not enabled. Api key is empty.');
+        }
+    }
+
+
+    /**
+     * @param stdClass $obj
+     * @return Document
+     */
+    private function buildDocument(stdClass $obj): Document
+    {
+        return new Document(
+            $obj->document_identifier,
+            $obj->name,
+            $obj->file_status,
+            $obj->file_error_message,
+            new Alaress_Date_Format($obj->created_at, Alaress_Date_Format::FORMAT_DATETIME_UTC)
+        );
+    }
+
+
+    /**
+     * Does the response indicate a valid URL that simply returned no data?
+     * (as opposed to an invalid URL)
+     *
+     * @param ResponseInterface $response
+     * @return bool
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     */
+    private function isValidNotFound(ResponseInterface $response): bool
+    {
+        if (!$response || 404 !== $response->getStatusCode()) {
+            return false;
+        }
+        $body = $this->decodeResponseContent($response->getBody());
+        if (!is_object($body) || !property_exists($body, 'errors')) {
+            return false;
+        }
+        return 'Record Not Found' === $body->errors[0];
+    }
+
+
+    /**
+     * Generate an ApiException containing the request and response contents
+     *
+     * @param RequestInterface  $request
+     * @param ResponseInterface $response
+     * @throws ApiException
+     */
+    private function generateApiException(RequestInterface $request, ResponseInterface $response): void
+    {
+        $requestString  = Psr7\str($request);
+        $responseString = Psr7\str($response);
+        throw new ApiException("Unable to fetch document.\n{$requestString}\n$responseString");
+    }
+
+
+    /**
+     * Convert a response body into a view session object
+     *
+     * @param stdClass $obj
+     * @return Session
+     */
+    private function buildViewSession(stdClass $obj): Session
+    {
+        return new Session(
+            $obj->view_session_key,
+            $obj->viewer_url,
+            $obj->session_expiry
+                ? new Alaress_Date_Format($obj->session_expiry, Alaress_Date_Format::FORMAT_DATETIME_UTC)
+                : new Alaress_Date_NullDate()
+        );
+    }
+
+
+    /**
+     * Get merged request options
+     *
+     * @param array $extraOptions
+     * @return array
+     */
+    private function getOptions(array $extraOptions = []): array
+    {
+        return array_merge_recursive($extraOptions, $this->getBaseOptions());
+    }
+
+
+    /**
+     * Get options common to all authenticated requests
+     *
+     * @return array
+     */
+    private function getBaseOptions(): array
+    {
+        return [
+            RequestOptions::HEADERS     => $this->getHeaderAuthorisation(),
+            RequestOptions::HTTP_ERRORS => false,
+            'base_uri'                  => static::BASE_URI,
+        ];
+    }
 }
