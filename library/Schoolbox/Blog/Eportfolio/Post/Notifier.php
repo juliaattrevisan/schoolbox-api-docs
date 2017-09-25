@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Eportfolio\PageMapper;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
+use Schoolbox\Blog\Eportfolio\Access;
 use Schoolbox\Collection;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -28,10 +29,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use OutOfBoundsException;
 use InvalidArgumentException;
-use External_UserInterface;
-use External_User;
-use External_ClassInterface;
-use External_Class;
+use Schoolbox\Resource\Folder;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -45,14 +43,19 @@ class Notifier extends AbstractModuleNotifier
     private $pageMapper;
 
     /**
-     * @var PermissionMapper
+     * @var Access
      */
-    private $permissionMapper;
+    private $access;
 
     /**
      * @var UserMapper
      */
     private $userMapper;
+
+    /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
 
 
     /**
@@ -63,7 +66,11 @@ class Notifier extends AbstractModuleNotifier
         $dependencies                     = $dependencies ?: [];
         $dependencies['mapper']           = $dependencies['mapper'] ?? Mapper::getInstance();
         $dependencies['pageMapper']       = $dependencies['pageMapper'] ?? PageMapper::getInstance();
-        $dependencies['permissionMapper'] = $dependencies['permissionMapper'] ?? PermissionMapper::getInstance();
+        $dependencies['folderMapper']     = $dependencies['folderMapper'] ?? Folder\Mapper::getInstance();
+        $dependencies['blogAccess']       = $dependencies['blogAccess'] ?? new Access(
+            $dependencies['permissionMapper'] ?? PermissionMapper::getInstance(),
+            $dependencies['folderMapper']
+        );
         $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
         parent::loadDependencies($dependencies);
     }
@@ -142,18 +149,22 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $post
      * @param User  $effector
      * @return Envelope
+     * @throws BaseMapper\Exception
      * @throws OutOfBoundsException     If severity is not set
      * @throws InvalidArgumentException If a required property was not set
      */
     public function notifyParentPosted(Model $post, User $effector): Envelope
     {
         $page  = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner = $this->userMapper->findById($page->getOwner()->getId());
+        $owner = $this->userMapper->findById($page->getOwner()->getId())->loadParents();
 
-        // Empty audience if parents don't have view permission
-        $audience = $this->isPostVisibleToParents($post)
-            ? $owner->loadParents()->getParents()
-            : $this->userMapper->createCollection();
+        $audience = $this->userMapper->createCollection();
+
+        foreach ($owner->getParents() as $parent) {
+            if ($this->access->userCanView($post, $parent)) {
+                $audience[$parent->getId()] = $parent;
+            }
+        }
 
         return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_PARENT);
     }
@@ -266,12 +277,23 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param PermissionMapper $permissionMapper
+     * @param Access $access
      * @return $this|self
      */
-    protected function setPermissionMapper(PermissionMapper $permissionMapper): self
+    protected function setBlogAccess(Access $access): self
     {
-        $this->permissionMapper = $permissionMapper;
+        $this->access = $access;
+        return $this;
+    }
+
+
+    /**
+     * @param Folder\Mapper $folderMapper
+     * @return $this|self
+     */
+    protected function setFolderMapper(Folder\Mapper $folderMapper): self
+    {
+        $this->folderMapper = $folderMapper;
         return $this;
     }
 
@@ -297,21 +319,4 @@ class Notifier extends AbstractModuleNotifier
         return self::BASE_URI . "{$post->getPage()->getPageId()}/{$post->getId()}";
     }
 
-
-    /**
-     * Return whether the specified post is visible to parents
-     *
-     * @param Model $post
-     * @return bool
-     */
-    private function isPostVisibleToParents(Model $post): bool
-    {
-        // Can parents view the page where the blog post resides?
-        foreach ($this->permissionMapper->findParentSetting($post->getPage()->getPageId()) as $permission) {
-            if ($permission->getValue()) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

@@ -8,7 +8,6 @@
  * @version     SVN: $Id$
  */
 namespace Eportfolio;
-use Eportfolio;
 use Schoolbox;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -203,6 +202,22 @@ class PermissionMapper extends Schoolbox\Mapper {
             'page_id' => $page->getPageId(),
             'type'    => Permission::TYPE_STUDENT,
             'value'   => $student->getId(),
+        ]);
+    }
+
+
+    /**
+     * Get the set of groups who have view permission on the specified page
+     *
+     * @param Page $page
+     * @return GenericCollection|Permission[]
+     * @throws Schoolbox\Mapper\Exception If invalid column name specified
+     */
+    public function findGroupPermissions(Page $page): GenericCollection
+    {
+        return $this->findByColumnList([
+            'page_id' => $page->getPageId(),
+            'type'    => Permission::TYPE_GROUP,
         ]);
     }
 }

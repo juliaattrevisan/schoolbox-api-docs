@@ -10,6 +10,8 @@ namespace Schoolbox\Blog\Eportfolio\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Schoolbox\Blog\Eportfolio\Access;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Blog\Eportfolio\Post;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
@@ -47,9 +49,14 @@ class Notifier extends AbstractModuleNotifier
     private $postMapper;
 
     /**
-     * @var PermissionMapper
+     * @var Folder\Mapper
      */
-    private $permissionMapper;
+    private $folderMapper;
+
+    /**
+     * @var Access
+     */
+    private $access;
 
     /**
      * @var UserMapper
@@ -65,7 +72,11 @@ class Notifier extends AbstractModuleNotifier
         $dependencies                     = $dependencies ?: [];
         $dependencies['mapper']           = $dependencies['mapper'] ?? Mapper::getInstance();
         $dependencies['postMapper']       = $dependencies['postMapper'] ?? Post\Mapper::getInstance();
-        $dependencies['permissionMapper'] = $dependencies['permissionMapper'] ?? PermissionMapper::getInstance();
+        $dependencies['folderMapper']     = $dependencies['folderMapper'] ?? Folder\Mapper::getInstance();
+        $dependencies['blogAccess']       = $dependencies['blogAccess'] ?? new Access(
+                $dependencies['permissionMapper'] ?? PermissionMapper::getInstance(),
+                $dependencies['folderMapper']
+        );
         $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
         parent::loadDependencies($dependencies);
     }
@@ -175,12 +186,19 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentCommented(Model $comment, User $effector): Envelope
     {
         $post  = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
+        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
 
-        // Empty audience if parents don't have view permission
-        $audience = $this->isPostVisibleToParents($post)
-            ? $owner->loadParents()->getParents()
-            : $this->userMapper->createCollection();
+        $audience = $this->userMapper->createCollection();
+
+        foreach ($owner->getParents() as $parent) {
+            try {
+                if ($this->access->userCanView($post, $parent)) {
+                    $audience[$parent->getId()] = $parent;
+                }
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
+        }
 
         return $this->notifyCommented($comment, $effector, $audience, RoleMapper::ROLE_PARENT);
     }
@@ -216,9 +234,9 @@ class Notifier extends AbstractModuleNotifier
     {
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
         $audience = $this->userMapper->createCollection();
-        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_STUDENT) as $commentator) {
-            if ($this->isPostVisibleToStudent($post, $commentator)) {
-                $audience[$commentator->getId()] = $commentator;
+        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_STUDENT) as $student) {
+            if ($this->access->userCanView($post, $student)) {
+                $audience[$student->getId()] = $student;
             }
         }
         return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STUDENT, self::TRIGGER_FOLLOWED);
@@ -236,10 +254,14 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentFollowed(Model $comment, User $effector): Envelope
     {
-        $post     = $this->postMapper->findById($comment->getBlog()->getId());
-        $audience = $this->isPostVisibleToParents($post)
-            ? $this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT)
-            : $this->userMapper->createCollection();
+        $post           = $this->postMapper->findById($comment->getBlog()->getId());
+        $audience       = $this->userMapper->createCollection();
+
+        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT) as $parent) {
+            if ($this->access->userCanView($post, $parent)) {
+                $audience[$parent->getId()] = $parent;
+            }
+        }
         return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_PARENT, self::TRIGGER_FOLLOWED);
     }
 
@@ -256,12 +278,23 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param PermissionMapper $permissionMapper
+     * @param Folder\Mapper $folderMapper
      * @return $this|self
      */
-    protected function setPermissionMapper(PermissionMapper $permissionMapper): self
+    protected function setFolderMapper(Folder\Mapper $folderMapper): self
     {
-        $this->permissionMapper = $permissionMapper;
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param Access $access
+     * @return $this|self
+     */
+    protected function setBlogAccess(Access $access): self
+    {
+        $this->access = $access;
         return $this;
     }
 
@@ -346,8 +379,8 @@ class Notifier extends AbstractModuleNotifier
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
             $effectorParam = RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($effector)
-                ? new ChildParam($effector, ParameterInterface::STACKING_REPLACE)
-                : new UserParam($effector, ParameterInterface::STACKING_REPLACE);
+                ? new ChildParam($effector)
+                : new UserParam($effector);
 
             // Adjust title for effector, owner and recipient role combinations
             if ((int)$owner->getId() === (int)$target->getId()) {
@@ -361,11 +394,11 @@ class Notifier extends AbstractModuleNotifier
             } elseif (RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
-                $ownerParam = ['student' => new ChildParam($owner, ParameterInterface::STACKING_REPLACE)];
+                $ownerParam = ['student' => new ChildParam($owner)];
             } else {
                 // Effector is not the owner, target is not owner, target is not parent of owner
                 $ownerToken = ":student's";
-                $ownerParam = ['student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE)];
+                $ownerParam = ['student' => new UserParam($owner)];
             }
 
             $bob = $this->createBuilder($post, $effector, $comment, $trigger);
@@ -416,43 +449,6 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * Return whether the specified post is visible to parents
-     *
-     * @param Post\Model $post
-     * @return bool
-     */
-    private function isPostVisibleToParents(Post\Model $post): bool
-    {
-        // Can parents view the page where the blog post resides?
-        foreach ($this->permissionMapper->findParentSetting($post->getPage()->getPageId()) as $permission) {
-            if ($permission->getValue()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Return whether the specified post is visible to the specified student
-     *
-     * @param Post\Model $post
-     * @param User       $student
-     * @return bool
-     * @throws BaseMapper\Exception If invalid column name specified
-     */
-    private function isPostVisibleToStudent(Post\Model $post, User $student): bool
-    {
-        foreach ($this->permissionMapper->findStudentPermissions($post->getPage(), $student) as $permission) {
-            if ($permission->getValue()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
      * Return a list of users of the specified type if have created adjacent comments
      *
      * @param Model  $comment
@@ -472,4 +468,5 @@ class Notifier extends AbstractModuleNotifier
         }
         return $audience;
     }
+
 }
