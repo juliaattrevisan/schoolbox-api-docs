@@ -88,7 +88,7 @@ class Controller extends Base
      * @throws \DomainException Some kind of curl error between us and crocodoc
      * @throws \InvalidArgumentException If assessment due date is null.
      */
-    public function getParticularResponse(DueWork $assessment, Participant $participant, Submission $response = null)
+    public function getParticularResponse(DueWork $assessment, Participant $participant, Submission $response = null): void
     {
         /* Module doesn't have access to $this->getUser()
          *
