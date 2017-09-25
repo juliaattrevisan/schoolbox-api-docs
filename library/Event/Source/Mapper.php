@@ -39,6 +39,7 @@ class Mapper extends BaseMapper
      *
      * @param $sourceName
      * @return array
+     * @throws BaseMapper\DefinitionException
      */
     private function findEventIdsUsingSource($sourceName)
     {
@@ -46,7 +47,7 @@ class Mapper extends BaseMapper
             SELECT 
             {$this->getTable()}.`event_id`
             FROM {$this->getTable()} 
-            INNER JOIN `event` ON {$this->getTable()}.`event_id` = event.`id`
+            INNER JOIN {$this->getJoinSql('event')}
             WHERE {$this->getTable()}.`source_name` = :sourceName
         ";
 
@@ -58,10 +59,12 @@ class Mapper extends BaseMapper
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 
+
     /**
      * Delete events using a given $sourceName
      *
      * @param string $sourceName
+     * @throws BaseMapper\DefinitionException
      */
     public function deleteEventsFromSource($sourceName)
     {
