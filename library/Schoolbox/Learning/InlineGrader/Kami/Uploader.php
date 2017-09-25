@@ -13,6 +13,9 @@ use Alaress\Jitter\IJitter;
 use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\SimulatedNetworkFailureException;
 
 
 /**
@@ -44,11 +47,11 @@ class Uploader
     /**
      * Build the uploader.
      *
-     * @param bool                          $dryRun
-     * @param IConnector                    $kamiConnector
-     * @param IJitter                       $jitter
-     * @param Mapper                        $kamiMapper
-     * @param LoggerInterface               $log
+     * @param bool            $dryRun
+     * @param IConnector      $kamiConnector
+     * @param IJitter         $jitter
+     * @param Mapper          $kamiMapper
+     * @param LoggerInterface $log
      */
     public function __construct(
         bool $dryRun,
@@ -57,12 +60,13 @@ class Uploader
         Mapper $kamiMapper,
         LoggerInterface $log
     ) {
-        $this->dryRun               = $dryRun;
-        $this->kamiConnector        = $kamiConnector;
-        $this->jitter               = $jitter;
-        $this->kamiMapper           = $kamiMapper;
-        $this->log                  = $log;
+        $this->dryRun        = $dryRun;
+        $this->kamiConnector = $kamiConnector;
+        $this->jitter        = $jitter;
+        $this->kamiMapper    = $kamiMapper;
+        $this->log           = $log;
     }
+
 
     /**
      * Has the uploader timed out?
@@ -128,11 +132,11 @@ class Uploader
         $kamiCount          = $this->getKamiCount($retryFailed);
 
         // Keep going till we upload everything, or error out
-        while(true){
+        while (true) {
             // Get the next batch
             $kamiModels = $this->getKamiModels($results->getCountTotal(), $batchSize, $retryFailed);
 
-            if(!$kamiModels->count()){
+            if (!$kamiModels->count()) {
                 $this->log->notice('No kami documents left to upload.');
                 break;
             }
@@ -147,16 +151,16 @@ class Uploader
                     $successiveFailures = 0;
                     $results->incrementSuccessCount();
                     $this->log->notice(sprintf("Upload successful. documentId: '%s'", $kamiDoc->getId()));
-                } catch (\Throwable $e) {
+                } catch (\Throwable $lastException) {
                     $successiveFailures++;
                     $kamiModel->setStatus(Model::STATUS_FAILED);
-                    $kamiModel->setErrorMessage($e->getMessage());
+                    $kamiModel->setErrorMessage($lastException->getMessage());
                     $results->incrementFailureCount();
-                    $this->logUploadFailure($kamiModel, $e);
+                    $this->logUploadFailure($kamiModel, $lastException);
 
                     if ($successiveFailures > $maxSkips) {
                         $this->log->error('Too many sequential failures: aborting!');
-                        throw $e;
+                        return $results;
                     }
                     continue;
                 }
@@ -184,20 +188,40 @@ class Uploader
         return $this->jitter->retry(function () use ($kamiModel, &$countFailedAttempts) {
             try {
                 return $this->kamiConnector->uploadDocument($kamiModel->getStudentSubmissionFile()->getStorage());
-            } catch (\Throwable $e) {
-                $this->log->error(
-                    sprintf(
-                        "Upload failure. id: %d, attempt #%d, message: '%s'",
-                        $kamiModel->getId(),
-                        $countFailedAttempts++,
-                        $e->getMessage()
-                    ),
-                    $e->getTrace()
-                );
+            } catch (SimulatedNetworkFailureException|ApiException|ResponseDecodeException $e) {
+                // If we recognise the exception, just print the info we need.
+                $this->logUploadException($e, $kamiModel, $countFailedAttempts);
                 throw $e;
+            } catch (\Throwable $e) {
+                // But if unknown, also print the trace to help debugging
+                $this->logUploadException($e, $kamiModel, $countFailedAttempts);
+                $this->log->error($e->getTraceAsString());
+                throw $e;
+            } finally {
+                $countFailedAttempts++;
             }
         });
+    }
 
+
+    /**
+     * Convenience method to log an exception that occurred during upload
+     *
+     * @param \Throwable $e
+     * @param Model      $kamiModel
+     * @param int        $countFailedAttempts
+     */
+    private function logUploadException(\Throwable $e, Model $kamiModel, int $countFailedAttempts): void
+    {
+        $this->log->error(
+            sprintf(
+                "Upload failure. id: %d, attempt #%d, message: '%s'",
+                $kamiModel->getId(),
+                $countFailedAttempts,
+                $e->getMessage()
+            ),
+            $e->getTrace()
+        );
     }
 
 

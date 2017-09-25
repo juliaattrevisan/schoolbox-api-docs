@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami\Test;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Schoolbox\Learning\InlineGrader\Kami\Exception\SimulatedNetworkFailureException;
 
 class UnreliableClient extends Client
 {
@@ -47,7 +47,7 @@ class UnreliableClient extends Client
     {
         // Possibly simulate a network failure
         if (random_int(0, PHP_INT_MAX) <= $this->failureRate * PHP_INT_MAX) {
-            throw new ClientException('Simulated network failure', $request);
+            throw new SimulatedNetworkFailureException('Simulated network failure', $request);
         }
         return parent::send($request, $options);
     }
