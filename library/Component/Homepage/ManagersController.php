@@ -134,9 +134,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $userAccessMapper = new UserAccessMapper();
             $admin = $userAccessMapper->findAdminsInCategory($this->getContext())->first();
 
-            $staffPhotoVisibilty = $this->getConfigMapper()->get('protect_teacher_photo');
+            $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
             $studentPhotoHidden  = $this->getConfigMapper()->get('protect_student_photo');
-            $veiwer = $this->getUser();
+            $viewer = $this->getUser();
 
             $i = 0;
             foreach ($managerList as $manager) {
@@ -149,7 +149,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     $emailall[] = $email;
                 }
 
-                if ($this->getUser()->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
+                if ($this->getUser()->getRole()->isStaff() && isset($emailall) && $this->getConfigMapper()->get('mail_enable')) {
                     $this->setVar([
                         "REPLYTO" => $this->getUser()->getEmail(),
                         "EMAILALL" => implode(',', $emailall),
@@ -190,9 +190,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
                     //Hide Student Photo
                     if($manager->getRole()->isStudent()) {
-                        if ($veiwer->getRole()->isStudent() && $studentPhotoHidden) {
+                        if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                             $this->setVar('photo_block', '');
-                        } else if ($veiwer->getRole()->isParent() && !$veiwer->isParentOf($user->loadParents())) {
+                        } else if ($viewer->getRole()->isParent() && !$viewer->isParentOf($manager->loadParents())) {
                             $this->setVar('photo_block', '');
                         } else {
                             $this->parse('photo_block', 'photo');
@@ -201,9 +201,9 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
                     //Hide Staff Photo
                     if($manager->getRole()->isStaff()) {
-                        if ($staffPhotoVisibilty == 2 && $veiwer->getRole()->isStudent()) {
+                        if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
                             $this->setVar('photo_block', '');
-                        } else if ($staffPhotoVisibilty == 1 && !$veiwer->getRole()->isStaff()) {
+                        } else if ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
                             $this->setVar('photo_block', '');
                         } else {
                             $this->parse('photo_block', 'photo');
