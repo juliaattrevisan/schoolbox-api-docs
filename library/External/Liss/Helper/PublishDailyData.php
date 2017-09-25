@@ -42,7 +42,7 @@ class PublishDailyData
     /**
      * Remove all events using this source
      */
-    public function cleanse()
+    public function deleteEventsFromSource()
     {
         EventSourceMapper::getInstance()->deleteEventsFromSource($this->generateSourceName());
     }

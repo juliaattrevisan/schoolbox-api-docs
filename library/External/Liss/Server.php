@@ -698,9 +698,9 @@ class External_Liss_Server
 
         if ($authenticator->isAuthenticated()) {
 
-            /* Cleanse all previous versions of events using the same source
+            /* Delete all previous versions of events using the same source
              */
-            $helper->cleanse();
+            $helper->deleteEventsFromSource();
 
             /* Set a default event type for now - use the first one in the list
              */
