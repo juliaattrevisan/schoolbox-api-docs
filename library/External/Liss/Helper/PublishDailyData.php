@@ -15,6 +15,8 @@ use Event\Source\Mapper as EventSourceMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Mapper\Exception as MapperException;
+use xmlrpcval;
+
 
 class PublishDailyData
 {
@@ -49,7 +51,7 @@ class PublishDailyData
      * Preprocess all this stuff
      * Make it easier to understand because their data structure is blasphemously terrible
      *
-     * @param $allData
+     * @param array $allData
      * @return array
      */
     public function reformatAllEvents($allData)
@@ -67,7 +69,7 @@ class PublishDailyData
      * Preprocess all this stuff
      * Make it easier to understand because their data structure is blasphemously terrible
      *
-     * @param $currentEvent
+     * @param xmlrpcval $currentEvent
      * @return array
      */
     private function reformatEvent($currentEvent)
