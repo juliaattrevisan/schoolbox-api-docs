@@ -17,6 +17,7 @@ use Alaress_Date_Format;
  */
 class Document
 {
+
     // Intentionally distinct from the Kami Model definitions to ensure changes to
     // Kami's API do not require changes to Schoolbox's schema.
     const FILE_STATUS_PROCESSING = 'processing';

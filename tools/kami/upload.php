@@ -36,7 +36,7 @@ $fields  = [
     'max-skips:',
     'base-back-off:',
     'timeout:',
-    'failure-rate:'
+    'failure-rate:',
 ];
 $options = require __DIR__ . '/../../conf/core/require-cli.php';
 
@@ -58,14 +58,14 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
     ]
 );
 
-$colourRed = "\033[0;31m";
+$colourRed   = "\033[0;31m";
 $colourWhite = "\033[0m";
 $displayHelp = isset($options['help']);
-if(!isset($options['dry-run']) && !isset($options['perform'])){
+if (!isset($options['dry-run']) && !isset($options['perform'])) {
     echo "{$colourRed}Invalid syntax. You must specify the mode using '--dry-run' or '--perform'{$colourWhite}\n\n";
     $displayHelp = true;
 }
-if(isset($options['dry-run'], $options['perform'])){
+if (isset($options['dry-run'], $options['perform'])) {
     echo "{$colourRed}Invalid syntax. You must specify only one mode using '--dry-run' or '--perform'{$colourWhite}\n\n";
     $displayHelp = true;
 }
@@ -140,10 +140,10 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
      * @var Storage\Mapper    $storageMapper
      * @var Kami\Mapper       $kamiMapper
      */
-    $config               = $di->get('config');
-    $mapperFactory        = $di->get('mapperFactory');
-    $kamiMapper           = $mapperFactory->get(Kami\Mapper::class);
-    $client               = $failureRate === 0.0
+    $config        = $di->get('config');
+    $mapperFactory = $di->get('mapperFactory');
+    $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
+    $client        = $failureRate === 0.0
         ? new GuzzleHttp\Client()
         : new Kami\Test\UnreliableClient([], $failureRate);
 
@@ -173,9 +173,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     }
 
     // Run the uploader
-    try{
+    try {
         $results = $uploader->upload($retryFailed, $batchSize, $maxSkips);
-    } catch (Throwable $e){
+    } catch (Throwable $e) {
         $log->error($e->getMessage(), $e->getTrace());
         $log->error($e->getTraceAsString());
         exit(1);

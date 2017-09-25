@@ -110,7 +110,7 @@ class Connector implements IConnector
         $this->assertEnabled();
 
         // The 'name' and 'document' fields are required.
-        $options = [
+        $options  = [
             RequestOptions::MULTIPART => [
                 [
                     'name'     => 'name',

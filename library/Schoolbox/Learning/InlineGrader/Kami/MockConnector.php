@@ -19,7 +19,9 @@ use Schoolbox\Learning\InlineGrader\Kami;
  */
 class MockConnector extends Kami\Connector
 {
+
     const BASE_URI = 'https://private-anon-6b67e9f45b-kamiembeddingapi.apiary-mock.com/';
+
 
     /**
      * @param ClientInterface $client
