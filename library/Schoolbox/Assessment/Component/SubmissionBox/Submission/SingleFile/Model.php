@@ -1,5 +1,8 @@
 <?php
 /**
+ * A File that was uploaded as part of a Student's Submission
+ * for a particular Due Work
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -80,6 +83,25 @@ class Model implements IFile, ISoftDeletable
 
 
     /**
+     * @return string
+     */
+    public function getCrocodocId()
+    {
+        return $this->getUuid();
+    }
+
+
+    /**
+     * @param string $crocodocId
+     * @return self
+     */
+    public function setCrocodocId($crocodocId)
+    {
+        return $this->setUuid($crocodocId);
+    }
+
+
+    /**
      * @return boolean
      */
     public function getEditableInline()
@@ -121,6 +143,35 @@ class Model implements IFile, ISoftDeletable
     public function getSubmission()
     {
         return $this->submission;
+    }
+
+
+    /**
+     * This Submission File has an attached Plagscan result document
+     *
+     * @return bool
+     */
+    public function hasPlagscan()
+    {
+        return $this->getPlagscan() !== null;
+    }
+
+
+    /**
+     * Wrap up hasPlagscan() logic here, to save you from doing it everywhere
+     *
+     * @return string
+     */
+    public function findPlagscanScore()
+    {
+        if ($this->hasPlagscan()) {
+            return (string)$this->getPlagscan()->getScore();
+        }
+
+        /* TODO: Probably check for returning a status of some sort first
+         */
+
+        return '';
     }
 
     /**
