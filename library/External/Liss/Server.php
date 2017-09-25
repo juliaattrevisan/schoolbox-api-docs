@@ -705,7 +705,10 @@ class External_Liss_Server
             /* Set a default event type for now - use the first one in the list
              */
             /** @var EventType $eventType */
-            $allEventTypes = $eventTypeMapper->findAll();
+            $allEventTypes = $eventTypeMapper->findAll([
+                'limit' => 1,
+                'id' => 'ASC'
+            ]);
 
             if ($allEventTypes->count()) {
                 $eventType = $allEventTypes->first();
