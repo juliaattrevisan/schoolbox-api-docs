@@ -261,12 +261,15 @@ class UserMapper extends Mapper
             SELECT {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                     {$this->getJoinColumnString('role', 'g')},
                     {$this->getJoinColumnString('userCampus', 'c')},
+                    {$this->getJoinColumnString('schoolHouse', 'h')},
                     {$this->getColumnString('lu')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
             LEFT JOIN {$this->getJoinSql('role', '', 'g')}
             LEFT JOIN {$this->getJoinSql('userCampus', '', 'c')}
             LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
+            LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
+
         ";
     }
 
@@ -287,9 +290,11 @@ class UserMapper extends Mapper
             if (!isset($users[$userId])) {
                 /** @var Role $role */
                 $role = $this->hydrateJoin($row, 'role', 'g');
+                $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
                 $users[$userId] = $this->hydrate($row)
                                        ->setSuperuser($row['superuser'] == 1)
-                                       ->setRole($role);
+                                       ->setRole($role)
+                                       ->setSchoolHouse($schoolHouse);
             }
 
             /** @var Campus $campus */
@@ -311,6 +316,7 @@ class UserMapper extends Mapper
                 // Don't double add
                 $users[$userId]->getLinkedUser()->setOffset($linkedUser->getId(), $linkedUser);
             }
+
         }
 
         return $this->createCollection(array_values($users));
