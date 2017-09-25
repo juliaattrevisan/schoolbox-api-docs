@@ -1565,7 +1565,10 @@ class Controller extends Base
         $dateParts = [];
         foreach ($series as $thisBooking) {
             if (!($thisBooking->isDeleted())) {
-                $dateParts[] = [$thisBooking->getResource(), $startDate, $endDate, $thisBooking];
+                $dateParts[] = [$thisBooking->getResource(),
+                                $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                                $thisBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                                $thisBooking];
             }
         }
 
