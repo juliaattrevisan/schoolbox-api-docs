@@ -8,7 +8,7 @@
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkResponseFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 
 /**
  * A DAV collection representing a single file within a submission.

@@ -10,7 +10,7 @@
  */
 namespace Schoolbox\Learning\InlineGrader;
 
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SwampMapper;
 

@@ -21,7 +21,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -29,7 +29,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
@@ -37,6 +37,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -59,6 +60,9 @@ class Controller extends Assessment\Controller
     /** @var ParticipantMapper */
     private $participantMapper;
 
+    /** @var SingleFile\Mapper */
+    private $submissionFileMapper;
+
     /**
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
@@ -72,6 +76,7 @@ class Controller extends Assessment\Controller
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
      * @param ParticipantMapper             $participantMapper
      * @param Term\Mapper                   $termMapper
+     * @param SingleFile\Mapper             $submissionFileMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -85,13 +90,15 @@ class Controller extends Assessment\Controller
         Rubric\ResultMapper $resultSetMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper,
-        Term\Mapper $termMapper
+        Term\Mapper $termMapper,
+        SingleFile\Mapper $submissionFileMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper);
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
         $this->participantMapper     = $participantMapper;
+        $this->submissionFileMapper  = $submissionFileMapper;
     }
 
     /**
@@ -692,6 +699,7 @@ class Controller extends Assessment\Controller
 
             // Validate attachment list can actually be built
             try {
+                /** @var IStorage[] $attachments */
                 $attachments = $factory->build($rq->post['attachment'])->getAll();
 
             } catch (\InvalidArgumentException $e) {
@@ -724,7 +732,7 @@ class Controller extends Assessment\Controller
                  * appear in the attached files list at all (it should always be
                  * loaded into the wizzywig)
                  */
-                $attachedFile = (new DueWorkSubmissionFile())
+                $attachedFile = $this->submissionFileMapper->createModel()
                     ->setStorage($attachment)
                     ->setFilename($attachment->getFilename())
                     ->setEditableInline(false);

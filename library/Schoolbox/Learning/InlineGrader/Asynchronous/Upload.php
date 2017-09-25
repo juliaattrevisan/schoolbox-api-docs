@@ -17,7 +17,7 @@
 namespace Schoolbox\Learning\InlineGrader\Asynchronous;
 
 use \Psr\Log\LoggerInterface;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkSubmissionFile;
 use Schoolbox\Learning\InlineGrader\Authenticator;
 use Schoolbox\Learning\InlineGrader\Document;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SingleFile;

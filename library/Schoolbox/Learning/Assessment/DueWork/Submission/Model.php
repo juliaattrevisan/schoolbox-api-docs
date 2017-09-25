@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use \Schoolbox\Collection;
-use \Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 
@@ -58,7 +58,7 @@ class Model extends AbstractResponse
         $storage = \Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream('online-submission.html', $body, false);
 
         $this->getAllFiles()->add(
-            (new File\Model())
+            SingleFile\Mapper::getInstance()->createModel()
                 ->setStorage($storage)
                 ->setFilename('Online Submission')
                 ->setEditableInline(true)
@@ -98,7 +98,7 @@ class Model extends AbstractResponse
      * Find a file with a particular $hash
      *
      * @param $hash
-     * @return File\Model
+     * @return SingleFile\Model
      * @throws \OutOfBoundsException
      */
     public function findFileByHash($hash)
@@ -116,7 +116,7 @@ class Model extends AbstractResponse
      */
 
     /**
-     * @return Collection|File\Model[]
+     * @return Collection|SingleFile\Model[]
      */
     public function getAllFiles()
     {
@@ -124,7 +124,7 @@ class Model extends AbstractResponse
     }
 
     /**
-     * @param Collection|File\Model[] $allFiles
+     * @param Collection|SingleFile\Model[] $allFiles
      * @return self
      */
     public function setAllFiles($allFiles)

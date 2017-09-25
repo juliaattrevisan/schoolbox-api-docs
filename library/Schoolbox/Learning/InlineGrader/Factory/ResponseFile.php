@@ -17,7 +17,7 @@
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use \Schoolbox\Learning\InlineGrader\Authenticator;
 use \Schoolbox\Learning\InlineGrader\Facade;
 use \Schoolbox\User;

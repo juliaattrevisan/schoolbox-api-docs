@@ -11,9 +11,6 @@
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
 
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
 
@@ -67,15 +64,6 @@ foreach ($allDocuments as $currentDocument) {
      */
     if ($currentDocument->getPlagscanId() > 0) {
         try {
-
-            /** @var StudentSubmissionFile $studentSubmissionFile */
-            $studentSubmissionFile = StudentSubmissionFileMapper::getInstance()->findById($currentDocument->getStudentSubmissionFileId());
-
-            /* Convert to new format
-             */
-            $submissionFile = new SubmissionFile();
-            $submissionFile->setStorage($studentSubmissionFile->getStorage());
-
             /* Tells plagscan to analyse the document
              * Plagscan will do it in its own time, whenever it wants to
              * We have to poll it to find out its actual status
