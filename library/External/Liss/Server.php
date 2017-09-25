@@ -770,7 +770,7 @@ class External_Liss_Server
                         $folder = $folderMapper->findByCode($currentEvent['classCode']);
                     }
                     catch (MapperException $e) {
-                        $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
+                        $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
                         $skipCount++;
 
                         continue;
@@ -799,7 +799,7 @@ class External_Liss_Server
                             $helper->saveEventSource($event, $currentEvent['guid']);
                         }
                         catch (MapperException $e) {
-                            $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}) for user {$currentExternalId}: no schoolbox account found");
+                            $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}) for user {$currentExternalId}: no Schoolbox account found");
                         }
                     }
                 }
