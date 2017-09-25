@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\API\Help;
+namespace Custom\Help\CourseParticipation;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
@@ -17,7 +17,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 
 
-class CourseParticipationController extends Base
+class Controller extends Base
 {
     /**
      * @var UserAccessMapper

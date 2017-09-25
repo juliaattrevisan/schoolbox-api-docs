@@ -6,10 +6,10 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\API\Help;
+namespace Custom\Help\CourseParticipation;
 
 use Alaress\Authorizer\Rule\IsAlaressAdmin;
-use Alaress\Module\Module;
+use Alaress;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\API\Help\Token;
@@ -20,7 +20,7 @@ use Twig_Error_Loader;
 use Twig_Loader_Chain;
 
 
-class CourseParticipationModule extends Module
+class Module extends Alaress\Module\Module
 {
     /** @var string */
     protected $basename = 'helpCourseParticipation';
@@ -47,7 +47,7 @@ class CourseParticipationModule extends Module
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(CourseParticipationController::class)
+            $injector->lazyNew(Controller::class)
         );
     }
 
@@ -67,7 +67,7 @@ class CourseParticipationModule extends Module
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $injector->get('mapperFactory');
 
-        $injector->params[CourseParticipationController::class] = [
+        $injector->params[Controller::class] = [
             'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
             'tokenMapper'      => $mapperFactory->getLazy(Token\Mapper::class),
             'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),

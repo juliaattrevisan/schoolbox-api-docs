@@ -9,7 +9,7 @@
 namespace Config\Modules\Custom\Help;
 
 use Config\ModuleLoader;
-use Schoolbox;
+use Custom\Help\CourseParticipation;
 use Schoolbox\Application\WebRequest\Kernel;
 
 class API extends ModuleLoader
@@ -23,7 +23,7 @@ class API extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, Schoolbox\API\Help\CourseParticipationModule::class, '/api/course-participation');
+        $this->loadModule($kernel, CourseParticipation\Module::class, '/api/course-participation');
     }
 
 }
