@@ -59,7 +59,7 @@ class CourseParticipationController extends Base
 
 
     /**
-     * @api   /api/courseParticipation/apitest
+     * @api   /api/course-participation/apitest
      * @level 170
      *
      * @throws \Aura\Di\Exception\ServiceNotFound

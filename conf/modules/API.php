@@ -25,7 +25,7 @@ class API extends ModuleLoader {
     public function configure($kernel)
     {
         $this->loadModule($kernel, Schoolbox\API\Module::class, '/api');
-        $this->loadModule($kernel, Schoolbox\API\Help\CourseParticipationModule::class, '/api/courseParticipation');
+        $this->loadModule($kernel, Schoolbox\API\Help\CourseParticipationModule::class, '/api/course-participation');
     }
 
 }
