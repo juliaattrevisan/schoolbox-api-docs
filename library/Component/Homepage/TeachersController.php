@@ -31,7 +31,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
 
         $listSyns = null;
 
-        if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
+        if (($this->getContext()->getCodeString() != '') && $this->getConfigMapper()->get('external_enable')) {
             $externalClassHandler = new External_Class();
             $listSyns = $externalClassHandler->getTeacherName($this->getContext()->getCodeString());
         }
@@ -109,7 +109,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 'LIST_STYLE' => $displayOptions[$display]['css'],
             ]);
 
-            if (($this->getContext()->getCodeString() != '') && Cfg::get('external_enable')) {
+            if (($this->getContext()->getCodeString() != '') && $this->getConfigMapper()->get('external_enable')) {
                 $externalClassHandler = new External_Class();
                 $userMapper = \Schoolbox\UserMapper::getInstance();
                 $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
