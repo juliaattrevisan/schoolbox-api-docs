@@ -295,8 +295,7 @@ class Controller extends Base
                 if ($moderationId == Item\ModerationType\Model::TYPE_MODERATED &&
                     $statusId == Status\Model::STATUS_APPROVED &&
                     $isTimeChanged) {
-                    $status = Status\Mapper::getInstance()->createModel(Status\Model::STATUS_PENDING);
-                    $booking->setStatus($status);
+                    $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
                 }
 
                 // getUpdatedSeries() sets deleted field if the item isn't in
