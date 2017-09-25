@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Eportfolio\PageMapper;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
+use Schoolbox\Blog\Eportfolio\Access;
 use Schoolbox\Collection;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -42,9 +43,9 @@ class Notifier extends AbstractModuleNotifier
     private $pageMapper;
 
     /**
-     * @var PermissionMapper
+     * @var Access
      */
-    private $permissionMapper;
+    private $access;
 
     /**
      * @var UserMapper
@@ -65,9 +66,12 @@ class Notifier extends AbstractModuleNotifier
         $dependencies                     = $dependencies ?: [];
         $dependencies['mapper']           = $dependencies['mapper'] ?? Mapper::getInstance();
         $dependencies['pageMapper']       = $dependencies['pageMapper'] ?? PageMapper::getInstance();
-        $dependencies['permissionMapper'] = $dependencies['permissionMapper'] ?? PermissionMapper::getInstance();
-        $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
         $dependencies['folderMapper']     = $dependencies['folderMapper'] ?? Folder\Mapper::getInstance();
+        $dependencies['blogAccess']       = $dependencies['blogAccess'] ?? new Access(
+            $dependencies['permissionMapper'] ?? PermissionMapper::getInstance(),
+            $dependencies['folderMapper']
+        );
+        $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
         parent::loadDependencies($dependencies);
     }
 
@@ -145,6 +149,7 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $post
      * @param User  $effector
      * @return Envelope
+     * @throws BaseMapper\Exception
      * @throws OutOfBoundsException     If severity is not set
      * @throws InvalidArgumentException If a required property was not set
      */
@@ -153,18 +158,14 @@ class Notifier extends AbstractModuleNotifier
         $page  = $this->pageMapper->findById($post->getPage()->getPageId());
         $owner = $this->userMapper->findById($page->getOwner()->getId())->loadParents();
 
-        // Parents can view if page is visible to them
-        if ($this->isPostVisibleToParents($post)) {
-            $audience = $owner->getParents();
-        } else {
-            // Parents can also view by virtue of group permissions
-            $audience = $this->userMapper->createCollection();
-            foreach ($owner->getParents() as $parent) {
-                if ($this->hasGroupViewPermission($post, $parent)) {
-                    $audience[$parent->getId()] = $parent;
-                }
+        $audience = $this->userMapper->createCollection();
+
+        foreach ($owner->getParents() as $parent) {
+            if ($this->access->userCanView($post, $parent)) {
+                $audience[$parent->getId()] = $parent;
             }
         }
+
         return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_PARENT);
     }
 
@@ -276,12 +277,12 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param PermissionMapper $permissionMapper
+     * @param Access $access
      * @return $this|self
      */
-    protected function setPermissionMapper(PermissionMapper $permissionMapper): self
+    protected function setBlogAccess(Access $access): self
     {
-        $this->permissionMapper = $permissionMapper;
+        $this->access = $access;
         return $this;
     }
 
@@ -318,43 +319,4 @@ class Notifier extends AbstractModuleNotifier
         return self::BASE_URI . "{$post->getPage()->getPageId()}/{$post->getId()}";
     }
 
-
-    /**
-     * Return whether the specified post is visible to parents
-     *
-     * @param Model $post
-     * @return bool
-     */
-    private function isPostVisibleToParents(Model $post): bool
-    {
-        // Can parents view the page where the blog post resides?
-        foreach ($this->permissionMapper->findParentSetting($post->getPage()->getPageId()) as $permission) {
-            if ($permission->getValue()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Returns whether the specified user can view the specified post by virtue of group permissions.
-     *
-     * @param Model $post
-     * @param User  $user
-     * @return bool
-     */
-    private function hasGroupViewPermission(Model $post, User $user): bool
-    {
-        $groupPerms = $this->permissionMapper->findGroupPermissions($post->getPage());
-        $userGroups = $this->folderMapper->findForUser($user, false);
-        foreach ($groupPerms as $groupPerm) {
-            foreach ($userGroups as $group) {
-                if ((int)$groupPerm->getValue() === (int)$group->getId()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }
