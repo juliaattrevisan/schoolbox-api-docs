@@ -175,9 +175,6 @@ if(typeof window.location.origin == 'undefined') {
                     submit.prop('disabled', true);
                 });
                 // Re-enable form submission when upload is done
-                this.on('totaluploadprogress', function (uploadProgress) {
-                    submit.prop('disabled', uploadProgress < 100);
-                });
                 this.on('queuecomplete', function () {
                     submit.prop('disabled', false);
                 });
