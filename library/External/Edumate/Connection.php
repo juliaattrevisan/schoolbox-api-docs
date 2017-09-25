@@ -72,7 +72,7 @@ class External_Edumate_Connection
      */
     protected function getConnection()
     {
-        return $this->getConnection();
+        return $this->connector;
     }
 
     /**
