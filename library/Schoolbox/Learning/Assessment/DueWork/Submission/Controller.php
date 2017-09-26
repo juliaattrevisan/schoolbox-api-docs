@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Assessment\DueWork\Response;
+namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;

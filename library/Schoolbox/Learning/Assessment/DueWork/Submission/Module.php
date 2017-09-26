@@ -4,7 +4,7 @@
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Learning\Assessment\DueWork\Response;
+namespace Schoolbox\Learning\Assessment\DueWork\Submission;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;

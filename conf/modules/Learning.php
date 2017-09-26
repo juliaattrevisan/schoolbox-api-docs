@@ -15,7 +15,7 @@ use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbackFileModule;
-use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Module as DueworkResponseModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;

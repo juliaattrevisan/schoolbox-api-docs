@@ -1,0 +1,55 @@
+{#
+     Displays a Kami Document in read-only mode
+
+     Data:
+         kami      Kami\Model
+         session   Kami\Session
+         response  DueWork\Submission\Model
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{# Extra crumb inserted if inside project #}
+{% if response.assessable.context is project %}
+    {% set nodes = [
+        ['Learning', routeLookup('learning.getClasses')],
+        [response.assessable.context.title, routeLookup('learningAssessment.getSummary', {
+            assessmentId: response.assessable.context.id,
+            studentId: response.submittedOnBehalfOf.id
+        }) ],
+        [response.assessable.title, routeLookup('learningAssessment.getSummary', {
+            assessmentId: response.assessable.id,
+            studentId: response.submittedOnBehalfOf.id
+        }) ],
+        ['Annotations']
+    ] %}
+{% else %}
+    {% set nodes = [
+        ['Learning', routeLookup('learning.getClasses')],
+        [response.assessable.title, routeLookup('learningAssessment.getSummary', {
+            assessmentId: response.assessable.id,
+            studentId: response.submittedOnBehalfOf.id
+        }) ],
+        ['Annotations']
+    ] %}
+{% endif %}
+
+{{ bread.crumbsArray(nodes)}}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Annotations for {{ response.assessable.title }}</h1>
+            <ul class="meta">
+                <li class="icon-staff-students"><a href="/search/user/{{ response.submittedOnBehalfOf.id }}" title="View Profile">{{ response.submittedOnBehalfOf.fullname }}</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            {% include '@learningDueWorkResponse/kamiIframe.twig' with {session: data.session} only %}
+        </section>
+    </div>
+</div>

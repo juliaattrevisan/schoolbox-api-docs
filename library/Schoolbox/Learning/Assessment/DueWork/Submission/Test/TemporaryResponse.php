@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Response;
+namespace Schoolbox\Learning\Assessment\DueWork\Submission\Test;
 
 use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
