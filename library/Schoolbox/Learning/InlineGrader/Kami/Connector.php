@@ -19,7 +19,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
@@ -163,10 +162,11 @@ class Connector implements IConnector
      * @return null|Document
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
-     * @throws ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\NotFound If document does not exist in Kami
      */
-    public function getDocument(string $documentId): ?Document
+    public function getDocument(string $documentId): Document
     {
         $this->assertEnabled();
         $request  = new Request('GET', $this->getPathGetDocument($documentId));
@@ -181,7 +181,7 @@ class Connector implements IConnector
         if (!$this->isValidNotFound($response)) {
             $this->generateApiException($request, $response);
         }
-        return null;
+        throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
     }
 
 
@@ -192,8 +192,9 @@ class Connector implements IConnector
      * @return bool Whether a mutation occurred. (will return false if doc not found)
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
-     * @throws ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\NotFound If document does not exist in Kami
      */
     public function deleteDocument(string $documentId): bool
     {
@@ -203,7 +204,7 @@ class Connector implements IConnector
         $response = $this->client->send($request, $this->getOptions());
 
         if ($this->isValidNotFound($response)) {
-            return false;
+            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
         }
         // TODO confirm with Kami. The docs state 200, but testing indicates 204 from prod Kami API
         if (!in_array($response->getStatusCode(), [200, 204], true)) {
@@ -231,6 +232,7 @@ class Connector implements IConnector
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
+     * @throws Exception\NotFound If document does not exist in Kami
      */
     public function viewSession(
         string $documentId,
@@ -269,6 +271,9 @@ class Connector implements IConnector
         ];
         $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
         $response = $this->client->send($request, $this->getOptions($options));
+        if($this->isValidNotFound($response)){
+            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+        }
         return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
     }
 
@@ -414,14 +419,14 @@ class Connector implements IConnector
      *
      * @param RequestInterface  $request
      * @param ResponseInterface $response
-     * @throws ApiException
+     * @throws Exception\ApiException
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
      */
     private function generateApiException(RequestInterface $request, ResponseInterface $response): void
     {
         $requestString  = Psr7\str($request);
         $responseString = Psr7\str($response);
-        throw new ApiException("Unable to fetch document.\n{$requestString}\n$responseString");
+        throw new Exception\ApiException("Unable to fetch document.\n{$requestString}\n$responseString");
     }
 
 
