@@ -19,6 +19,7 @@ use Alaress_Date_Format;
  */
 interface IConnector
 {
+    // Session options
     const SESSION_THEME_LIGHT = 'light';
     const SESSION_THEME_DARK = 'dark';
 

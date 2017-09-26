@@ -46,10 +46,6 @@ class Connector implements IConnector
     // How long should view sessions last for by default?
     const DEFAULT_SESSION_EXPIRY_HOURS = 1;
 
-    // Session options
-    const SESSION_THEME_DARK = 'dark';
-    const SESSION_THEME_LIGHT = 'light';
-
     /**
      * @var IConfigLoader
      */
