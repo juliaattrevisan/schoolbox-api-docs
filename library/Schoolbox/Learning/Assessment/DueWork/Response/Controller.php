@@ -225,7 +225,7 @@ class Controller extends Base
         } catch (\RangeException|\DomainException $e) {
             // Crocodoc exceptions
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-        } catch (Kami\Exception\ResponseDecodeException|Kami\Exception\ApiException $e){
+        } catch (Kami\Exception\IKamiException $e){
             // Kami Exceptions
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }
