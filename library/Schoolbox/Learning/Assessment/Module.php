@@ -307,7 +307,7 @@ class Module extends BaseModule
         );
         $dc['participantMapper'] = $injector->lazyNew(ParticipantDataSource::class);
         $dc['submissionFileMapper'] = $injector->lazyNew(SingleFile\Mapper::class);
-        $dc['kamiConnector'] = $injector->get('kamiConnector');
+        $dc['kamiConnector'] = $injector->lazyGet('kamiConnector');
         $dc['kamiMapper'] = $this->getMapperFactory()->getLazy(Kami\Mapper::class);
 
         // project specific
