@@ -193,6 +193,45 @@ class Controller extends Base
 
 
     /**
+     * Display a kami document in an iFrame
+     *
+     * @api   /learning/kami/{kamiId}
+     * @level 17.5
+     * @param Kami\Model $kami
+     * @param Submission $response
+     * @throws Kami\Exception\ApiException
+     * @throws Kami\Exception\EmptyApiKeyException
+     * @throws Kami\Exception\NotFound
+     * @throws Kami\Exception\ResponseDecodeException
+     * @throws ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function getKamiView(Kami\Model $kami, Submission $response): void
+    {
+        // Was it still being processed by Kami last time we checked?
+        if ($kami->isStatusProcessing()) {
+            $statusChecker = new Kami\StatusChecker($this->kamiMapper, $this->kamiConnector);
+            $kami          = $statusChecker->updateStatus($kami);
+        }
+
+        // Don't attempt to get a view session if not done processing
+        $session = null;
+        if($kami->isStatusDone()){
+            $session = $this->kamiConnector->viewSession($kami->getKamiDocumentId(), $this->getUser(), false);
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/kamiView.twig', [
+            'kami'     => $kami,
+            'session'  => $session,
+            'response' => $response,
+        ]));
+    }
+
+
+    /**
      * Get which file the user is likely to wish to see details for
      *
      * @param Submission  $response

@@ -1,10 +1,10 @@
 {#
-     Displays a Kami Document in read-only mode
+     Displays a Kami Document for viewing.
 
      Data:
-         kami      Kami\Model
-         session   Kami\Session
-         response  DueWork\Submission\Model
+         kami        Kami\Model
+         session     Kami\Session              Optional. Null if document not finished processing.
+         response    DueWork\Submission\Model
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
@@ -48,8 +48,29 @@
 
 <div class="row">
     <div class="small-12 island">
+        {% if kami.isStatusDone %}
         <section>
-            {% include '@learningDueWorkResponse/kamiIframe.twig' with {session: data.session} only %}
+            {% include '@learningDueWorkResponse/kamiIframe.twig' with {session: session} only %}
         </section>
+        {% else %}
+            <div class="empty-state">
+                {% if kami.statusPending%}
+                    <i class="icon-time-value"></i>
+                    <p>Upload pending. Please refresh your browser in a few minutes.</p>
+                {% elseif kami.isStatusUploading %}
+                    <i class="icon-upload"></i>
+                    <p>Upload in progress. Please refresh your browser in a few minutes.</p>
+                {% elseif kami.isStatusProcessing %}
+                    <i class="icon-refresh"></i>
+                    <p>Document is being processed. Please refresh your browser in a few seconds</p>
+                {% elseif kami.isStatusError %}
+                    <i class="icon-alert"></i>
+                    <p>Something went wrong while processing the document.</p>
+                {% else %}
+                    <i class="icon-alert"></i>
+                    <p>Unable to display document.</p>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 </div>

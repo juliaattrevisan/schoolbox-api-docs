@@ -11,6 +11,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -47,12 +49,16 @@ class Module extends BaseModule
      * @return void
      * @throws \InvalidArgumentException if any sub-rule is not a IAuthorizationRule
      * @throws Unauthorized If auth rule fails
+     * @throws \InvalidArgumentException If mapper class not found
+     * @throws MapperException\Deleted If a deleted assessment is requested
+     * @throws \UnexpectedValueException If the kami files owner is not a participant
      */
     protected function registerRoutes()
     {
         $preloadParticipant     = function (array $params) { return $this->preloadParticipant($params); };
         $preloadResponse        = function (array $params) { return $this->preloadResponseWithFeedback($params); };
         $preloadPlagscanWithAss = function (array $params) { return $this->preloadPlagscanWithAssessment($params); };
+        $preloadKami            = function (array $params) { return $this->preloadKami($params); };
 
         $hasWriteAccess = $this->buildRuleHasWriteAccess();
 
@@ -82,6 +88,10 @@ class Module extends BaseModule
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
+
+        // For now, same auth rules as crocodoc.
+        $canAccessKami = $canAccessCrocodoc;
+        $this->register('GET', '/kami/{kamiId:\d+}' . '', 'getKamiView', $canAccessKami, $preloadKami);
     }
 
 
@@ -361,16 +371,69 @@ class Module extends BaseModule
         );
     }
 
+
     /**
-     * @return IMapper|Error\Mapper
+     * @param array $params
+     * @return array
+     * @throws MapperException\Deleted If the assessment the kami belongs to is deleted
+     * @throws NotFound If the requested Kami Doc has not finished processing
+     * @throws OutOfBoundsException
+     * @throws \InvalidArgumentException If mapper class not found
+     * @throws \UnexpectedValueException If the kami files owner is not a participant
+     */
+    private function preloadKami(array $params): array
+    {
+        $kami = $this->getKamiMapper()->findById($params['kamiId']);
+        if(!$kami->isStatusDone()){
+            throw new NotFound("Kami document (id: {$kami->getId()}) has not finished processing");
+        }
+
+        $submissionFile = $kami->getStudentSubmissionFile();
+        $submission     = $this->getSubmissionMapper()->findById($submissionFile->getSubmission()->getId());
+        $assessment     = $this->getAssessmentMapperProxy()->findByDueWorkId($submission->getSubmissionBox()->getId());
+        $participant    = $assessment->getParticipant($submission->getOwner());
+        $response       = $this->getResponseMapperProxy()->findInAssessment($submission->getId(), $assessment);
+
+        return [
+            'kami'        => $kami,
+            'participant' => $participant,
+            'response'    => $response,
+            'feedback'    => $participant->findMostRecentPublishedFeedback(),
+        ];
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return Error\Mapper|IMapper
+     * @throws \InvalidArgumentException If mapper class not found
      */
     private function getErrorMapper()
     {
         return $this->getMapperFactory()->get(Error\Mapper::class);
     }
 
-    /* Getters / Setters
+
+    /**
+     * @return IMapper|Kami\Mapper
+     * @throws \InvalidArgumentException If mapper class not found
      */
+    private function getKamiMapper()
+    {
+        return $this->getMapperFactory()->get(Kami\Mapper::class);
+    }
+
+
+    /**
+     * @return IMapper|SubmissionMapper
+     * @throws \InvalidArgumentException If mapper class not found
+     */
+    private function getSubmissionMapper()
+    {
+        return $this->getMapperFactory()->get(SubmissionMapper::class);
+    }
+
 
     /**
      * @return object|IConfigLoader
