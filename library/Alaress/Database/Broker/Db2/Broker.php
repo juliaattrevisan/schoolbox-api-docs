@@ -97,7 +97,7 @@ class Broker extends Base implements IBroker
 
             // Create a new PDO wrapper instance using the DSN string and supplied username/password parameters
 
-            $this->pdo = new PDO($this->getDsn(), null, null);
+            $this->pdo = new PDO($this->getDsn());
 
             // These will only get called if the child class overrides the values- don't *think*
             // we need these to be parameters as they're really just there to get the database in a

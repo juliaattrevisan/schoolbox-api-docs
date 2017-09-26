@@ -83,7 +83,7 @@ class PDO extends BasePDO
      */
     public function beginTransaction()
     {
-        db2_autocommit($this->getConnectionWithCheck(), DB2_AUTOCOMMIT_OFF);
+        return db2_autocommit($this->getConnectionWithCheck(), DB2_AUTOCOMMIT_OFF);
     }
 
     /**
