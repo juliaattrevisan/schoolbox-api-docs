@@ -215,7 +215,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @param  Integer $currentTermRestriction
+     * @param  Boolean $currentTermRestriction
      * @return $this
      */
     public function setCurrentTermRestriction($currentTermRestriction) {
@@ -224,7 +224,7 @@ class Model implements ISoftDeletable, JsonSerializable {
     }
 
     /**
-     * @return Integer
+     * @return Boolean
      */
     public function getCurrentTermRestriction() {
         return $this->currentTermRestriction;

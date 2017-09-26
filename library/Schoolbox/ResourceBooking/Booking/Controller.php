@@ -645,7 +645,7 @@ class Controller extends Base
                     list($thisResource, $thisStart, $thisEnd) = $check;
 
                     // Validate for matching the current term
-                    if ($thisResource->getCurrentTermRestriction() == 1) {
+                    if ($thisResource->getCurrentTermRestriction()) {
                         $errors = array_merge_recursive(
                             $errors,
                             $this->validateCurrentTermRestriction($thisEnd)
@@ -669,7 +669,7 @@ class Controller extends Base
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
 
                     // Validate for matching the current term
-                    if ($thisResource->getCurrentTermRestriction() == 1) {
+                    if ($thisResource->getCurrentTermRestriction()) {
                         $errors = array_merge_recursive(
                             $errors,
                             $this->validateCurrentTermRestriction($thisEnd)

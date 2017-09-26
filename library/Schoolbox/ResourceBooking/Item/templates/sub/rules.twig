@@ -22,7 +22,7 @@
         </li>
     {% endif %}
 
-    {% if item.currentTermRestriction == 1 %}
+    {% if item.currentTermRestriction %}
         <li>
             Resource cannot be booked past the end of the current school term ({{ currentTerm.displayFinish.localShort }})
         </li>
