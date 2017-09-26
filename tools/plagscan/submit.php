@@ -73,23 +73,28 @@ foreach ($allDocuments as $currentDocument) {
 
             /* Transmit the new file
              */
-            $plagscanId = $mapper->getConnector()->transmit($studentSubmissionFile, $filename);
+            try {
+                $plagscanId = $mapper->getConnector()->transmit($studentSubmissionFile, $filename);
 
-            /* Update the db with this new plagscan id
-             */
-            if ($plagscanId) {
-                $log->info("{$prefix}: queueing student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
+                /* Update the db with this new plagscan id */
+                if ($plagscanId) {
+                    $log->info("{$prefix}: queueing student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
-                $currentDocument->setPlagscanId($plagscanId);
-                $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
-                $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
-                $mapper->save($currentDocument);
+                    $currentDocument->setPlagscanId($plagscanId);
+                    $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
+                    $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
+                    $mapper->save($currentDocument);
 
-                $log->info("{$prefix}: set to pending status");
-                $numUpdated++;
-            } else {
-                $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
+                    $log->info("{$prefix}: set to pending status");
+                    $numUpdated++;
+                } else {
+                    $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
+                }
             }
+            catch (Exception $e) {
+                $log->error($e->getMessage());
+            }
+
         } else {
             $log->warning("{$prefix}: unknown join criteria for file/assessment/user");
         }
