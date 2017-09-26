@@ -164,6 +164,7 @@ class Connector implements IConnector
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
      */
     public function getDocument(string $documentId): ?Document
     {
@@ -192,6 +193,7 @@ class Connector implements IConnector
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
      */
     public function deleteDocument(string $documentId): bool
     {
@@ -228,6 +230,7 @@ class Connector implements IConnector
      * @return Session
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
      */
     public function viewSession(
         string $documentId,
@@ -397,6 +400,7 @@ class Connector implements IConnector
      * @param RequestInterface  $request
      * @param ResponseInterface $response
      * @throws ApiException
+     * @throws \InvalidArgumentException If cannot convert the request or response to a string
      */
     private function generateApiException(RequestInterface $request, ResponseInterface $response): void
     {
