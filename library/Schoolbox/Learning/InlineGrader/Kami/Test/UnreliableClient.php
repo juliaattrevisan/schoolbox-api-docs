@@ -27,6 +27,7 @@ class UnreliableClient extends Client
     /**
      * @param array $config
      * @param float $failureRate
+     * @throws \InvalidArgumentException If specified failure rate is < 0 or > 1.0
      */
     public function __construct(float $failureRate, array $config = [])
     {
@@ -42,6 +43,7 @@ class UnreliableClient extends Client
      * @param RequestInterface $request
      * @param array            $options
      * @return ResponseInterface
+     * @throws SimulatedNetworkFailureException At random invocations.
      */
     public function send(RequestInterface $request, array $options = []): ResponseInterface
     {
