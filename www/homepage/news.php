@@ -55,7 +55,7 @@ $output = array(
     "NEWS_HEADING"	=> Scrub::text($news->getHeading()),
     "NEWS_BODY"		=> Scrub::html($news->getBody()),
     "EMAIL_CONTACT"	=> "", //"<a href=\"/search/user/{$news['uid']}\">$poster</a>",
-    "POSTED_DATE"	=> $news->getPostDate()->getShort(),
+    "PUBLISH_DATE"	=> $news->getPublishDate()->getShort(),
     "AUTHOR"        => $news->getOwner()->formatName(),
     "AUTHOR_ID"     => $news->getOwner()->getId(),
     "AUTHOR_EXTERNAL_ID" => $news->getOwner()->getExternalId()
