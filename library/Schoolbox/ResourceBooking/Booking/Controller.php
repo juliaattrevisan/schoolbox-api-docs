@@ -644,7 +644,7 @@ class Controller extends Base
                     list($thisResource, $thisStart, $thisEnd) = $check;
 
                     // Validate for matching the current term
-                    if ($resource->getCurrentTermRestriction() == 1) {
+                    if ($thisResource->getCurrentTermRestriction() == 1) {
                         $errors = array_merge_recursive(
                             $errors,
                             $this->validateCurrentTermRestriction($thisEnd)
@@ -667,7 +667,7 @@ class Controller extends Base
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
 
                     // Validate for matching the current term
-                    if ($resource->getCurrentTermRestriction() == 1) {
+                    if ($thisResource->getCurrentTermRestriction() == 1) {
                         $errors = array_merge_recursive(
                             $errors,
                             $this->validateCurrentTermRestriction($thisEnd)
@@ -870,8 +870,7 @@ class Controller extends Base
         $errors = [];
 
         $currentTerm = $this->getTermMapper()->findForToday();
-        // TODO display or actual finish?
-        $currentTermFinishDate = $currentTerm->getActualFinish()->getDateTimeObject();
+        $currentTermFinishDate = $currentTerm->getDisplayFinish()->getDateTimeObject();
         if ($endDate > $currentTermFinishDate) {
             $errors['end_datetime'][] = 'current_term';
         }
