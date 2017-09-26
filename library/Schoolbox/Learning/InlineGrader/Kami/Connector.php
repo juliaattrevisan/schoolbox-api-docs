@@ -268,11 +268,13 @@ class Connector implements IConnector
     /**
      * Get the configured API key
      *
+     * Returns scalar NULL if not configured.
+     *
      * @return null|string
      */
     private function getApiKey(): ?string
     {
-        return $this->config->get(self::CONFIG_KEY_KAMI_API_KEY);
+        return trim($this->config->get(self::CONFIG_KEY_KAMI_API_KEY)) ?: null;
     }
 
 

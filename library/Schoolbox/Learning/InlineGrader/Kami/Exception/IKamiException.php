@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
 
-
 interface IKamiException
 {
 
