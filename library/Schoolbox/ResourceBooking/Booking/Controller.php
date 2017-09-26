@@ -637,19 +637,20 @@ class Controller extends Base
                 $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
             );
 
-            // Validate for matching the current term
-            if ($resource->getCurrentTermRestriction() == 1) {
-                $errors = array_merge_recursive(
-                    $errors,
-                    $this->validateCurrentTermRestriction($resource, $startDate, $endDate)
-                );
-            }
-
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
                 $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
                 foreach ($dateParts as $check) {
                     list($thisResource, $thisStart, $thisEnd) = $check;
+
+                    // Validate for matching the current term
+                    if ($resource->getCurrentTermRestriction() == 1) {
+                        $errors = array_merge_recursive(
+                            $errors,
+                            $this->validateCurrentTermRestriction($thisResource, $thisStart, $thisEnd)
+                        );
+                    }
+
                     $errors = array_merge_recursive(
                         $errors,
                         $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
@@ -664,6 +665,15 @@ class Controller extends Base
 
                 foreach ($this->getExistingSeries($existingBooking, $startDate, $endDate) as $check) {
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
+
+                    // Validate for matching the current term
+                    if ($resource->getCurrentTermRestriction() == 1) {
+                        $errors = array_merge_recursive(
+                            $errors,
+                            $this->validateCurrentTermRestriction($thisResource, $thisStart, $thisEnd)
+                        );
+                    }
+
                     $errors = array_merge_recursive(
                         $errors,
                         $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
