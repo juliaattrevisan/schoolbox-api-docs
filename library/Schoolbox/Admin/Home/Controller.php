@@ -16,6 +16,7 @@ use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
+use GuzzleHttp;
 
 class Controller extends Base
 {
@@ -203,7 +204,7 @@ class Controller extends Base
             }
         }
 
-        $kamiConnector = new Kami\Connector($this->getConfigLoader());
+        $kamiConnector = new Kami\Connector($this->getConfigLoader(), new GuzzleHttp\Client());
 
         // Get the navigation
 
