@@ -221,6 +221,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
             $iterator = $this->getStaffDayTimetable($externalUserId, $campus, $dayNumber);
         }
 
+        /* Rewind function on iterator is broken atm, so this ensures that we can iterate
+         * multiple times over the class list
+         */
         $classList = iterator_to_array($iterator);
 
         $timetable = [];
