@@ -281,6 +281,17 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Has the kami document been uploaded to Kami? Regardless of whether Kami has finished processing
+     *
+     * @return bool
+     */
+    public function isUploaded(): bool
+    {
+        return in_array($this->status, [self::STATUS_PROCESSING, self::STATUS_DONE, self::STATUS_ERROR], true);
+    }
+
+
+    /**
      * @return Alaress_Date_Format
      */
     public function getKamiCreatedAt(): ?Alaress_Date_Format

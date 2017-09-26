@@ -18,6 +18,7 @@ use Schoolbox\Mapper as BaseMapper;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */

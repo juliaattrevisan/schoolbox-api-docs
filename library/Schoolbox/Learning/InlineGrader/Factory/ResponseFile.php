@@ -213,9 +213,12 @@ class ResponseFile
      * @param User           $user
      * @return null|Kami\Session
      * @throws Kami\Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws Kami\Exception\NotFound
      * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
      * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
+     * @throws \LogicException
      * @throws \PDOException If something went wrong when saving the kami document's status
+     * @throws \UnexpectedValueException
      */
     private function getKamiViewSession(SubmissionFile $file, User $user): ?Kami\Session
     {
@@ -223,33 +226,32 @@ class ResponseFile
         if (!$this->kamiConnector->isEnabled()) {
             return null;
         }
+
         // Has this file been uploaded to kami?
         $kamiModel = $this->kamiMapper->findForSubmissionFile($file);
-        if (!$kamiModel) {
+        if (!$kamiModel || !$kamiModel->isUploaded()) {
+            return null;
+        }
+
+        // Was it still being processed by Kami last time we checked?
+        if ($kamiModel->isStatusProcessing()) {
+            try {
+                $checker   = new Kami\StatusChecker($this->kamiMapper, $this->kamiConnector);
+                $kamiModel = $checker->updateStatus($kamiModel);
+            } catch (Kami\Exception\EmptyApiKeyException $e) {
+                // Should be impossible here due to short-circuit at start of method.
+                return null;
+            }
+        }
+
+        // Still not finished processing?
+        if (!$kamiModel->isStatusDone()) {
             return null;
         }
 
         try {
-            // Was it still being processed by Kami last time we checked?
-            if ($kamiModel->isStatusProcessing()) {
-                $kamiDoc = $this->kamiConnector->getDocument($kamiModel->getKamiDocumentId());
-                if (!$kamiDoc) {
-                    // Not found in Kami
-                    return null;
-                }
-                // Update Schoolbox if a change detected in status
-                if ($kamiDoc->isDone()) {
-                    $kamiModel->setStatusDone();
-                } elseif ($kamiDoc->isError()) {
-                    $kamiModel->setStatusError();
-                    $kamiModel->setErrorMessage($kamiDoc->getFileErrorMessage());
-                }
-                $this->kamiMapper->save($kamiModel);
-            }
-            if (!$kamiModel->isStatusDone()) {
-                return null;
-            }
-            return $this->kamiConnector->viewSession($kamiModel->getKamiDocumentId(), $user);
+            // Finished processing. Get a fresh view session
+            return $this->kamiConnector->viewSession($kamiModel->getKamiDocumentId(), $user, true);
         } catch (Kami\Exception\EmptyApiKeyException $e) {
             // Should be impossible here due to short-circuit at start of method.
             return null;
