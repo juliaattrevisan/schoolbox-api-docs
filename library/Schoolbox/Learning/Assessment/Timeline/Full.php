@@ -178,7 +178,7 @@ class Full
 
         $isFeedbackVisible = $this->getParticipant()->getAssessable()->getMarkVisibility() >= $minimumVisibility;
 
-        /** @var DueWork\Submission\Model $currentResponse */
+        /** @var DueWork\Response\Model $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
 
             /* Only show Submitted submissions (ignore drafts)

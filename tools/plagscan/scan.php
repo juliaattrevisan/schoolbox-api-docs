@@ -11,8 +11,8 @@
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
 
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 
 
 require_once __DIR__ . '/../../conf/core/require.php';

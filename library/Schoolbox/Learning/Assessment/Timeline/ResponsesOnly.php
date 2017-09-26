@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Timeline;
 
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
+use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 
 class ResponsesOnly extends Full
 {

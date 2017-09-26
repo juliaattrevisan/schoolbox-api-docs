@@ -19,8 +19,8 @@ use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSubmissionFilePlagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan as DueWorkSubmissionFilePlagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;

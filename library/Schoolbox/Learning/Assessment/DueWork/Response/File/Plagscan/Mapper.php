@@ -9,11 +9,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3\Connector;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;

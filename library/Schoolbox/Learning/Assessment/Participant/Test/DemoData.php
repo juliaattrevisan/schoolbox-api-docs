@@ -13,7 +13,7 @@ use InvalidArgumentException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Response;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Response;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as Attempt;

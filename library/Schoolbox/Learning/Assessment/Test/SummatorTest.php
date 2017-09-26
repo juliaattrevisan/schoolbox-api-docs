@@ -31,8 +31,8 @@ use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
 
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as DueWorkSubmissionFilePlagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as DueWorkSubmissionFilePlagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;

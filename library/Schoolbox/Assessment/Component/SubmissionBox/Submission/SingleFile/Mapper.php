@@ -15,7 +15,7 @@ use Schoolbox\Mapper as BaseMapper;
 use \Schoolbox\File\Mimetype;
 use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile;
 use Schoolbox\Learning\InlineGrader\Kami;
 

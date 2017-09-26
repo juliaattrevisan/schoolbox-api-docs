@@ -4,7 +4,7 @@
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Learning\Assessment\DueWork\Submission;
+namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
@@ -25,11 +25,11 @@ use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
-use Schoolbox\Learning\Assessment\DueWork\Submission;
+use Schoolbox\Learning\Assessment\DueWork\Response;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\InlineGrader\Kami;
@@ -268,7 +268,7 @@ class Module extends BaseModule
          */
         $file = null;
 
-        /** @var Submission\Model $response */
+        /** @var Response\Model $response */
         foreach ($response->getAllFiles() as $currentFile) {
             if ($currentFile->getCrocodocId() == $params['crocodocId']) {
                 $file = $currentFile;

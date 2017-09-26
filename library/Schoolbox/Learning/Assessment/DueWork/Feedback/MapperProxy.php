@@ -20,7 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as Submissio
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DomainObject;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback

@@ -12,7 +12,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
-use Schoolbox\Learning\Assessment\DueWork\Submission;
+use Schoolbox\Learning\Assessment\DueWork\Response;
 
 abstract class AbstractCanViewFeedback implements IAuthorizationRule
 {
@@ -54,8 +54,8 @@ abstract class AbstractCanViewFeedback implements IAuthorizationRule
             $participant = $params['participant'];
             return $participant->getUser();
         }
-        if (isset($params['response']) && $params['response'] instanceof Submission\Model) {
-            /** @var Submission\Model $response */
+        if (isset($params['response']) && $params['response'] instanceof Response\Model) {
+            /** @var Response\Model $response */
             $response = $params['response'];
             return $response->getSubmittedBy();
         }

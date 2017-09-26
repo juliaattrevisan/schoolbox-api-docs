@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -37,7 +37,7 @@ class Model implements IFile, ISoftDeletable
      * Because this object is used in both the domain and data graphs,
      * it will point to either the domain or data version of the Student Submission
      *
-     * @var Submission|DueWork\Submission\Model
+     * @var Submission|DueWork\Response\Model
      */
     protected $submission;
 
@@ -160,7 +160,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @return Submission|DueWork\Submission\Model
+     * @return Submission|DueWork\Response\Model
      */
     public function getSubmission()
     {
@@ -197,7 +197,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @param Submission|DueWork\Submission\Model $submission DO NOT DECLARE TYPE (unless common interface)
+     * @param Submission|DueWork\Response\Model $submission DO NOT DECLARE TYPE (unless common interface)
      * @return static
      */
     public function setSubmission($submission)

@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\InlineGrader;
 
 use Aura\Router\Router;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
+use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 

@@ -39,7 +39,7 @@ class InteractionMapperProxy extends \PHPUnit_Framework_TestCase
         return [
             [
                 $this->getDueWorkResponseMapperProxy(),
-                Assessment\DueWork\Submission\Model::class,
+                Assessment\DueWork\Response\Model::class,
             ],
             [
                 $this->getDueWorkFeedbackMapperProxy(),
@@ -66,11 +66,11 @@ class InteractionMapperProxy extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @return Assessment\DueWork\Submission\MapperProxy
+     * @return Assessment\DueWork\Response\MapperProxy
      */
     private function getDueWorkResponseMapperProxy()
     {
-        return new Assessment\DueWork\Submission\MapperProxy(SubmissionMapper::getInstance());
+        return new Assessment\DueWork\Response\MapperProxy(SubmissionMapper::getInstance());
     }
 
     /**

@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\Attachzone;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
+use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Resource\Attachment\Zone;
 use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -111,7 +111,7 @@ class Factory
     /**
      * Build an attachzone with any Attached Files preloaded into the attachzone
      *
-     * @param \Schoolbox\Learning\Assessment\DueWork\Submission\Model $response
+     * @param \Schoolbox\Learning\Assessment\DueWork\Response\Model $response
      * @return Zone
      */
     public function buildForDueWorkResponse(Submission $response)

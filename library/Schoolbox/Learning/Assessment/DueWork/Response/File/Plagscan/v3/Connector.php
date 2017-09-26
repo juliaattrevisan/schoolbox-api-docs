@@ -11,13 +11,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3;
+namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\ValidFiles;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\ValidFiles;
 
 class Connector
 {

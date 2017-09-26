@@ -50,7 +50,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as SubmissionBoxFile;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\LinkMapper;

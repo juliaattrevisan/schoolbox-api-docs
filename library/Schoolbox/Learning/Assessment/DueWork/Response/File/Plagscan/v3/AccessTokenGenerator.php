@@ -12,7 +12,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\v3;
+namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Client;
 

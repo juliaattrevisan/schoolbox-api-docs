@@ -71,7 +71,7 @@ use Schoolbox\Learning\Assessment\DataModel\Translator\Project as ProjectTransla
 use Schoolbox\Learning\Assessment\DataModel\Translator\Quiz as QuizTranslator;
 use Schoolbox\Learning\Assessment\DataModel\Translator\Task as TaskTranslator;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
-use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkSubmissionMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as FeedbackSubSourceDueWork;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
