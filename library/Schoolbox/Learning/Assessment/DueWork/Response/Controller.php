@@ -87,6 +87,7 @@ class Controller extends Base
         $this->kamiConnector      = $kamiConnector;
     }
 
+
     /**
      * Get the contents of a particular $response
      *
@@ -96,14 +97,20 @@ class Controller extends Base
      *
      * I can't call it getResponse() lol wups
      *
-     * @param DueWork $assessment
+     * @param DueWork     $assessment
      * @param Participant $participant
-     * @param Submission $response
+     * @param Submission  $response
      * @throws ApplicationException\Exception Cannot authenticate crocodoc or a curl error between us and crocodoc
+     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
      * @throws \InvalidArgumentException If assessment due date is null.
+     * @throws \PDOException If something went wrong when saving the kami document's status
      */
-    public function getParticularResponse(DueWork $assessment, Participant $participant, Submission $response = null): void
-    {
+    public function getParticularResponse(
+        DueWork $assessment,
+        Participant $participant,
+        Submission $response = null
+    ): void {
         /* Module doesn't have access to $this->getUser()
          *
          * Superusers can see draft Responses in the inline grader
@@ -214,6 +221,8 @@ class Controller extends Base
      * @param            $file
      * @return array
      * @throws ApplicationException\Exception If a Crocodoc or Kami exception occurs
+     * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
+     * @throws \PDOException If something went wrong when saving the kami document's status
      */
     private function getSubFragment(Submission $response, SubmissionFile $file): array
     {

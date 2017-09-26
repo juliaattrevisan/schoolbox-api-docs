@@ -65,12 +65,16 @@ class ResponseFile
 
     /**
      * Figure out which fragment to load
+     *
      * @param Submission     $submission
      * @param SubmissionFile $file
      * @param User           $user
      * @return array
-     * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
      * @throws Kami\Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
+     * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
+     * @throws \PDOException If something went wrong when saving the kami document's status
+     * @throws \RangeException If Crocodoc API token is not defined
      */
     public function produce(Submission $submission, SubmissionFile $file, User $user): array
     {
@@ -206,10 +210,12 @@ class ResponseFile
      * Fetch a Kami View Session if one is available
      *
      * @param SubmissionFile $file
-     * @param User $user
+     * @param User           $user
      * @return null|Kami\Session
-     * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
      * @throws Kami\Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
+     * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
+     * @throws \PDOException If something went wrong when saving the kami document's status
      */
     private function getKamiViewSession(SubmissionFile $file, User $user): ?Kami\Session
     {
