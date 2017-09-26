@@ -18,8 +18,6 @@ use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 
 class Model extends AbstractAssessment
@@ -589,7 +587,7 @@ class Model extends AbstractAssessment
      */
     public function getResponseClass()
     {
-        return DueWorkSubmission::class;
+        return Response\Model::class;
     }
 
     /**
@@ -597,6 +595,6 @@ class Model extends AbstractAssessment
      */
     public function getFeedbackClass()
     {
-        return DueWorkFeedback::class;
+        return Feedback\Model::class;
     }
 }

@@ -23,7 +23,6 @@ use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Permission\Access\Access;
 use \Schoolbox\Learning\Assessment\Attachzone;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
@@ -99,7 +98,7 @@ class Controller extends Base
      *
      * @param DueWork     $assessment
      * @param Participant $participant
-     * @param Submission  $response
+     * @param Model       $response
      * @throws ApplicationException\Exception Cannot authenticate crocodoc or a curl error between us and crocodoc
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
@@ -109,7 +108,7 @@ class Controller extends Base
     public function getParticularResponse(
         DueWork $assessment,
         Participant $participant,
-        Submission $response = null
+        Model $response = null
     ): void {
         /* Module doesn't have access to $this->getUser()
          *
@@ -198,7 +197,7 @@ class Controller extends Base
      * @api   /learning/kami/{kamiId}
      * @level 17.5
      * @param Kami\Model $kami
-     * @param Submission $response
+     * @param Model $response
      * @throws Kami\Exception\ApiException
      * @throws Kami\Exception\EmptyApiKeyException
      * @throws Kami\Exception\NotFound
@@ -209,7 +208,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function getKamiView(Kami\Model $kami, Submission $response): void
+    public function getKamiView(Kami\Model $kami, Model $response): void
     {
         // Was it still being processed by Kami last time we checked?
         if ($kami->isStatusProcessing()) {
@@ -234,11 +233,11 @@ class Controller extends Base
     /**
      * Get which file the user is likely to wish to see details for
      *
-     * @param Submission  $response
+     * @param Model       $response
      * @param null|string $hash
      * @return null|SubmissionFile
      */
-    private function getFile(Submission $response, ?string $hash): ?SubmissionFile
+    private function getFile(Model $response, ?string $hash): ?SubmissionFile
     {
         // Use hash if possible
         if ($hash) {
@@ -256,14 +255,14 @@ class Controller extends Base
     /**
      * ResponseFile Factory might throw exceptions if you're viewing crocodocable files that somehow die
      *
-     * @param Submission $response
-     * @param            $file
+     * @param Model          $response
+     * @param SubmissionFile $file
      * @return array
      * @throws ApplicationException\Exception If a Crocodoc or Kami exception occurs
      * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
      * @throws \PDOException If something went wrong when saving the kami document's status
      */
-    private function getSubFragment(Submission $response, SubmissionFile $file): array
+    private function getSubFragment(Model $response, SubmissionFile $file): array
     {
         try {
             return (new Factory\ResponseFile(
@@ -294,9 +293,9 @@ class Controller extends Base
      * @api   DELETE /assessments/:assessmentId/response/:responseId
      * @level 165
      * @param Participant $participant
-     * @param Submission $response
+     * @param Model $response
      */
-    public function deleteParticularResponse(Participant $participant, Submission $response)
+    public function deleteParticularResponse(Participant $participant, Model $response)
     {
         $code = 204;
         $data = [];
@@ -316,11 +315,11 @@ class Controller extends Base
     /**
      * Download a particular annotated crocodoc as a pdf
      *
-     * @param Submission     $response
+     * @param Model          $response
      * @param SubmissionFile $file
      * @throws ApplicationException\Exception
      */
-    public function getCrocodocDownload(Submission $response, SubmissionFile $file)
+    public function getCrocodocDownload(Model $response, SubmissionFile $file)
     {
         try {
             $download = $this->getInlineGraderFacade($response, $file)->getDownloadUrl();
@@ -341,13 +340,13 @@ class Controller extends Base
     /**
      * View a particular annotated crocodoc
      *
-     * @param Submission $response
+     * @param Model $response
      * @param Feedback $feedback
      * @param SubmissionFile $file
      * @throws ServiceNotFound If unable to locate Web Renderer in DI
      * @throws ApplicationException\Exception
      */
-    public function getCrocodocView(Submission $response, Feedback $feedback, SubmissionFile $file)
+    public function getCrocodocView(Model $response, Feedback $feedback, SubmissionFile $file)
     {
         try {
             $facade = $this->getInlineGraderFacade($response, $file);
@@ -377,14 +376,14 @@ class Controller extends Base
      * Figure out a Response File's crocodoc url
      * This is a link to the third-party Crocodoc system
      *
-     * @param Submission     $response
+     * @param Model          $response
      * @param SubmissionFile $file
      * @return InlineGraderFacade
      * @throws \RangeException Cannot authenticate at crocodoc
      * @throws \DomainException Some kind of curl error between us and crocodoc
      * @throws \InvalidArgumentException If no crocodoc ID
      */
-    private function getInlineGraderFacade(Submission $response, SubmissionFile $file)
+    private function getInlineGraderFacade(Model $response, SubmissionFile $file)
     {
         if (!$file->getCrocodocId()) {
             throw new \InvalidArgumentException('There is no Inline Grader annotated version of this document.');
