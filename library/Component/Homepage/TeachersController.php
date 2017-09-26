@@ -143,7 +143,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             if ($teacher->getRole()->isStaff()) {
                                 if ($staffPhotoVisibility == 2 && $this->getUser()->getRole()->isStudent()) {
                                     $this->setVar('photo_block', '');
-                                } else if ($staffPhotoVisibility == 1 && !$this->getUser()->getRole()->isStaff()) {
+                                } elseif ($staffPhotoVisibility == 1 && !$this->getUser()->getRole()->isStaff()) {
                                     $this->setVar('photo_block', '');
                                 } else {
                                     $this->parse('photo_block', 'photo');
