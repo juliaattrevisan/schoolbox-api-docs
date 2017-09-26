@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
 /**
  * Thrown if the Kami Api returns a response our connector does not understand
  */
-class ApiException extends \UnexpectedValueException
+class ApiException extends \UnexpectedValueException implements IKamiException
 {
 
 }

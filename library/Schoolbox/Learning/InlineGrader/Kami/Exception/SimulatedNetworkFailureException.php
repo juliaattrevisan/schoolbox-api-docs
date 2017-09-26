@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
 
 use GuzzleHttp\Exception\ClientException;
 
-class SimulatedNetworkFailureException extends ClientException
+class SimulatedNetworkFailureException extends ClientException implements IKamiException
 {
 
 }

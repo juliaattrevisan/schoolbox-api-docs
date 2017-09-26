@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
 /**
  * Generated when system attempts a Kami operation but the API key is not configured.
  */
-class EmptyApiKeyException extends \RuntimeException
+class EmptyApiKeyException extends \RuntimeException implements IKamiException
 {
 
 }

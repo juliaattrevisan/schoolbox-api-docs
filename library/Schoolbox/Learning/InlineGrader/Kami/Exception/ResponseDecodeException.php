@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
 /**
  * Generated when a response from Kami's servers cannot be decoded
  */
-class ResponseDecodeException extends \RuntimeException
+class ResponseDecodeException extends \RuntimeException implements IKamiException
 {
 
 }
