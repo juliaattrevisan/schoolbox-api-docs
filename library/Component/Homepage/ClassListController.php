@@ -183,7 +183,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                         if($user->getRole()->isStudent()) {
                             if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
-                            } else if ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
+                            } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
@@ -194,7 +194,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                         if($user->getRole()->isStaff()) {
                             if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
                                 $this->setVar('photo_block', '');
-                            } else if ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
+                            } elseif ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');
