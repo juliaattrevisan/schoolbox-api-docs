@@ -71,10 +71,13 @@ class ResponseFile
      * @param User           $user
      * @return array
      * @throws Kami\Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws Kami\Exception\NotFound
      * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
      * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
+     * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
      * @throws \PDOException If something went wrong when saving the kami document's status
      * @throws \RangeException If Crocodoc API token is not defined
+     * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
     public function produce(Submission $submission, SubmissionFile $file, User $user): array
     {
@@ -216,9 +219,9 @@ class ResponseFile
      * @throws Kami\Exception\NotFound
      * @throws Kami\Exception\ResponseDecodeException If unable to decode a server response
      * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
-     * @throws \LogicException
+     * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
      * @throws \PDOException If something went wrong when saving the kami document's status
-     * @throws \UnexpectedValueException
+     * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
     private function getKamiViewSession(SubmissionFile $file, User $user): ?Kami\Session
     {

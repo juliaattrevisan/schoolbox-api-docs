@@ -104,6 +104,8 @@ class Controller extends Base
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
      * @throws \InvalidArgumentException If assessment due date is null.
      * @throws \PDOException If something went wrong when saving the kami document's status
+     * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
+     * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
     public function getParticularResponse(
         DueWork $assessment,
@@ -260,7 +262,9 @@ class Controller extends Base
      * @return array
      * @throws ApplicationException\Exception If a Crocodoc or Kami exception occurs
      * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
+     * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
      * @throws \PDOException If something went wrong when saving the kami document's status
+     * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
     private function getSubFragment(Model $response, SubmissionFile $file): array
     {
