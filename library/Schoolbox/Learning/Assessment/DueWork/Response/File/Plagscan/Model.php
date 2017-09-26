@@ -21,12 +21,12 @@ class Model
     use DeletedAtDate;
 
     /**
-     * Plagscan queued for processing
+     * Documents that are queued to be uploaded to plagscan servers
      */
     const STATUS_QUEUED = 1;
 
     /**
-     * Plagscan currently in progress
+     * Documents that have been uploaded to plagscan but have not yet finished being analysed and thus provided a result
      */
     const STATUS_PROCESSING = 2;
 
@@ -36,7 +36,7 @@ class Model
     const STATUS_COMPLETE = 3;
 
     /**
-     * Status of the document, if it's returned as unscannable?
+     * Documents that have returned errors from plagscan, for example deleted or cannot be analysed
      */
     const STATUS_UNSCANNABLE = -1;
 
