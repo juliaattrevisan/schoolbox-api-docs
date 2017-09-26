@@ -24,7 +24,7 @@
 
     {% if item.currentTermRestriction == 1 %}
         <li>
-            Resource may only be booked before {{ currentTerm.displayFinish.localShort }}
+            Resource cannot be booked past the end of the current school term ({{ currentTerm.displayFinish.localShort }})
         </li>
     {% endif %}
 

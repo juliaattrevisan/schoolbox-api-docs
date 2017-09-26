@@ -641,6 +641,7 @@ class Controller extends Base
                 // Validate related and recurrent bookings of a new booking
                 $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
                 foreach ($dateParts as $check) {
+                    /** @var Item\Model $thisResource */
                     list($thisResource, $thisStart, $thisEnd) = $check;
 
                     // Validate for matching the current term
@@ -664,6 +665,7 @@ class Controller extends Base
                 // messed with.
 
                 foreach ($this->getExistingSeries($existingBooking, $startDate, $endDate) as $check) {
+                    /** @var Item\Model $thisResource */
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
 
                     // Validate for matching the current term
@@ -861,7 +863,7 @@ class Controller extends Base
     }
 
     /**
-     * Validates is booking needs to be within the current term
+     * Validates if booking needs to be within the current term
      *
      * @param DateTime $endDate
      */
