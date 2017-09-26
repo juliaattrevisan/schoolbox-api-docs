@@ -336,9 +336,7 @@ class Connector implements IConnector
         } catch (\RuntimeException $e) {
             throw new Exception\ResponseDecodeException(
                 $e->getMessage(),
-                $e->getCode(),
-                $e->getFile(),
-                $e->getLine()
+                $e->getCode()
             );
         }
     }
