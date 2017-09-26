@@ -257,11 +257,14 @@ class Connector implements IConnector
                     'user_id' => $user->getId(),
                 ],
                 'expires_at'          => $expires->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
-                'theme'               => $theme,
-                'show_save'           => $showSave,
-                'show_print'          => $showPrint,
-                'show_help'           => $showHelp,
-                'show_menu'           => $showMenu,
+                'viewer_options'      => [
+                    'theme'      => $theme,
+                    'show_save'  => $showSave,
+                    'show_print' => $showPrint,
+                    'show_help'  => $showHelp,
+                    'show_menu'  => $showMenu,
+                ],
+                'editable'            => $editable,
             ]),
         ];
         $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
