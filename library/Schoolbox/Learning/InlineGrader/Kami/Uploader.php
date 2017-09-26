@@ -206,7 +206,7 @@ class Uploader
         return $this->jitter->retry(function () use ($kamiModel, &$countFailedAttempts) {
             try {
                 return $this->kamiConnector->uploadDocument($kamiModel->getStudentSubmissionFile()->getStorage());
-            } catch (SimulatedNetworkFailureException|ApiException|ResponseDecodeException $e) {
+            } catch (Exception\IKamiException $e) {
                 // If we recognise the exception, just print the info we need.
                 $this->logUploadException($e, $kamiModel, $countFailedAttempts);
                 throw $e;
