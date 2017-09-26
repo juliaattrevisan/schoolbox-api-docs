@@ -241,7 +241,7 @@ class Mapper extends \Schoolbox\Mapper
             $plagscan->setCreatedAt(\Alaress_Date_Format::now());
         }
 
-        $plagscan->setStatus(Plagscan::STATUS_UNSCANNABLE);
+        $plagscan->setStatus(Plagscan::STATUS_QUEUED);
         $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
 
         // We save it early so if it fails we at least have a record
@@ -258,7 +258,7 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         $plagscan->setPlagscanId($plagscanId);
-        $plagscan->setStatus(Plagscan::STATUS_QUEUED);
+        $plagscan->setStatus(Plagscan::STATUS_PROCESSING);
 
         return parent::save($plagscan);
 

@@ -31,7 +31,7 @@ if (!$mapper->getConnector()) {
 }
 
 /** @var Plagscan $currentDocument */
-$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_UNSCANNABLE, [
+$allDocuments = $mapper->findByColumn('status', Plagscan::STATUS_QUEUED, [
     'order' => [
         'student_submission_file_id' => 'ASC',
     ],
@@ -81,7 +81,7 @@ foreach ($allDocuments as $currentDocument) {
                     $log->info("{$prefix}: queueing student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}");
 
                     $currentDocument->setPlagscanId($plagscanId);
-                    $currentDocument->setStatus(Plagscan::STATUS_QUEUED);
+                    $currentDocument->setStatus(Plagscan::STATUS_PROCESSING);
                     $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
                     $mapper->save($currentDocument);
 
