@@ -69,8 +69,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
             LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
             WHERE tc.campus_id = :campusId
-            AND tc.start < NOW()
-            AND tc.finish > NOW()
+            AND tc.start <= DATE(NOW())
+            AND tc.finish >= DATE(NOW())
             ";
 
         if($day > 0) {
@@ -165,8 +165,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
             LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
             WHERE tc.campus_id = :campusId
-            AND tc.start < NOW()
-            AND tc.finish > NOW()
+            AND tc.start <= DATE(NOW())
+            AND tc.finish >= DATE(NOW())
             AND CAST(FROM_UNIXTIME(:now, '%h:%i:%s') as TIME) BETWEEN tp.start and tp.finish
             AND tp.day = :dayNumber
         ";
@@ -365,8 +365,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 timetable_campus.campus_id = luCampus.id
             INNER JOIN class ON
                 class_period.class_id = class.id
-            WHERE timetable_campus.start < NOW()
-            AND   timetable_campus.finish > NOW()
+            WHERE timetable_campus.start <= DATE(NOW())
+            AND   timetable_campus.finish >= DATE(NOW())
             AND   class_period.room = :room
             ORDER BY
                 timetable_period.day ASC,
