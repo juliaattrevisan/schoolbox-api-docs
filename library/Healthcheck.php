@@ -490,143 +490,25 @@ class Healthcheck
     /** @noinspection PhpUnusedPrivateMethodInspection */
     private function schoolproTest()
     {
-        /*
-        $this->log .= "\nSchoolpro Permission Check - Stored Procedures\n";
-
-        $splist[] = array(
+        $procedures = [
             'sbGetParent',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetStudent',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetStudentSubjectList',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetStaffSubjectList',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetEnrolledStudents',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetTimetableDefinition',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pCampusID', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetDayNumber',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pCampusID', 1, SQLINT4, false, false, -1),
-                array('@pDateToUse', '2013-12-02 12:12:12', SQLVARCHAR, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetPeriodNumber',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pCampusID', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetStaffDayTimetable',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-                array('@pCampusID', 1, SQLINT4, false, false, -1),
-                array('@pDayNumber', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetStudentDayTimetable',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-                array('@pCampusID', 1, SQLINT4, false, false, -1),
-                array('@pDayNumber', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetStudents',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pClassID', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetTeacherName',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pClassID', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetTimetableDefinition',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pCampusID', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetStudentContact',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetPortraitLastUpdated',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-            )
-        );
-        $splist[] = array(
             'sbGetPortraitFile',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pSchoolNum', 1, SQLINT4, false, false, -1),
-            )
-        );
-        */
+            ];
+        $this->procedureTest($procedures);
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */

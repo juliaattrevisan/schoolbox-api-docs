@@ -204,7 +204,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      * @param \Schoolbox\Campus $campus
      * @param $dayNumber
      *
-     * @return bool|void|array
+     * @return array
      */
     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
@@ -213,13 +213,18 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
         }
         $groupHandler = new Group();
 
+        $definition = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
+
         if ($groupHandler->isStudent($userId)) {
             $iterator = $this->getStudentDayTimetable($externalUserId, $campus, $dayNumber);
         } else {
             $iterator = $this->getStaffDayTimetable($externalUserId, $campus, $dayNumber);
         }
 
-        $definition = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
+        /* Rewind function on iterator is broken atm, so this ensures that we can iterate
+         * multiple times over the class list
+         */
+        $classList = iterator_to_array($iterator);
 
         $timetable = [];
 
@@ -252,7 +257,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
          * this kind of stuff is currently not documented well.
          */
         for ($x = 0; $x < count($timetable); $x++) {
-            foreach ($iterator as $currentClass) {
+            foreach ($classList as $currentClass) {
                 /* If this class occurs in this period, append its details
                  */
                 if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {
