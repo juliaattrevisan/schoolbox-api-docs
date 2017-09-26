@@ -18,6 +18,7 @@
       <directory suffix=".php">library/Schoolbox/</directory>
       <exclude>library/Alaress/Database/</exclude>
       <exclude>library/Schoolbox/Database/Test</exclude>
+      <exclude>library/Schoolbox/Learning/InlineGrader/Kami/Test</exclude>
     </testsuite>
     <testsuite name="databaseTest">
       <directory suffix=".php">library/Alaress/Database/</directory>
