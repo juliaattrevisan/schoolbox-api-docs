@@ -625,11 +625,6 @@ class Controller extends Base
                 $this->validateTooLong($resource, $startDate, $endDate)
             );
 
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
-            );
-
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
                 $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
