@@ -21,20 +21,20 @@ trait External_Schoolbox_TimetableDefinitionTrait
     public function getTimetableDefinitionFromDatabase(Database $database, \Schoolbox\Campus $campus)
     {
         $statement = $database->prepare("
-            SELECT 
-                tc.start, 
-                tc.reset, 
-                tc.finish, 
+            SELECT
+                tc.start,
+                tc.reset,
+                tc.finish,
                 tc.start_day,
-                ty.title, 
-                ty.cycle_length, 
-                ty.day_length, 
+                ty.title,
+                ty.cycle_length,
+                ty.day_length,
                 ty.regular
             FROM timetable_campus tc
             LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
             WHERE tc.campus_id = :campusId
-            AND tc.start < NOW()
-            AND tc.finish > NOW()
+            AND tc.start <= DATE(NOW())
+            AND tc.finish >= DATE(NOW())
         ");
 
         $statement->execute(array(':campusId' => $campus->getId()));
