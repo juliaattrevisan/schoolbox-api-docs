@@ -1,0 +1,27 @@
+{#
+    Display a responsive Kami iframe.
+
+    Data:
+        session    Kami\Session
+#}
+<script src="/javascript/shared/jquery.responsive-iframe.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        /**
+         * Resize iframe dynamically ("responsively")
+         */
+        $.fn.responsiveIframe({
+            onLoad: resizeViewport,
+            onResize: resizeViewport
+        });
+
+        /**
+         * Resize the iFrame viewport
+         */
+        function resizeViewport() {
+            $('#kami-viewport').height($(window).height() * 0.75);
+        }
+    });
+</script>
+<iframe id="kami-viewport" src="{{ session.viewerUrl }}" frameborder="0"></iframe>
