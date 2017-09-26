@@ -265,10 +265,28 @@ class Controller extends Base
         } else {
             $response->status->setCode(200);
         }
-        $response->content->set($this->buildJsonOutput([
+
+        // This works in Chrome, IE, and Chromium. It does not work in Firefox. Unknown for Mac.
+        // It updates the link to point straight to amazon, so subsequent clicks on the link
+        // do not re-generate the file, or go through the schoolbox server.
+        $this->response->content->set($this->buildJsonOutput([
             'fileUrl'   => $export->getFileUrl(),
             'pollCount' => $pollCount,
         ]));
+
+
+        // This works in all browsers, but means we need to stream the file through schoolbox as a proxy.
+        // This code is currently reading the whole contents into memory, but presumably we could stream this easily enough
+//        $client = new \GuzzleHttp\Client();
+//        $contents = $client->get($export->getFileUrl())->getBody()->getContents();
+//        $response->headers->set('Content-Description', 'File Transfer');
+//        $response->headers->set('Content-Type', 'application/octet-stream');
+//        $response->headers->set('Content-Disposition', 'attachment; filename="xxx.pdf"');
+//        $response->headers->set('Expires', '0');
+//        $response->headers->set('Cache-Control', 'must-revalidate');
+//        $response->headers->set('Pragma', 'public');
+//        $response->headers->set('Content-Length', strlen($contents));
+//        $response->content->set($this->buildFileOutputFromString($contents));
     }
 
 

@@ -89,7 +89,7 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card attachment small-12">
-                            {% set kamiRoute = currentFile.kami
+                            {% set kamiViewRoute = currentFile.kami
                                 ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiView', {
                                     kamiId:       currentFile.kami.id,
                                     assessment:   assessment,
@@ -98,8 +98,8 @@
                                 })
                                 : null
                             %}
-                            {% if currentFile.kami and kamiRoute %}
-                                <a href="{{ kamiRoute }}" title="{{ currentFile.filename }}">
+                            {% if currentFile.kami and kamiViewRoute %}
+                                <a href="{{ kamiViewRoute }}" title="{{ currentFile.filename }}">
                                     <img src="/ajax/mime/{{ currentFile.mime }}" alt="View Annotated Document" />
                                     <p>{{ currentFile.filename }} </p>
                                 </a>
@@ -132,11 +132,20 @@
                         </div>
                     </div>
                     <nav>
-                        {% if currentFile.kami and kamiRoute and false %}
-                            {# TODO SA-4753 downlaod export of Kami Document #}
-                        {% elseif currentFile.crocodocId and not kamiRoute %}
+                        {% set kamiExportRoute = currentFile.kami
+                            ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExportUrl', {
+                                kamiId:       currentFile.kami.id,
+                                assessment:   assessment,
+                                participant:  participant,
+                                feedback:     currentFeedback,
+                            })
+                            : null
+                        %}
+                        {% if kamiExportRoute %}
+                            <a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document"></a>
+                        {% elseif currentFile.crocodocId and not kamiViewRoute %}
                             {% include '@learningDueWorkResponse/crocodocLink.twig' with {assessment: assessment, feedback: currentFeedback, file: currentFile, participant: participant} only %}
-                        {% elseif not kamiRoute %}
+                        {% else %}
                             <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=1" class="icon-download" title="Download"></a>
                         {% endif %}
                     </nav>
