@@ -109,6 +109,15 @@ class Factory extends NullableContext\Factory
         // Get all courses imported to these folders
         $courseImpls = $this->courseImplMapper->findByFolderId($folders->getColumnValues('id'));
 
+        // Get all unitSpecs imported to relevant folders
+        $unitSpecsImportedToFolders = $this->unitSpecMapper->createCollection();
+        foreach ($courseImpls as $courseImpl) {
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                $unitSpec = $unitImpl->getSpecification();
+                $unitSpecsImportedToFolders->setOffset($unitSpec->getId(), $unitSpec);
+            }
+        }
+
         // Divide folders into Classes and Groups (not mutually exclusive!)
 
         // Was course imported to a class? ?
@@ -142,6 +151,7 @@ class Factory extends NullableContext\Factory
         }
 
         return [
+            'unitSpecsImportedToFolders' => $unitSpecsImportedToFolders,
             'unitSpecsImportedToClasses' => $unitSpecsImportedToClasses,
             'unitSpecsImportedToGroups'  => $unitSpecsImportedToGroups,
         ];

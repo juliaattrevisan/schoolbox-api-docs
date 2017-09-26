@@ -1,21 +1,25 @@
-{# Implementation common to folder filters #}
+{#
+    Implementation common to folder filters
 
+    Usage:
+        isUserConfigurable: bool          - If false, just hidden input. If true, render a checkbox to clobber hidden value
+        definition:     IFilterDefinition
+        roleSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
+        userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
+        folders:        Folder\Model[]
+#}
 {% extends '@filters/_component.twig' %}
 
-{% block scripts %}
-    <script>
-        $(function() {
+{% block filterName %}Folders{% endblock %}
 
-            var $component = $('[data-component="{{ definition.filter.id }}"]');
-
-            // Ensure if a folder is both a class and a group, they are either both selected, or neither selected
-            // This solves issue of later checkedState clobbering first.
-            $component.on('change', 'input[type=checkbox]', function(){
-                var $checkbox    = $(this);
-                var checkedState = $checkbox.prop('checked');
-                var filter_key   = $checkbox.data('duplicate-checkbox');
-                $component.find('input[type=checkbox][data-duplicate-checkbox=' + filter_key + ']').prop('checked', checkedState);
-            });
-        });
-    </script>
+{% block userOptions %}
+    {% for folder in folders %}
+        {% set selection = roleSelections[folder.id] %}
+        {% include '@filters/_selectionCheckbox.twig' with {
+            roleSelection:      selection,
+            userSelection:      userSelections[selection.key],
+            label:              folder.nameWithCodes,
+            disabled:           isDisabled
+        } only %}
+    {% endfor %}
 {% endblock %}

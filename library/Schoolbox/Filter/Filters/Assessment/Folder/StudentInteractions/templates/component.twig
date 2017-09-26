@@ -1,59 +1,10 @@
 {#
     Usage:
-        isUserConfigurable: bool              - If false, just hidden input. If true, render a checkbox to clobber hidden value
         definition:     IFilterDefinition
         roleSelections: FilterSelection[] - Default filter selections for current user's role, indexed by selection.key
         userSelections: FilterSelection[] - A set of filter selections made by the current user, indexed by selection.key
-        classes:        Folder\Model[]
-        groups:         Folder\Model[]
+        folders:        Folder\Model[]
 
 #}
 {% extends '@filterDefinitions/Assessment/Folder/templates/component.twig' %}
 
-{% set hasClasses = classes | length %}
-{% set hasGroups  = groups | length %}
-
-{# What should this filter name be for the UI ?#}
-{% if hasClasses and hasGroups %}
-    {% set filterName  = 'Class / Group' %}
-{% elseif hasClasses %}
-    {% set filterName  = 'Class' %}
-{% else %}
-    {% set filterName  = 'Group' %}
-{% endif %}
-
-{% block filterName %}{{ filterName }}{% endblock %}
-
-{% block userOptions %}
-    {% if hasClasses %}
-        <h4>Classes</h4>
-        {% for classFolder in classes %}
-            {% set selection = roleSelections[classFolder.id] %}
-
-            {% include '@filters/_selectionCheckboxWithDuplicates.twig' with {
-                roleSelection:      selection,
-                userSelection:      userSelections[selection.key],
-                label:              classFolder.nameWithCodes,
-                idSuffix:           '_class'
-            } only %}
-
-        {% endfor %}
-    {% endif %}
-
-    {% if hasClasses and hasGroups %}
-        <hr>
-    {% endif %}
-
-    {% if hasGroups %}
-        <h4>Groups</h4>
-        {% for groupFolder in groups %}
-            {% set selection = roleSelection[groupFolder.id] %}
-            {% include '@filters/_selectionCheckboxWithDuplicates.twig' with {
-                roleSelection:      selection,
-                userSelection:      userSelections[selection.key],
-                label:              groupFolder.name,
-                idSuffix:           '_group'
-            } only %}
-        {% endfor %}
-    {% endif %}
-{% endblock %}

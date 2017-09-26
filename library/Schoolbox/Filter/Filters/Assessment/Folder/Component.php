@@ -20,12 +20,7 @@ abstract class Component extends Filter\AbstractComponent
     /**
      * @var GenericCollection|Folder\Model[]
      */
-    private $classes;
-
-    /**
-     * @var GenericCollection|Folder\Model[]
-     */
-    private $groups;
+    private $folders;
 
 
     /**
@@ -34,8 +29,7 @@ abstract class Component extends Filter\AbstractComponent
      * @param Filter\Page\Model                           $pageFilter
      * @param GenericCollection|Filter\Selection\Model[]  $userSelections
      * @param Filter\Selection\Mapper                     $filterSelectionMapper
-     * @param Collection|GenericCollection|Folder\Model[] $classes
-     * @param Collection|GenericCollection|Folder\Model[] $groups
+     * @param Collection|GenericCollection|Folder\Model[] $folders
      */
     public function __construct(
         Filter\IDefinition $definition,
@@ -43,12 +37,10 @@ abstract class Component extends Filter\AbstractComponent
         Filter\Page\Model $pageFilter,
         GenericCollection $userSelections,
         Filter\Selection\Mapper $filterSelectionMapper,
-        GenericCollection $classes,
-        GenericCollection $groups
+        GenericCollection $folders
     ) {
         parent::__construct($definition, $user, $pageFilter, $userSelections, $filterSelectionMapper);
-        $this->classes = $classes;
-        $this->groups  = $groups;
+        $this->folders = $folders;
     }
 
 
@@ -64,32 +56,24 @@ abstract class Component extends Filter\AbstractComponent
         $isUserConfigurable  = $this->getPageFilter()->getUserConfigurable();
 
         foreach ($abstractOptions as $option) {
-
-            if($isUserConfigurable && !$option->getAvailable()){
+            // has admin configured the filter to be user-configurable, but that this option should not be available?
+            if ($isUserConfigurable && !$option->getAvailable()) {
                 continue;
             }
 
+            // did the admin configure the abstract option to be selected by default for the specified role?
             $selected = $option->getDefaults()[$roleType]->getSelected();
 
-            if (Definition::KEY_CLASSES === $option->getKey()) {
-                foreach ($this->classes as $folder) {
-                    $key                       = (string)$folder->getId();
-                    $availableSelections[$key] = $this->createSelection($key, $selected);
-                }
-            } elseif (Definition::KEY_GROUPS === $option->getKey()) {
-                foreach ($this->groups as $folder) {
-                    $key = (string)$folder->getId();
+            foreach ($this->folders as $folder) {
+                $key = (string)$folder->getId();
 
-                    if (!$availableSelections->offsetExists($key)) {
-                        // Does the folder not yet exist in selections ?
-                        $availableSelections[$key] = $this->createSelection($key, $selected);
-                    } elseif ($selected) {
-                        // Does it exist, ensure it is selected if abstract option is selected
-                        $availableSelections[$key]->setSelected(true);
-                    }
+                if (!$availableSelections->offsetExists($key)) {
+                    // Does the folder not yet exist in selections ?
+                    $availableSelections[$key] = $this->createSelection($key, $selected);
+                } elseif ($selected) {
+                    // Does it exist, ensure it is selected if abstract option is selected
+                    $availableSelections[$key]->setSelected(true);
                 }
-            } else {
-                throw new \InvalidArgumentException("Unknown option key: {$option->getKey()}");
             }
         }
         return $availableSelections;
@@ -102,8 +86,7 @@ abstract class Component extends Filter\AbstractComponent
     public function toContext()
     {
         return array_merge(parent::toContext(), [
-            'classes' => $this->classes,
-            'groups'  => $this->groups,
+            'folders' => $this->folders,
         ]);
     }
 }

@@ -37,6 +37,19 @@ class Definition extends FolderFilter\Definition
         ];
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    protected function getCustomKeys()
+    {
+        return [
+            self::KEY_CLASSES,
+            self::KEY_GROUPS,
+        ];
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -53,5 +66,20 @@ class Definition extends FolderFilter\Definition
     protected static function getTemplatesDir()
     {
         return '@filterDefinitions/Assessment/Folder/TeacherInvolved/templates';
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getLabel($key)
+    {
+        switch ($key) {
+            case self::KEY_CLASSES:
+                return 'Classes';
+            case self::KEY_GROUPS:
+                return 'Groups';
+        }
+        throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
     }
 }

@@ -123,7 +123,7 @@ class Model
 
 
     /**
-     * @return GenericCollection|\Schoolbox\Filter\Page\Option\Defaults\Model[]
+     * @return GenericCollection|Defaults\Model[]
      */
     public function getDefaults()
     {
@@ -132,7 +132,7 @@ class Model
 
 
     /**
-     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Defaults\Model[] $defaults
+     * @param GenericCollection|Defaults\Model[] $defaults
      * @return $this
      */
     public function setDefaults(GenericCollection $defaults)
