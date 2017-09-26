@@ -218,13 +218,28 @@ class Connector implements IConnector
      *
      * @param string                   $documentId
      * @param User                     $user
+     * @param bool                     $editable
      * @param null|Alaress_Date_Format $expires
+     * @param string                   $theme     Sets the theme to use when viewing the document
+     * @param bool                     $showSave  Hides the save (download) button
+     * @param bool                     $showPrint Hides the print button
+     * @param bool                     $showHelp  Hides the help button
+     * @param bool                     $showMenu  Hides the menu button
      * @return Session
-     * @throws  Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\EmptyApiKeyException If API key not configured
      */
-    public function viewSession(string $documentId, User $user, Alaress_Date_Format $expires = null): Session
-    {
+    public function viewSession(
+        string $documentId,
+        User $user,
+        bool $editable = true,
+        Alaress_Date_Format $expires = null,
+        string $theme = IConnector::SESSION_THEME_LIGHT,
+        bool $showSave = true,
+        bool $showPrint = true,
+        bool $showHelp = true,
+        bool $showMenu = true
+    ): Session {
         $this->assertEnabled();
         // When should the view session expire?
         if (!$expires) {
