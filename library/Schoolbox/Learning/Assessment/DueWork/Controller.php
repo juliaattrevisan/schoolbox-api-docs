@@ -668,8 +668,9 @@ class Controller extends Assessment\Controller
      * @throws ApplicationException\Exception If not accepting submissions
      * @throws MapperException\Deleted If specified Response is deleted
      * @throws MapperException If unable to create new Response object
+     * @throws \LogicException If files are not saved prior to insertion into kami upload queue
      */
-    public function postCreateResponse(Participant $participant)
+    public function postCreateResponse(Participant $participant): void
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
@@ -1053,6 +1054,7 @@ class Controller extends Assessment\Controller
      *
      * @param Collection|SubmissionFile[] $files
      * @return GenericCollection|Kami\Model[]
+     * @throws \LogicException If files have not yet been saved
      */
     private function enqueueKamiUploads(Collection $files): GenericCollection
     {
@@ -1063,8 +1065,15 @@ class Controller extends Assessment\Controller
             return $kamiModels;
         }
 
+        // Check files have been saved so Kami docs can point to them
+        $fileIds = $files->map(function (SubmissionFile $file) {
+            if (empty($file->getId())) {
+                throw new \LogicException("File '{$file->getBasename()}' has not been saved, cannot process");
+            }
+            return $file->getId();
+        });
+
         // Check if any files have already been queued for kami upload
-        $fileIds            = $files->getColumnValues('id');
         $existingKamiModels = $this->kamiMapper->findByColumn('student_submission_file_id', $fileIds);
         $existingFileIds    = $existingKamiModels->map(function (Kami\Model $kamiModel) {
             return $kamiModel->getStudentSubmissionFile()->getId();
