@@ -647,7 +647,7 @@ class Controller extends Base
                     if ($resource->getCurrentTermRestriction() == 1) {
                         $errors = array_merge_recursive(
                             $errors,
-                            $this->validateCurrentTermRestriction($thisResource, $thisStart, $thisEnd)
+                            $this->validateCurrentTermRestriction($thisEnd)
                         );
                     }
 
@@ -670,7 +670,7 @@ class Controller extends Base
                     if ($resource->getCurrentTermRestriction() == 1) {
                         $errors = array_merge_recursive(
                             $errors,
-                            $this->validateCurrentTermRestriction($thisResource, $thisStart, $thisEnd)
+                            $this->validateCurrentTermRestriction($thisEnd)
                         );
                     }
 
