@@ -625,33 +625,28 @@ class Controller extends Base
                 $this->validateTooLong($resource, $startDate, $endDate)
             );
 
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
-            );
-
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
-                if ($this->getRequest()->post['repeat_until']) {
-                    foreach ($this->getAllRecurrenceDates($resource, $startDate, $endDate) as $check) {
-                        list($resource, $thisStart, $thisEnd) = $check;
-                        $errors = array_merge_recursive(
-                            $errors,
-                            $this->validateForConflicts($resource, $thisStart, $thisEnd)
-                        );
-                    }
+                $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
+                foreach ($dateParts as $check) {
+                    list($thisResource, $thisStart, $thisEnd) = $check;
+                    $errors = array_merge_recursive(
+                        $errors,
+                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
+                    );
                 }
+
             } else {
                 // Validating an existing booking?
                 // Check each item in the series, adjusting its dates.
                 // Work with a fresh copy of the booking, because it can get
                 // messed with.
 
-                foreach ($this->getAllRelatedBookingDates($existingBooking, $startDate, $endDate) as $check) {
-                    list($resource, $thisStart, $thisEnd, $thisBooking) = $check;
+                foreach ($this->getExistingSeries($existingBooking, $startDate, $endDate) as $check) {
+                    list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
                     $errors = array_merge_recursive(
                         $errors,
-                        $this->validateForConflicts($resource, $thisStart, $thisEnd, $thisBooking)
+                        $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
                     );
                 }
             }
@@ -1380,11 +1375,11 @@ class Controller extends Base
         &$isTimeChanged
     ) {
         // Get the date and time changes.
-        $startDelta = Interval::createFromDateTimeDifference(
+        $startDelta    = Interval::createFromDateTimeDifference(
             $item->getEvent()->getStartDateTime()->getDateTimeObject(),
             $startDate
         );
-        $endDelta   = Interval::createFromDateTimeDifference(
+        $endDelta      = Interval::createFromDateTimeDifference(
             $item->getEvent()->getEndDateTime()->getDateTimeObject(),
             $endDate
         );
@@ -1486,48 +1481,53 @@ class Controller extends Base
      *
      * @return array
      */
-    protected function getAllRecurrenceDates(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    protected function getNewBookingSeries(Item\Model $resource, DateTime $startDate, DateTime $endDate)
     {
         $dateParts = [];
-
-        // Check each in series (if there is one)
         $series = [];
 
-        try {
-            $repeatUntil = Alaress_Date_Format::newLocalShort(
-                $this->getRequest()->post['repeat_until']
-            );
-        } catch (\Exception $e) {
-            $repeatUntil = null;
+        // Get all booking dates for the current resource
+        if ($this->getRequest()->post['repeat_until']) {
+            try {
+                $repeatUntil = Alaress_Date_Format::newLocalShort(
+                    $this->getRequest()->post['repeat_until']
+                );
+            } catch (\Exception $e) {
+                $repeatUntil = null;
+            }
+            if ($repeatUntil instanceof Alaress_Date_Format) {
+                $series = $this->getRecurrencePeriod(
+                    $startDate,
+                    $this->request->post['repeat'],
+                    $repeatUntil->getDateTimeObject(),
+                    $this->request->post['timetable']['campus']
+                );
+            }
+            $difference = $startDate->diff($endDate);
+            foreach ($series as $occurenceStart) {
+                $occurenceEnd = clone $occurenceStart;
+                $occurenceEnd->add($difference);
+                // Check all of $occurenceStart and $occurenceEnd
+                $dateParts[] = [$resource, $occurenceStart, $occurenceEnd];
+            }
         }
-        if ($repeatUntil instanceof Alaress_Date_Format) {
-            $series = $this->getRecurrencePeriod(
-                $startDate,
-                $this->request->post['repeat'],
-                $repeatUntil->getDateTimeObject(),
-                $this->request->post['timetable']['campus']
-            );
-        }
-        $difference = $startDate->diff($endDate);
-        foreach ($series as $occurenceStart) {
-            $occurenceEnd = clone $occurenceStart;
-            $occurenceEnd->add($difference);
-            // Check all of $occurenceStart and $occurenceEnd
-            $dateParts[] = [$resource, $occurenceStart, $occurenceEnd];
+        else {
+            $dateParts[] = [$resource, $startDate, $endDate];
         }
 
-        // Get dates for related items too
+        // Get all booking dates for all the related resources
         $relatedItems = $this->getRelatedItemsFromForm();
         foreach ($resource->getRelatedResourceList() as $relatedResource) {
             if (array_key_exists($relatedResource->getId(), $relatedItems)) {
-                $dateParts[] = [$relatedResource, $startDate, $endDate];
-
-                foreach ($series as $occurenceStart) {
-                    $occurenceEnd = clone $occurenceStart;
-                    $occurenceEnd->add($difference);
-
-                    // Check all of $occurenceStart and $occurenceEnd
-                    $dateParts[] = [$resource, $occurenceStart, $occurenceEnd];
+                if (!empty($series)) {
+                    foreach ($series as $occurenceStart) {
+                        $occurenceEnd = clone $occurenceStart;
+                        $occurenceEnd->add($difference);
+                        $dateParts[] = [$relatedResource, $occurenceStart, $occurenceEnd];
+                    }
+                }
+                else {
+                    $dateParts[] = [$relatedResource, $startDate, $endDate];
                 }
             }
         }
@@ -1545,7 +1545,7 @@ class Controller extends Base
      * @return array
      * @throws MapperException
      */
-    protected function getAllRelatedBookingDates(Model $existingBooking, DateTime $startDate, DateTime $endDate)
+    protected function getExistingSeries(Model $existingBooking, DateTime $startDate, DateTime $endDate)
     {
         $isTimeChanged = false;
         $series        = $this->getUpdatedSeries(
@@ -1560,7 +1560,10 @@ class Controller extends Base
         $dateParts = [];
         foreach ($series as $thisBooking) {
             if (!($thisBooking->isDeleted())) {
-                $dateParts[] = [$thisBooking->getResource(), $startDate, $endDate, $thisBooking];
+                $dateParts[] = [$thisBooking->getResource(),
+                                $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                                $thisBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                                $thisBooking];
             }
         }
 
