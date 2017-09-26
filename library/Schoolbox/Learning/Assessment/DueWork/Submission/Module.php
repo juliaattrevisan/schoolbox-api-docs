@@ -373,6 +373,8 @@ class Module extends BaseModule
 
 
     /**
+     * Intentionally does not check the status of the Kami upload. The controller handles that.
+     *
      * @param array $params
      * @return array
      * @throws MapperException\Deleted If the assessment the kami belongs to is deleted
@@ -383,11 +385,7 @@ class Module extends BaseModule
      */
     private function preloadKami(array $params): array
     {
-        $kami = $this->getKamiMapper()->findById($params['kamiId']);
-        if(!$kami->isStatusDone()){
-            throw new NotFound("Kami document (id: {$kami->getId()}) has not finished processing");
-        }
-
+        $kami           = $this->getKamiMapper()->findById($params['kamiId']);
         $submissionFile = $kami->getStudentSubmissionFile();
         $submission     = $this->getSubmissionMapper()->findById($submissionFile->getSubmission()->getId());
         $assessment     = $this->getAssessmentMapperProxy()->findByDueWorkId($submission->getSubmissionBox()->getId());
