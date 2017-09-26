@@ -10,7 +10,6 @@
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Jitter\Jitter;
-use Alaress\Random\FloatGenerator;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -19,6 +18,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Resource\Storage;
+use Alaress\Random;
 
 const DEFAULT_BATCH_SIZE           = 100;
 const DEFAULT_MAX_ATTEMPTS         = 3;
@@ -145,12 +145,12 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
     $client        = $failureRate === 0.0
         ? new GuzzleHttp\Client()
-        : new Kami\Test\UnreliableClient($failureRate);
+        : new Kami\Test\UnreliableClient($failureRate, new Random\FloatGenerator());
 
     $uploader = new Kami\Uploader(
         $dryRun,
         $dryRun ? new Kami\MockConnector($client) : new Kami\Connector($config, $client),
-        new Jitter(new FloatGenerator(), $maxAttempts, $baseBackOff),
+        new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff),
         $kamiMapper,
         $log
     );

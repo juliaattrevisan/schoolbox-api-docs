@@ -12,30 +12,38 @@ use GuzzleHttp\Client;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Learning\InlineGrader\Kami\Exception\SimulatedNetworkFailureException;
+use Alaress\Random;
 
 class UnreliableClient extends Client
 {
 
     /**
-     * Proportion of time (0 to 1.0) that the network fails
+     * Proportion of time (0.0 to 1.0) that the network fails
      *
      * @var float
      */
     private $failureRate;
 
+    /**
+     * @var  Random\IGenerator
+     */
+    private $generator;
+
 
     /**
-     * @param array $config
-     * @param float $failureRate
+     * @param float             $failureRate
+     * @param Random\IGenerator $generator
+     * @param array             $config
      * @throws \InvalidArgumentException If specified failure rate is < 0 or > 1.0
      */
-    public function __construct(float $failureRate, array $config = [])
+    public function __construct(float $failureRate, Random\IGenerator $generator, array $config = [])
     {
         parent::__construct($config);
         if ($failureRate < 0 || $failureRate > 1.0) {
             throw new \InvalidArgumentException("Failure rate must be between 0 and 1.0 inclusive: {$failureRate}");
         }
         $this->failureRate = $failureRate;
+        $this->generator = $generator;
     }
 
 
@@ -48,7 +56,7 @@ class UnreliableClient extends Client
     public function send(RequestInterface $request, array $options = []): ResponseInterface
     {
         // Possibly simulate a network failure
-        if (random_int(0, PHP_INT_MAX) <= $this->failureRate * PHP_INT_MAX) {
+        if (0.0 !== $this->failureRate && $this->generator->generate() <= $this->failureRate) {
             throw new SimulatedNetworkFailureException('Simulated network failure', $request);
         }
         return parent::send($request, $options);
