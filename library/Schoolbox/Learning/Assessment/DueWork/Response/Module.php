@@ -51,6 +51,9 @@ class Module extends BaseModule
      * @throws \InvalidArgumentException If mapper class not found
      * @throws MapperException\Deleted If a deleted assessment is requested
      * @throws \UnexpectedValueException If the kami files owner is not a participant
+     * @throws \Aura\Di\Exception\ServiceNotFound If unable to find service in DI
+     * @throws NotFound If the requested Kami Doc has not finished processing
+     * @throws OutOfBoundsException
      */
     protected function registerRoutes()
     {
@@ -89,9 +92,22 @@ class Module extends BaseModule
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
 
         // For now, same auth rules as crocodoc.
-        $canAccessKami = $canAccessCrocodoc;
+        $canAccessKami = new Rule\All(
+            $canAccessCrocodoc,
+            new Kami\Authentication\IsEnabled($this->getKamiConnector())
+        );
         $this->register('GET', '/kami/{kamiId:\d+}' . '',        'getKamiView',      $canAccessKami, $preloadKami);
         $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExportUrl', $canAccessKami, $preloadKami);
+    }
+
+
+    /**
+     * @return object|Kami\IConnector
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function getKamiConnector()
+    {
+        return $this->getInjector()->get('kamiConnector');
     }
 
 

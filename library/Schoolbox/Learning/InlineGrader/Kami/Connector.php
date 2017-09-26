@@ -289,6 +289,7 @@ class Connector implements IConnector
      * @return Export
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If document does not exist in Kami
      */
     public function createAnnotatedExport(string $documentId): Export
     {
@@ -303,6 +304,7 @@ class Connector implements IConnector
      * @return Export
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If document does not exist in Kami
      */
     public function createInlineExport(string $documentId): Export
     {
@@ -317,6 +319,7 @@ class Connector implements IConnector
      * @return Export
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If export does not exist in Kami
      */
     public function getExport(string $exportId): Export
     {
@@ -333,19 +336,23 @@ class Connector implements IConnector
      * @return Export
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If document does not exist in Kami
      */
     private function createExport(string $documentId, string $exportType): Export
     {
         $this->assertEnabled();
         $options  = [
             RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
-            RequestOptions::BODY    => \GuzzleHttp\json_encode([
+            RequestOptions::BODY    => json_encode([
                 'document_identifier' => $documentId,
                 'export_type'         => $exportType,
             ]),
         ];
         $request  = new Request('POST', self::BASE_URI . 'embed/exports');
         $response = $this->client->send($request, $this->getOptions($options));
+        if($this->isValidNotFound($response)){
+            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+        }
         return $this->buildExport($this->decodeResponseContent($response->getBody()));
     }
 
