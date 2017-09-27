@@ -113,6 +113,10 @@
     section {
         margin: 0;
     }
+    // Allow wide tables to scroll in textbox
+    .content{
+        overflow-x: auto;
+    }
 }
 
 /* Dashboard, Homepage: Calendar Events
