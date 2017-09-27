@@ -1,8 +1,9 @@
 {#
-    Display a responsive Kami iframe.
+    Display a responsive iframe.
 
     Data:
-        session    Kami\Session
+        'id'       string       The HTML id attribute of the iframe
+        'src'      string       The source URL to load into the iframe
 #}
 <script src="/javascript/shared/jquery.responsive-iframe.js"></script>
 <script type="text/javascript">
@@ -20,8 +21,8 @@
          * Resize the iFrame viewport
          */
         function resizeViewport() {
-            $('#kami-viewport').height($(window).height() * 0.75);
+            $('#{{ id }}').height($(window).height() * 0.75);
         }
     });
 </script>
-<iframe id="kami-viewport" src="{{ session.viewerUrl }}" frameborder="0"></iframe>
+<iframe class="" id="{{ id }}" src="{{ src }}" frameborder="0"></iframe>
