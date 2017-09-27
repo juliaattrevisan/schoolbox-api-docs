@@ -32,10 +32,15 @@
  */
 
 use \Alaress\Lumberjack\Logger;
+use External\Liss\Helper\PublishDailyData as PublishDailyDataHelper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
-use Schoolbox\UserMapper;
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventRelations;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -45,8 +50,9 @@ use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-
+use Schoolbox\UserMapper;
 
 class External_Liss_Server
 {
@@ -59,6 +65,16 @@ class External_Liss_Server
      * Log message when authentication fails
      */
     const AUTHENTICATION_FAILED = 'Authentication Failed';
+
+    /**
+     * Log message when owner can't be found
+     */
+    const MISSING_CALENDAR_OWNER = 'External Liss Calendar Owner not found';
+
+    /**
+     * Log message when no event types can be found
+     */
+    const NO_EVENT_TYPES = 'Cannot find a default event type';
 
     /**
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
@@ -600,7 +616,7 @@ class External_Liss_Server
 
                 /** @var TimetablePeriod $timetablePeriod */
                 $timetablePeriod = $timetablePeriodMapper->createModel();
-                $timetablePeriod->setCycle($cycle->getId());
+                $timetablePeriod->setCycle($cycle);
                 $timetablePeriod->setTitle((string)$struct['Period']->me['string']);
                 $timetablePeriod->setDay($dayNumber);
                 $timetablePeriod->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'h:i'));
@@ -642,6 +658,7 @@ class External_Liss_Server
         return self::generateResponse(self::AUTHENTICATION_FAILED);
     }
 
+
     /**
      * publish daily timetable and room changes to schoolbox
      *
@@ -650,18 +667,152 @@ class External_Liss_Server
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws PDOException
      */
     static public function publishDailyData(xmlrpcmsg $message)
     {
         $log = self::log();
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $configLoader = new ConfigLoader();
+        $helper = new PublishDailyDataHelper($configLoader);
+        $eventMapper = EventMapper::getInstance();
+        $eventTypeMapper = EventTypeMapper::getInstance();
+        $folderMapper = FolderMapper::getInstance();
+        $userMapper = UserMapper::getInstance();
+
+        /* Owner set in config
+         */
+        try {
+            $author = $userMapper->findById($configLoader->get('external_liss_calendar_owner'));
+
+        } catch (MapperException $e) {
+            $log->critical(self::MISSING_CALENDAR_OWNER);
+            return self::generateResponse(self::MISSING_CALENDAR_OWNER);
+        }
+
+        /* Have an owner - continue normally
+         */
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log, $configLoader);
 
         if ($authenticator->isAuthenticated()) {
-            $allData = $message->params[3]->me['array'];
+            /* Delete all previous versions of events using the same source
+             */
+            $helper->deleteEventsFromSource();
 
-            /* Log data for use */
-            $log->info("publishDailyData: " . json_encode($allData));
+            /* Set a default event type for now - use the first one in the list
+             */
+            /** @var EventType $eventType */
+            $allEventTypes = $eventTypeMapper->findAll([
+                'limit' => 1,
+                'id' => 'ASC'
+            ]);
+
+            if ($allEventTypes->count()) {
+                $eventType = $allEventTypes->first();
+
+            } else {
+                $log->critical(self::NO_EVENT_TYPES);
+                return self::generateResponse(self::NO_EVENT_TYPES);
+            }
+
+            /* Save it specifically for this user without mass reset which
+             * is what EventRelations normally does - we only need access
+             * to specific operations for saving personal/folder events
+             */
+            $eventRelations = new EventRelations(null, null, null);
+
+            /* Set up all events in a nicer format
+             */
+            $allEvents = $helper->reformatAllEvents($message->params[3]->me['array']);
+
+            /* Now do it in a way that makes sense
+             * Map everything together and persist it to the db
+             */
+            $skipCount = 0;
+            $total = count($allEvents);
+
+            foreach ($allEvents as $currentEvent) {
+                /* Skip events that don't have a type
+                 */
+                if (!strlen($currentEvent['type'])) {
+                    $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): no type");
+                    $skipCount++;
+
+                    continue;
+                }
+
+                /* Otherwise continue to process under the guise that it will be either a
+                 * homepage (folder) event, or a personal event
+                 */
+
+                /** @var Event $event */
+                $event = $eventMapper->createModel();
+                $event->setOwner($author);
+                $event->setAuthor($author);
+                $event->setType($eventType);
+                $event->setLocation($currentEvent['rooms']);
+                $event->setTitle($currentEvent['className']);
+                $event->setDetail($currentEvent['detail']);
+                $event->setStartDateTime($currentEvent['startDateTime']);
+                $event->setEndDateTime($currentEvent['endDateTime']);
+
+                /* Decide between homepage events and personal events
+                 * Determine which one based on the presence/content of classCode
+                 *
+                 * We don't do Campus events in Edval (no way to identify)
+                 */
+                if (strlen($currentEvent['classCode'])) {
+                    /* Skip if we can't find a corresponding folder
+                     */
+                    try {
+                        $folder = $folderMapper->findByCode($currentEvent['classCode']);
+                    } catch (MapperException $e) {
+                        $log->info(sprintf('Skipping %s (%s): cannot find corresponding Schoolbox folder for %s',
+                            $event->getTitle(), $currentEvent['edvalGuid'], $currentEvent['classCode'])
+                        );
+                        $skipCount++;
+
+                        continue;
+                    }
+
+                    $event->setAccess(Event::ACCESS_GROUP);
+                    $eventMapper->save($event);
+
+                    $eventRelations->saveFolderRelation($event, [$folder->getId()]);
+                    $helper->saveEventSource($event, $currentEvent['edvalGuid']);
+                } else {
+                    $event->setAccess(Event::ACCESS_PERSONAL);
+
+                    /* Teachers and Students can be treated synonymously
+                     */
+                    $combined = array_merge($currentEvent['students'], $currentEvent['teacherIds']);
+
+                    foreach ($combined as $currentExternalId) {
+                        try {
+                            $user = $userMapper->findByExternalId($currentExternalId);
+                            $event->setOwner($user);
+                            $eventMapper->save($event);
+
+                            $eventRelations->savePersonalRelation($event);
+                            $helper->saveEventSource($event, $currentEvent['edvalGuid']);
+                        } catch (MapperException $e) {
+                            $log->info(sprintf('Skipping %s (%s) for user %s: no Schoolbox account found',
+                                $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId
+                            ));
+                        }
+                    }
+                }
+            }
+
+            /* Log diagnostics
+             */
+            $processed = $total-$skipCount;
+
+            $log->info("Total events: {$total}");
+            $log->info("Processed: {$processed}");
+            $log->info("Skipped: {$skipCount}");
 
             return self::generateResponse('Daily Data Imported');
         }

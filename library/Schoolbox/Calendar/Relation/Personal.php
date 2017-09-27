@@ -17,16 +17,16 @@ class Personal
     /**
      * eventId to which this sid belongs
      *
-     * @var null
+     * @var int
      */
-    private $eventId = null;
+    private $eventId;
 
     /**
      * Sid value
      *
-     * @var null
+     * @var int
      */
-    private $userId = null;
+    private $userId;
 
     /**
      * Constructor
@@ -41,7 +41,7 @@ class Personal
     /**
      * Set event id
      *
-     * @param null $eventId
+     * @param int $eventId
      */
     public function setEventId($eventId)
     {
@@ -51,7 +51,7 @@ class Personal
     /**
      * Get event id
      *
-     * @return null
+     * @return int
      */
     public function getEventId()
     {
@@ -61,7 +61,7 @@ class Personal
     /**
      * Set user id
      *
-     * @param null $userId
+     * @param int $userId
      */
     public function setUserId($userId)
     {
@@ -71,7 +71,7 @@ class Personal
     /**
      * Get user id
      *
-     * @return null
+     * @return int
      */
     public function getUserId()
     {

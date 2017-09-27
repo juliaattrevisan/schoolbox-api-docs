@@ -138,12 +138,14 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
             try {
                 /** @var Event $event */
                 $event = $eventMapper->findById($currentEventId);
+
                 /* Purge existing sids
                  */
-                $userRelationMapper->cleanse($event);
-                $categoryRelationMapper->cleanse($event);
-                $roleRelationMapper->cleanse($event);
-                $campusRelationMapper->cleanse($event);
+                $userRelationMapper->deleteByColumn('event_id', $event->getId());
+                $categoryRelationMapper->deleteByColumn('event_id', $event->getId());
+                $roleRelationMapper->deleteByColumn('event_id', $event->getId());
+                $campusRelationMapper->deleteByColumn('event_id', $event->getId());
+
                 /* Purge event
                  */
                 $eventMapper->delete($event);
