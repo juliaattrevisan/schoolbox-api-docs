@@ -1,1 +1,1 @@
-UPDATE schoolbox.assessment SET default_open_span = null WHERE default_open_span < 0;
+UPDATE `assessment` SET `default_open_span` = null WHERE `default_open_span` < 0;
