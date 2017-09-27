@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Blog\Eportfolio\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Schoolbox\Blog\Eportfolio\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Blog\Eportfolio\Post;
@@ -187,6 +186,7 @@ class Notifier extends AbstractModuleNotifier
     {
         $post  = $this->postMapper->findById($comment->getBlog()->getId());
         $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
+        $post->getPage()->setOwner($owner);
 
         $audience = $this->userMapper->createCollection();
 
@@ -249,14 +249,16 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $comment
      * @param User  $effector
      * @return Envelope
-     * @throws OutOfBoundsException     If severity is not set
+     * @throws BaseMapper\Exception
      * @throws InvalidArgumentException If a required property was not set
+     * @throws OutOfBoundsException If severity is not set
      */
     public function notifyParentFollowed(Model $comment, User $effector): Envelope
     {
-        $post           = $this->postMapper->findById($comment->getBlog()->getId());
-        $audience       = $this->userMapper->createCollection();
+        $post = $this->postMapper->findById($comment->getBlog()->getId());
+        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents());
 
+        $audience = $this->userMapper->createCollection();
         foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT) as $parent) {
             if ($this->access->userCanView($post, $parent)) {
                 $audience[$parent->getId()] = $parent;

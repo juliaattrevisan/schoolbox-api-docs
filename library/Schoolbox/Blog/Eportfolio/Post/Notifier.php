@@ -155,12 +155,12 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentPosted(Model $post, User $effector): Envelope
     {
-        $page  = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner = $this->userMapper->findById($page->getOwner()->getId())->loadParents();
-
+        // Hydrate
+        $post->setPage($this->pageMapper->findById($post->getPage()->getPageId()));
+        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents());
         $audience = $this->userMapper->createCollection();
 
-        foreach ($owner->getParents() as $parent) {
+        foreach ($post->getPage()->getOwner()->getParents() as $parent) {
             if ($this->access->userCanView($post, $parent)) {
                 $audience[$parent->getId()] = $parent;
             }
