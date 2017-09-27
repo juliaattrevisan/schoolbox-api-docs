@@ -4,6 +4,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
@@ -17,6 +18,8 @@ use Alaress_Date_Format;
 class Document
 {
 
+    // Intentionally distinct from the Kami Model definitions to ensure changes to
+    // Kami's API do not require changes to Schoolbox's schema.
     const FILE_STATUS_PROCESSING = 'processing';
     const FILE_STATUS_DONE = 'done';
     const FILE_STATUS_ERROR = 'error';
@@ -44,8 +47,13 @@ class Document
      * @param null|string         $fileErrorMessage
      * @param Alaress_Date_Format $createdAt
      */
-    public function __construct($id, $name, $fileStatus, $fileErrorMessage, Alaress_Date_Format $createdAt)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        string $fileStatus,
+        ?string $fileErrorMessage,
+        Alaress_Date_Format $createdAt
+    ) {
         $this->id               = $id;
         $this->name             = $name;
         $this->fileStatus       = $fileStatus;
@@ -57,7 +65,7 @@ class Document
     /**
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -66,7 +74,7 @@ class Document
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -75,7 +83,7 @@ class Document
     /**
      * @return string
      */
-    public function getFileStatus()
+    public function getFileStatus(): string
     {
         return $this->fileStatus;
     }
@@ -84,7 +92,7 @@ class Document
     /**
      * @return bool
      */
-    public function isProcessing()
+    public function isProcessing(): bool
     {
         return self::FILE_STATUS_PROCESSING === $this->fileStatus;
     }
@@ -93,7 +101,7 @@ class Document
     /**
      * @return bool
      */
-    public function isDone()
+    public function isDone(): bool
     {
         return self::FILE_STATUS_DONE === $this->fileStatus;
     }
@@ -102,7 +110,7 @@ class Document
     /**
      * @return bool
      */
-    public function isError()
+    public function isError(): bool
     {
         return self::FILE_STATUS_ERROR === $this->fileStatus;
     }
@@ -113,7 +121,7 @@ class Document
      *
      * @return null|string
      */
-    public function getFileErrorMessage()
+    public function getFileErrorMessage(): ?string
     {
         return $this->fileErrorMessage;
     }
@@ -122,7 +130,7 @@ class Document
     /**
      * @return Alaress_Date_Format
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): Alaress_Date_Format
     {
         return $this->createdAt;
     }

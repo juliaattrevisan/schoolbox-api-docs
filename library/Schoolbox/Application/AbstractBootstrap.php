@@ -25,6 +25,7 @@ use Alaress\Web\Output;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
+use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\ICommunityPortal;
@@ -97,6 +98,7 @@ use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
 use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
 use Twig_Environment;
+use Schoolbox\Learning\InlineGrader\Kami;
 
 abstract class AbstractBootstrap implements BootstrapInterface
 {
@@ -743,6 +745,11 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 }
             )
         );
+
+        $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
+            'config' => $di->get('config'),
+            'client' => $di->lazyNew(GuzzleHttp\Client::class),
+        ]));
 
         // injectable module auth rules
         $di->set('rule:isLoggedIn',  $di->lazyNew(Rule\IsLoggedIn::class));

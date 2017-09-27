@@ -50,6 +50,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Learning\InlineGrader\Kami;
 
 class Module extends BaseModule
 {
@@ -306,6 +307,8 @@ class Module extends BaseModule
         );
         $dc['participantMapper'] = $injector->lazyNew(ParticipantDataSource::class);
         $dc['submissionFileMapper'] = $injector->lazyNew(SingleFile\Mapper::class);
+        $dc['kamiConnector'] = $injector->lazyGet('kamiConnector');
+        $dc['kamiMapper'] = $this->getMapperFactory()->getLazy(Kami\Mapper::class);
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];

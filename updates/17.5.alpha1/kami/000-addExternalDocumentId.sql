@@ -8,7 +8,7 @@ CREATE TABLE `student_submission_file_kami` (
   `id` INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `student_submission_file_id` INT(11) UNSIGNED NOT NULL,
   `kami_document_id` CHAR(32) NULL,
-  `status` ENUM ('uploading','processing', 'done', 'error') NOT NULL,
+  `status` ENUM ('pending', 'uploading', 'failed', 'processing', 'done', 'error') NOT NULL,
   `error_message` VARCHAR(2048) NULL,
   `kami_created_at` DATETIME NULL,
   `created_at` DATETIME NOT NULL,

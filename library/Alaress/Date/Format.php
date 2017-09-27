@@ -48,6 +48,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 
     const DATABASE_FORMAT = 'Y-m-d H:i:s';
     const DATABASE_FORMAT_MS = 'Y-m-d H:i:s.u';
+    const FORMAT_DATETIME_UTC = 'Y-m-d\TH:i:s.u\Z';  // eg '2015-09-22T23:22:12.798Z'
     const DATABASE_DATE_FORMAT = 'Y-m-d';
     const DATABASE_TIME_FORMAT = 'H:i:s';
     const TIMESTAMP = 'U';

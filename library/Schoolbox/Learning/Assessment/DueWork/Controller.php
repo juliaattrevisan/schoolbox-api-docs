@@ -16,6 +16,7 @@ use DueWork_ErrorMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
@@ -28,7 +29,6 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
@@ -45,6 +45,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Application\Exception as ApplicationException;
+use Schoolbox\Learning\InlineGrader\Kami;
 
 class Controller extends Assessment\Controller
 {
@@ -63,6 +64,12 @@ class Controller extends Assessment\Controller
     /** @var SingleFile\Mapper */
     private $submissionFileMapper;
 
+    /** @var Kami\Connector  */
+    private $kamiConnector;
+
+    /** @var Kami\Mapper  */
+    private $kamiMapper;
+
     /**
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
@@ -77,6 +84,8 @@ class Controller extends Assessment\Controller
      * @param ParticipantMapper             $participantMapper
      * @param Term\Mapper                   $termMapper
      * @param SingleFile\Mapper             $submissionFileMapper
+     * @param Kami\Connector                $kamiConnector
+     * @param Kami\Mapper                   $kamiMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -91,7 +100,9 @@ class Controller extends Assessment\Controller
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper,
         Term\Mapper $termMapper,
-        SingleFile\Mapper $submissionFileMapper
+        SingleFile\Mapper $submissionFileMapper,
+        Kami\Connector $kamiConnector,
+        Kami\Mapper $kamiMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $workTypeMapper, $access, $transactor, $bakery, $termMapper);
         $this->resultSetMapper       = $resultSetMapper;
@@ -99,6 +110,8 @@ class Controller extends Assessment\Controller
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
         $this->participantMapper     = $participantMapper;
         $this->submissionFileMapper  = $submissionFileMapper;
+        $this->kamiConnector         = $kamiConnector;
+        $this->kamiMapper            = $kamiMapper;
     }
 
     /**
@@ -655,8 +668,9 @@ class Controller extends Assessment\Controller
      * @throws ApplicationException\Exception If not accepting submissions
      * @throws MapperException\Deleted If specified Response is deleted
      * @throws MapperException If unable to create new Response object
+     * @throws \LogicException If files are not saved prior to insertion into kami upload queue
      */
-    public function postCreateResponse(Participant $participant)
+    public function postCreateResponse(Participant $participant): void
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
@@ -753,6 +767,12 @@ class Controller extends Assessment\Controller
         /* Do the actual saving
          */
         $this->getDueWorkResponseMapper()->save($response);
+
+        // If not a draft, check if any files should be uploaded to Kami
+        if ($isFinal) {
+            $this->enqueueKamiUploads($response->getAllFiles());
+        }
+
 
         /* Save stubble record and send each file in the Submission to Plagscan
          * if the Submission was saved successfully
@@ -1024,6 +1044,63 @@ class Controller extends Assessment\Controller
         $this->getResponse()->status->setCode(204);
         $this->getResponse()->content->set($this->buildJsonOutput(null));
         return;
+    }
+
+
+    /**
+     * Enqueue any eligible files for upload to Kami.
+     *
+     * Must be called *after* the files are saved to ensure their IDs exist
+     *
+     * @param Collection|SubmissionFile[] $files
+     * @return GenericCollection|Kami\Model[]
+     * @throws \LogicException If files have not yet been saved
+     */
+    private function enqueueKamiUploads(Collection $files): GenericCollection
+    {
+        $kamiModels = $this->kamiMapper->createCollection();
+
+        // Short-circuit if Kami is not enabled
+        if (!$this->kamiConnector->isEnabled()) {
+            return $kamiModels;
+        }
+
+        // Check files have been saved so Kami docs can point to them
+        $fileIds = $files->map(function (SubmissionFile $file) {
+            if (empty($file->getId())) {
+                throw new \LogicException("File '{$file->getBasename()}' has not been saved, cannot process");
+            }
+            return $file->getId();
+        });
+
+        // Check if any files have already been queued for kami upload
+        $existingKamiModels = $this->kamiMapper->findByColumn('student_submission_file_id', $fileIds);
+        $existingFileIds    = $existingKamiModels->map(function (Kami\Model $kamiModel) {
+            return $kamiModel->getStudentSubmissionFile()->getId();
+        })->getAll();
+        $existingFileIds    = array_combine($existingFileIds, $existingFileIds);
+
+        foreach ($files as $file) {
+            if ($file->getEditableInline()) {
+                // For now, we ignore the WYSIWYG editor contents.
+                continue;
+            }
+            if (array_key_exists($file->getId(), $existingFileIds)) {
+                // Don't re-enqueue if already queued
+                continue;
+            }
+            if (!array_key_exists(strtolower($file->getExtension()), Kami\Model::ALLOWED_FILE_TYPES)) {
+                // Don't enqueue if extension not eligible for Kami
+                continue;
+            }
+            // File is eligible, and not yet queued.
+            $kamiModel = $this->kamiMapper->createModel()
+                                          ->setStudentSubmissionFile($file)
+                                          ->setStatus(Kami\Model::STATUS_PENDING);
+            $this->kamiMapper->save($kamiModel);
+            $kamiModels[$kamiModel->getId()] = $kamiModel;
+        }
+        return $kamiModels;
     }
 
     /* Getters/Setters
