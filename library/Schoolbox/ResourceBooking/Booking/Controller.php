@@ -632,11 +632,6 @@ class Controller extends Base
                 $this->validateTooLong($resource, $startDate, $endDate)
             );
 
-            $errors = array_merge_recursive(
-                $errors,
-                $this->validateForConflicts($resource, $startDate, $endDate, $existingBooking)
-            );
-
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
                 $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
@@ -866,6 +861,8 @@ class Controller extends Base
      * Validates if booking needs to be within the current term
      *
      * @param DateTime $endDate
+     * 
+     * @return array
      */
     protected function validateCurrentTermRestriction(DateTime $endDate)
     {
