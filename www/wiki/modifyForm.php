@@ -169,5 +169,5 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 }
 
 function is_ascii($str) {
-    return (bool) mb_check_encoding($str, 'ASCII');
+    return mb_check_encoding($str, 'ASCII');
 }

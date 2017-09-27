@@ -67,7 +67,6 @@ if (is_numeric($this->arg[0])) {
         ]
     ]);
 }
-
 elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
     /* Check permission
      *
