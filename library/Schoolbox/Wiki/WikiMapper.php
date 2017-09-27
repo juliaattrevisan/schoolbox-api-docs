@@ -63,11 +63,7 @@ class WikiMapper extends Mapper implements FeedableMapperInterface {
 			'type'       => self::TYPE_DATETIME
 		));
 
-		$this->hasMap(array(
-			'column'     => 'deleted',
-			'property'   => 'deleted',
-			'type'       => self::TYPE_BOOL_ENUM
-		));
+		$this->uses('deleted', self::TYPE_BOOL_ENUM, self::COLUMN_SOFTDELETE);
 
 		$this->hasMap(array(
 			'column'     => 'locked',
