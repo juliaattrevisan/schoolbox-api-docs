@@ -10,9 +10,11 @@
 namespace Schoolbox\Wiki;
 
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 
-class Wiki {
+class Wiki implements ISoftDeletable
+{
 
 	/** @var int */
 	protected $id;
@@ -144,7 +146,18 @@ class Wiki {
 	}
 
 
-	/**
+    /**
+     * Is this object deleted?
+     *
+     * @return bool
+     */
+	public function isDeleted()
+    {
+        return $this->deleted;
+    }
+
+
+    /**
 	 * @param bool $locked
 	 * @return self
 	 */
