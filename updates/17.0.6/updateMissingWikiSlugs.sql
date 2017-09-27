@@ -1,0 +1,1 @@
+UPDATE `wiki` SET `slug` = `wikiID` WHERE (`slug` = "" OR `slug` IS NULL);
