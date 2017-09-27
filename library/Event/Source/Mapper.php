@@ -27,7 +27,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('event_id', EventMapper::class, 'id', null, null, 'event', 'event');
         $this->uses('source_name', self::TYPE_STRING);
-        $this->uses('guid', self::TYPE_STRING);
+        $this->uses('edval_guid', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

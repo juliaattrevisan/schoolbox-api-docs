@@ -40,7 +40,7 @@ class Model implements ISoftDeletable
      *
      * @var string
      */
-    private $guid;
+    private $edvalGuid;
 
 
     /**
@@ -86,19 +86,19 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getGuid()
+    public function getEdvalGuid()
     {
-        return $this->guid;
+        return $this->edvalGuid;
     }
 
 
     /**
-     * @param string $guid
+     * @param string $edvalGuid
      * @return $this
      */
-    public function setGuid($guid)
+    public function setEdvalGuid($edvalGuid)
     {
-        $this->guid = $guid;
+        $this->edvalGuid = $edvalGuid;
         return $this;
     }
 }

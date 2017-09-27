@@ -739,7 +739,7 @@ class External_Liss_Server
                 /* Skip events that don't have a type
                  */
                 if (!strlen($currentEvent['type'])) {
-                    $log->info("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): no type");
+                    $log->info("Skipping {$currentEvent['className']} ({$currentEvent['edvalGuid']}): no type");
                     $skipCount++;
 
                     continue;
@@ -773,7 +773,7 @@ class External_Liss_Server
                         $folder = $folderMapper->findByCode($currentEvent['classCode']);
                     }
                     catch (MapperException $e) {
-                        $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
+                        $log->info("Skipping {$event->getTitle()} ({$currentEvent['edvalGuid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
                         $skipCount++;
 
                         continue;
@@ -783,7 +783,7 @@ class External_Liss_Server
                     $eventMapper->save($event);
 
                     $eventRelations->saveFolderRelation($event, [$folder->getId()]);
-                    $helper->saveEventSource($event, $currentEvent['guid']);
+                    $helper->saveEventSource($event, $currentEvent['edvalGuid']);
                 }
                 else {
                     $event->setAccess(Event::ACCESS_PERSONAL);
@@ -799,10 +799,10 @@ class External_Liss_Server
                             $eventMapper->save($event);
 
                             $eventRelations->savePersonalRelation($event);
-                            $helper->saveEventSource($event, $currentEvent['guid']);
+                            $helper->saveEventSource($event, $currentEvent['edvalGuid']);
                         }
                         catch (MapperException $e) {
-                            $log->info("Skipping {$event->getTitle()} ({$currentEvent['guid']}) for user {$currentExternalId}: no Schoolbox account found");
+                            $log->info("Skipping {$event->getTitle()} ({$currentEvent['edvalGuid']}) for user {$currentExternalId}: no Schoolbox account found");
                         }
                     }
                 }
