@@ -686,8 +686,8 @@ class External_Liss_Server
          */
         try {
             $author = $userMapper->findById($configLoader->get('external_liss_calendar_owner'));
-        }
-        catch (MapperException $e) {
+
+        } catch (MapperException $e) {
             $log->critical(self::MISSING_CALENDAR_OWNER);
             return self::generateResponse(self::MISSING_CALENDAR_OWNER);
         }
@@ -697,7 +697,6 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $log, $configLoader);
 
         if ($authenticator->isAuthenticated()) {
-
             /* Delete all previous versions of events using the same source
              */
             $helper->deleteEventsFromSource();
@@ -712,8 +711,8 @@ class External_Liss_Server
 
             if ($allEventTypes->count()) {
                 $eventType = $allEventTypes->first();
-            }
-            else {
+
+            } else {
                 $log->critical(self::NO_EVENT_TYPES);
                 return self::generateResponse(self::NO_EVENT_TYPES);
             }
@@ -735,7 +734,6 @@ class External_Liss_Server
             $total = count($allEvents);
 
             foreach ($allEvents as $currentEvent) {
-
                 /* Skip events that don't have a type
                  */
                 if (!strlen($currentEvent['type'])) {
@@ -766,14 +764,14 @@ class External_Liss_Server
                  * We don't do Campus events in Edval (no way to identify)
                  */
                 if (strlen($currentEvent['classCode'])) {
-
                     /* Skip if we can't find a corresponding folder
                      */
                     try {
                         $folder = $folderMapper->findByCode($currentEvent['classCode']);
-                    }
-                    catch (MapperException $e) {
-                        $log->info("Skipping {$event->getTitle()} ({$currentEvent['edvalGuid']}): cannot find corresponding Schoolbox folder for {$currentEvent['classCode']}");
+                    } catch (MapperException $e) {
+                        $log->info(sprintf('Skipping %s (%s): cannot find corresponding Schoolbox folder for %s',
+                            $event->getTitle(), $currentEvent['edvalGuid'], $currentEvent['classCode'])
+                        );
                         $skipCount++;
 
                         continue;
@@ -784,8 +782,7 @@ class External_Liss_Server
 
                     $eventRelations->saveFolderRelation($event, [$folder->getId()]);
                     $helper->saveEventSource($event, $currentEvent['edvalGuid']);
-                }
-                else {
+                } else {
                     $event->setAccess(Event::ACCESS_PERSONAL);
 
                     /* Teachers and Students can be treated synonymously
@@ -800,9 +797,10 @@ class External_Liss_Server
 
                             $eventRelations->savePersonalRelation($event);
                             $helper->saveEventSource($event, $currentEvent['edvalGuid']);
-                        }
-                        catch (MapperException $e) {
-                            $log->info("Skipping {$event->getTitle()} ({$currentEvent['edvalGuid']}) for user {$currentExternalId}: no Schoolbox account found");
+                        } catch (MapperException $e) {
+                            $log->info(sprintf('Skipping %s (%s) for user %s: no Schoolbox account found',
+                                $event->getTitle(), $currentEvent['edvalGuid'], $currentExternalId
+                            ));
                         }
                     }
                 }

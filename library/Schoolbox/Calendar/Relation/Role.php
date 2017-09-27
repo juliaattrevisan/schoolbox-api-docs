@@ -17,16 +17,16 @@ class Role
     /**
      * eventId to which this sid belongs
      *
-     * @var null
+     * @var int
      */
-    private $eventId = null;
+    private $eventId;
 
     /**
      * Sid value
      *
-     * @var null
+     * @var int
      */
-    private $roleId = null;
+    private $roleId;
 
     /**
      * Constructor
@@ -41,7 +41,7 @@ class Role
     /**
      * Set event id
      *
-     * @param null $eventId
+     * @param int $eventId
      */
     public function setEventId($eventId)
     {
@@ -51,7 +51,7 @@ class Role
     /**
      * Get event id
      *
-     * @return null
+     * @return int
      */
     public function getEventId()
     {
@@ -61,7 +61,7 @@ class Role
     /**
      * Set role id
      *
-     * @param null $roleId
+     * @param int $roleId
      */
     public function setRoleId($roleId)
     {
@@ -71,7 +71,7 @@ class Role
     /**
      * Get role id
      *
-     * @return null
+     * @return int
      */
     public function getRoleId()
     {

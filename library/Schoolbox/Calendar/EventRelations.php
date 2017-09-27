@@ -23,9 +23,9 @@ class EventRelations {
     /**
      * An event object, sometimes one of many in a series
      *
-     * @var null
+     * @var Event
      */
-    private $event = null;
+    private $event;
 
     /**
      * Access level, an int
@@ -37,46 +37,47 @@ class EventRelations {
     /**
      * From $_POST
      *
-     * @var array
+     * @var int[]
      */
-    private $group = array();
+    private $group = [];
 
     /**
      * From $_POST
      *
-     * @var array
+     * @var int[]
      */
-    private $roles = array();
+    private $roles = [];
 
     /**
      * An instance of PersonalMapper
      *
      * @var Relation\PersonalMapper
      */
-    private $personalMapper = null;
+    private $personalMapper;
 
     /**
      * An instance of CategoryMapper
      *
      * @var Relation\CategoryMapper
      */
-    private $categoryMapper = null;
+    private $categoryMapper;
 
     /**
      * An instance of RoleMapper
      *
      * @var Relation\RoleMapper
      */
-    private $roleMapper = null;
+    private $roleMapper;
 
     /**
      * Constructor
      *
-     * @param $level
-     * @param $group
-     * @param $roles
+     * @param int|null   $level
+     * @param int[]|null $group
+     * @param int[]|null $roles
      */
-    public function __construct($level, $group, $roles) {
+    public function __construct($level, $group, $roles)
+    {
         $this->setLevel($level);
         $this->setGroup($group);
         $this->setRoles($roles);
@@ -94,7 +95,8 @@ class EventRelations {
      * @param Event $event
      * @throws \PDOException
      */
-    public function resetRelations($event) {
+    public function resetRelations($event)
+    {
         $this->setEvent($event);
 
         /* Save new relations based on its access level
@@ -171,7 +173,8 @@ class EventRelations {
      * Purge existing sids, before inserting new ones
      * @param array $eventIds
      */
-    public function purgeAllRelations($eventIds) {
+    public function purgeAllRelations($eventIds)
+    {
         $this->getPersonalMapper()->deleteByColumn('event_id', $eventIds);
         $this->getCategoryMapper()->deleteByColumn('event_id', $eventIds);
         $this->getRoleMapper()->deleteByColumn('event_id', $eventIds);
@@ -205,7 +208,7 @@ class EventRelations {
     /**
      * Set group
      *
-     * @param array $group
+     * @param int[] $group
      * @return $this
      */
     private function setGroup($group)
@@ -217,7 +220,7 @@ class EventRelations {
     /**
      * Get group
      *
-     * @return array
+     * @return int[]
      */
     private function getGroup()
     {
@@ -249,7 +252,7 @@ class EventRelations {
     /**
      * Set roles
      *
-     * @param array $roles
+     * @param int[] $roles
      * @return $this
      */
     private function setRoles($roles)
@@ -261,7 +264,7 @@ class EventRelations {
     /**
      * Get roles
      *
-     * @return array
+     * @return int[]
      */
     private function getRoles()
     {

@@ -71,7 +71,6 @@ class Mapper extends BaseMapper
         $eventIds = $this->findEventIdsUsingSource($sourceName);
 
         if (count($eventIds)) {
-
             /* Delete relations
              */
             PersonalMapper::getInstance()->deleteByColumn('event_id', $eventIds);
