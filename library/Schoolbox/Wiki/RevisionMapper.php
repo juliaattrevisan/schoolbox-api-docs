@@ -49,6 +49,7 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
                 'join'     => 'wiki'
             )
         );
+        // TODO is the issue in here?
         $this->hasMap(
             array(
                 'column'   => 'heading',

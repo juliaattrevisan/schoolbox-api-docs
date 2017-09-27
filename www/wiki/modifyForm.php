@@ -15,10 +15,12 @@ $now = new Alaress_Date_Format(time(), 'U');
 // posting a revision - wiki may or may not exist
 if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     $heading = trim($_POST['heading']);
+
     if (strlen($heading) === 0) {
         error(2);
         exit;
     }
+
     // generate the revision object regardless of whether or not the wiki exists
     $revision = $revisionMapper->createModel()
         ->setHeading($heading)
@@ -51,10 +53,20 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
             ->setCategory($folderMapper->createModel()->setId($_POST['categoryID']))
             ->setLatestRevision(null)
             ->setCreated($now)
-            // Never set slug from form
-            ->setSlug($url->getSlug())
             ->setLocked(false)
             ->setDeleted(false);
+
+        /* If the heading contains unicode it can't be used as a slug, so we
+        use the wiki ID instead */
+        if (is_ascii($_POST['heading'])) {
+            $wiki->setSlug($url->getSlug());
+        } else {
+            /* Need to save new wiki before we can get the auto-incremented
+             * ID to use in the slug.
+             */
+            $wikiMapper->save($wiki);
+            $wiki->setSlug($wiki->getId());
+        }
 
         // Only check component's create permissions for a new wiki.
         /* First check that Allow Create is active. If it is, continue;
@@ -99,9 +111,11 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 
     // no merge conflict? ok, persist the wiki entity with the latest revision
     $wiki->setLatestRevision($revision);
+
     $wikiMapper->save($wiki);
 
     SitePage::localRedir('/wiki/' . $wiki->getCategory()->getId() . '/' . $wiki->getSlug());
+
 } elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
     // applying a reversion
     $wiki = $wikiHandler->getByID($_GET['wikiID']);
@@ -152,4 +166,8 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 } else {
     // le fail
     error(2);
+}
+
+function is_ascii($str) {
+    return (bool) mb_check_encoding($str, 'ASCII');
 }
