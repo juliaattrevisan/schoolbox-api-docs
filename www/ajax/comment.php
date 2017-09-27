@@ -129,7 +129,7 @@ else {
             if (isset($_POST['deleteComment']) && $_POST['deleteComment'] == true) {
                 if (isset($comment)) {
                     if ($cMap->softDelete($comment)) {
-                        respond(240, '');
+                        respond(204, '');
                     } else {
                         respond(410, 'Comment has already been deleted.');
                     }

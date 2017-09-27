@@ -162,6 +162,7 @@
                 <section>
                     <ul class="action-list" data-comment-list>
                         {% for comment in comments %}
+                            {% set isCommenter = comment.commenter.id == USER.id  %}
                             <li class="actions-small-2" data-id="{{ comment.id }}">
                                 <div class="list-item">
                                     <div class="small-10 card">
@@ -180,7 +181,7 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    {% if canComment %}
+                                    {% if isCommenter %}
                                         <a class="icon-delete" title="Delete" data-comment-delete></a>
                                         <a class="icon-modify" title="Modify" data-comment-modify></a>
                                     {% endif %}
