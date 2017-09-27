@@ -30,7 +30,7 @@
 
             if ($('input[name="delete[]"]:checked').length > 0) {
                 $(this).confirmDialog({
-                    text: 'Are you sure you want to remove the selected members from the group.',
+                    text: 'Are you sure you want to remove the selected members from the group?',
                     confirmEvent: function () {
                         var deleteIds = $('input[name="delete[]"]:checked').map(function() {
                             return $(this).val();
@@ -61,15 +61,15 @@
             waitingUser = $(this).closest('[data-relation="waiting-user"]');
             var label       = $('#save-label');
             if ($(this).is('[data-interaction="reject"]')) {
-                label.toastActivate({text: 'Rejecting', css: 'alert'});
+                label.toastActivate({text: 'Declining {USER_NAME}\'s request...'});
             } else {
-                label.toastActivate({text: 'Accepting'});
+                label.toastActivate({text: 'Accepting', css: 'success'});
             }
             // loading dialog
             $.get(this.href)
                     .done(function(response) {
                         // success stuff. Reload memberlist and waitlist
-                        label.toastTimeout({text: 'Done'});
+                        label.toastTimeout({text: '{USER_NAME}\'s request has been declined.', css: 'success'});
                         label.one('hide.toastTimeout', function() {
                             var $response = $(response);
                             waitingList.empty().append($response.find('#waitingList').children());
@@ -121,11 +121,10 @@
 
             // loading dialog
             if (this.value == 0) {
-                label.toastActivate({text: 'Removing', css: 'alert'});
+                label.toastActivate({text: 'Removing {USER_NAME} from group...'});
             } else {
                 label.toastActivate({text: 'Updating'});
             }
-
             // Disable all other inputs
             var data   = form.serializeArray();
             var inputs = form.find(':input').not(':disabled').prop('disabled', true);
@@ -148,14 +147,14 @@
                     }
                 } catch (e) {
 
-                    // Noop. Will fall through to the .done() functio
+                    // Noop. Will fall through to the .done() function
 
                 }
             });
 
             $.ajax({url: form.attr('action'), method: form.attr('method'), data: data})
                     .done(function(response) {
-                        label.toastTimeout({text: 'Done'});
+                        label.toastTimeout({text: '{USER_NAME} has been removed from this group.', css: 'success'});
                         label.one('toastTimeout', function() {
                             var $response = $(response);
 
