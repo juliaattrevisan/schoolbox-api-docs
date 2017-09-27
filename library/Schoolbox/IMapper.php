@@ -29,6 +29,15 @@ interface IMapper
      */
     public static function getInstance();
 
+
+    /**
+     * @param null|int $idValue
+     * @return mixed
+     * @todo return an IModel interface
+     */
+    public function createModel($idValue = null);
+
+
     /**
      * @return IDatabase
      */
