@@ -73,25 +73,10 @@ var calendar = {
 	 * Set up Remove behaviours
 	 */
 	initRemove: function() {
-		var self = this;
-
-		$(self.options.removeConfig).click(function() {
-			var id = $(this).attr('id').toString().replace(/remove_/, '');
-
-			if (confirm('Are you sure you want to remove this configuration option?')) {
-
-				/* Ajax remove this config option
-				 */
-				var data = {
-					id: id
-				};
-
-				$.post(self.options.removeUri, data, function(responseText) {
-					self.refresh();
-				});
-			}
-
-			return false;
+		window.self = this;
+		$(window.self.options.removeConfig).click(function() {
+			window.id = $(this).attr('id').toString().replace(/remove_/, '');
+            $('#confirm').foundation('reveal','open');
 		});
 	}
 }
