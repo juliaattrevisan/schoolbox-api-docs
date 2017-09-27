@@ -516,7 +516,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         $privateBody = "{$pastoral->getHeading()}\r\n\r\n{$pastoral->getBody()}";
-        $publicBody = $pastoral->getPrivate() ? $pastoral->getHeading() : $privateBody;
 
         // Retrieve pastoral type
 
@@ -553,7 +552,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $data =  [
             'studentExternalId' => $studentExternalId,
             'createdAt' => $pastoral->getCreatedAt()->getDatabase(),
-            'publicBody' => substr($publicBody, 0, 2000),
+            'publicBody' => '',
             'privateBody' => substr($privateBody, 0, 2000),
             'pastoralTypeCode' => substr($pastoralTypeCode, 0, 15),
             'pastoralCategoryCode' => substr($pastoralCategoryCode, 0, 15),
@@ -692,7 +691,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         $privateBody = "{$pastoral->getHeading()}\r\n\r\n{$pastoral->getBody()}";
-        $publicBody = $pastoral->getPrivate() ? $pastoral->getHeading() : $privateBody;
 
         // Retrieve pastoral type
 
@@ -728,7 +726,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $data = [
             'externalId' => $pastoral->getExternalId(),
-            'publicBody' => substr($publicBody, 0, 2000),
+            'publicBody' => '',
             'privateBody' => substr($privateBody, 0, 2000),
             'pastoralTypeCode' => substr($pastoralTypeCode, 0, 15),
             'pastoralCategoryCode' => substr($pastoralCategoryCode, 0, 15),
