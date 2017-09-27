@@ -55,7 +55,7 @@ class Access
 
         if ($role->isParent()) {
             // parents have access if the page is flagged as such...
-            if ($this->isPostVisibleToParents($post) && $user->isParentOf($post->getOwner())) {
+            if ($this->isPostVisibleToParents($post) && $user->isParentOf($post->getPage()->getOwner())) {
                 return true;
             }
 
