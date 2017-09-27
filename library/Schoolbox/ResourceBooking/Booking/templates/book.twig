@@ -68,7 +68,7 @@ $(function() {
     $.validator.addMethod(
         'remote.currentTerm',
         getValidatorRemoteMethod('current_term', 'end_datetime'),
-        'You can only book this item during the current term'
+        'This item may not be booked outside of the current term.'
     );
 
     // Repeat-Until must be after StartDate
