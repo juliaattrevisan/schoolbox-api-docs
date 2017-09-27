@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
 
@@ -59,6 +60,10 @@ class Controller extends Base
      */
     protected $externalTimetableHandler;
 
+    /** @var TermMapper */
+
+    private $termMapper;
+
     /**
      * @var StatusMapper
      */
@@ -75,6 +80,7 @@ class Controller extends Base
     {
         /** @var Model $item */
         /** @var Item\Model $resource */
+
         $resource = $item;
         $item     = $this->getBookingMapper()->createModel();
         $item
@@ -137,6 +143,7 @@ class Controller extends Base
                     'campusList'    => $this->getCampusList(),
                     'callbackUrl'   => $this->getRequest()->query['callbackUrl'],
                     'allowOverride' => $item->getResource()->canUserModerateThisItem($this->getUser()),
+                    'currentTerm'       => $this->getTermMapper()->findForToday(),
                 ],
             ]
         );
@@ -629,7 +636,17 @@ class Controller extends Base
                 // Validate related and recurrent bookings of a new booking
                 $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
                 foreach ($dateParts as $check) {
+                    /** @var Item\Model $thisResource */
                     list($thisResource, $thisStart, $thisEnd) = $check;
+
+                    // Validate for matching the current term
+                    if ($thisResource->getCurrentTermRestriction()) {
+                        $errors = array_merge_recursive(
+                            $errors,
+                            $this->validateCurrentTermRestriction($thisEnd)
+                        );
+                    }
+
                     $errors = array_merge_recursive(
                         $errors,
                         $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
@@ -643,7 +660,17 @@ class Controller extends Base
                 // messed with.
 
                 foreach ($this->getExistingSeries($existingBooking, $startDate, $endDate) as $check) {
+                    /** @var Item\Model $thisResource */
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
+
+                    // Validate for matching the current term
+                    if ($thisResource->getCurrentTermRestriction()) {
+                        $errors = array_merge_recursive(
+                            $errors,
+                            $this->validateCurrentTermRestriction($thisEnd)
+                        );
+                    }
+
                     $errors = array_merge_recursive(
                         $errors,
                         $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
@@ -831,6 +858,26 @@ class Controller extends Base
     }
 
     /**
+     * Validates if booking needs to be within the current term
+     *
+     * @param DateTime $endDate
+     * 
+     * @return array
+     */
+    protected function validateCurrentTermRestriction(DateTime $endDate)
+    {
+        $errors = [];
+
+        $currentTerm = $this->getTermMapper()->findForToday();
+        $currentTermFinishDate = $currentTerm->getDisplayFinish()->getDateTimeObject();
+        if ($endDate > $currentTermFinishDate) {
+            $errors['end_datetime'][] = 'current_term';
+        }
+
+        return $errors;
+    }
+
+    /**
      * Gets selected related items out of the form, along with notes and name.
      *
      * @return array
@@ -1004,6 +1051,7 @@ class Controller extends Base
                     'recurrence'        => $recurrence,
                     'campusList'        => $this->getCampusList(),
                     'cancelCallbackUrl' => $this->session->getHistory(),
+                    'currentTerm'       => $this->getTermMapper()->findForToday(),
                 ],
             ]
         );
@@ -1212,146 +1260,6 @@ class Controller extends Base
                 $callbackUrl ?: $this->getSession()->getHistory()
             );
         }
-    }
-
-    /**
-     * @param  Mapper $bookingMapper
-     *
-     * @return $this
-     */
-    public function setBookingMapper($bookingMapper)
-    {
-        $this->bookingMapper = $bookingMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return Mapper
-     */
-    public function getBookingMapper()
-    {
-        return $this->bookingMapper;
-    }
-
-    /**
-     * @param  Calendar\EventMapper $eventMapper
-     *
-     * @return $this
-     */
-    public function setEventMapper($eventMapper)
-    {
-        $this->eventMapper = $eventMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return Calendar\EventMapper
-     */
-    public function getEventMapper()
-    {
-        return $this->eventMapper;
-    }
-
-    /**
-     * @param  Calendar\EventRecurrenceMapper $eventRecurrenceMapper
-     *
-     * @return $this
-     */
-    public function setEventRecurrenceMapper($eventRecurrenceMapper)
-    {
-        $this->eventRecurrenceMapper = $eventRecurrenceMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return Calendar\EventRecurrenceMapper
-     */
-    public function getEventRecurrenceMapper()
-    {
-        return $this->eventRecurrenceMapper;
-    }
-
-    /**
-     * @param  Item\Mapper $resourceMapper
-     *
-     * @return $this
-     */
-    public function setResourceMapper($resourceMapper)
-    {
-        $this->resourceMapper = $resourceMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return Item\Mapper
-     */
-    public function getResourceMapper()
-    {
-        return $this->resourceMapper;
-    }
-
-    /**
-     * @param  External_Timetable $externalTimetableHandler
-     *
-     * @return $this
-     */
-    public function setExternalTimetableHandler($externalTimetableHandler)
-    {
-        $this->externalTimetableHandler = $externalTimetableHandler;
-
-        return $this;
-    }
-
-    /**
-     * @return External_Timetable
-     */
-    public function getExternalTimetableHandler()
-    {
-        return $this->externalTimetableHandler;
-    }
-
-    /**
-     * @return CampusMapper
-     */
-    public function getCampusMapper()
-    {
-        return $this->campusMapper;
-    }
-
-    /**
-     * @param  CampusMapper $campusMapper
-     *
-     * @return $this
-     */
-    public function setCampusMapper($campusMapper)
-    {
-        $this->campusMapper = $campusMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return StatusMapper
-     */
-    public function getStatusMapper()
-    {
-        return $this->statusMapper;
-    }
-
-    /**
-     * @param  StatusMapper $statusMapper
-     *
-     * @return $this
-     */
-    public function setStatusMapper($statusMapper)
-    {
-        $this->statusMapper = $statusMapper;
-
-        return $this;
     }
 
     /**
@@ -1569,4 +1477,165 @@ class Controller extends Base
 
         return $dateParts;
     }
+
+    /**
+     * @param  Mapper $bookingMapper
+     *
+     * @return $this
+     */
+    public function setBookingMapper($bookingMapper)
+    {
+        $this->bookingMapper = $bookingMapper;
+
+        return $this;
+    }
+
+    /**
+     * @return Mapper
+     */
+    public function getBookingMapper()
+    {
+        return $this->bookingMapper;
+    }
+
+    /**
+     * @param  Calendar\EventMapper $eventMapper
+     *
+     * @return $this
+     */
+    public function setEventMapper($eventMapper)
+    {
+        $this->eventMapper = $eventMapper;
+
+        return $this;
+    }
+
+    /**
+     * @return Calendar\EventMapper
+     */
+    public function getEventMapper()
+    {
+        return $this->eventMapper;
+    }
+
+    /**
+     * @param  Calendar\EventRecurrenceMapper $eventRecurrenceMapper
+     *
+     * @return $this
+     */
+    public function setEventRecurrenceMapper($eventRecurrenceMapper)
+    {
+        $this->eventRecurrenceMapper = $eventRecurrenceMapper;
+
+        return $this;
+    }
+
+    /**
+     * @return Calendar\EventRecurrenceMapper
+     */
+    public function getEventRecurrenceMapper()
+    {
+        return $this->eventRecurrenceMapper;
+    }
+
+    /**
+     * @param  Item\Mapper $resourceMapper
+     *
+     * @return $this
+     */
+    public function setResourceMapper($resourceMapper)
+    {
+        $this->resourceMapper = $resourceMapper;
+
+        return $this;
+    }
+
+    /**
+     * @return Item\Mapper
+     */
+    public function getResourceMapper()
+    {
+        return $this->resourceMapper;
+    }
+
+    /**
+     * @param  External_Timetable $externalTimetableHandler
+     *
+     * @return $this
+     */
+    public function setExternalTimetableHandler($externalTimetableHandler)
+    {
+        $this->externalTimetableHandler = $externalTimetableHandler;
+
+        return $this;
+    }
+
+    /**
+     * @return External_Timetable
+     */
+    public function getExternalTimetableHandler()
+    {
+        return $this->externalTimetableHandler;
+    }
+
+    /**
+     * @return CampusMapper
+     */
+    public function getCampusMapper()
+    {
+        return $this->campusMapper;
+    }
+
+    /**
+     * @param  CampusMapper $campusMapper
+     *
+     * @return $this
+     */
+    public function setCampusMapper($campusMapper)
+    {
+        $this->campusMapper = $campusMapper;
+
+        return $this;
+    }
+
+    /**
+     * @return StatusMapper
+     */
+    public function getStatusMapper()
+    {
+        return $this->statusMapper;
+    }
+
+    /**
+     * @param  StatusMapper $statusMapper
+     *
+     * @return $this
+     */
+    public function setStatusMapper($statusMapper)
+    {
+        $this->statusMapper = $statusMapper;
+
+        return $this;
+    }
+
+    /**
+     * @return TermMapper
+     */
+    public function getTermMapper()
+    {
+        return $this->termMapper;
+    }
+
+    /**
+     * @param  TermMapper $termMapper
+     *
+     * @return $this
+     */
+    public function setTermMapper($termMapper)
+    {
+        $this->termMapper = $termMapper;
+
+        return $this;
+    }
+
 }

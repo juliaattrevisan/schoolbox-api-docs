@@ -22,6 +22,12 @@
         </li>
     {% endif %}
 
+    {% if item.currentTermRestriction %}
+        <li>
+            Resource cannot be booked past the end of the current school term ({{ currentTerm.displayFinish.localShort }})
+        </li>
+    {% endif %}
+
     {# Booking moderation status #}
 
     {# Are any roles allowed to book this? #}

@@ -364,6 +364,21 @@
                         </label>
                     </div>
                 </fieldset>
+                <fieldset>
+                    <legend>
+                        Restrict bookings to current term
+                        <span class='hint has-tip tip-top' data-tooltip title="If this is set, this item cannot be reserved outside of the current term">?</span>
+                    </legend>
+                    <div class="small-12 columns">
+                        <div class="switch">
+                            <input type="checkbox" value="1" {% if item.currentTermRestriction %}checked{% endif %} id="current_term_restriction" name="current_term_restriction">
+                            <label for="current_term_restriction">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
             </section>
             <div class="row">
                 <div class="small-12 columns">

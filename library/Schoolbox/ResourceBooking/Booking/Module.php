@@ -21,6 +21,7 @@ use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 
 class Module extends BaseModule
@@ -143,6 +144,8 @@ class Module extends BaseModule
             = $this->getMapperFactory()->getLazy(CampusMapper::class);
         $injector->setters[Controller::class]['setStatusMapper']
             = $this->getMapperFactory()->getLazy(StatusMapper::class);
+        $injector->setters[Controller::class]['setTermMapper']
+            = $this->getMapperFactory()->getLazy(TermMapper::class);
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)

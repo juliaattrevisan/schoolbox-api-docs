@@ -65,6 +65,11 @@ $(function() {
         getValidatorRemoteMethod('too_long', 'end_datetime'),
         'This item may not be booked for more than ' + {{ include('sub/interval.twig', {interval: item.resource.maxReservationTime})|json_encode|raw }} + '.'
     );
+    $.validator.addMethod(
+        'remote.currentTerm',
+        getValidatorRemoteMethod('current_term', 'end_datetime'),
+        'This item may not be booked outside of the current term.'
+    );
 
     // Repeat-Until must be after StartDate
     $.validator.addMethod(
@@ -181,7 +186,8 @@ $(function() {
                 'remote.invalidEnd': true,
                 'remote.beforeStart': true,
                 'remote.tooShort': true,
-                'remote.tooLong': true
+                'remote.tooLong': true,
+                'remote.currentTerm': true
             },
             'repeat_until': {
                 datepickerDate: {
@@ -324,7 +330,7 @@ $(function() {
 <div class="row">
     <div class="small-12 island">
         <div class="alert-box">
-            {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
+            {% include '@resourceItem/sub/rules.twig' with {item: item.resource, currentTerm: currentTerm} %}
         </div>
         <form id="resource-booking-form" action="{{ saveAction }}" method="post" name="form">
             <input type="hidden" name="id" value="{{ item.id }}"/>
