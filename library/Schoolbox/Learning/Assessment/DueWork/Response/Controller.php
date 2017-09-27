@@ -35,6 +35,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Learning\InlineGrader\Kami;
+use GuzzleHttp\Client;
 
 class Controller extends Base
 {
@@ -241,14 +242,12 @@ class Controller extends Base
      */
     public function getKamiExportUrl(Kami\Model $kami): void
     {
-        // TODO consider caching the fileUrl in redis for even a few minutes?
-
-        // I figure there's less overhead in sleeping the server process, than spinning it up per client poll.
+        // Less overhead in sleeping the server process, than spinning it up per client poll.
         // Total timeout before failure = $sleep * $exponent^$maxPolls - $sleep
         $maxPolls  = 10;
         $exponent  = 2;
-        $sleep     = 500000; // 0.5 seconds initially
-        $pollCount = 0; // TODO remove testing
+        $sleep     = 500000; // 0.5 seconds initial back-off
+        $pollCount = 0;
         $export    = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
         while ($export->isStatusPending()) {
             if($pollCount >= $maxPolls){
@@ -260,34 +259,32 @@ class Controller extends Base
             $pollCount++;
 
         }
+
+        // Let the browser know that the synchronous request has finished (either success or failure)
         $response = $this->getResponse();
-        if ($export->isStatusError()) {
-            $response->status->setCode(400);
-        } else {
-            $response->status->setCode(200);
+        $token    = $this->getRequest()->query->get('token');
+        $response->cookies->set('kamiExportToken', $token, null, '/', null, null, false);
+        $response->cookies->set('kamiExportStatus', $export->getStatus(), null, '/', null, null, false);
+
+        // Unable to generate the export? (either due to error or timeout)
+        if (!$export->isStatusDone()) {
+            // Don't change browser viewport
+            $response->status->setCode(204);
+            return;
         }
 
-        // This works in Chrome, IE, and Chromium. It does not work in Firefox. Unknown for Mac.
-        // It updates the link to point straight to amazon, so subsequent clicks on the link
-        // do not re-generate the file, or go through the schoolbox server.
-        $this->response->content->set($this->buildJsonOutput([
-            'fileUrl'   => $export->getFileUrl(),
-            'pollCount' => $pollCount,
-        ]));
-
-
         // This works in all browsers, but means we need to stream the file through schoolbox as a proxy.
-        // This code is currently reading the whole contents into memory, but presumably we could stream this easily enough
-//        $client = new \GuzzleHttp\Client();
-//        $contents = $client->get($export->getFileUrl())->getBody()->getContents();
-//        $response->headers->set('Content-Description', 'File Transfer');
-//        $response->headers->set('Content-Type', 'application/octet-stream');
-//        $response->headers->set('Content-Disposition', 'attachment; filename="xxx.pdf"');
-//        $response->headers->set('Expires', '0');
-//        $response->headers->set('Cache-Control', 'must-revalidate');
-//        $response->headers->set('Pragma', 'public');
-//        $response->headers->set('Content-Length', strlen($contents));
-//        $response->content->set($this->buildFileOutputFromString($contents));
+        $response->status->setCode(200);
+        $filename = $kami->getStudentSubmissionFile()->getBasename();
+        $guzzleResponse = (new Client())->get($export->getFileUrl());
+        $response->headers->set('Content-Description', 'File Transfer');
+        $response->headers->set('Content-Type', 'application/octet-stream');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"');
+        $response->headers->set('Expires', '0');
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+        $response->headers->set('Content-Length', $guzzleResponse->getHeader('Content-Length')[0]);
+        $response->content->set($this->buildFileOutputFromString($guzzleResponse->getBody()));
     }
 
 
