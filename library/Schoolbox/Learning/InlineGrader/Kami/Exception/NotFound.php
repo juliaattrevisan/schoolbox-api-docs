@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
 
 use GuzzleHttp\Exception\ClientException;
 
-
 /**
  * Thrown when the requested object is not found because it does not exist, as opposed
  * to an invalid API route

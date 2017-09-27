@@ -199,7 +199,7 @@ class Controller extends Base
      * @api   /learning/kami/{kamiId}
      * @level 17.5
      * @param Kami\Model $kami
-     * @param Model $response
+     * @param Model      $response
      * @throws Kami\Exception\ApiException
      * @throws Kami\Exception\EmptyApiKeyException
      * @throws Kami\Exception\NotFound
@@ -220,7 +220,7 @@ class Controller extends Base
 
         // Don't attempt to get a view session if not done processing
         $session = null;
-        if($kami->isStatusDone()){
+        if ($kami->isStatusDone()) {
             $session = $this->kamiConnector->viewSession($kami->getKamiDocumentId(), $this->getUser(), false);
         }
 
@@ -276,7 +276,7 @@ class Controller extends Base
         } catch (\RangeException|\DomainException $e) {
             // Crocodoc exceptions
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
-        } catch (Kami\Exception\IKamiException $e){
+        } catch (Kami\Exception\IKamiException $e) {
             // Kami Exceptions
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PROCESSING, null, $e->getMessage());
         }

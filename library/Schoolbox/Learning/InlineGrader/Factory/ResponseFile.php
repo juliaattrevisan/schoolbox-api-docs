@@ -107,7 +107,6 @@ class ResponseFile
             ];
         }
         if ($mimetype->isAudio()) {
-
             /* Load from the ResourceVideoMapper to get extra stuff
              * about the media file. Bundle it into a struct
              */
@@ -127,7 +126,6 @@ class ResponseFile
             ];
         }
         if ($mimetype->isVideo()) {
-
             /* Load from the ResourceVideoMapper to get extra stuff
              * about the media file. Bundle it into a struct
              */
@@ -147,7 +145,6 @@ class ResponseFile
             ];
         }
         if ($file->getEditableInline()) {
-
             /* Load purified html into a random div or suchlike
              */
             return [
@@ -155,7 +152,6 @@ class ResponseFile
             ];
         }
         if ($this->isCrocodocable($file)) {
-
             /* Figger out a crocodoc url
              * \RangeException Use Download File prompt if crocodoc api key is nonexistent on our end
              * \DomainException Use Download File prompt if crocodoc cannot be authenticated on the crocodoc end

@@ -50,7 +50,9 @@ class StatusChecker
     {
         if (!$model->isStatusProcessing()) {
             throw new \LogicException(sprintf(
-                "Only '%s' status can change. Found: '%s'", Model::STATUS_PROCESSING, $model->getStatus()
+                "Only '%s' status can change. Found: '%s'",
+                Model::STATUS_PROCESSING,
+                $model->getStatus()
             ));
         }
         $kamiDoc = $this->connector->getDocument($model->getKamiDocumentId());

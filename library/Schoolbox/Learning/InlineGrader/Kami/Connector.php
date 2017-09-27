@@ -271,7 +271,7 @@ class Connector implements IConnector
         ];
         $request  = new Request('POST', self::BASE_URI . 'embed/sessions');
         $response = $this->client->send($request, $this->getOptions($options));
-        if($this->isValidNotFound($response)){
+        if ($this->isValidNotFound($response)) {
             throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
         }
         return $this->buildViewSession($this->decodeResponseContent($response->getBody()));
