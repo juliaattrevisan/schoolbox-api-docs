@@ -20,6 +20,7 @@ use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DueWork;
+use Alaress_Date_Format;
 
 /**
  * A single file within a student's submission to a due work.
@@ -58,9 +59,16 @@ class Model implements IFile, ISoftDeletable
 
     public function __clone()
     {
-        $this->setCreatedAt(clone $this->getCreatedAt());
-        $this->setUpdatedAt(clone $this->getUpdatedAt());
-        $this->setDeletedAt(clone $this->getDeletedAt());
+        // Robustly protect against scalar nulls
+        if (is_object($this->getCreatedAt())) {
+            $this->setCreatedAt(clone $this->getCreatedAt());
+        }
+        if (is_object($this->getUpdatedAt())) {
+            $this->setUpdatedAt(clone $this->getUpdatedAt());
+        }
+        if (is_object($this->getDeletedAt())) {
+            $this->setDeletedAt(clone $this->getDeletedAt());
+        }
     }
 
 
