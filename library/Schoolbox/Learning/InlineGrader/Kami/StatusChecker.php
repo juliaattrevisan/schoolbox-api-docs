@@ -56,7 +56,7 @@ class StatusChecker
         $kamiDoc = $this->connector->getDocument($model->getKamiDocumentId());
 
         // No change?
-        if (!$kamiDoc->isProcessing()) {
+        if ($kamiDoc->isProcessing()) {
             return $model;
         }
 
