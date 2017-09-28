@@ -30,7 +30,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     /**
      * Determine whether the current user should be able to see the video given as an argument.
      *
-     * @param object $video
+     * @param \Schoolbox\Video\ResourceVideo $video
      *
      * @return boolean
      */
