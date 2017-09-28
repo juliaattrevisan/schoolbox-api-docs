@@ -31,8 +31,6 @@
         });
 
         jQuery.validator.addMethod("mimeNotUsed", function(value, element) {
-
-
             //
             // Some sort of form validation - check for no duplicate mimetypes.
 
@@ -61,7 +59,6 @@
             else {
                 return true;
             }
-
         });
 
 		$('form[data-action="createNewFileType"], form[data-action="updateFileType"]').each(function() {

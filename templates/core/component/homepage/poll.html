@@ -67,39 +67,35 @@
                                       method="post">
                                      <script type="text/javascript">
                                         $(function () {
-
                                             /* Vote validate on a per-poll basis
                                              */
-                                            $('[data-component-poll={COMPONENT_INSTANCE_ID}]').submit(function (event) {
-                                                var valid = false;
-
-                                                $(this).find('[data-poll-option]').each(function (index, element) {
-                                                    if ($(this).prop('checked')) {
-                                                        valid = true;
+                                            $('[data-component-poll={COMPONENT_INSTANCE_ID}]').alaressValidate({
+                                                rules: {
+                                                    'vote': {
+                                                        required: true
                                                     }
-                                                });
-
-                                                if (!valid) {
-                                                    event.preventDefault();
-                                                    var $toast = $('[data-toast]');
-                                                    $toast.toastActivate({text: 'Please select an option.', duration: 3000, css: 'alert'});
+                                                },
+                                                messages: {
+                                                    vote: "Please choose an option"
                                                 }
-
-                                                return valid;
                                             });
+
                                         });
                                      </script>
 
                                     <input type="hidden" name="pollID" value="{POLL_ID}"/>
                                     <input type="hidden" name="categoryID" value="{ID}"/>
-
-                                    <!-- BEGIN poll_options -->
-                                    <input type="radio" name="vote" data-poll-option
-                                           id="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
-                                           value="{POLL_OPTION_INDEX}"/>
-                                    <label for="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
-                                           class="radio-label">{POLL_OPTION}</label>
-                                    <!-- END poll_options -->
+                                    <section>
+                                        <fieldset class="radiolist">
+                                            <!-- BEGIN poll_options -->
+                                            <input type="radio" name="vote" data-poll-option
+                                                   id="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
+                                                   value="{POLL_OPTION_INDEX}"/>
+                                            <label for="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
+                                                   class="radio-label">{POLL_OPTION}</label>
+                                            <!-- END poll_options -->
+                                        </fieldset>
+                                    </section>
 
                                     <input type="submit" value="Vote" data-poll-validate="{COMPONENT_INSTANCE_ID}"/>
                                 </form>
