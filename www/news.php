@@ -47,8 +47,10 @@ if (is_numeric($this->arg[1])) {
     $page = 1;
 }
 
+/** @var \Schoolbox\L10n\RosettaStone $l10n */
 $l10n = $this->getDi()->get('l10n');
-$this->setTitle($l10n->news->translate());
+
+$this->setTitle($l10n->translate("news", false, true));
 $this->setVar('PAGE_TITLE', $l10n->news->translate());
 
 
