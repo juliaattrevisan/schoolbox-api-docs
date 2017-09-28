@@ -30,20 +30,27 @@
                 }
             })
 
+        jQuery.validator.addMethod("noAudience", function(value, element) {
+
+            var userList = $('#addUser')[0].selectize.options;
+            var userCount =  Object.keys(userList);
+
+            if (userCount > 0) {
+               return true;
+            }
+            if ($("input[name='campus[]']:checked").length > 0 && $("input[name='group[]']:checked").length > 0) {
+               return true;
+            }
+
+           return false;
+
+        }, "You must select an audience (role and campus, and/or individual users)");
+
         $('#newsForm').alaressValidate({
-            rules:{
-                'group[]':{
-                    required:true,
-                    minlength:1
-                },
-                'campus[]':{
-                    required:true,
-                    minlength:1
+            rules: {
+                'audience': {
+                    noAudience: true
                 }
-            },
-            messages:{
-                'group[]':"Please tick at least one role",
-                'campus[]':"Please tick at least one campus"
             }
         });
 
@@ -123,6 +130,7 @@
 
                 </fieldset>
                 <fieldset class="content">
+                    <input name="audience" type="hidden" />
                     <div class="small-12 medium-6 columns checklist">
                         <legend>
                             Roles
