@@ -107,9 +107,6 @@
 								errors = true;
 							}
 
-							if ($(element).valid()) {
-
-                            }
 						}
 					}
 				});
