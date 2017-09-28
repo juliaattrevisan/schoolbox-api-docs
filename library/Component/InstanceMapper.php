@@ -83,8 +83,14 @@ class Component_InstanceMapper extends BaseMapper
         }
 
         // Hydrate row
+        $result = parent::hydrate($row, $alias, $callback);
 
-        return parent::hydrate($row, $alias, $callback);
+        // Undo any override that was put in place.
+        // Later on, I may try to hydrate again, and fail to add an object to a
+        // collection because the model has change.
+        $this->hasModel(Component_Instance::class);
+
+        return $result;
     }
 
     /**
