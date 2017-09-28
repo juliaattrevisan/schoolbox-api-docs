@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;

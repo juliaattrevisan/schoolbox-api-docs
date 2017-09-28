@@ -19,6 +19,7 @@ use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
@@ -119,7 +120,8 @@ class Full
         if ($user->isSuperuser() || ($user->getId() == $participant->getId() && $role->isStaff())) {
             return $this->getForAdmin();
 
-        } elseif ($role->isStudent()) {
+        }
+        if ($role->isStudent()) {
             if ($user->getId() == $participant->getId()) {
                 return $this->getForStudent();
             }
@@ -176,6 +178,7 @@ class Full
 
         $isFeedbackVisible = $this->getParticipant()->getAssessable()->getMarkVisibility() >= $minimumVisibility;
 
+        /** @var DueWork\Response\Model $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
 
             /* Only show Submitted submissions (ignore drafts)
@@ -194,6 +197,7 @@ class Full
                         $includedFeedback = $currentResponse->getAllFeedback();
 
                     } else {
+                        /** @var DueWork\Feedback\Model $currentFeedback */
                         foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                             if ($currentFeedback->isPublished()) {
                                 $includedFeedback->add($currentFeedback);
@@ -217,9 +221,16 @@ class Full
                      * here normally. In the case of the Timeline, Feedback includes
                      * both the set of attached files and any Submission Files that
                      * were annotated via crocodoc.
+                     *
+                     * Kami:
+                     * * If feedback is for specific response, for all files in that *response* that have a KamiDoc,
+                     *   add the file to the feedback.
+                     * * If feedback is floating, we do *not* add any response files to it. Floating feedbacks now
+                     *   only exist if no response exists, hence no response file could have been annotated at the
+                     *   time of feedback creation.
                      */
                     foreach ($currentResponse->getAllFiles() as $currentFile) {
-                        if ($currentFile->getCrocodocId()) {
+                        if ($currentFile->getCrocodocId() || $currentFile->getKami()) {
                             $currentFeedback->getAllFiles()->add($currentFile);
                         }
                     }

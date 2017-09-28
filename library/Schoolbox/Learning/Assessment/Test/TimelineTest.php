@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\Assessment\Test;
 
 use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as Submission;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;

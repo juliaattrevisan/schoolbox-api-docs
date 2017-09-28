@@ -1,0 +1,70 @@
+{#
+     Displays a Kami Document for viewing.
+
+     Data:
+         kami        Kami\Model
+         session     Kami\Session              Optional. Null if document not finished processing.
+         response    DueWork\Submission\Model
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{# Build breadcrumbs #}
+{% set nodes = [['Learning', routeLookup('learning.getClasses')]] %}
+{# Extra crumb inserted if inside project #}
+{% if response.assessable.context is project %}
+    {% set nodes = nodes|merge([
+        [response.assessable.context.title, routeLookup('learningAssessment.getSummary', {
+            assessmentId: response.assessable.context.id,
+            studentId:    response.submittedOnBehalfOf.id
+        }) ]
+    ]) %}
+{% endif %}
+{% set nodes = nodes|merge([
+    [response.assessable.title, routeLookup('learningAssessment.getSummary', {
+        assessmentId: response.assessable.id,
+        studentId:    response.submittedOnBehalfOf.id
+    }) ],
+    ['Annotations']
+]) %}
+
+{{ bread.crumbsArray(nodes)}}
+
+<div class="row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Annotations for {{ response.assessable.title }}</h1>
+            <ul class="meta">
+                <li class="icon-staff-students"><a href="/search/user/{{ response.submittedOnBehalfOf.id }}" title="View Profile">{{ response.submittedOnBehalfOf.fullname }}</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if kami.isStatusDone %}
+        <section>
+            {% include '@learningDueWorkResponse/kamiIframe.twig' with {session: session} only %}
+        </section>
+        {% else %}
+            <div class="empty-state">
+                {% if kami.statusPending%}
+                    <i class="icon-time-value"></i>
+                    <p>Upload pending. Please refresh your browser in a few minutes.</p>
+                {% elseif kami.isStatusUploading %}
+                    <i class="icon-upload"></i>
+                    <p>Upload in progress. Please refresh your browser in a few minutes.</p>
+                {% elseif kami.isStatusProcessing %}
+                    <i class="icon-refresh"></i>
+                    <p>Document is being processed. Please refresh your browser in a few seconds</p>
+                {% elseif kami.isStatusError %}
+                    <i class="icon-alert"></i>
+                    <p>Something went wrong while processing the document.</p>
+                {% else %}
+                    <i class="icon-alert"></i>
+                    <p>Unable to display document.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>

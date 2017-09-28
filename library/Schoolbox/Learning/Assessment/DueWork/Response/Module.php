@@ -11,27 +11,28 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Authorizer\Rule\IsParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
-use Schoolbox\Learning\Assessment\DueWork\Submission;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\IMapper;
 
 class Module extends BaseModule
 {
@@ -47,12 +48,16 @@ class Module extends BaseModule
      * @return void
      * @throws \InvalidArgumentException if any sub-rule is not a IAuthorizationRule
      * @throws Unauthorized If auth rule fails
+     * @throws \InvalidArgumentException If mapper class not found
+     * @throws MapperException\Deleted If a deleted assessment is requested
+     * @throws \UnexpectedValueException If the kami files owner is not a participant
      */
     protected function registerRoutes()
     {
         $preloadParticipant     = function (array $params) { return $this->preloadParticipant($params); };
         $preloadResponse        = function (array $params) { return $this->preloadResponseWithFeedback($params); };
         $preloadPlagscanWithAss = function (array $params) { return $this->preloadPlagscanWithAssessment($params); };
+        $preloadKami            = function (array $params) { return $this->preloadKami($params); };
 
         $hasWriteAccess = $this->buildRuleHasWriteAccess();
 
@@ -82,6 +87,10 @@ class Module extends BaseModule
 
         $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
+
+        // For now, same auth rules as crocodoc.
+        $canAccessKami = $canAccessCrocodoc;
+        $this->register('GET', '/kami/{kamiId:\d+}' . '', 'getKamiView', $canAccessKami, $preloadKami);
     }
 
 
@@ -145,7 +154,7 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
         }
         catch (\Schoolbox\Mapper\Exception $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         $participant = null;
@@ -158,7 +167,7 @@ class Module extends BaseModule
                 $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
                 $participant = $assessment->getParticipant($response->getSubmittedOnBehalfOf());
             } catch (OutOfBoundsException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
         /* Otherwise spawn a floating feedback instead
@@ -170,7 +179,7 @@ class Module extends BaseModule
                 $participant = $assessment->getParticipant($student);
             }
             catch (\Schoolbox\Mapper\Exception $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         }
 
@@ -194,7 +203,7 @@ class Module extends BaseModule
             $assessment = $this->getAssessmentMapperProxy()->findById($params['assessmentId']);
         }
         catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Get all the feedbacks associated with $assessment, then find the requested Feedback
@@ -212,7 +221,7 @@ class Module extends BaseModule
             }
 
             if (!$feedback) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
 
             $responses = $this->getResponseMapperProxy()->findForAssessment($assessment);
@@ -246,19 +255,19 @@ class Module extends BaseModule
                 /* Still didn't find it? Then it really didn't exist
                  */
                 if (!$response) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                    throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
                 }
             }
         }
         catch (OutOfBoundsException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Factory to figure out which fragment is required
          */
         $file = null;
 
-        /** @var Submission\Model $response */
+        /** @var Model $response */
         foreach ($response->getAllFiles() as $currentFile) {
             if ($currentFile->getCrocodocId() == $params['crocodocId']) {
                 $file = $currentFile;
@@ -269,7 +278,7 @@ class Module extends BaseModule
         /* Die early when requested crocodocked File doesn't exist
          */
         if (!$file) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Spawn participant(s)
@@ -298,7 +307,7 @@ class Module extends BaseModule
             // Need to cache HTML value as the cache will clear it if this model is used in a different context
             $html = $plagscanDocument->getHtml();
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Die early when requested Assessment doesn't exist
@@ -306,7 +315,7 @@ class Module extends BaseModule
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Die early when requested Response doesn't exist in $assessment
@@ -314,7 +323,7 @@ class Module extends BaseModule
         try {
             $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
         } catch (OutOfBoundsException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         /* Die early when participant isn't found
@@ -322,7 +331,7 @@ class Module extends BaseModule
         try {
             $participant = $assessment->getParticipant($response->getSubmittedOnBehalfOf());
         } catch (OutOfBoundsException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
@@ -349,18 +358,79 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'errorMapper' => $this->getMapperFactory()->getLazy(Error\Mapper::class),
                 'responseDataSource' => $injector->lazyGet('responseDataSource'),
                 'bakery' => $injector->lazyNew(BreadcrumbFactory::class, [
                     'router' => $injector->lazyGet('router')
                 ]),
                 'termMapper' => $this->getMapperFactory()->getLazy(Term\Mapper::class),
+                'kamiMapper' => $this->getMapperFactory()->getLazy(Kami\Mapper::class),
+                'kamiConnector' => $injector->lazyGet('kamiConnector'),
             ])
         );
     }
 
+
+    /**
+     * Intentionally does not check the status of the Kami upload. The controller handles that.
+     *
+     * @param array $params
+     * @return array
+     * @throws MapperException\Deleted If the assessment the kami belongs to is deleted
+     * @throws NotFound If the requested Kami Doc has not finished processing
+     * @throws OutOfBoundsException
+     * @throws \InvalidArgumentException If mapper class not found
+     * @throws \UnexpectedValueException If the kami files owner is not a participant
+     */
+    private function preloadKami(array $params): array
+    {
+        $kami           = $this->getKamiMapper()->findById($params['kamiId']);
+        $submissionFile = $kami->getStudentSubmissionFile();
+        $submission     = $this->getSubmissionMapper()->findById($submissionFile->getSubmission()->getId());
+        $assessment     = $this->getAssessmentMapperProxy()->findByDueWorkId($submission->getSubmissionBox()->getId());
+        $participant    = $assessment->getParticipant($submission->getOwner());
+        $response       = $this->getResponseMapperProxy()->findInAssessment($submission->getId(), $assessment);
+
+        return [
+            'kami'        => $kami,
+            'participant' => $participant,
+            'response'    => $response,
+            'feedback'    => $participant->findMostRecentPublishedFeedback(),
+        ];
+    }
+
     /* Getters / Setters
      */
+
+    /**
+     * @return Error\Mapper|IMapper
+     * @throws \InvalidArgumentException If mapper class not found
+     */
+    private function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(Error\Mapper::class);
+    }
+
+
+    /**
+     * @return IMapper|Kami\Mapper
+     * @throws \InvalidArgumentException If mapper class not found
+     */
+    private function getKamiMapper()
+    {
+        return $this->getMapperFactory()->get(Kami\Mapper::class);
+    }
+
+
+    /**
+     * @return IMapper|SubmissionMapper
+     * @throws \InvalidArgumentException If mapper class not found
+     */
+    private function getSubmissionMapper()
+    {
+        return $this->getMapperFactory()->get(SubmissionMapper::class);
+    }
+
 
     /**
      * @return object|IConfigLoader

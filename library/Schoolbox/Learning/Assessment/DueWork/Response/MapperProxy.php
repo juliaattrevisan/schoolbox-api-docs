@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission;
+namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Collection;
@@ -13,7 +13,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as DataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DomainObject;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DomainObject;
 use Schoolbox\Mapper;
 
 

@@ -19,6 +19,7 @@ use Alaress_Date_Format;
  */
 interface IConnector
 {
+    // Session options
     const SESSION_THEME_LIGHT = 'light';
     const SESSION_THEME_DARK = 'dark';
 
@@ -71,6 +72,7 @@ interface IConnector
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws Exception\NotFound If document does not exist in Kami
      */
     public function getDocument(string $documentId): ?Document;
 
@@ -83,6 +85,7 @@ interface IConnector
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
+     * @throws Exception\NotFound If document does not exist in Kami
      */
     public function deleteDocument(string $documentId): bool;
 
@@ -104,6 +107,7 @@ interface IConnector
      * @return Session
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\NotFound If document does not exist in Kami
      */
     public function viewSession(
         string $documentId,

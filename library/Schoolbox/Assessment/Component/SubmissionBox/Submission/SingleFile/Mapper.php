@@ -7,15 +7,17 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
+use Alaress\Database\Quoter\IQuoter;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use \Schoolbox\File\Mimetype as Mimetype;
+use \Schoolbox\File\Mimetype;
 use \Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
-use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile as ResponseFile;
+use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use \Schoolbox\Learning\InlineGrader\Factory\ResponseFile;
+use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
  * A mapper for a single file within a student's submission to a due work.
@@ -42,6 +44,7 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseSingle('student_submission_file_id', Plagscan\Mapper::class, 'plagscan', 'plagscan');
+        $this->joinsReverseSingle('student_submission_file_id', Kami\Mapper::class, 'kami', 'kami');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, array($this, 'restorePlagScan'));
@@ -77,19 +80,22 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
+        /** @var IQuoter $db */
+        $db = $this->getDatabase();
         return "
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('submission', 's')},
                 {$this->getJoinColumnString('storage', 'f')},
                 {$this->getJoinColumnString('storage.allowedFileExtension', 'm')},
-                {$this->getJoinMapper('plagscan')->getColumnString('ps')}
-
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+                {$this->getJoinMapper('plagscan')->getColumnString('ps')},
+                {$this->getJoinMapper('kami')->getColumnString('k')}
+            FROM {$db->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('submission', '', 's')}
             LEFT JOIN {$this->getJoinSql('storage', '', 'f')}
             LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'f', 'm')}
             LEFT JOIN {$this->getJoinSql('plagscan', '', 'ps')}
+            LEFT JOIN {$this->getJoinSql('kami', '', 'k')}
         ";
     }
 
@@ -104,6 +110,13 @@ class Mapper extends BaseMapper
         /** @var Collection|Model[] $resultSet */
         $resultSet = $this->createCollection();
         $seen = [];
+
+        /**
+         * @var Kami\Mapper      $kamiMapper
+         * @var SubmissionMapper $submissionMapper
+         */
+        $kamiMapper       = $this->getJoinMapper('kami');
+        $submissionMapper = $this->getJoinMapper('submission');
 
         foreach ($statement as $row) {
 
@@ -140,7 +153,8 @@ class Mapper extends BaseMapper
             $submissionFile
                 ->setStorage($storage)
                 ->setPlagscan($plagscan)
-                ->setSubmission($this->hydrateJoin($row, 'submission', 's'));
+                ->setKami($kamiMapper->hydrate($row, 'k'))
+                ->setSubmission($submissionMapper->hydrate($row, 's'));
 
             $resultSet->add($submissionFile);
 

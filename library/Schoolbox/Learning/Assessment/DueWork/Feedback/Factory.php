@@ -16,7 +16,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\MarkScheme\IMarkScheme;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
+use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as DueWorkFeedbackDataSource;
 

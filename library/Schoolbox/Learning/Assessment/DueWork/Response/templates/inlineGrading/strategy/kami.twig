@@ -1,0 +1,12 @@
+{#
+    Display a Kami iframe.
+
+    Data:
+        data.session    Kami\Session
+#}
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Document Preview</h2>
+        {% include '@learningDueWorkResponse/kamiIframe.twig' with {session: data.session} only %}
+    </div>
+</div>

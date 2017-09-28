@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -20,6 +20,7 @@ use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\InlineGrader\Kami;
 use Alaress_Date_Format;
 
 /**
@@ -36,7 +37,7 @@ class Model implements IFile, ISoftDeletable
      * Because this object is used in both the domain and data graphs,
      * it will point to either the domain or data version of the Student Submission
      *
-     * @var Submission|DueWork\Submission\Model
+     * @var Submission|DueWork\Response\Model
      */
     protected $submission;
 
@@ -56,6 +57,8 @@ class Model implements IFile, ISoftDeletable
      */
     protected $plagscan;
 
+    /** @var Kami\Model */
+    private $kami;
 
     public function __clone()
     {
@@ -157,7 +160,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @return Submission|DueWork\Submission\Model
+     * @return Submission|DueWork\Response\Model
      */
     public function getSubmission()
     {
@@ -194,12 +197,32 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @param Submission|DueWork\Submission\Model $submission DO NOT DECLARE TYPE (unless common interface)
+     * @param Submission|DueWork\Response\Model $submission DO NOT DECLARE TYPE (unless common interface)
      * @return static
      */
     public function setSubmission($submission)
     {
         $this->submission = $submission;
+        return $this;
+    }
+
+
+    /**
+     * @return null|Kami\Model
+     */
+    public function getKami(): ?Kami\Model
+    {
+        return $this->kami;
+    }
+
+
+    /**
+     * @param null|Kami\Model $kami
+     * @return $this|self
+     */
+    public function setKami(?Kami\Model $kami): self
+    {
+        $this->kami = $kami;
         return $this;
     }
 }

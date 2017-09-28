@@ -20,7 +20,7 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkResponse;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\InlineGrader\Authenticator;
 use Schoolbox\Learning\InlineGrader\Facade;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;

@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;

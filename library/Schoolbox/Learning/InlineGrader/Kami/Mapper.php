@@ -18,6 +18,7 @@ use Schoolbox\Mapper as BaseMapper;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */
@@ -85,5 +86,18 @@ class Mapper extends BaseMapper
             $collection[$model->getId()] = $model;
         }
         return $collection;
+    }
+
+
+    /**
+     * Returns the kami model for the specified file if one exists
+     *
+     * @param SingleFile\Model $file
+     * @param array            $options
+     * @return null|Model
+     */
+    public function findForSubmissionFile(SingleFile\Model $file, array $options = []): ?Model
+    {
+        return $this->findByColumnList(['student_submission_file_id' => $file->getId()], $options)->first();
     }
 }

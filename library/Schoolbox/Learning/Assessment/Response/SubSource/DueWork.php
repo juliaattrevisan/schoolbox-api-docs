@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\Assessment\Response\SubSource;
 
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
-use Schoolbox\Learning\Assessment\DueWork\Submission\MapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**

@@ -8,7 +8,7 @@
  *
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 

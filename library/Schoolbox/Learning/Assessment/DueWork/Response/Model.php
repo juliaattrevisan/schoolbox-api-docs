@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Assessment\DueWork\Submission;
+namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;

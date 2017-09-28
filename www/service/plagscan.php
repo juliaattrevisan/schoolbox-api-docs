@@ -10,7 +10,7 @@
 
 require_once '../../library/Bootstrap.php';
 
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Callback as PlagscanCallback;
+use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Callback as PlagscanCallback;
 
 try {
     $callback = new PlagscanCallback();

@@ -13,10 +13,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan;
+namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Model as Plagscan;
-use Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class Callback
