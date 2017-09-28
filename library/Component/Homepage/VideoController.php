@@ -171,8 +171,8 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                             'VIDEO_LIST_ID' =>          $video->getFile()->getId(),
                             'VIDEO_LIST_TITLE' =>       Scrub::text($video->getFile()->getTitle()),
                             'VIDEO_LIST_DURATION' =>    $video->getDuration() >= 3600
-                                ? gmdate('H:i:s', $video->getDuration())
-                                : gmdate('i:s', $video->getDuration()),
+                                                        ? gmdate('H:i:s', $video->getDuration())
+                                                        : gmdate('i:s', $video->getDuration()),
                             'VIDEO_LIST_COMMENT' =>     Scrub::text($video->getFile()->getDescription()),
                             'VIDEO_LIST_HIDDEN' =>      $video->getFile()->getHidden() ? 'hidden' : '',
                             'VIDEO_LIST_POSTER_ID' =>   $video->getFile()->getOwner()->getId(),
@@ -218,7 +218,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                     }
                 }
 
-                if ($this->defaultVideo->getStatus() == 'completed') {
+                if (is_object($this->defaultVideo) and $this->defaultVideo->getStatus() == 'completed') {
                     $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
                     $this->parse('default_video_block', 'default_video');
                 }
