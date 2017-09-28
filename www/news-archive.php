@@ -343,7 +343,9 @@ if (is_array($items)) {
             'POSTER_ID' => $article['uid'],
             'POSTER_EXTERNAL_ID' => $article['synid'],
             'DATETIME' => $postDate->getLong(),
-            'NEWS_BODY' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
+            'NEWS_BODY' => empty($article['item_blurb'])
+                ? '<p>'.TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300).'</p>'
+                : Scrub::html($article['item_blurb']),
         );
 
         $this->setVar($output);
