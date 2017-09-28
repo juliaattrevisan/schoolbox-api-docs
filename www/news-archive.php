@@ -81,7 +81,8 @@ $filter = array(
 );
 
 // set an appropriate title based on news context
-$title = $this->getVar('TPL_LOCAL_NEWS_PC') . ($archive ? ' Archive' : '');
+$l10n = $this->getDi()->get('l10n');
+$title = $l10n->news->translate() . ($archive ? ' Archive' : '');
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 
