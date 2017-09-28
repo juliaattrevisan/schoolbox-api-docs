@@ -45,7 +45,7 @@
                 <ul class="action-list">
                     <!-- BEGIN poll_question -->
                     <li class="actions-small-1">
-                        <div class="list-item">
+                        <div>
                             <div class="card wrap-down small-12">
                                 <img src="{POLL_AUTHOR_THUMB}" alt="View Profile" />
                                 <h3>{POLL_QUESTION}</h3>
@@ -65,7 +65,7 @@
                             <div class="small-12 column">
                                 <form data-component-poll="{COMPONENT_INSTANCE_ID}" action="/poll/modifyForm.php"
                                       method="post">
-                                     <script type="text/javascript">
+                                    <script type="text/javascript">
                                         $(function () {
 
                                             /* Vote validate on a per-poll basis
@@ -86,7 +86,7 @@
                                                 return valid;
                                             });
                                         });
-                                     </script>
+                                    </script>
 
                                     <input type="hidden" name="pollID" value="{POLL_ID}"/>
                                     <input type="hidden" name="categoryID" value="{ID}"/>
@@ -104,6 +104,7 @@
                             </div>
                         </div>
                         <!-- END poll_vote -->
+
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="poll-options{POLL_ID}" aria-expanded="false" title="Actions"></a>
                         </nav>
