@@ -30,6 +30,40 @@
             $('#allowed-file-dialog').foundation('reveal', 'close');
         });
 
+        jQuery.validator.addMethod("mimeNotUsed", function(value, element) {
+
+
+            //
+            // Some sort of form validation - check for no duplicate mimetypes.
+
+            var form = element.closest("form");
+            var create_form  = $('form[data-action="createNewFileType"]');
+            var update_forms = $('form[data-action="updateFileType"]');
+
+            if ($(form).is('form[data-action="createNewFileType"]')) {
+                create_form.add(update_forms);
+            }
+
+            var this_mimetype = value;
+
+            var mimetype_list = $.map(
+                update_forms.not(form).find(':input[name="mime"]'),
+
+                function(element) {
+                    return $(element).val();
+                }
+            );
+
+
+            if ($.inArray(this_mimetype, mimetype_list) >= 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+
+        });
+
 		$('form[data-action="createNewFileType"], form[data-action="updateFileType"]').each(function() {
             $(this).alaressValidate({
                 rules: {
@@ -39,6 +73,7 @@
                     },
                     mime: {
                         required: true,
+                        mimeNotUsed: true,
                         minlength: 2
                     },
                     extension: {
@@ -48,38 +83,11 @@
                 },
                 messages: {
                     title: "Please enter a title",
-                    mime: "Please enter a mime type",
+                    mime: {
+                        required: "Please enter a mime type",
+                        mimeNotUsed: "The mime type you have chosen for this file type is already in use."
+                    },
                     extension: "Please enter a file extension"
-                },
-                submitHandler: function (form) {
-                    //
-                    // Some sort of form validation - check for no duplicate mimetypes.
-                    var create_form  = $('form[data-action="createNewFileType"]');
-                    var update_forms = $('form[data-action="updateFileType"]');
-
-                    if ($(form).is('form[data-action="createNewFileType"]')) {
-                        create_form.add(update_forms);
-                    }
-
-                    var this_mimetype = $(form).find(':input[name="mime"]').val();
-
-                    var mimetype_list = $.map(
-                            update_forms.not(form).find(':input[name="mime"]'),
-
-                            function(element) {
-                                return $(element).val();
-                            }
-                    );
-
-                    if ($.inArray(this_mimetype, mimetype_list) >= 0) {
-                        event.preventDefault();
-                        var $toast = $('[data-toast]');
-                        $toast.toastActivate({text: 'The mime type you have chosen for this file type is already in use.', duration: 3000, css: 'alert'});
-                        event.preventDefault();
-                    }
-                    else {
-                        form.submit();
-                    }
                 }
             });
         });
@@ -338,5 +346,3 @@
     <!-- END image -->
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
-
-<div id='toaster' class="toast" data-toast></div>
