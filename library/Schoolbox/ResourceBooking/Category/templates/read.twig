@@ -107,6 +107,7 @@
                             name = name + ' [' + resource.room_code + ']';
                         }
                         var href = $('<a />').attr('href', '/resource-booking/item/'+resource.id);
+                        href.addClass("resource-link");
                         el.find('.fc-cell-text').empty().append(href.text(name));
                     }
                 }],
@@ -289,6 +290,11 @@
             onZeroClipboardReady: function() {
                 $('#copy-button').show();
             }
+        });
+
+        //Some third party js is disabling these links - I'll show them!
+        $('a.resource-link').click(function() {
+            window.location = $(this).attr('href');
         });
 
     });
