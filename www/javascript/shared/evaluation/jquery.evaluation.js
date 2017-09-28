@@ -61,7 +61,7 @@
 				$('[data-evaluation-navigator]').removeAttr('disabled').removeAttr('readonly');
 			})
 			.done(function() {
-				var errors = false;
+                var errors = false;
 				questions.each(function(index, element) {
 					var pluginName = $(element).data('plugin');
 
@@ -106,12 +106,18 @@
 							if (!$(element).valid()) {
 								errors = true;
 							}
+
+							if ($(element).valid()) {
+
+                            }
 						}
 					}
 				});
 				/* Remove loading gif; show success label
 				 */
 				label.toastTimeout({text: 'Progress Saved'});
+                $('[data-evaluation-finish]').removeAttr('disabled').removeAttr('readonly');
+                $('[data-evaluation-navigator]').removeAttr('disabled').removeAttr('readonly');
 
 				/* Detect errors, prevent redirection if any were made
 				 * and hide that Saving box
@@ -120,6 +126,12 @@
 					location.href = href;
 				}
 				else {
+				    // Scroll to first element with an error
+                    // http://www.robertprice.co.uk/robblog/using-jquery-to-scroll-to-an-element/
+                    $('html, body').animate({
+                        // li is the corresponding parent item, to which the error pertains
+                        scrollTop: ($('.error').first().closest("li").offset().top)
+                    });
 				}
 			});
 
