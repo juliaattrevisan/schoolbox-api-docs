@@ -45,7 +45,7 @@
                 <ul class="action-list">
                     <!-- BEGIN poll_question -->
                     <li class="actions-small-1">
-                        <div class="list-item">
+                        <div>
                             <div class="card wrap-down small-12">
                                 <img src="{POLL_AUTHOR_THUMB}" alt="View Profile" />
                                 <h3>{POLL_QUESTION}</h3>
@@ -59,51 +59,55 @@
                                     {POLL_CREATED}
                                 </p>
                             </div>
-                        </div>
-                        <!-- BEGIN poll_vote -->
-                        <div class="row content">
-                            <div class="small-12 column">
-                                <form data-component-poll="{COMPONENT_INSTANCE_ID}" action="/poll/modifyForm.php"
-                                      method="post">
-                                     <script type="text/javascript">
-                                        $(function () {
 
-                                            /* Vote validate on a per-poll basis
-                                             */
-                                            $('[data-component-poll={COMPONENT_INSTANCE_ID}]').submit(function (event) {
-                                                var valid = false;
+                            <!-- BEGIN poll_vote -->
+                            <div class="row content">
+                                <div class="small-12 column">
+                                    <form data-component-poll="{COMPONENT_INSTANCE_ID}" action="/poll/modifyForm.php"
+                                          method="post">
+                                        <script type="text/javascript">
+                                            $(function () {
 
-                                                $(this).find('[data-poll-option]').each(function (index, element) {
-                                                    if ($(this).prop('checked')) {
-                                                        valid = true;
+                                                /* Vote validate on a per-poll basis
+                                                 */
+                                                $('[data-component-poll={COMPONENT_INSTANCE_ID}]').submit(function (event) {
+                                                    var valid = false;
+
+                                                    $(this).find('[data-poll-option]').each(function (index, element) {
+                                                        if ($(this).prop('checked')) {
+                                                            valid = true;
+                                                        }
+                                                    });
+
+                                                    if (!valid) {
+                                                        alert('Please select an option.');
                                                     }
+
+                                                    return valid;
                                                 });
-
-                                                if (!valid) {
-                                                    alert('Please select an option.');
-                                                }
-
-                                                return valid;
                                             });
-                                        });
-                                     </script>
+                                        </script>
 
-                                    <input type="hidden" name="pollID" value="{POLL_ID}"/>
-                                    <input type="hidden" name="categoryID" value="{ID}"/>
+                                        <input type="hidden" name="pollID" value="{POLL_ID}"/>
+                                        <input type="hidden" name="categoryID" value="{ID}"/>
 
-                                    <!-- BEGIN poll_options -->
-                                    <input type="radio" name="vote" data-poll-option
-                                           id="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
-                                           value="{POLL_OPTION_INDEX}"/>
-                                    <label for="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
-                                           class="radio-label">{POLL_OPTION}</label>
-                                    <!-- END poll_options -->
+                                        <!-- BEGIN poll_options -->
+                                        <input type="radio" name="vote" data-poll-option
+                                               id="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
+                                               value="{POLL_OPTION_INDEX}"/>
+                                        <label for="component{COMPONENT_INSTANCE_ID}-poll{POLL_ID}-option-{POLL_OPTION_INDEX}"
+                                               class="radio-label">{POLL_OPTION}</label>
+                                        <!-- END poll_options -->
 
-                                    <input type="submit" value="Vote" data-poll-validate="{COMPONENT_INSTANCE_ID}"/>
-                                </form>
+                                        <input type="submit" value="Vote" data-poll-validate="{COMPONENT_INSTANCE_ID}"/>
+                                    </form>
+                                </div>
                             </div>
+                            <!-- END poll_vote -->
                         </div>
-                        <!-- END poll_vote -->
+
+
+
                         <nav>
                             <a href="#" class="icon-more" data-dropdown="poll-options{POLL_ID}" aria-expanded="false" title="Actions"></a>
                         </nav>
