@@ -168,14 +168,11 @@ class Controller extends Base
         }
 
         // show the list of users for this school
-        /** @var UserMapper $userMapper */
-        $userMapper = $this->userAccessMapper->getJoinMapper('user');
-
         // filter to the list of users whose external IDs are prefixed with the given school code
-        $predicate = $userMapper->getPredicateBuilder()->like('synergy_id', "{$schoolCode}.%");
+        $predicate = $this->getUserMapper()->getPredicateBuilder()->like('synergy_id', "{$schoolCode}.%");
 
         // we only need the external ID itself, so bypass object hydration
-        $externalIds = $userMapper->findScalarByPredicates('synergy_id', $predicate);
+        $externalIds = $this->getUserMapper()->findScalarByPredicates('synergy_id', $predicate);
 
         $unprefixed = array_map(function ($id) use ($schoolCode) {
             return str_replace("{$schoolCode}.", '', $id);
@@ -270,4 +267,13 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($r->getReasonPhrase()));
     }
 
+
+    /**
+     * @return UserMapper|Mapper
+     * @throws Mapper\DefinitionException
+     */
+    private function getUserMapper()
+    {
+        return $this->userAccessMapper->getJoinMapper('user');
+    }
 }
