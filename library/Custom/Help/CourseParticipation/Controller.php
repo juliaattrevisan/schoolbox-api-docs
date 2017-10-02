@@ -201,6 +201,14 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
+        try {
+            $participantRole = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
+        } catch (Mapper\Exception $e) {
+            // if this role doesn't exist, that's *bad* bad
+            $this->sendGenericStatus(500);
+            return;
+        }
+
         $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
 
         $authDigest = $rq->query->get('token', '');
@@ -255,7 +263,7 @@ class Controller extends Base
                 ->setLastname($userData['lastname'])
                 ->setAltEmail($userData['email'])
                 ->setEnabled(true)
-                ->setRole($this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME))
+                ->setRole($participantRole)
                 ->setExternalId($externalId)
             ;
         }
