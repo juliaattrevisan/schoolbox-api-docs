@@ -32,13 +32,19 @@
 
         jQuery.validator.addMethod("noAudience", function(value, element) {
 
-            var userList = $('#addUser')[0].selectize.options;
-            var userCount =  Object.keys(userList);
+            //Campus or Role must be paired with each other
+            if ($("input[name='campus[]']:checked").length > 0 || $("input[name='group[]']:checked").length > 0) {
+                if ($("input[name='campus[]']:checked").length > 0 && $("input[name='group[]']:checked").length > 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            //Or we have users in our selectize
+            var userCount = $('#addUser')[0].selectize.items.length;
 
             if (userCount > 0) {
-               return true;
-            }
-            if ($("input[name='campus[]']:checked").length > 0 && $("input[name='group[]']:checked").length > 0) {
                return true;
             }
 
