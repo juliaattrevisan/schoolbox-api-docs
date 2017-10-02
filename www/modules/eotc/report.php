@@ -26,6 +26,8 @@ $this->setBlock(TEMPLATE_content, 'report_timespan', 'report_timespan_block');
 $this->setBlock(TEMPLATE_content, 'report_status', 'report_status_block');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
+$this->setBlock('event', 'link_start', 'link_start_block');
+$this->setBlock('event', 'link_end', 'link_end_block');
 
 $this->setVar([
     'event_list_group_block' => '',
@@ -142,11 +144,19 @@ foreach ($allListGroups as $key => $currentListGroup) {
                     'EVENT_TITLE'                      => $currentEvent->getTitle(),
                     'EVENT_START_DATETIME'             => $currentEvent->getStartDatetime()->getShort(),
                     'EVENT_TEACHER_IN_CHARGE_ID'       => $currentEvent->getTeacherInCharge()->getId(),
-                    'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
+                    'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullName(),
                     'EVENT_CREATED_AT'                 => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
                     'EVENT_STUDENTS'                   => $currentEvent->getMetadata()->getStudentAttendees()->count(),
                     'EVENT_RAMS_REQUIRED'              => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
                 ]);
+
+                if($currentEvent->getTeacherInCharge()->isDeleted()) {
+                    $this->setVar('link_start_block', '');
+                    $this->setVar('link_end_block', '');
+                } else {
+                    $this->parse('link_start_block', 'link_start');
+                    $this->parse('link_end_block', 'link_end');
+                }
 
                 $this->parse('event_block', 'event', true);
 
