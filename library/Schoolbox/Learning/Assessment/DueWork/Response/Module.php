@@ -96,8 +96,20 @@ class Module extends BaseModule
             $canAccessCrocodoc,
             new Kami\Authentication\IsEnabled($this->getKamiConnector())
         );
+        // Don't attempt to export a kamiDoc if not possible
+        $canExportKami = new Rule\All(
+            $canAccessCrocodoc,
+            new Kami\Authentication\IsEnabled($this->getKamiConnector()),
+            new Rule\Callback(function (array $params) {
+                $kami = $this->getKamiMapper()->findById($params['kamiId']);
+                if ($kami->isStatusProcessing() || $kami->isStatusDone()) {
+                    return true;
+                }
+                throw new Unauthorized();
+            })
+        );
         $this->register('GET', '/kami/{kamiId:\d+}' . '',        'getKamiView',      $canAccessKami, $preloadKami);
-        $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExportUrl', $canAccessKami, $preloadKami);
+        $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExportUrl', $canExportKami, $preloadKami);
     }
 
 
