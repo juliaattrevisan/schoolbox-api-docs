@@ -219,7 +219,7 @@ class Controller extends Base
 
         // check all the necessary data is present
         foreach ($requiredFields as $required) {
-            if (!array_key_exists($required, $userData)) {
+            if (!array_key_exists($required, $userData) || empty(trim($userData[$required]))) {
                 return false;
             }
         }
