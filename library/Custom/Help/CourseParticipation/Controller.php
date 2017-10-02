@@ -135,7 +135,7 @@ class Controller extends Base
             $payload[] = [
                 'folderName'   => $course->getName(),
                 'folderId'     => $course->getId(),
-                'participants' => $participants
+                'participants' => array_filter($participants)
             ];
         }
 
