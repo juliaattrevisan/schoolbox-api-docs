@@ -21,6 +21,8 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+    const PARTICIPANT_ROLE_NAME = 'School Staff';
+
     /**
      * @var UserAccessMapper
      */
@@ -186,7 +188,9 @@ class Controller extends Base
     /**
      * @api   POST /api/course-participation/{schoolCode}/users
      * @level 170
+     *
      * @param string $schoolCode
+     * @throws Mapper\DefinitionException
      */
     public function postUserRegistrations($schoolCode)
     {
@@ -205,7 +209,66 @@ class Controller extends Base
             return;
         }
 
-        $rs->content->set($this->buildJsonOutput($schoolCode));
+        // process the payload
+        $post = $rq->post;
+
+        if (empty($post['user'])) {
+            // empty payload: do nothing
+            $this->sendGenericStatus(400);
+            return;
+        }
+
+        $failedUsers = [];
+
+        foreach ($post['user'] as $userData) {
+
+            if (!$this->userPayloadIsValid($userData)) {
+                $failedUsers[] = $userData;
+                continue;
+            }
+
+            // user uniqueness is looked up by external ID
+            $externalId = "{$schoolCode}.{$userData['id']}";
+
+            try {
+                $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
+
+            } catch (Mapper\Exception\Deleted $e) {
+                // user exists, but is deleted; consider this a fail case
+                $failedUsers[] = $userData;
+                continue;
+
+            } catch (Mapper\Exception $e) {
+                // user does not exist; create the model
+                $user = $this->getUserMapper()->createModel();
+            }
+
+            // update user object
+            $user
+                ->setUsername($userData['email'])
+                ->setTitle($userData['title'])
+                ->setFirstname($userData['firstname'])
+                ->setLastname($userData['lastname'])
+                ->setAltEmail($userData['email'])
+                ->setEnabled(true)
+                ->setRole($this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME))
+                ->setExternalId($externalId)
+            ;
+        }
+
+        if (count($failedUsers)) {
+            // just blame the client :P
+            $this->sendGenericStatus(400);
+            $rs->content->set($this->buildJsonOutput($failedUsers));
+
+        } else {
+            // everything went fine, nothing to respond with
+            $this->sendGenericStatus(204);
+            $rs->content->set($this->buildJsonOutput(null));
+        }
+
+    }
+
 
     /**
      * @param array $userData
