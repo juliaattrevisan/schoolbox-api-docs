@@ -30,7 +30,7 @@
                 }
             })
 
-        jQuery.validator.addMethod("noAudience", function(value, element) {
+        jQuery.validator.addMethod("hasAudience", function(value, element) {
 
             //Campus or Role must be paired with each other
             if ($("input[name='campus[]']:checked").length > 0 || $("input[name='group[]']:checked").length > 0) {
@@ -55,7 +55,7 @@
         $('#newsForm').alaressValidate({
             rules: {
                 'audience': {
-                    noAudience: true
+                    hasAudience: true
                 }
             }
         });
