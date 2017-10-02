@@ -13,9 +13,7 @@ use Alaress\Jitter\IJitter;
 use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException;
-use Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException;
-use Schoolbox\Learning\InlineGrader\Kami\Exception\SimulatedNetworkFailureException;
+use GuzzleHttp\Exception\ConnectException;
 
 /**
  * Uploads eligible student submission files into Kami and inserts the
@@ -176,6 +174,11 @@ class Uploader
                         Model::STATUS_FAILED
                     ));
 
+                    if($lastException instanceof ConnectException){
+                        $this->log->error('Network is down: aborting!');
+                        return $results;
+                    }
+
                     if ($successiveFailures > $maxSkips) {
                         $this->log->error('Too many sequential failures: aborting!');
                         return $results;
@@ -208,6 +211,10 @@ class Uploader
                 return $this->kamiConnector->uploadDocument($kamiModel->getStudentSubmissionFile()->getStorage());
             } catch (Exception\IKamiException $e) {
                 // If we recognise the exception, just print the info we need.
+                $this->logUploadException($e, $kamiModel, $countFailedAttempts);
+                throw $e;
+            } catch (ConnectException $e) {
+                // Network is unreachable.
                 $this->logUploadException($e, $kamiModel, $countFailedAttempts);
                 throw $e;
             } catch (\Throwable $e) {
