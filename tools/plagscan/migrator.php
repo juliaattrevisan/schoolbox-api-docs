@@ -45,7 +45,8 @@ try {
 
             $predicateBuilder = $plagscanMapper->getPredicateBuilder();
 
-            $predicatePending = $predicateBuilder->notNull('html')
+            $predicatePending = $predicateBuilder
+                ->notNull('html')
                 ->isNull('storage_migrated_at')
                 ->isNull('storage_failed_at');
 

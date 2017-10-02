@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
@@ -20,8 +21,11 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagsc
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\File\Mimetype;
+use Schoolbox\File\MimetypeMapper;
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
@@ -66,7 +70,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
         $this->uses('privatised_at', self::TYPE_DATETIME);
-        $this->uses('storage_hash', self::TYPE_STRING);
+        $this->joins('storage_hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('storage_migrated_at', self::TYPE_DATETIME);
         $this->uses('storage_failed_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -455,13 +459,14 @@ class Mapper extends \Schoolbox\Mapper
 
             // Uploading to storage succeeded
 
-            $document->setStorageHash(NodeFactory::STORE . ':' . $storageObject->getHash());
+            $document->setStorage($storageObject);
             $document->setStorageMigratedAt(Alaress_Date_Format::now());
             $this->save($document);
             fclose($file);
 
             return true;
         } catch (FileException $e) {
+            var_dump($e);
             // Uploading to storage failed
 
             $document->setStorageFailedAt(Alaress_Date_Format::now());
@@ -470,6 +475,62 @@ class Mapper extends \Schoolbox\Mapper
 
             return false;
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString()
+    {
+        $storageMapper = $this->getJoinMapper('storage');
+
+        return "
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('storage', 's')},
+                        {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
+            FROM        {$this->getTable()} 
+            LEFT JOIN  {$this->getJoinSql('storage', '', 's', true)}
+            LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime')}
+        ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        // Return attachments fully hydrated by default
+
+        $collection = $this->createCollection();
+
+        /** @var MimetypeMapper $mimeMapper */
+        $mimeMapper = $this->getJoinMapper('storage')->getJoinMapper('allowedFileExtension');
+
+        foreach ($statement as $row) {
+            $model = $this->hydrate($row);
+
+            // Hydrate storage object
+
+            /** @var Storage $storage */
+            $storage = $this->hydrateJoin($row, 'storage', 's');
+
+            if ($storage instanceof Storage) {
+                // Hydrate a mime type if we can find one
+
+                /** @var Mimetype $mime */
+                $mime = $mimeMapper->hydrate($row, 'mime');
+
+                if ($mime instanceof Mimetype) {
+                    $storage->setMimetype($mime);
+                }
+
+                $model->setStorage($storage);
+            }
+
+            $collection->add($model);
+        }
+
+        return $collection;
     }
 
     /* Getters/Setters
