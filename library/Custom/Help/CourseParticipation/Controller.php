@@ -186,6 +186,32 @@ class Controller extends Base
 
 
     /**
+     * @api   POST /api/course-participation/{schoolCode}/users
+     * @level 170
+     * @param string $schoolCode
+     */
+    public function postUserRegistrations($schoolCode)
+    {
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
+
+        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
+
+        $authDigest = $rq->query->get('token', '');
+
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
+
+        if ($responseCode !== 200) {
+            // if the request didn't pass the gauntlet, bounce the request
+            $this->sendGenericStatus($responseCode);
+            return;
+        }
+
+        $rs->content->set($this->buildJsonOutput($schoolCode));
+    }
+
+
+    /**
      * @param string              $schoolCode
      * @param Alaress_Date_Format $requestTimestamp
      * @param string              $authDigest
