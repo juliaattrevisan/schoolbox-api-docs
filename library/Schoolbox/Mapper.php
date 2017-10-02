@@ -2363,11 +2363,28 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findIdsByPredicates(Builder $pb, array $options = [])
     {
-        try{
-            $selection = "{$this->getTable()}.{$this->getIdentifierColumn()}";
+        return $this->findScalarByPredicates($this->getIdentifierColumn(), $pb, $options);
+    }
+
+
+    /**
+     * @param string  $column
+     * @param Builder $pb
+     * @param array   $options
+     * @return array
+     */
+    public function findScalarByPredicates($column, Builder $pb, array $options = [])
+    {
+        try {
+            $selection = implode('.', array_map(function ($v) {
+                return $this->database->quoteIdentifier($v);
+            }, [ $this->getTable(), $column ]));
+
             $stmt = $this->selectScalarByPredicates($selection, $pb, $options);
+
             return $stmt->fetchAll(PDO::FETCH_COLUMN);
-        } catch (UnderflowException $e){
+
+        } catch (UnderflowException $e) {
             return [];
         }
     }
