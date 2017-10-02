@@ -266,6 +266,14 @@ class Controller extends Base
                 ->setRole($participantRole)
                 ->setExternalId($externalId)
             ;
+
+            try {
+                $this->getUserMapper()->save($user);
+
+            } catch (Mapper\Exception $e) {
+                // the user failed to save; is fail case
+                $failedUsers[] = $userData;
+            }
         }
 
         if (count($failedUsers)) {
