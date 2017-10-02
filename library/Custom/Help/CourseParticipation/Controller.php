@@ -15,6 +15,7 @@ use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 
 class Controller extends Base
@@ -147,13 +148,40 @@ class Controller extends Base
      * @level 170
      *
      * @param string $schoolCode
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getUsersBySchool($schoolCode)
     {
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $rs->content->set($this->buildJsonOutput($schoolCode));
+        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
+
+        $authDigest = $rq->query->get('token', '');
+
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
+
+        if ($responseCode !== 200) {
+            // if the request didn't pass the gauntlet, bounce the request
+            $this->sendGenericStatus($responseCode);
+            return;
+        }
+
+        // show the list of users for this school
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->userAccessMapper->getJoinMapper('user');
+
+        // filter to the list of users whose external IDs are prefixed with the given school code
+        $predicate = $userMapper->getPredicateBuilder()->like('synergy_id', "{$schoolCode}.%");
+
+        // we only need the external ID itself, so bypass object hydration
+        $externalIds = $userMapper->findScalarByPredicates('synergy_id', $predicate);
+
+        $unprefixed = array_map(function ($id) use ($schoolCode) {
+            return str_replace("{$schoolCode}.", '', $id);
+        }, $externalIds);
+
+        $rs->content->set($this->buildJsonOutput($unprefixed));
     }
 
 
