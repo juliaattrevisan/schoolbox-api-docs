@@ -326,7 +326,7 @@ class Model implements IStorage, ISoftDeletable
      */
     public function isMigrated(): bool
     {
-        return !empty($this->getStorageHash()) && !empty($this->getStorageMigratedAt());
+        return !empty($this->getStorage()->getHash()) && !empty($this->getStorageMigratedAt());
     }
 
     /**
@@ -364,24 +364,6 @@ class Model implements IStorage, ISoftDeletable
     public function setStorageFailedAt($storageFailedAt)
     {
         $this->storageFailedAt = $storageFailedAt;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStorageHash()
-    {
-        return $this->storageHash;
-    }
-
-    /**
-     * @param string $storageHash
-     * @return $this
-     */
-    public function setStorageHash($storageHash)
-    {
-        $this->storageHash = $storageHash;
         return $this;
     }
 }
