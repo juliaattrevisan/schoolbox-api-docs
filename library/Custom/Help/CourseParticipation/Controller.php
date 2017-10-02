@@ -99,31 +99,13 @@ class Controller extends Base
 
         $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
 
-        $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
-
-        // permit a window of +/- 10 seconds to guard against replay
-        if ($deltaTimestamp > 10) {
-            $this->sendGenericStatus(400);
-            return;
-        }
-
         $authDigest = $rq->query->get('token', '');
 
-        try {
-            $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
-        } catch (Mapper\Exception $e) {
-            $this->sendGenericStatus(401);
-            return;
-        }
+        $responseCode = $this->getResponseCode($schoolCode, $requestTimestamp, $authDigest);
 
-        $expectedToken = $this->computeAccessToken(
-            $requestTimestamp,
-            $schoolCode,
-            $privateKey
-        );
-
-        if ($expectedToken !== $authDigest) {
-            $this->sendGenericStatus(403);
+        if ($responseCode !== 200) {
+            // if the request didn't pass the gauntlet, bounce the request
+            $this->sendGenericStatus($responseCode);
             return;
         }
 
@@ -173,6 +155,42 @@ class Controller extends Base
 
         $rs->content->set($this->buildJsonOutput($schoolCode));
     }
+
+
+    /**
+     * @param string              $schoolCode
+     * @param Alaress_Date_Format $requestTimestamp
+     * @param string              $authDigest
+     * @return int
+     */
+    private function getResponseCode($schoolCode, Alaress_Date_Format $requestTimestamp, $authDigest)
+    {
+        $deltaTimestamp = abs(Alaress_Date_Format::now()->diffInSeconds($requestTimestamp));
+
+        // permit a window of +/- 10 seconds to guard against replay
+        if ($deltaTimestamp > 10) {
+            return 400;
+        }
+
+        try {
+            $privateKey = $this->tokenMapper->findById($schoolCode)->getAccessToken();
+        } catch (Mapper\Exception $e) {
+            return 401;
+        }
+
+        $expectedToken = $this->computeAccessToken(
+            $requestTimestamp,
+            $schoolCode,
+            $privateKey
+        );
+
+        if ($expectedToken !== $authDigest) {
+            return 403;
+        }
+
+        return 200;
+    }
+
 
     /**
      * @param string $timestamp
