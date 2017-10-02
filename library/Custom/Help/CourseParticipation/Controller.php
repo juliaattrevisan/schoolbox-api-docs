@@ -15,6 +15,7 @@ use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 
@@ -275,5 +276,15 @@ class Controller extends Base
     private function getUserMapper()
     {
         return $this->userAccessMapper->getJoinMapper('user');
+    }
+
+
+    /**
+     * @return RoleMapper|Mapper
+     * @throws Mapper\DefinitionException
+     */
+    private function getRoleMapper()
+    {
+        return $this->getUserMapper()->getJoinMapper('role');
     }
 }
