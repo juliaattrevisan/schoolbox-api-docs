@@ -326,9 +326,9 @@ class EventMapper extends CalendarEventMapper
                 {$teacherInChargeMapper->getColumnString('c')},
                 {$eventTypeMapper->getColumnString('t')}
             FROM `{$this->table}` e
-            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            LEFT JOIN {$this->getJoinSql('author', 'e', 'a', true)}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c', true)}
+            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't', true)}
             WHERE e.author_id = :userId
             OR e.teacher_in_charge_id = :userId
             ORDER BY e.start_datetime
