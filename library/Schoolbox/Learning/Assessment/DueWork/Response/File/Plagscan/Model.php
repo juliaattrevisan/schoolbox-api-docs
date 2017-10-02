@@ -319,6 +319,8 @@ class Model implements IStorage, ISoftDeletable
         return !empty($this->getHtml());
     }
 
+    // TODO: Remove these once migration has completed
+
     /**
      * Return boolean flag indicating if the document has been successfully migrated to OTFS storage
      *
@@ -326,6 +328,10 @@ class Model implements IStorage, ISoftDeletable
      */
     public function isMigrated(): bool
     {
+        if (!$this->getStorage() instanceof IStorage) {
+            return false;
+        }
+
         return !empty($this->getStorage()->getHash()) && !empty($this->getStorageMigratedAt());
     }
 
