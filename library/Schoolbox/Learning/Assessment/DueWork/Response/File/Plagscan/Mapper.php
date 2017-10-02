@@ -11,10 +11,15 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
 use Schoolbox\Collection;
+use Schoolbox\File\Exception as FileException;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -35,7 +40,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * An instance of the Plagscan Connector
      * which is where files end up
-     * 
+     *
      * @var Connector
      */
     private $connector;
@@ -61,6 +66,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('html', self::TYPE_STRING);
         $this->uses('interactive_url', self::TYPE_STRING);
         $this->uses('privatised_at', self::TYPE_DATETIME);
+        $this->uses('storage_hash', self::TYPE_STRING);
+        $this->uses('storage_migrated_at', self::TYPE_DATETIME);
+        $this->uses('storage_failed_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
@@ -185,8 +193,8 @@ class Mapper extends \Schoolbox\Mapper
         $plagscan->setPlagscanId(null);
         $plagscan->setStatus(Plagscan::STATUS_QUEUED);
         $plagscan->setStudentSubmissionFileId($file->getId());
-        $plagscan->setCreatedAt(\Alaress_Date_Format::now());
-        $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
+        $plagscan->setCreatedAt(Alaress_Date_Format::now());
+        $plagscan->setUpdatedAt(Alaress_Date_Format::now());
 
         return parent::save($plagscan);
     }
@@ -238,11 +246,11 @@ class Mapper extends \Schoolbox\Mapper
              */
             $plagscan = $this->createModel();
             $plagscan->setStudentSubmissionFileId($file->getId());
-            $plagscan->setCreatedAt(\Alaress_Date_Format::now());
+            $plagscan->setCreatedAt(Alaress_Date_Format::now());
         }
 
         $plagscan->setStatus(Plagscan::STATUS_QUEUED);
-        $plagscan->setUpdatedAt(\Alaress_Date_Format::now());
+        $plagscan->setUpdatedAt(Alaress_Date_Format::now());
 
         // We save it early so if it fails we at least have a record
         parent::save($plagscan);
@@ -372,8 +380,7 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * Privatise a particular plagscan id
-     * in both our db and in plagscan's
+     * Privatise a particular plagscan id in both our db and in plagscan's
      *
      * @param Plagscan $plagscan
      *
@@ -387,7 +394,7 @@ class Mapper extends \Schoolbox\Mapper
              */
             $this->getConnector()->privatise($plagscan->getPlagscanId());
 
-            $plagscan->setPrivatisedAt(\Alaress_Date_Format::now());
+            $plagscan->setPrivatisedAt(Alaress_Date_Format::now());
             $this->save($plagscan);
         }
         catch (\RuntimeException $e) {
@@ -398,6 +405,70 @@ class Mapper extends \Schoolbox\Mapper
              * This allows you to re-encounter documents being checked against older versions of themselves
              * but can't do much to stop it if plagscan screws us
              */
+        }
+    }
+
+    /**
+     * Migrate the HTML contents from `plagscan_document` table into OTFS storage
+     *
+     * @param Model $document The Plagscan document to be migrated
+     * @param bool $retry Flag used to determine if failed documents should be reattempted
+     * @return bool
+     */
+    public function migrateHtml(Model $document, bool $retry = false): bool
+    {
+        // If the document had already failed, and we aren't retrying failed documents, fail again.
+
+        if (!$document->getStorageFailedAt() instanceof Alaress_Date_NullDate && !$retry) {
+            return false;
+        }
+
+        // Shortcut if the document has already been migrated
+
+        if ($document->isMigrated()) {
+            return true;
+        }
+
+        // If the document does not have HTML mark it as migrated so we don't attempt again
+
+        if (!$document->hasHtml()) {
+            $document->setStorageMigratedAt(Alaress_Date_Format::now());
+            $this->save($document);
+
+            return true;
+        }
+
+        // Otherwise save the HTML content into an OTFS storage object
+
+        $storageMapper = StorageMapper::getInstance();
+
+        // Create temporary file to hold the HTML
+
+        $filename = "plagscan-{$document->getPlagscanId()}.html";
+        $file     = tmpfile();
+        $metadata = stream_get_meta_data($file);
+        fwrite($file, $document->getHtml());
+        fseek($file, 0);
+
+        try {
+            $storageObject = $storageMapper->accept($filename, $metadata["uri"]);
+
+            // Uploading to storage succeeded
+
+            $document->setStorageHash(NodeFactory::STORE . ':' . $storageObject->getHash());
+            $document->setStorageMigratedAt(Alaress_Date_Format::now());
+            $this->save($document);
+            fclose($file);
+
+            return true;
+        } catch (FileException $e) {
+            // Uploading to storage failed
+
+            $document->setStorageFailedAt(Alaress_Date_Format::now());
+            $this->save($document);
+            fclose($file);
+
+            return false;
         }
     }
 

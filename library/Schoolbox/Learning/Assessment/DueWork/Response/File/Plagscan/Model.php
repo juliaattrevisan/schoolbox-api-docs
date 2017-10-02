@@ -1,24 +1,28 @@
 <?php
 /**
- * Plagscan
+ * Plagscan Document
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
+use Alaress_Date_Format;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Resource\File\StorableTrait;
+use Schoolbox\Resource\Storage\IStorage;
 
-class Model
+class Model implements IStorage, ISoftDeletable
 {
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use StorableTrait;
 
     /**
      * Documents that are queued to be uploaded to plagscan servers
@@ -83,9 +87,18 @@ class Model
     protected $studentSubmissionFileId;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
     protected $privatisedAt;
+
+    /** @var Alaress_Date_Format $storageMigratedAt */
+    protected $storageMigratedAt;
+
+    /** @var Alaress_Date_Format $storageFailedAt */
+    protected $storageFailedAt;
+
+    /** @var string $storageHash */
+    protected $storageHash;
 
     /**
      * Figure out the url to the plagscan report
@@ -278,7 +291,7 @@ class Model
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getPrivatisedAt()
     {
@@ -286,13 +299,89 @@ class Model
     }
 
     /**
-     * @param \Alaress_Date_Format $privatisedAt
+     * @param Alaress_Date_Format $privatisedAt
      *
      * @return $this
      */
     public function setPrivatisedAt($privatisedAt)
     {
         $this->privatisedAt = $privatisedAt;
+        return $this;
+    }
+
+    /**
+     * Return boolean flag indicating if the document has HTML content
+     *
+     * @return bool
+     */
+    public function hasHtml(): bool
+    {
+        return !empty($this->getHtml());
+    }
+
+    /**
+     * Return boolean flag indicating if the document has been successfully migrated to OTFS storage
+     *
+     * @return bool
+     */
+    public function isMigrated(): bool
+    {
+        return !empty($this->getStorageHash()) && !empty($this->getStorageMigratedAt());
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getStorageMigratedAt()
+    {
+        return $this->storageMigratedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format $storageMigratedAt
+     *
+     * @return $this
+     */
+    public function setStorageMigratedAt($storageMigratedAt)
+    {
+        $this->storageMigratedAt = $storageMigratedAt;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getStorageFailedAt()
+    {
+        return $this->storageFailedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format $storageFailedAt
+     *
+     * @return $this
+     */
+    public function setStorageFailedAt($storageFailedAt)
+    {
+        $this->storageFailedAt = $storageFailedAt;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStorageHash()
+    {
+        return $this->storageHash;
+    }
+
+    /**
+     * @param string $storageHash
+     * @return $this
+     */
+    public function setStorageHash($storageHash)
+    {
+        $this->storageHash = $storageHash;
         return $this;
     }
 }
