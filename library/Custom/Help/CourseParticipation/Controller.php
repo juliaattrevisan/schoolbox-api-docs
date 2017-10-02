@@ -161,6 +161,20 @@ class Controller extends Base
 
 
     /**
+     * @api   /api/course-participation/{schoolCode}/users
+     * @level 170
+     *
+     * @param string $schoolCode
+     */
+    public function getUsersBySchool($schoolCode)
+    {
+        $rq = $this->getRequest();
+        $rs = $this->getResponse();
+
+        $rs->content->set($this->buildJsonOutput($schoolCode));
+    }
+
+    /**
      * @param string $timestamp
      * @param string $schoolCode
      * @param string $accessToken
