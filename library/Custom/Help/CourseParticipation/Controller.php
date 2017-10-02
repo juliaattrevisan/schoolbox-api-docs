@@ -206,6 +206,25 @@ class Controller extends Base
         }
 
         $rs->content->set($this->buildJsonOutput($schoolCode));
+
+    /**
+     * @param array $userData
+     * @return bool
+     */
+    private function userPayloadIsValid(array $userData)
+    {
+        $requiredFields = [
+            'id', 'email', 'title', 'firstname', 'lastname'
+        ];
+
+        // check all the necessary data is present
+        foreach ($requiredFields as $required) {
+            if (!array_key_exists($required, $userData)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
