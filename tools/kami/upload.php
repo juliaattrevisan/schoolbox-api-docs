@@ -147,9 +147,16 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         ? new GuzzleHttp\Client()
         : new Kami\Test\UnreliableClient($failureRate, new Random\FloatGenerator());
 
+    $connector = $dryRun ? new Kami\MockConnector($client) : new Kami\Connector($config, $client);
+
+    if(!$connector->isEnabled()) {
+        $log->warning('Kami has not been disabled by puppet for this instance. Aborting');
+        exit(0);
+    }
+
     $uploader = new Kami\Uploader(
         $dryRun,
-        $dryRun ? new Kami\MockConnector($client) : new Kami\Connector($config, $client),
+        $connector,
         new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff),
         $kamiMapper,
         $log
