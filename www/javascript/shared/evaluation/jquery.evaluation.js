@@ -57,8 +57,7 @@
         saveForms(questions)
             .fail(function () {
                 label.toastTimeout({text: 'Progress Save Failed!', css: 'alert'});
-                $('[data-evaluation-finish]').removeAttr('disabled').removeAttr('readonly');
-                $('[data-evaluation-navigator]').removeAttr('disabled').removeAttr('readonly');
+                $('[data-evaluation-finish], [data-evaluation-navigator]').removeAttr('disabled').removeAttr('readonly');
             })
             .done(function () {
                 var errors = false;
@@ -113,8 +112,7 @@
                 /* Remove loading gif; show success label
                  */
                 label.toastTimeout({text: 'Progress Saved'});
-                $('[data-evaluation-finish]').removeAttr('disabled').removeAttr('readonly');
-                $('[data-evaluation-navigator]').removeAttr('disabled').removeAttr('readonly');
+                $('[data-evaluation-finish], [data-evaluation-navigator]').removeAttr('disabled').removeAttr('readonly');
 
                 /* Detect errors, prevent redirection if any were made
                  * and hide that Saving box
@@ -123,11 +121,14 @@
                     location.href = href;
                 }
                 else {
-                    // Scroll to first element with an error
+                    // Scroll to first visible element with an error
                     // http://www.robertprice.co.uk/robblog/using-jquery-to-scroll-to-an-element/
+                    var firstError = $('.error').filter(
+                        function() {return $(this).css("display") === "block";}
+                    ).first().closest("li");
                     $('html, body').animate({
                         // li is the corresponding parent item, to which the error pertains
-                        scrollTop: ($('.error').first().closest("li").offset().top)
+                        scrollTop: ($(firstError).offset().top)
                     });
                 }
             });
