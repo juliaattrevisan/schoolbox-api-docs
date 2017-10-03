@@ -85,7 +85,8 @@ class Exporter
             'student code',
             'class code',
             'assessment item code',
-            'result'
+            'result',
+            'assessment title'
         ];
 
         $data = [];
@@ -118,7 +119,8 @@ class Exporter
                 $headings[0] => $result['synergy_id'],
                 $headings[1] => $result['code'],
                 $headings[2] => $assessmentCode,
-                $headings[3] => $mark
+                $headings[3] => $mark,
+                $headings[4] => $result['name']
             ];
         }
 
