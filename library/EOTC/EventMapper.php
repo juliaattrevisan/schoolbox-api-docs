@@ -199,6 +199,7 @@ class EventMapper extends CalendarEventMapper
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+        $sql = '';
 
         // Build a query around from/to dates
         $queryParts  = [];
@@ -232,7 +233,7 @@ class EventMapper extends CalendarEventMapper
                 {$eventTypeMapper->getColumnString('t')}
             FROM `{$this->table}` e
             LEFT JOIN {$this->getJoinSql('author', 'e', 'a', true)}
-            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c',true)}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c', true)}
             LEFT JOIN {$this->getJoinSql('eventType', 'e', 't', true)}
             {$sql}
             ORDER BY e.start_datetime
