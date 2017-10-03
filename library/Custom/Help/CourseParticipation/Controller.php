@@ -10,6 +10,8 @@ namespace Custom\Help\CourseParticipation;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\SiteAccess;
@@ -84,7 +86,8 @@ class Controller extends Base
         $data = [
             'codes'  => $codes,
             'ts'     => $now->getUnixTimeStamp(),
-            'hashes' => []
+            'hashes' => [],
+            'fields' => self::REQUIRED_USER_FIELDS
         ];
 
         foreach ($codes as $code) {
@@ -94,6 +97,54 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpCourseParticipation/apitest.twig', $data));
     }
+
+
+    /**
+     * @api   POST /api/course-participation/apitest
+     * @level 170
+     */
+    public function postApiTest()
+    {
+        $post = $this->getRequest()->post->getArrayCopy();
+
+        $school = $post['schoolCode'];
+
+        $code = $this->tokenMapper->findById($school);
+
+        $now = Alaress_Date_Format::now();
+
+        $uri = $post['host'] . $this->getRouteIfAuthorized('helpCourseParticipation.postUserRegistrations', [ 'schoolCode' => $school ]);
+
+        $c = new Client();
+
+        unset($post['schoolCode'], $post['host']);
+
+        try {
+            $c->post($uri, [
+                'query' => [
+                    'ts'    => $now->getUnixTimeStamp(),
+                    'token' => $this->computeAccessToken($now, $school, $code->getAccessToken())
+                ],
+                'form_params' => $post
+            ]);
+
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouteIfAuthorized('helpCourseParticipation.getApiTest')
+            );
+
+        } catch (BadResponseException $e) {
+            $response = $e->getResponse();
+
+            $content = $this->buildFileOutputFromString($response->getBody()->getContents());
+
+            $this->getResponse()->status->set($response->getStatusCode());
+            $this->getResponse()->content->set($content);
+            $this->getResponse()->headers->set('Content-Type', 'text/html');
+        }
+
+
+    }
+
 
     /**
      * @param string $schoolCode
