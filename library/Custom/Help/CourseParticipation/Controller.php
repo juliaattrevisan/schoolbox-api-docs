@@ -98,7 +98,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
+        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
 
         $authDigest = $rq->query->get('token', '');
 
@@ -155,7 +155,7 @@ class Controller extends Base
         $rq = $this->getRequest();
         $rs = $this->getResponse();
 
-        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), 'U');
+        $requestTimestamp = new Alaress_Date_Format($rq->query->get('ts', 0), Alaress_Date_Format::TIMESTAMP);
 
         $authDigest = $rq->query->get('token', '');
 
