@@ -34,7 +34,8 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
      *
      * @return boolean
      */
-    private function isVisibleToCurrentUser($video) {
+    private function isVisibleToCurrentUser($video)
+    {
         // Read access users should not be able to see hidden videos.
         return !$video->getFile()->getHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
     }
@@ -165,7 +166,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 $this->setBlock('video_list', 'video_edit', 'video_edit_block');
 
                 if (count($this->outputList) >= 1) {
-
                     foreach ($this->outputList as $video) {
                         $this->setVar([
                             'VIDEO_LIST_ID' =>          $video->getFile()->getId(),
@@ -181,7 +181,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
                         // Display the list of videos if the user has permission to view them.
                         if ($this->isVisibleToCurrentUser($video)) {
-
                             // Owner and edit blocks are children of the video list item,
                             // so should not appear unless we are parsing the list item.
 
@@ -236,5 +235,4 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
         return true; // everything went according to plan
     }
-
 }
