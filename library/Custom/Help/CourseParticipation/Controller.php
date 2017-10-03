@@ -20,6 +20,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 
 class Controller extends Base
@@ -334,6 +335,11 @@ class Controller extends Base
             } catch (Mapper\Exception $e) {
                 // the user failed to save; is fail case
                 $failedUsers[] = $userData;
+
+            } catch (UnexpectedValueException $e) {
+                // duplicate username
+                $failedUsers[] = $userData;
+
             }
         }
 
