@@ -12,11 +12,12 @@ use Alaress_Date_Format;
 use Alaress\Date\Interval;
 use Schoolbox\User;
 use Schoolbox\Collection;
-use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Item\Model as Resource;
 use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\ResourceBooking\Booking\Model as Booking;
+use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 
 class Validation {
 
@@ -62,7 +63,7 @@ class Validation {
      * Attempts to validate the creation or update of a booking from post data.
      *
      * @param  Resource   $resource
-     * @param  Model      $existingBooking If provided, this is the booking that
+     * @param  Booking    $existingBooking If provided, this is the booking that
      *                                     is being updated.
      *                                     Leave it out of conflict checks.
      * @param  array      $postData
@@ -71,7 +72,7 @@ class Validation {
      */
     protected function validateBookingFromPostData(
         Resource $resource,
-        Model $existingBooking = null,
+        Booking $existingBooking = null,
         Array $postData
     )
     {
@@ -113,7 +114,7 @@ class Validation {
         }
 
         // New booking
-        if (!($existingBooking instanceof Model)) {
+        if (!($existingBooking instanceof Booking)) {
             $isNewBooking = true;
         } // Updated booking
         else {
@@ -151,9 +152,9 @@ class Validation {
 
             if ($isNewBooking) {
                 // Validate related and recurrent bookings of a new booking
-                $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate);
+                $dateParts = $this->getNewBookingSeries($resource, $startDate, $endDate, $postData);
                 foreach ($dateParts as $check) {
-                    /** @var Item\Model $thisResource */
+                    /** @var Resource $thisResource */
                     list($thisResource, $thisStart, $thisEnd) = $check;
 
                     // Validate for matching the current term
@@ -177,7 +178,7 @@ class Validation {
                 // messed with.
 
                 foreach ($this->getExistingSeries($existingBooking, $startDate, $endDate) as $check) {
-                    /** @var Item\Model $thisResource */
+                    /** @var Resource $thisResource */
                     list($thisResource, $thisStart, $thisEnd, $thisBooking) = $check;
 
                     // Validate for matching the current term
@@ -199,6 +200,110 @@ class Validation {
 
         return $errors;
 
+    }
+
+    /**
+     * Get all recursive booking dates
+     *
+     * @param Resource   $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @param array      $postData
+     *
+     * @return array
+     */
+    protected function getNewBookingSeries(
+        Resource $resource,
+        DateTime $startDate,
+        DateTime $endDate,
+        array $postData
+    )
+    {
+        $dateParts = [];
+        $series = [];
+
+        // Get all booking dates for the current resource
+        if ($postData['repeat_until']) {
+            try {
+                $repeatUntil = Alaress_Date_Format::newLocalShort(
+                    $postData['repeat_until']
+                );
+            } catch (\Exception $e) {
+                $repeatUntil = null;
+            }
+            if ($repeatUntil instanceof Alaress_Date_Format) {
+                $series = $this->getRecurrencePeriod(
+                    $startDate,
+                    $postData['repeat'],
+                    $repeatUntil->getDateTimeObject(),
+                    $postData['timetable']['campus']
+                );
+            }
+            $difference = $startDate->diff($endDate);
+            foreach ($series as $occurenceStart) {
+                $occurenceEnd = clone $occurenceStart;
+                $occurenceEnd->add($difference);
+                // Check all of $occurenceStart and $occurenceEnd
+                $dateParts[] = [$resource, $occurenceStart, $occurenceEnd];
+            }
+        }
+        else {
+            $dateParts[] = [$resource, $startDate, $endDate];
+        }
+
+        // Get all booking dates for all the related resources
+        $relatedItems = $this->getRelatedItemsFromForm();
+        foreach ($resource->getRelatedResourceList() as $relatedResource) {
+            if (array_key_exists($relatedResource->getId(), $relatedItems)) {
+                if (!empty($series)) {
+                    foreach ($series as $occurenceStart) {
+                        $occurenceEnd = clone $occurenceStart;
+                        $occurenceEnd->add($difference);
+                        $dateParts[] = [$relatedResource, $occurenceStart, $occurenceEnd];
+                    }
+                }
+                else {
+                    $dateParts[] = [$relatedResource, $startDate, $endDate];
+                }
+            }
+        }
+
+        return $dateParts;
+    }
+
+    /**
+     * Get all related booking dates
+     *
+     * @param Booking  $existingBooking
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     *
+     * @return array
+     * @throws MapperException
+     */
+    protected function getExistingSeries(Booking $existingBooking, DateTime $startDate, DateTime $endDate)
+    {
+        $isTimeChanged = false;
+        $series        = $this->getUpdatedSeries(
+            $this->bookingMapper->findById($existingBooking->getId()),
+            $startDate,
+            $endDate,
+            $this->getRelatedItemsFromForm(),
+            $this->request->post['efficacy'],
+            $isTimeChanged
+        );
+
+        $dateParts = [];
+        foreach ($series as $thisBooking) {
+            if (!($thisBooking->isDeleted())) {
+                $dateParts[] = [$thisBooking->getResource(),
+                                $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                                $thisBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                                $thisBooking];
+            }
+        }
+
+        return $dateParts;
     }
 
     protected function validateBeforeTime(DateTime $startDate, DateTime $endDate)
