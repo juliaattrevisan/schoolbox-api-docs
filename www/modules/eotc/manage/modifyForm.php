@@ -99,6 +99,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     try {
         /** @var User $teacherInCharge */
         $teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
+    } catch (MapperException\Deleted $e) {
+        // Allow a soft-deleted teacher in charge to remain
+        /** @var User $teacherInCharge */
+        $teacherInCharge = $e->getDeletedObject();
     } catch (MapperException $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
         exit;

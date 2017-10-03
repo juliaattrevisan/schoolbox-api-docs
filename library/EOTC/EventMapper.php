@@ -71,9 +71,9 @@ class EventMapper extends CalendarEventMapper
     {
         return "
             FROM `{$this->table}`
-            LEFT JOIN {$this->getJoinSql('author', '', 'a')}
-            LEFT JOIN {$this->getJoinSql('teacherInCharge', '', 'c')}
-            LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
+            LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', '', 'c', true)}
+            LEFT JOIN {$this->getJoinSql('eventType', '', 't', true)}
         ";
     }
 
