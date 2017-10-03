@@ -255,7 +255,7 @@ class Connector implements IConnector
             RequestOptions::BODY    => \GuzzleHttp\json_encode([
                 'document_identifier' => $documentId,
                 'user'                => [
-                    'name'    => $user->getFullName(),
+                    'name'    => "{$user->getFirstname()} {$user->getLastname()}",
                     'user_id' => $user->getId(),
                 ],
                 'expires_at'          => $expires->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
