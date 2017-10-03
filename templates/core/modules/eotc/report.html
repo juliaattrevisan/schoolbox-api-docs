@@ -143,7 +143,15 @@
             <tr>
                 <td>{EVENT_START_DATETIME}</td>
                 <td>{EVENT_TITLE}</td>
-                <td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
+                <td>
+                    <!-- BEGIN link_start -->
+                    <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
+                    <!-- END link_start -->
+                    {EVENT_TEACHER_IN_CHARGE_FULLNAME}
+                    <!-- BEGIN link_end -->
+                    </a>
+                    <!-- END link_end -->
+                </td>
                 <td>{EVENT_CREATED_AT}</td>
                 <td>{EVENT_STUDENTS}</td>
                 <td>{EVENT_RAMS_REQUIRED}</td>
