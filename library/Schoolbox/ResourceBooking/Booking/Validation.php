@@ -67,7 +67,7 @@ class Validation {
      * @param  Booking    $existingBooking If provided, this is the booking that
      *                                     is being updated.
      *                                     Leave it out of conflict checks.
-     * @param  array      $postData
+     * @param  Request\Values      $postData
      *
      * @return array
      */
@@ -209,7 +209,7 @@ class Validation {
      * @param Resource   $resource
      * @param DateTime   $startDate
      * @param DateTime   $endDate
-     * @param array      $postData
+     * @param Request\Values      $postData
      *
      * @return array
      */
