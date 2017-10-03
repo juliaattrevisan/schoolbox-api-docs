@@ -256,7 +256,14 @@ class Controller extends Base
 
             } catch (Mapper\Exception $e) {
                 // user does not exist; create the model
-                $user = $this->getUserMapper()->createModel();
+                $user = $this->getUserMapper()->createModel()
+                    ->setRole($participantRole)
+                    ->setCampusCollection($participantCampuses)
+                    ->setLocalEmail(false)
+                    ->setWebmail(false)
+                    ->setUseInternalMail(false)
+                    ->setEportfolioEnable(false)
+                ;
             }
 
             // update user object
@@ -267,8 +274,6 @@ class Controller extends Base
                 ->setLastname($userData['lastname'])
                 ->setAltEmail($userData['email'])
                 ->setEnabled(true)
-                ->setRole($participantRole)
-                ->setCampusCollection($participantCampuses)
                 ->setExternalId($externalId)
             ;
 
