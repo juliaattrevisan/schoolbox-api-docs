@@ -234,33 +234,24 @@ table.rb {
 @media #{$medium-down} {
 
     table.rb {
-        tbody {
-            tr td:last-of-type {
-                height: 0;
-                padding-top: 0;
-                padding-bottom: 0;
-                border-bottom-width: 1px;
+        tbody th {
+            &:last-of-type {
+                border-right-width: 0;
             }
-            th {
-                &:last-of-type {
-                    border-right-width: 0;
-                }
-                &:first-of-type {
-                    border-right-width: 0;
-                    border-bottom-width: 2px;
-                }
+            &:first-of-type {
+                border-right-width: 0;
+                border-bottom-width: 2px;
             }
         }
         td {
             padding-left: 2rem;
-            &.hide-v {
-                padding-top: 0;
-                padding-bottom: 0;
-                overflow-y: hidden;
-                height: 0;
-                border-bottom-width: 0;
-                border-top-width: 0;
-            }
+        }
+        .hide-v,
+        .rb-blank,
+        th:empty{
+            visibility: hidden;
+            height: 0;
+            padding: 0;
         }
         thead {
             display: block;
