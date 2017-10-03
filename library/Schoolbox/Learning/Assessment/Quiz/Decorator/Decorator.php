@@ -37,13 +37,16 @@ class Decorator implements DecoratorInterface
      */
     public function decorate($assessment)
     {
+        // If hours or minutes field is empty, treat it as 0
+        $durationHours = empty($this->getDurationHours()) ? 0 : $this->getDurationHours();
+        $durationMinutes = empty($this->getDurationMinutes()) ? 0 : $this->getDurationMinutes();
+
         /* Use unlimited duration if a specific duration isn't provided
          */
-        if (!$this->getDurationHours() && !$this->getDurationMinutes()) {
+        if (!$durationHours && !$durationMinutes) {
             $duration = Assess_Main::UNLIMITED_DURATION;
-
         } else {
-            $duration = (3600 * $this->getDurationHours()) + (60 * $this->getDurationMinutes());
+            $duration = (3600 * $durationHours) + (60 * $durationMinutes);
         }
 
         $assessment->setDuration($duration);
