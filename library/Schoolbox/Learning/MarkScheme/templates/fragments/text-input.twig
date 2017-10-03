@@ -31,7 +31,7 @@
 {% if not readonly %}
 <script type="text/javascript">
     $(function() {
-        $('[data-combobox]').combobox({{ errors | json_encode | raw }});
+        $('#mark-{{ participant.user.id }}').combobox({{ errors | json_encode | raw }});
     });
 </script>
 {% endif %}
