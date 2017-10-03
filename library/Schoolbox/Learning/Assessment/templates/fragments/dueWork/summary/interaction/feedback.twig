@@ -133,7 +133,7 @@
                     </div>
                     <nav>
                         {% set kamiExportRoute = currentFile.kami
-                            ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExportUrl', {
+                            ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
                                 kamiId:       currentFile.kami.id,
                                 assessment:   assessment,
                                 participant:  participant,

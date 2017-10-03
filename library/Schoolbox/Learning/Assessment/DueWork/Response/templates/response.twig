@@ -209,7 +209,7 @@ Usage:
                     </nav>
                     <ul id="download-options-{{ currentFile.id }}" class="f-dropdown" data-dropdown-content>
                         {% if currentFile.kami %}
-                            {% set kamiExportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getKamiExportUrl', {
+                            {% set kamiExportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
                                 kamiId:       currentFile.kami.id,
                                 assessment:   response.assessable,
                                 participant:  participant,

@@ -108,8 +108,8 @@ class Module extends BaseModule
                 throw new Unauthorized();
             })
         );
-        $this->register('GET', '/kami/{kamiId:\d+}' . '',        'getKamiView',      $canAccessKami, $preloadKami);
-        $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExportUrl', $canExportKami, $preloadKami);
+        $this->register('GET', '/kami/{kamiId:\d+}' . '',        'getKamiView',   $canAccessKami, $preloadKami);
+        $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExport', $canExportKami, $preloadKami);
     }
 
 

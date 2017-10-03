@@ -240,7 +240,7 @@ class Controller extends Base
      * @throws Kami\Exception\ResponseDecodeException If cannot decode the Kami Response
      * @throws \Aura\Web\Exception\InvalidStatusCode If tried to set an invalid HTTP status code on the response.
      */
-    public function getKamiExportUrl(Kami\Model $kami): void
+    public function getKamiExport(Kami\Model $kami): void
     {
         // Less overhead in sleeping the server process, than spinning it up per client poll.
         // Total timeout before failure = $sleep * $exponent^$maxPolls - $sleep
