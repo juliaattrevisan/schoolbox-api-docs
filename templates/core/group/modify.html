@@ -61,7 +61,7 @@
             waitingUser = $(this).closest('[data-relation="waiting-user"]');
             var label       = $('#save-label');
             if ($(this).is('[data-interaction="reject"]')) {
-                label.toastActivate({text: 'Declining {USER_NAME}\'s request...'});
+                label.toastActivate({text: 'Declining request...'});
             } else {
                 label.toastActivate({text: 'Accepting', css: 'success'});
             }
@@ -69,7 +69,7 @@
             $.get(this.href)
                     .done(function(response) {
                         // success stuff. Reload memberlist and waitlist
-                        label.toastTimeout({text: '{USER_NAME}\'s request has been declined.', css: 'success'});
+                        label.toastTimeout({text: 'Request has been declined.', css: 'success'});
                         label.one('hide.toastTimeout', function() {
                             var $response = $(response);
                             waitingList.empty().append($response.find('#waitingList').children());
@@ -121,7 +121,7 @@
 
             // loading dialog
             if (this.value == 0) {
-                label.toastActivate({text: 'Removing {USER_NAME} from group...'});
+                label.toastActivate({text: 'Removing from group...'});
             } else {
                 label.toastActivate({text: 'Updating'});
             }
@@ -154,7 +154,7 @@
 
             $.ajax({url: form.attr('action'), method: form.attr('method'), data: data})
                     .done(function(response) {
-                        label.toastTimeout({text: '{USER_NAME} has been removed from this group.', css: 'success'});
+                        label.toastTimeout({text: 'Removed from group.', css: 'success'});
                         label.one('toastTimeout', function() {
                             var $response = $(response);
 
