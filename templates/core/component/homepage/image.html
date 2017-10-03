@@ -26,11 +26,6 @@
                     <!-- BEGIN empty_write -->
                     <p><a href="/cms/file/new/{ID}/{COMPONENT_INSTANCE_ID}">Post an image</a>, <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">select an existing image</a> or drag and drop one on this component to display here.</p>
                     <script type="text/javascript">
-//                        $('.open-settings').on('click', function(){
-//                            $('[data-component-panel="settings"]').toggle();
-//                            $(this).closest();
-//                            event.preventDefault();
-//                        });
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
                             wrapClass: 'dragging',
                             wrap: '#content',
