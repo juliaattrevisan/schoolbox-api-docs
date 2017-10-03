@@ -3,7 +3,7 @@
 {% block eventSpan %}
 <div class="small-4 column">
     {% if not event.AllDay %}
-        {{ event.startTime.getTimeOnly() }} : {{ event.endTime.getTimeOnly() }}
+        {{ event.startTime.timeOnly }} : {{ event.endTime.timeOnly }}
     {% endif %}
         &nbsp;
 </div>
