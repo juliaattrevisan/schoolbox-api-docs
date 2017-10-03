@@ -47,7 +47,7 @@
                 event.preventDefault();
                 $downloadButton.get(0).click();
                 kamiExport.options.toast.toastActivate({text: 'Requesting export...'});
-                return false;
+                event.preventDefault();
             }
 
             // Second click? (Performed by javascript)
@@ -56,7 +56,6 @@
             // Check for download
             checkDownloadFinished($downloadButton, $downloadButton.attr('token'), 1000, 0, kamiExport.options.timeout);
             // Permit the browser to perform a normal synchronous download
-            return true;
         });
     }
 
