@@ -46,28 +46,34 @@ if ($user->getId() == $article['item_owner']) {
 
 // Check if user has moderate access
 $isModerator = false;
-foreach ($article['campusList'] as $articleCampusId) {
-    foreach($newsAccess as $access) {
-        if ($access->getServiceIdentifier() == $articleCampusId) {
-            $isModerator = true;
+if (!empty($article['campusList'])) {
+    foreach ($article['campusList'] as $articleCampusId) {
+        foreach ($newsAccess as $access) {
+            if ($access->getServiceIdentifier() == $articleCampusId) {
+                $isModerator = true;
+            }
         }
     }
 }
 
 // Check if user is in one of the selected roles
 $hasRole = false;
-foreach ($article['groupList'] as $groupId) {
-    if ($user->getRole()->getId() == $groupId) {
-        $hasRole = true;
+if (!empty($article['groupList'])) {
+    foreach ($article['groupList'] as $groupId) {
+        if ($user->getRole()->getId() == $groupId) {
+            $hasRole = true;
+        }
     }
 }
 
 // Check user is in one of the selected campuses
 $hasCampus = false;
-foreach ($article['campusList'] as $articleCampusId) {
-    foreach ($user->getCampusCollection() as $userCampus) {
-        if ($userCampus->getId() == $articleCampusId) {
-            $hasCampus = true;
+if (!empty($article['campusList'])) {
+    foreach ($article['campusList'] as $articleCampusId) {
+        foreach ($user->getCampusCollection() as $userCampus) {
+            if ($userCampus->getId() == $articleCampusId) {
+                $hasCampus = true;
+            }
         }
     }
 }

@@ -30,20 +30,33 @@
                 }
             })
 
-        $('#newsForm').alaressValidate({
-            rules:{
-                'group[]':{
-                    required:true,
-                    minlength:1
-                },
-                'campus[]':{
-                    required:true,
-                    minlength:1
+        jQuery.validator.addMethod("hasAudience", function(value, element) {
+
+            //Campus or Role must be paired with each other
+            if ($("input[name='campus[]']:checked").length > 0 || $("input[name='group[]']:checked").length > 0) {
+                if ($("input[name='campus[]']:checked").length > 0 && $("input[name='group[]']:checked").length > 0) {
+                    return true;
+                } else {
+                    return false;
                 }
-            },
-            messages:{
-                'group[]':"Please tick at least one role",
-                'campus[]':"Please tick at least one campus"
+            }
+
+            //Or we have users in our selectize
+            var userCount = $('#addUser')[0].selectize.items.length;
+
+            if (userCount > 0) {
+               return true;
+            }
+
+           return false;
+
+        }, "You must select an audience (role and campus, and/or individual users)");
+
+        $('#newsForm').alaressValidate({
+            rules: {
+                'audience': {
+                    hasAudience: true
+                }
             }
         });
 
@@ -156,6 +169,7 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You may add users individually by typing their name and selecting from the list">?</span>
                             <select id="addUser" name="userList[]" multiple placeholder="Search Users"></select>
                         </label>
+                        <input name="audience" type="hidden" />
                     </div>
                 </fieldset>
                 <fieldset class="content">
