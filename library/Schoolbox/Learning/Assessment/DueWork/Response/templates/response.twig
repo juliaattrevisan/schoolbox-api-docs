@@ -38,6 +38,7 @@ Usage:
 <script type="text/javascript" src='/javascript/shared/submissions/jquery.dynamic-feedback.js'></script>
 {% endif %}
 
+<script type="application/javascript" src="/javascript/shared/submissions/jquery.kami-export.js"></script>
 <script type="text/javascript">
     $(function() {
         var nextHref = findNext(tgt);
@@ -122,6 +123,11 @@ Usage:
             });
         });
         {% endif %}
+
+        // Activate export of Kami Documents
+        $('[data-kami-export]').kamiExport({
+            toast: $('#toaster')
+        });
     });
 </script>
 
@@ -203,12 +209,20 @@ Usage:
                     </nav>
                     <ul id="download-options-{{ currentFile.id }}" class="f-dropdown" data-dropdown-content>
                         {% if currentFile.kami %}
-                            {# TODO SA-4753 #}
-                            {#<li><a href="#" class="icon-download" title="Download annotated document">Download annotated document</a></li>#}
+                            {% set kamiExportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
+                                kamiId:       currentFile.kami.id,
+                                assessment:   response.assessable,
+                                participant:  participant,
+                                feedback:     latestFeedback
+                            }) %}
+                            {% if kamiExportRoute %}
+                                <li><a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document">Download annotated document</a></li>
+                            {% endif %}
+                        {% elseif currentFile.crocodocId and latestFeedback.id %}
+                            <li>
+                                {% include '@learningDueWorkResponse/crocodocLink.twig' with {assessment: assessment, feedback: latestFeedback, file: currentFile, participant: participant, linkText: 'Download annotated document'} only %}
+                            </li>
                         {% endif %}
-                        <li>
-                            {% include '@learningDueWorkResponse/crocodocLink.twig' with {assessment: assessment, feedback: latestFeedback, file: currentFile, participant: participant, linkText: 'Download annotated document'} only %}
-                        </li>
                         <li>
                             <a href="/storage/fetch.php?hash={{ currentFile.hash }}" class='icon-download' title="Download original">Download original</a>
                         </li>

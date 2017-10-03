@@ -51,6 +51,9 @@ class Module extends BaseModule
      * @throws \InvalidArgumentException If mapper class not found
      * @throws MapperException\Deleted If a deleted assessment is requested
      * @throws \UnexpectedValueException If the kami files owner is not a participant
+     * @throws \Aura\Di\Exception\ServiceNotFound If unable to find service in DI
+     * @throws NotFound If the requested Kami Doc has not finished processing
+     * @throws OutOfBoundsException
      */
     protected function registerRoutes()
     {
@@ -89,8 +92,34 @@ class Module extends BaseModule
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
 
         // For now, same auth rules as crocodoc.
-        $canAccessKami = $canAccessCrocodoc;
-        $this->register('GET', '/kami/{kamiId:\d+}' . '', 'getKamiView', $canAccessKami, $preloadKami);
+        $canAccessKami = new Rule\All(
+            $canAccessCrocodoc,
+            new Kami\Authentication\IsEnabled($this->getKamiConnector())
+        );
+        // Don't attempt to export a kamiDoc if not possible
+        $canExportKami = new Rule\All(
+            $canAccessCrocodoc,
+            new Kami\Authentication\IsEnabled($this->getKamiConnector()),
+            new Rule\Callback(function (array $params) {
+                $kami = $this->getKamiMapper()->findById($params['kamiId']);
+                if ($kami->isStatusProcessing() || $kami->isStatusDone()) {
+                    return true;
+                }
+                throw new Unauthorized();
+            })
+        );
+        $this->register('GET', '/kami/{kamiId:\d+}' . '',        'getKamiView',   $canAccessKami, $preloadKami);
+        $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExport', $canExportKami, $preloadKami);
+    }
+
+
+    /**
+     * @return object|Kami\IConnector
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function getKamiConnector()
+    {
+        return $this->getInjector()->get('kamiConnector');
     }
 
 

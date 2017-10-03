@@ -19,9 +19,11 @@ use Alaress_Date_Format;
  */
 interface IConnector
 {
+
     // Session options
     const SESSION_THEME_LIGHT = 'light';
     const SESSION_THEME_DARK = 'dark';
+
 
     /**
      * Is Kami enabled for this school? (Controlled by Puppet)
@@ -120,4 +122,40 @@ interface IConnector
         bool $showHelp = true,
         bool $showMenu = true
     ): Session;
+
+
+    /**
+     * Request generation of a PDF export with annotations embedded as PDF annotations
+     *
+     * @param string $documentId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If document does not exist in Kami
+     */
+    public function createAnnotatedExport(string $documentId): Export;
+
+
+    /**
+     * Request generation of a PDF export suitable for printing
+     *
+     * @param string $documentId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If document does not exist in Kami
+     */
+    public function createInlineExport(string $documentId): Export;
+
+
+    /**
+     * Get the current status of a previously requested document export.
+     *
+     * @param string $exportId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If export does not exist in Kami
+     */
+    public function getExport(string $exportId): Export;
 }

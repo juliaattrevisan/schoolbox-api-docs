@@ -44,7 +44,7 @@
     <div class="small-12 island">
         {% if kami.isStatusDone %}
         <section>
-            {% include '@learningDueWorkResponse/kamiIframe.twig' with {session: session} only %}
+            {% include 'sub/iframeResponsive.twig' with {id: 'kami-viewport', src: session.viewerUrl} only %}
         </section>
         {% else %}
             <div class="empty-state">

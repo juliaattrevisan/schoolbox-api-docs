@@ -45,6 +45,10 @@ class Connector implements IConnector
     // How long should view sessions last for by default?
     const DEFAULT_SESSION_EXPIRY_HOURS = 1;
 
+    // Export types
+    const EXPORT_TYPE_ANNOTATION = 'annotation'; // Annotations embedded into the document as PDF Annotations.
+    const EXPORT_TYPE_INLINE = 'inline';         // Annotations drawn into the document. Mostly useful for printing.
+
     /**
      * @var IConfigLoader
      */
@@ -279,6 +283,81 @@ class Connector implements IConnector
 
 
     /**
+     * Request generation of a PDF export with annotations embedded as PDF annotations
+     *
+     * @param string $documentId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If document does not exist in Kami
+     */
+    public function createAnnotatedExport(string $documentId): Export
+    {
+        return $this->createExport($documentId, self::EXPORT_TYPE_ANNOTATION);
+    }
+
+
+    /**
+     * Request generation of a PDF export suitable for printing
+     *
+     * @param string $documentId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If document does not exist in Kami
+     */
+    public function createInlineExport(string $documentId): Export
+    {
+        return $this->createExport($documentId, self::EXPORT_TYPE_INLINE);
+    }
+
+
+    /**
+     * Get the current status of a previously requested document export.
+     *
+     * @param string $exportId
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If export does not exist in Kami
+     */
+    public function getExport(string $exportId): Export
+    {
+        $this->assertEnabled();
+        $request  = new Request('GET', self::BASE_URI . "embed/exports/$exportId");
+        $response = $this->client->send($request, $this->getOptions());
+        return $this->buildExport($this->decodeResponseContent($response->getBody()));
+    }
+
+
+    /**
+     * @param string $documentId
+     * @param string $exportType
+     * @return Export
+     * @throws Exception\EmptyApiKeyException If API key not configured
+     * @throws Exception\ResponseDecodeException If unable to decode a server response
+     * @throws Exception\NotFound If document does not exist in Kami
+     */
+    private function createExport(string $documentId, string $exportType): Export
+    {
+        $this->assertEnabled();
+        $options  = [
+            RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
+            RequestOptions::BODY    => json_encode([
+                'document_identifier' => $documentId,
+                'export_type'         => $exportType,
+            ]),
+        ];
+        $request  = new Request('POST', self::BASE_URI . 'embed/exports');
+        $response = $this->client->send($request, $this->getOptions($options));
+        if($this->isValidNotFound($response)){
+            throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
+        }
+        return $this->buildExport($this->decodeResponseContent($response->getBody()));
+    }
+
+
+    /**
      * Get the configured API key
      *
      * Returns scalar NULL if not configured.
@@ -444,6 +523,23 @@ class Connector implements IConnector
             $obj->session_expiry
                 ? new Alaress_Date_Format($obj->session_expiry, Alaress_Date_Format::FORMAT_DATETIME_UTC)
                 : new Alaress_Date_NullDate()
+        );
+    }
+
+
+    /**
+     * Convert a response body into a view session object
+     *
+     * @param stdClass $obj
+     * @return Export
+     */
+    private function buildExport(stdClass $obj): Export
+    {
+        return new Export(
+            $obj->id,
+            $obj->status,
+            $obj->file_url,
+            $obj->error_type
         );
     }
 

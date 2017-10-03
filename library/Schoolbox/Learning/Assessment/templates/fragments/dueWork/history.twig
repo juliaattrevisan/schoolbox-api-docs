@@ -1,5 +1,5 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
-
+<script type="application/javascript" src="/javascript/shared/submissions/jquery.kami-export.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -53,6 +53,11 @@
                     });
                 }
             });
+        });
+
+        // Activate export of Kami Documents
+        $('[data-kami-export]').kamiExport({
+            toast: $history.find('[data-alert]')
         });
     });
 </script>

@@ -35,6 +35,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Learning\InlineGrader\Kami;
+use GuzzleHttp\Client;
 
 class Controller extends Base
 {
@@ -229,6 +230,61 @@ class Controller extends Base
             'session'  => $session,
             'response' => $response,
         ]));
+    }
+
+
+    /**
+     * @param Kami\Model $kami
+     * @throws Kami\Exception\EmptyApiKeyException If Kami is not enabled
+     * @throws Kami\Exception\NotFound If unable to find the document in Kami
+     * @throws Kami\Exception\ResponseDecodeException If cannot decode the Kami Response
+     * @throws \Aura\Web\Exception\InvalidStatusCode If tried to set an invalid HTTP status code on the response.
+     */
+    public function getKamiExport(Kami\Model $kami): void
+    {
+        // Less overhead in sleeping the server process, than spinning it up per client poll.
+        // Total timeout before failure = $sleep * $exponent^$maxPolls - $sleep
+        $maxPolls  = 10;
+        $exponent  = 2;
+        $sleep     = 500000; // 0.5 seconds initial back-off
+        $pollCount = 0;
+        $export    = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
+        while ($export->isStatusPending()) {
+            if($pollCount >= $maxPolls){
+                break;
+            }
+            usleep($sleep);
+            $sleep  *= $exponent; // exponential back-off.
+            $export = $this->kamiConnector->getExport($export->getId());
+            $pollCount++;
+
+        }
+
+        // Let the browser know that the synchronous request has finished (either success or failure)
+        $response = $this->getResponse();
+        $token    = $this->getRequest()->query->get('token');
+        $response->cookies->set('kamiExportToken', $token, null, '/', null, null, false);
+        $response->cookies->set('kamiExportStatus', $export->getStatus(), null, '/', null, null, false);
+
+        // Unable to generate the export? (either due to error or timeout)
+        if (!$export->isStatusDone()) {
+            // Don't change browser viewport
+            $response->status->setCode(204);
+            return;
+        }
+
+        // This works in all browsers, but means we need to stream the file through schoolbox as a proxy.
+        $response->status->setCode(200);
+        $filename = $kami->getStudentSubmissionFile()->getBasename();
+        $guzzleResponse = (new Client())->get($export->getFileUrl());
+        $response->headers->set('Content-Description', 'File Transfer');
+        $response->headers->set('Content-Type', 'application/octet-stream');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.pdf"');
+        $response->headers->set('Expires', '0');
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+        $response->headers->set('Content-Length', $guzzleResponse->getHeader('Content-Length')[0]);
+        $response->content->set($this->buildFileOutputFromString($guzzleResponse->getBody()));
     }
 
 
