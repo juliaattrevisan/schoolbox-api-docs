@@ -27,6 +27,7 @@ use Calendar\Event\Collection\Renderer;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
+use Schoolbox\ResourceBooking\Booking\Validation;
 
 class Controller extends Base
 {
@@ -158,10 +159,12 @@ class Controller extends Base
     public function createBooking(Item\Model $item)
     {
         $bookingList = null;
+        $errors = [];
 
         // Validate this item.
         $code   = 200;
-        $errors = $this->validateBookingFromPostData($item);
+        $validation = new Validation($this->getUser(), $this->getBookingMapper(), $this->getResourceMapper(), $this->getTermMapper());
+        $errors = $validation->validateBookingFromPostData($item, null, $this->getRequest()->post);
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
@@ -471,22 +474,6 @@ class Controller extends Base
         }
 
         return $newList;
-    }
-
-    /**
-     * Attempts to validate the creation or update of a booking from post data.
-     *
-     * @param  Item\Model $resource
-     * @param  Model      $existingBooking If provided, this is the booking that
-     *                                     is being updated.
-     *                                     Leave it out of conflict checks.
-     *
-     * @return array
-     */
-    protected function validateBookingFromPostData(Item\Model $resource, Model $existingBooking = null)
-    {
-
-
     }
 
     /**

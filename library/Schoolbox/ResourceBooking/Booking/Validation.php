@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\ResourceBooking\Booking\Validation;
+namespace Schoolbox\ResourceBooking\Booking;
 
 use DateTime;
 use Alaress_Date_Format;
@@ -18,6 +18,7 @@ use Schoolbox\ResourceBooking\Booking\Model as Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Aura\Web\Request;
 
 class Validation {
 
@@ -70,10 +71,10 @@ class Validation {
      *
      * @return array
      */
-    protected function validateBookingFromPostData(
+    public function validateBookingFromPostData(
         Resource $resource,
         Booking $existingBooking = null,
-        Array $postData
+        Request\Values $postData
     )
     {
 
@@ -216,7 +217,7 @@ class Validation {
         Resource $resource,
         DateTime $startDate,
         DateTime $endDate,
-        array $postData
+        Request\Values $postData
     )
     {
         $dateParts = [];
