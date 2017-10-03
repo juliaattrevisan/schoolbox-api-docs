@@ -30,6 +30,7 @@ use Schoolbox\UserMapper;
  */
 class EventMapper extends CalendarEventMapper
 {
+
     /**
      * Calls for the core mapping of events, then extends it
      */
@@ -42,6 +43,7 @@ class EventMapper extends CalendarEventMapper
 
         $this->joins('teacher_in_charge_id', UserMapper::class, 'id', null, null, 'teacherInCharge', 'teacherInCharge');
     }
+
 
     /**
      * @return string
@@ -61,6 +63,7 @@ class EventMapper extends CalendarEventMapper
         ";
     }
 
+
     /**
      * @return string
      */
@@ -73,6 +76,7 @@ class EventMapper extends CalendarEventMapper
             LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
         ";
     }
+
 
     /**
      * @param \PDOStatement $statement
@@ -172,6 +176,7 @@ class EventMapper extends CalendarEventMapper
 
         return $this->createCollection($allEvents);
     }
+
 
     /**
      * Custom findAllByListGroups
@@ -297,6 +302,7 @@ class EventMapper extends CalendarEventMapper
         return $listGroup;
     }
 
+
     /**
      * Custom findAllByListGroups for a particular user
      *
@@ -326,9 +332,9 @@ class EventMapper extends CalendarEventMapper
                 {$teacherInChargeMapper->getColumnString('c')},
                 {$eventTypeMapper->getColumnString('t')}
             FROM `{$this->table}` e
-            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            LEFT JOIN {$this->getJoinSql('author', 'e', 'a', true)}
+            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c', true)}
+            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't', true)}
             WHERE e.author_id = :userId
             OR e.teacher_in_charge_id = :userId
             ORDER BY e.start_datetime
@@ -393,6 +399,7 @@ class EventMapper extends CalendarEventMapper
         return $allEvents;
     }
 
+
     /**
      * Postsave hook
      *
@@ -405,6 +412,7 @@ class EventMapper extends CalendarEventMapper
         /* noop
          */
     }
+
 
     /**
      * Some caching issue prevents metadata being correctly formed.
@@ -447,6 +455,7 @@ class EventMapper extends CalendarEventMapper
         $metadataMapper->createResourceBookings($event->getMetadata());
     }
 
+
     /**
      * Find metadata for a particular event
      *
@@ -479,6 +488,7 @@ class EventMapper extends CalendarEventMapper
         return $manyManyRelation->find();
     }
 
+
     /**
      * Deletes metadata relations if there are no remaining
      * events in the series
@@ -499,6 +509,7 @@ class EventMapper extends CalendarEventMapper
             ]
         );
     }
+
 
     /**
      * Assign campuses to an event
@@ -527,6 +538,7 @@ class EventMapper extends CalendarEventMapper
             );
         }
     }
+
 
     /**
      * Find campuses for a particular event
@@ -560,6 +572,7 @@ class EventMapper extends CalendarEventMapper
         return $manyManyRelation->find();
     }
 
+
     /**
      * Deletes campus relations if there are no remaining
      * events in the series
@@ -580,6 +593,7 @@ class EventMapper extends CalendarEventMapper
             ]
         );
     }
+
 
     /**
      * Assign roles to an event
@@ -608,6 +622,7 @@ class EventMapper extends CalendarEventMapper
             );
         }
     }
+
 
     /**
      * Find roles for a particular event
@@ -641,6 +656,7 @@ class EventMapper extends CalendarEventMapper
         return $manyManyRelation->find();
     }
 
+
     /**
      * Deletes role relations if there are no remaining
      * events in the series
@@ -661,6 +677,7 @@ class EventMapper extends CalendarEventMapper
             ]
         );
     }
+
 
     /**
      * Does nothing, EOTC events aren't associated with homepages
