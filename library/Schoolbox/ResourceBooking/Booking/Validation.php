@@ -253,7 +253,12 @@ class Validation {
         }
 
         // Get all booking dates for all the related resources
-        $relatedItems = $this->getRelatedItemsFromForm();
+        $relatedItems = [];
+        foreach ($postData['related_item'] ?: [] as $relatedItem) {
+            if ($relatedItem['resource_id']) {
+                $relatedItems[$relatedItem['resource_id']] = $relatedItem;
+            }
+        }
         foreach ($resource->getRelatedResourceList() as $relatedResource) {
             if (array_key_exists($relatedResource->getId(), $relatedItems)) {
                 if (!empty($series)) {
