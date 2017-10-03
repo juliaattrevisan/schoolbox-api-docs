@@ -38,7 +38,7 @@
 <!-- END custom_head -->
 
 <!-- BEGIN section -->
-<div class="actions-small-1">
+<div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 columns">
             <h2 class="subheader"><a name="section-{SECTION_SECTION_ID}"></a>{SECTION_TITLE}</h2>
@@ -75,16 +75,18 @@
     <ul class="action-list sortable-card" id="section{SECTION_SECTION_ID}" data-question-list>
         <!-- BEGIN question -->
         <li class="actions-small-3" id="question_{QUESTION_QUESTION_ID}">
-            <div class="grip"></div>
-            <div class="list-item">
-                <div class="card small-12 wrap-down">
-                    <h4>
-                        <span data-seq>Q{QUESTION_SEQUENCE}</span>
-                        <!-- BEGIN has_mark -->
-                        <span class="meta">({QUESTION_MARKS} marks)</span>
-                        <!-- END has_mark -->
-                    </h4>
-                    {QUESTION_QUESTION}
+            <div>
+                <div class="grip"></div>
+                <div class="list-item">
+                    <div class="card small-12 wrap-down">
+                        <h4>
+                            <span data-seq>Q{QUESTION_SEQUENCE}</span>
+                            <!-- BEGIN has_mark -->
+                            <span class="meta">({QUESTION_MARKS} marks)</span>
+                            <!-- END has_mark -->
+                        </h4>
+                        {QUESTION_QUESTION}
+                    </div>
                 </div>
             </div>
             <nav>
