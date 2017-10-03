@@ -11,6 +11,7 @@ namespace Custom\Help\CourseParticipation;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use GuzzleHttp\Psr7\Response;
+use Schoolbox\CampusMapper;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -22,6 +23,7 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
     const PARTICIPANT_ROLE_NAME = 'School Staff';
+    const PARTICIPANT_CAMPUS    = 1;
 
     const REQUIRED_USER_FIELDS = [
         'id', 'email', 'title', 'firstname', 'lastname'
@@ -202,7 +204,9 @@ class Controller extends Base
         $rs = $this->getResponse();
 
         try {
-            $participantRole = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
+            $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::PARTICIPANT_ROLE_NAME);
+            $participantCampuses = $this->getCampusMapper()->findByColumn('id', self::PARTICIPANT_CAMPUS);
+
         } catch (Mapper\Exception $e) {
             // if this role doesn't exist, that's *bad* bad
             $this->sendGenericStatus(500);
@@ -264,6 +268,7 @@ class Controller extends Base
                 ->setAltEmail($userData['email'])
                 ->setEnabled(true)
                 ->setRole($participantRole)
+                ->setCampusCollection($participantCampuses)
                 ->setExternalId($externalId)
             ;
 
@@ -384,5 +389,15 @@ class Controller extends Base
     private function getRoleMapper()
     {
         return $this->getUserMapper()->getJoinMapper('role');
+    }
+
+
+    /**
+     * @return CampusMapper|Mapper
+     * @throws Mapper\DefinitionException
+     */
+    private function getCampusMapper()
+    {
+        return $this->getUserMapper()->getJoinMapper('userCampus');
     }
 }
