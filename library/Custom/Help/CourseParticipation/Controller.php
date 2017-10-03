@@ -10,9 +10,11 @@ namespace Custom\Help\CourseParticipation;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
+use PDOException;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
@@ -72,10 +74,10 @@ class Controller extends Base
 
 
     /**
-     * @api   /api/course-participation/apitest
+     * @api   GET /api/course-participation/apitest
      * @level 170
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
     public function getApiTest()
     {
@@ -149,10 +151,10 @@ class Controller extends Base
 
     /**
      * @param string $schoolCode
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws ServiceNotFound
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
+     * @throws Mapper\DefinitionException
      */
     public function getFolderAccessBySchool($schoolCode)
     {
@@ -205,11 +207,11 @@ class Controller extends Base
 
 
     /**
-     * @api   /api/course-participation/{schoolCode}/users
+     * @api   GET /api/course-participation/{schoolCode}/users
      * @level 170
      *
      * @param string $schoolCode
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws Mapper\DefinitionException
      */
     public function getUsersBySchool($schoolCode)
     {
@@ -249,6 +251,7 @@ class Controller extends Base
      *
      * @param string $schoolCode
      * @throws Mapper\DefinitionException
+     * @throws PDOException
      */
     public function postUserRegistrations($schoolCode)
     {
