@@ -51,8 +51,6 @@ if (is_numeric($this->arg[1])) {
 $l10n = $this->getDi()->get('l10n');
 
 $this->setTitle($l10n->translate("news", false, true));
-$this->setVar('PAGE_TITLE', $l10n->news->translate());
-
 
 // display add news button if user is allowed to
 if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
