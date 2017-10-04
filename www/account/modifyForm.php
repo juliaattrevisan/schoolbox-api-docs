@@ -1,4 +1,7 @@
 <?php
+/**
+ * @deprecated this has been replaced by Schoolbox\User\Password\Reset\Controller
+ */
 
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
 $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');

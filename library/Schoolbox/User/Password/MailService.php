@@ -37,6 +37,8 @@ class MailService
     /**
      * Sends a change password confirmation email.
      *
+     * @deprecated this method is only called from /www/account/modifyForm.php, which itself is not used
+     *
      * @param User $user The user to send to.
      *
      * @return bool
@@ -67,6 +69,8 @@ class MailService
     /**
      * Sends a password change fail message to the Schoolbox admin, if there is
      * one.
+     *
+     * @deprecated this method is only called from /www/account/modifyForm.php, which itself is not used
      *
      * @param User $user The user to send to.
      *
