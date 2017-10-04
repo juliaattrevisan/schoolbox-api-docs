@@ -116,6 +116,7 @@
     // Allow wide tables to scroll in textbox
     article {
         overflow-x: auto;
+        overflow-y: hidden;
     }
 }
 
