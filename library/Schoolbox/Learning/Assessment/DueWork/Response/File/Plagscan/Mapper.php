@@ -348,9 +348,19 @@ class Mapper extends \Schoolbox\Mapper
              * Probably don't need to do this, but I want to be sure
              * given I have to curl this id to plagscan.com every time
              */
+            /* TODO - temp hack. Remove ASAP when HTML is migrated to files
+             * At this point, the cached version is already in existence because it was hydrated along with the
+             * student submission files. That version has its HTML blanked out, which will prevent it being re-saved.
+             * We therefore get a fresh copy from the DB here. The alternative is to do a subsequent update() instead
+             * of save(), but that also has issues. Or we could override hydrate(), but that is a bit too far IMO.
+             *
+             * @see SA-746 + SA-4174
+             */
+            $this->disableCache();
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $plagscanDocuments->setOffset($row['plagscan_id'], $this->hydrate($row));
             }
+            $this->enableCache();
         }
 
         return $plagscanDocuments;
