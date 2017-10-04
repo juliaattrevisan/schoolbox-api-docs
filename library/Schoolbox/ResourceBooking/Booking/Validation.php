@@ -12,7 +12,7 @@ use Alaress_Date_Format;
 use Alaress\Date\Interval;
 use Schoolbox\User;
 use Schoolbox\Collection;
-use Schoolbox\ResourceBooking\Item\Model as Resource;
+use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
 use Schoolbox\ResourceBooking\Booking\Model as Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
@@ -352,17 +352,18 @@ class Validation {
     /**
      * Validate the minimum length of the booking
      *
-     * @param Resource   $resource
-     * @param DateTime   $startDate
-     * @param DateTime   $endDate
+     * @param Item\Model    $resource
+     * @param DateTime      $startDate
+     * @param DateTime      $endDate
      *
      * @return array
      */
-    protected function validateTooShort(Resource $resource, DateTime $startDate, DateTime $endDate)
+    public function validateTooShort(Item\Model $resource, DateTime $startDate, DateTime $endDate)
     {
         $errors = [];
         // End date before earliest possible end
         $earliestEnd = clone $startDate;
+
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
             $errors['end_datetime'][] = 'too_short';
