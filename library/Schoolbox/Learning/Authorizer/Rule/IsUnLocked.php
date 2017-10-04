@@ -25,17 +25,12 @@ abstract class IsUnLocked implements IAuthorizationRule
     /** @var LockedChecker */
     private $lockedChecker;
 
-    /** @var IAssessable $assessment */
-    private $assessment;
-
     /**
      * @param LockedChecker $lockedChecker
-     * @param IAssessable|null $assessable Optional assessment override
      */
-    public function __construct(LockedChecker $lockedChecker, IAssessable $assessable = null)
+    public function __construct(LockedChecker $lockedChecker)
     {
         $this->lockedChecker = $lockedChecker;
-        $this->assessment    = $assessable;
     }
 
     /**
@@ -50,11 +45,7 @@ abstract class IsUnLocked implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        if ($this->assessment instanceof IAssessable) {
-            $assessment = $this->assessment;
-        } else {
-            $assessment = $this->getAssessment($params);
-        }
+        $assessment = $this->getAssessment($params);
 
         if ($this->isLocked($assessment)) {
             throw new Unauthorized();
@@ -77,12 +68,6 @@ abstract class IsUnLocked implements IAuthorizationRule
      */
     private function getAssessment(array $params)
     {
-        // Was an assessment supplied to the constructor?
-
-        if ($this->assessment) {
-            return $this->assessment;
-        }
-
         // Was an assessment injected?
 
         if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
