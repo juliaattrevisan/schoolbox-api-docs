@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami\Test;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
@@ -41,14 +42,25 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @dataProvider providerDisabledConnector
+     * @dataProvider providerEnabledConnector
      * @param IConfigLoader $configLoader
      */
     public function testOnline(IConfigLoader $configLoader): void
     {
-        // TODO. The only way to really test this is to do an authenticated GET which
-        //       requires us to hard-code the real API key here. Do we want to do that?
-        $this->markTestIncomplete('testOnline is not yet implemented');
+        $mockResponse = new Response(
+            404,
+            [],
+            json_encode(['errors' => ['Record Not Found']])
+        );
+
+        // I need to peer into the box here
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($mockResponse);
+
+        $connector = new Connector($configLoader, $mockClient);
+        $this->assertTrue($connector->isOnline());
     }
 
 
