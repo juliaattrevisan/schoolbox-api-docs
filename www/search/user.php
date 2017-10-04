@@ -361,6 +361,12 @@ function renderStudent(
     if ($hohTeacher instanceof User) {
         $allTeacherEmailsString = $allTeacherEmailsString.",".$hohTeacher->getEmail();
     }
+    if ($coordTeacher instanceof User) {
+        $allTeacherEmailsString = $allTeacherEmailsString.",".$coordTeacher->getEmail();
+    }
+    if ($studentCoach instanceof User) {
+        $allTeacherEmailsString = $allTeacherEmailsString.",".$studentCoach->getEmail();
+    }
 
     $page->setVar(
         'OUTPUT',
