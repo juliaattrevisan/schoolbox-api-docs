@@ -25,6 +25,7 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
         $this->addRoute($router, 'tassWeb', $basePath, '/tassweb');
         $this->addRoute($router, 'teacherKiosk', $basePath, '/teacherkiosk');
         $this->addRoute($router, 'webBook', $basePath, '/webbook');
+        $this->addRoute($router, 'studentCafe', $basePath, '/studentcafe');
     }
 
     /**
@@ -58,6 +59,7 @@ class External_Tass_PortalModule extends \Alaress\Module\Module
                         'tassWeb'      => $config->get('external_tass_app_code_tassweb'),
                         'teacherKiosk' => $config->get('external_tass_app_code_teacherkiosk'),
                         'webBook'      => $config->get('external_tass_app_code_webbook'),
+                        'studentCafe'  => $config->get('external_tass_app_code_studentcafe'),
                     ]
                 ]
             )

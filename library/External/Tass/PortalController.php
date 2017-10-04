@@ -32,6 +32,7 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         'tassWeb'      => '',
         'teacherKiosk' => '',
         'webBook'      => '',
+        'studentCafe'      => '',
     ];
 
     /**
@@ -123,6 +124,24 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
     }
 
     /**
+     * SSO to student cafe
+     */
+    public function studentCafe()
+    {
+        $token = $this->getToken([
+            'prod_code' => 'SC',
+            'app_code'  => $this->appCodes['studentCafe'],
+        ]);
+        if ($token) {
+            $this->getResponse()->redirect->to(
+                $this->portalHost."/studentcafe/login.cfm?sso_token=$token"
+            );
+        } else {
+            $this->getResponse()->status->setCode(404);
+        }
+    }
+
+    /**
      * Gets a token out of the SSO token fetcher.
      *
      * @param array $config
@@ -136,6 +155,9 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
             $ssoCode = preg_replace('/[^0-9]/s', '', $this->getUser()->getExternalId());
         }
         else if ($this->getUser()->getRole()->isStaff() && \Cfg::get('external_tass_sso_staff_code') == "TASS ID") {
+            $ssoCode = $this->getUser()->getExternalId();
+        }
+        else if ($this->getUser()->getRole()->isStudent() && \Cfg::get('external_tass_sso_student_code') == "TASS ID") {
             $ssoCode = $this->getUser()->getExternalId();
         } else {
             $ssoCode = $this->getUser()->getUsername();
