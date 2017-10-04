@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Test;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
@@ -42,24 +43,19 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @dataProvider providerEnabledConnector
-     * @param IConfigLoader $configLoader
+     * Test for success case for whether Kami is online
+     *
+     * @dataProvider providerOnlineSuccessResponse
+     * @param ResponseInterface $response A mocked response from Kami
      */
-    public function testOnline(IConfigLoader $configLoader): void
+    public function testOnlineSuccess(ResponseInterface $response): void
     {
-        $mockResponse = new Response(
-            404,
-            [],
-            json_encode(['errors' => ['Record Not Found']])
-        );
-
-        // I need to peer into the box here
         $mockClient = $this->getMockBuilder(Client::class)->getMock();
         $mockClient
             ->method('send')
-            ->willReturn($mockResponse);
+            ->willReturn($response);
 
-        $connector = new Connector($configLoader, $mockClient);
+        $connector = new MockConnector($mockClient);
         $this->assertTrue($connector->isOnline());
     }
 
@@ -135,6 +131,14 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             [new TestLoader([Connector::CONFIG_KEY_KAMI_API_KEY => 'some invalid val'])],
             [new TestLoader([Connector::CONFIG_KEY_KAMI_API_KEY => '123'])],
             [new TestLoader([Connector::CONFIG_KEY_KAMI_API_KEY => 'Hisohslfd92382923'])],
+        ];
+    }
+
+
+    public function providerOnlineSuccessResponse(): array
+    {
+        return [
+            [new Response(404, [], json_encode(['errors' => ['Record Not Found']]))],
         ];
     }
 
