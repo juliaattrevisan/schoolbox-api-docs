@@ -82,7 +82,7 @@ switch($to)
         $form="form";
         $action="http://www.oxfordreference.com/LOGIN";
         $method="POST";
-        $formArray['dest'] = '/view/10.1093/acref/9780198117353.001.0001/acref-9780198117353';
+        $formArray['dest'] = '/view/10.1093/acref/9780195170726.001.0001/acref-9780195170726';
         $formArray['user'] = 'melbgirls';
         $formArray['pass'] = 'mggs1893';
         break;
@@ -91,7 +91,7 @@ switch($to)
         $form="form";
         $action="http://www.oxfordreference.com/LOGIN";
         $method="POST";
-        $formArray['dest'] = '/view/10.1093/acref/9780195170726.001.0001/acref-9780195170726';
+        $formArray['dest'] = '/view/10.1093/acref/9780198117353.001.0001/acref-9780198117353';
         $formArray['user'] = 'melbgirls';
         $formArray['pass'] = 'mggs1893';
         break;
