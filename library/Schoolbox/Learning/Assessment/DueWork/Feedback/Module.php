@@ -17,10 +17,10 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
-use Schoolbox\Learning\Authorizer\Rule\IsAssessmentInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -58,25 +58,80 @@ class Module extends BaseModule
             )
         );
 
+        $canGiveFeedbackForAssessment = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\All(
+            // User must have write access to the folder the assessment is in
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+                    /** @var IAssessable $assessable */
+                    $assessable = $params['assessableId'];
+                    if ($assessable instanceof IAssessable) {
+                        return $assessable->getContext()->getId();
+                    }
+                    throw new Forbidden('User does not have homepage access');
+                }, Access::getInstance()),
+                new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+            )
+        );
+
         $canDeleteFeedback = new Rule\IsSuperuser();
 
-        // preloads
+        // Preloads
+
+        /**
+         * @param $params
+         *
+         * @return array
+         * @throws MapperException
+         * @throws MapperException\Deleted
+         * @throws \Aura\Di\Exception\ServiceNotFound
+         */
+        $preloadAssessable = function ($params) {
+            return [
+                'assessable' => $this->preloadAssessable($params['assessmentId']),
+            ];
+        };
+
+        /**
+         * @param $params
+         *
+         * @return array
+         * @throws MapperException
+         * @throws MapperException\Deleted
+         * @throws \Aura\Di\Exception\ServiceNotFound
+         */
         $preloadParticipant = function ($params) {
             return [
-                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId'])
+                'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
             ];
         };
 
+        /**
+         * @param $params
+         *
+         * @return array
+         * @throws MapperException
+         * @throws MapperException\Deleted
+         * @throws \Aura\Di\Exception\ServiceNotFound
+         */
         $preloadFeedback = function ($params) {
             return [
-                'feedback' => $this->preloadFeedback($params['assessmentId'], $params['feedbackId'])
+                'feedback' => $this->preloadFeedback($params['assessmentId'], $params['feedbackId']),
             ];
         };
 
+        /**
+         * @param $params
+         *
+         * @return array
+         * @throws MapperException
+         * @throws MapperException\Deleted
+         * @throws \Aura\Di\Exception\ServiceNotFound
+         */
         $preloadParticipantAndResponse = function ($params) {
             return [
                 'participant' => $this->preloadParticipant($params['assessmentId'], $params['studentId']),
-                'response'    => $this->preloadResponse($params['assessmentId'], $params['responseId'])
+                'response'    => $this->preloadResponse($params['assessmentId'], $params['responseId']),
             ];
         };
 
@@ -108,64 +163,12 @@ class Module extends BaseModule
             $preloadFeedback
         );
 
-        // If multiple feedbacks are passed in the POST['feedback'] array we need to check that the logged in user has
-        // write access to each of the folders these assessables are stored in. This is horrible- but I can't find a
-        // way to create dynamic permissions based on the contents of POST data any other way
-
-        if (isset($_POST['feedback'])) {
-            $ruleArguments = [];
-            $testedAssessmentIds = [];
-
-            foreach ($_POST['feedback'] as $feedback) {
-                // Find each assessable and check we can write to it
-
-                /** @var int $assessmentId */
-                $assessmentId = $feedback['assessmentId'];
-
-                // Only need to do this once per assessment
-
-                if (!in_array($assessmentId, $testedAssessmentIds)) {
-                    $assessment = $this->getAssessmentDataSource()->findById((int)$assessmentId);
-
-                    // Make sure the current user has access to write to the folder in which the assessable is located
-
-                    $ruleArguments[] = new Rule\HasHomepageAccess(
-                        UserAccess::ACCESS_WRITE,
-                        $assessment->getContext()->getFolder()->getId(),
-                        Access::getInstance()
-                    );
-
-                    $ruleArguments[] = new IsInteractionUnLocked(
-                        new Assessment\LockedChecker($this->getTermMapper()),
-                        $assessment
-                    );
-
-                    $testedAssessmentIds[] = $assessmentId;
-                }
-            }
-
-            if (count($ruleArguments) > 0) {
-                $ruleClass           = new \ReflectionClass(Rule\All::class);
-                $rulesHomepageAccess = $ruleClass->newInstanceArgs($ruleArguments);
-            }
-        }
-
-        if (isset($rulesHomepageAccess)) {
-            $canGiveFeedbackFromAllParticipants = new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\All(
-                    $rulesHomepageAccess
-                )
-            );
-        } else {
-            $canGiveFeedbackFromAllParticipants = new Rule\IsSuperuser();
-        }
-
         $this->register(
             'POST',
-            "/assessments/feedbacks",
+            "/{$assessmentRoute}/feedbacks",
             'postParticipantFeedbacks',
-            $canGiveFeedbackFromAllParticipants
+            $canGiveFeedbackForAssessment,
+            $preloadAssessable
         );
     }
 
@@ -181,7 +184,6 @@ class Module extends BaseModule
 
     /**
      * Override with any steps required for a controller and its routes
-     *
      * You should use this method to initialize any mappers or other objects
      * which the controller needs, but are too heavy to initialize at module
      * init time.
@@ -195,7 +197,7 @@ class Module extends BaseModule
             'participantDataSource' => $injector->lazyGet('participantDataSource'),
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
-            'responseDataSource'    => $injector->lazyGet('responseDataSource')
+            'responseDataSource'    => $injector->lazyGet('responseDataSource'),
         ];
     }
 
@@ -209,11 +211,14 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
-
     /**
-     * @param int $assessmentId
-     * @param int $studentId
+     * @param $assessmentId
+     * @param $studentId
+     *
      * @return Participant
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadParticipant($assessmentId, $studentId)
     {
@@ -227,9 +232,25 @@ class Module extends BaseModule
 
     /**
      * @param int $assessmentId
-     * @param int $responseId
-     * @return Assessment\IResponse
+     *
+     * @return IAssessable
      * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function preloadAssessable($assessmentId)
+    {
+        return $this->getAssessmentDataSource()->findById($assessmentId);
+    }
+
+    /**
+     * @param int $assessmentId
+     * @param int $responseId
+     *
+     * @return mixed|Assessment\IResponse
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadResponse($assessmentId, $responseId)
     {
@@ -251,8 +272,11 @@ class Module extends BaseModule
     /**
      * @param int $assessmentId
      * @param int $feedbackId
+     *
      * @return Assessment\IFeedback
      * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preloadFeedback($assessmentId, $feedbackId)
     {
@@ -290,6 +314,7 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentDataSource
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getAssessmentDataSource()
     {
@@ -298,6 +323,7 @@ class Module extends BaseModule
 
     /**
      * @return object|ParticipantDataSource
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getParticipantDataSource()
     {
@@ -306,6 +332,7 @@ class Module extends BaseModule
 
     /**
      * @return object|ResponseDataSource
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getResponseDataSource()
     {
@@ -314,6 +341,7 @@ class Module extends BaseModule
 
     /**
      * @return object|FeedbackDataSource
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getFeedbackDataSource()
     {
