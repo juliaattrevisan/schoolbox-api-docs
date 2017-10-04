@@ -48,7 +48,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     {
         // TODO. The only way to really test this is to do an authenticated GET which
         //       requires us to hard-code the real API key here. Do we want to do that?
-        $this->assertTrue(true);
+        $this->markTestIncomplete('testOnline is not yet implemented');
     }
 
 
