@@ -2,11 +2,9 @@
 
 {% block eventSpan %}
 <div class="small-4 column">
-    {% if not event.startTime.isAtStartOfDay() %}
-        {{ event.startTime.getTimeOnly() }}
+    {% if not event.AllDay %}
+        {{ event.startTime.timeOnly }} : {{ event.endTime.timeOnly }}
     {% endif %}
-    {% if not event.endTime.isAtStartOfDay() %}
-        : {{ event.endTime.getTimeOnly() }}
-    {% endif %}
+        &nbsp;
 </div>
 {% endblock eventSpan %}
