@@ -339,19 +339,19 @@ function renderStudent(
     }
 
     $allTeacherEmails;
-    $allTeacherEmailsString;
 
     foreach ($subjects as $subject) {
         foreach ($subject as $class) {
             /** @var \Schoolbox\User $teacher */
             foreach ($class["teachers"] as $teacher) {
-                $allTeacherEmails[] = $teacher->getEmail();
+                if(empty($allTeacherEmails)) {
+                    $allTeacherEmails = $teacher->getEmail();
+                } else {
+                    $allTeacherEmails = $allTeacherEmails.",".$teacher->getEmail();
+                }
             }
         }
     }
-
-    $allTeacherEmailsString = implode(",", $allTeacherEmails);
-
     if ($formTeacher instanceof User) {
         $allTeacherEmailsString = $allTeacherEmailsString.",".$formTeacher->getEmail();
     }
@@ -393,7 +393,7 @@ function renderStudent(
                 'isParentOfStudent'  => $isParentOfStudent,
                 'isRelatedToStudent' => $isRelatedToStudent,
                 'isPrimaryCarer'     => $isPrimaryCarer,
-                'allTeacherEmails'   => $allTeacherEmailsString,
+                'allTeacherEmails'   => $allTeacherEmails,
             ]
         )
     );
