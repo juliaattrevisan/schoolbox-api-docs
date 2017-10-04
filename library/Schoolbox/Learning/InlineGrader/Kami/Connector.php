@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
@@ -93,7 +94,11 @@ class Connector implements IConnector
             return false;
         }
         $request  = new Request('GET', $this->getPathGetDocument('FAKE_DOC_ID'));
-        $response = $this->client->send($request, $this->getOptions());
+        try {
+            $response = $this->client->send($request, $this->getOptions());
+        } catch (GuzzleException $e) {
+            return false;
+        }
         return $this->isValidNotFound($response);
     }
 
