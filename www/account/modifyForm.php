@@ -6,9 +6,12 @@
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
 $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
+use Psr\Log\NullLogger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
+use Schoolbox\Mail\CoreContext;
+use Schoolbox\Mail\TwigEmailFactory;
 
 $page = new SitePage();
 $userHandler = new User();
@@ -37,7 +40,12 @@ if (isset($_POST['current_password'])) {
         $user                = $_SESSION['user'];
         $userMapper          = Schoolbox\UserMapper::getInstance();
         $passwordService     = new \Alaress\Password\Service();
-        $passwordMailService = new \Schoolbox\User\Password\MailService($configMapper);
+        $passwordMailService = new \Schoolbox\User\Password\MailService(
+            $configMapper,
+            Schoolbox\User\Password\Reset\Mapper::getInstance(),
+            $userMapper,
+            new TwigEmailFactory(new CoreContext($configMapper), new NullLogger())
+        );
         // Test password against existing
         $currentHash = $user->getPassword();
         if ($passwordService->verify($_POST['current_password'], $currentHash)
