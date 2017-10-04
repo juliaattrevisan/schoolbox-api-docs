@@ -34,7 +34,7 @@ $(function() {
         }
     }
     $('#to').selectizeSelector($.extend({}, options, {value: {REPLYTO}}))
-    $('#cc').selectizeSelector(options)
+    $('#cc').selectizeSelector($.extend({}, options, {value: {CC}}))
     $('#bcc').selectizeSelector($.extend({}, options, {value: {BCC}}))
 
     // dialogs for copying email fields

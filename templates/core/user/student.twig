@@ -22,6 +22,14 @@
 {% set showClasses = showClasses and showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 
+<script type="text/javascript">
+    $(function () {
+        $('#email-all-staff').click(function () {
+            $('#email-all-form').submit();
+        })
+    });
+</script>
+
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
     <div class="list-item">
         <div class="small-12 column">
@@ -330,7 +338,11 @@
                             {% block buttons_email_all_staff %}
                                 {% if config.email_all_staff %}
                                     <li>
-                                        <a class="icon-email" href="{{ session.mailhandle }}{{  }}">Email All Staff</a>
+                                        <a class="icon-email" id="email-all-staff">Email All Staff</a>
+                                        <form id="email-all-form" action="/mail/createMail.php">
+                                            <input name="cc" value="cc@cc.com" type="hidden">
+                                            <input name="replyto" value="cc@cc.com" type="hidden">
+                                        </form>
                                     </li>
                                 {% endif %}
                             {% endblock  buttons_email_all_staff  %}
