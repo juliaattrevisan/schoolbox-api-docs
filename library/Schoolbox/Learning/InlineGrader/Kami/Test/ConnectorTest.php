@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami\Test;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Config\TestLoader;
@@ -59,6 +61,22 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
         $connector = new MockConnector($mockClient);
         $this->assertEquals($expected, $connector->isOnline());
+    }
+
+
+    /**
+     * Test for whether Kami is online, if Kami is unreachable.
+     * (Obviously, it's not online!)
+     */
+    public function testOnlineUnreachable(): void
+    {
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willThrowException(new ConnectException('Destination unreachable', new Request('GET', 'kami.com')));
+
+        $connector = new MockConnector($mockClient);
+        $this->assertFalse($connector->isOnline());
     }
 
 
