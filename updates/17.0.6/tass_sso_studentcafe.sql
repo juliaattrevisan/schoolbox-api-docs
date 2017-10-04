@@ -1,2 +1,2 @@
-INSERT IGNORE INTO config VALUES(0,'external_tass_app_code_studentcafe','','TASS StudentCafe Code','App code for TASS Student Cafe (required for generating a SSO token)',1,'',7,true,false,false);
-INSERT IGNORE INTO config VALUES(0,'external_tass_sso_student_code','Username','External TASS Student SSO Code',"Sets whether to send a student user's username or TASS ID as the SSO code for authentication",4,'TASS ID:Username',7,true,false,false);
+INSERT IGNORE INTO config VALUES(0,'external_tass_app_code_studentcafe','','TASS StudentCafe Code','App code for TASS Student Cafe (required for generating a SSO token)',1,'',7,'true','false','false');
+INSERT IGNORE INTO config VALUES(0,'external_tass_sso_student_code','Username','External TASS Student SSO Code',"Sets whether to send a student user's username or TASS ID as the SSO code for authentication",4,'TASS ID:Username',7,'true','false','false');
