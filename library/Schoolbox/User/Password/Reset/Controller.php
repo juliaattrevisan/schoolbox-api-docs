@@ -9,7 +9,7 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\User\Password\MailService;
 use Schoolbox\UserMapper;
 
 /**
@@ -30,9 +30,9 @@ class Controller extends Base
     protected $resetMapper;
 
     /**
-     * @var TwigEmailFactory
+     * @var MailService
      */
-    protected $mailFactory;
+    protected $passwordMailService;
 
     /**
      * @var PasswordService
@@ -44,18 +44,18 @@ class Controller extends Base
      *
      * @param UserMapper $userMapper
      * @param Mapper $resetMapper
-     * @param TwigEmailFactory $mailFactory
+     * @param MailService $passwordMailService
      * @param PasswordService $passwordService
      */
     public function __construct(
         UserMapper $userMapper,
         Mapper $resetMapper,
-        TwigEmailFactory $mailFactory,
+        MailService $passwordMailService,
         PasswordService $passwordService
     ) {
         $this->userMapper = $userMapper;
         $this->resetMapper = $resetMapper;
-        $this->mailFactory = $mailFactory;
+        $this->passwordMailService = $passwordMailService;
         $this->passwordService = $passwordService;
     }
 
@@ -115,103 +115,20 @@ class Controller extends Base
 
     /**
      * Action for creating a password reset request.
+     * @throws \PDOException if the attempt to save the requisite Reset object fails
      */
     public function createRequest()
     {
-        $config = $this->getConfigLoader();
-
         $this->validateAccess();
         $emailAddress = $this->getRequest()->post->get('email');
         $sessionSegment = $this->getSessionSegment();
         $sessionSegment->setFlash('email', $emailAddress);
         $sessionSegment->setFlash('isEmailSubmitted', true);
 
-        // Find all people with a matching username
-
-        $users = $this->userMapper->findByColumn('username', $emailAddress);
-
-        // If the user entered a validly formatted email address- search by email address as well
-
-        if (filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
-            $users = $users->merge($this->userMapper->findByEmail($emailAddress));
-        }
-
-        // Check if we found any matching users
-
-        if (count($users) > 0) {
-
-            // Attempt to reset each account we found
-
-            /** @var \Schoolbox\User $user */
-            foreach ($users as $user) {
-
-                // Make sure the user is allowed to reset password based on their role
-
-                $reset = null;
-
-                if ($user->getRole()->getCanChangePassword()) {
-
-                    $reset = $this->resetMapper->createModel()->setIp($this->getRequest()->server->get('REMOTE_ADDR'));
-
-                    if ($user->getEnabled()) {
-                        $reset->setUser($user);
-                        $this->resetMapper->save($reset);
-                    }
-
-                    $email = $this->mailFactory->build('userPasswordReset/reset.twig');
-                } else {
-
-                    // Password reset not allowed
-
-                    $email = $this->mailFactory->build('userPasswordReset/userNotAllowedReset.twig');
-                }
-
-                // If the user entered a username- try to retrieve their email address from the user record
-
-                if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
-                    $emailAddress = $user->getEmail();
-                }
-
-                // Only try and send the email if we got a valid address in the end
-
-                if (filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
-
-                    $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
-                    $email->setSubject($config->get('title') . ' Password Reset');
-                    $email->setContext([
-                        'user' => $user,
-                        'reset' => $reset,
-                        'hideUnsubscribe' => true
-                    ]);
-
-                    $email->send([
-                        'name' => $user->formatName(),
-                        'email' => $emailAddress
-                    ]);
-                }
-                else
-                {
-                    // Not a valid email address, send blackhole email
-
-                    $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
-                    $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
-                    $email->setSubject($config->get('title') . ' Password Reset');
-                    $email->sendToBlackhole();                
-                }
-            }
-        } else {
-
-            // No matches - send a message anyway?
-            // Weigh up security (give away no information about whether account exists)
-            // vs. flood prevention (don't send too many emails)
-            // vs. convenience (maybe user got password wrong)
-            // Currently, this sacrifices convenience for flood protection.
-
-            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
-            $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
-            $email->setSubject($config->get('title') . ' Password Reset');
-            $email->sendToBlackhole();
-        }
+        $this->passwordMailService->sendResetLinkToAddress(
+            $emailAddress,
+            $this->getRequest()->server->get('REMOTE_ADDR')
+        );
 
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
