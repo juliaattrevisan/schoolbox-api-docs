@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\InlineGrader\Kami\Test;
+namespace Alaress\Http;
 
 use GuzzleHttp\Client;
 use Psr\Http\Message\RequestInterface;
