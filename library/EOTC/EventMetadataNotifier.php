@@ -604,7 +604,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             /** @var EventPermission $permission */
             // the field is called userId, yet it MIGHT contain userIds OR User objects...
             if ($permission->getSubscribed() || $permission->getAllowed()) {
-                $unknown   = $permission->getUserId();
+                $unknown   = $permission->getUser()->getId();
                 $userIds[] = $unknown instanceof User ? $unknown->getId() : (int)$unknown;
             }
         }

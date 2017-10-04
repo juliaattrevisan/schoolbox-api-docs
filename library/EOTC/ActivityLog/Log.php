@@ -98,7 +98,7 @@ class Log {
 	/**
 	 * Set actioner
 	 *
-	 * @param null $actioner
+	 * @param User $actioner
 	 */
 	public function setActioner($actioner) {
 		$this->actioner = $actioner;
@@ -107,7 +107,7 @@ class Log {
 	/**
 	 * Get actioner
 	 *
-	 * @return null
+	 * @return User
 	 */
 	public function getActioner() {
 		return $this->actioner;
