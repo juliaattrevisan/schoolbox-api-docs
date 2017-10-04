@@ -379,7 +379,7 @@
                                 });
                             });
 
-                            $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessableId: assessment.id}) }}', {
+                            $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessment.id}) }}', {
                                 'feedback': feedback
                             }).done(function (response) {
                                 var toastError = '';
