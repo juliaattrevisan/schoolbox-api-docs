@@ -327,6 +327,16 @@
                         {% endif %}
 
                         {% if showButtons %}
+                            {% block buttons_email_all_staff %}
+                                {% if config.email_all_staff %}
+                                    <li>
+                                        <a class="icon-email" href="{{ session.mailhandle }}{{  }}">Email All Staff</a>
+                                    </li>
+                                {% endif %}
+                            {% endblock  buttons_email_all_staff  %}
+                        {% endif %}
+
+                        {% if showButtons %}
                             {% block buttons_miscellaneous %}
                             {% endblock buttons_miscellaneous %}
                         {% endif %}
