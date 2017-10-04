@@ -91,7 +91,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
         $author = $userMapper->findById($_POST['authorId']);
     } catch (MapperException\Deleted $e) {
         // Allow a soft-deleted author to remain
-        /** @var User $teacherInCharge */
+        /** @var User $author */
         $author = $e->getDeletedObject();
     } catch (MapperException $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
