@@ -70,8 +70,8 @@ abstract class IsUnLocked implements IAuthorizationRule
     {
         // Was an assessment injected?
 
-        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
-            return $params['assessment'];
+        if (isset($params['assessable']) && $params['assessable'] instanceof IAssessable) {
+            return $params['assessable'];
         }
 
         // Is a participant available?
