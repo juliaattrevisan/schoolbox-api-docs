@@ -16,6 +16,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Response;
 use PDOException;
 use Schoolbox\CampusMapper;
+use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -23,6 +24,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Swift_SwiftException;
 use UnexpectedValueException;
 
 
@@ -60,25 +62,30 @@ class Controller extends Base
      */
     private $passwordMailService;
 
+    /** @var TwigEmailFactory */
+    private $mailFactory;
 
     /**
      * @param UserAccessMapper          $userAccessMapper
      * @param SiteAccess\Mapper         $tokenMapper
      * @param Folder\Mapper             $folderMapper
      * @param User\Password\MailService $mailService
+     * @param TwigEmailFactory          $mailFactory
      * @throws Mapper\DefinitionException
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
         Folder\Mapper $folderMapper,
-        User\Password\MailService $mailService
+        User\Password\MailService $mailService,
+        TwigEmailFactory $mailFactory
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper      = $tokenMapper;
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
         $this->passwordMailService = $mailService;
+        $this->mailFactory      = $mailFactory;
     }
 
 
@@ -313,6 +320,9 @@ class Controller extends Base
             try {
                 $user = $this->getUserMapper()->findOneByColumn('synergy_id', $externalId);
 
+                // cache the old value
+                $oldUsername = $user->getUsername();
+
             } catch (Mapper\Exception\Deleted $e) {
                 // user exists, but is deleted; consider this a fail case
                 $failedUsers[] = $userData;
@@ -328,11 +338,14 @@ class Controller extends Base
                     ->setUseInternalMail(false)
                     ->setEportfolioEnable(false)
                 ;
+
+                // no previous username
+                $oldUsername = null;
             }
 
             // update user object
             $user
-                ->setUsername($userData['email'])
+                ->setUsername($userData['email']) // yes, email -> username is on purpose
                 ->setTitle($userData['title'])
                 ->setFirstname($userData['firstname'])
                 ->setLastname($userData['lastname'])
@@ -344,12 +357,37 @@ class Controller extends Base
             try {
                 $this->getUserMapper()->save($user);
 
-                if ($user->getEmail() === $userData['email']) {
-                    // send existing-user email ("your username has changed")
-                    // TODO
+                if ($oldUsername) {
+                  // existing user
+                    if ($user->getUsername() !== $oldUsername) {
+                        // send existing-user email ("your username has changed")
+                        $subject     = $this->getConfigLoader()->get('title') . ' Username Change';
+                        $fromAddress = $this->getConfigLoader()->get('password_change_email_from');
+                        $fromName    = $this->getConfigLoader()->get('mail_from_name');
 
+                        $email = $this->mailFactory->build(
+                            'userPasswordReset/welcome/usernameChange.twig',
+                            $subject
+                        );
+
+                        $email->setFrom($fromAddress, $fromName);
+
+                        $email->setContext([
+                            'user'        => $user,
+                            'oldUsername' => $oldUsername
+                        ]);
+
+                        try {
+                            $email->send([
+                                'name'  => $user->formatName(),
+                                'email' => $user->getEmail()
+                            ]);
+                        } catch (Swift_SwiftException $e) {
+                            // noop
+                        }
+                    }
                 } else {
-                    // emails don't match: send new-user email ("welcome and here's how to set your password")
+                    // new user: send new-user email ("welcome and here's how to set your password")
                     $this->passwordMailService->sendWelcomeEmailToUser($user);
                 }
             } catch (Mapper\Exception $e) {
