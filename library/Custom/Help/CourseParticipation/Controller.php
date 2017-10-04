@@ -21,6 +21,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -54,22 +55,30 @@ class Controller extends Base
      */
     private $codeMapper;
 
+    /**
+     * @var User\Password\MailService
+     */
+    private $passwordMailService;
+
 
     /**
-     * @param UserAccessMapper $userAccessMapper
-     * @param SiteAccess\Mapper     $tokenMapper
-     * @param Folder\Mapper    $folderMapper
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @param UserAccessMapper          $userAccessMapper
+     * @param SiteAccess\Mapper         $tokenMapper
+     * @param Folder\Mapper             $folderMapper
+     * @param User\Password\MailService $mailService
+     * @throws Mapper\DefinitionException
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         SiteAccess\Mapper $tokenMapper,
-        Folder\Mapper $folderMapper
+        Folder\Mapper $folderMapper,
+        User\Password\MailService $mailService
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->tokenMapper      = $tokenMapper;
         $this->folderMapper     = $folderMapper;
         $this->codeMapper       = $folderMapper->getJoinMapper('codes');
+        $this->passwordMailService = $mailService;
     }
 
 
@@ -335,6 +344,14 @@ class Controller extends Base
             try {
                 $this->getUserMapper()->save($user);
 
+                if ($user->getEmail() === $userData['email']) {
+                    // send existing-user email ("your username has changed")
+                    // TODO
+
+                } else {
+                    // emails don't match: send new-user email ("welcome and here's how to set your password")
+                    $this->passwordMailService->sendWelcomeEmailToUser($user);
+                }
             } catch (Mapper\Exception $e) {
                 // the user failed to save; is fail case
                 $failedUsers[] = $userData;
