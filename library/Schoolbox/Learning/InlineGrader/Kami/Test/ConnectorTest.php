@@ -43,12 +43,14 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Test for success case for whether Kami is online
+     * Test for whether Kami is online
      *
-     * @dataProvider providerOnlineSuccessResponse
+     * @dataProvider providerOnlineResponse
+     *
+     * @param bool $expected
      * @param ResponseInterface $response A mocked response from Kami
      */
-    public function testOnlineSuccess(ResponseInterface $response): void
+    public function testOnline(bool $expected, ResponseInterface $response): void
     {
         $mockClient = $this->getMockBuilder(Client::class)->getMock();
         $mockClient
@@ -56,7 +58,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($response);
 
         $connector = new MockConnector($mockClient);
-        $this->assertTrue($connector->isOnline());
+        $this->assertEquals($expected, $connector->isOnline());
     }
 
 
@@ -135,10 +137,11 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function providerOnlineSuccessResponse(): array
+    public function providerOnlineResponse(): array
     {
         return [
-            [new Response(404, [], json_encode(['errors' => ['Record Not Found']]))],
+            'Online' => [true, new Response(404, [], json_encode(['errors' => ['Record Not Found']]))],
+            'Bad key' => [false, new Response(401, [], json_encode(['errors' => ['Authorization Failed']]))],
         ];
     }
 
