@@ -46,17 +46,17 @@ class Validation {
     private $termMapper;
 
     public function __construct(
-        User $user,
-        BookingMapper $bookingMapper,
-        ResourceMapper $resourceMapper,
-        TermMapper $termMapper
+        User $user = null,
+        BookingMapper $bookingMapper = null
+//        ResourceMapper $resourceMapper,
+//        TermMapper $termMapper
     )
     {
 
         $this->setUser($user);
         $this->setBookingMapper($bookingMapper);
-        $this->setResourceMapper($resourceMapper);
-        $this->setTermMapper($termMapper);
+//        $this->setResourceMapper($resourceMapper);
+//        $this->setTermMapper($termMapper);
 
     }
 
@@ -312,7 +312,7 @@ class Validation {
         return $dateParts;
     }
 
-    protected function validateBeforeTime(DateTime $startDate, DateTime $endDate)
+    public function validateBeforeTime(DateTime $startDate, DateTime $endDate)
     {
         $errors = [];
         if ($startDate > $endDate) {

@@ -163,7 +163,7 @@ class Controller extends Base
 
         // Validate this item.
         $code   = 200;
-        $validation = new Validation($this->getUser(), $this->getBookingMapper(), $this->getResourceMapper(), $this->getTermMapper());
+        $validation = new Validation($this->getUser(), $this->getBookingMapper());
         $errors = $validation->validateBookingFromPostData($item, null, $this->getRequest()->post);
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
