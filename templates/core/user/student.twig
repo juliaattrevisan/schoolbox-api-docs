@@ -340,7 +340,7 @@
                                     <li>
                                         <a class="icon-email" id="email-all-staff">Email All Staff</a>
                                         <form id="email-all-form" action="/mail/createMail.php">
-                                            <input name="cc" value="cc@cc.com" type="hidden">
+                                            <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
                                             <input name="replyto" value="cc@cc.com" type="hidden">
                                         </form>
                                     </li>
