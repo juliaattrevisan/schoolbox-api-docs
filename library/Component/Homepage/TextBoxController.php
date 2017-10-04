@@ -137,7 +137,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
             $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
             $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
-            $this->setBlock('text_locked', 'create_text', 'create_text_block');
 
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
@@ -160,7 +159,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                     'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
                     'text_editable_block' => '',
                     'modify_text_block' => '',
-                    'create_text_block' => '',
                     'text_locked_block' => '',
                 ));
 
@@ -188,11 +186,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 } else {
                     // modify links
                     if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                        if ($this->getTextbox()->getId()) {
-                            $this->parse('modify_text_block', 'modify_text');
-                        } else {
-                            $this->parse('create_text_block', 'create_text');
-                        }
+                        $this->parse('modify_text_block', 'modify_text');
                     }
 
                     // formatted text
