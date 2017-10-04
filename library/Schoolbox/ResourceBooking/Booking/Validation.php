@@ -17,6 +17,7 @@ use Schoolbox\ResourceBooking\Item\Mapper as ResourceMapper;
 use Schoolbox\ResourceBooking\Booking\Model as Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Aura\Web\Request;
 
@@ -47,23 +48,23 @@ class Validation {
 
     public function __construct(
         User $user = null,
-        BookingMapper $bookingMapper = null
+        BookingMapper $bookingMapper = null,
 //        ResourceMapper $resourceMapper,
-//        TermMapper $termMapper
+        TermMapper $termMapper = null
     )
     {
 
         $this->setUser($user);
         $this->setBookingMapper($bookingMapper);
 //        $this->setResourceMapper($resourceMapper);
-//        $this->setTermMapper($termMapper);
+        $this->setTermMapper($termMapper);
 
     }
 
     /**
      * Attempts to validate the creation or update of a booking from post data.
      *
-     * @param  Resource   $resource
+     * @param  Item\Model   $resource
      * @param  Booking    $existingBooking If provided, this is the booking that
      *                                     is being updated.
      *                                     Leave it out of conflict checks.
@@ -72,7 +73,7 @@ class Validation {
      * @return array
      */
     public function validateBookingFromPostData(
-        Resource $resource,
+        Item\Model $resource,
         Booking $existingBooking = null,
         Request\Values $postData
     )
@@ -143,6 +144,11 @@ class Validation {
 
             $errors = array_merge_recursive(
                 $errors,
+                $this->validatePastTime($startDate)
+            );
+
+            $errors = array_merge_recursive(
+                $errors,
                 $this->validateTooShort($resource, $startDate, $endDate)
             );
 
@@ -162,7 +168,7 @@ class Validation {
                     if ($thisResource->getCurrentTermRestriction()) {
                         $errors = array_merge_recursive(
                             $errors,
-                            $this->validateCurrentTermRestriction($thisEnd)
+                            $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
                         );
                     }
 
@@ -206,7 +212,7 @@ class Validation {
     /**
      * Get all recursive booking dates
      *
-     * @param Resource   $resource
+     * @param Item\Model   $resource
      * @param DateTime   $startDate
      * @param DateTime   $endDate
      * @param Request\Values      $postData
@@ -214,7 +220,7 @@ class Validation {
      * @return array
      */
     protected function getNewBookingSeries(
-        Resource $resource,
+        Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
         Request\Values $postData
@@ -323,27 +329,38 @@ class Validation {
     }
 
     /**
-     * Validate start date not in the past or not too early
+     * Validate start date not in the past
      *
-     * @param Resource   $resource
      * @param DateTime   $startDate
      *
      * @return array
      */
-    protected function validateLeadTime(Resource $resource, DateTime $startDate)
+    public function validatePastTime(DateTime $startDate)
     {
         $errors = [];
         $now    = new DateTime();
-        //TODO change this
-        $now->setTimestamp($this->request->server['REQUEST_TIME']);
         if ($startDate < $now) {
             $errors['start_datetime'][] = 'in_past';
-        } else {
-            $earliest = new DateTime();
-            $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
-            if ($startDate < $earliest) {
-                $errors['start_datetime'][] = 'too_early';
-            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate start date not too early
+     *
+     * @param Item\Model   $resource
+     * @param DateTime   $startDate
+     *
+     * @return array
+     */
+    public function validateLeadTime(Item\Model $resource, DateTime $startDate)
+    {
+        $errors = [];
+        $earliest = new DateTime();
+        $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
+        if ($startDate < $earliest) {
+            $errors['start_datetime'][] = 'too_early';
         }
 
         return $errors;
@@ -375,13 +392,13 @@ class Validation {
     /**
      * Validate the maximum length of the booking
      *
-     * @param Resource   $resource
+     * @param Item\Model    $resource
      * @param DateTime   $startDate
      * @param DateTime   $endDate
      *
      * @return array
      */
-    protected function validateTooLong(Resource $resource, DateTime $startDate, DateTime $endDate)
+    protected function validateTooLong(Item\Model $resource, DateTime $startDate, DateTime $endDate)
     {
         $errors = [];
         // End date after latest possible end (Only if there is an actual max time)
@@ -400,7 +417,7 @@ class Validation {
      * Validates whether a booking for this resource conflicts with any
      * bookings that already exist.
      *
-     * @param  Resource   $resource
+     * @param  Item\Model    $resource
      * @param  DateTime   $startDate
      * @param  DateTime   $endDate
      * @param  Model      $existingBooking
@@ -408,7 +425,7 @@ class Validation {
      * @return array
      */
     protected function validateForConflicts(
-        Resource $resource,
+        Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
         Model $existingBooking = null
@@ -483,14 +500,14 @@ class Validation {
      * Validates if booking needs to be within the current term
      *
      * @param DateTime $endDate
+     * @param Term\Model $currentTerm
      *
      * @return array
      */
-    protected function validateCurrentTermRestriction(DateTime $endDate)
+    protected function validateCurrentTermRestriction(DateTime $endDate, Term\Model $currentTerm)
     {
         $errors = [];
 
-        $currentTerm = $this->getTermMapper()->findForToday();
         $currentTermFinishDate = $currentTerm->getDisplayFinish()->getDateTimeObject();
         if ($endDate > $currentTermFinishDate) {
             $errors['end_datetime'][] = 'current_term';
@@ -577,6 +594,14 @@ class Validation {
         $this->termMapper = $termMapper;
 
         return $this;
+    }
+
+    /**
+     * @return Term\Model
+     */
+    public function getCurrentTerm()
+    {
+        return $this->getTermMapper()->findForToday();
     }
 
 }
