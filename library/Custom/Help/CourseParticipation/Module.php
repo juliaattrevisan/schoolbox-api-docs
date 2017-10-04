@@ -12,10 +12,16 @@ use Alaress\Authorizer\Rule\IsAlaressAdmin;
 use Alaress;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Psr\Log\NullLogger;
+use Schoolbox\Mail\CoreContext;
+use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User\Password\MailService;
+use Schoolbox\User\Password\Reset;
+use Schoolbox\UserMapper;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
 
@@ -70,10 +76,28 @@ class Module extends Alaress\Module\Module
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $injector->get('mapperFactory');
 
+        $injector->params[CoreContext::class] = [
+            'conf' => $injector->lazyGet('config')
+        ];
+
+        $injector->params[TwigEmailFactory::class] = [
+            'context' => $injector->lazyNew(CoreContext::class),
+            'log'     => $injector->lazyNew(NullLogger::class)
+        ];
+
+        $injector->params[MailService::class] = [
+            'config'      => $injector->lazyGet('config'),
+            'resetMapper' => $mapperFactory->getLazy(Reset\Mapper::class),
+            'userMapper'  => $mapperFactory->getLazy(UserMapper::class),
+            'mailFactory' => $injector->lazyNew(TwigEmailFactory::class)
+        ];
+
         $injector->params[Controller::class] = [
             'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
             'tokenMapper'      => $mapperFactory->getLazy(SiteAccess\Mapper::class),
             'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),
+            'mailService'      => $injector->lazyNew(MailService::class),
+            'mailFactory'      => $injector->lazyNew(TwigEmailFactory::class)
         ];
     }
 
