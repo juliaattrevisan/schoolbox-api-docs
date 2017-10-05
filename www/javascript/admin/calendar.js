@@ -76,7 +76,18 @@ var calendar = {
 		window.self = this;
 		$(window.self.options.removeConfig).click(function() {
 			window.id = $(this).attr('id').toString().replace(/remove_/, '');
-            $('#confirm').foundation('reveal','open');
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Event?',
+                confirmEvent: function() {
+                    var data = {
+                        id: window.id
+                    };
+
+                    $.post(window.self.options.removeUri, data, function (responseText) {
+                        window.self.refresh();
+                    });
+                }
+            });
 		});
 	}
 }

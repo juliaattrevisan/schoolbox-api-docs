@@ -320,29 +320,3 @@
         });
 	});
 </script>
-
-<div data-reveal id="confirm" class="reveal-modal">
-    <h2>Are you sure you wish to delete this event?</h2>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    <div class="reveal-action">
-        <section>
-            <a id="modalConfirm" class="button icon-delete">Yes</a>
-            <a class="button close-reveal-modal">No</a>
-        </section>
-    </div>
-</div>
-
-<script type='text/javascript'>
-    $(function() {
-        /* Ajax remove this config option
-      */$("#modalConfirm").click(function() {
-            var data = {
-                id: id
-            };
-
-            $.post(self.options.removeUri, data, function (responseText) {
-                self.refresh();
-            });
-        });
-    });
-</script>
