@@ -116,15 +116,48 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function testListDocuments(): void
     {
-        $connector = new MockConnector(new Client());
+        // Silently ignore any bad documents
+        $response = new Response(
+            200,
+            [],
+            json_encode([
+                'documents' => [
+                    [
+                        "name"                => "Blah Document 1",
+                        "document_identifier" => "111",
+                        "file_status"         => "done",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ],
+                    [
+                        "name"                => "Blah Document 2",
+                        "document_identifier" => "222",
+                        "file_status"         => "processing",
+                        "file_error_message"  => null,
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ],
+                    [
+                        "name"                => "Blah Document 3",
+                        "document_identifier" => "333",
+                        "file_status"         => "error",
+                        "file_error_message"  => 'No error',
+                        "created_at"          => "2015-09-22T23:22:12.798Z",
+                    ],
+                ],
+            ])
+        );
+        $mockClient = $this->getMockBuilder(Client::class)->getMock();
+        $mockClient
+            ->method('send')
+            ->willReturn($response);
 
-        /* TODO - Kami mock route is currently broken. I'll write to them:
-         * * mock route fails if trailing slash. prod route tolerates trailing slash
-         * * mock route returns array of documents, prod route returns object with
-         *   single key 'documents', which is array of documents
-         */
-        $this->markTestIncomplete('Document list is currently broken');
-//        $documents = $connector->listDocuments();
+        $connector = new MockConnector($mockClient);
+        $documents = $connector->listDocuments();
+
+        $this->assertCount(3, $documents);
+        $this->assertEquals('Blah Document 1', $documents['111']->getName());
+        $this->assertEquals('Blah Document 2', $documents['222']->getName());
+        $this->assertEquals('Blah Document 3', $documents['333']->getName());
     }
 
 
