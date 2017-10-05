@@ -1117,10 +1117,18 @@ class Leave_Controller extends Controller
         } catch (Schoolbox\Mapper\Exception $e) {
             throw new ApplicationException\NotFound('User not found');
         }
-
-        if(!($house instanceof HouseResidential) ) {
-            throw new ApplicationException\NotFound('User\'s house not found');
+        try {
+            if(($house instanceof HouseResidential) ) {
+                $house = $this->getHouseMapper()->findById($house->getId());
+            }
+            else {
+                throw new ApplicationException\NotFound('User not found');
+            }
+        } catch (Schoolbox\Mapper\Exception $e) {
+            throw new ApplicationException\NotFound('User not found');
         }
+
+
 
         $requestList = $this->getRequestMapper()->findAllByUserId($user->getId());
 
