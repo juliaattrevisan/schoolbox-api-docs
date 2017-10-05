@@ -123,7 +123,7 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
+     * @param string $externalUserId
      *
      * @return array
      */
@@ -471,9 +471,12 @@ class External_Schoolbox_User implements External_UserInterface
     /**
      * {@inheritDoc}
      * @param int $externalUserId
+     *
+     * @return array
      */
     public function getStaff($externalUserId)
     {
+        return [];
     }
 
     /**
@@ -482,8 +485,11 @@ class External_Schoolbox_User implements External_UserInterface
      * @param string $name
      * @param string $boardingStatus
      * @param string $form
+     *
+     * @return array
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
+        return [];
     }
 }

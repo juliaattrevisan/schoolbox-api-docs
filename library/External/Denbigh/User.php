@@ -75,7 +75,7 @@ class External_Denbigh_User implements External_UserInterface
      * {@inheritDoc}
      * @param int $houseId
      *
-     * @return array
+     * @return string
      */
     public function getHousemasterByHouseId($houseId)
     {
@@ -321,7 +321,7 @@ class External_Denbigh_User implements External_UserInterface
      * {@inheritDoc}
      * @param string $externalId
      *
-     * @return mixed
+     * @return array
      */
     public function getStudentContactList($externalId)
     {
@@ -395,7 +395,7 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param null|int $externalId
+     * @param null|string $externalId
      *
      * @return string
      */
@@ -655,6 +655,8 @@ class External_Denbigh_User implements External_UserInterface
      * @param string $name
      * @param string $boardingStatus
      * @param string $form
+     *
+     * @return array
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
