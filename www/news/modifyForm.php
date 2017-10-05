@@ -49,7 +49,7 @@ if ($_POST['heading']) {
 	}
 
     // If a blank heading is given, throw a tantrum
-    if (strlen(trim($_POST['heading'])) < 1) {
+    if (empty(trim($_POST['heading']))) {
         error(2);
     }
 
