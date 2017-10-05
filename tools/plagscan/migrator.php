@@ -89,7 +89,7 @@ try {
 
     });
 } catch (Exception $e) {
-    $log->critical('Exception Error: ' . $e->getMessage());
+    $log->critical('Exception Error: ' . $e->getMessage(), $e);
 } finally {
     $lock->release();
 }
