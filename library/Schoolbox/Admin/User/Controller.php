@@ -28,8 +28,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
-use House;
-use HouseResidential;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
@@ -78,12 +76,12 @@ class Controller extends Base
     protected $errorMapper;
 
     /**
-     * @var \HouseResidentialMapper
+     * @var HouseResidentialMapper
      */
     protected $houseResidentialMapper;
 
     /**
-     * @var \HouseMapper
+     * @var HouseMapper
      */
     protected $houseMapper;
 
@@ -416,16 +414,14 @@ class Controller extends Base
         }
 
         if(!empty($post['house'])) {
-            $house = new House();
-            $house->setId($post['house']);
+            $house = $this->houseMapper->createModel($post['house']);
         }
         else {
             $house = null;
         }
 
         if(!empty($post['residential_house'])) {
-            $resHouse = new HouseResidential();
-            $resHouse->setId($post['residential_house']);
+            $resHouse = $this->houseResidentialMapper->createModel($post['residential_house']);
         }
         else {
             $resHouse = null;

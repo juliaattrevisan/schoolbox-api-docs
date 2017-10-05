@@ -69,10 +69,10 @@ class User implements JsonSerializable, ISoftDeletable
     /** @var string */
     private $year;
 
-    /** @var House */
+    /** @var null|House */
     private $schoolHouse;
 
-    /** @var HouseResidential */
+    /** @var null|HouseResidential */
     private $residentialHouse;
 
     /** @var Collection|self[] */
@@ -672,7 +672,7 @@ class User implements JsonSerializable, ISoftDeletable
 
 
     /**
-     * @param House $schoolHouse
+     * @param null|House $schoolHouse
      * @return self
      */
     public function setSchoolHouse($schoolHouse)
@@ -683,7 +683,7 @@ class User implements JsonSerializable, ISoftDeletable
 
 
     /**
-     * @return House
+     * @return null|House
      */
     public function getSchoolHouse()
     {
