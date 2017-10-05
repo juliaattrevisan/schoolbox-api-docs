@@ -326,7 +326,7 @@
                                 {% if config.email_all_staff %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff">Email All Staff</a>
-                                        <form id="email-all-form" action="/mail/createMail.php">
+                                        <form id="email-all-form" action="/mail/createMail.php" class="hide">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
                                             <input name="replyto" value="{{ session.user.email() }}" type="hidden">
                                         </form>
